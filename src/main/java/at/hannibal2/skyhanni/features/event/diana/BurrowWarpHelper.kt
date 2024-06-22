@@ -23,6 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 object BurrowWarpHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
+
     var currentWarp: WarpPoint? = null
 
     private var lastWarpTime = SimpleTimeMark.farPast()

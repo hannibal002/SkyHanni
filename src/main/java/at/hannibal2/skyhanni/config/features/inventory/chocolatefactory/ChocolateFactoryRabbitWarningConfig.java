@@ -17,14 +17,14 @@ public class ChocolateFactoryRabbitWarningConfig {
     public boolean rabbitWarning = true;
 
     @Expose
-    @ConfigOption(name = "Special Rabbit Warning", desc = "Warn when a special rabbit that needs to be clicked appears. (Rabbit The Fish and Golden Rabbits.")
+    @ConfigOption(name = "Special Rabbit Warning", desc = "Warn when a special rabbit that needs to be clicked appears. (Rabbit The Fish and Golden Rabbits)")
     @ConfigEditorBoolean
     public boolean specialRabbitWarning = true;
 
     @Expose
-    @ConfigOption(name = "Warning Sound", desc = "The sound that play for a special rabbit.\n" +
-        "§eYou can use custom sounds, put it in the skyhanni/sounds folder in your resource pack.\n" +
-        "§eThen write skyhanni:yourfilename\n" +
+    @ConfigOption(name = "Warning Sound", desc = "The sound that plays for a special rabbit.\n" +
+        "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
+        "§eThen write §bskyhanni:yourfilename\n" +
         "§cMust be a .ogg file")
     @ConfigEditorText
     public Property<String> specialRabbitSound = Property.of("note.pling");

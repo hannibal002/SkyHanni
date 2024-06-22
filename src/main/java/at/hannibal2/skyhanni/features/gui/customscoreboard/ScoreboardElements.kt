@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig.Ar
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig.PowderDisplay
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getMaxPlayersForCurrentServer
-import at.hannibal2.skyhanni.data.HypixelData.Companion.getPlayersOnCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getMaxPlayersForCurrentServer
+import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.data.MiningAPI.getCold
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -39,7 +39,9 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -56,14 +58,14 @@ import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import java.util.function.Supplier
 import kotlin.time.Duration.Companion.seconds
 
-internal var confirmedUnknownLines = mutableListOf<String>()
+internal var confirmedUnknownLines = listOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(2.seconds) { onRemoval(it) }
+internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
-    if (!unconfirmedUnknownLines.contains(line)) return
+    if (line !in unconfirmedUnknownLines) return
     unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
-    confirmedUnknownLines.add(line)
+    confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
     if (!config.unknownLinesWarning) return
     val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
     val message = "CustomScoreboard detected $pluralize"
@@ -71,7 +73,7 @@ private fun onRemoval(line: String) {
         CustomScoreboardUtils.UndetectedScoreboardLines(message),
         message,
         "Unknown Lines" to confirmedUnknownLines,
-        "Island" to HypixelData.skyBlockIsland,
+        "Island" to LorenzUtils.skyBlockIsland,
         "Area" to HypixelData.skyBlockArea,
         "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
         noStackTrace = true,
@@ -474,7 +476,7 @@ private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
     && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
-    val cold = -getCold()
+    val cold = -MiningAPI.cold
 
     return listOf(
         when {
@@ -510,7 +512,7 @@ private fun getChunkedStatsDisplayPair(): List<ScoreboardElementType> =
 private fun getEmptyLineDisplayPair() = listOf("<empty>" to HorizontalAlignment.LEFT)
 
 private fun getIslandDisplayPair() =
-    listOf("§7㋖ §a" + HypixelData.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
+    listOf("§7㋖ §a" + LorenzUtils.skyBlockIsland.displayName to HorizontalAlignment.LEFT)
 
 private fun getLocationDisplayPair() = buildList {
     HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }

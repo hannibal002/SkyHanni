@@ -56,12 +56,13 @@ public class ChocolateFactoryConfig {
     ));
 
     @Expose
-    @ConfigOption(name = "Show Stack Sizes", desc = "Shows additional info as many items in the chocolate menu as the stack size.")
+    @ConfigOption(name = "Show Stack Sizes", desc = "Show additional info as many items in the chocolate menu as the stack size.")
     @ConfigEditorBoolean
     public boolean showStackSizes = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford. The upgrade with a star is the most optimal and the lightest colour of green is the most optimal you can afford.")
+    @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford.\n" +
+        "The upgrade with a star is the most optimal and the lightest colour of green is the most optimal you can afford.")
     @ConfigEditorBoolean
     public boolean highlightUpgrades = true;
 
@@ -87,7 +88,7 @@ public class ChocolateFactoryConfig {
     public boolean rabbitCrushOnlyDuringHoppity = false;
 
     @Expose
-    @ConfigOption(name = "Extra Tooltip Stats", desc = "Shows extra information about upgrades in the tooltip.")
+    @ConfigOption(name = "Extra Tooltip Stats", desc = "Show extra information about upgrades in the tooltip.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean extraTooltipStats = true;
@@ -105,14 +106,14 @@ public class ChocolateFactoryConfig {
     public boolean showStrayTime = false;
 
     @Expose
-    @ConfigOption(name = "Time Tower Usage Warning", desc = "Notification when you have a new time tower usage available and " +
+    @ConfigOption(name = "Time Tower Usage Warning", desc = "Notify when you have a new time tower usage available and " +
         "continuously warn when your time tower is full.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeTowerWarning = false;
 
     @Expose
-    @ConfigOption(name = "Time Tower Reminder", desc = "Notification a minute before the time tower ends.")
+    @ConfigOption(name = "Time Tower Reminder", desc = "Notify a minute before the time tower ends.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeTowerReminder = true;
@@ -133,12 +134,12 @@ public class ChocolateFactoryConfig {
     public boolean compactOnClick = true;
 
     @Expose
-    @ConfigOption(name = "Always Compact", desc = "Always Compact the item tooltip on the chocolate. Requires the above option to be enabled.")
+    @ConfigOption(name = "Always Compact", desc = "Always compact the item tooltip on the chocolate. Requires the above option to be enabled.")
     @ConfigEditorBoolean
     public boolean compactOnClickAlways = false;
 
     @Expose
-    @ConfigOption(name = "Tooltip Move", desc = "Move Tooltip away from the item you hover over while inside the Chocolate Factory.")
+    @ConfigOption(name = "Tooltip Move", desc = "Move tooltip away from the item you hover over while inside the Chocolate Factory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tooltipMove = false;
@@ -148,7 +149,7 @@ public class ChocolateFactoryConfig {
     public Position tooltipMovePosition = new Position(-380, 150, false, true);
 
     @Expose
-    @ConfigOption(name = "Hoppity Collection Stats", desc = "Shows info about your hoppity rabbit collection.")
+    @ConfigOption(name = "Hoppity Collection Stats", desc = "Show info about your Hoppity rabbit collection.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityCollectionStats = true;
@@ -159,15 +160,15 @@ public class ChocolateFactoryConfig {
 
     @Expose
     @ConfigOption(name = "Leaderboard Change",
-        desc = "Show the change of your chocolate leaderboard over time in chat. " +
-            "This updates every time you first open the /cf menu on a new server."
+        desc = "Show the change of your chocolate leaderboard over time in chat.\n" +
+            "This updates every time you first open the §e/cf §7menu on a new server."
     )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean leaderboardChange = false;
 
     @Expose
-    @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs /chocolatefactory on click.")
+    @ConfigOption(name = "Hoppity Menu Shortcut", desc = "Add a Chocolate Factory button in the SkyBlock Menu that runs §e/chocolatefactory §7on click.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityMenuShortcut = true;
@@ -181,19 +182,19 @@ public class ChocolateFactoryConfig {
     public boolean highlightRabbitsWithRequirement = false;
 
     @Expose
-    @ConfigOption(
-        name = "Show Missing Location Rabbits",
-        desc = "Shows which in which locations you have not yet found enough egg locations to unlock the rabbit for that location."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showLocationRequirementsRabbitsInHoppityStats = false;
-
-    @Expose
     @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean onlyHighlightRequirementNotMet = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Show Missing Location Rabbits",
+        desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLocationRequirementsRabbitsInHoppityStats = false;
 
     @Expose
     @ConfigOption(name = "Rabbit Warning", desc = "")
@@ -215,4 +216,9 @@ public class ChocolateFactoryConfig {
     @Accordion
     public ChocolateFactoryCustomReminderConfig customReminder = new ChocolateFactoryCustomReminderConfig();
 
+    @Expose
+    @ConfigOption(name = "Mythic Rabbit", desc = "Blocks running /cf without a §d§lMythic Rabbit Pet §7equipped.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean mythicRabbitRequirement = false;
 }

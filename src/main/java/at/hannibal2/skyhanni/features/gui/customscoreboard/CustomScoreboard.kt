@@ -263,12 +263,6 @@ object CustomScoreboard {
 
             newArray
         }
-        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
-            array.add(JsonPrimitive(ScoreboardEvents.CARNIVAL.name))
-            array
-        }
 
         event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
             JsonPrimitive(
@@ -287,6 +281,17 @@ object CustomScoreboard {
                     VerticalAlignment.DONT_ALIGN.name
                 },
             )
+        }
+        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
+            array.add(JsonPrimitive(ScoreboardEvents.CARNIVAL.name))
+            array
+        }
+        event.transform(51, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvents.NEW_YEAR.name))
+            array
         }
     }
 }
