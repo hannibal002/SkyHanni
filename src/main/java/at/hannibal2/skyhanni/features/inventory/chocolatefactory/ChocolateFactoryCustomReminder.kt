@@ -148,7 +148,8 @@ object ChocolateFactoryCustomReminder {
             "You can now purchase §f$targetName §ein Chocolate factory!",
             onClick = {
                 HypixelCommands.chocolateFactory()
-            }, "§eClick to run /cf!"
+            },
+            "§eClick to run /cf!",
         )
     }
 

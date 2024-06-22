@@ -94,7 +94,7 @@ object ChocolateFactoryBarnManager {
             ChatUtils.clickableChat(
                 "Open your chocolate factory to see your barn's capacity status!",
                 onClick = { HypixelCommands.chocolateFactory() },
-                "§eClick to run /cf!"
+                "§eClick to run /cf!",
             )
             return
         }
@@ -105,7 +105,7 @@ object ChocolateFactoryBarnManager {
         ChatUtils.clickableChat(
             "§cYour barn is $fullLevel! §7(${barnStatus()}). §cUpgrade it so they don't get crushed",
             onClick = { HypixelCommands.chocolateFactory() },
-            "§eClick to run /cf!"
+            "§eClick to run /cf!",
         )
         SoundUtils.playBeepSound()
         lastBarnFullWarning = SimpleTimeMark.now()

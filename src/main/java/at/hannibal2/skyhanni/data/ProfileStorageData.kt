@@ -101,12 +101,12 @@ object ProfileStorageData {
                     onClick = {
                         HypixelCommands.widget()
                     },
-                    "§eClick to run /widget!"
+                    "§eClick to run /widget!",
                 )
             } else {
                 ChatUtils.chat(
                     "§cExtra Information from Tab list not found! " +
-                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
+                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info",
                 )
             }
         }

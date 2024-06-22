@@ -334,7 +334,7 @@ class RepoManager(private val configLocation: File) {
                     onClick = {
                         updateRepo()
                     },
-                    "§eClick to update the repo!"
+                    "§eClick to update the repo!",
                 )
             }
         }

@@ -223,7 +223,7 @@ object FarmingFortuneDisplay {
                 "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
                     "show the Farming Fortune stat, also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
-                "§eClick to run /widget!"
+                "§eClick to run /widget!",
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
@@ -233,7 +233,7 @@ object FarmingFortuneDisplay {
                 "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
                     "show latest Crop Fortune, also give the widget enough priority.",
                 onClick = { HypixelCommands.widget() },
-                "§eClick to run /widget!"
+                "§eClick to run /widget!",
             )
             lastCropFortuneMissingError = SimpleTimeMark.now()
         }

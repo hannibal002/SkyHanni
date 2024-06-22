@@ -42,11 +42,11 @@ object GetFromSackAPI {
     private val patternGroup = RepoPattern.group("gfs.chat")
     private val fromSacksChatPattern by patternGroup.pattern(
         "from",
-        "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory."
+        "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory.",
     )
     private val missingChatPattern by patternGroup.pattern(
         "missing",
-        "§cYou have no (?<item>.+) in your Sacks!"
+        "§cYou have no (?<item>.+) in your Sacks!",
     )
 
     fun getFromSack(item: NEUInternalName, amount: Int) = getFromSack(item.makePrimitiveStack(amount))
@@ -58,9 +58,9 @@ object GetFromSackAPI {
     fun getFromChatMessageSackItems(
         item: PrimitiveItemStack,
         text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!",
-        hover: String = "§eClick to get from sacks!"
+        hover: String = "§eClick to get from sacks!",
     ) = ChatUtils.clickableChat(
-        text, onClick = { getFromSack(item) }, hover
+        text, onClick = { getFromSack(item) }, hover,
     )
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
@@ -164,7 +164,7 @@ object GetFromSackAPI {
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
         "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
-        onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!"
+        onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!",
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
@@ -185,7 +185,7 @@ object GetFromSackAPI {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",
                     "Query failed",
-                    "itemName" to itemString
+                    "itemName" to itemString,
                 )
                 return CommandResult.INTERNAL_ERROR to null
             }
