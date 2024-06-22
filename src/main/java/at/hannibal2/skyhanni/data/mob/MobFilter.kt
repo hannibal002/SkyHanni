@@ -155,9 +155,9 @@ object MobFilter {
 
     private val displayNPCCompressedNamePattern by repoGroup.pattern("displaynpc.name", "[a-z0-9]{10}")
 
-    private fun displayNPCNameCheck(name: String) = name.startsWith('§')
-        || displayNPCCompressedNamePattern.matches(name)
-        || extraDisplayNPCByName.contains(name)
+    private fun displayNPCNameCheck(name: String) = name.startsWith('§') ||
+        displayNPCCompressedNamePattern.matches(name) ||
+        extraDisplayNPCByName.contains(name)
 
     private val listOfClickArmorStand = setOf(
         "§e§lCLICK",
@@ -179,13 +179,14 @@ object MobFilter {
 
     fun EntityPlayer.isRealPlayer() = uniqueID?.let { it.version() == 4 } ?: false
 
-    fun EntityLivingBase.isDisplayNPC() = (this is EntityPlayer && isNPC() && displayNPCNameCheck(this.name))
-        || (this is EntityVillager && this.maxHealth == 20.0f) // Villager NPCs in the Village
-        || (this is EntityWitch && this.entityId <= 500) // Alchemist NPC
-        || (this is EntityCow && this.entityId <= 500) // Shania NPC (in Rift and Outside)
-        || (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
+    fun EntityLivingBase.isDisplayNPC() =
+        (this is EntityPlayer && isNPC() && displayNPCNameCheck(this.name)) ||
+            (this is EntityVillager && this.maxHealth == 20.0f) || // Villager NPCs in the Village
+            (this is EntityWitch && this.entityId <= 500) || // Alchemist NPC
+            (this is EntityCow && this.entityId <= 500) || // Shania NPC (in Rift and Outside)
+            (this is EntitySnowman && this.entityId <= 500) // Sherry NPC (in Jerry Island)
 
-    internal fun createDisplayNPC(entity: EntityLivingBase): Boolean {
+    fun createDisplayNPC(entity: EntityLivingBase): Boolean {
         val clickArmorStand = MobUtils.getArmorStandByRangeAll(entity, 1.5).firstOrNull { armorStand ->
             listOfClickArmorStand.contains(armorStand.name)
         } ?: return false
@@ -201,8 +202,8 @@ object MobFilter {
         exceptions(baseEntity, nextEntity)?.let { return it }
 
         // Check if Late Stack
-        nextEntity?.let { nextEntity ->
-            MobData.entityToMob[nextEntity]?.apply { internalAddEntity(baseEntity) }?.also { return MobResult.illegal }
+        nextEntity?.let {
+            MobData.entityToMob[it]?.apply { internalAddEntity(baseEntity) }?.also { return MobResult.illegal }
         }
 
         // Stack up the mob
@@ -319,7 +320,8 @@ object MobFilter {
     ): MobResult? =
         if (DungeonAPI.inDungeon()) {
             when {
-                (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) && extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
+                (baseEntity is EntityEnderman || baseEntity is EntityGiantZombie) &&
+                    extraEntityList.lastOrNull()?.name == "§e﴾ §c§lLivid§r§r §a7M§c❤ §e﴿" -> MobResult.illegal // Livid Start Animation
                 else -> null
             }
         } else when (LorenzUtils.skyBlockIsland) {
@@ -366,7 +368,11 @@ object MobFilter {
         100 -> MobResult.found(
             MobFactories.basic(
                 baseEntity,
-                if (DungeonAPI.inDungeon()) "Dungeon Secret Bat" else if (IslandType.PRIVATE_ISLAND.isInIsland()) "Private Island Bat" else "Mega Bat",
+                when {
+                    DungeonAPI.inDungeon() -> "Dungeon Secret Bat"
+                    IslandType.PRIVATE_ISLAND.isInIsland() -> "Private Island Bat"
+                    else -> "Mega Bat"
+                },
             ),
         )
 
