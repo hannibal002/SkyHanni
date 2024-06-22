@@ -281,7 +281,7 @@ interface Renderable {
             override val width: Int
                 get() = renderable.width
             override val height: Int
-                get() = renderable.height
+                get() = renderable.height + 1
             override val horizontalAlign = renderable.horizontalAlign
             override val verticalAlign = renderable.verticalAlign
 

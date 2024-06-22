@@ -51,6 +51,7 @@ object GardenOptimalSpeed {
     private var optimalSpeed: Int? = null
     private var lastWarnTime = SimpleTimeMark.farPast()
     private var cropInHand: CropType? = null
+    private var lastCrop: CropType? = null
     private var display = listOf<Renderable>()
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
@@ -78,25 +79,25 @@ object GardenOptimalSpeed {
 
         display = if (config.compactRancherGui) {
             crops.groupBy({ it.second }, { it.first }).map { (speed, crops) ->
-                val color = if (cropInHand in crops) LorenzColor.GOLD else LorenzColor.WHITE
+                val color = if (lastCrop in crops) LorenzColor.GOLD else LorenzColor.WHITE
                 val renderable = Renderable.horizontalContainer(
                     listOf(
                         Renderable.horizontalContainer(crops.map { Renderable.itemStack(it.icon) }),
                         Renderable.string("${color.getChatColor()} - $speed"),
                     ),
-                    spacing = 3,
+                    spacing = 2,
                 )
                 Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
             }
         } else {
             crops.map { (crop, speed) ->
-                val color = if (cropInHand == crop) LorenzColor.GOLD else LorenzColor.WHITE
+                val color = if (lastCrop == crop) LorenzColor.GOLD else LorenzColor.WHITE
                 val renderable = Renderable.horizontalContainer(
                     listOf(
                         Renderable.itemStack(crop.icon),
                         Renderable.string("${color.getChatColor()}${crop.cropName} - $speed"),
                     ),
-                    spacing = 3,
+                    spacing = 2,
                 )
                 Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
             }
@@ -118,6 +119,7 @@ object GardenOptimalSpeed {
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
+        event.crop?.let { lastCrop = it }
         optimalSpeed = cropInHand?.getOptimalSpeed()
     }
 
