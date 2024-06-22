@@ -40,7 +40,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Winter
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
-enum class ScoreboardEvents(val event: Event) {
+enum class ScoreboardEvent(val event: Event) {
     VOTING(Voting),
     SERVER_CLOSE(ServerClose),
     DUNGEONS(Dungeons),
