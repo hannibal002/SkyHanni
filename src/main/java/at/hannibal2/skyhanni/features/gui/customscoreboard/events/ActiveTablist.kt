@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
 object ActiveTablist : ScoreboardEvent() {
+    // Some Active Events are better not shown from the tablist,
+    // but from other locations like the scoreboard
+    private val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
+
     override fun getDisplay(): List<Any> {
         val name = getTablistEvent() ?: return listOf()
-
-        // Some Active Events are better not shown from the tablist,
-        // but from other locations like the scoreboard
-        val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
         if (blockedEvents.contains(name.removeColor())) return listOf()
         val currentActiveEventTime = ScoreboardPattern.eventTimeEndsPattern.firstMatcher(TabWidget.EVENT.lines) {
             group("time")
