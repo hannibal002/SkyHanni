@@ -145,7 +145,7 @@ enum class ScoreboardElement(
     CHUNKED_STATS(
         ::getChunkedStatsDisplayPair,
         ::shouldShowChunkedStats,
-        "§652,763,737 §7| §d64,647 §7| §6249M §7| §b59,264 §7| §c23,495 §7| §a57,873 §7| §c♨ 0 §7| §b0❄ §7| §d756",
+        "§652,763,737 §7| §d64,647 §7| §6249M\n§b59,264 §7| §c23,495 §7| §a57,873\n§c♨ 0 §7| §b0❄ §7| §d756",
     ),
     EMPTY_LINE(
         ::getEmptyLineDisplayPair,
