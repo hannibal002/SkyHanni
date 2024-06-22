@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ActiveTablist
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Anniversary
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Broodmother
@@ -36,7 +35,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Winter
  * This enum contains all the lines that either are events or other lines that are so rare/not often seen that they
  * don't fit in the normal [ScoreboardElement] enum.
  *
- * We for example have the [VOTING] Event, while this is clearly not an event, I don't consider them as normal lines
+ * We for example have the [ScoreboardEvent.VOTING] Event, while this is clearly not an event, I don't consider them as normal lines
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
@@ -77,7 +76,7 @@ enum class ScoreboardEvent(val event: Event) {
     fun getLines(): List<ScoreboardElementType> = event.getDisplay().map { getElementFromAny(it) }
 
     companion object {
-        fun getEvent(): List<ScoreboardEvents> =
+        fun getEvent(): List<ScoreboardEvent> =
             eventsConfig.eventEntries.filter { it.event.showWhen() && it.getLines().isNotEmpty() }.let { events ->
                 events.takeIf { eventsConfig.showAllActiveEvents } ?: listOfNotNull(events.firstOrNull())
             }

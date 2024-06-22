@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent
 
 object Events : Element() {
-    override fun getDisplay() = ScoreboardEvents.getEvent().filterNotNull().flatMap { it.getLines() }
+    override fun getDisplay() = ScoreboardEvent.getEvent().flatMap { it.getLines() }
 
     override fun showWhen() = true
 
