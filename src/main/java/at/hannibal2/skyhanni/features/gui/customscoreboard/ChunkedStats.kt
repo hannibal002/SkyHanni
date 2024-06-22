@@ -14,12 +14,11 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
-import java.util.function.Supplier
 
 private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines
 
 enum class ChunkedStats(
-    private val displayPair: Supplier<String>,
+    private val displayPair: () -> String,
     val showWhen: () -> Boolean,
     private val configLine: String,
 ) {
@@ -74,7 +73,7 @@ enum class ChunkedStats(
 
     companion object {
         fun getChunkedStats() = chunkedConfig.chunkedStats.mapNotNull {
-            it.takeIf { it.showWhen() }?.displayPair?.get()
+            it.takeIf { it.showWhen() }?.displayPair?.invoke()
         }
 
         fun shouldShowChunkedStats() = chunkedConfig.chunkedStats.any { it.showWhen() }
