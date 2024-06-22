@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.LinkedList
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -81,7 +80,7 @@ object ChocolateFactoryAPI {
 
 
     var allBestPossibleUpgrades: Map<Int, MutableList<ChocolateFactoryUpgrade>> = mapOf()
-    var lastUpgradesWhenChecking: Map<Int,ChocolateFactoryUpgrade> = mapOf()
+    var lastUpgradesWhenChecking: Map<Int, ChocolateFactoryUpgrade> = mapOf()
     var lastBestNotAffordableUpgrade: ChocolateFactoryUpgrade? = null
     var totalUpgradeCost = 0L
 
