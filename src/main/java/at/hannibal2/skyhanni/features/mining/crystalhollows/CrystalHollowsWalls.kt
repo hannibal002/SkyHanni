@@ -21,7 +21,7 @@ object CrystalHollowsWalls {
 
     private val config get() = SkyHanniMod.feature.mining.crystalHollowsAreaWalls
 
-    private enum class Areas(val color: Color) {
+    private enum class Area(val color: Color) {
         MITHRIL(LorenzColor.GREEN.addOpacity(60)),
         PRECURSOR(LorenzColor.BLUE.addOpacity(60)),
         JUNGLE(LorenzColor.LIGHT_PURPLE.addOpacity(60)),
@@ -93,19 +93,19 @@ object CrystalHollowsWalls {
     }
 
     private fun drawGoblin(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(true, false, Areas.JUNGLE.color, Areas.PRECURSOR.color)
+        drawArea(true, false, Area.JUNGLE.color, Area.PRECURSOR.color)
     }
 
     private fun drawJungle(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(true, true, Areas.GOBLIN.color, Areas.MITHRIL.color)
+        drawArea(true, true, Area.GOBLIN.color, Area.MITHRIL.color)
     }
 
     private fun drawPrecursor(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(false, false, Areas.MITHRIL.color, Areas.GOBLIN.color)
+        drawArea(false, false, Area.MITHRIL.color, Area.GOBLIN.color)
     }
 
     private fun drawMithril(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
-        drawArea(false, true, Areas.PRECURSOR.color, Areas.JUNGLE.color)
+        drawArea(false, true, Area.PRECURSOR.color, Area.JUNGLE.color)
     }
 
     private fun drawHeat(event: LorenzRenderWorldEvent) = RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
@@ -114,13 +114,13 @@ object CrystalHollowsWalls {
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
             LorenzVec(nucleusBB.maxX, heatHeight, nucleusBB.minZ),
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.maxZ),
-            Areas.NUCLEUS.color
+            Area.NUCLEUS.color
         )
 
-        drawHeatAreaForHeat(false, false, Areas.PRECURSOR.color, heatHeight)
-        drawHeatAreaForHeat(false, true, Areas.MITHRIL.color, heatHeight)
-        drawHeatAreaForHeat(true, false, Areas.GOBLIN.color, heatHeight)
-        drawHeatAreaForHeat(true, true, Areas.JUNGLE.color, heatHeight)
+        drawHeatAreaForHeat(false, false, Area.PRECURSOR.color, heatHeight)
+        drawHeatAreaForHeat(false, true, Area.MITHRIL.color, heatHeight)
+        drawHeatAreaForHeat(true, false, Area.GOBLIN.color, heatHeight)
+        drawHeatAreaForHeat(true, true, Area.JUNGLE.color, heatHeight)
     }
 
     private fun drawNucleus(event: LorenzRenderWorldEvent) {
@@ -134,55 +134,55 @@ object CrystalHollowsWalls {
                 southEastCorner,
                 southWestCorner,
                 northEastCorner,
-                Areas.HEAT.color
+                Area.HEAT.color
             )
             draw(
                 southEastCorner,
                 southEastTopCorner,
                 LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.JUNGLE.color
+                Area.JUNGLE.color
             )
             draw(
                 southEastCorner,
                 southEastTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-                Areas.JUNGLE.color
+                Area.JUNGLE.color
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
                 LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.PRECURSOR.color
+                Area.PRECURSOR.color
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-                Areas.PRECURSOR.color
+                Area.PRECURSOR.color
             )
             draw(
                 southWestCorner,
                 southWestTopCorner,
                 LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.GOBLIN.color,
+                Area.GOBLIN.color,
             )
             draw(
                 southWestCorner,
                 southWestTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-                Areas.GOBLIN.color
+                Area.GOBLIN.color
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
                 LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
-                Areas.MITHRIL.color
+                Area.MITHRIL.color
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-                Areas.MITHRIL.color
+                Area.MITHRIL.color
             )
         }
     }
@@ -209,7 +209,7 @@ object CrystalHollowsWalls {
         val nucleusXSideBase = LorenzVec(nucleusX, heatHeight, middleZ)
 
         drawHeatArea(
-            Areas.HEAT.color,
+            Area.HEAT.color,
             heatHeight,
             nucleusX,
             middleX,
@@ -234,13 +234,13 @@ object CrystalHollowsWalls {
             nucleusXSideBase,
             nucleusBase,
             LorenzVec(nucleusX, MAX_HEIGHT, middleZ),
-            Areas.NUCLEUS.color,
+            Area.NUCLEUS.color,
         )
         draw(
             nucleusZSideBase,
             nucleusBase,
             LorenzVec(middleX, MAX_HEIGHT, nucleusZ),
-            Areas.NUCLEUS.color,
+            Area.NUCLEUS.color,
         )
     }
 

@@ -730,13 +730,13 @@ private fun getPowderDisplayPair() = buildList {
 
 private fun getPowderShowWhen() = inAdvancedMiningIsland()
 
-private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEvents.getEvent()
+private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEvent.getEvent()
     .filterNotNull()
     .flatMap { it.getLines().map { i -> i to HorizontalAlignment.LEFT } }
     .takeIf { it.isNotEmpty() } ?: listOf("<hidden>" to HorizontalAlignment.LEFT)
 
 
-private fun getEventsShowWhen() = ScoreboardEvents.getEvent().isNotEmpty()
+private fun getEventsShowWhen() = ScoreboardEvent.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair() = buildList {
     val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: "<hidden>"
