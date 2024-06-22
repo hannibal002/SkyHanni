@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsAvailable
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurse
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -17,7 +18,7 @@ object CustomLines {
         Triple("%z%", { Minecraft.getMinecraft().thePlayer.posZ.round(2) }, "Z-Coordinate"),
         Triple("%yaw%", { normalizeYaw(Minecraft.getMinecraft().thePlayer.rotationYaw).round(2) }, "Direction"),
         Triple("%pitch%", { Minecraft.getMinecraft().thePlayer.rotationPitch.round(2) }, "Pitch"),
-        Triple("%purse%", { getPurse() }, "Purse"),
+        Triple("%purse%", { PurseAPI.getPurse().formatNum() }, "Purse"),
         Triple("%bits%", { getBits() }, "Bits"),
         Triple("%bits_available%", { getBitsAvailable() }, "Bits Available"),
         Triple("%island%", { HypixelData.skyBlockIsland.displayName }, "Island"),

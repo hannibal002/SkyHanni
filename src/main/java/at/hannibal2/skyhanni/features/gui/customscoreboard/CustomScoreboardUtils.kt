@@ -49,10 +49,10 @@ object CustomScoreboardUtils {
 
     internal fun getBits() = BitsAPI.bits.coerceAtLeast(0).formatNum()
 
-    internal fun getBitsToClaim() = BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
+    internal fun getBitsAvailable() = BitsAPI.bitsAvailable.coerceAtLeast(0).formatNum()
 
     internal fun getBitsLine() = if (displayConfig.showUnclaimedBits) {
-        "§b${getBits()}§7/§b${getBitsToClaim()}"
+        "§b${getBits()}§7/§b${getBitsAvailable()}"
     } else {
         "§b${getBits()}"
     }
