@@ -215,8 +215,9 @@ object NEUItems {
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack): Boolean =
-        manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
+
+    fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
 
     const val itemFontSize = 2.0 / 3.0
 

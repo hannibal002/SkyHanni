@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
+import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -37,7 +37,7 @@ object MiningAPI {
     private val group = RepoPattern.group("data.miningapi")
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
-    private val coldReset by group.pattern(
+    val coldReset by group.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7.",
     )
@@ -129,11 +129,13 @@ object MiningAPI {
             updateCold(0)
             lastColdReset = SimpleTimeMark.now()
         }
-        coldResetDeath.matchMatcher(event.message) {
-            if (group("name") == LorenzUtils.getPlayerName()) {
-                updateCold(0)
-                lastColdReset = SimpleTimeMark.now()
-            }
+    }
+
+    @SubscribeEvent
+    fun onPlayerDeath(event: PlayerDeathEvent) {
+        if (event.name == LorenzUtils.getPlayerName()) {
+            updateCold(0)
+            lastColdReset = SimpleTimeMark.now()
         }
     }
 
