@@ -5,10 +5,13 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 object Queue : ScoreboardEvent() {
-    override fun getDisplay() = listOf(
+
+    private val patterns = listOf(
         ScoreboardPattern.queuePattern,
         ScoreboardPattern.queuePositionPattern,
-    ).allMatches(getSbLines())
+    )
+
+    override fun getDisplay() = patterns.allMatches(getSbLines())
 
     override val configLine = "Queued: Glacite Mineshafts\nPosition: §b#45 §fSince: §a00:00"
 }

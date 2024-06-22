@@ -6,14 +6,17 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 object Winter : ScoreboardEvent() {
-    override fun getDisplay() = listOf(
+
+    private val patterns = listOf(
         ScoreboardPattern.winterEventStartPattern,
         ScoreboardPattern.winterNextWavePattern,
         ScoreboardPattern.winterWavePattern,
         ScoreboardPattern.winterMagmaLeftPattern,
         ScoreboardPattern.winterTotalDmgPattern,
         ScoreboardPattern.winterCubeDmgPattern,
-    ).allMatches(getSbLines()).filter { !it.endsWith("Soon!") }
+    )
+
+    override fun getDisplay() = patterns.allMatches(getSbLines()).filter { !it.endsWith("Soon!") }
 
     override val configLine = "§7(All Winter Event Lines)"
 

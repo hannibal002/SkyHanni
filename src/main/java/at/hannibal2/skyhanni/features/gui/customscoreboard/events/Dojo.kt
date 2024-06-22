@@ -8,12 +8,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 object Dojo : ScoreboardEvent() {
-    override fun getDisplay() = listOf(
+
+    private val patterns = listOf(
         ScoreboardPattern.dojoChallengePattern,
         ScoreboardPattern.dojoDifficultyPattern,
         ScoreboardPattern.dojoPointsPattern,
         ScoreboardPattern.dojoTimePattern,
-    ).allMatches(getSbLines())
+    )
+
+    override fun getDisplay() = patterns.allMatches(getSbLines())
 
     override fun showWhen() = LorenzUtils.skyBlockArea == "Dojo"
 
