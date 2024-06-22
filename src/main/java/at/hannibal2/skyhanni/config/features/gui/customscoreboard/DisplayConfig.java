@@ -53,14 +53,14 @@ public class DisplayConfig {
 
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.\n" +
-            "§cMods that add their own scoreboard will not be affected by this setting!")
+        "§cMods that add their own scoreboard will not be affected by this setting!")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideVanillaScoreboard = Property.of(true);
 
     @Expose
     @ConfigOption(name = "Display Numbers First", desc = "Whether the number or line name displays first.\n" +
-            "§eNote: Will not update the preview above!")
+        "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = false;
 
@@ -92,7 +92,8 @@ public class DisplayConfig {
     public enum PowderDisplay {
         AVAILABLE("Available"),
         TOTAL("Total"),
-        BOTH("Available / All");
+        BOTH("Available / All"),
+        ;
 
         private final String str;
 

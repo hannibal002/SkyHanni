@@ -13,7 +13,7 @@ public class ChunkedStatsConfig {
 
     @Expose
     @ConfigOption(
-        name = "ChunkedStats",
+        name = "Chunked Stats",
         desc = "Select the stats you want to display chunked on the scoreboard."
     )
     @ConfigEditorDraggableList

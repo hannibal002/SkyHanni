@@ -198,12 +198,11 @@ object SkyHanniDebugsAndTests {
 
     fun resetConfigCommand() {
         ChatUtils.clickableChat(
-            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-            onClick = {
-                resetConfig()
-            },
+            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
+            onClick = { resetConfig() },
+            "§eClick to confirm.",
             prefix = false,
-            oneTimeClick = true,
+            oneTimeClick = true
         )
     }
 
