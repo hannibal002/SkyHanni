@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.data.MiningAPI.getCold
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
@@ -59,8 +59,8 @@ enum class ChunkedStats(
         configLine = "§cHeat",
     ),
     COLD(
-        displayPair = { "§b${getCold()}❄" },
-        showWhen = { !(hideEmptyLines && getCold() == 0) && ScoreboardElement.COLD.showWhen() },
+        displayPair = { "§b${MiningAPI.cold}❄" },
+        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardElement.COLD.showWhen() },
         configLine = "§bCold",
     ),
     NORTH_STARS(
