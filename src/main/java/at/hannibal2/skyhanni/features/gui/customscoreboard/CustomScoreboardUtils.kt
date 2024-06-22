@@ -73,15 +73,25 @@ object CustomScoreboardUtils {
 
     internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { group("event") }
 
-    internal fun getElementFromAny(element: Any): ScoreboardElementType = when (element) {
-        is String -> element to HorizontalAlignment.LEFT
-        is Pair<*, *> -> element.first as String to element.second as HorizontalAlignment
-        else -> HIDDEN to HorizontalAlignment.LEFT
+    internal fun getElementsFromAny(element: Any?): List<ScoreboardElementType> = when (element) {
+        null -> listOf()
+        is List<*> -> element.mapNotNull { it?.toScoreboardElement() }
+        else -> listOfNotNull(element.toScoreboardElement())
+    }
+
+    private fun Any.toScoreboardElement(): ScoreboardElementType? = when (this) {
+        is String -> this to HorizontalAlignment.LEFT
+        is Pair<*, *> -> this.toElement()
+        else -> null
+    }
+
+    private fun Pair<Any?, Any?>.toElement(): ScoreboardElementType? {
+        val first = first as? String ?: return null
+        val second = second as? HorizontalAlignment ?: HorizontalAlignment.LEFT
+        return first to second
     }
 
     internal fun getSbLines(): List<String> {
         return ScoreboardData.sidebarLinesFormatted
     }
-
-    class UndetectedScoreboardLines(message: String) : Exception(message)
 }

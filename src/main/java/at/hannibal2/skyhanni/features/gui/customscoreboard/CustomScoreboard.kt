@@ -240,6 +240,7 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateIslandEntries()
+        // FIXME: Scoreboard bugs out on island switch
     }
 
     private fun updateIslandEntries() {

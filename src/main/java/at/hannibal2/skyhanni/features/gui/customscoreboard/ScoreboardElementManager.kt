@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Bank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Bits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ChunkedStats
@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Time
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Tuning
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Visiting
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 
 enum class ScoreboardElementManager(val element: ScoreboardElement) {
     TITLE(Title),
@@ -85,9 +84,9 @@ enum class ScoreboardElementManager(val element: ScoreboardElement) {
 
     override fun toString() = element.configLine
 
-    fun getVisiblePair() = if (isVisible()) getPair() else listOf(HIDDEN to HorizontalAlignment.LEFT)
+    fun getVisiblePair() = if (isVisible()) getPair() else listOf()
 
-    private fun getPair(): List<ScoreboardElementType> = element.getDisplay().map { getElementFromAny(it) }
+    private fun getPair(): List<ScoreboardElementType> = getElementsFromAny(element.getDisplay())
 
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true

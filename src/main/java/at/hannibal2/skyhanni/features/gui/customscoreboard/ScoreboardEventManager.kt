@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.currentIslandEvents
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ActiveTablist
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Anniversary
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Broodmother
@@ -74,7 +74,7 @@ enum class ScoreboardEventManager(val event: ScoreboardEvent) {
 
     override fun toString() = event.configLine
 
-    fun getLines(): List<ScoreboardElementType> = event.getDisplay().map { getElementFromAny(it) }
+    fun getLines(): List<ScoreboardElementType> = getElementsFromAny(event.getDisplay())
 
     companion object {
         fun getEvent(): List<ScoreboardEventManager> =

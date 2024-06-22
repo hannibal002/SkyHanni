@@ -25,7 +25,6 @@ internal var unconfirmedUnknownLines = listOf<String>()
 internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
 internal var amountOfUnknownLines = 0
 
-
 private fun onRemoval(line: String) {
     if (!LorenzUtils.inSkyBlock) return
     if (!unconfirmedUnknownLines.contains(line)) return
@@ -36,7 +35,7 @@ private fun onRemoval(line: String) {
     val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
     val message = "CustomScoreboard detected $pluralize"
     ErrorManager.logErrorWithData(
-        CustomScoreboardUtils.UndetectedScoreboardLines(message),
+        UndetectedScoreboardLines(message),
         message,
         "Unknown Lines" to confirmedUnknownLines,
         "Island" to LorenzUtils.skyBlockIsland,
@@ -46,6 +45,8 @@ private fun onRemoval(line: String) {
         betaOnly = true,
     )
 }
+
+private class UndetectedScoreboardLines(message: String) : Exception(message)
 
 object UnknownLinesHandler {
 
