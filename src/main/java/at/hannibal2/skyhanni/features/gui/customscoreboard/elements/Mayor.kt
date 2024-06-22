@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.mayorConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 object Mayor : ScoreboardElement() {
@@ -34,7 +33,9 @@ object Mayor : ScoreboardElement() {
         add(extraMayorName + extraTimeTillNextMayor)
     }
 
-    override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT) && MayorAPI.currentMayor != null
+    override fun showWhen() = MayorAPI.currentMayor != null
 
     override val configLine = "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
+
+    override fun showIsland() = !RiftAPI.inRift()
 }

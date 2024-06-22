@@ -137,7 +137,7 @@ object MaxwellAPI {
         chatPowerUnlockedPattern.tryReadPower(message)
         tuningAutoAssignedPattern.matchMatcher(event.message) {
             if (tunings.isNullOrEmpty()) return
-            val tuningsInScoreboard = ScoreboardElementManager.TUNING in CustomScoreboard.config.scoreboardEntries
+            val tuningsInScoreboard = ScoreboardElementManager.TUNING in CustomScoreboard.config.scoreboardEntries.get()
             if (tuningsInScoreboard) {
                 ChatUtils.chat(
                     "Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.",

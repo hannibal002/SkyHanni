@@ -15,7 +15,7 @@ object Winter : ScoreboardEvent() {
         ScoreboardPattern.winterCubeDmgPattern,
     ).allMatches(getSbLines()).filter { !it.endsWith("Soon!") }
 
-    override fun showWhen() = WinterAPI.inWorkshop()
-
     override val configLine = "§7(All Winter Event Lines)"
+
+    override fun showIsland() = WinterAPI.inWorkshop()
 }

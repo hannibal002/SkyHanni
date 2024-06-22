@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.currentIslandEvents
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ActiveTablist
@@ -77,7 +78,7 @@ enum class ScoreboardEventManager(val event: ScoreboardEvent) {
 
     companion object {
         fun getEvent(): List<ScoreboardEventManager> =
-            eventsConfig.eventEntries.filter { it.event.showWhen() && it.getLines().isNotEmpty() }.let { events ->
+            currentIslandEvents.filter { it.event.showWhen() && it.getLines().isNotEmpty() }.let { events ->
                 events.takeIf { eventsConfig.showAllActiveEvents } ?: listOfNotNull(events.firstOrNull())
             }
 

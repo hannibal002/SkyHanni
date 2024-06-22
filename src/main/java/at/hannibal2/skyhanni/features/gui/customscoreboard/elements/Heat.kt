@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
 object Heat : ScoreboardElement() {
@@ -23,8 +22,9 @@ object Heat : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
-        ScoreboardPattern.heatPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
+    override fun showWhen() = ScoreboardPattern.heatPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
     override val configLine = "Heat: §c♨ 14"
+
+    override fun showIsland() = MiningAPI.inCrystalHollows()
 }

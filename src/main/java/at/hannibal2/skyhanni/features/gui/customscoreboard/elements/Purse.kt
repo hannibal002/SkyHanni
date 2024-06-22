@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurseEarned
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 
 object Purse : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
@@ -26,7 +25,7 @@ object Purse : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT)
-
     override val configLine = "Purse: §652,763,737"
+
+    override fun showIsland() = !RiftAPI.inRift()
 }

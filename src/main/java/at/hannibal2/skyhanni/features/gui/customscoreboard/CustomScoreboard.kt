@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -57,8 +58,13 @@ internal const val EMPTY = "<empty>"
 @SkyHanniModule
 object CustomScoreboard {
 
-    private var display = emptyList<ScoreboardElementType>()
-    private var cache = emptyList<ScoreboardElementType>()
+    private var display = listOf<ScoreboardElementType>()
+    private var cache = listOf<ScoreboardElementType>()
+
+    private var currentIslandEntries = listOf<ScoreboardElementManager>()
+    var currentIslandEvents = listOf<ScoreboardEventManager>()
+        private set
+
     private const val GUI_NAME = "Custom Scoreboard"
 
     @SubscribeEvent
@@ -156,7 +162,7 @@ object CustomScoreboard {
     }
 
     private fun MutableList<ScoreboardElementType>.addCustomSkyBlockLines() {
-        for (element in config.scoreboardEntries) {
+        for (element in currentIslandEntries) {
             val lines = element.getVisiblePair()
             if (lines.isEmpty()) continue
 
@@ -216,6 +222,12 @@ object CustomScoreboard {
         ) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
+        ConditionalUtils.onToggle(
+            config.scoreboardEntries,
+            eventsConfig.eventEntries,
+        ) {
+            updateIslandEntries()
+        }
     }
 
     @SubscribeEvent
@@ -223,6 +235,16 @@ object CustomScoreboard {
         runDelayed(2.seconds) {
             if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) dirty = true
         }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        updateIslandEntries()
+    }
+
+    private fun updateIslandEntries() {
+        currentIslandEntries = config.scoreboardEntries.get().filter { it.element.showIsland() }
+        currentIslandEvents = eventsConfig.eventEntries.get().filter { it.event.showIsland() }
     }
 
     @SubscribeEvent

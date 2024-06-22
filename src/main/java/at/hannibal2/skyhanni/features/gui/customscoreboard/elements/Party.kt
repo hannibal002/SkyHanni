@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.MiningAPI.inGlaciteArea
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
@@ -21,15 +21,10 @@ object Party : ScoreboardElement() {
             listOf(title, *partyList)
         }
 
-    override fun showWhen() = if (DungeonAPI.inDungeon()) {
-        false // Hidden bc the scoreboard lines already exist
-    } else {
-        if (partyConfig.showPartyEverywhere) {
-            true
-        } else {
-            inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || inGlaciteArea()
-        }
-    }
+    override fun showWhen() = if (partyConfig.showPartyEverywhere) true
+    else inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || MiningAPI.inColdIsland()
 
     override val configLine = "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fSkirtwearer"
+
+    override fun showIsland() = !DungeonAPI.inDungeon()
 }

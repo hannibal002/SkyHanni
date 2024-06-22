@@ -20,7 +20,7 @@ object NorthStars : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = WinterAPI.inWorkshop()
-
     override val configLine = "North Stars: §d756"
+
+    override fun showIsland() = WinterAPI.inWorkshop()
 }

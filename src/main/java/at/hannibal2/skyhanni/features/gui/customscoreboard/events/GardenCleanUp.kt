@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 object GardenCleanUp : ScoreboardEvent() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.cleanUpPattern.firstMatches(getSbLines())?.trim())
 
-    override fun showWhen() = GardenAPI.inGarden()
-
     override val configLine = "Cleanup: §c12.6%"
+
+    override fun showIsland() = GardenAPI.inGarden()
 }

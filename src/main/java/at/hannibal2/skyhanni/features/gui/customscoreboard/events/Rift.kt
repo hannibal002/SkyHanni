@@ -17,7 +17,7 @@ object Rift : ScoreboardEvent() {
         ScoreboardPattern.cluesPattern,
     ).allMatches(getSbLines())
 
-    override fun showWhen() = RiftAPI.inRift()
-
     override val configLine = "§7(All Rift Lines)"
+
+    override fun showIsland() = RiftAPI.inRift()
 }

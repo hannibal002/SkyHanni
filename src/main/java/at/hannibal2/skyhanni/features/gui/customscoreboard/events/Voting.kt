@@ -23,7 +23,7 @@ object Voting : ScoreboardEvent() {
         }
     }
 
-    override fun showWhen() = IslandType.HUB.isInIsland()
-
     override val configLine = "§7(All Voting Lines)"
+
+    override fun showIsland() = IslandType.HUB.isInIsland()
 }

@@ -1,10 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxwellConfig
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 
 object Tuning : ScoreboardElement() {
@@ -46,7 +45,7 @@ object Tuning : ScoreboardElement() {
         }
     }
 
-    override fun showWhen() = !inAnyIsland(IslandType.THE_RIFT)
-
     override val configLine = "Tuning: §c❁34§7, §e⚔20§7, and §9☣7"
+
+    override fun showIsland() = !RiftAPI.inRift()
 }

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 object JacobMedals : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.medalsPattern.allMatches(getSbLines())
 
-    override fun showWhen() = inAnyIsland(IslandType.GARDEN, IslandType.HUB)
-
     override val configLine = "§6§lGOLD §fmedals: §613\n§f§lSILVER §fmedals: §f3\n§c§lBRONZE §fmedals: §c4"
+
+    override fun showIsland() = inAnyIsland(IslandType.GARDEN, IslandType.HUB)
 }
