@@ -311,36 +311,20 @@ object HypixelData {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
-            // Modified from NEU.
-            // NEU does not send locraw when not in SkyBlock.
-            // So, as requested by Hannibal, use locraw from
-            // NEU and have NEU send it.
-            // Remove this when NEU dependency is removed
-            if (LorenzUtils.onHypixel &&
-                locrawData == null &&
-                lastLocRaw.passedSince() > 15.seconds
-            ) {
-                lastLocRaw = SimpleTimeMark.now()
-                thread(start = true) {
-                    Thread.sleep(1000)
-                    NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
-                }
-            }
+            checkNEULocraw()
         }
 
-        if (LorenzUtils.onHypixel) {
-            if (LorenzUtils.inSkyBlock) {
-                loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                    skyblockAreaPattern.matchMatcher(line) {
-                        val originalLocation = group("area")
-                        skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
-                        skyBlockAreaWithSymbol = line.trim()
-                        break@loop
-                    }
+        if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
+            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
+                skyblockAreaPattern.matchMatcher(line) {
+                    val originalLocation = group("area")
+                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    skyBlockAreaWithSymbol = line.trim()
+                    break@loop
                 }
-
-                checkProfileName()
             }
+
+            checkProfileName()
         }
 
         if (!LorenzUtils.onHypixel) {
@@ -362,6 +346,21 @@ object HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+    }
+
+    // Modified from NEU.
+    // NEU does not send locraw when not in SkyBlock.
+    // So, as requested by Hannibal, use locraw from
+    // NEU and have NEU send it.
+    // Remove this when NEU dependency is removed
+    private fun checkNEULocraw() {
+        if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
+            lastLocRaw = SimpleTimeMark.now()
+            thread(start = true) {
+                Thread.sleep(1000)
+                NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
+            }
+        }
     }
 
     @SubscribeEvent
