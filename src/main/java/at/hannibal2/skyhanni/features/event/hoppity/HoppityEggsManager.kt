@@ -185,6 +185,7 @@ object HoppityEggsManager {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
                     onClick = onClick,
+                    "§eClick to share!",
                     expireAt = 30.seconds.fromNow(),
                     oneTimeClick = true
                 )
