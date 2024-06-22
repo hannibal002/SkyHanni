@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
-object MagmaBoss : Event() {
+object MagmaBoss : ScoreboardEvent() {
     override fun getDisplay() = listOf(
         ScoreboardPattern.magmaBossPattern,
         ScoreboardPattern.damageSoakedPattern,

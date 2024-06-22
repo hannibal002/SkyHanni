@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
-object Dungeons : Event() {
+object Dungeons : ScoreboardEvent() {
     override fun getDisplay() = listOf(
         ScoreboardPattern.m7dragonsPattern,
         ScoreboardPattern.autoClosingPattern,

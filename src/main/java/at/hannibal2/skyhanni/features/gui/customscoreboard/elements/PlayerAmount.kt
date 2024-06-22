@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.HypixelData.getMaxPlayersForCurrentServer
 import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 
-object PlayerAmount : Element() {
+object PlayerAmount : ScoreboardElement() {
     override fun getDisplay(): List<Any> = buildList {
         val max = if (displayConfig.showMaxIslandPlayers) {
             "§7/§a${getMaxPlayersForCurrentServer()}"

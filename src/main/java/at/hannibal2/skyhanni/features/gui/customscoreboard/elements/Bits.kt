@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
-object Bits : Element() {
+object Bits : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val bits = formatNumber(BitsAPI.bits.coerceAtLeast(0))
         val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {

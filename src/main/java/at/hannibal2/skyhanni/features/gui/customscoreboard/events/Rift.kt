@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
-object Rift : Event() {
+object Rift : ScoreboardEvent() {
     override fun getDisplay() = listOf(
         RiftBloodEffigies.heartsPattern,
         ScoreboardPattern.riftHotdogTitlePattern,

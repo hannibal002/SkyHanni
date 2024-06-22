@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 
-object NorthStars : Element() {
+object NorthStars : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val northStars = formatStringNum(getNorthStars())
 

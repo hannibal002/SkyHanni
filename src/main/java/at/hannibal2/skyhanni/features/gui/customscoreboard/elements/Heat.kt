@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
-object Heat : Element() {
+object Heat : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val heat = getHeat()
 

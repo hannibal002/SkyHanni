@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 
-object Quiver : Element() {
+object Quiver : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         if (QuiverAPI.currentArrow == null)
             return listOf("§cChange your Arrow once")

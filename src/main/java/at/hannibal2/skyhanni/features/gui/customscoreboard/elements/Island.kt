@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.utils.LorenzUtils
 
-object Island : Element() {
+object Island : ScoreboardElement() {
     override fun getDisplay() = listOf("§7㋖ §a" + LorenzUtils.skyBlockIsland.displayName)
 
     override fun showWhen() = true

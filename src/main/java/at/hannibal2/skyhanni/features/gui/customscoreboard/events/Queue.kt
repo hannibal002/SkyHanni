@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
-object Queue : Event() {
+object Queue : ScoreboardEvent() {
     override fun getDisplay() = listOf(
         ScoreboardPattern.queuePattern,
         ScoreboardPattern.queuePositionPattern,

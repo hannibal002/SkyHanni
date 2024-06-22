@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object Trapper : Event() {
+object Trapper : ScoreboardEvent() {
     override fun getDisplay() = buildList {
         addNotNull(ScoreboardPattern.peltsPattern.firstMatches(getSbLines()))
         ScoreboardPattern.mobLocationPattern.firstMatches(getSbLines())?.let {

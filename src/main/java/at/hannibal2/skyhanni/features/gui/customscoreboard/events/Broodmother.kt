@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object Broodmother : Event() {
+object Broodmother : ScoreboardEvent() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.broodmotherPattern.firstMatches(getSbLines()))
 
     override fun showWhen() = IslandType.SPIDER_DEN.isInIsland()

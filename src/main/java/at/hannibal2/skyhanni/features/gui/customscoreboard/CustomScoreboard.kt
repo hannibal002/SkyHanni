@@ -145,9 +145,9 @@ object CustomScoreboard {
     }
 
     private fun MutableList<ScoreboardElementType>.addAllNonSkyBlockLines() {
-        addAll(ScoreboardElement.TITLE.getVisiblePair())
+        addAll(ScoreboardElementManager.TITLE.getVisiblePair())
         addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
-        addAll(ScoreboardElement.FOOTER.getVisiblePair())
+        addAll(ScoreboardElementManager.FOOTER.getVisiblePair())
     }
 
     private fun MutableList<ScoreboardElementType>.addDefaultSkyBlockLines() {
@@ -232,7 +232,7 @@ object CustomScoreboard {
             if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
-                ScoreboardElement.entries.map { element ->
+                ScoreboardElementManager.entries.map { element ->
                     add(
                         "${element.name.firstLetterUppercase()} - " +
                             "${element.element.showWhen()} - " +
@@ -287,7 +287,7 @@ object CustomScoreboard {
 
         event.transform(37, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvent.QUEUE.name))
+            array.add(JsonPrimitive(ScoreboardEventManager.QUEUE.name))
             array
         }
         event.transform(40, "$displayPrefix.events.eventEntries") { element ->
@@ -302,7 +302,7 @@ object CustomScoreboard {
             }
 
             if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
-                newArray.add(JsonPrimitive(ScoreboardEvent.RIFT.name))
+                newArray.add(JsonPrimitive(ScoreboardEventManager.RIFT.name))
             }
 
             newArray
@@ -328,13 +328,13 @@ object CustomScoreboard {
         }
         event.transform(50, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvent.ANNIVERSARY.name))
-            array.add(JsonPrimitive(ScoreboardEvent.CARNIVAL.name))
+            array.add(JsonPrimitive(ScoreboardEventManager.ANNIVERSARY.name))
+            array.add(JsonPrimitive(ScoreboardEventManager.CARNIVAL.name))
             array
         }
         event.transform(51, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvent.NEW_YEAR.name))
+            array.add(JsonPrimitive(ScoreboardEventManager.NEW_YEAR.name))
             array
         }
         event.move(

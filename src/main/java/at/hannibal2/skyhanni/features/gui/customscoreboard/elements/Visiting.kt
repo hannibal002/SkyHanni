@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object Visiting : Element() {
+object Visiting : ScoreboardElement() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
 
     override fun showWhen() = ScoreboardPattern.visitingPattern.anyMatches(ScoreboardData.sidebarLinesFormatted)

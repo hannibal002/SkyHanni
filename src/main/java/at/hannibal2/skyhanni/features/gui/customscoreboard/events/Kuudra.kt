@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
-object Kuudra : Event() {
+object Kuudra : ScoreboardEvent() {
     override fun getDisplay() = listOf(
         ScoreboardPattern.autoClosingPattern,
         ScoreboardPattern.startingInPattern,

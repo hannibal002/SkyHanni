@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Cold
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Cookie
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Copper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Date
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Element
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.EmptyLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Events
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Extra
@@ -30,6 +29,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Power
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Profile
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Purse
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Quiver
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Slayer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Soulflow
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Time
@@ -38,7 +38,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Tuning
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Visiting
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 
-enum class ScoreboardElement(val element: Element) {
+enum class ScoreboardElementManager(val element: ScoreboardElement) {
     TITLE(Title),
     PROFILE(Profile),
     PURSE(Purse),

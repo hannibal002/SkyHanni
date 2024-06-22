@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 
-object ActiveTablist : Event() {
+object ActiveTablist : ScoreboardEvent() {
     override fun getDisplay(): List<Any> {
         val currentActiveEvent = ScoreboardPattern.eventNamePattern.firstMatcher(TabListData.getTabList()) {
             group("name")

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object Redstone : Event() {
+object Redstone : ScoreboardEvent() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.redstonePattern.firstMatches(getSbLines()))
 
     override fun showWhen() = IslandType.PRIVATE_ISLAND.isInIsland()

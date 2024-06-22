@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object GardenCleanUp : Event() {
+object GardenCleanUp : ScoreboardEvent() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.cleanUpPattern.firstMatches(getSbLines())?.trim())
 
     override fun showWhen() = GardenAPI.inGarden()

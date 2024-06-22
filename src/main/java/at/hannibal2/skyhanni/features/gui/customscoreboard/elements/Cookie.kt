@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
-object Cookie : Element() {
+object Cookie : ScoreboardElement() {
     override fun getDisplay() = listOf(
         "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
             if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)

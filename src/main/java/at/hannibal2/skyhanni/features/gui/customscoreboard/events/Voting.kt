@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object Voting : Event() {
+object Voting : ScoreboardEvent() {
     override fun getDisplay() = buildList {
         val sbLines = getSbLines()
 

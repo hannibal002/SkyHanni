@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
-object Dojo : Event() {
+object Dojo : ScoreboardEvent() {
     override fun getDisplay() = listOf(
         ScoreboardPattern.dojoChallengePattern,
         ScoreboardPattern.dojoDifficultyPattern,

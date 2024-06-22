@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.DarkAuction
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Dojo
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Dungeons
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Essence
-import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Event
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.FlightDuration
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.GardenCleanUp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.GardenPasting
@@ -24,6 +23,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.NewYear
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Queue
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Redstone
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Rift
+import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ServerClose
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Spooky
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.StartingSoonTablist
@@ -33,13 +33,13 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Winter
 
 /**
  * This enum contains all the lines that either are events or other lines that are so rare/not often seen that they
- * don't fit in the normal [ScoreboardElement] enum.
+ * don't fit in the normal [ScoreboardElementManager] enum.
  *
  * We for example have the [ScoreboardEvent.VOTING] Event, while this is clearly not an event, I don't consider them as normal lines
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
-enum class ScoreboardEvent(val event: Event) {
+enum class ScoreboardEventManager(val event: ScoreboardEvent) {
     VOTING(Voting),
     SERVER_CLOSE(ServerClose),
     DUNGEONS(Dungeons),
@@ -76,7 +76,7 @@ enum class ScoreboardEvent(val event: Event) {
     fun getLines(): List<ScoreboardElementType> = event.getDisplay().map { getElementFromAny(it) }
 
     companion object {
-        fun getEvent(): List<ScoreboardEvent> =
+        fun getEvent(): List<ScoreboardEventManager> =
             eventsConfig.eventEntries.filter { it.event.showWhen() && it.getLines().isNotEmpty() }.let { events ->
                 events.takeIf { eventsConfig.showAllActiveEvents } ?: listOfNotNull(events.firstOrNull())
             }

@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object ServerClose : Event() {
+object ServerClose : ScoreboardEvent() {
     override fun getDisplay() = buildList {
         ServerRestartTitle.restartingGreedyPattern.firstMatches(getSbLines())?.let {
             add(it.split("§8")[0])

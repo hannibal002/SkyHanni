@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.disp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElementType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 
-object Title : Element() {
+object Title : ScoreboardElement() {
     override fun getDisplay(): List<ScoreboardElementType> {
         val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
 

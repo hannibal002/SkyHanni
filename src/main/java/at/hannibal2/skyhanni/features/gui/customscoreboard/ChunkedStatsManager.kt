@@ -25,47 +25,49 @@ enum class ChunkedStatsManager(
 ) {
     PURSE(
         displayPair = { "§6${formatNumber(PurseAPI.currentPurse)}" },
-        showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardElement.PURSE.element.showWhen() },
+        showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardElementManager.PURSE.element.showWhen() },
         configLine = "§6Purse",
     ),
     MOTES(
         displayPair = { "§b${getMotes()}" },
-        showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardElement.MOTES.element.showWhen() },
+        showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardElementManager.MOTES.element.showWhen() },
         configLine = "§dMotes",
     ),
     BANK(
         displayPair = { "§6${getBank()}" },
-        showWhen = { !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && ScoreboardElement.BANK.element.showWhen() },
+        showWhen = {
+            !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && ScoreboardElementManager.BANK.element.showWhen()
+        },
         configLine = "§6Bank",
     ),
     BITS(
         displayPair = { getBitsLine() },
-        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && ScoreboardElement.BITS.element.showWhen() },
+        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && ScoreboardElementManager.BITS.element.showWhen() },
         configLine = "§bBits",
     ),
     COPPER(
         displayPair = { "§c${getCopper()}" },
-        showWhen = { !(hideEmptyLines && getCopper() == "0") && ScoreboardElement.COPPER.element.showWhen() },
+        showWhen = { !(hideEmptyLines && getCopper() == "0") && ScoreboardElementManager.COPPER.element.showWhen() },
         configLine = "§cCopper",
     ),
     GEMS(
         displayPair = { "§a${getGems()}" },
-        showWhen = { !(hideEmptyLines && getGems() == "0") && ScoreboardElement.GEMS.element.showWhen() },
+        showWhen = { !(hideEmptyLines && getGems() == "0") && ScoreboardElementManager.GEMS.element.showWhen() },
         configLine = "§aGems",
     ),
     HEAT(
         displayPair = { "§c${getHeat()}" },
-        showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardElement.HEAT.element.showWhen() },
+        showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardElementManager.HEAT.element.showWhen() },
         configLine = "§cHeat",
     ),
     COLD(
         displayPair = { "§b${MiningAPI.cold}❄" },
-        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardElement.COLD.element.showWhen() },
+        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardElementManager.COLD.element.showWhen() },
         configLine = "§bCold",
     ),
     NORTH_STARS(
         displayPair = { "§d${getNorthStars()}" },
-        showWhen = { !(hideEmptyLines && getNorthStars() == "0") && ScoreboardElement.NORTH_STARS.element.showWhen() },
+        showWhen = { !(hideEmptyLines && getNorthStars() == "0") && ScoreboardElementManager.NORTH_STARS.element.showWhen() },
         configLine = "§dNorth Stars",
     ),
     ;

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElementManager;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -30,7 +30,7 @@ public class CustomScoreboardConfig {
         desc = "Drag text to change the appearance of the advanced scoreboard." // supporting both custom & advanced search
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.defaultOption);
+    public List<ScoreboardElementManager> scoreboardEntries = new ArrayList<>(ScoreboardElementManager.defaultOption);
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")

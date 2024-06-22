@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 
-object Mining : Event() {
+object Mining : ScoreboardEvent() {
     // TODO: Rethink this one
     override fun getDisplay() = buildList {
         // Wind

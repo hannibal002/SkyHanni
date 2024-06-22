@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
-object Motes : Element() {
+object Motes : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val motes = formatStringNum(getMotes())
 

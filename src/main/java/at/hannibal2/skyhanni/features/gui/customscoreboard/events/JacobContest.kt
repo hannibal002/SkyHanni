@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
-object JacobContest : Event() {
+object JacobContest : ScoreboardEvent() {
     // TODO: Use patterns instead of sublistAfter
     override fun getDisplay() = buildList {
         ScoreboardPattern.jacobsContestPattern.firstMatches(getSbLines())?.let { line ->

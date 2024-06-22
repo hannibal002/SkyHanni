@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 
-object Time : Element() {
+object Time : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val symbol = getGroup(ScoreboardPattern.timePattern, ScoreboardData.sidebarLinesFormatted, "symbol") ?: ""
         val time = SkyBlockTime.now()

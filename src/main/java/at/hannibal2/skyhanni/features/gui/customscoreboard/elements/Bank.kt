@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
-object Bank : Element() {
+object Bank : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val bank = getBank()
 

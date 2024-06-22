@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 import at.hannibal2.skyhanni.data.FlightDurationAPI
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
-object FlightDuration : Event() {
+object FlightDuration : ScoreboardEvent() {
     override fun getDisplay() = listOf("Flight Duration: §a${FlightDurationAPI.flightDuration.format(maxUnits = 2)}")
 
     override fun showWhen() = FlightDurationAPI.isFlyingActive()

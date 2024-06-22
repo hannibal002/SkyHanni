@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
-object Mayor : Element() {
+object Mayor : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: HIDDEN
         val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {

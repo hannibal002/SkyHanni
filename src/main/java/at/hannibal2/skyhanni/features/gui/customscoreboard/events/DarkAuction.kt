@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
-object DarkAuction : Event() {
+object DarkAuction : ScoreboardEvent() {
     override fun getDisplay() = buildList {
         addAll(listOf(ScoreboardPattern.startingInPattern, ScoreboardPattern.timeLeftPattern).allMatches(getSbLines()))
 

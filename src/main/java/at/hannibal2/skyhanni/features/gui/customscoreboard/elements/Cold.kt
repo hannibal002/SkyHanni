@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
-object Cold : Element() {
+object Cold : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val cold = -MiningAPI.cold
 

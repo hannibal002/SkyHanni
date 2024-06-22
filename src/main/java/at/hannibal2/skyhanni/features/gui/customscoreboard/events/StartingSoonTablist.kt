@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TabListData
 
-object StartingSoonTablist : Event() {
+object StartingSoonTablist : ScoreboardEvent() {
     override fun getDisplay(): List<Any> {
         val soonActiveEvent = ScoreboardPattern.eventNamePattern.firstMatcher(TabListData.getTabList()) {
             group("name")

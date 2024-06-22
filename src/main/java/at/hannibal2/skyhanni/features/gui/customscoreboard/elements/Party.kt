@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.part
 import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
-object Party : Element() {
+object Party : ScoreboardElement() {
     override fun getDisplay() =
         if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) listOf(HIDDEN)
         else {

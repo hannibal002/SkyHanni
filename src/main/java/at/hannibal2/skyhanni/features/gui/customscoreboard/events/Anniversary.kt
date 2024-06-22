@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
-object Anniversary : Event() {
+object Anniversary : ScoreboardEvent() {
     override fun getDisplay() = listOf(getSbLines().first { ScoreboardPattern.anniversaryPattern.matches(it) })
 
     override fun showWhen() = ScoreboardPattern.anniversaryPattern.anyMatches(getSbLines())

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxw
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 
-object Power : Element() {
+object Power : ScoreboardElement() {
     override fun getDisplay() = listOf(
         MaxwellAPI.currentPower?.let {
             val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""

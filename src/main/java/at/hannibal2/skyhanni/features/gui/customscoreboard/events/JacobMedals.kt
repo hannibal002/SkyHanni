@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
-object JacobMedals : Event() {
+object JacobMedals : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.medalsPattern.allMatches(getSbLines())
 
     override fun showWhen() = inAnyIsland(IslandType.GARDEN, IslandType.HUB)
