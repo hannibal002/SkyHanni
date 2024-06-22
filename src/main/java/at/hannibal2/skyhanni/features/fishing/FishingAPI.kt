@@ -106,7 +106,7 @@ object FishingAPI {
 
     fun NEUInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
+    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @SubscribeEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
