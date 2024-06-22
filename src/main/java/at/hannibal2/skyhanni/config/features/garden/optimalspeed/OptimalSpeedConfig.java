@@ -28,6 +28,11 @@ public class OptimalSpeedConfig {
     public boolean signEnabled = true;
 
     @Expose
+    @ConfigOption(name = "Compact GUI", desc = "Compact the Rancher Boots GUI only showing crop icons")
+    @ConfigEditorBoolean
+    public boolean compactRancherGui = false;
+
+    @Expose
     @ConfigLink(owner = OptimalSpeedConfig.class, field = "signEnabled")
     public Position signPosition = new Position(20, -195, false, true);
 

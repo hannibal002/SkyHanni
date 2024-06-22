@@ -8,10 +8,11 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -20,7 +21,6 @@ import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,9 +29,10 @@ object GardenOptimalSpeed {
     private val config get() = GardenAPI.config.optimalSpeeds
 
     private val configCustomSpeed get() = config.customSpeed
+    private var sneakingSince = SimpleTimeMark.farFuture()
     private var sneakingTime = 0.seconds
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
-    private val sneakingPersistent get() = sneakingTime > 5.seconds
+    private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
 
     /**
      * This speed value represents the walking speed, not the speed stat.
@@ -47,46 +48,69 @@ object GardenOptimalSpeed {
      */
     private var currentSpeed = 100
 
-    private var optimalSpeed = -1
-    private var lastWarnTime = 0L
+    private var optimalSpeed: Int? = null
+    private var lastWarnTime = SimpleTimeMark.farPast()
     private var cropInHand: CropType? = null
-    private var rancherOverlayList: List<List<Any?>> = emptyList()
+    private var display = listOf<Renderable>()
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
+        if (!GardenAPI.inGarden()) return
         currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
 
-        if (sneaking) {
+        if (sneaking && !sneakingSince.isInPast()) {
+            sneakingSince = SimpleTimeMark.now()
             currentSpeed = (currentSpeed * 0.3).toInt()
-            sneakingTime += 50.milliseconds
-        } else {
+        } else if (!sneaking && sneakingSince.isInPast()) {
             sneakingTime = 0.seconds
+            sneakingSince = SimpleTimeMark.farFuture()
         }
     }
 
     @SubscribeEvent
     fun onGuiOpen(event: GuiOpenEvent) {
         if (!isRancherOverlayEnabled()) return
-        val gui = event.gui
-        if (gui !is GuiEditSign) return
+        val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
-        rancherOverlayList = CropType.entries.map { crop ->
-            listOf(crop.icon, Renderable.link("${crop.cropName} - ${crop.getOptimalSpeed()}") {
-                LorenzUtils.setTextIntoSign("${crop.getOptimalSpeed()}")
-            })
+
+        val crops = CropType.entries.map { it to it.getOptimalSpeed() }
+
+        display = if (config.compactRancherGui) {
+            crops.groupBy({ it.second }, { it.first }).map { (speed, crops) ->
+                val color = if (cropInHand in crops) LorenzColor.GOLD else LorenzColor.WHITE
+                val renderable = Renderable.horizontalContainer(
+                    listOf(
+                        Renderable.horizontalContainer(crops.map { Renderable.itemStack(it.icon) }),
+                        Renderable.string("${color.getChatColor()} - $speed"),
+                    ),
+                    spacing = 3,
+                )
+                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+            }
+        } else {
+            crops.map { (crop, speed) ->
+                val color = if (cropInHand == crop) LorenzColor.GOLD else LorenzColor.WHITE
+                val renderable = Renderable.horizontalContainer(
+                    listOf(
+                        Renderable.itemStack(crop.icon),
+                        Renderable.string("${color.getChatColor()}${crop.cropName} - $speed"),
+                    ),
+                    spacing = 3,
+                )
+                Renderable.link(renderable, underlineColor = color.toColor(), onClick = { LorenzUtils.setTextIntoSign("$speed") })
+            }
         }
     }
 
     @SubscribeEvent
     fun onGuiRender(event: DrawScreenEvent.Post) {
         if (!isRancherOverlayEnabled()) return
-        val gui = event.gui
-        if (gui !is GuiEditSign) return
+        val gui = event.gui as? GuiEditSign ?: return
         if (!gui.isRancherSign()) return
-        config.signPosition.renderStringsAndItems(
-            rancherOverlayList,
-            posLabel = "Optimal Speed Rancher Overlay"
+        config.signPosition.renderRenderables(
+            display,
+            posLabel = "Optimal Speed Rancher Overlay",
         )
     }
 
@@ -94,7 +118,7 @@ object GardenOptimalSpeed {
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
-        optimalSpeed = cropInHand?.getOptimalSpeed() ?: -1
+        optimalSpeed = cropInHand?.getOptimalSpeed()
     }
 
     @SubscribeEvent
@@ -129,12 +153,12 @@ object GardenOptimalSpeed {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden()) return
 
-        if (optimalSpeed == -1) return
+        val speed = optimalSpeed ?: return
 
         if (GardenAPI.hideExtraGuis()) return
 
-        var text = "Optimal Speed: §f$optimalSpeed"
-        if (optimalSpeed != currentSpeed) {
+        var text = "Optimal Speed: §f$speed"
+        if (speed != currentSpeed) {
             text += " (§eCurrent: §f$currentSpeed"
             if (sneaking) text += " §7[Sneaking]"
             text += "§f)"
@@ -143,25 +167,24 @@ object GardenOptimalSpeed {
         val recentlySwitchedTool = lastToolSwitch.passedSince() < 1.5.seconds
         val recentlyStartedSneaking = sneaking && !sneakingPersistent
 
-        val colorCode =
-            if (recentlySwitchedTool || recentlyStartedSneaking) "7" else if (optimalSpeed != currentSpeed) "c" else "a"
+        val colorCode = if (recentlySwitchedTool || recentlyStartedSneaking) "7" else if (speed != currentSpeed) "c" else "a"
 
         if (config.showOnHUD) config.pos.renderString("§$colorCode$text", posLabel = "Garden Optimal Speed")
-        if (optimalSpeed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn()
+        if (speed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn(speed)
     }
 
-    private fun warn() {
-        if (!config.warning) return
+    private fun warn(speed: Int) {
         if (!Minecraft.getMinecraft().thePlayer.onGround) return
         if (GardenAPI.onBarnPlot) return
-        if (System.currentTimeMillis() < lastWarnTime + 20_000) return
+        if (!config.warning) return
+        if (lastWarnTime.passedSince() < 20.seconds) return
 
-        lastWarnTime = System.currentTimeMillis()
+        lastWarnTime = SimpleTimeMark.now()
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         cropInHand?.let {
             var text = "Wrong speed for ${it.cropName}: §f$currentSpeed"
             if (sneaking) text += " §7[Sneaking]"
-            text += " §e(§f$optimalSpeed §eis optimal)"
+            text += " §e(§f$speed §eis optimal)"
 
             ChatUtils.chat(text)
         }
