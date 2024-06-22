@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.HIDDEN
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
@@ -13,7 +12,7 @@ object Cold : ScoreboardElement() {
         val cold = -MiningAPI.cold
 
         return when {
-            informationFilteringConfig.hideEmptyLines && cold == 0 -> HIDDEN
+            informationFilteringConfig.hideEmptyLines && cold == 0 -> null
             displayConfig.displayNumbersFirst -> "§b$cold❄ Cold"
             else -> "Cold: §b$cold❄"
         }

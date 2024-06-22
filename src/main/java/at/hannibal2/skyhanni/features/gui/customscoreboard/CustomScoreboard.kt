@@ -52,7 +52,6 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
-internal const val HIDDEN = "<hidden>"
 internal const val EMPTY = "<empty>"
 
 @SkyHanniModule
@@ -176,10 +175,6 @@ object CustomScoreboard {
 
             if (lines.first().first == EMPTY) {
                 add("" to HorizontalAlignment.LEFT)
-                continue
-            }
-
-            if (lines.any { it.first == HIDDEN }) {
                 continue
             }
 
