@@ -7,10 +7,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 object Damage : ScoreboardEvent() {
-    override fun getDisplay() = listOf(
+
+    private val patterns = listOf(
         ScoreboardPattern.bossHPPattern,
         ScoreboardPattern.bossDamagePattern,
-    ).allMatches(getSbLines())
+    )
+
+    override fun getDisplay() = patterns.allMatches(getSbLines())
 
     override val configLine = "Dragon HP: §a6,180,925 §c❤\nYour Damage: §c375,298.5"
 

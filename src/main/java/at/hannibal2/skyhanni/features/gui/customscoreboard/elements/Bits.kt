@@ -13,11 +13,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 object Bits : ScoreboardElement() {
     override fun getDisplay(): List<Any> {
         val bits = formatNumber(BitsAPI.bits.coerceAtLeast(0))
-        val bitsToClaim = if (BitsAPI.bitsAvailable == -1) {
-            "§cOpen Sbmenu§b"
-        } else {
-            formatNumber(BitsAPI.bitsAvailable.coerceAtLeast(0))
-        }
+        val bitsToClaim = if (BitsAPI.bitsAvailable == -1) "§cOpen Sbmenu§b"
+        else formatNumber(BitsAPI.bitsAvailable.coerceAtLeast(0))
 
         return listOf(
             when {

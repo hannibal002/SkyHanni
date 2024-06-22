@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 object MagmaBoss : ScoreboardEvent() {
-    override fun getDisplay() = listOf(
+
+    private val patterns = listOf(
         ScoreboardPattern.magmaBossPattern,
         ScoreboardPattern.damageSoakedPattern,
         ScoreboardPattern.killMagmasPattern,
@@ -17,7 +18,9 @@ object MagmaBoss : ScoreboardEvent() {
         ScoreboardPattern.reformingPattern,
         ScoreboardPattern.bossHealthPattern,
         ScoreboardPattern.bossHealthBarPattern,
-    ).allMatches(getSbLines())
+    )
+
+    override fun getDisplay() = patterns.allMatches(getSbLines())
 
     override fun showWhen() = ScoreboardPattern.magmaChamberPattern.matches(HypixelData.skyBlockArea)
 

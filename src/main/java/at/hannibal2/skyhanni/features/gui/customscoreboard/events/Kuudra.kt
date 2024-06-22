@@ -6,7 +6,8 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 object Kuudra : ScoreboardEvent() {
-    override fun getDisplay() = listOf(
+
+    private val patterns = listOf(
         ScoreboardPattern.autoClosingPattern,
         ScoreboardPattern.startingInPattern,
         ScoreboardPattern.timeElapsedPattern,
@@ -14,7 +15,9 @@ object Kuudra : ScoreboardEvent() {
         ScoreboardPattern.wavePattern,
         ScoreboardPattern.tokensPattern,
         ScoreboardPattern.submergesPattern,
-    ).allMatches(getSbLines())
+    )
+
+    override fun getDisplay() = patterns.allMatches(getSbLines())
 
     override val configLine = "§7(All Kuudra Lines)"
 

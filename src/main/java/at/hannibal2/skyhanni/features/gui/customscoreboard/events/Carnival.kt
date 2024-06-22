@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
 object Carnival : ScoreboardEvent() {
-    override fun getDisplay() = listOf(
+
+    private val patterns = listOf(
         ScoreboardPattern.carnivalPattern,
         ScoreboardPattern.carnivalTokensPattern,
         ScoreboardPattern.carnivalTasksPattern,
@@ -18,7 +19,9 @@ object Carnival : ScoreboardEvent() {
         ScoreboardPattern.carnivalAccuracyPattern,
         ScoreboardPattern.carnivalKillsPattern,
         ScoreboardPattern.carnivalScorePattern,
-    ).allMatches(getSbLines())
+    )
+
+    override fun getDisplay() = patterns.allMatches(getSbLines())
 
     override fun showWhen() = ScoreboardPattern.carnivalPattern.anyMatches(getSbLines())
 
