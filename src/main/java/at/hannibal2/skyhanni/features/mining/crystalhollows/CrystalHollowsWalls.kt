@@ -27,8 +27,7 @@ object CrystalHollowsWalls {
         JUNGLE(LorenzColor.LIGHT_PURPLE.addOpacity(60)),
         GOBLIN(LorenzColor.GOLD.addOpacity(60)),
         HEAT(LorenzColor.RED.addOpacity(60)),
-        NUCLEUS(LorenzColor.WHITE.addOpacity(60))
-        ;
+        NUCLEUS(LorenzColor.WHITE.addOpacity(60)),
     }
 
     private const val EXPAND_TIMES = 20
@@ -51,7 +50,7 @@ object CrystalHollowsWalls {
     // Yes Hypixel has misaligned the nucleus
     private val nucleusBB = AxisAlignedBB(
         463.0, HEAT_HEIGHT, 460.0,
-        560.0, MAX_HEIGHT, 563.0
+        560.0, MAX_HEIGHT, 563.0,
     )
 
     private val nucleusBBInflate = nucleusBB.inflateBlock(EXPAND_TIMES)
@@ -72,22 +71,25 @@ object CrystalHollowsWalls {
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         val position = RenderUtils.getViewerPos(event.partialTicks)
-        if (position.y < HEAT_HEIGHT + yViewOffset) {
-            drawHeat(event)
-        } else if (nucleusBBOffsetY.isVecInside(position.toVec3())) {
-            if (!config.nucleus) return
-            drawNucleus(event)
-        } else if (position.x > MIDDLE_X) {
-            if (position.z > MIDDLE_Z) {
-                drawPrecursor(event)
-            } else {
-                drawMithril((event))
+        when {
+            position.y < HEAT_HEIGHT + yViewOffset -> drawHeat(event)
+            nucleusBBOffsetY.isVecInside(position.toVec3()) -> {
+                if (!config.nucleus) return
+                drawNucleus(event)
             }
-        } else {
-            if (position.z > MIDDLE_Z) {
-                drawGoblin(event)
-            } else {
-                drawJungle(event)
+            position.x > MIDDLE_X -> {
+                if (position.z > MIDDLE_Z) {
+                    drawPrecursor(event)
+                } else {
+                    drawMithril((event))
+                }
+            }
+            else -> {
+                if (position.z > MIDDLE_Z) {
+                    drawGoblin(event)
+                } else {
+                    drawJungle(event)
+                }
             }
         }
     }
@@ -114,7 +116,7 @@ object CrystalHollowsWalls {
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.minZ),
             LorenzVec(nucleusBB.maxX, heatHeight, nucleusBB.minZ),
             LorenzVec(nucleusBB.minX, heatHeight, nucleusBB.maxZ),
-            Area.NUCLEUS.color
+            Area.NUCLEUS.color,
         )
 
         drawHeatAreaForHeat(false, false, Area.PRECURSOR.color, heatHeight)
@@ -124,41 +126,40 @@ object CrystalHollowsWalls {
     }
 
     private fun drawNucleus(event: LorenzRenderWorldEvent) {
-        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) = nucleusBBInflate
-            .getCorners(nucleusBBInflate.minY)
-        val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) = nucleusBBInflate
-            .getCorners(nucleusBBInflate.maxY)
+        val (southEastCorner, southWestCorner, northWestCorner, northEastCorner) = nucleusBBInflate.getCorners(nucleusBBInflate.minY)
+        val (southEastTopCorner, southWestTopCorner, northWestTopCorner, northEastTopCorner) =
+            nucleusBBInflate.getCorners(nucleusBBInflate.maxY)
 
         RenderUtils.QuadDrawer.draw3D(event.partialTicks) {
             draw(
                 southEastCorner,
                 southWestCorner,
                 northEastCorner,
-                Area.HEAT.color
+                Area.HEAT.color,
             )
             draw(
                 southEastCorner,
                 southEastTopCorner,
                 LorenzVec(nucleusBBInflate.minX, nucleusBBInflate.minY, MIDDLE_Z),
-                Area.JUNGLE.color
+                Area.JUNGLE.color,
             )
             draw(
                 southEastCorner,
                 southEastTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-                Area.JUNGLE.color
+                Area.JUNGLE.color,
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
                 LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
-                Area.PRECURSOR.color
+                Area.PRECURSOR.color,
             )
             draw(
                 northWestCorner,
                 northWestTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-                Area.PRECURSOR.color
+                Area.PRECURSOR.color,
             )
             draw(
                 southWestCorner,
@@ -170,19 +171,19 @@ object CrystalHollowsWalls {
                 southWestCorner,
                 southWestTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.maxZ),
-                Area.GOBLIN.color
+                Area.GOBLIN.color,
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
                 LorenzVec(nucleusBBInflate.maxX, nucleusBBInflate.minY, MIDDLE_Z),
-                Area.MITHRIL.color
+                Area.MITHRIL.color,
             )
             draw(
                 northEastCorner,
                 northEastTopCorner,
                 LorenzVec(MIDDLE_X, nucleusBBInflate.minY, nucleusBBInflate.minZ),
-                Area.MITHRIL.color
+                Area.MITHRIL.color,
             )
         }
     }
@@ -216,7 +217,7 @@ object CrystalHollowsWalls {
             x,
             nucleusZ,
             middleZ,
-            z
+            z,
         )
         draw(
             nucleusXSideBase,
@@ -253,10 +254,10 @@ object CrystalHollowsWalls {
         color,
         heatHeight,
         nucleusX = if (isMinXEsleMaxX) nucleusBB.minX else nucleusBB.maxX,
-        middleX = if (isMinXEsleMaxX) MIDDLE_X else MIDDLE_X,
+        middleX = MIDDLE_X,
         x = if (isMinXEsleMaxX) MIN_X else MAX_X,
         nucleusZ = if (isMinZElseMaxZ) nucleusBB.minZ else nucleusBB.maxZ,
-        middleZ = if (isMinZElseMaxZ) MIDDLE_X else MIDDLE_X,
+        middleZ = MIDDLE_X,
         z = if (isMinZElseMaxZ) MIN_Z else MAX_Z,
     )
 
