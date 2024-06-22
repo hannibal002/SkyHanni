@@ -144,8 +144,7 @@ object ComposterDisplay {
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
-        if (ComposterAPI.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()
-        ) {
+        if (ComposterAPI.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
