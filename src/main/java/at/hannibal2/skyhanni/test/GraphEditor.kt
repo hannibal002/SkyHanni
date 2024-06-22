@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -26,11 +27,17 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import kotlin.math.sqrt
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object GraphEditor {
@@ -75,6 +82,10 @@ object GraphEditor {
 
     private val edgeColor = LorenzColor.GOLD.addOpacity(150)
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
+
+    val scrollValue = ScrollValue()
+    var namedNodeList: List<Renderable> = emptyList()
+    var lastUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
@@ -121,6 +132,51 @@ object GraphEditor {
         }
     }
 
+    @SubscribeEvent
+    fun onGuiRender(event: GuiRenderEvent) {
+        if (!isEnabled()) return
+        config.namedNodesList.renderRenderables(
+            buildList {
+                val list = getNamedNodes()
+                val size = list.size
+                addString("§eGraph Nodes: $size")
+                val height = (size * 10).coerceAtMost(150)
+                if (list.isNotEmpty()) {
+                    add(Renderable.scrollList(list, height, scrollValue = scrollValue, velocity = 10.0))
+                }
+            },
+            posLabel = "Graph Nodes List",
+        )
+    }
+
+    private fun getNamedNodes(): List<Renderable> {
+        if (lastUpdate.passedSince() > 250.milliseconds) {
+            lastUpdate = SimpleTimeMark.now()
+            namedNodeList = calculateNamedNodes()
+        }
+        return namedNodeList
+    }
+
+
+    private fun calculateNamedNodes(): List<Renderable> = buildList {
+        for ((node, distance: Double) in nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
+            val name = node.name?.takeIf { !it.isBlank() } ?: continue
+            val color = if (node == activeNode) "§a" else "§7"
+            val distanceFormat = sqrt(distance).toInt().addSeparators()
+            val text = "${color}Node §r$name §f($distanceFormat)"
+            add(
+                Renderable.clickAndHover(
+                    text,
+                    emptyList(),
+                    onClick = {
+                        activeNode = node
+                        lastUpdate = SimpleTimeMark.farPast()
+                    },
+                ),
+            )
+        }
+    }
+
     private fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
             ChatUtils.chat(text)
@@ -152,6 +208,7 @@ object GraphEditor {
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
+            maxDistance = 80,
         )
     }
 
@@ -302,8 +359,8 @@ object GraphEditor {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
             ChatUtils.chat(
                 "§lStats\n" +
-                    "§eNodes: ${nodes.size}\n" +
-                    "§eEdges: ${edges.size}\n" +
+                    "§eNodes: ${nodes.size.addSeparators()}\n" +
+                    "§eEdges: ${edges.size.addSeparators()}\n" +
                     "§eLength: $length",
             )
         }

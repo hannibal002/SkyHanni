@@ -304,7 +304,7 @@ object HoppityEggLocator {
             return
         }
 
-        event.addData {
+        event.addIrrelevant {
             add("First Pos: $firstPos")
             add("Second Pos: $secondPos")
             add("Possible Egg Locations: ${possibleEggLocations.size}")

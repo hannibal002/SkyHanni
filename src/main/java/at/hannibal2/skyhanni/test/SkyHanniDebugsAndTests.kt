@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigManager
@@ -13,10 +14,15 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.BlockUtils
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -358,10 +364,7 @@ object SkyHanniDebugsAndTests {
         }
 
         val internalName = hand.getInternalNameOrNull()
-        if (internalName == null) {
-            ChatUtils.error("§cInternal name is null for item ${hand.name}")
-            return
-        }
+            ?: ErrorManager.skyHanniError("Internal name is null for item ${hand.name}")
 
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)
@@ -504,12 +507,26 @@ object SkyHanniDebugsAndTests {
             itemRenderDebug()
         }
 
-        if (Minecraft.getMinecraft().gameSettings.showDebugInfo && debugConfig.currentAreaDebug) {
-            config.debugLocationPos.renderString(
-                "Current Area: ${HypixelData.skyBlockArea}",
-                posLabel = "SkyBlock Area (Debug)",
-            )
+        if (Minecraft.getMinecraft().gameSettings.showDebugInfo) {
+            if (debugConfig.currentAreaDebug) {
+                config.debugLocationPos.renderString(
+                    "Current Area: ${HypixelData.skyBlockArea}",
+                    posLabel = "SkyBlock Area (Debug)",
+                )
+            }
+
+            if (debugConfig.raytracedOreblock) {
+                BlockUtils.getBlockLookingAt(50.0)?.let { pos ->
+                    OreBlock.getByStateOrNull(pos.getBlockStateAt())?.let { ore ->
+                        config.debugOrePos.renderString(
+                            "Looking at: ${ore.name} (${pos.toCleanString()})",
+                            posLabel = "OreBlock",
+                        )
+                    }
+                }
+            }
         }
+
 
         if (!debugConfig.enabled) return
 
@@ -547,6 +564,14 @@ object SkyHanniDebugsAndTests {
             ),
             posLabel = "Item Debug",
         )
+    }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onOreMined(event: OreMinedEvent) {
+        if (!debugConfig.oreEventMessages) return
+        val originalOre = event.originalOre
+        val extraBlocks = event.extraBlocks.map { "${it.key.name}: ${it.value}" }
+        ChatUtils.debug("Mined: $originalOre (${extraBlocks.joinToString()})")
     }
 
     @SubscribeEvent

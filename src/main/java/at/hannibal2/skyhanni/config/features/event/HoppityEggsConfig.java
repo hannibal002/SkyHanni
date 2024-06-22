@@ -20,7 +20,7 @@ public class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Show Waypoints Immediately",
-        desc = "Show a raw estimate waypoint immediately after clicking. " +
+        desc = "Show an estimated waypoint immediately after clicking.\n" +
             "§cThis might cause issues with other particle sources."
     )
     @ConfigEditorBoolean
@@ -39,8 +39,8 @@ public class HoppityEggsConfig {
     public boolean showAllWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Hide Duplicate Waypoints", desc = "Hides egg waypoints you have found. §e" +
-        "Only works when you don't have an Egglocator in your inventory.")
+    @ConfigOption(name = "Hide Duplicate Waypoints", desc = "Hide egg waypoints you have already found.\n" +
+        "§eOnly works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideDuplicateWaypoints = false;
@@ -64,13 +64,14 @@ public class HoppityEggsConfig {
     public boolean loadFromNeuPv = true;
 
     @Expose
-    @ConfigOption(name = "Show Unclaimed Eggs", desc = "Displays which eggs haven't been found in the last SkyBlock day.")
+    @ConfigOption(name = "Show Unclaimed Eggs", desc = "Display which eggs haven't been found in the last SkyBlock day.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showClaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Show Collected Locations", desc = "Shows the number of found egg locations on this island. §eThis is not retroactive and may not be fully synced with Hypixel's count.")
+    @ConfigOption(name = "Show Collected Locations", desc = "Show the number of found egg locations on this island.\n" +
+        "§eThis is not retroactive and may not be fully synced with Hypixel's count.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showCollectedLocationCount = false;
@@ -82,7 +83,7 @@ public class HoppityEggsConfig {
     public boolean warnUnclaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Click to Warp", desc = "Makes the eggs ready chat message clickable to warp you to an island.")
+    @ConfigOption(name = "Click to Warp", desc = "Make the eggs ready chat message clickable to warp you to an island.")
     @ConfigEditorBoolean
     public boolean warpUnclaimedEggs = false;
 
@@ -98,7 +99,7 @@ public class HoppityEggsConfig {
     public boolean showDuringContest = false;
 
     @Expose
-    @ConfigOption(name = "Show outside Skyblock", desc = "Show on Hypixel even when not playing Skyblock.")
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Show on Hypixel even when not playing SkyBlock.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showOutsideSkyblock = false;
@@ -125,7 +126,7 @@ public class HoppityEggsConfig {
     public boolean highlightHoppityShop = true;
 
     @Expose
-    @ConfigOption(name = "Hoppity Shop Reminder", desc = "Reminds you to open the Hoppity Shop each year.")
+    @ConfigOption(name = "Hoppity Shop Reminder", desc = "Remind you to open the Hoppity Shop each year.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hoppityShopReminder = true;
@@ -145,7 +146,7 @@ public class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
-        desc = "Warn when using the Egglocator without having a §d§lMythic Rabbit Pet §7selected. " +
+        desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
             "§eOnly enable this setting when you own a mythic Rabbit pet."
     )
     @ConfigEditorBoolean

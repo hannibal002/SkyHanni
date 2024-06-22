@@ -17,9 +17,9 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -173,7 +173,7 @@ object GardenLevelDisplay {
             if (next && line.contains("                    ")) {
                 val progress = overflow / needForOnlyNextLvl
                 val progressBar = StringUtils.progressBar(progress, 20)
-                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${format(needForOnlyNextLvl)}")
+                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${needForOnlyNextLvl.shortFormat()}")
                 iterator.add("")
                 iterator.add("§b§lOVERFLOW XP:")
                 iterator.add("§7▸ ${overflowTotal.addSeparators()}")

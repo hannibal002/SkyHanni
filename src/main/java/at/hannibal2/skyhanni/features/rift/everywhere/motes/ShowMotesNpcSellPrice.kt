@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -180,7 +180,7 @@ object ShowMotesNpcSellPrice {
     }
 
     private fun Double.formatPrice(): String = when (config.inventoryValue.formatType) {
-        NumberFormatEntry.SHORT -> NumberUtil.format(this)
+        NumberFormatEntry.SHORT -> this.shortFormat()
         NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }

@@ -796,6 +796,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Vermin Highlight. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1457)
     + Highlights Vermin mobs in the West Village in the Rift.
     + Change Highlight color.
++ Punchcard Artifact Highlighter & Overlay. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1089)
+    + Highlights unpunched players in the Rift.
 
 </details>
 <details open><summary>
@@ -853,6 +855,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + HotM Perks Powder features. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1460)
     + Added total powder cost to HotM perks.
     + Added powder cost for 10 levels.
++ Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1655)
+    + Displays information about Mineshaft spawns, your progress towards a Pity Mineshaft, and more.
 
 </details>
 <details open><summary>
@@ -1185,6 +1189,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Command `/shlimbo` for easier Limbo access. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Limbo time tracker also now works in the Slumber Hotel in the Bed Wars Lobby.
     + A new secret method to get more SkyHanni User Luck from Limbo.
++ Added SkyHanni User Luck to the stats breakdown. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1288)
+    + This can be viewed in /sbmenu, /equipment, and the Misc Stats submenu.
 + Command `/shlimbostats` for a simple way to view your Limbo stats. -
   martimavocado (https://github.com/hannibal002/SkyHanni/pull/848)
     + Support for `/playtime` and  `/pt` while in Limbo.
@@ -1234,6 +1240,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Estimated Price Integration.
     + Favorite slots; option to only display favorite slots.
 + Added a Chat Message if the Perkapocalypse Mayor is unknown. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2009)
++ Added a source download verification checker. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1914)
+    + Warns you when the mod has been downloaded from an untrusted source (not the official GitHub or Modrinth).
 
 </details>
 <details open><summary>
