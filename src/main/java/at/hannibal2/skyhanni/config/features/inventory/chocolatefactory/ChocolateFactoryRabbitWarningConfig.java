@@ -10,6 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import org.jetbrains.annotations.NotNull;
 
 public class ChocolateFactoryRabbitWarningConfig {
 
@@ -39,6 +40,7 @@ public class ChocolateFactoryRabbitWarningConfig {
     @Expose
     @ConfigOption(name = "Flash Screen", desc = "Choose the stray rabbit type to flash the screen for.")
     @ConfigEditorDropdown
+    @NotNull
     public FlashScreenTypeEntry flashScreenType = FlashScreenTypeEntry.SPECIAL;
 
     public enum FlashScreenTypeEntry {
