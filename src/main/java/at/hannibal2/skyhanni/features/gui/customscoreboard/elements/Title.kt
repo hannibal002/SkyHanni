@@ -25,7 +25,5 @@ object Title : ScoreboardElement() {
         }
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§6§lSKYBLOCK"
 }

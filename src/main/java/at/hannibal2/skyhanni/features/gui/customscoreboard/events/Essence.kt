@@ -7,7 +7,5 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 object Essence : ScoreboardEvent() {
     override fun getDisplay() = listOfNotNull(ScoreboardPattern.essencePattern.firstMatches(getSbLines()))
 
-    override fun showWhen() = true
-
     override val configLine = "Dragon Essence: §d1,285"
 }

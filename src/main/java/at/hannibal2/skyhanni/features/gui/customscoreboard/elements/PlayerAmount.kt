@@ -14,7 +14,5 @@ object PlayerAmount : ScoreboardElement() {
         } else add("§7Players: §a${getPlayersOnCurrentServer()}$max")
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§7Players: §a69§7/§a80"
 }

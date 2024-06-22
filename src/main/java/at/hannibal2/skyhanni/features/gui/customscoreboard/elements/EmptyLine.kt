@@ -5,7 +5,5 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.EMPTY
 object EmptyLine : ScoreboardElement() {
     override fun getDisplay() = listOf(EMPTY)
 
-    override fun showWhen() = true
-
     override val configLine = ""
 }

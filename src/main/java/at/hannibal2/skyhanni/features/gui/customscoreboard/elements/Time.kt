@@ -17,7 +17,5 @@ object Time : ScoreboardElement() {
         )
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§710:40pm §b☽"
 }

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 abstract class ScoreboardElement {
     abstract fun getDisplay(): List<Any>
-    abstract fun showWhen(): Boolean
+    open fun showWhen(): Boolean = true
     abstract val configLine: String
 
     // TODO: Add Hover and Clickable Feedback to Lines

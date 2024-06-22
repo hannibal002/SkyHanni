@@ -12,7 +12,5 @@ object Location : ScoreboardElement() {
         addNotNull(ScoreboardPattern.plotPattern.firstMatches(ScoreboardData.sidebarLinesFormatted))
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§7⏣ §bVillage"
 }

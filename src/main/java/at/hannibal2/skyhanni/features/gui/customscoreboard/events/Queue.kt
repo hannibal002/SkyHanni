@@ -10,7 +10,5 @@ object Queue : ScoreboardEvent() {
         ScoreboardPattern.queuePositionPattern,
     ).allMatches(getSbLines())
 
-    override fun showWhen() = true
-
     override val configLine = "Queued: Glacite Mineshafts\nPosition: §b#45 §fSince: §a00:00"
 }

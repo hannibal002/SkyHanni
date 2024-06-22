@@ -18,8 +18,6 @@ object JacobContest : ScoreboardEvent() {
         }
     }
 
-    override fun showWhen() = true
-
     override val configLine: String = "§eJacob's Contest\n§e○ §fCarrot §a18m17s\n Collected §e8,264"
 }
 

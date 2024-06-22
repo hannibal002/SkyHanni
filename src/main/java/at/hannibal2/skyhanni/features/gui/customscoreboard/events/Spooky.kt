@@ -22,7 +22,6 @@ object Spooky : ScoreboardEvent() {
     }
 
     // TODO: Add isSpookyActive() somewhere
-    override fun showWhen() = true
 
     override val configLine = "§6Spooky Festival§f 50:54\n§7Your Candy:\n§a1 Green§7, §50 Purple §7(§61 §7pts.)"
 }

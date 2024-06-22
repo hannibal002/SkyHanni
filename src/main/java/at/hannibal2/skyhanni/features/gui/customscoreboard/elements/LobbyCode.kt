@@ -12,7 +12,5 @@ object LobbyCode : ScoreboardElement() {
         return listOf(lobbyDisplay)
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§8mega77CK"
 }

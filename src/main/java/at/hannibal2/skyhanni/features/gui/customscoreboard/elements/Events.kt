@@ -5,7 +5,5 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEventManage
 object Events : ScoreboardElement() {
     override fun getDisplay() = ScoreboardEventManager.getEvent().flatMap { it.getLines() }
 
-    override fun showWhen() = true
-
     override val configLine = "§7Wide Range of Events\n§7(too much to show all)"
 }

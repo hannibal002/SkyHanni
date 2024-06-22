@@ -22,7 +22,5 @@ object ActiveTablist : ScoreboardEvent() {
         return listOf(currentActiveEvent, " Ends in: §e$currentActiveEventTime")
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§7(All Active Tablist Events)\n§dHoppity's Hunt\n §fEnds in: §e26h"
 }

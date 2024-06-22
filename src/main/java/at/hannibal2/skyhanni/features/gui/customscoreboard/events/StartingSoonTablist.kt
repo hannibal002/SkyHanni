@@ -22,7 +22,5 @@ object StartingSoonTablist : ScoreboardEvent() {
         return listOf(soonActiveEvent, " Starts in: §e$soonActiveEventTime")
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
 }

@@ -7,7 +7,5 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 object Profile : ScoreboardElement() {
     override fun getDisplay() = listOf(CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase())
 
-    override fun showWhen() = true
-
     override val configLine = "§7♲ Blueberry"
 }

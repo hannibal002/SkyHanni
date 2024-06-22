@@ -9,8 +9,5 @@ object Footer : ScoreboardElement() {
             .split("\\n")
             .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
     ).flatten()
-
-    override fun showWhen() = true
-
     override val configLine = "§ewww.hypixel.net"
 }

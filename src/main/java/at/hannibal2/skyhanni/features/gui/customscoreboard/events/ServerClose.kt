@@ -11,7 +11,5 @@ object ServerClose : ScoreboardEvent() {
         }
     }
 
-    override fun showWhen() = true
-
     override val configLine = "§cServer closing soon!"
 }
