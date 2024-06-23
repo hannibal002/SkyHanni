@@ -27,8 +27,7 @@ object BridgeFormatter {
 
         // TODO: Optionally: replaces "X replying to Y: msg" with "Y <- X: msg" -> new config for this?
 
-        val format = config.bridgeFormat
-        val toSend = format
+        val toSend = config.bridgeFormat
             .replace("&", "§")
             .replace("%ign%", ign)
             .replace("%msg%", msg)
