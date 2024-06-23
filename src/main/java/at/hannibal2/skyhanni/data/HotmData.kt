@@ -652,9 +652,10 @@ enum class HotmData(
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
 
-                if (difference > 0) {
+                if (difference != 0L) {
                     type.gain(difference)
-                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.lowName} Powder")
+                    val what = if (difference > 0) "Gained" else "Lost"
+                    ChatUtils.debug("$what §a${difference.addSeparators()} §e${type.lowName} Powder")
                 }
             }
         }
