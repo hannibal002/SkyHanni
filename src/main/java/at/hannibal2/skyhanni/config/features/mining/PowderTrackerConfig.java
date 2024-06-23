@@ -99,7 +99,7 @@ public class PowderTrackerConfig {
         CONTROL_SWITCH("§b14 §9Control Switch", 20),
         SYNTHETIC_HEART("§b14 §9Synthetic Heart", 21),
         TOTAL_ROBOT_PARTS("§b14 §9Total Robot Parts", 22),
-        GOBLIN_EGGS("§30-§c0-§e0-§a0-§90 §fGoblin Egg", 23),
+        GOBLIN_EGGS("§30§7-§c0§7-§e0§7-§a0§f-§90 §fGoblin Egg", 23),
         WISHING_COMPASS("§b12 §aWishing Compass", 24),
         SLUDGE_JUICE("§b320 §aSludge Juice", 25),
         ASCENSION_ROPE("§b2 §9Ascension Rope", 26),
