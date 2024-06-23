@@ -18,17 +18,17 @@ public class QuiverDisplayConfig {
 
     @Expose
     @ConfigLink(owner = QuiverDisplayConfig.class, field = "enabled")
-    public Position quiverDisplayPos = new Position(260, 80);
+    public Position quiverDisplayPos = new Position(260, -15);
 
     @Expose
-    @ConfigOption(name = "Show arrow icon", desc = "Displays an icon next to the Quiver Display.")
+    @ConfigOption(name = "Show arrow icon", desc = "Display an icon next to the Quiver Display.")
     @ConfigEditorBoolean
     public Property<Boolean> showIcon = Property.of(true);
 
     @Expose
     @ConfigOption(
         name = "When to show",
-        desc = "Decides in what conditions to show the display."
+        desc = "Decide in what conditions to show the display."
     )
     @ConfigEditorDropdown
     public Property<ShowWhen> whenToShow = Property.of(ShowWhen.ONLY_BOW_HAND);

@@ -9,28 +9,30 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.isCommand
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUCalculator
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isDouble
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Calculator
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GetFromSackAPI {
     private val config get() = SkyHanniMod.feature.inventory.gfs
 
@@ -40,11 +42,11 @@ object GetFromSackAPI {
     private val patternGroup = RepoPattern.group("gfs.chat")
     private val fromSacksChatPattern by patternGroup.pattern(
         "from",
-        "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory."
+        "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory.",
     )
     private val missingChatPattern by patternGroup.pattern(
         "missing",
-        "§cYou have no (?<item>.+) in your Sacks!"
+        "§cYou have no (?<item>.+) in your Sacks!",
     )
 
     fun getFromSack(item: NEUInternalName, amount: Int) = getFromSack(item.makePrimitiveStack(amount))
@@ -56,10 +58,10 @@ object GetFromSackAPI {
     fun getFromChatMessageSackItems(
         item: PrimitiveItemStack,
         text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!",
-    ) =
-        ChatUtils.clickableChat(text, onClick = {
-            HypixelCommands.getFromSacks(item.internalName.asString(), item.amount)
-        })
+        hover: String = "§eClick to get from sacks!",
+    ) = ChatUtils.clickableChat(
+        text, onClick = { getFromSack(item) }, hover,
+    )
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
@@ -89,7 +91,8 @@ object GetFromSackAPI {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
-            HypixelCommands.getFromSacks(item.internalName.asString().replace('-', ':'), item.amount)
+            // TODO find a better workaround
+            ChatUtils.sendMessageToServer("/gfs ${item.internalName.asString().replace('-', ':')} ${item.amount}")
             lastTimeOfCommand = ChatUtils.getTimeWhenNewlyQueuedMessageGetsExecuted()
         }
     }
@@ -105,7 +108,7 @@ object GetFromSackAPI {
         if (event.clickedButton != 1) return // filter none right clicks
         addToQueue(inventoryMap[event.slotId] ?: return)
         inventoryMap.remove(event.slotId)
-        event.isCanceled = true
+        event.cancel()
     }
 
     @SubscribeEvent
@@ -128,11 +131,11 @@ object GetFromSackAPI {
         queuedHandler(replacedEvent)
         bazaarHandler(replacedEvent)
         if (replacedEvent.isCanceled) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
         if (replacedEvent !== event) {
-            event.isCanceled = true
+            event.cancel()
             ChatUtils.sendMessageToServer(replacedEvent.message)
         }
     }
@@ -150,7 +153,7 @@ object GetFromSackAPI {
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
             CommandResult.INTERNAL_ERROR -> {}
         }
-        event.isCanceled = true
+        event.cancel()
     }
 
     private fun bazaarHandler(event: MessageSendToServerEvent) {
@@ -161,7 +164,7 @@ object GetFromSackAPI {
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
         "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
-        onClick = { HypixelCommands.bazaar(item.removeColor()) }
+        onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!",
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
@@ -170,7 +173,7 @@ object GetFromSackAPI {
         }
 
         var amountString = args.last()
-        amountString = Calculator.calculate(amountString).toString()
+        amountString = NEUCalculator.calculateOrNull(amountString)?.toString() ?: amountString
 
         if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
@@ -182,7 +185,7 @@ object GetFromSackAPI {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",
                     "Query failed",
-                    "itemName" to itemString
+                    "itemName" to itemString,
                 )
                 return CommandResult.INTERNAL_ERROR to null
             }

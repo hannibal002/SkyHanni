@@ -10,8 +10,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class MiningConfig {
 
     @Expose
-    @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker")
+    @Category(name = "Mining Event Tracker", desc = "Settings for the Mining Event Tracker.")
     public MiningEventConfig miningEvent = new MiningEventConfig();
+
+    @Expose
+    @Category(name = "HotM", desc = "Settings for Heart of the Mountain.")
+    public HotmConfig hotm = new HotmConfig();
 
     @Expose
     @ConfigOption(name = "Powder Tracker", desc = "")
@@ -39,8 +43,12 @@ public class MiningConfig {
     public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
 
     @Expose
-    @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features")
+    @Category(name = "Fossil Excavator", desc = "Settings for the Fossil Excavator Features.")
     public FossilExcavatorConfig fossilExcavator = new FossilExcavatorConfig();
+
+    @Expose
+    @Category(name = "Glacite Mineshaft", desc = "Settings for the Glacite Mineshaft.")
+    public GlaciteMineshaftConfig glaciteMineshaft = new GlaciteMineshaftConfig();
 
     @Expose
     @ConfigOption(name = "Notifications", desc = "")
@@ -48,7 +56,25 @@ public class MiningConfig {
     public MiningNotificationsConfig notifications = new MiningNotificationsConfig();
 
     @Expose
-    @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight Mobs that are part of active commissions.")
+    @Category(name = "Tunnel Maps", desc = "Settings for the Tunnel Maps.")
+    public TunnelMapsConfig tunnelMaps = new TunnelMapsConfig();
+    @Expose
+    @ConfigOption(name = "Commissions Blocks Color", desc = "")
+    @Accordion
+    public CommissionsBlocksColorConfig commissionsBlocksColor = new CommissionsBlocksColorConfig();
+
+    @Expose
+    @ConfigOption(name = "Mineshaft", desc = "")
+    @Accordion
+    public MineshaftConfig mineshaft = new MineshaftConfig();
+
+    @Expose
+    @ConfigOption(name = "Mineshaft Pity Display", desc = "")
+    @Accordion
+    public MineshaftPityDisplayConfig mineshaftPityDisplay = new MineshaftPityDisplayConfig();
+
+    @Expose
+    @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightCommissionMobs = false;
@@ -60,13 +86,13 @@ public class MiningConfig {
     public boolean crystalHollowsNamesInCore = false;
 
     @Expose
-    @ConfigOption(name = "Private Island Ability Block", desc = "Blocks the mining ability when on private island.")
+    @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean privateIslandNoPickaxeAbility = false;
 
     @Expose
-    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlights golden goblins you have spawned in green.")
+    @ConfigOption(name = "Highlight your Golden Goblin", desc = "Highlight golden goblins you have spawned in green.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightYourGoldenGoblin = true;

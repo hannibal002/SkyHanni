@@ -1,85 +1,87 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardRawChangeEvent
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
+import net.minecraft.network.play.server.S3CPacketUpdateScore
+import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ScoreboardData {
+@SkyHanniModule
+object ScoreboardData {
 
-    companion object {
+    var sidebarLinesFormatted: List<String> = emptyList()
 
-        private val minecraftColorCodesPattern = "(?i)[0-9a-fkmolnr]".toPattern()
+    private var sidebarLines: List<String> = emptyList() // TODO rename to raw
+    var sidebarLinesRaw: List<String> = emptyList() // TODO delete
+    var objectiveTitle = ""
 
-        // TODO USE SH-REPO
-        private val splitIcons = listOf(
-            "\uD83C\uDF6B",
-            "\uD83D\uDCA3",
-            "\uD83D\uDC7D",
-            "\uD83D\uDD2E",
-            "\uD83D\uDC0D",
-            "\uD83D\uDC7E",
-            "\uD83C\uDF20",
-            "\uD83C\uDF6D",
-            "⚽",
-            "\uD83C\uDFC0",
-            "\uD83D\uDC79",
-            "\uD83C\uDF81",
-            "\uD83C\uDF89",
-            "\uD83C\uDF82",
-            "\uD83D\uDD2B",
-        )
+    private var dirty = false
 
-        fun formatLines(rawList: List<String>): List<String> {
-            val list = mutableListOf<String>()
-            for (line in rawList) {
-                val separator = splitIcons.find { line.contains(it) } ?: continue
-                val split = line.split(separator)
-                val start = split[0]
-                var end = split[1]
-                // get last color code in start
-                val lastColorIndex = start.lastIndexOf('§')
-                val lastColor = if (lastColorIndex != -1
-                    && lastColorIndex + 1 < start.length
-                    && (minecraftColorCodesPattern.matches(start[lastColorIndex + 1].toString()))
-                ) start.substring(lastColorIndex, lastColorIndex + 2)
-                else ""
+    private val minecraftColorCodesPattern = "(?i)[0-9a-fkmolnr]".toPattern()
 
-                // remove first color code from end, when it is the same as the last color code in start
-                end = end.removePrefix(lastColor)
+    fun formatLines(rawList: List<String>): List<String> {
+        val list = mutableListOf<String>()
+        for (line in rawList) {
+            val separator = splitIcons.find { line.contains(it) } ?: continue
+            val split = line.split(separator)
+            val start = split[0]
+            var end = split[1]
+            // get last color code in start
+            val lastColorIndex = start.lastIndexOf('§')
+            val lastColor = if (lastColorIndex != -1
+                && lastColorIndex + 1 < start.length
+                && (minecraftColorCodesPattern.matches(start[lastColorIndex + 1].toString()))
+            ) start.substring(lastColorIndex, lastColorIndex + 2)
+            else ""
 
-                list.add(start + end)
-            }
+            // remove first color code from end, when it is the same as the last color code in start
+            end = end.removePrefix(lastColor)
 
-            return list
+            list.add(start + end)
         }
 
-        var sidebarLinesFormatted: List<String> = emptyList()
+        return list
+    }
 
-        var sidebarLines: List<String> = emptyList() // TODO rename to raw
-        var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-        var objectiveTitle = ""
+    @HandleEvent(receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
+        if (event.packet is S3CPacketUpdateScore) {
+            if (event.packet.objectiveName == "update") {
+                dirty = true
+            }
+        }
+        if (event.packet is S3EPacketTeams) {
+            if (event.packet.name.startsWith("team_")) {
+                dirty = true
+            }
+        }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onTick(event: LorenzTickEvent) {
+        if (!dirty) return
+        dirty = false
 
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }
         if (semiFormatted != sidebarLines) {
-            ScoreboardRawChangeEvent(sidebarLines, semiFormatted).postAndCatch()
+            RawScoreboardUpdateEvent(semiFormatted).postAndCatch()
             sidebarLines = semiFormatted
         }
 
         sidebarLinesRaw = list
         val new = formatLines(list)
         if (new != sidebarLinesFormatted) {
-            ScoreboardChangeEvent(sidebarLinesFormatted, new).postAndCatch()
+            ScoreboardUpdateEvent(new).postAndCatch()
             sidebarLinesFormatted = new
         }
     }
@@ -105,4 +107,23 @@ class ScoreboardData {
             ScorePlayerTeam.formatPlayerName(scoreboard.getPlayersTeam(it.playerName), it.playerName)
         }
     }
+
+    // TODO USE SH-REPO
+    private val splitIcons = listOf(
+        "\uD83C\uDF6B",
+        "\uD83D\uDCA3",
+        "\uD83D\uDC7D",
+        "\uD83D\uDD2E",
+        "\uD83D\uDC0D",
+        "\uD83D\uDC7E",
+        "\uD83C\uDF20",
+        "\uD83C\uDF6D",
+        "⚽",
+        "\uD83C\uDFC0",
+        "\uD83D\uDC79",
+        "\uD83C\uDF81",
+        "\uD83C\uDF89",
+        "\uD83C\uDF82",
+        "\uD83D\uDD2B",
+    )
 }

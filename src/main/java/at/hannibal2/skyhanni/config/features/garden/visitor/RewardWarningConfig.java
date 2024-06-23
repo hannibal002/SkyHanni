@@ -58,7 +58,7 @@ public class RewardWarningConfig {
 
     @Expose
     @ConfigOption(
-        name = "Coins Per Copper",
+        name = "Coins per Copper",
         desc = "The price to use for the options below.\n" +
             "Requires at least one of them to be on."
     )
@@ -78,7 +78,29 @@ public class RewardWarningConfig {
     public boolean preventAcceptingCopper = false;
 
     @Expose
-    @ConfigOption(name = "Block Refusing New Visitors", desc = "Prevent refusing visitors you've never completed an offer with.")
+    @ConfigOption(
+        name = "Acceptable Coin Loss",
+        desc = "The price to use for the below options.\n" +
+            "Requires one of the below options to be on.\n" +
+            "Above options take precedence."
+    )
+    @ConfigEditorSlider(minValue = 1, maxValue = 500_000, minStep = 1000)
+    public int coinsLossThreshold = 150_000;
+
+    @Expose
+    @ConfigOption(name = "Block Refusing Low Loss", desc = "Prevent refusing a visitor with a net loss lower than a certain value.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventRefusingLowLoss = false;
+
+    @Expose
+    @ConfigOption(name = "Block Accepting High Loss", desc = "Prevent accepting a visitor with a net loss higher than a certain value.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventAcceptingHighLoss = false;
+
+    @Expose
+    @ConfigOption(name = "Block Refusing New Visitors", desc = "Prevents refusing a visitor you've never completed an offer with.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventRefusingNew = true;
@@ -96,7 +118,7 @@ public class RewardWarningConfig {
     public int opacity = 180;
 
     @Expose
-    @ConfigOption(name = "Outline", desc = "Adds a red/green line around the best offer buttons.")
+    @ConfigOption(name = "Outline", desc = "Add a red/green line around the best offer buttons.")
     @ConfigEditorBoolean
     public boolean optionOutline = true;
 }

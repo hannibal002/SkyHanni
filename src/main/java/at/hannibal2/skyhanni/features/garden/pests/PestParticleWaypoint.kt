@@ -1,21 +1,25 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -27,7 +31,9 @@ import java.awt.Color
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
-class PestParticleWaypoint {
+// TODO delete workaround class PestParticleLine when this class works again
+@SkyHanniModule
+object PestParticleWaypoint {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
@@ -37,7 +43,7 @@ class PestParticleWaypoint {
     private var secondParticlePoint: LorenzVec? = null
     private var lastParticlePoint: LorenzVec? = null
     private var guessPoint: LorenzVec? = null
-    private val locations = mutableListOf<LorenzVec>()
+    private var locations = listOf<LorenzVec>()
     private var particles = 0
     private var lastParticles = 0
     private var isPointingToPest = false
@@ -61,7 +67,7 @@ class PestParticleWaypoint {
 
     private fun reset() {
         lastPestTrackerUse = SimpleTimeMark.farPast()
-        locations.clear()
+        locations = emptyList()
         guessPoint = null
         lastParticlePoint = null
         firstParticlePoint = null
@@ -100,21 +106,25 @@ class PestParticleWaypoint {
         } else if (secondParticlePoint == null) {
             secondParticlePoint = location
             lastParticlePoint = location
-            locations.add(location)
+            locations = locations.editCopy {
+                add(location)
+            }
         } else {
             val firstDistance = secondParticlePoint?.let { firstParticlePoint?.distance(it) } ?: return
             val distance = lastParticlePoint?.distance(location) ?: return
             if ((distance - firstDistance).absoluteValue > 0.1) return
             lastParticlePoint = location
-            locations.add(location)
+            locations = locations.editCopy {
+                add(location)
+            }
         }
         ++particles
     }
 
-    @SubscribeEvent
-    fun onFireWorkSpawn(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onFireWorkSpawn(event: PacketReceivedEvent) {
         if (event.packet !is S0EPacketSpawnObject) return
-        if (!GardenAPI.inGarden() || !config.hideParticles) return
+        if (!config.hideParticles) return
         val fireworkId = 76
         if (event.packet.type == fireworkId) event.cancel()
     }
@@ -161,19 +171,19 @@ class PestParticleWaypoint {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
         if (PestAPI.scoreboardPests == 0) reset()
     }
 
     private fun calculateWaypoint(): LorenzVec? {
         val firstParticle = firstParticlePoint ?: return null
-        val list = locations.toMutableSet()
+        val list = locations.toList()
         var pos = LorenzVec(0.0, 0.0, 0.0)
         for ((i, particle) in list.withIndex()) {
-            pos = pos.add(particle.subtract(firstParticle).divide(i.toDouble() + 1.0))
+            pos += (particle - firstParticle) / (i.toDouble() + 1.0)
         }
-        return firstParticle.add(pos.multiply(120.0 / list.size))
+        return firstParticle + pos * (120.0 / list.size)
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.enabled

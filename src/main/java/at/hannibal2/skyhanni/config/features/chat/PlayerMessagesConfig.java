@@ -13,8 +13,7 @@ import java.util.List;
 public class PlayerMessagesConfig {
 
     @Expose
-    @ConfigOption(name = "Enable Chat Formatting", desc = "Enable player chat modifications. Required for all settings below.\n" +
-        "§cThis might break hover/click on chat actions.")
+    @ConfigOption(name = "Enable Chat Formatting", desc = "Enable player chat modifications. Required for all settings below.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enable = false;
@@ -75,7 +74,7 @@ public class PlayerMessagesConfig {
     public boolean playerRankHider = false;
 
     @Expose
-    @ConfigOption(name = "Ignore YouTube", desc = "Do not remove the rank for YouTubers in chat.")
+    @ConfigOption(name = "Ignore YouTube Rank", desc = "Do not remove the YouTube rank from chat.")
     @ConfigEditorBoolean
     public boolean ignoreYouTube = false;
 
@@ -86,7 +85,7 @@ public class PlayerMessagesConfig {
     public boolean chatFilter = false;
 
     @Expose
-    @ConfigOption(name = "Same Chat Color", desc = "All players, also those with ranks, write with the same, white chat color.")
+    @ConfigOption(name = "Same Chat Color", desc = "Make all chat messages white regardless of rank.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sameChatColor = true;

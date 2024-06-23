@@ -65,6 +65,19 @@ object ConfigUtils {
         return JsonPrimitive(getEnumConstantFromLegacyId(element.asInt, enumClass)?.name)
     }
 
+    /**
+     * Migrates a Boolean to an Enum Constant.
+     *
+     * @param element The JsonElement to migrate
+     * @param trueValue The enum value it should map to if the value is true
+     * @param falseValue The enum value it should map to if the value is false
+     * @return The migrated JsonElement
+     */
+    fun <T : Enum<T>> migrateBooleanToEnum(element: JsonElement, trueValue: T, falseValue: T): JsonElement {
+        require(element is JsonPrimitive) { "Expected a JsonPrimitive but got ${element.javaClass.simpleName}" }
+        return JsonPrimitive(if (element.asBoolean) trueValue.name else falseValue.name)
+    }
+
     fun KMutableProperty0<*>.tryFindEditor(editor: MoulConfigEditor<*>): ProcessedOption? {
         return editor.processedConfig.getOptionFromField(this.javaField ?: return null)
     }

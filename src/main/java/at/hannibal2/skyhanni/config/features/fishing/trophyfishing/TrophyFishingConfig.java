@@ -15,6 +15,11 @@ public class TrophyFishingConfig {
     public ChatMessagesConfig chatMessages = new ChatMessagesConfig();
 
     @Expose
+    @ConfigOption(name = "Trophy Fishing Display", desc = "")
+    @Accordion
+    public TrophyFishDisplayConfig display = new TrophyFishDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Geyser Fishing", desc = "")
     @Accordion
     public GeyserFishingConfig geyserOptions = new GeyserFishingConfig();
@@ -33,8 +38,8 @@ public class TrophyFishingConfig {
     @Expose
     @ConfigOption(
         name = "Odger Waypoint",
-        desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand. " +
-            "§cOnly useful for users without abiphone contact."
+        desc = "Show the Odger waypoint when Trophy Fishes are in the inventory and no lava rod in hand.\n" +
+            "§cOnly useful for users without Abiphone contact."
     )
     @ConfigEditorBoolean
     @FeatureToggle

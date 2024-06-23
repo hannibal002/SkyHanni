@@ -12,8 +12,8 @@ public class AuctionHousePriceComparisonConfig {
     @Expose
     @ConfigOption(
         name = "Show Price Comparison",
-        desc = "Highlight auctions based on the difference between their estimated value and the value they are listed for. §eCan " +
-            "be very inaccurate."
+        desc = "Highlight auctions based on the difference between their estimated value and the value they are listed for.\n" +
+            "§eThis may be very inaccurate at times and only provides an estimate."
     )
     @ConfigEditorBoolean
     @FeatureToggle

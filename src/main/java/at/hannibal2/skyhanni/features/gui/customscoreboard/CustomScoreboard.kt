@@ -21,13 +21,19 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
@@ -36,10 +42,12 @@ import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
 
-class CustomScoreboard {
+@SkyHanniModule
+object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
@@ -61,17 +69,21 @@ class CustomScoreboard {
         config.position.renderStringsAlignedWidth(
             render,
             posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10
+            extraSpace = displayConfig.lineSpacing - 10,
         )
     }
 
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
-            if (alignmentConfig.alignRight || alignmentConfig.alignCenterVertically) {
-                alignmentConfig.alignRight = false
-                alignmentConfig.alignCenterVertically = false
-                ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+            with(alignmentConfig) {
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
+                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                ) {
+                    horizontalAlignment = HorizontalAlignment.DONT_ALIGN
+                    verticalAlignment = VerticalAlignment.DONT_ALIGN
+                    ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+                }
             }
         }
     }
@@ -92,19 +104,17 @@ class CustomScoreboard {
         UnknownLinesHandler.handleUnknownLines()
     }
 
-    companion object {
-        internal val config get() = SkyHanniMod.feature.gui.customScoreboard
-        internal val displayConfig get() = config.display
-        internal val alignmentConfig get() = displayConfig.alignment
-        internal val arrowConfig get() = displayConfig.arrow
-        internal val eventsConfig get() = displayConfig.events
-        internal val mayorConfig get() = displayConfig.mayor
-        internal val partyConfig get() = displayConfig.party
-        internal val maxwellConfig get() = displayConfig.maxwell
-        internal val informationFilteringConfig get() = config.informationFiltering
-        internal val backgroundConfig get() = config.background
-        internal val devConfig get() = SkyHanniMod.feature.dev
-    }
+    internal val config get() = SkyHanniMod.feature.gui.customScoreboard
+    internal val displayConfig get() = config.display
+    internal val alignmentConfig get() = displayConfig.alignment
+    internal val arrowConfig get() = displayConfig.arrow
+    internal val chunkedConfig get() = displayConfig.chunkedStats
+    internal val eventsConfig get() = displayConfig.events
+    internal val mayorConfig get() = displayConfig.mayor
+    internal val partyConfig get() = displayConfig.party
+    internal val maxwellConfig get() = displayConfig.maxwell
+    internal val informationFilteringConfig get() = config.informationFiltering
+    internal val backgroundConfig get() = config.background
 
     private fun createLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
@@ -143,11 +153,33 @@ class CustomScoreboard {
         return this
     }
 
+    private var dirty = false
+
     // Thank you Apec for showing that the ElementType of the stupid scoreboard is FUCKING HELMET WTF
     @SubscribeEvent
     fun onRenderScoreboard(event: RenderGameOverlayEvent.Post) {
         if (event.type == RenderGameOverlayEvent.ElementType.HELMET) {
-            GuiIngameForge.renderObjective = !isHideVanillaScoreboardEnabled()
+            if (isHideVanillaScoreboardEnabled()) {
+                GuiIngameForge.renderObjective = false
+            }
+            if (dirty) {
+                GuiIngameForge.renderObjective = true
+                dirty = false
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+            if (!isHideVanillaScoreboardEnabled()) dirty = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        runDelayed(2.seconds) {
+            if (!LorenzUtils.inSkyBlock) dirty = true
         }
     }
 
@@ -155,22 +187,22 @@ class CustomScoreboard {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Custom Scoreboard")
         event.addIrrelevant {
-            if (!config.enabled) {
+            if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
                 ScoreboardElement.entries.map { element ->
                     add(
                         "${element.name.firstLetterUppercase()} - " +
                             "${element.showWhen.invoke()} - " +
-                            "${element.getVisiblePair().map { it.first }}"
+                            "${element.getVisiblePair().map { it.first }}",
                     )
                 }
             }
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
@@ -181,7 +213,7 @@ class CustomScoreboard {
         event.move(
             28,
             "$prefix.displayConfig.showAllActiveEvents",
-            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents",
         )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
@@ -198,7 +230,7 @@ class CustomScoreboard {
         event.move(
             31,
             "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
-            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+            "$displayPrefix.cacheScoreboardOnIslandSwitch",
         )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
@@ -211,7 +243,7 @@ class CustomScoreboard {
 
         event.transform(37, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array.add(JsonPrimitive(ScoreboardEvent.QUEUE.name))
             array
         }
         event.transform(40, "$displayPrefix.events.eventEntries") { element ->
@@ -226,11 +258,40 @@ class CustomScoreboard {
             }
 
             if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
-                newArray.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
+                newArray.add(JsonPrimitive(ScoreboardEvent.RIFT.name))
             }
 
             newArray
         }
 
+        event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
+            JsonPrimitive(
+                if (it.asBoolean) {
+                    HorizontalAlignment.RIGHT.name
+                } else {
+                    HorizontalAlignment.DONT_ALIGN.name
+                },
+            )
+        }
+        event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
+            JsonPrimitive(
+                if (it.asBoolean) {
+                    VerticalAlignment.CENTER.name
+                } else {
+                    VerticalAlignment.DONT_ALIGN.name
+                },
+            )
+        }
+        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvent.ANNIVERSARY.name))
+            array.add(JsonPrimitive(ScoreboardEvent.CARNIVAL.name))
+            array
+        }
+        event.transform(51, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvent.NEW_YEAR.name))
+            array
+        }
     }
 }

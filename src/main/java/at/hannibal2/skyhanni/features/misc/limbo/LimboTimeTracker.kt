@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -25,6 +26,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
 
+@SkyHanniModule
 object LimboTimeTracker {
     private val storage get() = ProfileStorageData.playerSpecific?.limbo
     private val config get() = SkyHanniMod.feature.misc
@@ -117,7 +119,10 @@ object LimboTimeTracker {
             userLuck = ((storage?.personalBest ?: 0) * USER_LUCK_MULTIPLIER).round(2)
             if (onFire) userLuck *= FIRE_MULTIPLIER
             ChatUtils.chat("§fYou were in Limbo for §e$duration§f! §d§lPERSONAL BEST§r§f!")
-            ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            if (oldPB != 0.seconds) {
+                ChatUtils.chat("§fYour previous Personal Best was §e$oldPB.")
+            }
+
         } else ChatUtils.chat("§fYou were in Limbo for §e$duration§f.")
         if (userLuck > oldLuck) {
             if (onFire) {

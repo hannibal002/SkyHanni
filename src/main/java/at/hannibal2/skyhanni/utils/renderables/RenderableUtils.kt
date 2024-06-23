@@ -13,11 +13,14 @@ internal object RenderableUtils {
         buildList {
             add(0)
             while (true) {
-                buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOf {
+                buffer += content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
                     it?.width ?: 0
                 }?.let { it + xPadding } ?: break
                 add(buffer)
                 index++
+            }
+            if (this.size == 1) {
+                add(xPadding)
             }
         }
     }
@@ -25,43 +28,55 @@ internal object RenderableUtils {
     /** Calculates the absolute y position of the rows in a table*/
     fun calculateTableYOffsets(content: List<List<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
-        listOf(0) + content.map { row ->
-            buffer += row.maxOf { it?.height ?: 0 } + yPadding
+        listOf(0) + (content.takeIf { it.isNotEmpty() }?.map { row ->
+            buffer += (row.maxOfOrNull { it?.height ?: 0 } ?: 0) + yPadding
             buffer
-        }
+        } ?: listOf(yPadding))
     }
 
     private fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
         HorizontalAlignment.LEFT -> 0
         HorizontalAlignment.CENTER -> (xSpace - renderable.width) / 2
         HorizontalAlignment.RIGHT -> xSpace - renderable.width
+        else -> 0
     }
 
     private fun calculateAlignmentYOffset(renderable: Renderable, ySpace: Int) = when (renderable.verticalAlign) {
         VerticalAlignment.TOP -> 0
         VerticalAlignment.CENTER -> (ySpace - renderable.height) / 2
         VerticalAlignment.BOTTOM -> ySpace - renderable.height
+        else -> 0
     }
 
-    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int) {
+    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         GlStateManager.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
         this.render(posX + xOffset, posY + yOffset)
         GlStateManager.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
+        return xOffset to yOffset
     }
 
-    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int) {
+    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         GlStateManager.translate(xOffset.toFloat(), 0f, 0f)
         this.render(posX + xOffset, posY)
         GlStateManager.translate(-xOffset.toFloat(), 0f, 0f)
+        return xOffset
     }
 
-    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int) {
+    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         GlStateManager.translate(0f, yOffset.toFloat(), 0f)
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
+        return yOffset
     }
+}
+
+internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
+    override val width = content.width
+    override val height = content.height
+    override val horizontalAlign = content.horizontalAlign
+    override val verticalAlign = content.verticalAlign
 }

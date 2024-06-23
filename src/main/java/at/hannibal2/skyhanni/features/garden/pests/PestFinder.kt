@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -15,12 +15,14 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.sendTeleportTo
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -31,14 +33,14 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class PestFinder {
+@SkyHanniModule
+object PestFinder {
 
     private val config get() = PestAPI.config.pestFinder
 
     private var display = emptyList<Renderable>()
-    private var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
         update()
     }
@@ -83,7 +85,7 @@ class PestFinder {
                     "Runs /desk."
                 ),
                 onClick = {
-                    ChatUtils.sendCommandToServer("desk")
+                    HypixelCommands.gardenDesk()
                 }
             ))
         }
@@ -111,7 +113,7 @@ class PestFinder {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
-        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
+        if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         val visibility = config.visibilityType
@@ -165,7 +167,18 @@ class PestFinder {
         if (lastKeyPress.passedSince() < 2.seconds) return
         lastKeyPress = SimpleTimeMark.now()
 
+        teleportNearestInfestedPlot()
+    }
+
+    fun teleportNearestInfestedPlot() {
+        // need to check again for the command
+        if (!GardenAPI.inGarden()) {
+            ChatUtils.userError("This command only works while on the Garden!")
+        }
+
         val plot = PestAPI.getNearestInfestedPlot() ?: run {
+            if (config.backToGarden) return HypixelCommands.warp("garden")
+
             ChatUtils.userError("No infested plots detected to warp to!")
             return
         }
@@ -176,14 +189,6 @@ class PestFinder {
         }
 
         plot.sendTeleportTo()
-    }
-
-    @SubscribeEvent
-    fun onItemInHandChange(event: ItemInHandChangeEvent) {
-        if (!isEnabled()) return
-        if (!config.showPlotInWorld) return
-        if (event.oldItem !in PestAPI.vacuumVariants) return
-        lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
     fun isEnabled() = GardenAPI.inGarden() && (config.showDisplay || config.showPlotInWorld)

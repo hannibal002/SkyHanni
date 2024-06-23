@@ -26,7 +26,7 @@ class BingoGoal {
     lateinit var hiddenGoalData: HiddenGoalData
 
     @Expose
-    var communtyGoalPercentage: Double? = null
+    var communtyGoalPercentage: Double? = null // TODO fix typo (Needs changes inside of storage)
 
     override fun toString(): String = displayName
 }

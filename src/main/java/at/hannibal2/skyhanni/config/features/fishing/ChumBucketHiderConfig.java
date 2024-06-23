@@ -12,7 +12,7 @@ public class ChumBucketHiderConfig {
     @ConfigOption(name = "Enable", desc = "Hide the Chum/Chumcap Bucket name tags for other players.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public Property<Boolean> enabled = Property.of(true);
+    public Property<Boolean> enabled = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Hide Bucket", desc = "Hide the Chum/Chumcap Bucket.")
@@ -20,7 +20,7 @@ public class ChumBucketHiderConfig {
     public Property<Boolean> hideBucket = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Hide Own", desc = "Hides your own Chum/Chumcap Bucket.")
+    @ConfigOption(name = "Hide Own", desc = "Hide your own Chum/Chumcap Bucket.")
     @ConfigEditorBoolean
     public Property<Boolean> hideOwn = Property.of(false);
 }

@@ -1,126 +1,103 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide.pages
 
-import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
+import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrade
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FortuneUpgrades
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
-import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil
-import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.MathHelper
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.guide.GuideScrollPage
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import java.text.DecimalFormat
 
-class UpgradePage : FFGuideGUI.FFGuidePage() {
+class UpgradePage(val crop0: () -> CropType?, sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7) :
+    GuideScrollPage(
+        sizeX,
+        sizeY,
+        paddingX,
+        paddingY,
+        marginY = 10,
+        hasHeader = true,
+    ) {
 
-    private var pageScroll = 0
-    private var scrollVelocity = 0.0
-    private val maxNoInputFrames = 100
-    private var listLength = 0
+    val crop get() = crop0()
 
-    override fun drawPage(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        val adjustedY = FFGuideGUI.guiTop + 20 + pageScroll
-        val inverseScale = 1 / 0.75f
-
-        // TODO fix duplicate drawString lines, add guiLeft, guiTop and inverseScale
-        GlStateManager.scale(0.75f, 0.75f, 1f)
-        GuiRenderUtils.drawString(
-            "Upgrade",
-            (FFGuideGUI.guiLeft + 45) * inverseScale,
-            (FFGuideGUI.guiTop + 5) * inverseScale
-        )
-        GuiRenderUtils.drawString(
-            "Item",
-            (FFGuideGUI.guiLeft + 190) * inverseScale,
-            (FFGuideGUI.guiTop + 5) * inverseScale
-        )
-        GuiRenderUtils.drawString(
-            "FF increase",
-            (FFGuideGUI.guiLeft + 240) * inverseScale,
-            (FFGuideGUI.guiTop + 5) * inverseScale
-        )
-        GuiRenderUtils.drawString(
-            "Cost/FF",
-            (FFGuideGUI.guiLeft + 290) * inverseScale,
-            (FFGuideGUI.guiTop + 5) * inverseScale
-        )
-        GuiRenderUtils.drawString(
-            "Total",
-            (FFGuideGUI.guiLeft + 330) * inverseScale,
-            (FFGuideGUI.guiTop + 5) * inverseScale
-        )
-
-        val upgradeList =
-            if (FFGuideGUI.currentCrop == null) FortuneUpgrades.genericUpgrades else FortuneUpgrades.cropSpecificUpgrades
-        listLength = upgradeList.size
-        for ((index, upgrade) in upgradeList.withIndex()) {
-            if (adjustedY + 25 * index < FFGuideGUI.guiTop + 20) continue
-            if (adjustedY + 25 * index > FFGuideGUI.guiTop + 160) continue
-            val upgradeItem = upgrade.requiredItem.asInternalName().getItemStack()
-            var formattedUpgrade = upgradeItem.itemName
-            if (adjustedY + 25 * index - 5 < FFGuideGUI.lastClickedHeight && FFGuideGUI.lastClickedHeight < adjustedY + 25 * index + 10) {
-                FFGuideGUI.lastClickedHeight = 0
-                BazaarApi.searchForBazaarItem(formattedUpgrade, upgrade.itemQuantity)
-            }
-            if (upgrade.itemQuantity != 1) {
-                formattedUpgrade = "$formattedUpgrade §fx${upgrade.itemQuantity}"
-            }
-            GuiRenderUtils.drawTwoLineString(
-                upgrade.description,
-                (FFGuideGUI.guiLeft + 15) * inverseScale,
-                (adjustedY + 25 * index) * inverseScale
-            )
-            GuiRenderUtils.renderItemAndTip(
-                FFGuideGUI.tooltipToDisplay,
-                upgradeItem,
-                (FFGuideGUI.guiLeft + 155) * inverseScale,
-                (adjustedY + 25 * index - 5) * inverseScale,
-                mouseX * inverseScale,
-                mouseY * inverseScale,
-                0x00FFFFFF
-            )
-            GuiRenderUtils.drawString(
-                formattedUpgrade,
-                (FFGuideGUI.guiLeft + 180) * inverseScale,
-                (adjustedY + 25 * index) * inverseScale
-            )
-            GuiRenderUtils.drawString(
-                "§a${DecimalFormat("0.##").format(upgrade.fortuneIncrease)}",
-                (FFGuideGUI.guiLeft + 270) * inverseScale,
-                (adjustedY + 25 * index) * inverseScale
-            )
-            GuiRenderUtils.drawString(
-                "§6" + upgrade.costPerFF?.let { NumberUtil.format(it) },
-                (FFGuideGUI.guiLeft + 300) * inverseScale,
-                (adjustedY + 25 * index) * inverseScale
-            )
-            GuiRenderUtils.drawString(
-                ("§6" + upgrade.cost?.let { NumberUtil.format(it) }),
-                (FFGuideGUI.guiLeft + 335) * inverseScale,
-                (adjustedY + 25 * index) * inverseScale
-            )
+    override fun onEnter() {
+        crop?.let {
+            FortuneUpgrades.getCropSpecific(it.farmingItem.getItemOrNull())
+        } ?: {
+            FortuneUpgrades.getCropSpecific(null) // TODO
         }
-        GlStateManager.scale(inverseScale, inverseScale, 1f)
-        scrollScreen()
+
+        FarmingItems.resetClickState()
+        update(
+            content = buildList {
+                add(header())
+                val upgradeList = if (crop == null)
+                    FortuneUpgrades.genericUpgrades
+                else
+                    FortuneUpgrades.cropSpecificUpgrades
+                addAll(upgradeList.map { upgrade -> upgrade.print() })
+            }
+        )
     }
 
-    private fun scrollScreen() {
-        scrollVelocity += FFGuideGUI.lastMouseScroll / 48.0
-        scrollVelocity *= 0.95
-        pageScroll += scrollVelocity.toInt() + FFGuideGUI.lastMouseScroll / 24
+    private fun header() = listOf("Upgrade", "", "Item", "FF", "Cost/FF", "Total").map {
+        Renderable.string(
+            it,
+            0.9,
+            horizontalAlign = HorizontalAlignment.CENTER
+        )
+    }
 
-        FFGuideGUI.noMouseScrollFrames++
-
-        if (FFGuideGUI.noMouseScrollFrames >= maxNoInputFrames) {
-            scrollVelocity *= 0.75
-        }
-
-        if (pageScroll > 0) {
-            pageScroll = 0
-        }
-
-        pageScroll = MathHelper.clamp_int(pageScroll, -(listLength * 15 - 15), 0)
-        FFGuideGUI.lastMouseScroll = 0
+    private fun FortuneUpgrade.print() = buildList {
+        add(
+            Renderable.wrappedString(
+                description,
+                136,
+                0.75,
+                verticalAlign = VerticalAlignment.CENTER
+            )
+        )
+        add(
+            Renderable.itemStackWithTip(
+                requiredItem.getItemStack(),
+                8.0 / 9.0,
+                verticalAlign = VerticalAlignment.CENTER
+            )
+        )
+        add(
+            Renderable.wrappedString(
+                requiredItem.itemName.let { if (itemQuantity == 1) it else "$it §fx$itemQuantity" }, // TODO wtf
+                70,
+                0.75,
+                verticalAlign = VerticalAlignment.CENTER
+            )
+        )
+        add(
+            Renderable.string(
+                "§a${DecimalFormat("0.##").format(fortuneIncrease)}",
+                horizontalAlign = HorizontalAlignment.CENTER,
+                verticalAlign = VerticalAlignment.CENTER
+            )
+        ) // TODO cleaner formating
+        add(
+            Renderable.string(
+                "§6" + costPerFF?.let { it.shortFormat() },
+                horizontalAlign = HorizontalAlignment.CENTER,
+                verticalAlign = VerticalAlignment.CENTER
+            )
+        )
+        add(
+            Renderable.string(
+                "§6" + cost?.let { it.shortFormat() },
+                horizontalAlign = HorizontalAlignment.CENTER,
+                verticalAlign = VerticalAlignment.CENTER
+            )
+        )
     }
 }
+

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.skillprogress
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -12,9 +13,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SkillTooltip {
+@SkyHanniModule
+object SkillTooltip {
 
     private val overflowConfig get() = SkillProgress.config.overflowConfig
     private val customGoalConfig get() = SkillProgress.config.customGoalConfig
@@ -29,7 +32,7 @@ class SkillTooltip {
             val split = stack.cleanName().split(" ")
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: return
-            val useRoman = split.last().toIntOrNull() == null
+            val useRoman = split.last().isRoman()
             val skillInfo = SkillAPI.storage?.get(skill) ?: return
             val showCustomGoal = skillInfo.customGoalLevel != 0 && customGoalConfig.enableInSkillMenuTooltip
             var next = false

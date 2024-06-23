@@ -121,7 +121,7 @@ public class TrackerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not insidie an inventory.")
+    @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not inside an inventory.")
     @ConfigEditorBoolean
     public boolean hideItemTrackersOutsideInventory = false;
 }

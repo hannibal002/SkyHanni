@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,20 +22,19 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
 import io.github.moulberry.notenoughupdates.util.toJsonArray
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -54,6 +54,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenNextJacobContest {
 
     private var dispatcher = Dispatchers.IO
@@ -67,9 +68,16 @@ object GardenNextJacobContest {
         "day",
         "§aDay (?<day>.*)"
     )
+
+    /**
+     * REGEX-TEST: Early Spring, Year 351
+     * REGEX-TEST: Late Summer, Year 351
+     * REGEX-TEST: Autumn, Year 351
+     */
+
     val monthPattern by patternGroup.pattern(
         "month",
-        "(?<month>.*), Year (?<year>.*)"
+        "(?<month>(?:\\w+ )?(?:Summer|Spring|Winter|Autumn)), Year (?<year>\\d+)"
     )
     private val cropPattern by patternGroup.pattern(
         "crop",
@@ -99,7 +107,7 @@ object GardenNextJacobContest {
             return
         }
 
-        event.addData {
+        event.addIrrelevant {
             add("Current time: ${SimpleTimeMark.now()}")
             add("")
 
@@ -187,11 +195,8 @@ object GardenNextJacobContest {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
-        if (!monthPattern.matches(event.inventoryName)) return
-
-        inCalendar = true
-
         monthPattern.matchMatcher(event.inventoryName) {
+            inCalendar = true
             val month = LorenzUtils.getSBMonthByName(group("month"))
             val year = group("year").toInt()
 
@@ -247,9 +252,9 @@ object GardenNextJacobContest {
                 } else {
                     ChatUtils.clickableChat(
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
-                        onClick = {
-                            shareContests()
-                        }
+                        onClick = { shareContests() },
+                        "§eClick to submit!",
+                        oneTimeClick = true
                     )
                 }
             }
@@ -303,7 +308,9 @@ object GardenNextJacobContest {
                     config.shareAutomatically = ShareContestsEntry.AUTO
                     SkyHanniMod.feature.storage.contestSendingAsked = true
                     ChatUtils.chat("§2Enabled automatic sharing of future contests!")
-                }
+                },
+                "§eClick to enable autosharing!",
+                oneTimeClick = true
             )
         }
     }
@@ -557,9 +564,11 @@ object GardenNextJacobContest {
                 }
             } else {
                 ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
-                ChatUtils.clickableChat("Click here to open your calendar!", onClick = {
-                    HypixelCommands.calendar()
-                })
+                ChatUtils.clickableChat(
+                    "Click here to open your calendar!",
+                    onClick = { HypixelCommands.calendar() },
+                    "§eClick to run /calendar!"
+                )
             }
 
             if (newContests.count() == MAX_CONTESTS_PER_YEAR) {

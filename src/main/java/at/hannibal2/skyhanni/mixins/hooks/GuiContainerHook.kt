@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
+import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.events.DrawScreenAfterEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.CloseWindowEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.DelayedRun
+import io.github.moulberry.notenoughupdates.NEUApi
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.inventory.Slot
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
@@ -24,6 +27,29 @@ class GuiContainerHook(guiAny: Any) {
     fun backgroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (!SkyHanniDebugsAndTests.globalRender) return
         GuiContainerEvent.BackgroundDrawnEvent(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
+    }
+
+    fun preDraw(
+        mouseX: Int,
+        mouseY: Int,
+        partialTicks: Float,
+        ci: CallbackInfo,
+    ) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
+        if (GuiContainerEvent.PreDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
+            NEUApi.setInventoryButtonsToDisabled()
+            GuiData.preDrawEventCancelled = true
+            ci.cancel()
+        } else {
+            DelayedRun.runNextTick {
+                GuiData.preDrawEventCancelled = false
+            }
+        }
+    }
+
+    fun postDraw(mouseX: Int, mouseY: Int, partialTicks: Float) {
+        if (!SkyHanniDebugsAndTests.globalRender) return
+        GuiContainerEvent.PostDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
     fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {
@@ -52,4 +78,5 @@ class GuiContainerHook(guiAny: Any) {
     ) {
         if (DrawScreenAfterEvent(mouseX, mouseY, ci).postAndCatch()) ci.cancel()
     }
+
 }
