@@ -320,8 +320,15 @@ object ReforgeHelper {
             tip = stat.iconWithName
         }
 
-        val fieldColor = if (sortAfter == stat) LorenzColor.GRAY else LorenzColor.DARK_GRAY
+        val alreadySelected = sortAfter == stat
+        val fieldColor = if (alreadySelected) LorenzColor.GRAY else LorenzColor.DARK_GRAY
 
+
+        val tips = if (alreadySelected) {
+            listOf("§6Sort after", tip)
+        } else {
+            listOf("§6Sort after", tip, "", "§eClick to apply sorting!")
+        }
         val sortField =
             Renderable.drawInsideRoundedRect(
                 Renderable.hoverTips(
@@ -329,11 +336,11 @@ object ReforgeHelper {
                         renderableString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                         SkyblockStat.fontSizeOfLargestIcon,
                     ),
-                    listOf("§6Sort after", tip, "", "§eClick to apply sorting!"),
+                    tips,
                 ),
                 fieldColor.toColor(), radius = 15, padding = 1,
             )
-        return if (sortAfter == stat) {
+        return if (alreadySelected) {
             sortField
         } else {
             Renderable.clickable(
