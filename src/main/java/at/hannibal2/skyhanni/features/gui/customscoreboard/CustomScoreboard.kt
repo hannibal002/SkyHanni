@@ -118,32 +118,24 @@ object CustomScoreboard {
     internal val informationFilteringConfig get() = config.informationFiltering
     internal val backgroundConfig get() = config.background
 
-    private fun createLines() = buildList<ScoreboardElementType> {
-        if (!LorenzUtils.inSkyBlock) {
-            addAllNonSkyBlockLines()
-            return@buildList
-        }
-
-        if (!displayConfig.useCustomLines) {
-            addDefaultSkyBlockLines()
-            return@buildList
-        }
-
-        addCustomSkyBlockLines()
+    private fun createLines() = when {
+        !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()
+        !displayConfig.useCustomLines -> addDefaultSkyBlockLines()
+        else -> addCustomSkyBlockLines()
     }
 
-    private fun MutableList<ScoreboardElementType>.addAllNonSkyBlockLines() {
+    private fun addAllNonSkyBlockLines() = buildList {
         addAll(ScoreboardElement.TITLE.getVisiblePair())
         addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
         addAll(ScoreboardElement.FOOTER.getVisiblePair())
     }
 
-    private fun MutableList<ScoreboardElementType>.addDefaultSkyBlockLines() {
+    private fun addDefaultSkyBlockLines() = buildList {
         add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
         addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
     }
 
-    private fun MutableList<ScoreboardElementType>.addCustomSkyBlockLines() {
+    private fun addCustomSkyBlockLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
             val lines = element.getVisiblePair()
             if (lines.isEmpty()) continue
