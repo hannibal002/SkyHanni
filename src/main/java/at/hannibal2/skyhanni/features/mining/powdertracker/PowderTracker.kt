@@ -92,6 +92,7 @@ object PowderTracker {
         calculateResourceHour(diamondEssenceInfo)
         calculateResourceHour(goldEssenceInfo)
         calculateResourceHour(chestInfo)
+        calculateResourceHour(hardStoneInfo)
 
         doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
         powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
@@ -273,7 +274,7 @@ object PowderTracker {
         addPerHour(rewards, entries[47], goldEssenceInfo)
         addAsSingletonList("")
         val hardStonePerHour = format(hardStoneInfo.perHour)
-        addAsSingletonList("§f${data.totalHardStoneCompacted.addSeparators()} Hard Stone Compacted §7($hardStonePerHour/h)")
+        addAsSingletonList("§b${data.totalHardStoneCompacted.addSeparators()} §fHard Stone §bCompacted §7($hardStonePerHour/h)")
         addAsSingletonList("")
         for ((gem, color) in gemstones) {
             var totalGemstone = 0L
@@ -307,7 +308,7 @@ object PowderTracker {
         val redEgg = rewards.getOrDefault(PowderChestReward.RED_GOBLIN_EGG, 0)
         val yellowEgg = rewards.getOrDefault(PowderChestReward.YELLOW_GOBLIN_EGG, 0)
         val blueEgg = rewards.getOrDefault(PowderChestReward.BLUE_GOBLIN_EGG, 0)
-        addAsSingletonList("§3$blueEgg-§c$redEgg-§e$yellowEgg-§a$greenEgg-§9$goblinEgg §fGoblin Egg")
+        addAsSingletonList("§3$blueEgg§f-§c$redEgg§f-§e$yellowEgg§f-§a$greenEgg§f-§9$goblinEgg §fGoblin Egg")
 
         for (reward in entries.subList(37, 46)) {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
