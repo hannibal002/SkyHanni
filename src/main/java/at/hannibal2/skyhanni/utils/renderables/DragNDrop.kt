@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -18,6 +19,8 @@ object DragNDrop {
 
     private const val buttonMapped = button - 100
 
+    private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
+
     @SubscribeEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.BeforeDraw) {
         isInvalidDrop = false
@@ -31,7 +34,11 @@ object DragNDrop {
             return
         }
         GlStateManager.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
-        item.onRender(event.mouseX, event.mouseY)
+        if (isInvalidDrop) {
+            invalidItem.render(event.mouseX, event.mouseY)
+        } else {
+            item.onRender(event.mouseX, event.mouseY)
+        }
         GlStateManager.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
     }
 
