@@ -70,7 +70,7 @@ object MiningAPI {
 
     private var recentClickedBlocks = mutableMapOf<LorenzVec, MinedBlock>()
     private var surroundingMinedBlocks = mutableMapOf<LorenzVec, MinedBlock>()
-    private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth")
+    private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
     var cold: Int = 0
         private set
@@ -142,8 +142,9 @@ object MiningAPI {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
+        if (event.soundName !in allowedSoundNames) return
         if (waitingForInitSound) {
-            if (event.soundName in allowedSoundNames && event.pitch == 0.7936508f) {
+            if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
                 if (pos !in recentClickedBlocks) return
                 waitingForInitSound = false
@@ -155,13 +156,11 @@ object MiningAPI {
         }
         if (waitingForEffMinerSound) {
             if (surroundingMinedBlocks.isEmpty()) return
-            if (event.soundName in allowedSoundNames || event.soundName == "random.orb") {
-                val lastBlock = surroundingMinedBlocks.values.minByOrNull { it.time.passedSince() } ?: return
-                if (lastBlock.confirmed) return
-                waitingForEffMinerSound = false
-                lastBlock.confirmed = true
-                waitingForEffMinerBlock = true
-            }
+            val lastBlock = surroundingMinedBlocks.values.minByOrNull { it.time.passedSince() } ?: return
+            if (lastBlock.confirmed) return
+            waitingForEffMinerSound = false
+            lastBlock.confirmed = true
+            waitingForEffMinerBlock = true
         }
     }
 
