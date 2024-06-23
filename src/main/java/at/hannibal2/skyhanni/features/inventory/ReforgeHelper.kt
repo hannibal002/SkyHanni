@@ -262,31 +262,30 @@ object ReforgeHelper {
         reforge: ReforgeAPI.Reforge,
         itemRarity: LorenzRarity,
     ): List<Renderable> {
-        val pre: List<Renderable>
         val stats: List<Renderable>
         val removedEffect: List<Renderable>
         val addEffectText: String
         val click: List<Renderable>
         if (currentReforge == reforge) {
-            pre = listOf(renderableString("§3Reforge is currently applied!"))
             stats = currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList()
             removedEffect = emptyList()
             addEffectText = "§aEffect:"
-            click = emptyList()
+            click = listOf(renderableString(""), renderableString("§3Reforge is currently applied!"))
         } else {
-            pre = listOf(renderableString("§6Reforge Stats"))
             stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList()
             removedEffect = getReforgeEffect(
                 currentReforge,
                 itemRarity,
             )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff } ?: emptyList()
             addEffectText = "§aAdds Effect:"
-            click = listOf(renderableString(""), renderableString("§eClick to select!"))
+            click = if (reforgeToSearch != reforge) {
+                listOf(renderableString(""), renderableString("§eClick to select!"))
+            } else emptyList()
         }
 
         val addedEffect = getReforgeEffect(reforge, itemRarity)?.let { listOf(renderableString(addEffectText)) + it } ?: emptyList()
 
-        return pre + stats + removedEffect + addedEffect + click
+        return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
     }
 
     private fun getReforgeEffect(reforge: ReforgeAPI.Reforge?, rarity: LorenzRarity) =
