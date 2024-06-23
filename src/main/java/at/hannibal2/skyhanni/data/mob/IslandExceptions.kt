@@ -79,9 +79,9 @@ object IslandExceptions {
                 .makeMobResult { MobFactories.boss(baseEntity, it, overriddenName = "Real Livid") }
 
         baseEntity is EntityIronGolem && MobFilter.wokeSleepingGolemPattern.matches(
-            armorStand?.name ?: ""
+            armorStand?.name ?: "",
         ) -> MobData.MobResult.found(
-            Mob(baseEntity, Mob.Type.DUNGEON, armorStand, "Sleeping Golem")
+            Mob(baseEntity, Mob.Type.DUNGEON, armorStand, "Sleeping Golem"),
         ) // Consistency fix
         else -> null
     }
@@ -107,8 +107,8 @@ object IslandExceptions {
         baseEntity is EntitySlime && armorStand != null && armorStand.cleanName()
             .startsWith("﴾ [Lv10] B") -> MobData.MobResult.found(
             Mob(
-                baseEntity, Mob.Type.BOSS, armorStand, name = "Bacte"
-            )
+                baseEntity, Mob.Type.BOSS, armorStand, name = "Bacte",
+            ),
         )
 
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() && baseEntity.name == "Branchstrutter " ->
@@ -123,7 +123,7 @@ object IslandExceptions {
         nextEntity: EntityLivingBase?,
     ) = when {
         baseEntity is EntitySlime && armorStand?.name == "§f§lCOLLECT!" -> MobData.MobResult.found(
-            MobFactories.special(baseEntity, "Heavy Pearl")
+            MobFactories.special(baseEntity, "Heavy Pearl"),
         )
 
         baseEntity is EntityPig && nextEntity is EntityPig -> MobData.MobResult.illegal // Matriarch Tongue
@@ -139,7 +139,7 @@ object IslandExceptions {
 
         baseEntity is EntityPigZombie && baseEntity.inventory?.get(4)
             ?.getSkullTexture() == MobFilter.NPC_TURD_SKULL -> MobData.MobResult.found(
-            Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Turd")
+            Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = "Turd"),
         )
 
         baseEntity is EntityOcelot -> if (MobFilter.createDisplayNPC(baseEntity)) {
@@ -153,7 +153,7 @@ object IslandExceptions {
 
     private fun deepCaverns(baseEntity: EntityLivingBase) = when {
         baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 120 -> MobData.MobResult.found(
-            Mob(baseEntity, Mob.Type.BASIC, name = "Sneaky Creeper", levelOrTier = 3)
+            Mob(baseEntity, Mob.Type.BASIC, name = "Sneaky Creeper", levelOrTier = 3),
         )
 
         else -> null
@@ -161,7 +161,7 @@ object IslandExceptions {
 
     private fun dwarvenMines(baseEntity: EntityLivingBase) = when {
         baseEntity is EntityCreeper && baseEntity.baseMaxHealth.derpy() == 1_000_000 -> MobData.MobResult.found(
-            MobFactories.basic(baseEntity, "Ghost")
+            MobFactories.basic(baseEntity, "Ghost"),
         )
 
         else -> null
@@ -187,7 +187,7 @@ object IslandExceptions {
             MobUtils.getArmorStand(baseEntity, 1).makeMobResult { MobFactories.basic(baseEntity, it) }
 
         baseEntity is EntityOcelot && (nextEntity is EntityOcelot || nextEntity == null) -> MobUtils.getArmorStand(
-            baseEntity, 3
+            baseEntity, 3,
         ).makeMobResult { MobFactories.basic(baseEntity, it) }
 
         baseEntity is EntityOtherPlayerMP &&
@@ -196,9 +196,9 @@ object IslandExceptions {
             MobUtils.getArmorStand(baseEntity, 2)
                 .makeMobResult { MobFactories.basic(baseEntity, it, listOf(armorStand)) }
 
-        baseEntity is EntityZombie && armorStand?.isDefaultValue() == true && MobUtils.getNextEntity(
-            baseEntity, 4
-        )?.name?.startsWith("§e") == true -> petCareHandler(baseEntity)
+        baseEntity is EntityZombie && armorStand?.isDefaultValue() == true &&
+            MobUtils.getNextEntity(baseEntity, 4)
+                ?.name?.startsWith("§e") == true -> petCareHandler(baseEntity)
 
         baseEntity is EntityZombie && armorStand != null && !armorStand.isDefaultValue() -> null // Impossible Rat
         baseEntity is EntityZombie -> ratHandler(baseEntity, nextEntity) // Possible Rat
@@ -207,7 +207,7 @@ object IslandExceptions {
 
     private fun garden(baseEntity: EntityLivingBase) = when {
         baseEntity is EntityOtherPlayerMP && baseEntity.isNPC() -> MobData.MobResult.found(
-            Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = baseEntity.cleanName())
+            Mob(baseEntity, Mob.Type.DISPLAY_NPC, name = baseEntity.cleanName()),
         )
 
         else -> null
@@ -225,9 +225,9 @@ object IslandExceptions {
 
     private fun winterIsland(baseEntity: EntityLivingBase) = when {
         baseEntity is EntityMagmaCube && MobFilter.jerryMagmaCubePattern.matches(
-            MobUtils.getArmorStand(baseEntity, 2)?.name
+            MobUtils.getArmorStand(baseEntity, 2)?.name,
         ) -> MobData.MobResult.found(
-            Mob(baseEntity, Mob.Type.BOSS, MobUtils.getArmorStand(baseEntity, 2), "Jerry Magma Cube")
+            Mob(baseEntity, Mob.Type.BOSS, MobUtils.getArmorStand(baseEntity, 2), "Jerry Magma Cube"),
         )
 
         else -> null
@@ -257,7 +257,8 @@ object IslandExceptions {
                     armorStand = extraEntityList[1],
                     name = this.group("name"),
                     additionalEntities = extraEntityList,
-                    levelOrTier = this.group("level").toInt()),
+                    levelOrTier = this.group("level").toInt(),
+                ),
             )
         } ?: MobData.MobResult.somethingWentWrong
     }
