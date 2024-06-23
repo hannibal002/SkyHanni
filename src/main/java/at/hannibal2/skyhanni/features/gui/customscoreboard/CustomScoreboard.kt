@@ -134,18 +134,12 @@ object CustomScoreboard {
     val informationFilteringConfig: InformationFilteringConfig get() = config.informationFiltering
     val backgroundConfig: BackgroundConfig get() = config.background
 
-    private fun createLines() = buildList<ScoreboardLine> {
-        if (!LorenzUtils.inSkyBlock) {
-            addAllNonSkyBlockLines()
-            return@buildList
+    private fun createLines() = buildList {
+        when {
+            !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()
+            !displayConfig.useCustomLines -> addDefaultSkyBlockLines()
+            else -> addCustomSkyBlockLines()
         }
-
-        if (!displayConfig.useCustomLines) {
-            addDefaultSkyBlockLines()
-            return@buildList
-        }
-
-        addCustomSkyBlockLines()
     }
 
     private fun MutableList<ScoreboardLine>.addAllNonSkyBlockLines() {
