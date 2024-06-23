@@ -15,9 +15,9 @@ object DragNDrop {
 
     private var isInvalidDrop = false
 
-    private const val button = 0
+    private const val BUTTON = 0
 
-    private const val buttonMapped = button - 100
+    private const val BUTTON_MAPPED = BUTTON - 100
 
     private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
 
@@ -29,7 +29,7 @@ object DragNDrop {
     @SubscribeEvent
     fun onGuiContainerAfterDraw(event: GuiContainerEvent.AfterDraw) {
         val item = currentDrag ?: return
-        if (!buttonMapped.isKeyHeld()) {
+        if (!BUTTON_MAPPED.isKeyHeld()) {
             currentDrag = null
             return
         }
@@ -50,7 +50,7 @@ object DragNDrop {
     ) = Renderable.clickable(
         display,
         onClick = { currentDrag = item() },
-        button = button,
+        button = BUTTON,
         bypassChecks = bypassChecks,
         condition = condition,
     )
@@ -72,7 +72,7 @@ object DragNDrop {
     private fun handelDroppable(drop: Droppable) {
         val item = currentDrag ?: return
         if (drop.validTarget(item.get())) {
-            if (!buttonMapped.isKeyHeld()) {
+            if (!BUTTON_MAPPED.isKeyHeld()) {
                 drop.handle(item.get())
                 currentDrag = null
             }
