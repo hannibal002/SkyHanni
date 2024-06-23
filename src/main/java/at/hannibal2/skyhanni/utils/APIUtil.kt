@@ -75,9 +75,8 @@ object APIUtil {
                             if (showApiErrors && apiName == "Hypixel API") {
                                 ChatUtils.clickableChat(
                                     "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
-                                    onClick = {
-                                        toggleApiErrorMessages()
-                                    }
+                                    onClick = { toggleApiErrorMessages() },
+                                    "§eClick to run /shtogglehypixelapierrors!"
                                 )
                             }
                             ErrorManager.skyHanniError(

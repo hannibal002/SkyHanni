@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -143,9 +143,9 @@ object BitsAPI {
     )
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
-        for (line in event.newList) {
+        for (line in event.scoreboard) {
             val message = line.trimWhiteSpace().removeResets()
 
             bitsScoreboardPattern.matchMatcher(message) {
