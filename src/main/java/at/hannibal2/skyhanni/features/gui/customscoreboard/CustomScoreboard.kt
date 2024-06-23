@@ -29,7 +29,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -108,6 +108,7 @@ object CustomScoreboard {
     internal val displayConfig get() = config.display
     internal val alignmentConfig get() = displayConfig.alignment
     internal val arrowConfig get() = displayConfig.arrow
+    internal val chunkedConfig get() = displayConfig.chunkedStats
     internal val eventsConfig get() = displayConfig.events
     internal val mayorConfig get() = displayConfig.mayor
     internal val partyConfig get() = displayConfig.party
@@ -170,7 +171,7 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+        ConditionalUtils.onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
@@ -242,7 +243,7 @@ object CustomScoreboard {
 
         event.transform(37, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array.add(JsonPrimitive(ScoreboardEvent.QUEUE.name))
             array
         }
         event.transform(40, "$displayPrefix.events.eventEntries") { element ->
@@ -257,7 +258,7 @@ object CustomScoreboard {
             }
 
             if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
-                newArray.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
+                newArray.add(JsonPrimitive(ScoreboardEvent.RIFT.name))
             }
 
             newArray
@@ -283,13 +284,13 @@ object CustomScoreboard {
         }
         event.transform(50, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
-            array.add(JsonPrimitive(ScoreboardEvents.CARNIVAL.name))
+            array.add(JsonPrimitive(ScoreboardEvent.ANNIVERSARY.name))
+            array.add(JsonPrimitive(ScoreboardEvent.CARNIVAL.name))
             array
         }
         event.transform(51, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.NEW_YEAR.name))
+            array.add(JsonPrimitive(ScoreboardEvent.NEW_YEAR.name))
             array
         }
     }

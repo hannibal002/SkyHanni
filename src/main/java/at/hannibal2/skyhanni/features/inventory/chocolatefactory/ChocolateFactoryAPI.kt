@@ -83,7 +83,7 @@ object ChocolateFactoryAPI {
 
 
     var allBestPossibleUpgrades: Map<Int, MutableList<ChocolateFactoryUpgrade>> = mapOf()
-    var lastUpgradesWhenChecking: Map<Int,ChocolateFactoryUpgrade> = mapOf()
+    var lastUpgradesWhenChecking: Map<Int, ChocolateFactoryUpgrade> = mapOf()
     var lastBestNotAffordableUpgrade: ChocolateFactoryUpgrade? = null
     var totalUpgradeCost = 0L
 

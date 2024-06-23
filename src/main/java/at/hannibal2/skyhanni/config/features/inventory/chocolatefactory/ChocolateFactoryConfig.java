@@ -187,6 +187,12 @@ public class ChocolateFactoryConfig {
     public boolean highlightRabbitsWithRequirement = false;
 
     @Expose
+    @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean onlyHighlightRequirementNotMet = true;
+
+    @Expose
     @ConfigOption(
         name = "Show Missing Location Rabbits",
         desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location."
@@ -194,12 +200,6 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showLocationRequirementsRabbitsInHoppityStats = false;
-
-    @Expose
-    @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean onlyHighlightRequirementNotMet = true;
 
     @Expose
     @ConfigOption(name = "Rabbit Warning", desc = "")
@@ -221,4 +221,9 @@ public class ChocolateFactoryConfig {
     @Accordion
     public ChocolateFactoryCustomReminderConfig customReminder = new ChocolateFactoryCustomReminderConfig();
 
+    @Expose
+    @ConfigOption(name = "Mythic Rabbit", desc = "Blocks running /cf without a §d§lMythic Rabbit Pet §7equipped.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean mythicRabbitRequirement = false;
 }

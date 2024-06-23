@@ -74,10 +74,6 @@ object ProfileStorageData {
         ConfigLoadEvent().postAndCatch()
     }
 
-    private fun runWorkaround() {
-
-    }
-
     @SubscribeEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -104,12 +100,13 @@ object ProfileStorageData {
                         "This is needed for the mod to function! And therefore this warning cannot be disabled",
                     onClick = {
                         HypixelCommands.widget()
-                    }
+                    },
+                    "§eClick to run /widget!",
                 )
             } else {
                 ChatUtils.chat(
                     "§cExtra Information from Tab list not found! " +
-                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info"
+                        "Enable it: SkyBlock Menu ➜ Settings ➜ Personal ➜ User Interface ➜ Player List Info",
                 )
             }
         }
