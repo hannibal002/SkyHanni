@@ -222,9 +222,8 @@ object FarmingFortuneDisplay {
             ChatUtils.clickableChat(
                 "§cCan not read Farming Fortune from tab list! Open /widget, enable the Stats Widget and " +
                     "show the Farming Fortune stat, also give the widget enough priority.",
-                onClick = {
-                    HypixelCommands.widget()
-                }
+                onClick = { HypixelCommands.widget() },
+                "§eClick to run /widget!",
             )
             lastUniversalFortuneMissingError = SimpleTimeMark.now()
         }
@@ -233,9 +232,8 @@ object FarmingFortuneDisplay {
             ChatUtils.clickableChat(
                 "§cCan not read Crop Fortune from tab list! Open /widget, enable the Stats Widget and " +
                     "show latest Crop Fortune, also give the widget enough priority.",
-                onClick = {
-                    HypixelCommands.widget()
-                }
+                onClick = { HypixelCommands.widget() },
+                "§eClick to run /widget!",
             )
             lastCropFortuneMissingError = SimpleTimeMark.now()
         }
@@ -319,7 +317,7 @@ object FarmingFortuneDisplay {
     fun getAbilityFortune(internalName: NEUInternalName, lore: List<String>): Double {
         var pieces = 0
 
-        lore.forEach { line ->
+        for (line in lore) {
             if (internalName.contains("LOTUS")) {
                 lotusAbilityPattern.matchMatcher(line) {
                     return group("bonus").toDouble()

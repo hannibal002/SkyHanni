@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
@@ -214,7 +214,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                     quest.haveAmount = haveAmount
                 } catch (e: IndexOutOfBoundsException) {
                     ErrorManager.logErrorWithData(
-                        e, "Error loading Crimson Isle Quests from config.",
+                        e,
+                        "Error loading Crimson Isle Quests from config.",
                         "text" to text,
                     )
                 }

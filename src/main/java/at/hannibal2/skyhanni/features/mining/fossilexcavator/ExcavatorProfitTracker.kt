@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -12,8 +13,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -23,7 +24,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ExcavatorProfitTracker {
+@SkyHanniModule
+object ExcavatorProfitTracker {
 
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.profitTracker
 
@@ -103,13 +105,13 @@ class ExcavatorProfitTracker {
         val fossilDustPrice = pricePer * fossilDustGained
         addAsSingletonList(
             Renderable.hoverTips(
-                "§7${NumberUtil.format(fossilDustGained)}x §fFossil Dust§7: §6${NumberUtil.format(fossilDustPrice)}",
+                "§7${fossilDustGained.shortFormat()}x §fFossil Dust§7: §6${fossilDustPrice.shortFormat()}",
                 listOf(
-                    "§7You gained §6${NumberUtil.format(fossilDustPrice)} coins §7in total",
+                    "§7You gained §6${fossilDustPrice.shortFormat()} coins §7in total",
                     "§7for all §e$fossilDustGained §fFossil Dust",
                     "§7you have collected.",
                     "",
-                    "§7Price Per Fossil Dust: §6${NumberUtil.format(pricePer)}"
+                    "§7Price Per Fossil Dust: §6${pricePer.shortFormat()}"
                 )
             )
         )
@@ -140,9 +142,9 @@ class ExcavatorProfitTracker {
         val name = StringUtils.pluralize(timesExcavated.toInt(), scrapItem.itemName)
         addAsSingletonList(
             Renderable.hoverTips(
-                "$name §7price: §c-${NumberUtil.format(scrapPrice)}",
+                "$name §7price: §c-${scrapPrice.shortFormat()}",
                 listOf(
-                    "§7You paid §c${NumberUtil.format(scrapPrice)} coins §7in total",
+                    "§7You paid §c${scrapPrice.shortFormat()} coins §7in total",
                     "§7for all §e$timesExcavated $name",
                     "§7you have used."
                 )

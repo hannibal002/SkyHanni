@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -16,7 +17,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonsRaceGuide {
+@SkyHanniModule
+object DungeonsRaceGuide {
 
     private val config get() = SkyHanniMod.feature.dungeon.dungeonsRaceGuide
     private val raceActivePattern by RepoPattern.pattern(
@@ -37,9 +39,9 @@ class DungeonsRaceGuide {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<DungeonHubRacesJson>("DungeonHubRaces")
-        data.data.forEach {
-            val nothingNoReturn = it.value["nothing:no_return"]
-            parkourHelpers[it.key] = ParkourHelper(
+        for ((key, map) in data.data) {
+            val nothingNoReturn = map["nothing:no_return"]
+            parkourHelpers[key] = ParkourHelper(
                 nothingNoReturn?.locations ?: listOf(),
                 nothingNoReturn?.shortCuts ?: listOf(),
                 platformSize = 1.0,
@@ -65,17 +67,15 @@ class DungeonsRaceGuide {
             currentRace = group("race").replace(" ", "_").lowercase()
         }
         if (currentRace == null) {
-            parkourHelpers.forEach {
-                it.value.reset()
-            }
+            parkourHelpers.forEach { it.value.reset() }
         }
     }
 
     private fun updateConfig() {
-        parkourHelpers.forEach {
-            it.value.rainbowColor = config.rainbowColor.get()
-            it.value.monochromeColor = config.monochromeColor.get().toChromaColor()
-            it.value.lookAhead = config.lookAhead.get() + 1
+        parkourHelpers.values.forEach {
+            it.rainbowColor = config.rainbowColor.get()
+            it.monochromeColor = config.monochromeColor.get().toChromaColor()
+            it.lookAhead = config.lookAhead.get() + 1
         }
     }
 

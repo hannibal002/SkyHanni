@@ -27,7 +27,7 @@ object ChocolateFactoryUpgradeWarning {
         if (!LorenzUtils.inSkyBlock) return
         val profileStorage = profileStorage ?: return
 
-        val upgradeAvailableAt = SimpleTimeMark(profileStorage.bestUpgradeAvailableAt)
+        val upgradeAvailableAt = profileStorage.bestUpgradeAvailableAt
         if (upgradeAvailableAt.isInPast() && !upgradeAvailableAt.isFarPast()) {
             checkUpgradeWarning()
         }
@@ -46,9 +46,8 @@ object ChocolateFactoryUpgradeWarning {
         if (ChocolateFactoryAPI.inChocolateFactory) return
         ChatUtils.clickableChat(
             "You have a Chocolate factory upgrade available to purchase!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            }
+            onClick = { HypixelCommands.chocolateFactory() },
+            "§eClick to run /cf!"
         )
     }
 

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
@@ -24,7 +25,8 @@ import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SlayerMiniBossFeatures {
+@SkyHanniModule
+object SlayerMiniBossFeatures {
 
     private val config get() = SkyHanniMod.feature.slayer
     private var miniBosses = listOf<EntityCreature>()

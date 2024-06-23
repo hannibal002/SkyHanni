@@ -47,9 +47,9 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -70,7 +70,6 @@ import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.seconds
-
 
 @SkyHanniModule
 object GardenVisitorFeatures {
@@ -182,67 +181,79 @@ object GardenVisitorFeatures {
     }
 
     private fun MutableList<List<Any>>.drawShoppingList(shoppingList: MutableMap<NEUInternalName, Int>) {
-        if (shoppingList.isNotEmpty()) {
-            var totalPrice = 0.0
-            addAsSingletonList("§7Visitor Shopping List:")
-            for ((internalName, amount) in shoppingList) {
-                val name = internalName.itemName
-                val itemStack = internalName.getItemStack()
+        if (shoppingList.isEmpty()) return
 
-                val list = mutableListOf<Any>()
-                list.add(" §7- ")
-                list.add(itemStack)
+        var totalPrice = 0.0
+        addAsSingletonList("§7Visitor Shopping List:")
+        for ((internalName, amount) in shoppingList) {
+            val name = internalName.itemName
+            val itemStack = internalName.getItemStack()
 
-                list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
-                    if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                        LorenzUtils.setTextIntoSign("$amount")
-                    } else {
-                        BazaarApi.searchForBazaarItem(name, amount)
-                    }
-                }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
+            val list = mutableListOf<Any>()
+            list.add(" §7- ")
+            list.add(itemStack)
 
-                if (config.shoppingList.showPrice) {
-                    val price = internalName.getPrice() * amount
-                    totalPrice += price
-                    val format = NumberUtil.format(price)
-                    list.add(" §7(§6$format§7)")
+            list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
+                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                    LorenzUtils.setTextIntoSign("$amount")
+                } else {
+                    BazaarApi.searchForBazaarItem(name, amount)
                 }
+            }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
 
-                if (config.shoppingList.showSackCount) {
-                    var amountInSacks = 0
-                    internalName.getAmountInSacksOrNull()?.let {
-                        amountInSacks = it
-                        val textColour = if (it >= amount) "a" else "e"
-                        list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
-                    }
-                    val ingredients = NEUItems.getRecipes(internalName)
-                        // TODO describe what this line does
-                        .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
-                        ?.allIngredients() ?: return
-                    val requiredIngredients = mutableMapOf<String, Int>()
-                    for (ingredient in ingredients) {
-                        val key = ingredient.internalItemId
-                        requiredIngredients[key] = requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
-                    }
-                    var hasIngredients = true
-                    for ((key, value) in requiredIngredients) {
-                        val sackItem = key.asInternalName().getAmountInSacks()
-                        if (sackItem < value * (amount - amountInSacks)) {
-                            hasIngredients = false
-                            break
-                        }
-                    }
-                    if (hasIngredients) {
-                        list.add(" §7(§aCraftable!§7)")
-                    }
-                }
+            if (config.shoppingList.showPrice) {
+                val price = internalName.getPrice() * amount
+                totalPrice += price
+                val format = price.shortFormat()
+                list.add(" §7(§6$format§7)")
+            }
 
-                add(list)
+            addSackData(internalName, amount, list)
+
+            add(list)
+        }
+        if (totalPrice > 0) {
+            val format = totalPrice.shortFormat()
+            this[0] = listOf("§7Visitor Shopping List: §7(§6$format§7)")
+        }
+    }
+
+    private fun addSackData(
+        internalName: NEUInternalName,
+        amount: Int,
+        list: MutableList<Any>,
+    ) {
+        if (!config.shoppingList.showSackCount) return
+
+        var amountInSacks = 0
+        internalName.getAmountInSacksOrNull()?.let {
+            amountInSacks = it
+            val textColour = if (it >= amount) "a" else "e"
+            list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+        }
+
+        val ingredients = NEUItems.getRecipes(internalName)
+            // TODO describe what this line does
+            .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
+            ?.allIngredients() ?: emptySet()
+        if (ingredients.isEmpty()) return
+
+        val requiredIngredients = mutableMapOf<String, Int>()
+        for (ingredient in ingredients) {
+            val key = ingredient.internalItemId
+            requiredIngredients[key] =
+                requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
+        }
+        var hasIngredients = true
+        for ((key, value) in requiredIngredients) {
+            val sackItem = key.asInternalName().getAmountInSacks()
+            if (sackItem < value * (amount - amountInSacks)) {
+                hasIngredients = false
+                break
             }
-            if (totalPrice > 0) {
-                val format = NumberUtil.format(totalPrice)
-                this[0] = listOf("§7Visitor Shopping List: §7(§6$format§7)")
-            }
+        }
+        if (hasIngredients) {
+            list.add(" §7(§aCraftable!§7)")
         }
     }
 
@@ -390,14 +401,14 @@ object GardenVisitorFeatures {
             if (config.inventory.experiencePrice) {
                 gardenExperiencePattern.matchMatcher(formattedLine) {
                     val gardenExp = group("amount").formatInt()
-                    val pricePerCopper = NumberUtil.format((totalPrice / gardenExp).toInt())
+                    val pricePerCopper = (totalPrice / gardenExp).toInt().shortFormat()
                     finalList.set(index, "$formattedLine §7(§6$pricePerCopper §7per)")
                 }
             }
 
             copperPattern.matchMatcher(formattedLine) {
                 val copper = group("amount").formatInt()
-                val pricePerCopper = NumberUtil.format((totalPrice / copper).toInt())
+                val pricePerCopper = (totalPrice / copper).toInt().shortFormat()
                 visitor.pricePerCopper = (totalPrice / copper).toInt()
                 visitor.totalPrice = totalPrice
                 // Estimate could be changed to most value per copper item, instead of green thumb
@@ -423,16 +434,16 @@ object GardenVisitorFeatures {
             val price = internalName.getPrice() * amount
 
             if (config.inventory.showPrice) {
-                val format = NumberUtil.format(price)
+                val format = price.shortFormat()
                 finalList[index] = "$formattedLine §7(§6$format§7)"
             }
             if (!readingShoppingList) continue
-            val multiplier = NEUItems.getMultiplier(internalName)
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(internalName)
 
-            val rawName = multiplier.first.itemNameWithoutColor
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = getByNameOrNull(rawName) ?: continue
 
-            val cropAmount = multiplier.second.toLong() * amount
+            val cropAmount = primitiveStack.amount.toLong() * amount
             val formattedName = "§e${cropAmount.addSeparators()}§7x ${cropType.cropName} "
             val formattedSpeed = cropType.getSpeed()?.let { speed ->
                 val duration = (cropAmount / speed).seconds

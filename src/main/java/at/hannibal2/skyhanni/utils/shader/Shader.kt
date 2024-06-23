@@ -9,7 +9,6 @@ import net.minecraft.client.shader.ShaderLinkHelper
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.OpenGLException
-import java.util.function.Supplier
 
 /**
  * Superclass for shader objects to compile and attach vertex and fragment shaders to the shader program
@@ -106,7 +105,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
      * to the uniform in the shader file.
      * @param uniformValuesSupplier The supplier that changes / sets the uniform's value
      */
-    fun <T> registerUniform(uniformType: Uniform.UniformType<T>, name: String, uniformValuesSupplier: Supplier<T>) {
+    fun <T> registerUniform(uniformType: Uniform.UniformType<T>, name: String, uniformValuesSupplier: () -> T) {
         uniforms.add(Uniform(this, uniformType, name, uniformValuesSupplier))
     }
 }
