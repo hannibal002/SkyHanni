@@ -65,7 +65,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
      */
     val minibossAmountPattern by RepoPattern.pattern(
         "crimson.reputationhelper.quest.minibossamount",
-        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!",
     )
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
@@ -87,11 +87,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTabListWidgetUpdate(event: WidgetUpdateEvent) {
-        if (event.isWidget(TabWidget.FACTION_QUESTS)) {
-            if (!isEnabled()) return
-            questLoader.loadFromTabList()
-        }
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
+        if (!isEnabled()) return
+
+        questLoader.loadFromTabList()
     }
 
     @SubscribeEvent
@@ -211,7 +211,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT || state == QuestState.NOT_ACCEPTED ||
+        state == QuestState.READY_TO_COLLECT ||
+            state == QuestState.NOT_ACCEPTED ||
             (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 
