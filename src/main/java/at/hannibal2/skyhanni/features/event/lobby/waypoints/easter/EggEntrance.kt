@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.lobby.waypoints.easter
 
 import at.hannibal2.skyhanni.utils.LorenzVec
 
-enum class EggEntrances(
+enum class EggEntrance(
     val eggEntranceName: String,
     val waypoint: LorenzVec,
     vararg val easterEgg: EasterEgg,

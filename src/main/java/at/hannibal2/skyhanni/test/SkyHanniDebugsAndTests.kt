@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -197,12 +198,11 @@ object SkyHanniDebugsAndTests {
 
     fun resetConfigCommand() {
         ChatUtils.clickableChat(
-            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-            onClick = {
-                resetConfig()
-            },
+            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
+            onClick = { resetConfig() },
+            "§eClick to confirm.",
             prefix = false,
-            oneTimeClick = true,
+            oneTimeClick = true
         )
     }
 
@@ -363,10 +363,7 @@ object SkyHanniDebugsAndTests {
         }
 
         val internalName = hand.getInternalNameOrNull()
-        if (internalName == null) {
-            ChatUtils.error("§cInternal name is null for item ${hand.name}")
-            return
-        }
+            ?: ErrorManager.skyHanniError("Internal name is null for item ${hand.name}")
 
         val rawInternalName = internalName.asString()
         OSUtils.copyToClipboard(rawInternalName)

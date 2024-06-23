@@ -70,6 +70,7 @@ import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -411,7 +412,7 @@ object Commands {
         ) { HoppityCollectionStats.clearSavedRabbits() }
         registerCommand(
             "shresetpunchcard",
-            "Resets the Rift Punchcard Artifact player list."
+            "Resets the Rift Punchcard Artifact player list.",
         ) { PunchcardHighlight.clearList() }
     }
 
@@ -446,6 +447,10 @@ object Commands {
             "shtestgriffinspots",
             "Show potential griffin spots around you.",
         ) { GriffinBurrowHelper.testGriffinSpots() }
+        registerCommand(
+            "shtestisland",
+            "Sets the current skyblock island for testing purposes.",
+        ) { SkyBlockIslandTest.onCommand(it) }
     }
 
     private fun developersCodingHelp() {
@@ -514,7 +519,7 @@ object Commands {
         ) { TestChatCommand.command(it) }
         registerCommand(
             "shtestrainbow",
-            "Sends a rainbow in chat"
+            "Sends a rainbow in chat",
         ) { ExtendedChatColor.testCommand() }
         registerCommand(
             "shcopyinternalname",
@@ -621,6 +626,7 @@ object Commands {
                 onClick = {
                     UpdateManager.checkUpdate(true, updateStream)
                 },
+                "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {

@@ -193,9 +193,13 @@ object ComposterDisplay {
         if (IslandType.GARDEN.isInIsland()) {
             ChatUtils.chat(warningMessage)
         } else {
-            ChatUtils.clickableChat(warningMessage, onClick = {
-                HypixelCommands.warp("garden")
-            })
+            ChatUtils.clickableChat(
+                warningMessage,
+                onClick = {
+                    HypixelCommands.warp("garden")
+                },
+                "§eClick to warp to the garden!",
+            )
         }
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
