@@ -328,9 +328,9 @@ object ReforgeHelper {
 
 
         val tips = if (alreadySelected) {
-            listOf("§6Sort after", tip)
+            listOf("§6Sort by", tip)
         } else {
-            listOf("§6Sort after", tip, "", "§eClick to apply sorting!")
+            listOf("§6Sort by", tip, "", "§eClick to apply sorting!")
         }
         val sortField =
             Renderable.drawInsideRoundedRect(
