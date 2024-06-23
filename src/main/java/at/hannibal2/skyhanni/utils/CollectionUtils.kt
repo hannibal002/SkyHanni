@@ -223,6 +223,17 @@ object CollectionUtils {
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
         takeIf { null !in this } as? List<T>
 
+
+    fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
+
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean {
+        return this.toSet() == other.toSet()
+    }
+
+    fun <T> Pair<T, T>.toSet(): Set<T> {
+        return setOf(this.first, this.second)
+    }
+
     // TODO add cache
     fun MutableList<Renderable>.addString(
         text: String,

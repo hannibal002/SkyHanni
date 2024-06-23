@@ -1,22 +1,23 @@
 package at.hannibal2.skyhanni.features.inventory.attribute
 
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GoodRollsJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsIgnoreOrder
+import at.hannibal2.skyhanni.utils.CollectionUtils.toPair
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
 object AttributeAPI {
 
-    enum class GodRollType {
-        GODROLL,
-        GOOD_ROLL,
-        NONE
-    }
+    var goodRolls = listOf<GoodRollItem>()
 
-    enum class Attribute(val displayName: String, val internalName: String, val shortName: String) {
+    enum class AttributeType(val displayName: String, val internalName: String, val shortName: String) {
         ARACHNO("Arachno", "arachno", "AR"),
         ATTACK_SPEED("Attack Speed", "attack_speed", "AS"),
         BLAZING("Blazing", "blazing", "BL"),
@@ -54,101 +55,50 @@ object AttributeAPI {
         FISHING_SPEED("Fishing Speed", "fishing_speed", "FS"),
         HUNTER("Hunter", "hunter", "HU"),
         TROPHY_HUNTER("Trophy Hunter", "trophy_hunter", "TH"),
+        UNKNOWN("Unknown", "unknown", "??")
         ;
 
         override fun toString() = displayName
 
         companion object {
             fun getByInternalNameOrNull(internalName: String) = entries.firstOrNull { it.internalName == internalName }
+
+            fun getByInternalName(internalName: String) = getByInternalNameOrNull(internalName) ?: UNKNOWN
         }
     }
 
-    private data class GodRoll(
-        val attributes: Pair<Attribute, Attribute>,
-        val godRollItemTypes: List<GodRollItems>,
-        val goodRollItemTypes: List<GodRollItems> = listOf()
-    ) {
-        fun isGodRoll(internalName: NEUInternalName) =
-            godRollItemTypes.any { it.regex.matches(internalName.asString()) }
+    data class Attribute(val type: AttributeType, val level: Int)
 
-        fun isGoodRoll(internalName: NEUInternalName) =
-            goodRollItemTypes.any { it.regex.matches(internalName.asString()) }
-    }
+    data class GoodRollItem(val regex: Pattern, val attributes: List<Pair<AttributeType, AttributeType>>)
 
-    private data class GodRollItems(val displayName: String, val regex: Pattern)
-
-    private fun getByName(name: String) =
-        godRollItems.firstOrNull { it.displayName == name } ?: GodRollItems("", "".toPattern())
-
-    // TODO: move to repo
-    private val godRollItems = listOf<GodRollItems>(
-        GodRollItems(
-            "CRIMSON",
-            "(?:(?:HOT|BURNING|FIERY|INFERNAL)_)?crimson_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
-        ),
-        GodRollItems(
-            "AURORA",
-            "(?:(?:HOT|BURNING|FIERY|INFERNAL)_)?AURORA_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
-        ),
-        GodRollItems(
-            "TERROR",
-            "(?:(?:HOT|BURNING|FIERY|INFERNAL)_)?TERROR_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
-        ),
-        GodRollItems(
-            "FERVOR",
-            "(?:(?:HOT|BURNING|FIERY|INFERNAL)_)?FERVOR_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
-        ),
-        GodRollItems(
-            "MAGMA_LORD",
-            "MAGMA_LORD_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
-        ),
-        GodRollItems(
-            "LAVA_ROD",
-            "(?:MAGMA|INFERNO|HELLFIRE)_ROD".toPattern()
-        ),
-        GodRollItems(
-            "FISHING_EQUIPMENT",
-            "".toPattern()
-        ),
-        GodRollItems(
-            "DUNGEON_EQUIPMENT",
-            "".toPattern()
-        ),
-        GodRollItems(
-            "COMBAT_EQUIPMENT",
-            "".toPattern()
-        ),
-        GodRollItems(
-            "MAGE_EQUIPMENT",
-            "".toPattern()
-        )
-
-    )
-
-    // TODO: move to repo
-    private val godRolls = listOf<GodRoll>(
-        GodRoll(
-            Pair(Attribute.BLAZING_FORTUNE, Attribute.FISHING_EXPERIENCE),
-            listOf(
-                getByName("MAGMA_LORD"),
-                getByName("FISHING_EQUIPMENT")
-            )
-        )
-    )
-
-    fun List<Pair<Attribute, Int>>.getGodRollType(internalName: NEUInternalName): GodRollType? {
-        return godRolls.firstOrNull { godRoll -> godRoll.attributes == this.map { it.first } }?.let { godRoll ->
-            when {
-                godRoll.isGodRoll(internalName) -> GodRollType.GODROLL
-                godRoll.isGoodRoll(internalName) -> GodRollType.GOOD_ROLL
-                else -> null
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<GoodRollsJson>("GoodRolls")
+        goodRolls = data.goodRolls.values.map {
+            val regex = it.regex.toPattern()
+            val list = it.list.map { combo ->
+                val first = AttributeType.getByInternalName(combo[0])
+                val second = AttributeType.getByInternalName(combo[1])
+                first to second
             }
+            GoodRollItem(regex, list)
+        }
+        goodRolls.forEach {
+            println("GoodRollItem(regex=${it.regex}, attributes=${it.attributes.joinToString(", ")})")
         }
     }
 
-    fun ItemStack.getAttributesWithLevels(): List<Pair<Attribute, Int>>? =
-        getAttributes()?.takeIf { it.isNotEmpty() }?.mapNotNull { (attr, level) ->
-            Attribute.getByInternalNameOrNull(attr.lowercase())?.let { it to level }
-        }
+    fun ItemStack.getAttributesLevels(): Pair<Attribute, Attribute>? {
+        return getAttributes()?.takeIf { it.isNotEmpty() }?.mapNotNull { (name, level) ->
+            AttributeType.getByInternalNameOrNull(name.lowercase())?.let { Attribute(it, level) }
+        }?.toPair()
+    }
+
+    fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NEUInternalName): Boolean {
+        return goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->
+            val attributes = first.type to second.type
+            goodRoll.attributes.any { it.equalsIgnoreOrder(attributes) }
+        } ?: false
+    }
 
 }
