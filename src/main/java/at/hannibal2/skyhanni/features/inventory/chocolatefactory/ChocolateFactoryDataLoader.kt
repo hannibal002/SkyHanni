@@ -5,8 +5,10 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.RabbitUtils.getNextRabbit
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.RabbitUtils.getNextUpgrade
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.RabbitUtils.getUpgradeCost
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -28,9 +30,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
-import kotlin.math.floor
-import kotlin.math.pow
-import kotlin.math.round
 
 @SkyHanniModule
 object ChocolateFactoryDataLoader {
@@ -39,22 +38,22 @@ object ChocolateFactoryDataLoader {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private val chocolatePerSecondPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.persecond", "§6(?<amount>[\\d.,]+) §8per second"
+        "chocolate.persecond", "§6(?<amount>[\\d.,]+) §8per second",
     )
     private val chocolateAllTimePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.alltime", "§7All-time Chocolate: §6(?<amount>[\\d,]+)"
+        "chocolate.alltime", "§7All-time Chocolate: §6(?<amount>[\\d,]+)",
     )
     private val prestigeLevelPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "prestige.level", "§6Chocolate Factory (?<prestige>[IVX]+)"
+        "prestige.level", "§6Chocolate Factory (?<prestige>[IVX]+)",
     )
     private val chocolateThisPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.thisprestige", "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)"
+        "chocolate.thisprestige", "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)",
     )
     private val chocolateForPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.forprestige", "§7§cRequires (?<amount>\\w+) Chocolate this.*"
+        "chocolate.forprestige", "§7§cRequires (?<amount>\\w+) Chocolate this.*",
     )
     private val chocolateMultiplierPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "chocolate.multiplier", "§7Total Multiplier: §6(?<amount>[\\d.]+)x"
+        "chocolate.multiplier", "§7Total Multiplier: §6(?<amount>[\\d.]+)x",
     )
 
     /**
@@ -64,25 +63,25 @@ object ChocolateFactoryDataLoader {
      */
     private val leaderboardPlacePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "leaderboard.place",
-        "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time)?(?: Chocolate\\.)?"
+        "(?:§.)+You are §8#§b(?<position>[\\d,]+)(?: §7in all-time)?(?: Chocolate\\.)?",
     )
     private val leaderboardPercentilePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "leaderboard.percentile", "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!"
+        "leaderboard.percentile", "§7§8You are in the top §.(?<percent>[\\d.]+)%§8 of players!",
     )
     private val barnAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "barn.amount", "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits"
+        "barn.amount", "§7Your Barn: §.(?<rabbits>\\d+)§7/§.(?<max>\\d+) Rabbits",
     )
     private val timeTowerAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "timetower.amount", "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)"
+        "timetower.amount", "§7Charges: §.(?<uses>\\d+)§7/§a(?<max>\\d+)",
     )
     private val timeTowerStatusPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "timetower.status", "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)"
+        "timetower.status", "§7Status: §.§l(?<status>INACTIVE|ACTIVE)(?: §f)?(?<acitveTime>\\w*)",
     )
     private val timeTowerRechargePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "timetower.recharge", "§7Next Charge: §a(?<duration>\\w+)"
+        "timetower.recharge", "§7Next Charge: §a(?<duration>\\w+)",
     )
     private val clickMeRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.clickme", "§e§lCLICK ME!"
+        "rabbit.clickme", "§e§lCLICK ME!",
     )
 
     /**
@@ -90,19 +89,19 @@ object ChocolateFactoryDataLoader {
      */
     private val clickMeGoldenRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.clickme.golden",
-        "§6§lGolden Rabbit §8- §a(?<name>.*)"
+        "§6§lGolden Rabbit §8- §a(?<name>.*)",
     )
     private val rabbitAmountPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.amount", "Rabbit \\S+ - \\[(?<amount>\\d+)].*"
+        "rabbit.amount", "Rabbit \\S+ - \\[(?<amount>\\d+)].*",
     )
     private val upgradeTierPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "upgradetier", ".*\\s(?<tier>[IVXLC]+)"
+        "upgradetier", ".*\\s(?<tier>[IVXLC]+)",
     )
     private val unemployedRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.unemployed", "Rabbit \\w+ - Unemployed"
+        "rabbit.unemployed", "Rabbit \\w+ - Unemployed",
     )
     private val otherUpgradePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "other.upgrade", "Rabbit Shrine|Coach Jackrabbit"
+        "other.upgrade", "Rabbit Shrine|Coach Jackrabbit",
     )
 
     @SubscribeEvent
@@ -127,7 +126,7 @@ object ChocolateFactoryDataLoader {
         event.move(
             47,
             "inventory.chocolateFactory.rabbitWarning",
-            "inventory.chocolateFactory.rabbitWarning.rabbitWarning"
+            "inventory.chocolateFactory.rabbitWarning.rabbitWarning",
         )
     }
 
@@ -183,44 +182,6 @@ object ChocolateFactoryDataLoader {
         findBestUpgrades(list)
         if (config.showAllBestUpgrades) findAllBestUpgrades(list)
 
-        // TODO: Remove (ill leave it in for now since the bug still persists for now - flxwly)
-        // -------------- Begin Test --------------
-//        val upgrades = ArrayList<ChocolateFactoryUpgrade>()
-//        profileStorage.currentChocolate = 20000L
-//        var index = 2
-//        upgrades.add(ChocolateFactoryUpgrade(29, 20, getUpgradeCost(29, 20), 1.44, 680.0, isRabbit = true, isPrestige = false))
-//        upgrades.add(ChocolateFactoryUpgrade(30, 1, getUpgradeCost(30, 1), 2.87, 1429.0, isRabbit = true, isPrestige = false))
-//        upgrades.add(ChocolateFactoryUpgrade(31, 1, getUpgradeCost(31, 1), 4.32, 2143.0, isRabbit = true, isPrestige = false))
-//        //upgrades.add(ChocolateFactoryUpgrade(32, 1, getUpgradeCost(32, 1), 5.74, 2857.5, isRabbit = true, isPrestige = false))
-//        upgrades.add(ChocolateFactoryUpgrade(33, 1, getUpgradeCost(23, 1), 7.2, 3572.2, isRabbit = true, isPrestige = false))
-//
-//        updateEffectiveCost(upgrades, 0, 0.0)
-//        findAllBestUpgrades(upgrades)
-//
-//        upgrades[index] = getNextUpgrade(upgrades[index])
-//        updateEffectiveCost(upgrades, index + 1, 0.0)
-//        findAllBestUpgrades(upgrades)
-//
-//        upgrades[index] = getNextUpgrade(upgrades[index])
-//        updateEffectiveCost(upgrades, index + 1, 0.0)
-//        findAllBestUpgrades(upgrades)
-//
-//        upgrades[index] = getNextUpgrade(upgrades[index])
-//        updateEffectiveCost(upgrades, index + 1, 0.0)
-//        findAllBestUpgrades(upgrades)
-//
-//        upgrades[index] = getNextUpgrade(upgrades[index])
-//        updateEffectiveCost(upgrades, index + 1, 0.0)
-//        findAllBestUpgrades(upgrades)
-//
-//        upgrades[index] = getNextUpgrade(upgrades[index])
-//        updateEffectiveCost(upgrades, index + 1, 0.0)
-//        findAllBestUpgrades(upgrades)
-//
-//        ChocolateFactoryAPI.allBestPossibleUpgrades = emptyMap()
-
-        // -------------- End Test --------------
-
         ChocolateFactoryAPI.factoryUpgrades = list
     }
 
@@ -257,7 +218,7 @@ object ChocolateFactoryDataLoader {
             }
         }
         val prestigeUpgrade = ChocolateFactoryUpgrade(
-            ChocolateFactoryAPI.prestigeIndex, ChocolateFactoryAPI.currentPrestige, prestigeCost, isPrestige = true
+            ChocolateFactoryAPI.prestigeIndex, ChocolateFactoryAPI.currentPrestige, prestigeCost, isPrestige = true,
         )
         list.add(prestigeUpgrade)
     }
@@ -439,24 +400,14 @@ object ChocolateFactoryDataLoader {
         list.add(upgrade)
     }
 
-    private fun findAllBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
-
-        val curChocolate = ChocolateAmount.CURRENT.chocolate() + ChocolateAmount.chocolateSinceUpdate()
-
-        // Only look at upgrades that would increase the average chocolate per second.
-        // removing time tower here as people like to determine when to buy it themselves.
-        val currentUpgrades = ArrayList(
-            list.filter { it.extraPerSecond != null && it.extraPerSecond > 0 }
-                .filter { it.slotIndex != ChocolateFactoryAPI.timeTowerIndex }
-        )
-
+    private fun shouldSearchForBestUpgrades(curChocolate: Long, currentUpgrades: List<ChocolateFactoryUpgrade>): Boolean {
         // check if any of the current upgrades is of higher level then previous calculated best upgrades
         val isCurrentHigher = currentUpgrades.any { current ->
             val upgrade = ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.lastOrNull()
             val lvlOnLastRun = ChocolateFactoryAPI.lastUpgradesWhenChecking[current.slotIndex]
-            return@any /*Last level was not set (e.g., first run after clear)*/lvlOnLastRun == null
-                    || (/*No upgrade planned*/upgrade == null && /*Still upgraded*/lvlOnLastRun.level < current.level)
-                    || (/*upgrade planned*/upgrade != null && /*upgraded above planned*/current.level > upgrade.level)
+            return@any lvlOnLastRun == null ||
+                (upgrade == null && lvlOnLastRun.level < current.level) ||
+                (upgrade != null && current.level > upgrade.level)
         }
 
         if (!isCurrentHigher) {
@@ -465,23 +416,34 @@ object ChocolateFactoryDataLoader {
                 while ((ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.firstOrNull()?.level
                         ?: current.level) < current.level
                 ) {
-                    ChocolateFactoryAPI.totalUpgradeCost -= ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.firstOrNull()?.price ?: 0L
+                    ChocolateFactoryAPI.totalUpgradeCost -=
+                        ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.firstOrNull()?.price ?: 0L
+
                     ChocolateFactoryAPI.allBestPossibleUpgrades[current.slotIndex]?.removeFirst()
                 }
             }
 
             // Check weather the last best upgrade that couldn't be afforded can now be afforded
             // If not just return.
-            if (/*Can afford all upgrades*/ ChocolateFactoryAPI.totalUpgradeCost < curChocolate
-                /*Cannot afford next best upgrade*/&& ChocolateFactoryAPI.totalUpgradeCost
-                + (ChocolateFactoryAPI.lastBestNotAffordableUpgrade?.price ?: 0L)
-                > curChocolate
-            )
-                return
-
-        } else {
-            ChocolateFactoryAPI.allBestPossibleUpgrades = emptyMap()
+            if (ChocolateFactoryAPI.totalUpgradeCost < curChocolate &&
+                ChocolateFactoryAPI.totalUpgradeCost +
+                (ChocolateFactoryAPI.lastBestNotAffordableUpgrade?.price ?: 0L) > curChocolate
+            ) return false
         }
+        return true
+    }
+
+    private fun findAllBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
+
+        val curChocolate = ChocolateAmount.CURRENT.chocolate() + ChocolateAmount.chocolateSinceUpdate()
+
+        val currentUpgrades = ArrayList(
+            list.filter { it.extraPerSecond != null && it.extraPerSecond > 0 }
+                .filter { it.slotIndex != ChocolateFactoryAPI.timeTowerIndex },
+        )
+
+        if (!shouldSearchForBestUpgrades(curChocolate, currentUpgrades)) return
+        ChocolateFactoryAPI.allBestPossibleUpgrades = emptyMap()
 
         ChocolateFactoryAPI.lastUpgradesWhenChecking = currentUpgrades.associateBy { it.slotIndex }
 
@@ -492,7 +454,7 @@ object ChocolateFactoryDataLoader {
         val remainingChocolate = findAllBestUpgradesImpl(
             currentUpgrades,
             bestUpgrades,
-            curChocolate
+            curChocolate,
         )
         val totalCost = curChocolate - remainingChocolate
 
@@ -514,7 +476,7 @@ object ChocolateFactoryDataLoader {
         allUpgrades: MutableMap<Int, MutableList<ChocolateFactoryUpgrade>>,
         remainingChocolate: Long = profileStorage?.currentChocolate ?: 0,
         baseIncreaseAfterUpgrades: Int = 0,
-        multiplierIncreaseAfterUpgrades: Double = 0.0
+        multiplierIncreaseAfterUpgrades: Double = 0.0,
     ): Long {
 
         // ---------------- Find best possible upgrade ----------------
@@ -537,7 +499,8 @@ object ChocolateFactoryDataLoader {
 
         // Keep track of total base increase and multiplier increase after upgrades.
         val nextBaseIncrease = baseIncreaseAfterUpgrades + (ChocolateFactoryAPI.rabbitSlots[bestUpgrade.slotIndex] ?: 0)
-        val nextMultiplierIncrease = multiplierIncreaseAfterUpgrades + 0.01 * (if (bestUpgrade.slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 1 else 0)
+        val nextMultiplierIncrease = multiplierIncreaseAfterUpgrades +
+            0.01 * if (bestUpgrade.slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 1 else 0
 
         // Should never throw since empty lists are added in caller method.
         allUpgrades[bestUpgrade.slotIndex]?.add(bestUpgrade) ?: throw IllegalStateException("Best upgrade not found in list")
@@ -563,81 +526,20 @@ object ChocolateFactoryDataLoader {
             allUpgrades,
             remainingChocolate - (bestUpgrade.price ?: Long.MAX_VALUE),
             nextBaseIncrease,
-            nextMultiplierIncrease
+            nextMultiplierIncrease,
         )
     }
-
-    /** Calculates the upgrade Cost for the upgrade at [slotIndex] with [level].
-     *
-     * @param slotIndex the slot index of the upgrade
-     * @param level the level of the upgrade
-     *
-     * @return the cost of the upgrade || null if the upgrade is maxed.
-     */
-    private fun getUpgradeCost(slotIndex: Int, level: Int): Long? {
-        var price: Long? = null
-        if (level < (ChocolateFactoryAPI.maxUpgradeLevelPerPrestige[slotIndex]?.getOrNull(
-                ChocolateFactoryAPI.currentPrestige - 1
-            ) ?: 0)
-        ) {
-
-            // Use upgrade cost per level if it exists, otherwise use the formula.
-            if ((ChocolateFactoryAPI.upgradeCostPerLevel[slotIndex]?.size ?: 0) > level) {
-                val nextRaw = ChocolateFactoryAPI.upgradeCostPerLevel[slotIndex]?.get(level) ?: 0
-                val prestigeMultiplier =
-                    (ChocolateFactoryAPI.upgradeCostFormulaConstants[slotIndex]?.get("prestige")
-                        ?: 0.0) * (ChocolateFactoryAPI.currentPrestige - 1)
-                price = floor(nextRaw * (1 + prestigeMultiplier)).toLong()
-            } else {
-                val base = ChocolateFactoryAPI.upgradeCostFormulaConstants[slotIndex]?.get("base") ?: 0.0
-                val multiplier = ChocolateFactoryAPI.upgradeCostFormulaConstants[slotIndex]?.get("exp") ?: 0.0
-                val prestigeMultiplier =
-                    (ChocolateFactoryAPI.upgradeCostFormulaConstants[slotIndex]?.get("prestige")
-                        ?: 0.0) * (ChocolateFactoryAPI.currentPrestige - 1)
-                price = floor(round(base * multiplier.pow((level + 1)) * (1 + prestigeMultiplier))).toLong()
-            }
-        }
-        return price
-    }
-
-    /** Constructs the rabbit with level = 0 after [upgrade] if upgrade is a rabbit.
-     *  Does not recalculate [ChocolateFactoryUpgrade.effectiveCost] and [ChocolateFactoryUpgrade.extraPerSecond] but
-     *  instead just copies it from [upgrade]
-     *
-     * @param upgrade the current upgrade
-     */
-    private fun getNextRabbit(upgrade: ChocolateFactoryUpgrade): ChocolateFactoryUpgrade? {
-        val nextSlot = upgrade.slotIndex + 1
-        if (nextSlot !in ChocolateFactoryAPI.rabbitSlots) return null
-
-        return ChocolateFactoryUpgrade(
-            slotIndex = nextSlot,
-            level = 0,
-            price = getUpgradeCost(nextSlot, 0),
-            extraPerSecond = 0.0,
-            effectiveCost = 0.0,
-            isRabbit = true
-        )
-    }
-
-    /** Constructs the next upgrade after [upgrade].
-     *  Does not recalculate [ChocolateFactoryUpgrade.effectiveCost] and [ChocolateFactoryUpgrade.extraPerSecond] but
-     *  instead just copies it from [upgrade]
-     *
-     * @param upgrade the current upgrade
-     */
-    private fun getNextUpgrade(upgrade: ChocolateFactoryUpgrade): ChocolateFactoryUpgrade
-        = upgrade.copy(level = upgrade.level + 1, price = getUpgradeCost(upgrade.slotIndex, upgrade.level + 1))
 
     private fun updateEffectiveCost(upgrades: MutableList<ChocolateFactoryUpgrade>, baseIncrease: Int, multiplierIncrease: Double) {
         val beforeChocPerSec = ChocolateAmount.averageChocPerSecond(
             rawPerSecondIncrease = baseIncrease,
-            baseMultiplierIncrease = multiplierIncrease
+            baseMultiplierIncrease = multiplierIncrease,
         )
         for (i in upgrades.indices) {
             val afterChocPerSec = ChocolateAmount.averageChocPerSecond(
                 rawPerSecondIncrease = baseIncrease + (ChocolateFactoryAPI.rabbitSlots[upgrades[i].slotIndex] ?: 0),
-                baseMultiplierIncrease = multiplierIncrease + (if (upgrades[i].slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 0.01 else 0.0)
+                baseMultiplierIncrease = multiplierIncrease +
+                    if (upgrades[i].slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 0.01 else 0.0,
             )
 
             val extra: Double = (afterChocPerSec - beforeChocPerSec).round(2)
@@ -645,10 +547,6 @@ object ChocolateFactoryDataLoader {
             upgrades[i] = upgrades[i].copy(extraPerSecond = extra, effectiveCost = effectiveCost)
         }
     }
-
-    private fun calculateTotalUpgradeCost(upgrades: Map<Int, List<ChocolateFactoryUpgrade>>) =
-        upgrades.values.sumOf { inner -> inner.sumOf { it.price ?: 0 } }
-
 
     private fun handleRabbitWarnings(item: ItemStack, slotIndex: Int) {
         val isGoldenRabbit = clickMeGoldenRabbitPattern.matches(item.name)
@@ -686,6 +584,28 @@ object ChocolateFactoryDataLoader {
 
         val affordAbleUpgrade = notMaxed.filter { it.canAfford() }.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
         ChocolateFactoryAPI.bestAffordableSlot = affordAbleUpgrade?.getValidUpgradeIndex() ?: -1
+    }
+
+    private fun testCases() {
+        val upgrades = ArrayList<ChocolateFactoryUpgrade>()
+        profileStorage?.currentChocolate = 20000L
+        var index = 2
+        upgrades.add(ChocolateFactoryUpgrade(29, 20, getUpgradeCost(29, 20), 1.44, 680.0, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(30, 1, getUpgradeCost(30, 1), 2.87, 1429.0, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(31, 1, getUpgradeCost(31, 1), 4.32, 2143.0, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(32, 1, getUpgradeCost(32, 1), 5.74, 2857.5, isRabbit = true, isPrestige = false))
+        upgrades.add(ChocolateFactoryUpgrade(33, 1, getUpgradeCost(23, 1), 7.2, 3572.2, isRabbit = true, isPrestige = false))
+
+        updateEffectiveCost(upgrades, 0, 0.0)
+        findAllBestUpgrades(upgrades)
+
+        for (i in 0..5) {
+            upgrades[index] = getNextUpgrade(upgrades[index])
+            updateEffectiveCost(upgrades, index + 1, 0.0)
+            findAllBestUpgrades(upgrades)
+        }
+
+        ChocolateFactoryAPI.allBestPossibleUpgrades = emptyMap()
     }
 }
 
