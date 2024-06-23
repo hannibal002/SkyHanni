@@ -335,7 +335,7 @@ object ChatFilter {
         // Not THAT important items
         "§aYou received §r§f\\d* §r§aOil Barrel§r§a\\.".toPattern(),
         "§aYou received §r§f\\d* §r§9Goblin Egg§r§a\\.".toPattern(),
-        "§aYou received §r§f1\\d* §r§a§aGreen Goblin Egg§r§a\\.".toPattern(),
+        "§aYou received §r§f1\\d* §r§aGreen Goblin Egg§r§a\\.".toPattern(),
 
         // Useful, maybe in another chat
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
