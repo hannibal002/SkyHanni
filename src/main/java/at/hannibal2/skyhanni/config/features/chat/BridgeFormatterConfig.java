@@ -10,10 +10,20 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class BridgeFormatterConfig {
+
     @Expose
     @ConfigOption(
-        name = "Enable Bridge Formatting",
-        desc = "Reformat guild bridge messages."
+        name = "What is a Bridge?",
+        desc = "A bridge is an account that forwards Hypixel guild chat to a Discord channel and vice versa." +
+            "Some guild uses this to communicate with their Discord members."
+    )
+    @ConfigEditorInfoText
+    public String bridgeInfo = "§eBridge Info";
+
+    @Expose
+    @ConfigOption(
+        name = "Enable Bridge Reformatting",
+        desc = "Reformat guild bridge messages with your own format."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -22,7 +32,7 @@ public class BridgeFormatterConfig {
     @Expose
     @ConfigOption(
         name = "Bridge Bot Name",
-        desc = "IGN of the Minecraft account acting as the bridge. Case Sensitive."
+        desc = "IGN of the Minecraft account acting as the bridge. Case sensitive."
     )
     @ConfigEditorText
     public String bridgeName = "BotNameHere";
@@ -37,8 +47,8 @@ public class BridgeFormatterConfig {
 
     @Expose
     @ConfigOption(
-        name = "Bridge Format",
-        desc = "Message format that will be sent when a message is sent from Discord. "
+        name = "New Bridge Format",
+        desc = "New message format for bridge messages."
     )
     @ConfigEditorText
     public String bridgeFormat = "&c[Discord] &6&l%ign%&r: %msg%";
@@ -46,7 +56,7 @@ public class BridgeFormatterConfig {
     @Expose
     @ConfigOption(
         name = "Separator Info",
-        desc = "For the guild message:\n" +
+        desc = "For this guild message sent by bridge bot:\n" +
             "§2Guild > §7Bridge §e[rank]§f: Discord > Message\n" +
             "§e> §7would be the separator."
     )
@@ -55,8 +65,8 @@ public class BridgeFormatterConfig {
 
     @Expose
     @ConfigOption(
-        name = "Bridge Separator",
-        desc = "The character that separates the Discord name and the message."
+        name = "Bridge Incoming Separator",
+        desc = "The character that separates the Discord name and the Discord message sent by the bot."
     )
     @ConfigEditorText
     public String separator = ":";

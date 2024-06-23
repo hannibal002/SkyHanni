@@ -14,10 +14,10 @@ object BridgeFormatter {
 
     @SubscribeEvent
     fun onGuildChat(event: GuildChatEvent) {
+        if (!config.enabled) return
+
         val message = event.messageString
         val player = event.authorString
-
-        if (!config.enabled) return
         if (!player.contains(config.bridgeName.spaceless())) return
 
         val sep = config.separator.spaceless()
