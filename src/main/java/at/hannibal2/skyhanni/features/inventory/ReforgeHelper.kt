@@ -37,7 +37,7 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as rString
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as renderableString
 
 @SkyHanniModule
 object ReforgeHelper {
@@ -191,7 +191,7 @@ object ReforgeHelper {
 
     @SubscribeEvent
     fun onClose(event: InventoryCloseEvent) {
-        if (!isEnabled()) return
+        if (!isInReforgeMenu) return
         isInReforgeMenu = false
         isInHexReforgeMenu = false
         reforgeToSearch = null
@@ -199,7 +199,7 @@ object ReforgeHelper {
         hoveredReforge = null
         sortAfter = null
         itemToReforge = null
-        updateDisplay()
+        display = emptyList()
     }
 
     private fun updateDisplay() {
@@ -207,7 +207,7 @@ object ReforgeHelper {
     }
 
     private fun generateDisplay() = buildList<Renderable> {
-        this.add(rString("§6Reforge Overlay"))
+        this.add(renderableString("§6Reforge Overlay"))
 
         val item = itemToReforge ?: run {
             reforgeToSearch = null
@@ -240,33 +240,7 @@ object ReforgeHelper {
 
     private fun getReforgeView(itemRarity: LorenzRarity): (ReforgeAPI.Reforge) -> Renderable = { reforge ->
         val text = getReforgeColour(reforge) + reforge.name
-        val tips = run {
-            val pre: List<Renderable>
-            val stats: List<Renderable>
-            val removedEffect: List<Renderable>
-            val addEffectText: String
-            val click: List<Renderable>
-            if (currentReforge == reforge) {
-                pre = listOf(rString("§3Reforge is currently applied!"))
-                stats = currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList()
-                removedEffect = emptyList()
-                addEffectText = "§aEffect:"
-                click = emptyList()
-            } else {
-                pre = listOf(rString("§6Reforge Stats"))
-                stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList()
-                removedEffect = getReforgeEffect(
-                    currentReforge,
-                    itemRarity,
-                )?.let { listOf(rString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff } ?: emptyList()
-                addEffectText = "§aAdds Effect:"
-                click = listOf(rString("§eClick to select"))
-            }
-
-            val addedEffect = getReforgeEffect(reforge, itemRarity)?.let { listOf(rString(addEffectText)) + it } ?: emptyList()
-
-            return@run pre + stats + removedEffect + addedEffect + click
-        }
+        val tips = getReforgeTips(reforge, itemRarity)
         val onHover = if (!isInHexReforgeMenu) {
             {}
         } else {
@@ -282,6 +256,37 @@ object ReforgeHelper {
             },
             onHover = onHover,
         )
+    }
+
+    private fun getReforgeTips(
+        reforge: ReforgeAPI.Reforge,
+        itemRarity: LorenzRarity,
+    ): List<Renderable> {
+        val pre: List<Renderable>
+        val stats: List<Renderable>
+        val removedEffect: List<Renderable>
+        val addEffectText: String
+        val click: List<Renderable>
+        if (currentReforge == reforge) {
+            pre = listOf(renderableString("§3Reforge is currently applied!"))
+            stats = currentReforge?.stats?.get(itemRarity)?.print() ?: emptyList()
+            removedEffect = emptyList()
+            addEffectText = "§aEffect:"
+            click = emptyList()
+        } else {
+            pre = listOf(renderableString("§6Reforge Stats"))
+            stats = reforge.stats[itemRarity]?.print(currentReforge?.stats?.get(itemRarity)) ?: emptyList()
+            removedEffect = getReforgeEffect(
+                currentReforge,
+                itemRarity,
+            )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff } ?: emptyList()
+            addEffectText = "§aAdds Effect:"
+            click = listOf(renderableString("§eClick to select"))
+        }
+
+        val addedEffect = getReforgeEffect(reforge, itemRarity)?.let { listOf(renderableString(addEffectText)) + it } ?: emptyList()
+
+        return pre + stats + removedEffect + addedEffect + click
     }
 
     private fun getReforgeEffect(reforge: ReforgeAPI.Reforge?, rarity: LorenzRarity) =
@@ -321,7 +326,7 @@ object ReforgeHelper {
             Renderable.drawInsideRoundedRect(
                 Renderable.hoverTips(
                     Renderable.fixedSizeLine(
-                        rString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
+                        renderableString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                         SkyblockStat.fontSizeOfLargestIcon,
                     ),
                     listOf("§6Sort after", tip, "§eClick to apply sorting"),
@@ -405,9 +410,9 @@ object ReforgeHelper {
             val key = it.key
             val value = this[key] ?: 0.0
             buildList<Renderable> {
-                add(rString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
-                diff?.get(key)?.let { add(rString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
-                add(rString(key.iconWithName))
+                add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
+                diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
+                add(renderableString(key.iconWithName))
             }
         })
         val table = Renderable.table(main, 5)
