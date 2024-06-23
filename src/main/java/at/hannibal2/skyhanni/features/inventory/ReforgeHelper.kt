@@ -281,7 +281,7 @@ object ReforgeHelper {
                 itemRarity,
             )?.let { listOf(renderableString("§cRemoves Effect:")) + it }?.takeIf { config.showDiff } ?: emptyList()
             addEffectText = "§aAdds Effect:"
-            click = listOf(renderableString("§eClick to select"))
+            click = listOf(renderableString(""), renderableString("§eClick to select!"))
         }
 
         val addedEffect = getReforgeEffect(reforge, itemRarity)?.let { listOf(renderableString(addEffectText)) + it } ?: emptyList()
@@ -329,7 +329,7 @@ object ReforgeHelper {
                         renderableString(icon, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
                         SkyblockStat.fontSizeOfLargestIcon,
                     ),
-                    listOf("§6Sort after", tip, "§eClick to apply sorting"),
+                    listOf("§6Sort after", tip, "", "§eClick to apply sorting!"),
                 ),
                 fieldColor.toColor(), radius = 15, padding = 1,
             )
