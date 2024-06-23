@@ -37,4 +37,12 @@ object BridgeFormatter {
     }
 
     private fun String.spaceless() = replace(" ", "")
+
+    fun testFormat() {
+        val toSend = config.bridgeFormat
+            .replace("&", "§")
+            .replace("%ign%", "DiscordName")
+            .replace("%msg%", "DiscordMessage")
+        ChatUtils.chat(toSend, prefix = false)
+    }
 }

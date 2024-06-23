@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.features.chat.BridgeFormatter;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -58,4 +60,11 @@ public class BridgeFormatterConfig {
     )
     @ConfigEditorText
     public String separator = ":";
+
+    @ConfigOption(
+        name = "Test Format",
+        desc = "Test the current format."
+    )
+    @ConfigEditorButton(buttonText = "Test")
+    public Runnable testFormat = BridgeFormatter.INSTANCE::testFormat;
 }
