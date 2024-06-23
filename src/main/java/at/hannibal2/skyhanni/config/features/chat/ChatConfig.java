@@ -20,6 +20,16 @@ public class ChatConfig {
     public int peekChat = Keyboard.KEY_NONE;
 
     @Expose
+    @ConfigOption(
+        name = "Copy Chat",
+        desc = "Right click a chat message to copy it. Holding Shift will copy the\n" +
+            "message with Shwords applied, and holding Ctrl will copy only one line."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean copyChat = true;
+
+    @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
     // TODO move into own sub category
