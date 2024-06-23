@@ -70,12 +70,13 @@ object ChocolateFactoryTimeTowerManager {
     private fun checkTimeTowerExpired() {
         val isTimeTowerActive = timeTowerActive()
         if (!isTimeTowerActive && wasTimeTowerRecentlyActive && config.timeTowerReminder && currentCharges() > 0) {
-            val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", true)
+            val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", withNumber = true)
             ChatUtils.clickableChat(
                 "§cYour Time Tower just expired and has $charges remaining. Click here to use one.",
                 onClick = {
                     HypixelCommands.chocolateFactory()
                 },
+                hover = "§eClick to run /cf!",
             )
             SoundUtils.playBeepSound()
         }
