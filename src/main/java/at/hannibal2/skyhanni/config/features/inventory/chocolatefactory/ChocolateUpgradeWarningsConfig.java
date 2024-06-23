@@ -26,4 +26,10 @@ public class ChocolateUpgradeWarningsConfig {
     )
     @ConfigEditorSlider(minValue = 0, maxValue = 10, minStep = 0.25f)
     public float timeBetweenWarnings = 1;
+
+    @Expose
+    @ConfigOption(name = "Include Time Tower", desc = "Include Time Tower in the list of upgrades to be considered 'next best'.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean upgradeWarningTimeTower = false;
 }

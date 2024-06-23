@@ -428,8 +428,9 @@ object ChocolateFactoryDataLoader {
         val profileStorage = profileStorage ?: return
 
         // removing time tower here as people like to determine when to buy it themselves
+        // - Updated to be configurable with a config option instead of removing it statically
         val notMaxed = list.filter {
-            !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null
+            !it.isMaxed && (config.chocolateUpgradeWarnings.upgradeWarningTimeTower || it.slotIndex != ChocolateFactoryAPI.timeTowerIndex) && it.effectiveCost != null
         }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
