@@ -29,8 +29,8 @@ object FerocityDisplay {
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
-        if (event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS))
-            display = ""
+        if (event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS)) return
+        display = ""
         if (event.isClear()) return
         val stat = event.lines.matchFirst(ferocityPattern) {
             group("stat")

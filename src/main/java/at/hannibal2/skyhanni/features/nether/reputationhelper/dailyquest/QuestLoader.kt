@@ -37,12 +37,11 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadFromTabList() {
-        val lines = TabWidget.FACTION_QUESTS.lines
         dailyQuestHelper.greatSpook = false
         var found = 0
 
 
-        for (line in lines) {
+        for (line in TabWidget.FACTION_QUESTS.lines) {
             readQuest(line)
             found++
             if (dailyQuestHelper.greatSpook) return
