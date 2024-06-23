@@ -333,14 +333,9 @@ object ChatFilter {
         "§aYou received §r§f\\d* §r§aSludge Juice§r§a\\.".toPattern(),
 
         // Not THAT important items
-        "§aYou received §r§f\\d* §r§aWishing Compass§r§a\\.".toPattern(),
         "§aYou received §r§f\\d* §r§aOil Barrel§r§a\\.".toPattern(),
-        "§aYou received §r§f\\d* §r§9Ascension Rope§r§a\\.".toPattern(),
         "§aYou received §r§f\\d* §r§9Goblin Egg§r§a\\.".toPattern(),
         "§aYou received §r§f1\\d* §r§a§aGreen Goblin Egg§r§a\\.".toPattern(),
-        // it is double like that, blame Hypixel
-        "§aYou received §r§f\\d* §r§5Treasurite§r§a\\.".toPattern(),
-        "§aYou received §r§f\\d* §r§aYoggie§r§a\\.".toPattern(),
 
         // Useful, maybe in another chat
         "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
@@ -380,8 +375,11 @@ object ChatFilter {
     )
     private val powderMiningMessages = listOf(
         "§aYou uncovered a treasure chest!",
-        "§aYou received §r§f1 §r§aWishing Compass§r§a.",
+        // Not that important items
+        "§aYou received §r§f3 §r§aWishing Compass§r§a.",
         "§aYou received §r§f1 §r§9Ascension Rope§r§a.",
+        "§aYou received §r§f1 §r§5Treasurite§r§a.",
+        "§aYou received §r§f1 §r§aYoggie§r§a.",
         // Jungle
         "§aYou received §r§f1 §r§aOil Barrel§r§a.",
         // Useful, maybe in another chat
