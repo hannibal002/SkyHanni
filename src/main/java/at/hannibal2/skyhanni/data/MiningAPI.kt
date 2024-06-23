@@ -156,7 +156,7 @@ object MiningAPI {
         if (waitingForEffMinerSound) {
             if (surroundingMinedBlocks.isEmpty()) return
             if (event.soundName in allowedSoundNames || event.soundName == "random.orb") {
-                val lastBlock = surroundingMinedBlocks.minByOrNull { it.value.time.passedSince() }?.value ?: return
+                val lastBlock = surroundingMinedBlocks.values.minByOrNull { it.time.passedSince() } ?: return
                 if (lastBlock.confirmed) return
                 waitingForEffMinerSound = false
                 lastBlock.confirmed = true
