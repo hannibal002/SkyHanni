@@ -34,13 +34,13 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Winter
 
 /**
  * This enum contains all the lines that either are events or other lines that are so rare/not often seen that they
- * don't fit in the normal [ScoreboardElementManager] enum.
+ * don't fit in the normal [ScoreboardEntry] enum.
  *
- * We for example have the [ScoreboardEvent.VOTING] Event, while this is clearly not an event, I don't consider them as normal lines
+ * We for example have the [ScoreboardEventEntry.VOTING] Event, while this is clearly not an event, I don't consider them as normal lines
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
-enum class ScoreboardEventManager(val event: ScoreboardEvent) {
+enum class ScoreboardEventEntry(val event: ScoreboardEvent) {
     VOTING(Voting),
     SERVER_CLOSE(ServerClose),
     DUNGEONS(Dungeons),
@@ -74,10 +74,10 @@ enum class ScoreboardEventManager(val event: ScoreboardEvent) {
 
     override fun toString() = event.configLine
 
-    fun getLines(): List<ScoreboardElementType> = getElementsFromAny(event.getDisplay())
+    fun getLines(): List<ScoreboardLine> = getElementsFromAny(event.getDisplay())
 
     companion object {
-        fun getEvent(): List<ScoreboardEventManager> =
+        fun getEvent(): List<ScoreboardEventEntry> =
             currentIslandEvents.filter { it.event.showWhen() && it.getLines().isNotEmpty() }.let { events ->
                 events.takeIf { eventsConfig.showAllActiveEvents } ?: listOfNotNull(events.firstOrNull())
             }

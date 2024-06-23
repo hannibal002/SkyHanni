@@ -8,12 +8,12 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
-import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import java.util.regex.Pattern
@@ -73,22 +73,16 @@ object CustomScoreboardUtils {
 
     internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { group("event") }
 
-    internal fun getElementsFromAny(element: Any?): List<ScoreboardElementType> = when (element) {
+    internal fun getElementsFromAny(element: Any?): List<ScoreboardLine> = when (element) {
         null -> listOf()
         is List<*> -> element.mapNotNull { it?.toScoreboardElement() }
         else -> listOfNotNull(element.toScoreboardElement())
     }
 
-    private fun Any.toScoreboardElement(): ScoreboardElementType? = when (this) {
-        is String -> this to HorizontalAlignment.LEFT
-        is Pair<*, *> -> this.toElement()
+    private fun Any.toScoreboardElement(): ScoreboardLine? = when (this) {
+        is String -> this.align()
+        is ScoreboardLine -> this
         else -> null
-    }
-
-    private fun Pair<Any?, Any?>.toElement(): ScoreboardElementType? {
-        val first = first as? String ?: return null
-        val second = second as? HorizontalAlignment ?: HorizontalAlignment.LEFT
-        return first to second
     }
 
     internal fun getSbLines(): List<String> {

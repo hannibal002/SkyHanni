@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
@@ -16,7 +17,7 @@ object Mining : ScoreboardEvent() {
             ScoreboardPattern.windCompassArrowPattern.firstMatches(getSbLines())
         if (compassTitle != null && compassArrow != null) {
             add(compassTitle)
-            add(compassArrow to HorizontalAlignment.CENTER)
+            add(compassArrow align HorizontalAlignment.CENTER)
         }
 
         // Better Together

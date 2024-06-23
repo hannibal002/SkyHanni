@@ -5,10 +5,10 @@ abstract class ScoreboardElement {
      * Must be specified as one of the following:
      * - `String`
      * - `List<String>`
-     * - `ScoreboardElementType` (`Pair<String, HorizontalAlignment>`)
-     * - `List<ScoreboardElementType>` (`List<Pair<String, HorizontalAlignment>>`)
+     * - `ScoreboardLine` (`String align HorizontalAlignment`)
+     * - `List<ScoreboardLine>`
      *
-     * `null` values will be treated as empty strings.
+     * `null` values will be treated as empty lines.
      */
     abstract fun getDisplay(): Any?
     open fun showWhen(): Boolean = true

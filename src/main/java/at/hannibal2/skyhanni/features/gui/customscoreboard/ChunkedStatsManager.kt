@@ -26,58 +26,58 @@ enum class ChunkedStatsManager(
 ) {
     PURSE(
         displayPair = { "§6${formatNumber(PurseAPI.currentPurse)}" },
-        showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardElementManager.PURSE.element.showWhen() },
-        showIsland = { ScoreboardElementManager.PURSE.element.showIsland() },
+        showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardEntry.PURSE.element.showWhen() },
+        showIsland = { ScoreboardEntry.PURSE.element.showIsland() },
         configLine = "§6Purse",
     ),
     MOTES(
         displayPair = { "§b${getMotes()}" },
-        showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardElementManager.MOTES.element.showWhen() },
-        showIsland = { ScoreboardElementManager.MOTES.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardEntry.MOTES.element.showWhen() },
+        showIsland = { ScoreboardEntry.MOTES.element.showIsland() },
         configLine = "§dMotes",
     ),
     BANK(
         displayPair = { "§6${getBank()}" },
         showWhen = {
-            !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && ScoreboardElementManager.BANK.element.showWhen()
+            !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && ScoreboardEntry.BANK.element.showWhen()
         },
-        showIsland = { ScoreboardElementManager.BANK.element.showIsland() },
+        showIsland = { ScoreboardEntry.BANK.element.showIsland() },
         configLine = "§6Bank",
     ),
     BITS(
         displayPair = { getBitsLine() },
-        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && ScoreboardElementManager.BITS.element.showWhen() },
-        showIsland = { ScoreboardElementManager.BITS.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && ScoreboardEntry.BITS.element.showWhen() },
+        showIsland = { ScoreboardEntry.BITS.element.showIsland() },
         configLine = "§bBits",
     ),
     COPPER(
         displayPair = { "§c${getCopper()}" },
-        showWhen = { !(hideEmptyLines && getCopper() == "0") && ScoreboardElementManager.COPPER.element.showWhen() },
-        showIsland = { ScoreboardElementManager.COPPER.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getCopper() == "0") && ScoreboardEntry.COPPER.element.showWhen() },
+        showIsland = { ScoreboardEntry.COPPER.element.showIsland() },
         configLine = "§cCopper",
     ),
     GEMS(
         displayPair = { "§a${getGems()}" },
-        showWhen = { !(hideEmptyLines && getGems() == "0") && ScoreboardElementManager.GEMS.element.showWhen() },
-        showIsland = { ScoreboardElementManager.GEMS.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getGems() == "0") && ScoreboardEntry.GEMS.element.showWhen() },
+        showIsland = { ScoreboardEntry.GEMS.element.showIsland() },
         configLine = "§aGems",
     ),
     HEAT(
         displayPair = { "§c${getHeat()}" },
-        showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardElementManager.HEAT.element.showWhen() },
-        showIsland = { ScoreboardElementManager.HEAT.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardEntry.HEAT.element.showWhen() },
+        showIsland = { ScoreboardEntry.HEAT.element.showIsland() },
         configLine = "§cHeat",
     ),
     COLD(
         displayPair = { "§b${MiningAPI.cold}❄" },
-        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardElementManager.COLD.element.showWhen() },
-        showIsland = { ScoreboardElementManager.COLD.element.showIsland() },
+        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardEntry.COLD.element.showWhen() },
+        showIsland = { ScoreboardEntry.COLD.element.showIsland() },
         configLine = "§bCold",
     ),
     NORTH_STARS(
         displayPair = { "§d${getNorthStars()}" },
-        showWhen = { !(hideEmptyLines && getNorthStars() == "0") && ScoreboardElementManager.NORTH_STARS.element.showWhen() },
-        showIsland = { ScoreboardElementManager.NORTH_STARS.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getNorthStars() == "0") && ScoreboardEntry.NORTH_STARS.element.showWhen() },
+        showIsland = { ScoreboardEntry.NORTH_STARS.element.showIsland() },
         configLine = "§dNorth Stars",
     ),
     ;

@@ -37,7 +37,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Tuning
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Visiting
 
-enum class ScoreboardElementManager(val element: ScoreboardElement) {
+enum class ScoreboardEntry(val element: ScoreboardElement) {
     TITLE(Title),
     PROFILE(Profile),
     PURSE(Purse),
@@ -86,7 +86,7 @@ enum class ScoreboardElementManager(val element: ScoreboardElement) {
 
     fun getVisiblePair() = if (isVisible()) getPair() else listOf()
 
-    private fun getPair(): List<ScoreboardElementType> = getElementsFromAny(element.getDisplay())
+    private fun getPair(): List<ScoreboardLine> = getElementsFromAny(element.getDisplay())
 
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true

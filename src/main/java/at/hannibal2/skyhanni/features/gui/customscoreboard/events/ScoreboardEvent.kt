@@ -5,8 +5,8 @@ abstract class ScoreboardEvent {
      * Must be specified as one of the following:
      * - `String`
      * - `List<String>`
-     * - `ScoreboardElementType` (`Pair<String, HorizontalAlignment>`)
-     * - `List<ScoreboardElementType>` (`List<Pair<String, HorizontalAlignment>>`)
+     * - `ScoreboardLine` (`String align HorizontalAlignment`)
+     * - `List<ScoreboardLine>`
      *
      * `null` values will be treated as empty lines.
      */
