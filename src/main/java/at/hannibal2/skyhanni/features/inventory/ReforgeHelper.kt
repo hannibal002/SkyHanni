@@ -232,7 +232,7 @@ object ReforgeHelper {
         val statTypeButtons = (listOf(getStatButton(null)) + statTypes.map { getStatButton(it) }).chunked(9)
         this.add(Renderable.table(statTypeButtons, xPadding = 3, yPadding = 2))
 
-        val list = reforgeList.sortedBy(getSortSelector(itemRarity, sortAfter)).map(getReforgeView(itemRarity))
+        val list = reforgeList.sortedWith(getSortSelector(itemRarity, sortAfter)).map(getReforgeView(itemRarity))
         this.addAll(list)
     }
 
@@ -302,15 +302,14 @@ object ReforgeHelper {
             )
         }
 
-    @Suppress("UNCHECKED_CAST")
     private fun getSortSelector(
         itemRarity: LorenzRarity,
         sorting: SkyblockStat?,
-    ): (ReforgeAPI.Reforge) -> Comparable<Any?> =
+    ): Comparator<ReforgeAPI.Reforge> =
         if (sorting != null) {
-            { -(it.stats[itemRarity]?.get(sorting) ?: 0.0) as Comparable<Any?> }
+            Comparator.comparing<ReforgeAPI.Reforge, Double> { it.stats[itemRarity]?.get(sorting) ?: 0.0 }.reversed()
         } else {
-            { (it.isReforgeStone) as Comparable<Any?> }
+            Comparator.comparing { it.isReforgeStone }
         }
 
     private fun getStatButton(stat: SkyblockStat?): Renderable {
