@@ -117,26 +117,31 @@ object ReforgeHelper {
         if (!isEnabled()) return
         if (event.slot?.slotNumber == reforgeButton) {
             if (event.slot.stack?.name == "§eReforge Item" || event.slot.stack?.name == "§cError!") return
-            if (currentReforge == reforgeToSearch) {
-                event.cancel()
-                waitForChat.set(false)
-                SoundUtils.playBeepSound()
-            } else if (waitForChat.get()) {
-                waitDelay = true
-                event.cancel()
-            } else {
-                if (event.clickedButton == 2) return
-                if (waitDelay) {
-                    waitDelay = false
-                } else {
-                    waitForChat.set(true)
-                }
-            }
+            if (handleReforgeButtonClick(event)) return
         }
 
         DelayedRun.runNextTick {
             itemUpdate()
         }
+    }
+
+    private fun handleReforgeButtonClick(event: GuiContainerEvent.SlotClickEvent): Boolean {
+        if (currentReforge == reforgeToSearch) {
+            event.cancel()
+            waitForChat.set(false)
+            SoundUtils.playBeepSound()
+        } else if (waitForChat.get()) {
+            waitDelay = true
+            event.cancel()
+        } else {
+            if (event.clickedButton == 2) return true
+            if (waitDelay) {
+                waitDelay = false
+            } else {
+                waitForChat.set(true)
+            }
+        }
+        return false
     }
 
     @SubscribeEvent
