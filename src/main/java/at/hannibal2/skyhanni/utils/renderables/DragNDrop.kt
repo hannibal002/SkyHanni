@@ -14,9 +14,9 @@ object DragNDrop {
 
     private var isInvalidDrop = false
 
-    private val button = 0
+    private const val button = 0
 
-    private val buttonMapped = button - 100
+    private const val buttonMapped = button - 100
 
     @SubscribeEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.BeforeDraw) {
@@ -35,7 +35,7 @@ object DragNDrop {
         GlStateManager.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
     }
 
-    fun dragAble(
+    fun draggable(
         display: Renderable,
         item: () -> DragItem<*>,
         bypassChecks: Boolean = false,
@@ -48,21 +48,21 @@ object DragNDrop {
         condition = condition,
     )
 
-    fun dropAble(
+    fun droppable(
         display: Renderable,
-        drop: DropAble,
+        drop: Droppable,
         bypassChecks: Boolean = false,
         condition: () -> Boolean = { true },
     ): Renderable = object : RenderableWrapper(display) {
         override fun render(posX: Int, posY: Int) {
             if (isHovered(posX, posY) && condition() && Renderable.shouldAllowLink(true, bypassChecks)) {
-                handelDropAble(drop)
+                handelDroppable(drop)
             }
             content.render(posX, posY)
         }
     }
 
-    private fun handelDropAble(drop: DropAble) {
+    private fun handelDroppable(drop: Droppable) {
         val item = currentDrag ?: return
         if (drop.validTarget(item.get())) {
             if (!buttonMapped.isKeyHeld()) {
@@ -92,7 +92,7 @@ interface DragItem<T> {
 
 }
 
-interface DropAble {
+interface Droppable {
 
     fun handle(drop: Any?)
     fun validTarget(item: Any?): Boolean

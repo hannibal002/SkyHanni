@@ -57,7 +57,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.DragNDrop
-import at.hannibal2.skyhanni.utils.renderables.DropAble
+import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
@@ -205,7 +205,7 @@ object SkyHanniDebugsAndTests {
             onClick = { resetConfig() },
             "§eClick to confirm.",
             prefix = false,
-            oneTimeClick = true
+            oneTimeClick = true,
         )
     }
 
@@ -552,13 +552,13 @@ object SkyHanniDebugsAndTests {
 
         config.debugItemPos.renderRenderables(
             listOf(
-                DragNDrop.dragAble(Renderable.string("A Bone"), { bone }),
+                DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.dragAble(Renderable.string("A Leaf"), { leaf }),
+                DragNDrop.draggable(Renderable.string("A Leaf"), { leaf }),
                 Renderable.placeholder(0, 30),
-                DragNDrop.dropAble(
+                DragNDrop.droppable(
                     Renderable.string("Feed Dog"),
-                    object : DropAble {
+                    object : Droppable {
                         override fun handle(drop: Any?) {
                             val unit = drop as ItemStack
                             if (unit.item == Items.bone) {
