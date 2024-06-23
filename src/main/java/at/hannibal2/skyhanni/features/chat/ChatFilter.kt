@@ -337,7 +337,7 @@ object ChatFilter {
         "§aYou received §r§f\\d* §r§aOil Barrel§r§a\\.".toPattern(),
         "§aYou received §r§f\\d* §r§9Ascension Rope§r§a\\.".toPattern(),
         "§aYou received §r§f\\d* §r§9Goblin Egg§r§a\\.".toPattern(),
-        "§aYou received §r§f1\\d* §r§a§r§aGreen Goblin Egg§r§a.".toPattern(),
+        "§aYou received §r§f1\\d* §r§a§aGreen Goblin Egg§r§a\\.".toPattern(),
         // it is double like that, blame Hypixel
         "§aYou received §r§f\\d* §r§5Treasurite§r§a\\.".toPattern(),
         "§aYou received §r§f\\d* §r§aYoggie§r§a\\.".toPattern(),
