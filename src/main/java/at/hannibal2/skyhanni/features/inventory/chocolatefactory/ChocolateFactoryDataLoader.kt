@@ -203,7 +203,7 @@ object ChocolateFactoryDataLoader {
         processInventory(list, inventory)
 
         //Store list for use in async changes to config
-        profileStorage.upgradeList = list;
+        profileStorage.upgradeList = list
 
         findBestUpgrades(list)
         ChocolateFactoryAPI.factoryUpgrades = list
