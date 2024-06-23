@@ -134,26 +134,24 @@ object CustomScoreboard {
     val informationFilteringConfig: InformationFilteringConfig get() = config.informationFiltering
     val backgroundConfig: BackgroundConfig get() = config.background
 
-    private fun createLines() = buildList {
-        when {
-            !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()
-            !displayConfig.useCustomLines -> addDefaultSkyBlockLines()
-            else -> addCustomSkyBlockLines()
-        }
+    private fun createLines() = when {
+        !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()
+        !displayConfig.useCustomLines -> addDefaultSkyBlockLines()
+        else -> addCustomSkyBlockLines()
     }
 
-    private fun MutableList<ScoreboardLine>.addAllNonSkyBlockLines() {
+    private fun addAllNonSkyBlockLines() = buildList {
         addAll(ScoreboardEntry.TITLE.getVisiblePair())
         addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it.align() })
         addAll(ScoreboardEntry.FOOTER.getVisiblePair())
     }
 
-    private fun MutableList<ScoreboardLine>.addDefaultSkyBlockLines() {
+    private fun addDefaultSkyBlockLines() = buildList {
         add(ScoreboardData.objectiveTitle align displayConfig.titleAndFooter.alignTitleAndFooter)
         addAll(ScoreboardData.sidebarLinesFormatted.map { it.align() })
     }
 
-    private fun MutableList<ScoreboardLine>.addCustomSkyBlockLines() {
+    private fun addCustomSkyBlockLines() = buildList<ScoreboardLine> {
         for (element in currentIslandEntries) {
             val lines = element.getVisiblePair()
             if (lines.isEmpty()) continue
