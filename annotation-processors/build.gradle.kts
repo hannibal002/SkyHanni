@@ -13,6 +13,11 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib-jdk8"))
     implementation("com.google.devtools.ksp:symbol-processing-api:1.8.0-1.0.8")
+
+    implementation("com.squareup:javapoet:1.13.0")
+    implementation("com.squareup:kotlinpoet:1.13.0")
+    implementation("com.squareup:kotlinpoet-ksp:1.13.0")
+    implementation("com.squareup:kotlinpoet-javapoet:1.13.0")
 }
 
 tasks.withType<JavaCompile> {
