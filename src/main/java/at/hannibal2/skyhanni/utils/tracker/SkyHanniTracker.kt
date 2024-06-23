@@ -55,6 +55,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
         },
+        "§eClick to confirm.",
         oneTimeClick = true
     )
 
