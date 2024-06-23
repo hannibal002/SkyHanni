@@ -277,6 +277,7 @@ public class MiscConfig {
     @Expose
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 
+    @Expose
     @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
     @ConfigEditorBoolean
     @FeatureToggle
