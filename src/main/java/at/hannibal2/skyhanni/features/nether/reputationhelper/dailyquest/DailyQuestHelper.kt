@@ -81,7 +81,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
-                questLoader.loadFromTabList(TabWidget.FACTION_QUESTS.lines)
+                questLoader.loadFromTabList()
             }
         }
     }
@@ -91,7 +91,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
 
-        questLoader.loadFromTabList(event.lines)
+        questLoader.loadFromTabList()
     }
 
     @SubscribeEvent

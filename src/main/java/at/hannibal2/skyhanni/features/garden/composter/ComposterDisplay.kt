@@ -58,11 +58,6 @@ object ComposterDisplay {
         if (!(config.displayEnabled && GardenAPI.inGarden())) return
         if (!event.isWidget(TabWidget.COMPOSTER)) return
 
-        if (event.isClear()) {
-            tabListData = emptyMap()
-            return
-        }
-
         readData(event.lines)
 
         if (tabListData.isNotEmpty()) {
