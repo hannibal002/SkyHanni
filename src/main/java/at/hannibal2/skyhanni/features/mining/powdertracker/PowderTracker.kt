@@ -38,23 +38,23 @@ object PowderTracker {
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
     private val pickedPattern by patternGroup.pattern(
         "picked",
-        "§6You have successfully picked the lock on this chest!"
+        "§6You have successfully picked the lock on this chest!",
     )
     private val uncoveredPattern by patternGroup.pattern(
         "uncovered",
-        "§aYou uncovered a treasure chest!"
+        "§aYou uncovered a treasure chest!",
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",
-        ".*§r§b§l2X POWDER STARTED!.*"
+        ".*§r§b§l2X POWDER STARTED!.*",
     )
     private val powderEndedPattern by patternGroup.pattern(
         "powder.ended",
-        ".*§r§b§l2X POWDER ENDED!.*"
+        ".*§r§b§l2X POWDER ENDED!.*",
     )
     private val powderBossBarPattern by patternGroup.pattern(
         "powder.bossbar",
-        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r"
+        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
     )
 
     /**
@@ -81,7 +81,7 @@ object PowderTracker {
         "Amber" to "§6",
         "Amethyst" to "§5",
         "Jade" to "§a",
-        "Topaz" to "§e"
+        "Topaz" to "§e",
     )
 
     init {
@@ -111,8 +111,7 @@ object PowderTracker {
         }
     }
 
-    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker })
-    { formatDisplay(drawDisplay(it)) }
+    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {
 
@@ -178,8 +177,9 @@ object PowderTracker {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
                     var amount = group("amount").formatLong()
-                    if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder)
+                    if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder) {
                         amount *= 2
+                    }
                     it.rewards[reward] = count + amount
                 }
             }
