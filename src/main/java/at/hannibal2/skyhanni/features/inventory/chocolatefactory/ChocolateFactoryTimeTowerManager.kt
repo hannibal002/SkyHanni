@@ -24,6 +24,8 @@ object ChocolateFactoryTimeTowerManager {
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
     private var lastTimeTowerReminder = SimpleTimeMark.farPast()
 
+    private const val HOVER_TEXT = "§eClick to run /cf!"
+
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -51,9 +53,8 @@ object ChocolateFactoryTimeTowerManager {
             ChatUtils.clickableChat(
                 "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
                     "Click here to use one",
-                onClick = {
-                    HypixelCommands.chocolateFactory()
-                }
+                onClick = { HypixelCommands.chocolateFactory() },
+                HOVER_TEXT,
             )
             SoundUtils.playBeepSound()
             lastTimeTowerWarning = SimpleTimeMark.now()
@@ -74,9 +75,8 @@ object ChocolateFactoryTimeTowerManager {
         ChatUtils.clickableChat(
             "§cYour Time Tower is full §7(${timeTowerCharges()})§c, " +
                 "Use one to avoid wasting time tower usages!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            }
+            onClick = { HypixelCommands.chocolateFactory() },
+            HOVER_TEXT
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()
@@ -113,9 +113,8 @@ object ChocolateFactoryTimeTowerManager {
             ChatUtils.clickableChat(
                 "§cYour Time Tower is about to end! " +
                     "Open the Chocolate Factory to avoid wasting the multiplier!",
-                onClick = {
-                    HypixelCommands.chocolateFactory()
-                }
+                onClick = { HypixelCommands.chocolateFactory() },
+                HOVER_TEXT
             )
             SoundUtils.playBeepSound()
             lastTimeTowerReminder = SimpleTimeMark.now()
