@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class ChocolateUpgradeWarningsConfig {
     @Expose
@@ -30,6 +31,5 @@ public class ChocolateUpgradeWarningsConfig {
     @Expose
     @ConfigOption(name = "Include Time Tower", desc = "Include Time Tower in the list of upgrades to be considered 'next best'.")
     @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean upgradeWarningTimeTower = false;
+    public Property<Boolean> upgradeWarningTimeTower = Property.of(false);
 }
