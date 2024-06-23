@@ -36,7 +36,7 @@ class GuiContainerHook(guiAny: Any) {
         ci: CallbackInfo,
     ) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        if (GuiContainerEvent.BeforeDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
+        if (GuiContainerEvent.PreDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()) {
             NEUApi.setInventoryButtonsToDisabled()
             GuiData.preDrawEventCancelled = true
             ci.cancel()
@@ -49,7 +49,7 @@ class GuiContainerHook(guiAny: Any) {
 
     fun postDraw(mouseX: Int, mouseY: Int, partialTicks: Float) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        GuiContainerEvent.AfterDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
+        GuiContainerEvent.PostDraw(gui, gui.inventorySlots, mouseX, mouseY, partialTicks).postAndCatch()
     }
 
     fun foregroundDrawn(mouseX: Int, mouseY: Int, partialTicks: Float) {

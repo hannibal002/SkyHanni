@@ -22,12 +22,12 @@ object DragNDrop {
     private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
 
     @SubscribeEvent
-    fun onGuiContainerBeforeDraw(event: GuiContainerEvent.BeforeDraw) {
+    fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
         isInvalidDrop = false
     }
 
     @SubscribeEvent
-    fun onGuiContainerAfterDraw(event: GuiContainerEvent.AfterDraw) {
+    fun onGuiContainerAfterDraw(event: GuiContainerEvent.PostDraw) {
         val item = currentDrag ?: return
         if (!buttonMapped.isKeyHeld()) {
             currentDrag = null

@@ -19,7 +19,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
     ) : GuiContainerEvent(gui, container)
 
     @Cancelable
-    data class BeforeDraw(
+    data class PreDraw(
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -30,7 +30,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
             GuiRenderUtils.drawGradientRect(0, 0, gui.width, gui.height, -1072689136, -804253680, 0.0)
     }
 
-    data class AfterDraw(
+    data class PostDraw(
         override val gui: GuiContainer,
         override val container: Container,
         val mouseX: Int,
@@ -86,7 +86,7 @@ abstract class GuiContainerEvent(open val gui: GuiContainer, open val container:
             if (this.clickedButton == 2 && this.clickTypeEnum == ClickType.MIDDLE) return
             slot?.slotNumber?.let { slotNumber ->
                 Minecraft.getMinecraft().playerController.windowClick(
-                    container.windowId, slotNumber, 2, 3, Minecraft.getMinecraft().thePlayer
+                    container.windowId, slotNumber, 2, 3, Minecraft.getMinecraft().thePlayer,
                 )
                 isCanceled = true
             }
