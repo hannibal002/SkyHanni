@@ -76,7 +76,7 @@ object CustomScoreboard {
 
         val textRenderable = Renderable.verticalContainer(
             render.map { Renderable.string(it.display, horizontalAlign = it.alignment) },
-            0,
+            displayConfig.lineSpacing - 10,
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER,
         )
