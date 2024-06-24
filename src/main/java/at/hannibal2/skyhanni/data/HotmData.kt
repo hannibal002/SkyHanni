@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
-import kotlin.math.floor
 import kotlin.math.pow
 
 
@@ -57,50 +56,50 @@ private fun calculatePeakOfTheMountainLoot(level: Int): Map<HotmReward, Double> 
 enum class HotmData(
     val guiName: String,
     val maxLevel: Int,
-    val costFun: (Int) -> (Double?),
+    val costFun: (Int) -> (Int?),
     val rewardFun: (Int) -> (Map<HotmReward, Double>),
 ) {
 
     MINING_SPEED(
         "Mining Speed",
         50,
-        { currentLevel -> (currentLevel + 2.0).pow(3) },
+        { level -> (level + 1.0).pow(3).toInt() },
         { level -> mapOf(HotmReward.MINING_SPEED to level * 20.0) },
     ),
     MINING_FORTUNE(
         "Mining Fortune",
         50,
-        { currentLevel -> (currentLevel + 2.0).pow(3.05) },
+        { level -> (level + 1.0).pow(3.05).toInt() },
         { level -> mapOf(HotmReward.MINING_FORTUNE to level * 5.0) },
     ),
     QUICK_FORGE(
         "Quick Forge",
         20,
-        { currentLevel -> (currentLevel + 2.0).pow(4) },
-        { level -> mapOf(HotmReward.FORGE_TIME_DECREASE to 10.0 + (level * 0.5)) },
+        { level -> (level + 1.0).pow(4).toInt() },
+        { level -> mapOf(HotmReward.FORGE_TIME_DECREASE to if (level >= 20) 30.0 else 10.0 + (level * 0.5)) },
     ),
     TITANIUM_INSANIUM(
         "Titanium Insanium",
         50,
-        { currentLevel -> (currentLevel + 2.0).pow(3.1) },
+        { level -> (level + 1.0).pow(3.1).toInt() },
         { level -> mapOf(HotmReward.TITANIUM_CHANCE to 2.0 + (level * 0.1)) },
     ),
     DAILY_POWDER(
         "Daily Powder",
         100,
-        { currentLevel -> 200.0 + (currentLevel * 18.0) },
+        { level -> 200 + ((level - 1) * 18) },
         { level -> mapOf(HotmReward.DAILY_POWDER to (200.0 + ((level - 1.0) * 18.0)) * 2.0) },
     ),
     LUCK_OF_THE_CAVE(
         "Luck of the Cave",
         45,
-        { currentLevel -> (currentLevel + 2.0).pow(3.07) },
+        { level -> (level + 1.0).pow(3.07).toInt() },
         { level -> mapOf(HotmReward.EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES to 5.0 + level) },
     ),
     CRYSTALLIZED(
         "Crystallized",
         30,
-        { currentLevel -> (currentLevel + 2.0).pow(3.4) },
+        { level -> (level + 1.0).pow(3.4).toInt() },
         { level ->
             mapOf(
                 HotmReward.MINING_SPEED to 20.0 + ((level - 1.0) * 6.0),
@@ -111,43 +110,43 @@ enum class HotmData(
     EFFICIENT_MINER(
         "Efficient Miner",
         100,
-        { currentLevel -> (currentLevel + 2.0).pow(2.6) },
+        { level -> (level + 1.0).pow(2.6).toInt() },
         { level -> mapOf(HotmReward.AVERAGE_BLOCK_BREAKS to (10.0 + (level * 0.4)) * (1.0 + (level * 0.05))) },
     ),
     ORBITER(
         "Orbiter",
         80,
-        { currentLevel -> (currentLevel + 1.0) * 70.0 },
+        { level -> level * 70 },
         { level -> mapOf(HotmReward.CHANCE_EXTRA_XP_ORBS to 0.2 + (level * 0.01)) },
     ),
     SEASONED_MINEMAN(
         "Seasoned Mineman",
         100,
-        { currentLevel -> (currentLevel + 2.0).pow(2.3) },
+        { level -> (level + 1.0).pow(2.3).toInt() },
         { level -> mapOf(HotmReward.MINING_WISDOM to 5.0 + (level * 0.1)) },
     ),
     MOLE(
         "Mole",
         190,
-        { currentLevel -> (currentLevel + 2.0).pow(2.2) },
+        { level -> (level + 1.0).pow(2.2).toInt() },
         { level -> mapOf(HotmReward.AVERAGE_BLOCK_BREAKS to 1.0 + ((level + 9.0) * 0.05 * ((level + 8) % 20))) },
     ),
     PROFESSIONAL(
         "Professional",
         140,
-        { currentLevel -> (currentLevel + 2.0).pow(2.3) },
+        { level -> (level + 1.0).pow(2.3).toInt() },
         { level -> mapOf(HotmReward.MINING_SPEED to 50.0 + (level * 5.0)) },
     ),
     LONESOME_MINER(
         "Lonesome Miner",
         45,
-        { currentLevel -> (currentLevel + 2.0).pow(3.07) },
+        { level -> (level + 1.0).pow(3.07).toInt() },
         { level -> mapOf(HotmReward.COMBAT_STAT_BOOST to 5.0 + ((level - 1.0) * 0.5)) },
     ),
     GREAT_EXPLORER(
         "Great Explorer",
         20,
-        { currentLevel -> (currentLevel + 2.0).pow(4.0) },
+        { level -> (level + 1.0).pow(4.0).toInt() },
         { level ->
             mapOf(
                 HotmReward.CHANCE_OF_TREASURE_CHEST to (0.2 * (0.2 + 0.04 * (level - 1.0))),
@@ -158,13 +157,13 @@ enum class HotmData(
     FORTUNATE(
         "Fortunate",
         20,
-        { currentLevel -> (currentLevel + 1.0).pow(3.05) },
+        { level -> (level + 1.0).pow(3.05).toInt() },
         { level -> mapOf(HotmReward.MINING_FORTUNE to 20.0 + (level * 4.0)) },
     ),
     POWDER_BUFF(
         "Powder Buff",
         50,
-        { currentLevel -> (currentLevel + 1.0).pow(3.2) },
+        { level -> (level + 1.0).pow(3.2).toInt() },
         { level ->
             mapOf(
                 HotmReward.MORE_MITHRIL_POWER to level.toDouble(),
@@ -175,13 +174,13 @@ enum class HotmData(
     MINING_SPEED_II(
         "Mining Speed II",
         50,
-        { currentLevel -> (currentLevel + 2.0).pow(3.2) },
+        { level -> (level + 1.0).pow(3.2).toInt() },
         { level -> mapOf(HotmReward.MINING_SPEED to level * 40.0) },
     ),
     MINING_FORTUNE_II(
         "Mining Fortune II",
         50,
-        { currentLevel -> (currentLevel + 2.0).pow(3.2) },
+        { level -> (level + 1.0).pow(3.2).toInt() },
         { level -> mapOf(HotmReward.MINING_FORTUNE to level * 5.0) },
     ),
 
@@ -273,78 +272,78 @@ enum class HotmData(
     DAILY_GRIND(
         "Daily Grind",
         100,
-        { currentLevel -> 218.0 + (18.0 * (currentLevel - 2.0)) },
+        { level -> 218 + (18 * (level - 1)) },
         { level -> mapOf(HotmReward.DAILY_POWDER to 50.0 * level) },
     ),
     DUST_COLLECTOR(
         "Dust Collector",
         20,
-        { currentLevel -> (currentLevel + 1.0).pow(4) },
+        { level -> (level + 1.0).pow(4).toInt() },
         { level -> mapOf(HotmReward.FOSSIL_DUST to 1.0 * level) },
     ),
     WARM_HEARTED(
         "Warm Hearted",
         50,
-        { currentLevel -> floor((currentLevel + 1.0).pow(3.1)) },
+        { level -> (level + 1.0).pow(3.1).toInt() },
         { level -> mapOf(HotmReward.COLD_RESISTANCE to 0.2 * level) },
     ),
 
     STRONG_ARM(
         "Strong Arm",
         100,
-        { currentLevel -> floor((currentLevel + 1.0).pow(2.3)) },
+        { level -> (level + 1.0).pow(2.3).toInt() },
         { level -> mapOf(HotmReward.MINING_SPEED to 5.0 * level) },
     ),
     NO_STONE_UNTURNED(
         "No Stone Unturned",
         50,
-        { currentLevel -> floor((currentLevel + 1.0).pow(3.05)) },
+        { level -> (level + 1.0).pow(3.05).toInt() },
         { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) },
     ),
 
     SUB_ZERO_MINING(
         "SubZero Mining",
         100,
-        { currentLevel -> floor((currentLevel + 1.0).pow(2.3)) },
+        { level -> (level + 1.0).pow(2.3).toInt() },
         { level -> mapOf(HotmReward.MINING_FORTUNE to 1.0 * level) },
     ),
     SURVEYOR(
         "Surveyor",
         20,
-        { currentLevel -> (currentLevel + 1.0).pow(4) },
+        { level -> (level + 1.0).pow(4).toInt() },
         { level -> mapOf(HotmReward.MINESHAFT_CHANCE to 0.75 * level) },
     ),
     EAGER_ADVENTURER(
         "Eager Adventurer",
         100,
-        { currentLevel -> floor((currentLevel + 1.0).pow(2.3)) },
+        { level -> (level + 1.0).pow(2.3).toInt() },
         { level -> mapOf(HotmReward.MINING_SPEED to 2.0 * level) },
     ),
 
     DEAD_MANS_CHEST(
         "Dead Man's Chest",
         50,
-        { currentLevel -> floor((currentLevel + 1.0).pow(3.2)) },
+        { level -> (level + 1.0).pow(3.2).toInt() },
         { level -> mapOf(HotmReward.UNKNOWN to 1.0 * level) },
     ),
 
     GIFTS_FROM_THE_DEPARTED(
         "Gifts from the Departed",
         100,
-        { currentLevel -> floor((currentLevel + 1.0).pow(2.45)) },
+        { level -> (level + 1.0).pow(2.45).toInt() },
         { level -> mapOf(HotmReward.UNKNOWN to 0.2 * level) },
     ),
 
     EXCAVATOR(
         "Excavator",
         50,
-        { currentLevel -> (currentLevel + 1.0).pow(3) },
+        { level -> (level + 1.0).pow(3).toInt() },
         { level -> mapOf(HotmReward.UNKNOWN to 0.5 * level) },
     ),
     RAGS_TO_RICHES(
         "Rags to Riches",
         50,
-        { currentLevel -> floor((currentLevel + 1.0).pow(3.05)) },
+        { level -> (level + 1.0).pow(3.05).toInt() },
         { level -> mapOf(HotmReward.MINING_FORTUNE to 2.0 * level) },
     ),
 
@@ -393,7 +392,7 @@ enum class HotmData(
 
     fun getReward() = if (enabled) rewardFun(activeLevel) else emptyMap()
 
-    fun calculateTotalCost(desiredLevel: Int) = (1 until desiredLevel).sumOf { level -> costFun(level) ?: 0.0 }.toInt()
+    fun calculateTotalCost(desiredLevel: Int) = (2..desiredLevel).sumOf { level -> costFun(level) ?: 0 }
 
     val totalCostMaxLevel = calculateTotalCost(maxLevel)
 
