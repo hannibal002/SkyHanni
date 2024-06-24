@@ -51,6 +51,7 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+// TODO: check if we can just leave the line be actually empty?
 internal const val EMPTY = "<empty>"
 
 @SkyHanniModule
@@ -70,12 +71,8 @@ object CustomScoreboard {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
-        val render =
-            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
-                cache
-            } else {
-                display
-            }
+        val render = if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) cache
+        else display
 
         val textRenderable = Renderable.verticalContainer(
             render.map { Renderable.string(it.display, horizontalAlign = it.alignment) },
@@ -173,13 +170,9 @@ object CustomScoreboard {
         }
     }
 
-    private fun List<ScoreboardLine>.removeEmptyLinesFromEdges(): List<ScoreboardLine> {
-        if (config.informationFiltering.hideEmptyLinesAtTopAndBottom) {
-            return this
-                .dropWhile { it.display.isEmpty() }
-                .dropLastWhile { it.display.isEmpty() }
-        }
-        return this
+    private fun List<ScoreboardLine>.removeEmptyLinesFromEdges(): List<ScoreboardLine> = apply {
+        if (informationFilteringConfig.hideEmptyLinesAtTopAndBottom)
+            dropWhile { it.display.trim().isEmpty() }.dropLastWhile { it.display.isEmpty() }
     }
 
     private var dirty = false
@@ -241,10 +234,11 @@ object CustomScoreboard {
             if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
-                ScoreboardEntry.entries.map { element ->
+                ScoreboardEntry.entries.forEach { element ->
                     add(
                         "${element.name.firstLetterUppercase()} - " +
-                            "${element.element.showWhen()} - " +
+                            "island: ${element.element.showIsland()} - " +
+                            "show: ${element.element.showWhen()} - " +
                             "${element.getVisiblePair().map { it.display }}",
                     )
                 }
@@ -252,8 +246,7 @@ object CustomScoreboard {
         }
     }
 
-    private fun isEnabled() =
-        (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
 
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 

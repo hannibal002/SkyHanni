@@ -24,6 +24,5 @@ enum class OutsideSbFeature(private val displayName: String) {
 
     override fun toString() = displayName
 
-    fun isSelected() =
-        Minecraft.getMinecraft().thePlayer != null && SkyHanniMod.feature.misc.showOutsideSB.get().contains(this)
+    fun isSelected() = Minecraft.getMinecraft().thePlayer != null && this in SkyHanniMod.feature.misc.showOutsideSB.get()
 }

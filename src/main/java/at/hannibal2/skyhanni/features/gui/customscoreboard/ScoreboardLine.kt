@@ -8,11 +8,12 @@ data class ScoreboardLine(
 ) {
 
     companion object {
-        val DEFAULT_ALIGNMENT = RenderUtils.HorizontalAlignment.LEFT
+        // TODO: replace with config
+        private val DEFAULT_ALIGNMENT = RenderUtils.HorizontalAlignment.LEFT
 
-        val EMPTY = "" align DEFAULT_ALIGNMENT
+        val EMPTY = ScoreboardLine("", DEFAULT_ALIGNMENT)
 
-        fun String.align(): ScoreboardLine = this align DEFAULT_ALIGNMENT
+        fun String.align(): ScoreboardLine = ScoreboardLine(this, DEFAULT_ALIGNMENT)
 
         infix fun String.align(alignment: RenderUtils.HorizontalAlignment): ScoreboardLine = ScoreboardLine(this, alignment)
     }
