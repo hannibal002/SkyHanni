@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 import at.hannibal2.skyhanni.utils.RenderUtils
 
 data class ScoreboardLine(
@@ -8,8 +9,7 @@ data class ScoreboardLine(
 ) {
 
     companion object {
-        // TODO: replace with config
-        private val DEFAULT_ALIGNMENT = RenderUtils.HorizontalAlignment.LEFT
+        private val DEFAULT_ALIGNMENT get() = displayConfig.textAlignment
 
         val EMPTY = ScoreboardLine("", DEFAULT_ALIGNMENT)
 

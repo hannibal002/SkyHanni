@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -137,6 +138,11 @@ public class DisplayConfig {
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int lineSpacing = 10;
+
+    @Expose
+    @ConfigOption(name = "Text Alignment", desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
 
     @Expose
     @ConfigOption(name = "Cache Scoreboard on Island Switch", desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
