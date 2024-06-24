@@ -72,6 +72,12 @@ object HoppityEggsManager {
         "rabbit.found.new",
         "§d§lNEW RABBIT! (?:((§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!)|(?<other>.*))"
     )
+
+    val duplicateRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.duplicate",
+        "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate"
+    )
+
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!"
