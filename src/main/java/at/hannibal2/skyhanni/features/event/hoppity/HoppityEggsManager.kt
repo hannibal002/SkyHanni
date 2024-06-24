@@ -185,6 +185,7 @@ object HoppityEggsManager {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
                     onClick = onClick,
+                    "§eClick to share!",
                     expireAt = 30.seconds.fromNow(),
                     oneTimeClick = true
                 )
@@ -233,14 +234,13 @@ object HoppityEggsManager {
     }
 
     private fun checkWarn() {
+        val allEggsRemaining = HoppityEggType.allEggsRemaining()
         if (!warningActive) {
-            warningActive = !HoppityEggType.allEggsRemaining()
+            warningActive = !allEggsRemaining
         }
 
-        if (warningActive) {
-            if (HoppityEggType.allEggsRemaining()) {
-                warn()
-            }
+        if (warningActive && allEggsRemaining) {
+            warn()
         }
     }
 

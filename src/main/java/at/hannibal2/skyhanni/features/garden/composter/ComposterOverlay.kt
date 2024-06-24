@@ -503,9 +503,8 @@ object ComposterOverlay {
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
-                onClick = {
-                    HypixelCommands.sacks()
-                }
+                onClick = { HypixelCommands.sacks() },
+                "§eClick to run /sax!",
             )
             return
         }
@@ -528,9 +527,8 @@ object ComposterOverlay {
             } else {
                 ChatUtils.clickableChat( // TODO Add this as a separate feature, and then don't send any msg if the feature is disabled
                     "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
-                    onClick = {
-                        HypixelCommands.bazaar(itemName.removeColor())
-                    }
+                    onClick = { HypixelCommands.bazaar(itemName.removeColor()) },
+                    "§eClick find on the bazaar!",
                 )
             }
         }
