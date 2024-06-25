@@ -8,6 +8,17 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.OIL_BARREL
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PICKONIMBUS
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PREHISTORIC_EGG
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ROBOT_PARTS
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.SLUDGE_JUICE
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.TREASURITE
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE
+
 @SkyHanniModule
 object PowderMiningChatFilter {
 
@@ -21,7 +32,7 @@ object PowderMiningChatFilter {
      */
     private val breakingPowerPattern by patternGroup.pattern(
         "warning.breakingpower",
-        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!"
+        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!",
     )
 
     /**
@@ -30,7 +41,7 @@ object PowderMiningChatFilter {
      */
     private val powderRewardPattern by patternGroup.pattern(
         "reward.powder",
-        "§aYou received §r§b\\+(?<amount>[\\d|,]+) §r§a(?:Mithril|Gemstone) Powder."
+        "§aYou received §r§b\\+(?<amount>[\\d|,]+) §r§a(?:Mithril|Gemstone) Powder.",
     )
 
     /**
@@ -39,7 +50,7 @@ object PowderMiningChatFilter {
      */
     private val essenceRewardPattern by patternGroup.pattern(
         "reward.essence",
-        "§aYou received §r(?:§6|§b)\\+(?<amount>\\d+) (?:Gold|Diamond) Essence§r§a."
+        "§aYou received §r(?:§6|§b)\\+(?<amount>\\d+) (?:Gold|Diamond) Essence§r§a.",
     )
 
     /**
@@ -47,7 +58,7 @@ object PowderMiningChatFilter {
      */
     private val ascensionRopeRewardPattern by patternGroup.pattern(
         "reward.ascensionrope",
-        "§aYou received §r§f\\d+ §r§9Ascension Rope§r§a"
+        "§aYou received §r§f\\d+ §r§9Ascension Rope§r§a",
     )
 
     /**
@@ -55,7 +66,7 @@ object PowderMiningChatFilter {
      */
     private val wishingCompassRewardPattern by patternGroup.pattern(
         "reward.wishingcompass",
-        "§aYou received §r§f\\d+ §r§aWishing Compass§r§a."
+        "§aYou received §r§f\\d+ §r§aWishing Compass§r§a.",
     )
 
     /**
@@ -63,7 +74,7 @@ object PowderMiningChatFilter {
      */
     private val oilBarrelRewardPattern by patternGroup.pattern(
         "reward.oilbarrel",
-        "§aYou received §r§f\\d+ §r§aOil Barrel§r§a."
+        "§aYou received §r§f\\d+ §r§aOil Barrel§r§a.",
     )
 
     /**
@@ -71,7 +82,7 @@ object PowderMiningChatFilter {
      */
     private val prehistoricEggPattern by patternGroup.pattern(
         "reward.prehistoricegg",
-        "§aYou received §r§f\\d+ §r§fPrehistoric Egg§r§a."
+        "§aYou received §r§f\\d+ §r§fPrehistoric Egg§r§a.",
     )
 
     /**
@@ -79,7 +90,7 @@ object PowderMiningChatFilter {
      */
     private val pickonimbusPattern by patternGroup.pattern(
         "reward.pickonimbus",
-        "§aYou received §r§f\\d+ §r§5Pickonimbus 2000§r§a"
+        "§aYou received §r§f\\d+ §r§5Pickonimbus 2000§r§a",
     )
 
     /**
@@ -87,7 +98,7 @@ object PowderMiningChatFilter {
      */
     private val jungleHeartPattern by patternGroup.pattern(
         "reward.jungleheart",
-        "§aYou received §r§f\\d+ §r§6Jungle Heart§r§a."
+        "§aYou received §r§f\\d+ §r§6Jungle Heart§r§a.",
     )
 
     /**
@@ -95,7 +106,7 @@ object PowderMiningChatFilter {
      */
     private val sludgeJuicePattern by patternGroup.pattern(
         "reward.sludgejuice",
-        "§aYou received §r§f\\d+ §r§aSludge Juice§r§a."
+        "§aYou received §r§f\\d+ §r§aSludge Juice§r§a.",
     )
 
     // Why is the Yoggie message missing an §r before the §a.?
@@ -105,7 +116,7 @@ object PowderMiningChatFilter {
      */
     private val yoggiePattern by patternGroup.pattern(
         "reward.yoggie",
-        "§aYou received §r§f\\d+ §r§bYoggie§a."
+        "§aYou received §r§f\\d+ §r§bYoggie§a.",
     )
 
     /**
@@ -118,7 +129,7 @@ object PowderMiningChatFilter {
      */
     private val robotPartsPattern by patternGroup.pattern(
         "reward.robotparts",
-        "§aYou received §r§f\\d+ §r§9(?:FTX 3070|Synthetic Heart|Control Switch|Robotron Reflector|Electron Transmitter|Superlite Motor)§r§a."
+        "§aYou received §r§f\\d+ §r§9(?:FTX 3070|Synthetic Heart|Control Switch|Robotron Reflector|Electron Transmitter|Superlite Motor)§r§a.",
     )
 
     /**
@@ -126,7 +137,7 @@ object PowderMiningChatFilter {
      */
     private val treasuritePattern by patternGroup.pattern(
         "reward.treasurite",
-        "§aYou received §r§f\\d+ §r§5Treasurite§r§a."
+        "§aYou received §r§f\\d+ §r§5Treasurite§r§a.",
     )
 
     /**
@@ -138,7 +149,7 @@ object PowderMiningChatFilter {
      */
     private val goblinEggPattern by patternGroup.pattern(
         "reward.goblineggs",
-        "§aYou received §r§f\\d+ (?:§.)*(?<color>[a-zA-Z]+)? ?Goblin Egg§r§a."
+        "§aYou received §r§f\\d+ (?:§.)*(?<color>[a-zA-Z]+)? ?Goblin Egg§r§a.",
     )
 
     /**
@@ -148,7 +159,7 @@ object PowderMiningChatFilter {
      */
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§aYou received §r§f(?<amount>[\\d,]+) §r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\."
+        "§aYou received §r§f(?<amount>[\\d,]+) §r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.",
     )
 
     fun block(message: String): String {
@@ -180,52 +191,52 @@ object PowderMiningChatFilter {
 
         //Ascension Rope
         ascensionRopeRewardPattern.matchMatcher(message) {
-            if (config.ascensionRope) return "powder_mining_ascension_rope"
+            if (config.simplePowderMiningTypes.contains(ASCENSION_ROPE)) return "powder_mining_ascension_rope"
         }
 
         //Wishing Compass
         wishingCompassRewardPattern.matchMatcher(message) {
-            if (config.wishingCompass) return "powder_mining_wishing_compass"
+            if (config.simplePowderMiningTypes.contains(WISHING_COMPASS)) return "powder_mining_wishing_compass"
         }
 
         //Oil Barrel
         oilBarrelRewardPattern.matchMatcher(message) {
-            if (config.oilBarrel) return "powder_mining_oil_barrel"
+            if (config.simplePowderMiningTypes.contains(OIL_BARREL)) return "powder_mining_oil_barrel"
         }
 
         //Prehistoric Egg
         prehistoricEggPattern.matchMatcher(message) {
-            if (config.prehistoricEgg) return "powder_mining_prehistoric_egg"
+            if (config.simplePowderMiningTypes.contains(PREHISTORIC_EGG)) return "powder_mining_prehistoric_egg"
         }
 
         //Pickonimbus 2000
         pickonimbusPattern.matchMatcher(message) {
-            if (config.pickonimbus) return "powder_mining_pickonimbus"
+            if (config.simplePowderMiningTypes.contains(PICKONIMBUS)) return "powder_mining_pickonimbus"
         }
 
         //Jungle Heart
         jungleHeartPattern.matchMatcher(message) {
-            if (config.jungleHeart) return "powder_mining_jungle_heart"
+            if (config.simplePowderMiningTypes.contains(JUNGLE_HEART)) return "powder_mining_jungle_heart"
         }
 
         //Sludge Juice
         sludgeJuicePattern.matchMatcher(message) {
-            if (config.sludgeJuice) return "powder_mining_sludge_juice"
+            if (config.simplePowderMiningTypes.contains(SLUDGE_JUICE)) return "powder_mining_sludge_juice"
         }
 
         //Yoggie
         yoggiePattern.matchMatcher(message) {
-            if (config.yoggie) return "powder_mining_yoggie"
+            if (config.simplePowderMiningTypes.contains(YOGGIE)) return "powder_mining_yoggie"
         }
 
         //Robot Parts
         robotPartsPattern.matchMatcher(message) {
-            if (config.robotParts) return "powder_mining_robot_parts"
+            if (config.simplePowderMiningTypes.contains(ROBOT_PARTS)) return "powder_mining_robot_parts"
         }
 
         //Treasurite
         treasuritePattern.matchMatcher(message) {
-            if (config.treasurite) return "powder_mining_treasurite"
+            if (config.simplePowderMiningTypes.contains(TREASURITE)) return "powder_mining_treasurite"
         }
 
         //Goblin Eggs
@@ -250,8 +261,10 @@ object PowderMiningChatFilter {
                     // case that will block it is HIDE_ALL, which is covered above
                     "blue" -> return ""
                     else -> {
-                        ChatUtils.chat("§cUnknown Goblin Egg color detected in Powder Mining Filter: " +
-                            "'${colorStr}' - please report this in the Discord!")
+                        ChatUtils.chat(
+                            "§cUnknown Goblin Egg color detected in Powder Mining Filter: " +
+                                "'${colorStr}' - please report this in the Discord!",
+                        )
                         return ""
                     }
                 }

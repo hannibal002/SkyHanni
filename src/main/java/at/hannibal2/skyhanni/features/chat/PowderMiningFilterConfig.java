@@ -4,9 +4,22 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import static at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE;
+import static at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART;
+import static at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.OIL_BARREL;
+import static at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.SLUDGE_JUICE;
+import static at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.TREASURITE;
+import static at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS;
+import static at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE;
 
 public class PowderMiningFilterConfig {
     @Expose
@@ -36,55 +49,42 @@ public class PowderMiningFilterConfig {
     @Accordion
     public PowderMiningGemstoneFilterConfig gemstoneFilterConfig = new PowderMiningGemstoneFilterConfig();
 
-    @Expose
-    @ConfigOption(name = "Ascension Rope", desc = "Hide Ascension Rope rewards.")
-    @ConfigEditorBoolean
-    public boolean ascensionRope = true;
+    public enum SimplePowderMiningRewardTypes {
+
+        ASCENSION_ROPE("§9Ascension Rope"),
+        WISHING_COMPASS("§aWishing Compass"),
+        OIL_BARREL("§aOil Barrel"),
+        PREHISTORIC_EGG("§fPrehistoric Egg"),
+        PICKONIMBUS("§5Pickonimbus 2000"),
+        JUNGLE_HEART("§6Jungle Heart"),
+        SLUDGE_JUICE("§aSludge Juice"),
+        YOGGIE("§aYoggie"),
+        ROBOT_PARTS("§9Robot Parts"),
+        TREASURITE("§5Treasurite"),
+        ;
+
+        private final String name;
+
+        SimplePowderMiningRewardTypes(String name) { this.name = name; }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @Expose
-    @ConfigOption(name = "Wishing Compass", desc = "Hide Wishing Compass rewards.")
-    @ConfigEditorBoolean
-    public boolean wishingCompass = true;
-
-    @Expose
-    @ConfigOption(name = "Oil Barrel", desc = "Hide Oil Barrel rewards.")
-    @ConfigEditorBoolean
-    public boolean oilBarrel = true;
-
-    @Expose
-    @ConfigOption(name = "Prehistoric Egg", desc = "Hide Prehistoric Egg rewards.")
-    @ConfigEditorBoolean
-    public boolean prehistoricEgg = false;
-
-    @Expose
-    @ConfigOption(name = "Pickonimbus", desc = "Hide §5Pickonimbus 2000 §7rewards.")
-    @ConfigEditorBoolean
-    public boolean pickonimbus = false;
-
-    @Expose
-    @ConfigOption(name = "Jungle Heart", desc = "Hide Jungle Heart rewards.")
-    @ConfigEditorBoolean
-    public boolean jungleHeart = true;
-
-    @Expose
-    @ConfigOption(name = "Sludge Juice", desc = "Hide Sludge Juice rewards.")
-    @ConfigEditorBoolean
-    public boolean sludgeJuice = true;
-
-    @Expose
-    @ConfigOption(name = "Yoggie", desc = "Hide Yoggie rewards.")
-    @ConfigEditorBoolean
-    public boolean yoggie = true;
-
-    @Expose
-    @ConfigOption(name = "Robot Parts", desc = "Hide all Robot Part rewards.")
-    @ConfigEditorBoolean
-    public boolean robotParts = false;
-
-    @Expose
-    @ConfigOption(name = "Treasurite", desc = "Hide treasurite rewards.")
-    @ConfigEditorBoolean
-    public boolean treasurite = true;
+    @ConfigOption(name = "Common Items", desc = "Hide reward messages for listed items.")
+    @ConfigEditorDraggableList
+    public List<SimplePowderMiningRewardTypes> simplePowderMiningTypes = new ArrayList<>(Arrays.asList(
+        ASCENSION_ROPE,
+        WISHING_COMPASS,
+        OIL_BARREL,
+        JUNGLE_HEART,
+        SLUDGE_JUICE,
+        YOGGIE,
+        TREASURITE
+    ));
 
     @Expose
     @ConfigOption(name = "Goblin Egg", desc = "Hide Goblin Egg rewards that are below a certain rarity.")
