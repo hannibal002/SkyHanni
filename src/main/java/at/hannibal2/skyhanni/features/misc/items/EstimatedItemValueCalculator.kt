@@ -142,7 +142,7 @@ object EstimatedItemValueCalculator {
         var comboPrice = combo.asInternalName().getPriceOrNull()
 
         if (comboPrice != null) {
-            val useless = isUselessAttribute(combo)
+            val useless = isUselessAttribute(genericName.asInternalName(), attributes[0].first, attributes[1].first)
             val color = if (comboPrice > basePrice && !useless) "§6" else "§7"
             list.add("§7Attribute Combo: ($color${comboPrice.shortFormat()}§7)")
             if (!useless) {
@@ -156,7 +156,7 @@ object EstimatedItemValueCalculator {
             val price =
                 getPriceOrCompositePriceForAttribute(attributeName, attr.second)
             var priceColor = "§7"
-            val useless = isUselessAttribute(attributeName)
+            val useless = isUselessAttribute(genericName.asInternalName(), attr.first)
             var nameColor = if (!useless) "§9" else "§7"
             if (price != null) {
                 if (price > basePrice && !useless) {
@@ -192,13 +192,27 @@ object EstimatedItemValueCalculator {
         } else {
             0.0
         }
-
-    private fun isUselessAttribute(internalName: String): Boolean {
-        if (internalName.contains("RESISTANCE")) return true
-        if (internalName.contains("SPEED")) return true
-        if (internalName.contains("EXPERIENCE")) return true
-        if (internalName.contains("FORTITUDE")) return true
-        if (internalName.contains("ENDER")) return true
+    private val badAttributeList = listOf(
+        // armor
+        "ARACHNO_RESISTANCE",
+        "BLAZING_RESISTANCE",
+        "ENDER_RESISTANCE",
+        "EXPERIENCE",
+        "FORTITUDE",
+        "SPEED",
+        "UNDEAD_RESISTANCE",
+        // fishing
+        "HUNTER",
+        "INFECTION",
+        // weapons
+        "ARACHNO",
+        "COMBO",
+        "IGNITION",
+        "MIDAS_TOUCH"
+    )
+    private fun isUselessAttribute(itemName: NEUInternalName, attribute1: String? = null, attribute2: String? = null): Boolean {
+        val list = listOf(attribute1, attribute2)
+        if (list.any {it in badAttributeList}) return true
 
         return false
     }
