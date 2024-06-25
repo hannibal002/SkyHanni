@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -51,11 +53,9 @@ public class FilterTypesConfig {
     public boolean winterGift = false;
 
     @Expose
-    @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in the Crystal Hollows. " +
-        "(except powder numbers over 1k, essence numbers over 2, Prehistoric Eggs, and Automaton Parts)")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean powderMining = false;
+    @ConfigOption(name = "Powder Mining", desc = "")
+    @Accordion
+    public PowderMiningFilterConfig powderMiningFilterConfig = new PowderMiningFilterConfig();
 
     @Expose
     @ConfigOption(name = "Kill Combo", desc = "Hide messages about your Kill Combo from the Grandma Wolf pet.")

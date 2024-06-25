@@ -323,20 +323,6 @@ object ChatFilter {
         "§cThis gift is for §r.*§r§c, sorry!".toPattern(),
     )
 
-    // Powder Mining
-    private val powderMiningPatterns = listOf(
-        "§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c.".toPattern(),
-        "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] Rough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-        "§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] Flawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-
-        // Jungle
-        "§aYou received §r§f\\d* §r§aSludge Juice§r§a\\.".toPattern(),
-
-        // Useful, maybe in another chat
-        "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
-        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence§r§a.".toPattern(),
-    )
-
     private val fireSalePattern by RepoPattern.pattern(
         "chat.firesale",
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*"
@@ -421,7 +407,6 @@ object ChatFilter {
         "winter_island" to winterIslandPatterns,
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
-        "powder_mining" to powderMiningPatterns,
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
@@ -484,7 +469,7 @@ object ChatFilter {
         config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
+        config.powderMiningFilterConfig.enabled && isPowderMining(message) -> powderMiningMessage
         config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
@@ -497,6 +482,25 @@ object ChatFilter {
         dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
 
         else -> ""
+    }
+
+    private var powderMiningMessage = ""
+
+    /**
+     * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
+     * Will store the resultant reason in powderMiningMessage for usage in the block function
+     * @param message The message to check
+     * @return True if the message is a blocked Powder Mining message
+     * @see powderMiningMessage
+     * @see block
+     */
+    private fun isPowderMining(message: String): Boolean {
+        val powderMiningMatchResult = PowderMiningChatFilter.block(message)
+        if(powderMiningMatchResult == "no_match") return false;
+        else {
+            powderMiningMessage = powderMiningMatchResult;
+            return true;
+        }
     }
 
     private var othersMsg = ""
