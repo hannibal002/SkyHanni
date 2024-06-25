@@ -27,11 +27,19 @@ object PowderMiningChatFilter {
     val patternGroup = RepoPattern.group("filter.powdermining")
 
     /**
+     * REGEX-TEST: §aYou uncovered a treasure chest!
+     */
+    private val uncoverChestPattern by patternGroup.pattern(
+        "warning.chestuncover",
+        "§aYou uncovered a treasure chest!"
+    )
+
+    /**
      * REGEX-TEST: §cYou need a tool with a §r§aBreaking Power §r§cof §r§66§r§c to mine Ruby Gemstone Block§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!
      */
     private val breakingPowerPattern by patternGroup.pattern(
         "warning.breakingpower",
-        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!",
+        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!.+",
     )
 
     /**
@@ -57,7 +65,7 @@ object PowderMiningChatFilter {
      */
     private val ascensionRopeRewardPattern by patternGroup.pattern(
         "reward.ascensionrope",
-        "§aYou received §r§f\\d+ §r§9Ascension Rope§r§a",
+        "§aYou received §r§f\\d+ §r§9Ascension Rope§r§a.",
     )
 
     /**
@@ -89,7 +97,7 @@ object PowderMiningChatFilter {
      */
     private val pickonimbusPattern by patternGroup.pattern(
         "reward.pickonimbus",
-        "§aYou received §r§f\\d+ §r§5Pickonimbus 2000§r§a",
+        "§aYou received §r§f\\d+ §r§5Pickonimbus 2000§r§a.",
     )
 
     /**
@@ -158,10 +166,14 @@ object PowderMiningChatFilter {
      */
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§aYou received §r§f(?<amount>[\\d,]+) §r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.",
+        "§aYou received §r§f(?<amount>[\\d,]+) §r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a.",
     )
 
     fun block(message: String): String {
+
+        uncoverChestPattern.matchMatcher(message) {
+            return "powder_mining_chest"
+        }
 
         //Breaking power warning
         breakingPowerPattern.matchMatcher(message) {
