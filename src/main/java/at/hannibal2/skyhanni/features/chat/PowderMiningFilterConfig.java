@@ -98,8 +98,8 @@ public class PowderMiningFilterConfig {
         HIDE_ALL("Hide all"),
         GREEN_UP("Show §aGreen§7+"),
         YELLOW_UP("Show §eYellow§7+"),
-        RED_UP("Show §cRed§&+"),
-        BLUE_ONLY("Show §3Blue only");
+        RED_UP("Show §cRed§7+"),
+        BLUE_ONLY("Show §3Blue §7only");
 
         private final String str;
 

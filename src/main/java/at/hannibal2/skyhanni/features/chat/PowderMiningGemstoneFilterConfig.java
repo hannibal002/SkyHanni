@@ -45,7 +45,7 @@ public class PowderMiningGemstoneFilterConfig {
     public enum GemstoneFilterEntry {
         SHOW_ALL("Show All"),
         HIDE_ALL("Hide all"),
-        FLAWED_UP("Show §aFlawed §7& §9Fine"),
+        FLAWED_UP("Show §aFlawed§7+"),
         FINE_ONLY("Show §9Fine §7only");
 
         private final String str;
