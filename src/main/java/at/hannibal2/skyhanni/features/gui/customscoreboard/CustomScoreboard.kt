@@ -51,9 +51,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-// TODO: check if we can just leave the line be actually empty?
-internal const val EMPTY = "<empty>"
-
 @SkyHanniModule
 object CustomScoreboard {
 
@@ -155,14 +152,9 @@ object CustomScoreboard {
 
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().display == EMPTY &&
+                lines.first().display.isEmpty() &&
                 lastOrNull()?.display?.isEmpty() == true
             ) {
-                continue
-            }
-
-            if (lines.first().display == EMPTY) {
-                add(ScoreboardLine.EMPTY)
                 continue
             }
 
@@ -170,10 +162,10 @@ object CustomScoreboard {
         }
     }
 
-    private fun List<ScoreboardLine>.removeEmptyLinesFromEdges(): List<ScoreboardLine> = apply {
+    private fun List<ScoreboardLine>.removeEmptyLinesFromEdges(): List<ScoreboardLine> =
         if (informationFilteringConfig.hideEmptyLinesAtTopAndBottom)
-            dropWhile { it.display.trim().isEmpty() }.dropLastWhile { it.display.isEmpty() }
-    }
+            dropWhile { it.display.trim().isEmpty() }.dropLastWhile { it.display.trim().isEmpty() }
+        else this
 
     private var dirty = false
 
