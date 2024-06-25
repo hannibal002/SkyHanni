@@ -55,7 +55,7 @@ _Frequently Asked Questions_
 > **12: Why can I still see the normal Scoreboard when using Custom Scoreboard?**
 > Most of the time, this is a mod conflict.
 > If you are using [Sidebar Mod](https://github.com/Alexdoru/SidebarMod), please remove this mod.
-> If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please disable its Scoreboard by clicking on the blue bar below "Scoreboard" in the OneConfig Menu.
+> If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.7 or newer to resolve this issue.
 > If you are using [Apec](https://github.com/BananaFructa/Apec/) and want to remove their Scoreboard, you need to remove Apec since they don't have an option to disable their Scoreboard.
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
