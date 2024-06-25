@@ -145,10 +145,8 @@ object HoppityEggLocator {
                         )
                         drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
                     }
-                    if (!drawLocations) {
-                        if (config.showLine) {
-                            draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
-                        }
+                    if (!drawLocations && config.showLine) {
+                        draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
                     }
                 }
             }
@@ -168,7 +166,7 @@ object HoppityEggLocator {
     }
 
     private fun shouldShowAllEggs() =
-        config.showAllWaypoints && !hasLocatorInHotbar() && HoppityEggType.eggsRemaining()
+        config.showAllWaypoints && !isLocatorInHotbar && HoppityEggType.eggsRemaining()
 
     fun eggFound() {
         resetData()
@@ -177,7 +175,7 @@ object HoppityEggLocator {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!hasLocatorInHotbar()) return
+        if (!isLocatorInHotbar) return
         if (!event.isVillagerParticle() && !event.isEnchantmentParticle()) return
 
         val lastParticlePosition = lastParticlePosition ?: run {
@@ -283,9 +281,9 @@ object HoppityEggLocator {
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
-    private fun hasLocatorInHotbar() = RecalculatingValue(1.seconds) {
+    private val isLocatorInHotbar by RecalculatingValue(1.seconds) {
         LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
-    }.getValue()
+    }
 
     private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
         val distToLine = this.distanceToLine(firstPoint, secondPoint)

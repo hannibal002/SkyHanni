@@ -28,7 +28,7 @@ object TimeFeatures {
     private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
     private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
 
-    private val startOfNextYear = RecalculatingValue(1.seconds) {
+    private val startOfNextYear by RecalculatingValue(1.seconds) {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
     }
 
@@ -44,7 +44,7 @@ object TimeFeatures {
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
             if (WinterAPI.isDecember()) return
-            val timeTillNextYear = startOfNextYear.getValue().timeUntil()
+            val timeTillNextYear = startOfNextYear.timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
             val text = if (alreadyInNextYear) {
                 "§fJerry's Workshop §cis closing!"
