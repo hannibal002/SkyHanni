@@ -200,7 +200,6 @@ object EstimatedItemValueCalculator {
         "EXPERIENCE",
         "FORTITUDE",
         "SPEED",
-        "UNDEAD_RESISTANCE",
         // fishing
         "HUNTER",
         "INFECTION",
