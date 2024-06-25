@@ -250,8 +250,8 @@ object PowderMiningChatFilter {
                     // case that will block it is HIDE_ALL, which is covered above
                     "blue" -> return ""
                     else -> {
-                        ChatUtils.chat("§cUnknown Goblin Egg color detected in Powder Mining Filter: "
-                            + "'${colorStr}' - please report this in the Discord!")
+                        ChatUtils.chat("§cUnknown Goblin Egg color detected in Powder Mining Filter: " +
+                            "'${colorStr}' - please report this in the Discord!")
                         return ""
                     }
                 }
