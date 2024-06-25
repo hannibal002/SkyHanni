@@ -1,23 +1,16 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PowderMiningChatFilter {
 
-    private val config get() = SkyHanniMod.feature.chat.filterType.powderMiningFilterConfig;
-    private val gemstoneConfig get() = config.gemstoneFilterConfig;
-
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(52, "chat.filterType.powderMining", "chat.filterType.powderMiningFilterConfig.enabled")
-    }
+    private val config get() = SkyHanniMod.feature.chat.filterType.powderMiningFilter
+    private val gemstoneConfig get() = config.gemstoneFilterConfig
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
@@ -177,7 +170,7 @@ object PowderMiningChatFilter {
         essenceRewardPattern.matchMatcher(message) {
             if (config.essenceFilterThreshold == 10) return "powder_mining_essence"
             val amountStr = groupOrNull("amount") ?: ""
-            if (amountStr.isNotEmpty() && config.essenceFilterThreshold > 0){
+            if (amountStr.isNotEmpty() && config.essenceFilterThreshold > 0) {
                 val amountParsed = amountStr.toInt()
                 if (amountParsed < config.essenceFilterThreshold) return "powder_mining_essence"
             }
@@ -239,7 +232,7 @@ object PowderMiningChatFilter {
                 if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
                 val colorStr = groupOrNull("color")?.lowercase() ?: ""
-                when(colorStr){
+                when(colorStr) {
                     //'Colorless', base goblin eggs will never be shown in this code path
                     "" -> return "powder_mining_goblin_eggs"
                     "green" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
@@ -268,7 +261,7 @@ object PowderMiningChatFilter {
             val tierStr = groupOrNull("tier")?.lowercase() ?: ""
 
             //Theoretically impossible but ?
-            if(gemStr.isEmpty() || tierStr.isEmpty()) return ""
+            if (gemStr.isEmpty() || tierStr.isEmpty()) return ""
 
             val gemSpecificConfig = when(gemStr) {
                 "ruby" -> gemstoneConfig.rubyGemstones
@@ -281,13 +274,13 @@ object PowderMiningChatFilter {
                 else -> return ""
             }
 
-            if(gemSpecificConfig == GemstoneFilterEntry.HIDE_ALL) return "powder_mining_gemstones"
+            if (gemSpecificConfig == GemstoneFilterEntry.HIDE_ALL) return "powder_mining_gemstones"
 
             when(tierStr) {
                 // Never allowed through, except for in SHOW_ALL,
                 // which is handled above
                 "rough" -> return "powder_mining_gemstones"
-                "flawed" -> return if(gemSpecificConfig > GemstoneFilterEntry.FLAWED_UP) {
+                "flawed" -> return if (gemSpecificConfig > GemstoneFilterEntry.FLAWED_UP) {
                     "powder_mining_gemstones"
                 } else ""
                 // FINE_ONLY enum not explicitly used in comparison, as the only

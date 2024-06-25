@@ -55,7 +55,7 @@ public class FilterTypesConfig {
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "")
     @Accordion
-    public PowderMiningFilterConfig powderMiningFilterConfig = new PowderMiningFilterConfig();
+    public PowderMiningFilterConfig powderMiningFilter = new PowderMiningFilterConfig();
 
     @Expose
     @ConfigOption(name = "Kill Combo", desc = "Hide messages about your Kill Combo from the Grandma Wolf pet.")

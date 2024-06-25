@@ -469,7 +469,7 @@ object ChatFilter {
         config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.powderMiningFilterConfig.enabled && isPowderMining(message) -> powderMiningMessage
+        config.powderMiningFilter.enabled && isPowderMining(message) -> powderMiningMessage
         config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
@@ -559,5 +559,6 @@ object ChatFilter {
         event.move(3, "chat.killCombo", "chat.filterType.killCombo")
         event.move(3, "chat.profileJoin", "chat.filterType.profileJoin")
         event.move(3, "chat.others", "chat.filterType.others")
+        event.move(52, "chat.filterType.powderMining", "chat.filterType.powderMiningFilter.enabled")
     }
 }
