@@ -27,7 +27,7 @@ public class ChatConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean copyChat = true;
+    public boolean copyChat = false;
 
     @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
