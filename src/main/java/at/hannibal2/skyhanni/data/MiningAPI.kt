@@ -46,7 +46,7 @@ object MiningAPI {
         "§c ☠ §r§7§r§.(?<name>.+)§r§7 (?<reason>.+)",
     )
 
-    data class MinedBlock(val ore: OreBlock, var position: LorenzVec, var confirmed: Boolean, val time: SimpleTimeMark)
+    private data class MinedBlock(val ore: OreBlock, var confirmed: Boolean, val time: SimpleTimeMark = SimpleTimeMark.now())
 
     private var lastInitSound = SimpleTimeMark.farPast()
 
@@ -68,9 +68,9 @@ object MiningAPI {
 
     private var lastSkyblockArea: String? = null
 
-    private var recentClickedBlocks = mutableListOf<MinedBlock>()
-    private var surroundingMinedBlocks = mutableListOf<MinedBlock>()
-    private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth")
+    private var recentClickedBlocks = mutableMapOf<LorenzVec, MinedBlock>()
+    private var surroundingMinedBlocks = mutableMapOf<LorenzVec, MinedBlock>()
+    private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
     var cold: Int = 0
         private set
@@ -123,7 +123,7 @@ object MiningAPI {
         val position = event.position
         val blockState = event.getBlockState
         val ore = OreBlock.getByStateOrNull(blockState) ?: return
-        recentClickedBlocks.add(MinedBlock(ore, position, false, SimpleTimeMark.now()))
+        recentClickedBlocks[position] = MinedBlock(ore, false)
     }
 
     @SubscribeEvent
@@ -146,10 +146,11 @@ object MiningAPI {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
+        if (event.soundName !in allowedSoundNames) return
         if (waitingForInitSound) {
-            if (event.soundName in allowedSoundNames && event.pitch == 0.7936508f) {
+            if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
-                if (recentClickedBlocks.none { it.position == pos }) return
+                if (pos !in recentClickedBlocks) return
                 waitingForInitSound = false
                 waitingForInitBlock = true
                 waitingForInitBlockPos = event.location.roundLocationToBlock()
@@ -159,12 +160,11 @@ object MiningAPI {
         }
         if (waitingForEffMinerSound) {
             if (surroundingMinedBlocks.isEmpty()) return
-            if (event.soundName in allowedSoundNames || event.soundName == "random.orb") {
-                if (surroundingMinedBlocks.last().confirmed) return
-                waitingForEffMinerSound = false
-                surroundingMinedBlocks.last().confirmed = true
-                waitingForEffMinerBlock = true
-            }
+            val lastBlock = surroundingMinedBlocks.values.minByOrNull { it.time.passedSince() } ?: return
+            if (lastBlock.confirmed) return
+            waitingForEffMinerSound = false
+            lastBlock.confirmed = true
+            waitingForEffMinerBlock = true
         }
     }
 
@@ -182,14 +182,14 @@ object MiningAPI {
         if (waitingForInitBlock) {
             if (waitingForInitBlockPos != event.location) return
             waitingForInitBlock = false
-            surroundingMinedBlocks.add(MinedBlock(ore, event.location, true, SimpleTimeMark.now()))
+            surroundingMinedBlocks[event.location] = MinedBlock(ore, true)
             waitingForEffMinerBlock = true
             return
         }
         if (waitingForEffMinerBlock) {
-            if (surroundingMinedBlocks.any { it.position == event.location }) return
+            if (event.location in surroundingMinedBlocks) return
             waitingForEffMinerBlock = false
-            surroundingMinedBlocks.add(MinedBlock(ore, event.location, false, SimpleTimeMark.now()))
+            surroundingMinedBlocks[event.location] = MinedBlock(ore, false)
             waitingForEffMinerSound = true
             return
         }
@@ -205,34 +205,37 @@ object MiningAPI {
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 20 seconds to mine a single block, congrats
-        recentClickedBlocks.removeIf { it.time.passedSince() > 20.seconds }
-        surroundingMinedBlocks.removeIf { it.time.passedSince() > 20.seconds }
+        recentClickedBlocks = recentClickedBlocks.filter { it.value.time.passedSince() <= 20.seconds }.toMutableMap()
+        surroundingMinedBlocks = surroundingMinedBlocks.filter { it.value.time.passedSince() <= 20.seconds }.toMutableMap()
 
-        if (surroundingMinedBlocks.isEmpty()) return
+        if (waitingForInitSound) return
         if (lastInitSound.passedSince() < 200.milliseconds) return
 
         resetOreEvent()
 
-        val originalBlock = surroundingMinedBlocks.firstOrNull { it.confirmed } ?: run {
-            surroundingMinedBlocks = mutableListOf()
-            recentClickedBlocks = mutableListOf()
-            return
-        }
+        if (surroundingMinedBlocks.isEmpty()) return
 
-        val extraBlocks = surroundingMinedBlocks.filter { it.confirmed }.countBy { it.ore }
+        val originalBlock = surroundingMinedBlocks.maxByOrNull { it.value.time.passedSince() }?.takeIf { it.value.confirmed }?.value
+            ?: run {
+                surroundingMinedBlocks.clear()
+                recentClickedBlocks.clear()
+                return
+            }
+
+        val extraBlocks = surroundingMinedBlocks.values.filter { it.confirmed }.countBy { it.ore }
 
         OreMinedEvent(originalBlock.ore, extraBlocks).post()
 
-        surroundingMinedBlocks = mutableListOf()
-        recentClickedBlocks.removeIf { it.time.passedSince() >= originalBlock.time.passedSince() }
+        surroundingMinedBlocks.clear()
+        recentClickedBlocks = recentClickedBlocks.filter { it.value.time.passedSince() < originalBlock.time.passedSince() }.toMutableMap()
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
-        recentClickedBlocks = mutableListOf()
-        surroundingMinedBlocks = mutableListOf()
+        recentClickedBlocks.clear()
+        surroundingMinedBlocks.clear()
         currentAreaOreBlocks = setOf()
         resetOreEvent()
     }
@@ -265,7 +268,7 @@ object MiningAPI {
             add("waitingForInitBlockPos: $waitingForInitBlockPos")
             add("waitingForEffMinerSound: $waitingForEffMinerSound")
             add("waitingForEffMinerBlock: $waitingForEffMinerBlock")
-            add("recentClickedBlocks: ${recentClickedBlocks.joinToString { it.position.toCleanString() }}")
+            add("recentClickedBlocks: ${recentClickedBlocks.entries.joinToString { it.key.toCleanString() }}")
         }
     }
 
