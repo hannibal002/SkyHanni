@@ -13,8 +13,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Dojo
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Dungeons
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Essence
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.FlightDuration
-import at.hannibal2.skyhanni.features.gui.customscoreboard.events.GardenCleanUp
-import at.hannibal2.skyhanni.features.gui.customscoreboard.events.GardenPasting
+import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Garden
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.JacobContest
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.JacobMedals
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.Kuudra
@@ -50,10 +49,7 @@ enum class ScoreboardEventEntry(val event: ScoreboardEvent) {
     JACOB_CONTEST(JacobContest),
     JACOB_MEDALS(JacobMedals),
     TRAPPER(Trapper),
-
-    // TODO: Combine Cleanup & Pasting into Garden
-    GARDEN_CLEAN_UP(GardenCleanUp),
-    GARDEN_PASTING(GardenPasting),
+    GARDEN(Garden),
     FLIGHT_DURATION(FlightDuration),
     WINTER(Winter),
     NEW_YEAR(NewYear),
@@ -93,8 +89,7 @@ enum class ScoreboardEventEntry(val event: ScoreboardEvent) {
             JACOB_CONTEST,
             JACOB_MEDALS,
             TRAPPER,
-            GARDEN_CLEAN_UP,
-            GARDEN_PASTING,
+            GARDEN,
             FLIGHT_DURATION,
             NEW_YEAR,
             WINTER,

@@ -338,5 +338,22 @@ object CustomScoreboard {
         ) {
             JsonPrimitive(!it.asBoolean)
         }
+        event.transform(53, "$displayPrefix.events.eventEntries") { element ->
+            val jsonArray = element.asJsonArray
+            val newArray = JsonArray()
+
+            for (jsonElement in jsonArray) {
+                val stringValue = jsonElement.asString
+                if (stringValue !in listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING")) {
+                    newArray.add(jsonElement)
+                }
+            }
+
+            if (jsonArray.any { it.asString in listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING") }) {
+                newArray.add(JsonPrimitive(ScoreboardEventEntry.GARDEN.name))
+            }
+
+            newArray
+        }
     }
 }
