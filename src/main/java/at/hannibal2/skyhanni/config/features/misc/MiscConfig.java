@@ -282,4 +282,10 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gfsPiggyBank = true;
 }

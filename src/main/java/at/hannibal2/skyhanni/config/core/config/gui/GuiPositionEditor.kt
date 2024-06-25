@@ -136,16 +136,13 @@ class GuiPositionEditor(
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
             if (GuiRenderUtils.isPointInRect(
-
                     mouseX,
                     mouseY,
                     x - border,
                     y - border,
                     elementWidth + border * 2,
                     elementHeight + border * 2
-
                 )
-
             ) {
                 hoveredPos = index
             }
