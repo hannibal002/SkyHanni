@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 // TODO replace with ReforgeAPI
-enum class FarmingReforges(
+enum class FarmingReforge(
     val reforgeName: String,
     val reforgeItem: String,
     val common: Int,
@@ -22,7 +22,7 @@ enum class FarmingReforges(
     GREEN_THUMB("Green Thumb", "", 1, 2, 3, 4, 5, 6)
 }
 
-operator fun FarmingReforges.get(index: Int, current: Double = 0.0): Double? {
+operator fun FarmingReforge.get(index: Int, current: Double = 0.0): Double? {
     return when (index) {
         0 -> common - current
         1 -> uncommon - current

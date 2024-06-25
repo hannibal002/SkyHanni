@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data.mob
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData.logger
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
@@ -21,7 +20,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -61,21 +59,6 @@ object MobDetection {
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
 
-    init {
-        MobFilter.bossMobNameFilter
-        MobFilter.mobNameFilter
-        MobFilter.dojoFilter
-        MobFilter.summonFilter
-        MobFilter.dungeonNameFilter
-        MobFilter.petCareNamePattern
-        MobFilter.slayerNameFilter
-        MobFilter.summonOwnerPattern
-        MobFilter.wokeSleepingGolemPattern
-        MobFilter.jerryPattern
-        MobFilter.jerryMagmaCubePattern
-        MobUtils.defaultArmorStandName
-    }
-
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
             it.createDeSpawnEvent()
@@ -100,8 +83,10 @@ object MobDetection {
         MobData.previousEntityLiving.clear()
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
-        MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
-            .filter { it !is EntityArmorStand && it !is EntityPlayerSP })
+        MobData.currentEntityLiving.addAll(
+            EntityUtils.getEntities<EntityLivingBase>()
+                .filter { it !is EntityArmorStand && it !is EntityPlayerSP },
+        )
 
         if (forceReset) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
@@ -133,7 +118,7 @@ object MobDetection {
     private fun getRetry(entity: EntityLivingBase) = MobData.retries[entity.entityId]
 
     /** @return always true */
-    private fun mobDetectionError(string: String) = logger.log(string).let { true }
+    private fun mobDetectionError(string: String) = MobData.logger.log(string).let { true }
 
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
@@ -153,7 +138,7 @@ object MobDetection {
                             Mob.Type.SUMMON -> MobEvent.Spawn.Summon(mob)
 
                             Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(
-                                mob
+                                mob,
                             )
 
                             Mob.Type.SPECIAL -> MobEvent.Spawn.Special(mob)
@@ -267,7 +252,7 @@ object MobDetection {
 
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
-                logger.log(
+                MobData.logger.log(
                     "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
                         + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
                         + "\n Position: ${retry.entity.getLorenzVec()}\n "
@@ -275,7 +260,7 @@ object MobDetection {
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     }\n"
                         + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
-                        "}"
+                        "}",
                 )
                 // Uncomment this to make it closed a loop
                 // iterator.remove()

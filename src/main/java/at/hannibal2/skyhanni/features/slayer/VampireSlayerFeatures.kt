@@ -56,8 +56,10 @@ object VampireSlayerFeatures {
     private val entityList = mutableListOf<EntityLivingBase>()
     private val taggedEntityList = mutableListOf<Int>()
     private var standList = mapOf<EntityArmorStand, EntityOtherPlayerMP>()
+
     // Nicked support
-    private val username get() = EntityUtils.getEntities<EntityPlayerSP>().firstOrNull()?.name ?: error("own player is null")
+    private val username
+        get() = EntityUtils.getEntities<EntityPlayerSP>().firstOrNull()?.name ?: error("own player is null")
     private val bloodIchorTexture =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzAzNDA5MjNhNmRlNDgyNWExNzY4MTNkMTMzNTAzZWZmMTg2ZGIwODk2ZTMyYjY3MDQ5MjhjMmEyYmY2ODQyMiJ9fX0="
     private val killerSpringTexture =
@@ -70,15 +72,14 @@ object VampireSlayerFeatures {
         if (!event.isMod(5)) return
         val start = LocationUtils.playerLocation()
         if (configOwnBoss.highlight || configOtherBoss.highlight || configCoopBoss.highlight) {
-            EntityUtils.getEntities<EntityOtherPlayerMP>().forEach {
-                val vec = it.position.toLorenzVec()
-                val distance = start.distance(vec)
+            for (player in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
+                val distance = start.distance(player.position.toLorenzVec())
                 if (distance <= 15)
-                    it.process()
+                    player.process()
             }
         }
         if (configBloodIchor.highlight || configKillerSpring.highlight) {
-            EntityUtils.getEntities<EntityArmorStand>().forEach { stand ->
+            for (stand in EntityUtils.getEntities<EntityArmorStand>()) {
                 val vec = stand.position.toLorenzVec()
                 val distance = start.distance(vec)
                 val isIchor = stand.hasSkullTexture(bloodIchorTexture)
@@ -105,44 +106,42 @@ object VampireSlayerFeatures {
         if (name != "Bloodfiend ") return
 
         if (configOwnBoss.twinClawsTitle || configOtherBoss.twinClawsTitle || configCoopBoss.twinClawsTitle) {
-            getAllNameTagsInRadiusWith("TWINCLAWS").forEach { stand ->
-                if (".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) {
-                    val coopList = configCoopBoss.coopMembers.split(",").toList()
-                    val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
-                        it.name.contains(username)
-                    }
-                    val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
-                        coopList.isNotEmpty() && configCoopBoss.highlight && coopList.any { it2 ->
-                            var contain = false
-                            if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                                val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
-                                    .find(it.name)?.groupValues?.get(1)
-                                contain = it2 == name
-                            }
-                            contain
+            for (stand in getAllNameTagsInRadiusWith("TWINCLAWS")) {
+                if (!".*(?:§(?:\\d|\\w))+TWINCLAWS (?:§(?:\\w|\\d))+[0-9.,]+s.*".toRegex().matches(stand.name)) continue
+                val coopList = configCoopBoss.coopMembers.split(",").toList()
+                val containUser = getAllNameTagsInRadiusWith("Spawned by").any {
+                    it.name.contains(username)
+                }
+                val containCoop = getAllNameTagsInRadiusWith("Spawned by").any {
+                    coopList.isNotEmpty() && configCoopBoss.highlight && coopList.any { it2 ->
+                        var contain = false
+                        if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
+                            val name = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
+                                .find(it.name)?.groupValues?.get(1)
+                            contain = it2 == name
                         }
+                        contain
                     }
-                    val shouldSendTitle =
-                        if (containUser && configOwnBoss.twinClawsTitle) true
-                        else if (containCoop && configCoopBoss.twinClawsTitle) true
-                        else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsTitle
+                }
+                val shouldSendTitle =
+                    if (containUser && configOwnBoss.twinClawsTitle) true
+                    else if (containCoop && configCoopBoss.twinClawsTitle) true
+                    else taggedEntityList.contains(this.entityId) && configOtherBoss.twinClawsTitle
 
-                    if (shouldSendTitle) {
-                        DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
-                            if (nextClawSend < System.currentTimeMillis()) {
-                                LorenzUtils.sendTitle(
-                                    "§6§lTWINCLAWS",
-                                    (1750 - config.twinclawsDelay).milliseconds,
-                                    2.6
-                                )
-                                nextClawSend = System.currentTimeMillis() + 5_000
-                            }
-                        }
+                if (!shouldSendTitle) continue
+                DelayedRun.runDelayed(config.twinclawsDelay.milliseconds) {
+                    if (nextClawSend < System.currentTimeMillis()) {
+                        LorenzUtils.sendTitle(
+                            "§6§lTWINCLAWS",
+                            (1750 - config.twinclawsDelay).milliseconds,
+                            2.6
+                        )
+                        nextClawSend = System.currentTimeMillis() + 5_000
                     }
                 }
             }
         }
-        getAllNameTagsInRadiusWith("Spawned by").forEach {
+        for (it in getAllNameTagsInRadiusWith("Spawned by")) {
             val coopList = configCoopBoss.coopMembers.split(",").toList()
             val containUser = it.name.contains(username)
             val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
@@ -204,17 +203,18 @@ object VampireSlayerFeatures {
         if (event.clickedEntity !is EntityOtherPlayerMP) return
         if (!event.clickedEntity.isNPC()) return
         val coopList = configCoopBoss.coopMembers.split(",").toList()
-        event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by").forEach {
+        val regexA = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex()
+        val regexB = ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex()
+        for (armorStand in event.clickedEntity.getAllNameTagsInRadiusWith("Spawned by")) {
             val containCoop = coopList.isNotEmpty() && coopList.any { it2 ->
                 var contain = false
-                if (".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*).*".toRegex().matches(it.name)) {
-                    val name =
-                        ".*§(?:\\d|\\w)+Spawned by: §(?:\\d|\\w)(\\w*)".toRegex().find(it.name)?.groupValues?.get(1)
+                if (regexA.matches(armorStand.name)) {
+                    val name = regexB.find(armorStand.name)?.groupValues?.get(1)
                     contain = it2 == name
                 }
                 contain
             }
-            if (it.name.contains(username) || containCoop) return
+            if (armorStand.name.contains(username) || containCoop) return
             if (!taggedEntityList.contains(event.clickedEntity.entityId)) {
                 taggedEntityList.add(event.clickedEntity.entityId)
             }
@@ -257,71 +257,67 @@ object VampireSlayerFeatures {
         val start = LocationUtils.playerLocation()
 
         if (config.drawLine) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>().forEach {
-                if (it.isHighlighted()) {
-                    val vec = event.exactLocation(it)
-                    val distance = start.distance(vec)
-                    if (distance <= 15) {
-                        event.draw3DLine(
-                            event.exactPlayerEyeLocation(),
-                            vec.add(y = 1.54),
-                            config.lineColor.toChromaColor(),
-                            config.lineWidth,
-                            true
-                        )
-                    }
-                }
+            for (it in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityOtherPlayerMP>()) {
+                if (!it.isHighlighted()) continue
+                val vec = event.exactLocation(it)
+                val distance = start.distance(vec)
+                if (distance > 15) continue
+                event.draw3DLine(
+                    event.exactPlayerEyeLocation(),
+                    vec.add(y = 1.54),
+                    config.lineColor.toChromaColor(),
+                    config.lineWidth,
+                    true
+                )
             }
         }
-        if (configBloodIchor.highlight || configKillerSpring.highlight) {
-            Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>().forEach { stand ->
-                val vec = stand.position.toLorenzVec()
-                val distance = start.distance(vec)
-                val isIchor = stand.hasSkullTexture(bloodIchorTexture)
-                val isSpring = stand.hasSkullTexture(killerSpringTexture)
-                if ((isIchor && config.bloodIchor.highlight) || (isSpring && config.killerSpring.highlight)) {
-                    val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
-                        .toChromaColor().withAlpha(config.withAlpha)
-                    if (distance <= 15) {
-                        RenderLivingEntityHelper.setEntityColor(
-                            stand,
-                            color
-                        ) { isEnabled() }
+        if (!configBloodIchor.highlight && !configKillerSpring.highlight) return
+        for (stand in Minecraft.getMinecraft().theWorld.loadedEntityList.filterIsInstance<EntityArmorStand>()) {
+            val vec = stand.position.toLorenzVec()
+            val distance = start.distance(vec)
+            val isIchor = stand.hasSkullTexture(bloodIchorTexture)
+            val isSpring = stand.hasSkullTexture(killerSpringTexture)
+            if (!(isIchor && config.bloodIchor.highlight) && !(isSpring && config.killerSpring.highlight)) continue
+            val color = (if (isIchor) configBloodIchor.color else configKillerSpring.color)
+                .toChromaColor().withAlpha(config.withAlpha)
+            if (distance <= 15) {
+                RenderLivingEntityHelper.setEntityColor(
+                    stand,
+                    color
+                ) { isEnabled() }
 
-                        val linesColorStart =
-                            (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toChromaColor()
-                        val text = if (isIchor) "§4Ichor" else "§4Spring"
-                        event.drawColor(
-                            stand.position.toLorenzVec().add(y = 2.0),
-                            LorenzColor.DARK_RED,
-                            alpha = 1f
+                val linesColorStart =
+                    (if (isIchor) configBloodIchor.linesColor else configKillerSpring.linesColor).toChromaColor()
+                val text = if (isIchor) "§4Ichor" else "§4Spring"
+                event.drawColor(
+                    stand.position.toLorenzVec().add(y = 2.0),
+                    LorenzColor.DARK_RED,
+                    alpha = 1f
+                )
+                event.drawDynamicText(
+                    stand.position.toLorenzVec().add(0.5, 2.5, 0.5),
+                    text,
+                    1.5,
+                    ignoreBlocks = false
+                )
+                for ((player, stand2) in standList) {
+                    if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
+                        event.draw3DLine(
+                            event.exactLocation(player).add(y = 1.5),
+                            event.exactLocation(stand2).add(y = 1.5),
+                            // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
+                            linesColorStart,
+                            3,
+                            true
                         )
-                        event.drawDynamicText(
-                            stand.position.toLorenzVec().add(0.5, 2.5, 0.5),
-                            text,
-                            1.5,
-                            ignoreBlocks = false
-                        )
-                        for ((player, stand2) in standList) {
-                            if ((configBloodIchor.showLines && isIchor) || (configKillerSpring.showLines && isSpring))
-                                event.draw3DLine(
-                                    event.exactLocation(player).add(y = 1.5),
-                                    event.exactLocation(stand2).add(y = 1.5),
-                                    // stand2.position.toLorenzVec().add(0.0, 1.5, 0.0),
-                                    linesColorStart,
-                                    3,
-                                    true
-                                )
-                        }
-                    }
-                    if (configBloodIchor.renderBeam && isIchor && stand.isEntityAlive) {
-                        event.drawWaypointFilled(
-                            event.exactLocation(stand).add(0, y = -2, 0),
-                            configBloodIchor.color.toChromaColor(),
-                            beacon = true
-                        )
-                    }
                 }
+            }
+            if (configBloodIchor.renderBeam && isIchor && stand.isEntityAlive) {
+                event.drawWaypointFilled(
+                    event.exactLocation(stand).add(0, y = -2, 0),
+                    configBloodIchor.color.toChromaColor(),
+                    beacon = true
+                )
             }
         }
     }
@@ -337,12 +333,11 @@ object VampireSlayerFeatures {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         val loc = event.location
-        EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0).forEach {
-            if (it.isHighlighted() && event.type == EnumParticleTypes.ENCHANTMENT_TABLE) {
-                EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0).forEach { stand ->
-                    if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
-                        standList = standList.editCopy { this[stand] = it }
-                    }
+        for (player in EntityUtils.getEntitiesNearby<EntityOtherPlayerMP>(loc, 3.0)) {
+            if (!player.isHighlighted() || event.type != EnumParticleTypes.ENCHANTMENT_TABLE) continue
+            for (stand in EntityUtils.getEntitiesNearby<EntityArmorStand>(event.location, 3.0)) {
+                if (stand.hasSkullTexture(killerSpringTexture) || stand.hasSkullTexture(bloodIchorTexture)) {
+                    standList = standList.editCopy { this[stand] = player }
                 }
             }
         }
