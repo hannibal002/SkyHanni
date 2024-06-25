@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
@@ -142,7 +143,7 @@ object EstimatedItemValueCalculator {
         var comboPrice = combo.asInternalName().getPriceOrNull()
 
         if (comboPrice != null) {
-            val useless = isUselessAttribute(genericName.asInternalName(), attributes[0].first, attributes[1].first)
+            val useless = isUselessAttribute(stack.getInternalName(), attributes[0].first, attributes[1].first)
             val color = if (comboPrice > basePrice && !useless) "§6" else "§7"
             list.add("§7Attribute Combo: ($color${comboPrice.shortFormat()}§7)")
             if (!useless) {
@@ -156,7 +157,7 @@ object EstimatedItemValueCalculator {
             val price =
                 getPriceOrCompositePriceForAttribute(attributeName, attr.second)
             var priceColor = "§7"
-            val useless = isUselessAttribute(genericName.asInternalName(), attr.first)
+            val useless = isUselessAttribute(stack.getInternalName(), attr.first)
             var nameColor = if (!useless) "§9" else "§7"
             if (price != null) {
                 if (price > basePrice && !useless) {
@@ -200,6 +201,7 @@ object EstimatedItemValueCalculator {
         "EXPERIENCE",
         "FORTITUDE",
         "SPEED",
+        "UNDEAD_RESISTANCE",
         // fishing
         "HUNTER",
         "INFECTION",
@@ -209,8 +211,17 @@ object EstimatedItemValueCalculator {
         "IGNITION",
         "MIDAS_TOUCH"
     )
+
+    private val auroraArmorPattern =
+        "(?:.*_)?AURORA_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
+
     private fun isUselessAttribute(itemName: NEUInternalName, attribute1: String? = null, attribute2: String? = null): Boolean {
         val list = listOf(attribute1, attribute2)
+        auroraArmorPattern.matchMatcher(itemName.asString()) {
+            return ("MANA_POOL" in list) && ("UNDEAD_RESISTANCE" in list)
+
+        }
+
         return list.any { it in badAttributeList }
     }
 
