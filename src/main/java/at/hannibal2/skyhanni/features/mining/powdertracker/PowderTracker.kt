@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
-import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -28,6 +29,7 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -38,23 +40,27 @@ object PowderTracker {
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
     private val pickedPattern by patternGroup.pattern(
         "picked",
-        "§6You have successfully picked the lock on this chest!"
+        "§6You have successfully picked the lock on this chest!",
     )
     private val uncoveredPattern by patternGroup.pattern(
         "uncovered",
-        "§aYou uncovered a treasure chest!"
+        "§aYou uncovered a treasure chest!",
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",
-        ".*§r§b§l2X POWDER STARTED!.*"
+        ".*§r§b§l2X POWDER STARTED!.*",
     )
     private val powderEndedPattern by patternGroup.pattern(
         "powder.ended",
-        ".*§r§b§l2X POWDER ENDED!.*"
+        ".*§r§b§l2X POWDER ENDED!.*",
     )
     private val powderBossBarPattern by patternGroup.pattern(
         "powder.bossbar",
-        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r"
+        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
+    )
+    private val tablistEventDuration by patternGroup.pattern(
+        "powder.duration",
+        "Ends in: §r§b(?<duration>.*)",
     )
 
     private var lastChestPicked = SimpleTimeMark.farPast()
@@ -65,14 +71,15 @@ object PowderTracker {
     private val goldEssenceInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
-    private var powderTimer = ""
+    private var powderTimer = Duration.ZERO
+    private var eventEnded = false
     private val gemstones = listOf(
         "Ruby" to "§c",
         "Sapphire" to "§b",
         "Amber" to "§6",
         "Amethyst" to "§5",
         "Jade" to "§a",
-        "Topaz" to "§e"
+        "Topaz" to "§e",
     )
 
     init {
@@ -88,12 +95,17 @@ object PowderTracker {
         calculateResourceHour(goldEssenceInfo)
         calculateResourceHour(chestInfo)
 
-        doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
-        powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
-            powderTimer = group("time")
-            doublePowder = powderTimer != "00:00"
-
-            tracker.update()
+        for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
+            if (line.contains("2x Powder")) {
+                if (eventEnded) return
+                doublePowder = true
+                val durationLine = TabWidget.EVENT.lines.getOrNull(index + 1) ?: return
+                tablistEventDuration.matchMatcher(durationLine) {
+                    val duration = group("duration")
+                    powderTimer = TimeUtils.getDuration(duration)
+                    tracker.update()
+                }
+            }
         }
 
         if (lastChestPicked.passedSince() > 1.minutes) {
@@ -101,8 +113,7 @@ object PowderTracker {
         }
     }
 
-    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker })
-    { formatDisplay(drawDisplay(it)) }
+    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {
 
@@ -150,8 +161,14 @@ object PowderTracker {
             lastChestPicked = SimpleTimeMark.now()
         }
 
-        powderStartedPattern.matchMatcher(msg) { doublePowder = true }
-        powderEndedPattern.matchMatcher(msg) { doublePowder = false }
+        powderStartedPattern.matchMatcher(msg) {
+            doublePowder = true
+            eventEnded = false
+        }
+        powderEndedPattern.matchMatcher(msg) {
+            doublePowder = false
+            eventEnded = true
+        }
 
         for (reward in PowderChestReward.entries) {
             reward.chatPattern.matchMatcher(msg) {
@@ -193,6 +210,7 @@ object PowderTracker {
         chestInfo.stoppedChecks = 0
         chestInfo.perMin.clear()
         doublePowder = false
+        eventEnded = false
         tracker.update()
     }
 
