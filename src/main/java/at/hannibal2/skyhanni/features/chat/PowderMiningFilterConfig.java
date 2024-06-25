@@ -31,9 +31,9 @@ public class PowderMiningFilterConfig {
     @Expose
     @ConfigOption(
         name = "Powder", desc = "Hide §dGemstone §7and §aMithril §7Powder rewards under a certain amount." +
-        "\n§a0§7: §aShow all\n§c50000§7: §cHide all"
+        "\n§a0§7: §aShow all\n§c60000§7: §cHide all"
     )
-    @ConfigEditorSlider(minValue = 0, maxValue = 50000, minStep = 500)
+    @ConfigEditorSlider(minValue = 0, maxValue = 60000, minStep = 500)
     public int powderFilterThreshold = 1000;
 
     @Expose
