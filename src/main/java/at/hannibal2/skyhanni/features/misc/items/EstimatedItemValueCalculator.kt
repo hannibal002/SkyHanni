@@ -212,7 +212,7 @@ object EstimatedItemValueCalculator {
     )
     private fun isUselessAttribute(itemName: NEUInternalName, attribute1: String? = null, attribute2: String? = null): Boolean {
         val list = listOf(attribute1, attribute2)
-        if (list.any {it in badAttributeList}) return true
+        if (list.any { it in badAttributeList }) return true
 
         return false
     }
