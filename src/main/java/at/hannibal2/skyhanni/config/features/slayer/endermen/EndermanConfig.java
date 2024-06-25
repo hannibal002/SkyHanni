@@ -19,6 +19,12 @@ public class EndermanConfig {
     public boolean highlightNukekebi = false;
 
     @Expose
+    @ConfigOption(name = "Draw Line to Nukekubi Skulls", desc = "Draw a line to the Enderman Slayer Nukekubi Skulls.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean drawLineToNukekebi = false;
+
+    @Expose
     @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Enderman Slayer in damage indicator.")
     @ConfigEditorBoolean
     public boolean phaseDisplay = false;

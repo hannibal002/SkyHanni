@@ -70,7 +70,7 @@ object EndermanSlayerFeatures {
                     flyingBeacons.add(entity)
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
-                        beaconConfig.beaconColor.toChromaColor().withAlpha(1)
+                        beaconConfig.beaconColor.toChromaColor().withAlpha(1),
                     ) {
                         beaconConfig.highlightBeacon
                     }
@@ -85,7 +85,7 @@ object EndermanSlayerFeatures {
                 nukekubiSkulls.add(entity)
                 RenderLivingEntityHelper.setEntityColor(
                     entity,
-                    LorenzColor.GOLD.toColor().withAlpha(1)
+                    LorenzColor.GOLD.toColor().withAlpha(1),
                 ) { config.highlightNukekebi }
                 logger.log("Added Nukekubi skulls at ${entity.getLorenzVec()}")
             }
@@ -119,7 +119,7 @@ object EndermanSlayerFeatures {
                     location.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
-                    true
+                    true,
                 )
             }
 
@@ -145,20 +145,33 @@ object EndermanSlayerFeatures {
                     beaconLocation.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
-                    true
+                    true,
                 )
             }
         }
 
-        config.highlightNukekebi
         for (skull in nukekubiSkulls) {
             if (!skull.isDead) {
-                event.drawDynamicText(
-                    skull.getLorenzVec().add(-0.5, 1.5, -0.5),
-                    "§6Nukekubi Skull",
-                    1.6,
-                    ignoreBlocks = false
-                )
+                if (config.highlightNukekebi) {
+                    event.drawDynamicText(
+                        skull.getLorenzVec().add(-0.5, 1.5, -0.5),
+                        "§6Nukekubi Skull",
+                        1.6,
+                        ignoreBlocks = false,
+                    )
+                }
+                if (config.drawLineToNukekebi) {
+                    val skullLocation = event.exactLocation(skull)
+                    if (skullLocation.distanceToPlayer() > 20) continue
+                    if (!skullLocation.canBeSeen()) continue
+                    event.draw3DLine(
+                        event.exactPlayerEyeLocation(),
+                        skullLocation.add(0.5, 1.0, 0.5),
+                        LorenzColor.GOLD.toColor(),
+                        3,
+                        true,
+                    )
+                }
             }
         }
     }
@@ -226,7 +239,7 @@ object EndermanSlayerFeatures {
         event.move(
             3,
             "slayer.endermanBeaconConfig.highlightBeacon",
-            "slayer.endermen.endermanBeaconConfig.highlightBeacon"
+            "slayer.endermen.endermanBeaconConfig.highlightBeacon",
         )
         event.move(3, "slayer.endermanBeaconConfig.beaconColor", "slayer.endermen.endermanBeaconConfig.beaconColor")
         event.move(3, "slayer.endermanBeaconConfig.showWarning", "slayer.endermen.endermanBeaconConfig.showWarning")
