@@ -65,7 +65,9 @@ public class PowderMiningFilterConfig {
 
         private final String name;
 
-        SimplePowderMiningRewardTypes(String name) { this.name = name; }
+        SimplePowderMiningRewardTypes(String name) {
+            this.name = name;
+        }
 
         @Override
         public String toString() {

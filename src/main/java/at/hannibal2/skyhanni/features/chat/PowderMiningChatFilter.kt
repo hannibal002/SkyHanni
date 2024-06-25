@@ -1,13 +1,6 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-
 import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE
 import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART
 import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.OIL_BARREL
@@ -18,6 +11,12 @@ import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowder
 import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.TREASURITE
 import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
 import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE
+import at.hannibal2.skyhanni.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object PowderMiningChatFilter {
@@ -168,7 +167,7 @@ object PowderMiningChatFilter {
         breakingPowerPattern.matchMatcher(message) {
             if (gemstoneConfig.strongerToolMessages) return "stronger_tool"
         }
-        
+
         //Powder
         powderRewardPattern.matchMatcher(message) {
             if (config.powderFilterThreshold == 20000) return "powder_mining_powder"
