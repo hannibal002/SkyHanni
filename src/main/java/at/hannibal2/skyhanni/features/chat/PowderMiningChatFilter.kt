@@ -234,7 +234,7 @@ object PowderMiningChatFilter {
                 if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
                 val colorStr = groupOrNull("color")?.lowercase() ?: ""
-                when(colorStr) {
+                when (colorStr) {
                     //'Colorless', base goblin eggs will never be shown in this code path
                     "" -> return "powder_mining_goblin_eggs"
                     "green" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
@@ -250,7 +250,8 @@ object PowderMiningChatFilter {
                     // case that will block it is HIDE_ALL, which is covered above
                     "blue" -> return ""
                     else -> {
-                        ChatUtils.chat("§cUnknown Goblin Egg color detected in Powder Mining Filter: '${colorStr}' - please report this in the Discord!")
+                        ChatUtils.chat("§cUnknown Goblin Egg color detected in Powder Mining Filter: "
+                            + "'${colorStr}' - please report this in the Discord!")
                         return ""
                     }
                 }
@@ -265,7 +266,7 @@ object PowderMiningChatFilter {
             //Theoretically impossible but ?
             if (gemStr.isEmpty() || tierStr.isEmpty()) return ""
 
-            val gemSpecificConfig = when(gemStr) {
+            val gemSpecificConfig = when (gemStr) {
                 "ruby" -> gemstoneConfig.rubyGemstones
                 "sapphire" -> gemstoneConfig.sapphireGemstones
                 "amber" -> gemstoneConfig.amberGemstones
@@ -278,7 +279,7 @@ object PowderMiningChatFilter {
 
             if (gemSpecificConfig == GemstoneFilterEntry.HIDE_ALL) return "powder_mining_gemstones"
 
-            when(tierStr) {
+            when (tierStr) {
                 // Never allowed through, except for in SHOW_ALL,
                 // which is handled above
                 "rough" -> return "powder_mining_gemstones"

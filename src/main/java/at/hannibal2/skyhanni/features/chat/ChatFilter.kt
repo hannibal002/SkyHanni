@@ -496,10 +496,10 @@ object ChatFilter {
      */
     private fun isPowderMining(message: String): Boolean {
         val powderMiningMatchResult = PowderMiningChatFilter.block(message)
-        if(powderMiningMatchResult == "no_match") return false;
+        if (powderMiningMatchResult == "no_match") return false
         else {
-            powderMiningMessage = powderMiningMatchResult;
-            return true;
+            powderMiningMessage = powderMiningMatchResult
+            return true
         }
     }
 
