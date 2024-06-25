@@ -325,7 +325,11 @@ object ChatUtils {
     }
 
     val ChatLine.message get() = chatComponent.formattedText.stripHypixelMessage()
-    val ChatLine.fullComponent get() = (this as ChatLineData).skyHanni_getFullComponent
+    var ChatLine.fullComponent: IChatComponent?
+        get() = (this as ChatLineData).skyHanni_fullComponent
+        set(value) {
+            (this as ChatLineData).skyHanni_fullComponent = value
+        }
 
     fun ChatLine.passedSinceSent() = (Minecraft.getMinecraft().ingameGUI.updateCounter - updatedCounter).ticks
 }

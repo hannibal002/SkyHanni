@@ -19,12 +19,12 @@ public class MixinChatLine implements ChatLineData {
 
     @NotNull
     @Override
-    public IChatComponent getSkyHanni_getFullComponent() {
+    public IChatComponent getSkyHanni_fullComponent() {
         return skyHanni$fullComponent;
     }
 
     @Override
-    public void setSkyHanni_getFullComponent(IChatComponent fullComponent) {
+    public void setSkyHanni_fullComponent(IChatComponent fullComponent) {
         skyHanni$fullComponent = fullComponent;
     }
 
