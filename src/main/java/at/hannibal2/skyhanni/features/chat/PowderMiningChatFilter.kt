@@ -7,14 +7,16 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 object PowderMiningChatFilter {
 
     private val config get() = SkyHanniMod.feature.chat.filterType.powderMiningFilterConfig;
     private val gemstoneConfig get() = config.gemstoneFilterConfig;
 
+    @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "chat.filterType.powderMining", "chat.filterType.powderMiningFilterConfig.enabled")
+        event.move(52, "chat.filterType.powderMining", "chat.filterType.powderMiningFilterConfig.enabled")
     }
 
     val patternGroup = RepoPattern.group("filter.powdermining")
