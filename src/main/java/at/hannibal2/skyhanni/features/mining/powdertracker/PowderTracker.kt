@@ -58,11 +58,10 @@ object PowderTracker {
         "powder.bossbar",
         "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
     )
-<<<<<<< HEAD
     private val tablistEventDuration by patternGroup.pattern(
         "powder.duration",
         "Ends in: §r§b(?<duration>.*)",
-=======
+    )
 
     /**
      * REGEX-TEST: §b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!
@@ -70,7 +69,6 @@ object PowderTracker {
     private val compactedPattern by patternGroup.pattern(
         "compacted",
         "§b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!",
->>>>>>> e88f416c48f9659f89b7047d7629cd9a1d1535bc
     )
 
     private var lastChestPicked = SimpleTimeMark.farPast()
