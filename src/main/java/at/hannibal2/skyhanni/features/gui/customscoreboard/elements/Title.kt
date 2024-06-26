@@ -13,16 +13,16 @@ object Title : ScoreboardElement() {
             return ScoreboardData.objectiveTitle align alignment
         }
 
-        return if (displayConfig.titleAndFooter.useCustomTitle) {
-            listOf(
-                displayConfig.titleAndFooter.customTitle
-                    .replace("&", "§")
-                    .split("\\n")
-                    .map { it align alignment },
-            ).flatten()
-        } else {
-            ScoreboardData.objectiveTitle align alignment
+        if (!displayConfig.titleAndFooter.useCustomTitle) {
+            return ScoreboardData.objectiveTitle align alignment
         }
+
+        return listOf(
+            displayConfig.titleAndFooter.customTitle
+                .replace("&", "§")
+                .split("\\n")
+                .map { it align alignment },
+        ).flatten()
     }
 
     override val configLine = "§6§lSKYBLOCK"

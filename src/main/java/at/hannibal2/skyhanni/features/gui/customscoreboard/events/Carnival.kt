@@ -20,7 +20,7 @@ object Carnival : ScoreboardEvent() {
         ScoreboardPattern.carnivalScorePattern,
     )
 
-    override fun getDisplay() = buildList<String> {
+    override fun getDisplay() = buildList {
         ScoreboardPattern.carnivalPattern.firstMatches(getSbLines())?.let {
             add(it)
             addAll(patterns.allMatches(getSbLines()))

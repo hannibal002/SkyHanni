@@ -27,8 +27,8 @@ object RenderBackground {
                 textureLocation,
                 (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
                 padding,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                RenderUtils.HorizontalAlignment.CENTER,
+                RenderUtils.VerticalAlignment.CENTER,
             )
         } else {
             Renderable.drawInsideRoundedRect(
@@ -37,8 +37,8 @@ object RenderBackground {
                 padding,
                 backgroundConfig.roundedCornerSmoothness,
                 1,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                RenderUtils.HorizontalAlignment.CENTER,
+                RenderUtils.VerticalAlignment.CENTER,
             )
         }
 
@@ -52,8 +52,8 @@ object RenderBackground {
                 outlineConfig.colorBottom.toChromaColor().rgb,
                 outlineConfig.thickness,
                 outlineConfig.blur,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                RenderUtils.HorizontalAlignment.CENTER,
+                RenderUtils.VerticalAlignment.CENTER,
             )
         } else backgroundRenderable
     }

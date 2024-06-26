@@ -7,8 +7,8 @@ object Slayer : ScoreboardElement() {
     override fun getDisplay() = buildList {
         if (!SlayerAPI.hasActiveSlayerQuest()) return@buildList
         add("Slayer Quest")
-        add(" §7- §e${SlayerAPI.latestSlayerCategory.trim()}")
-        add(" §7- §e${SlayerAPI.latestSlayerProgress.trim()}")
+        add(SlayerAPI.latestSlayerCategory)
+        add(SlayerAPI.latestSlayerProgress)
     }
 
     override fun showWhen() = if (informationFilteringConfig.hideIrrelevantLines) SlayerAPI.isInCorrectArea else true

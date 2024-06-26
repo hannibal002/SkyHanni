@@ -85,7 +85,5 @@ object CustomScoreboardUtils {
         else -> null
     }
 
-    internal fun getSbLines(): List<String> {
-        return ScoreboardData.sidebarLinesFormatted
-    }
+    internal fun getSbLines() = ScoreboardData.sidebarLinesFormatted
 }

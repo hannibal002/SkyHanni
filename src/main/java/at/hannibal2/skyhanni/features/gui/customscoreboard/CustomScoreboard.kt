@@ -167,9 +167,8 @@ object CustomScoreboard {
     }
 
     private fun List<ScoreboardLine>.removeEmptyLinesFromEdges(): List<ScoreboardLine> =
-        if (informationFilteringConfig.hideEmptyLinesAtTopAndBottom)
-            dropWhile { it.display.trim().isEmpty() }.dropLastWhile { it.display.trim().isEmpty() }
-        else this
+        takeIf { !informationFilteringConfig.hideEmptyLinesAtTopAndBottom }
+            ?: dropWhile { it.display.isBlank() }.dropLastWhile { it.display.isBlank() }
 
     private var dirty = false
 
@@ -215,12 +214,13 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateIslandEntries()
-        // FIXME: Scoreboard bugs out on island switch
     }
 
     private fun updateIslandEntries() {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
+        // FIXME: events dont update by themselves, needs to be moved in the main list to actually show events
+        //  i have no idea how this shit works, empa you fix this
     }
 
     @SubscribeEvent
@@ -230,12 +230,12 @@ object CustomScoreboard {
             if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
-                ScoreboardEntry.entries.forEach { element ->
+                ScoreboardEntry.entries.forEach { entry ->
                     add(
-                        "${element.name.firstLetterUppercase()} - " +
-                            "island: ${element.element.showIsland()} - " +
-                            "show: ${element.element.showWhen()} - " +
-                            "${element.element.getLines().map { it.display }}",
+                        "${entry.name.firstLetterUppercase()} - " +
+                            "island: ${entry.element.showIsland()} - " +
+                            "show: ${entry.element.showWhen()} - " +
+                            "${entry.element.getLines().map { it.display }}",
                     )
                 }
             }
@@ -252,12 +252,7 @@ object CustomScoreboard {
         val displayConfigPrefix = "$prefix.displayConfig"
         val displayPrefix = "$prefix.display"
 
-        event.move(
-            28,
-            "$prefix.displayConfig.showAllActiveEvents",
-            "$prefix.displayConfig.eventsConfig.showAllActiveEvents",
-        )
-
+        event.move(28, "$displayConfigPrefix.showAllActiveEvents", "$displayConfigPrefix.eventsConfig.showAllActiveEvents")
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
         event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
         event.move(31, "$displayConfigPrefix.showMagicalPower", "$displayPrefix.maxwell.showMagicalPower")
@@ -269,12 +264,7 @@ object CustomScoreboard {
         event.move(31, "$displayConfigPrefix.showMaxIslandPlayers", "$displayPrefix.showMaxIslandPlayers")
         event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
         event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
-        event.move(
-            31,
-            "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
-            "$displayPrefix.cacheScoreboardOnIslandSwitch",
-        )
-        // Categories
+        event.move(31, "$displayConfigPrefix.cacheScoreboardOnIslandSwitch", "$displayPrefix.cacheScoreboardOnIslandSwitch")
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
         event.move(31, "$displayConfigPrefix.titleAndFooter", "$displayPrefix.titleAndFooter")
         event.move(31, "$prefix.backgroundConfig", "$prefix.background")
@@ -291,15 +281,16 @@ object CustomScoreboard {
         event.transform(40, "$displayPrefix.events.eventEntries") { element ->
             val jsonArray = element.asJsonArray
             val newArray = JsonArray()
+            val oldElements = listOf("HOT_DOG_CONTEST", "EFFIGIES")
 
             for (jsonElement in jsonArray) {
                 val stringValue = jsonElement.asString
-                if (stringValue !in listOf("HOT_DOG_CONTEST", "EFFIGIES")) {
+                if (stringValue !in oldElements) {
                     newArray.add(jsonElement)
                 }
             }
 
-            if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
+            if (jsonArray.any { it.asString in oldElements }) {
                 newArray.add(JsonPrimitive(ScoreboardEventEntry.RIFT.name))
             }
 

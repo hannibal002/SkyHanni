@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 object ActiveTablist : ScoreboardEvent() {
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard
-    private val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
+    private val blockedEvents = listOf("Spooky Festival", "Carnival", "th SkyBlock Anniversary", "New Year Celebration")
 
     override fun getDisplay(): List<String>? {
         val name = getTablistEvent() ?: return null

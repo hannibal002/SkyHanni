@@ -11,8 +11,6 @@ data class ScoreboardLine(
     companion object {
         private val DEFAULT_ALIGNMENT get() = displayConfig.textAlignment
 
-        val EMPTY = ScoreboardLine("", DEFAULT_ALIGNMENT)
-
         fun String.align(): ScoreboardLine = ScoreboardLine(this, DEFAULT_ALIGNMENT)
 
         infix fun String.align(alignment: RenderUtils.HorizontalAlignment): ScoreboardLine = ScoreboardLine(this, alignment)

@@ -9,7 +9,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object ScoreboardPattern {
     private val group = RepoPattern.group("features.gui.customscoreboard")
 
-    // Stats from the scoreboard
+    // Lines from the scoreboard
     private val scoreboardGroup by group.exclusiveGroup("scoreboard")
 
     @SubscribeEvent
@@ -17,7 +17,7 @@ object ScoreboardPattern {
         UnknownLinesHandler.remoteOnlyPatterns = scoreboardGroup.getUnusedPatterns().toTypedArray()
     }
 
-    // main scoreboard
+    // Main scoreboard
     private val mainSb = scoreboardGroup.group("main")
     val motesPattern by mainSb.pattern(
         "motes",
@@ -26,7 +26,7 @@ object ScoreboardPattern {
     val heatPattern by mainSb.pattern(
         "heat",
         "^Heat: (?<heat>.*)$",
-    ) // this line is weird (either text or number), ill leave it as is; it even has different colors?
+    )
     val coldPattern by mainSb.pattern(
         "cold",
         "^(?:§.)*Cold: §.(?<cold>-?\\d+)❄$",
@@ -79,10 +79,6 @@ object ScoreboardPattern {
     val profileTypePattern by mainSb.pattern(
         "profiletype",
         "^\\s*(§7♲ §7Ironman|§a☀ §aStranded|§.Ⓑ §.Bingo).*$",
-    )
-    val emptyLinesPattern by mainSb.pattern(
-        "emptylines",
-        "^\\s*$",
     )
 
     // multi use
@@ -531,7 +527,7 @@ object ScoreboardPattern {
         "(?:§f)?Kills: §.\\d+",
     )
 
-    // Stats from the tablist
+    // Lines from the tablist
     private val tablistGroup = group.group("tablist")
     val eventTimeEndsPattern by tablistGroup.pattern(
         "eventtime",
