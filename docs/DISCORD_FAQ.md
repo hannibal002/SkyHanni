@@ -60,5 +60,5 @@ _Frequently Asked Questions_
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
 
-*This FAQ was last updated on May 27th, 2024.
+*This FAQ was last updated on June 26th, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
