@@ -214,12 +214,17 @@ object EstimatedItemValueCalculator {
 
     private val auroraArmorPattern =
         "(?:.*_)?AURORA_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
+    private val moltenEquipmentPattern =
+        "(?:.*_)?MOLTEN_(?:BELT|CLOAK|NECKLACE|BRACELET)".toPattern()
 
     private fun isUselessAttribute(itemName: NEUInternalName, attribute: String): Boolean {
         auroraArmorPattern.matchMatcher(itemName.asString()) {
             if (attribute == "UNDEAD_RESISTANCE") return false
-
         }
+        moltenEquipmentPattern.matchMatcher(itemName.asString()) {
+            if (attribute == "SPEED") return false
+        }
+
         return attribute in badAttributeList
     }
 
