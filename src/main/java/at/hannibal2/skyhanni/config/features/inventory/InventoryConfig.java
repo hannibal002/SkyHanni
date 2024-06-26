@@ -57,7 +57,12 @@ public class InventoryConfig {
     @Expose
     @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
-
+  
+    @Expose
+    @Category(name = "Craftable Item List", desc = "")
+    @Accordion
+    public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
+  
     @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion

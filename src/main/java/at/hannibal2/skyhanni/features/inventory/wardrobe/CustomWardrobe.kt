@@ -58,7 +58,7 @@ object CustomWardrobe {
     private var guiName = "Custom Wardrobe"
 
     @SubscribeEvent
-    fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
+    fun onGuiRender(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled() || editMode) return
         val renderable = displayRenderable ?: run {
             update()
