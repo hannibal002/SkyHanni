@@ -40,6 +40,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -213,14 +214,12 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        updateIslandEntries()
+        DelayedRun.runNextTick { updateIslandEntries() }
     }
 
     private fun updateIslandEntries() {
         currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
         currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
-        // FIXME: events dont update by themselves, needs to be moved in the main list to actually show events
-        //  i have no idea how this shit works, empa you fix this
     }
 
     @SubscribeEvent
