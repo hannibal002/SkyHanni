@@ -143,7 +143,7 @@ object EstimatedItemValueCalculator {
         var comboPrice = combo.asInternalName().getPriceOrNull()
 
         if (comboPrice != null) {
-            val useless = isUselessAttribute(stack.getInternalName(), attributes[0].first, attributes[1].first)
+            val useless = isUselessAttributeCombo(stack.getInternalName(), attributes[0].first, attributes[1].first)
             val color = if (comboPrice > basePrice && !useless) "§6" else "§7"
             list.add("§7Attribute Combo: ($color${comboPrice.shortFormat()}§7)")
             if (!useless) {
@@ -215,15 +215,16 @@ object EstimatedItemValueCalculator {
     private val auroraArmorPattern =
         "(?:.*_)?AURORA_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)".toPattern()
 
-    private fun isUselessAttribute(itemName: NEUInternalName, attribute1: String? = null, attribute2: String? = null): Boolean {
-        val list = listOf(attribute1, attribute2)
+    private fun isUselessAttribute(itemName: NEUInternalName, attribute: String): Boolean {
         auroraArmorPattern.matchMatcher(itemName.asString()) {
-            return ("MANA_POOL" in list) && ("UNDEAD_RESISTANCE" in list)
+            if (attribute == "UNDEAD_RESISTANCE") return false
 
         }
-
-        return list.any { it in badAttributeList }
+        return attribute in badAttributeList
     }
+
+    private fun isUselessAttributeCombo(itemName: NEUInternalName, attribute1: String, attribute2: String) =
+        isUselessAttribute(itemName, attribute1) || isUselessAttribute(itemName, attribute2)
 
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
