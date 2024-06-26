@@ -57,9 +57,8 @@ object TabListData {
         if (debugCache != null) {
             ChatUtils.clickableChat(
                 "Tab list debug is enabled!",
-                onClick = {
-                    toggleDebug()
-                }
+                onClick = { toggleDebug() },
+                "§eClick to disable!"
             )
             return
         }
