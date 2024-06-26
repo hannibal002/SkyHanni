@@ -14,6 +14,15 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Bank
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Bits
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Cold
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Copper
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Gems
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Heat
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Motes
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.NorthStars
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Purse
 import java.util.function.Supplier
 
 private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines
@@ -26,58 +35,58 @@ enum class ChunkedStatsManager(
 ) {
     PURSE(
         displayPair = { "§6${formatNumber(PurseAPI.currentPurse)}" },
-        showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && ScoreboardEntry.PURSE.element.showWhen() },
-        showIsland = { ScoreboardEntry.PURSE.element.showIsland() },
+        showWhen = { !(hideEmptyLines && PurseAPI.currentPurse.toInt() == 0) && Purse.showWhen() },
+        showIsland = { Purse.showIsland() },
         configLine = "§6Purse",
     ),
     MOTES(
         displayPair = { "§b${getMotes()}" },
-        showWhen = { !(hideEmptyLines && getMotes() == "0") && ScoreboardEntry.MOTES.element.showWhen() },
-        showIsland = { ScoreboardEntry.MOTES.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getMotes() == "0") && Motes.showWhen() },
+        showIsland = { Motes.showIsland() },
         configLine = "§dMotes",
     ),
     BANK(
         displayPair = { "§6${getBank()}" },
         showWhen = {
-            !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && ScoreboardEntry.BANK.element.showWhen()
+            !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && Bank.showWhen()
         },
-        showIsland = { ScoreboardEntry.BANK.element.showIsland() },
+        showIsland = { Bank.showIsland() },
         configLine = "§6Bank",
     ),
     BITS(
         displayPair = { getBitsLine() },
-        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && ScoreboardEntry.BITS.element.showWhen() },
-        showIsland = { ScoreboardEntry.BITS.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && Bits.showWhen() },
+        showIsland = { Bits.showIsland() },
         configLine = "§bBits",
     ),
     COPPER(
         displayPair = { "§c${getCopper()}" },
-        showWhen = { !(hideEmptyLines && getCopper() == "0") && ScoreboardEntry.COPPER.element.showWhen() },
-        showIsland = { ScoreboardEntry.COPPER.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getCopper() == "0") && Copper.showWhen() },
+        showIsland = { Copper.showIsland() },
         configLine = "§cCopper",
     ),
     GEMS(
         displayPair = { "§a${getGems()}" },
-        showWhen = { !(hideEmptyLines && getGems() == "0") && ScoreboardEntry.GEMS.element.showWhen() },
-        showIsland = { ScoreboardEntry.GEMS.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getGems() == "0") && Gems.showWhen() },
+        showIsland = { Gems.showIsland() },
         configLine = "§aGems",
     ),
     HEAT(
         displayPair = { "§c${getHeat()}" },
-        showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && ScoreboardEntry.HEAT.element.showWhen() },
-        showIsland = { ScoreboardEntry.HEAT.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getHeat() == "§c♨ 0") && Heat.showWhen() },
+        showIsland = { Heat.showIsland() },
         configLine = "§cHeat",
     ),
     COLD(
         displayPair = { "§b${MiningAPI.cold}❄" },
-        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && ScoreboardEntry.COLD.element.showWhen() },
-        showIsland = { ScoreboardEntry.COLD.element.showIsland() },
+        showWhen = { !(hideEmptyLines && MiningAPI.cold == 0) && Cold.showWhen() },
+        showIsland = { Cold.showIsland() },
         configLine = "§bCold",
     ),
     NORTH_STARS(
         displayPair = { "§d${getNorthStars()}" },
-        showWhen = { !(hideEmptyLines && getNorthStars() == "0") && ScoreboardEntry.NORTH_STARS.element.showWhen() },
-        showIsland = { ScoreboardEntry.NORTH_STARS.element.showIsland() },
+        showWhen = { !(hideEmptyLines && getNorthStars() == "0") && NorthStars.showWhen() },
+        showIsland = { NorthStars.showIsland() },
         configLine = "§dNorth Stars",
     ),
     ;
