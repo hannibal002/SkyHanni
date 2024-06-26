@@ -33,6 +33,10 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Footer
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
+import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -57,8 +61,8 @@ object CustomScoreboard {
     private var display = listOf<ScoreboardLine>()
     private var cache = listOf<ScoreboardLine>()
 
-    private var currentIslandEntries = listOf<ScoreboardEntry>()
-    var currentIslandEvents = listOf<ScoreboardEventEntry>()
+    private var currentIslandEntries = listOf<ScoreboardElement>()
+    var currentIslandEvents = listOf<ScoreboardEvent>()
         private set
 
     private const val GUI_NAME = "Custom Scoreboard"
@@ -113,7 +117,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        UnknownLinesHandler.handleUnknownLines()
+        if (LorenzUtils.inSkyBlock) UnknownLinesHandler.handleUnknownLines()
     }
 
     val config: CustomScoreboardConfig get() = SkyHanniMod.feature.gui.customScoreboard
@@ -135,9 +139,9 @@ object CustomScoreboard {
     }
 
     private fun addAllNonSkyBlockLines() = buildList {
-        addAll(ScoreboardEntry.TITLE.getVisiblePair())
+        addAll(Title.getLines())
         addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it.align() })
-        addAll(ScoreboardEntry.FOOTER.getVisiblePair())
+        addAll(Footer.getLines())
     }
 
     private fun addDefaultSkyBlockLines() = buildList {
@@ -147,7 +151,7 @@ object CustomScoreboard {
 
     private fun addCustomSkyBlockLines() = buildList<ScoreboardLine> {
         for (element in currentIslandEntries) {
-            val lines = element.getVisiblePair()
+            val lines = element.getLines()
             if (lines.isEmpty()) continue
 
             if (
@@ -215,8 +219,8 @@ object CustomScoreboard {
     }
 
     private fun updateIslandEntries() {
-        currentIslandEntries = config.scoreboardEntries.get().filter { it.element.showIsland() }
-        currentIslandEvents = eventsConfig.eventEntries.get().filter { it.event.showIsland() }
+        currentIslandEntries = config.scoreboardEntries.get().map { it.element }.filter { it.showIsland() }
+        currentIslandEvents = eventsConfig.eventEntries.get().map { it.event }.filter { it.showIsland() }
     }
 
     @SubscribeEvent
@@ -231,7 +235,7 @@ object CustomScoreboard {
                         "${element.name.firstLetterUppercase()} - " +
                             "island: ${element.element.showIsland()} - " +
                             "show: ${element.element.showWhen()} - " +
-                            "${element.getVisiblePair().map { it.display }}",
+                            "${element.element.getLines().map { it.display }}",
                     )
                 }
             }
@@ -341,15 +345,16 @@ object CustomScoreboard {
         event.transform(53, "$displayPrefix.events.eventEntries") { element ->
             val jsonArray = element.asJsonArray
             val newArray = JsonArray()
+            val oldElements = listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING")
 
             for (jsonElement in jsonArray) {
                 val stringValue = jsonElement.asString
-                if (stringValue !in listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING")) {
+                if (stringValue !in oldElements) {
                     newArray.add(jsonElement)
                 }
             }
 
-            if (jsonArray.any { it.asString in listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING") }) {
+            if (jsonArray.any { it.asString in oldElements }) {
                 newArray.add(JsonPrimitive(ScoreboardEventEntry.GARDEN.name))
             }
 

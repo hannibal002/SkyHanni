@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Bank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Bits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ChunkedStats
@@ -83,15 +81,6 @@ enum class ScoreboardEntry(val element: ScoreboardElement) {
     ;
 
     override fun toString() = element.configLine
-
-    fun getVisiblePair() = if (isVisible()) getPair() else listOf()
-
-    private fun getPair(): List<ScoreboardLine> = getElementsFromAny(element.getDisplay())
-
-    private fun isVisible(): Boolean {
-        if (!informationFilteringConfig.hideIrrelevantLines) return true
-        return element.showWhen()
-    }
 
     companion object {
         @JvmField

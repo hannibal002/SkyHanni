@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
+
 abstract class ScoreboardElement {
     /**
      * Must be specified as one of the following:
@@ -8,9 +11,9 @@ abstract class ScoreboardElement {
      * - `ScoreboardLine` (`String align HorizontalAlignment`)
      * - `List<ScoreboardLine>`
      *
-     * `null` values will be treated as empty lines.
+     * `null` values will be treated as empty lines/lists.
      */
-    abstract fun getDisplay(): Any?
+    protected abstract fun getDisplay(): Any?
     open fun showWhen(): Boolean = true
     abstract val configLine: String
 
@@ -18,4 +21,12 @@ abstract class ScoreboardElement {
 
     // TODO: Add Hover and Clickable Feedback to Lines
     //  Suggestion: https://discord.com/channels/997079228510117908/1226508204762992733
+
+
+    fun getLines() = if (isVisible()) getElementsFromAny(getDisplay()) else listOf()
+
+    private fun isVisible(): Boolean {
+        if (!informationFilteringConfig.hideIrrelevantLines) return true
+        return showWhen()
+    }
 }
