@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
 import at.hannibal2.skyhanni.utils.json.fromJson
@@ -36,7 +37,8 @@ value class Graph(
     override fun lastIndexOf(element: GraphNode) = graph.lastIndexOf(element)
 
     companion object {
-        val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>({ out, value ->
+        val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
+            { out, value ->
                 out.beginObject()
                 value.forEach {
                     out.name(it.id.toString()).beginObject()
@@ -48,13 +50,14 @@ value class Graph(
                     out.beginObject()
                     it.neighbours.forEach { (node, weight) ->
                         val id = node.id.toString()
-                        out.name(id).value(weight)
+                        out.name(id).value(weight.round(2))
                     }
                     out.endObject()
                     out.endObject()
                 }
                 out.endObject()
-            }, { reader ->
+            },
+            { reader ->
                 reader.beginObject()
                 val list = mutableListOf<GraphNode>()
                 val neigbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
@@ -100,7 +103,8 @@ value class Graph(
                 }
                 reader.endObject()
                 Graph(list)
-            }).create()
+            },
+        ).create()
 
         fun fromJson(json: String): Graph = gson.fromJson<Graph>(json)
         fun fromJson(json: JsonElement): Graph = gson.fromJson<Graph>(json)
@@ -158,14 +162,16 @@ fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode):
         }
     }
 
-    return Graph(buildList {
-        var current = end
-        while (current != start) {
-            add(current)
-            current = previous[current] ?: return Graph(emptyList()) to 0.0
-        }
-        add(start)
-    }.reversed()) to distances[end]!!
+    return Graph(
+        buildList {
+            var current = end
+            while (current != start) {
+                add(current)
+                current = previous[current] ?: return Graph(emptyList()) to 0.0
+            }
+            add(start)
+        }.reversed(),
+    ) to distances[end]!!
 }
 
 fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> =

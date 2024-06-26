@@ -8,19 +8,20 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class FilterTypesConfig {
 
     @Expose
-    @ConfigOption(name = "Hypixel Hub", desc = "Block messages outside SkyBlock in the Hypixel lobby: player joins, loot boxes, prototype lobby messages, radiating generosity and Hypixel tournaments.")
+    @ConfigOption(name = "Hypixel Lobbies", desc = "Hide announcements in Hypixel lobbies " +
+        "(player joins, loot boxes, prototype lobby messages, radiating generosity, Hypixel tournaments)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hypixelHub = false;
 
     @Expose
-    @ConfigOption(name = "Empty", desc = "Hide all the empty messages from the chat.")
+    @ConfigOption(name = "Empty", desc = "Hide all empty messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean empty = false;
 
     @Expose
-    @ConfigOption(name = "Warping", desc = "Block 'Sending request to join...' and 'Warping...' messages.")
+    @ConfigOption(name = "Warping", desc = "Hide 'Sending request to join...' and 'Warping...' messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warping = false;
@@ -32,38 +33,38 @@ public class FilterTypesConfig {
     public boolean welcome = false;
 
     @Expose
-    @ConfigOption(name = "Guild Exp", desc = "Hide Guild EXP messages.")
+    @ConfigOption(name = "Guild EXP", desc = "Hide Guild EXP messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean guildExp = false;
 
     @Expose
-    @ConfigOption(name = "Friend Join Left", desc = "Hide friend join/left messages.")
+    @ConfigOption(name = "Friend Join/Left", desc = "Hide friend join/left messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean friendJoinLeft = false;
 
     @Expose
-    @ConfigOption(name = "Winter Gifts", desc = "Hide useless Winter Gift messages.")
+    @ConfigOption(name = "Winter Gifts", desc = "Hide pointless Winter Gift messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean winterGift = false;
 
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "Hide messages while opening chests in the Crystal Hollows. " +
-        "(Except powder numbers over 1k, essence numbers over 2, Prehistoric Eggs, and Automaton Parts)")
+        "(except powder numbers over 1k, essence numbers over 2, Prehistoric Eggs, and Automaton Parts)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powderMining = false;
 
     @Expose
-    @ConfigOption(name = "Kill Combo", desc = "Hide messages about the current Kill Combo from the Grandma Wolf Pet.")
+    @ConfigOption(name = "Kill Combo", desc = "Hide messages about your Kill Combo from the Grandma Wolf pet.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean killCombo = false;
 
     @Expose
-    @ConfigOption(name = "Watchdog", desc = "Hide the message where Hypixel is flexing how many players they have banned over the last week.")
+    @ConfigOption(name = "Watchdog", desc = "Hide the message where Hypixel flexes about how many players they have banned over the last week.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean watchDog = false;
@@ -81,26 +82,26 @@ public class FilterTypesConfig {
     public boolean fireSale = false;
 
     @Expose
-    @ConfigOption(name = "Event Level Up", desc = "Hide the message that shows on event level up.")
+    @ConfigOption(name = "Event Level Up", desc = "Hide event level up messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean eventLevelUp = false;
 
     @Expose
-    @ConfigOption(name = "Diana", desc = "Hide chat messages around griffin burrow chains and griffin feather drops and coin drops.")
+    @ConfigOption(name = "Diana", desc = "Hide chat messages around griffin burrow chains, griffin feather drops, and coin drops.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean diana = false;
 
     @Expose
-    @ConfigOption(name = "Factory Upgrade", desc = "Hide §nHypixel's§r chocolate factory upgrade and employee promotion messages. " +
-        "§eTo turn off Skyhanni upgrade messages search §lUpgrade Warning")
+    @ConfigOption(name = "Factory Upgrade", desc = "Hide §nHypixel's§r Chocolate Factory upgrade and employee promotion messages.\n" +
+        "§eTo turn off SkyHanni's upgrade messages, search §lUpgrade Warning")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean factoryUpgrade = false;
 
     @Expose
-    @ConfigOption(name = "Sacrifice", desc = "Hide sacrifice messages of other players.")
+    @ConfigOption(name = "Sacrifice", desc = "Hide other players' sacrifice messages.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean sacrifice = false;

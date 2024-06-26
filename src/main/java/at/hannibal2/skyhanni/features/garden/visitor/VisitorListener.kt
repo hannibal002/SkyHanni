@@ -1,17 +1,20 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.INFO_SLOT
@@ -40,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 object VisitorListener {
     private val offersAcceptedPattern by RepoPattern.pattern(
         "garden.visitor.offersaccepted",
-        "§7Offers Accepted: §a(?<offersAccepted>\\d+)"
+        "§7Offers Accepted: §a(?<offersAccepted>\\d+)",
     )
 
     private val config get() = VisitorAPI.config
@@ -53,8 +56,8 @@ object VisitorListener {
     }
 
     // TODO make event
-    @SubscribeEvent
-    fun onSendEvent(event: PacketEvent.SendEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onSendEvent(event: PacketSentEvent) {
         val packet = event.packet
         if (packet !is C02PacketUseEntity) return
 
@@ -66,17 +69,18 @@ object VisitorListener {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
+        if (!event.isWidget(TabWidget.VISITORS)) return
 
-        val hasVisitorInfo = event.tabList.any { VisitorAPI.visitorCountPattern.matches(it) }
+        val hasVisitorInfo = event.lines.any { VisitorAPI.visitorCountPattern.matches(it) }
         if (!hasVisitorInfo) return
 
-        val visitorsInTab = VisitorAPI.visitorsInTabList(event.tabList)
+        val visitorsInTab = VisitorAPI.visitorsInTabList(event.lines)
 
         if (LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds) {
-            VisitorAPI.getVisitors().forEach {
-                val name = it.visitorName
+            for (visitor in VisitorAPI.getVisitors()) {
+                val name = visitor.visitorName
                 val removed = name !in visitorsInTab
                 if (removed) {
                     logger.log("Removed old visitor: '$name'")
@@ -132,7 +136,7 @@ object VisitorListener {
         inventory.handleMouseClick_skyhanni(slot, slot.slotIndex, 0, 0)
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onTooltip(event: ItemHoverEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!VisitorAPI.inInventory) return
