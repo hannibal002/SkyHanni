@@ -196,7 +196,7 @@ loom {
 // Tasks:
 tasks.processResources {
     inputs.property("version", version)
-    filesMatching("mcmod.info") {
+    filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
     }
 }
