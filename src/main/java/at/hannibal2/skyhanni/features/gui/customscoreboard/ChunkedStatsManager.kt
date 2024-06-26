@@ -23,12 +23,11 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Heat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Motes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.NorthStars
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Purse
-import java.util.function.Supplier
 
 private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines
 
 enum class ChunkedStatsManager(
-    private val displayPair: Supplier<String>,
+    private val displayPair: () -> String,
     val showWhen: () -> Boolean,
     val showIsland: () -> Boolean,
     private val configLine: String,
@@ -47,9 +46,7 @@ enum class ChunkedStatsManager(
     ),
     BANK(
         displayPair = { "§6${getBank()}" },
-        showWhen = {
-            !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && Bank.showWhen()
-        },
+        showWhen = { !(hideEmptyLines && (getBank() == "0" || getBank() == "0§7 / §60")) && Bank.showWhen() },
         showIsland = { Bank.showIsland() },
         configLine = "§6Bank",
     ),
@@ -100,7 +97,7 @@ enum class ChunkedStatsManager(
         fun getChunkedStats() = buildList {
             currentIslandStats.forEach { stat ->
                 if (stat.showWhen()) {
-                    add(stat.displayPair.get())
+                    add(stat.displayPair.invoke())
                 }
             }
         }
