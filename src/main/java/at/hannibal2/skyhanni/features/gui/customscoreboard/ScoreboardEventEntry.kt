@@ -92,7 +92,6 @@ enum class ScoreboardEventEntry(val event: ScoreboardEvent) {
             RIFT,
             ESSENCE,
             ACTIVE_TABLIST_EVENTS,
-            STARTING_SOON_TABLIST_EVENTS,
             REDSTONE,
         )
     }
