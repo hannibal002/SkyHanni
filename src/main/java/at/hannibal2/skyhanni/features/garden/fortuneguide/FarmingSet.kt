@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
-enum class FarmingSets(
+enum class FarmingSet(
     val helmetIncrease: Double,
     val chestplateIncrease: Double,
     val leggingsIncrease: Double,

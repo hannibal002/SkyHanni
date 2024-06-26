@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -644,10 +644,10 @@ enum class HotmData(
         }
 
         @SubscribeEvent
-        fun onScoreboardUpdate(event: ScoreboardChangeEvent) {
+        fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
-            event.newList.matchFirst(ScoreboardPattern.powderPattern) {
+            event.scoreboard.matchFirst(ScoreboardPattern.powderPattern) {
                 val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()

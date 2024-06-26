@@ -66,10 +66,11 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §d§lNEW RABBIT! §6+2 Chocolate §7and §6+0.003x Chocolate §7per second!
      * REGEX-TEST: §d§lNEW RABBIT! §6+0.02x Chocolate §7per second!
+     * REGEX-TEST: §d§lNEW RABBIT! §7Your §dTime Tower §7charge time is now §a7h§7!
      */
     val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found.new",
-        "§d§lNEW RABBIT! (§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!"
+        "§d§lNEW RABBIT! (?:((§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!)|(?<other>.*))"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -184,6 +185,7 @@ object HoppityEggsManager {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
                     onClick = onClick,
+                    "§eClick to share!",
                     expireAt = 30.seconds.fromNow(),
                     oneTimeClick = true
                 )
@@ -232,14 +234,13 @@ object HoppityEggsManager {
     }
 
     private fun checkWarn() {
+        val allEggsRemaining = HoppityEggType.allEggsRemaining()
         if (!warningActive) {
-            warningActive = !HoppityEggType.allEggsRemaining()
+            warningActive = !allEggsRemaining
         }
 
-        if (warningActive) {
-            if (HoppityEggType.allEggsRemaining()) {
-                warn()
-            }
+        if (warningActive && allEggsRemaining) {
+            warn()
         }
     }
 

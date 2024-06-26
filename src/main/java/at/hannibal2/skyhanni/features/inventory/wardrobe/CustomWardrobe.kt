@@ -58,7 +58,7 @@ object CustomWardrobe {
     private var guiName = "Custom Wardrobe"
 
     @SubscribeEvent
-    fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
+    fun onGuiRender(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled() || editMode) return
         val renderable = displayRenderable ?: run {
             update()
@@ -111,8 +111,7 @@ object CustomWardrobe {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
-        if (!isEnabled()) return
-        DelayedRun.runDelayed(250.milliseconds) {
+        DelayedRun.runDelayed(300.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
             }
@@ -587,7 +586,7 @@ object CustomWardrobe {
         }
     }
 
-    private fun WardrobeSlot.clickSlot() {
+    fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = WardrobeAPI.currentPage ?: return

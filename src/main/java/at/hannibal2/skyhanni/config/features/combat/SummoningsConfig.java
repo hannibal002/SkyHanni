@@ -37,4 +37,9 @@ public class SummoningsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean summoningMobColored = false;
+
+    @Expose
+    @ConfigOption(name = "Summon Chat Messages", desc = "Sends a chat message when a summon dies and hides other summon related messages.")
+    @ConfigEditorBoolean
+    public boolean summonMessages = false;
 }
