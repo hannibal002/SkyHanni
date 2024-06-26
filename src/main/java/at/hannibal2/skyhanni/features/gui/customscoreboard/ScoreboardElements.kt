@@ -53,6 +53,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
@@ -394,7 +395,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
 private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getMotesDisplayPair(): List<ScoreboardElementType> {
-    val motes = getMotes().formatNum()
+    val motes = getMotes()?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -441,7 +442,7 @@ private fun getBitsDisplayPair(): List<ScoreboardElementType> {
 private fun getBitsShowWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 
 private fun getCopperDisplayPair(): List<ScoreboardElementType> {
-    val copper = getCopper().formatNum()
+    val copper = getCopper()?.formatNum() ?: "0"
 
     return listOf(
         when {
@@ -499,7 +500,7 @@ private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType
     ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
-    val northStars = getNorthStars().formatNum()
+    val northStars = getNorthStars()?.formatNum() ?: "0"
 
     return listOf(
         when {
