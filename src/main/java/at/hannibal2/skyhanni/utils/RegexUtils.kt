@@ -14,19 +14,19 @@ object RegexUtils {
     inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
         pattern.firstMatcher(this, consumer)
 
-    inline fun <T> Pattern.firstMatcher(sequence: Sequence<String>, consumer: Matcher.() -> T): T? =
-        firstMatcher(sequence.toList(), consumer)
+    inline fun <T> Pattern.firstMatcher(sequence: Sequence<String>, consumer: Matcher.() -> T): T? {
+        for (line in sequence) {
+            matcher(line).let { if (it.matches()) return consumer(it) }
+        }
+        return null
+    }
 
     @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
         pattern.firstMatcher(this, consumer)
 
-    inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? {
-        for (line in list) {
-            matcher(line).let { if (it.matches()) return consumer(it) }
-        }
-        return null
-    }
+    inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? =
+        firstMatcher(list.asSequence(), consumer)
 
     @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer() }"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? =
