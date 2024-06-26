@@ -454,8 +454,7 @@ object HypixelData {
         }
 
         if (skyBlockIsland != islandType) {
-            val oldIslandType = skyBlockIsland
-            IslandChangeEvent(islandType, oldIslandType).postAndCatch()
+            IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
                 loggerIslandChange.log("Unknown: '$foundIsland'")
