@@ -103,7 +103,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        UnknownLinesHandler.handleUnknownLines()
+        if (LorenzUtils.inSkyBlock || !displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
     }
 
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
