@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -130,7 +131,7 @@ object EstimatedItemValueCalculator {
             )
             if (price != null) {
                 val name = attributes[0].first.fixMending().allLettersFirstUppercase()
-                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${price.shortFormat()}§7)",)
+                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${price.shortFormat()}§7)")
                 return price
             }
         }
@@ -214,15 +215,15 @@ object EstimatedItemValueCalculator {
     private fun addReforgeStone(stack: ItemStack, list: MutableList<String>): Double {
         val rawReforgeName = stack.getReforgeName() ?: return 0.0
 
-        val reforge = EstimatedItemValue.reforges.values.firstOrNull {
-            rawReforgeName == it.reforgeName.lowercase() || rawReforgeName == it.internalName.asString().lowercase()
+        val reforge = ReforgeAPI.onlyPowerStoneReforge.firstOrNull {
+            rawReforgeName == it.lowercaseName || rawReforgeName == it.reforgeStone?.asString()?.lowercase()
         } ?: return 0.0
-        val internalName = reforge.internalName.asString().asInternalName()
+        val internalName = reforge.reforgeStone ?: return 0.0
         val reforgeStonePrice = internalName.getPrice()
         val reforgeStoneName = internalName.itemName
-        val applyCost = getReforgeStoneApplyCost(stack, reforge.reforgeCosts, internalName) ?: return 0.0
+        val applyCost = reforge.costs?.let { getReforgeStoneApplyCost(stack, it, internalName) } ?: return 0.0
 
-        list.add("§7Reforge: §9${reforge.reforgeName}")
+        list.add("§7Reforge: §9${reforge.name}")
         list.add("  §7Stone $reforgeStoneName §7(§6" + reforgeStonePrice.shortFormat() + "§7)")
         list.add("  §7Apply cost: (§6" + applyCost.shortFormat() + "§7)")
         return reforgeStonePrice + applyCost

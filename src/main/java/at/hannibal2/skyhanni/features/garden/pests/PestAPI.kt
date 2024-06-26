@@ -281,10 +281,9 @@ object PestAPI {
     }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfestedPlot() ?: run {
-            ChatUtils.error("Can not remove nearest pest: No infested plots detected.")
-            return
-        }
+        val plot = getNearestInfestedPlot()
+            ?: ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
+
         if (!plot.isPestCountInaccurate) plot.pests--
         scoreboardPests--
         updatePests()
