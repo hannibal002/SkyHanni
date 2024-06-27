@@ -46,7 +46,7 @@ object DungeonHighlightClickedBlocks {
         return colors[colorIndex]
     }
     
-    private val patternGroup = RepoPattern.group ("dungeons.highlightclickedblock")
+    private val patternGroup = RepoPattern.group("dungeons.highlightclickedblock")
     private val leverPattern by patternGroup.pattern(
         "lever",
         "§cYou hear the sound of something opening...",
