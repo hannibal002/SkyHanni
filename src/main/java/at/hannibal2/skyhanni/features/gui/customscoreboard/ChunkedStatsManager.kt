@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsAvailable
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsToClaim
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
@@ -52,7 +52,7 @@ enum class ChunkedStatsManager(
     ),
     BITS(
         displayPair = { getBitsLine() },
-        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsToClaim() == "0") && Bits.showWhen() },
+        showWhen = { !(hideEmptyLines && getBits() == "0" && getBitsAvailable() == "0") && Bits.showWhen() },
         showIsland = { Bits.showIsland() },
         configLine = "§bBits",
     ),
