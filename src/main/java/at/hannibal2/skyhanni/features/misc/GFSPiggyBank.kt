@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
@@ -34,9 +36,12 @@ object GFSPiggyBank {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
+        if (!isEnabled()) return
         val message = event.message
         listOf(crackedPattern, brokePattern).matchMatchers(message) {
             GetFromSackAPI.getFromChatMessageSackItems(ENCHANTED_PORK)
         }
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.gfsPiggyBank
 }
