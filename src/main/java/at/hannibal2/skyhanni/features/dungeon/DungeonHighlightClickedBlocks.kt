@@ -56,9 +56,7 @@ object DungeonHighlightClickedBlocks {
     }
 
     private fun getRandomColor(): Color {
-        var id = colorIndex + 1
-        if (id == allowedColors.size) id = 0
-        colorIndex = id
+        colorIndex = (colorIndex + 1) % allowedColors.size
         return allowedColors[colorIndex].toColor()
     }
 
