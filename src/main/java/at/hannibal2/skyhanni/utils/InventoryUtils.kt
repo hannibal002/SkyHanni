@@ -66,7 +66,7 @@ object InventoryUtils {
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
 
-    val isNeuStorageEnabled = RecalculatingValue(10.seconds) {
+    val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         try {
             val config = NotEnoughUpdates.INSTANCE.config
 

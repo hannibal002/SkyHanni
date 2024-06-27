@@ -62,7 +62,7 @@ object SlayerAPI {
         }
 
         event.addData {
-            add("activeSlayer: ${getActiveSlayer()}")
+            add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: $latestSlayerProgress")
@@ -82,9 +82,7 @@ object SlayerAPI {
         }
     }
 
-    fun getActiveSlayer() = activeSlayer.getValue()
-
-    private val activeSlayer = RecalculatingValue(1.seconds) {
+    val activeSlayer by RecalculatingValue(1.seconds) {
         grabActiveSlayer()
     }
 
@@ -125,7 +123,7 @@ object SlayerAPI {
             } else {
                 val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
                 isInAnyArea = slayerTypeForCurrentArea != null
-                slayerTypeForCurrentArea == getActiveSlayer() && slayerTypeForCurrentArea != null
+                slayerTypeForCurrentArea == activeSlayer && slayerTypeForCurrentArea != null
             }
         }
     }
