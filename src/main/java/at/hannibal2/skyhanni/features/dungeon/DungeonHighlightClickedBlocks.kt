@@ -119,5 +119,6 @@ object DungeonHighlightClickedBlocks {
 
     class ClickedBlock(val displayText: String, var colour: Color)
 
-    fun isEnabled() = DungeonAPI.inDungeon() && config.enabled
+    fun isEnabled() = !DungeonAPI.inBossRoom && inDungeonAPI.inDungeon() && config.enabled
+
 }
