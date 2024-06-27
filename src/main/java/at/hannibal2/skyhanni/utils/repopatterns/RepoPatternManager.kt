@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
 import java.util.TreeMap
@@ -78,6 +79,8 @@ object RepoPatternManager {
         }
 
     val localLoading: Boolean get() = config.forceLocal.get() xor (!insideTest && PlatformUtils.isDevEnvironment)
+
+    private val logger = LogManager.getLogger("SkyHanni")
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.
@@ -174,6 +177,7 @@ object RepoPatternManager {
                 is RepoPatternListImpl -> loadArrayPatterns(remotePatterns, it)
                 is RepoPatternImpl -> loadStandalonePattern(remotePatterns, it)
             }
+
         }
     }
 
@@ -187,7 +191,7 @@ object RepoPatternManager {
                 return
             }
         } catch (e: PatternSyntaxException) {
-            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+            logger.error("Error while loading pattern from repo", e)
         }
         it.value = Pattern.compile(it.defaultPattern)
         it.isLoadedRemotely = false
@@ -210,7 +214,7 @@ object RepoPatternManager {
         }
 
         if (patternMap.mapTo(mutableSetOf()) { it.first } != patternMap.indices.toSet()) {
-            SkyHanniMod.logger.error("Incorrect index set for $arrayPattern")
+            logger.error("Incorrect index set for $arrayPattern")
             setDefaultPatterns()
         }
 
@@ -221,7 +225,7 @@ object RepoPatternManager {
             arrayPattern.wasOverridden = patternStrings != arrayPattern.defaultPattern
             return
         } catch (e: PatternSyntaxException) {
-            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+            logger.error("Error while loading pattern from repo", e)
         }
         setDefaultPatterns()
     }
@@ -258,7 +262,7 @@ object RepoPatternManager {
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
         dump(sourceLabel, File(path))
         if (System.getenv("SKYHANNI_DUMP_REGEXES_EXIT") != null) {
-            SkyHanniMod.logger.info("Exiting after dumping RepoPattern regex patterns to $path")
+            logger.info("Exiting after dumping RepoPattern regex patterns to $path")
             FMLCommonHandler.instance().exitJava(0, false)
         }
     }

@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -81,9 +81,8 @@ object CityProjectFeatures {
 
         ChatUtils.clickableChat(
             "Daily City Project Reminder! (Click here to disable this reminder)",
-            onClick = {
-                disable()
-            },
+            onClick = { disable() },
+            "§eClick to disable!",
             oneTimeClick = true
         )
     }
@@ -158,16 +157,21 @@ object CityProjectFeatures {
             list.add(" §7- ")
             list.add(stack)
 
-            list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
-                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                    LorenzUtils.setTextIntoSign("$amount")
-                } else {
-                    BazaarApi.searchForBazaarItem(name, amount)
-                }
-            }) { inInventory && !NEUItems.neuHasFocus() })
+            list.add(
+                Renderable.optionalLink(
+                    "$name §ex${amount.addSeparators()}",
+                    {
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            LorenzUtils.setTextIntoSign("$amount")
+                        } else {
+                            BazaarApi.searchForBazaarItem(name, amount)
+                        }
+                    }
+                ) { inInventory && !NEUItems.neuHasFocus() }
+            )
 
             val price = internalName.getPrice(false) * amount
-            val format = NumberUtil.format(price)
+            val format = price.shortFormat()
             list.add(" §7(§6$format§7)")
             add(list)
         }

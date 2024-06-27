@@ -45,6 +45,15 @@ object HoppityEggsManager {
     )
 
     /**
+     * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     */
+    val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.bought",
+        "§aYou bought §r§.(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!"
+    )
+
+    /**
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §6Solomon §7(§6§LLEGENDARY§7)!
@@ -57,10 +66,11 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §d§lNEW RABBIT! §6+2 Chocolate §7and §6+0.003x Chocolate §7per second!
      * REGEX-TEST: §d§lNEW RABBIT! §6+0.02x Chocolate §7per second!
+     * REGEX-TEST: §d§lNEW RABBIT! §7Your §dTime Tower §7charge time is now §a7h§7!
      */
     val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found.new",
-        "§d§lNEW RABBIT! (§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!"
+        "§d§lNEW RABBIT! (?:((§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!)|(?<other>.*))"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -175,6 +185,7 @@ object HoppityEggsManager {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
                     onClick = onClick,
+                    "§eClick to share!",
                     expireAt = 30.seconds.fromNow(),
                     oneTimeClick = true
                 )
@@ -223,14 +234,13 @@ object HoppityEggsManager {
     }
 
     private fun checkWarn() {
+        val allEggsRemaining = HoppityEggType.allEggsRemaining()
         if (!warningActive) {
-            warningActive = !HoppityEggType.allEggsRemaining()
+            warningActive = !allEggsRemaining
         }
 
-        if (warningActive) {
-            if (HoppityEggType.allEggsRemaining()) {
-                warn()
-            }
+        if (warningActive && allEggsRemaining) {
+            warn()
         }
     }
 
