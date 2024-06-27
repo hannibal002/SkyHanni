@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
@@ -41,9 +42,13 @@ class ExperimentationTableDisplay {
         "superpairs",
         "Superpairs \\((?<experiment>.+)\\)"
     )
-    private val rewardsPattern by patternGroup.pattern(
+    private val powerUpPattern by patternGroup.pattern(
+        "powerups",
+        "Gained \\+\\d Clicks?|Instant Find|\\+\\S* XP"
+    )
+    private val rewardPattern by patternGroup.pattern(
         "rewards",
-        "(?<reward>Enchanting Exp|Clicks|Enchanted Book|Instant Find|Bottle|Click)"
+        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment The Fish"
     )
 
     @SubscribeEvent
@@ -55,68 +60,61 @@ class ExperimentationTableDisplay {
 
             for (item in toCheck) {
                 val slot = item.key
-                val itemName = InventoryUtils.getItemsInOpenChest()[slot].stack.displayName.removeColor()
+                val itemName = item.value.displayName.removeColor()
+                val reward = convertToReward(item.value)
+
+                if (!uncoveredItems.containsKey(slot)) uncoveredItems[slot] = reward
 
                 if (isOutOfBounds(slot, currentExperiment)) return
 
-                rewardsPattern.matchMatcher(itemName) {
-                    val reward = group("reward") ?: return
+                if (isPowerUp(reward)) {
+                    foundPowerUps[slot] = reward
+                    possiblePairs--
+                    lastClicked.clear()
+                } else if (isReward(itemName)) {
                     skip = false
 
-                    if (!uncoveredItems.containsKey(slot)) uncoveredItems[slot] = itemName
+                    val (lastSlotClicked, lastItemName) = lastClicked.entries.first()
+                    val foundPair = hasFoundPair(slot, lastSlotClicked, reward, lastItemName)
+                    val foundMatch = hasFoundMatch(reward, slot)
 
-                    if (isPowerUp(reward)) {
-                        if (!foundPowerUps.containsValue(itemName)) {
-                            foundPowerUps[slot] = itemName
-                            possiblePairs--
+                    if (foundPair || foundMatch) foundNormals.entries.removeIf { it.value == reward }
+                    if (foundPairs.any { it.first.second == reward }) skip = true
+
+                    when {
+                        foundPair && !skip -> {
+                            foundPairs.add(
+                                ItemPair(
+                                    Pair(slot, reward), Pair(lastSlotClicked, lastItemName)
+                                )
+                            )
+                            foundMatches.removeAll { it.first.second == reward }
+                            lastClicked.clear()
+                            skip = true
                         }
-                    } else {
-                        val lastLastClicked = lastClicked.entries.first()
-                        val lastSlotClicked = lastLastClicked.key
-                        val lastItemName = lastLastClicked.value
 
-                        val foundPair = hasFoundPair(slot, lastSlotClicked, itemName, lastItemName)
-                        println(listOf(slot, lastSlotClicked, itemName, lastItemName))
-                        val foundMatch = hasFoundMatch(itemName, slot)
-
-                        if (foundPair || foundMatch) foundNormals.entries.removeIf { it.value == itemName }
-
-                        if (foundPairs.any { it.first.second == itemName }) skip = true
-
-                        when {
-                            foundPair && !skip -> {
-                                foundPairs.add(
-                                    ItemPair(
-                                        Pair(slot, itemName),
-                                        Pair(lastSlotClicked, lastItemName)
-                                    )
+                        foundMatch && !skip -> {
+                            val match = uncoveredItems.entries.find { it.value == reward }?.key ?: return
+                            foundMatches.add(
+                                ItemPair(
+                                    Pair(slot, reward), Pair(match, reward)
                                 )
-                                if (foundMatches.any { it.first.second == itemName }) foundMatches.removeAll { it.first.second == itemName }
-                                skip = true
-                            }
-                            foundMatch && !skip -> {
-                                val match = uncoveredItems.entries.find { it.value == itemName }?.key ?: return
-                                foundMatches.add(
-                                    ItemPair(
-                                        Pair(slot, itemName),
-                                        Pair(match, itemName)
-                                    )
-                                )
-                                skip = true
-                            }
+                            )
+                            skip = true
                         }
                     }
 
-                    if (!isPowerUp(reward) && !skip) {
-                        foundNormals[slot] = itemName
+                    if (!skip && foundMatches.none { it.first.second == reward }) {
+                        foundNormals[slot] = reward
                         possiblePairs--
                     }
-
-                    if (lastClicked.size == 2) lastClicked.remove(slot)
-                    toCheck.remove(slot)
                 }
 
-                possiblePairs = (currentExperiment.gridSize / 2) - foundPairs.size - foundPowerUps.size - foundMatches.size
+                if (lastClicked.size == 2) lastClicked.clear()
+                toCheck.remove(slot)
+
+                possiblePairs =
+                    (currentExperiment.gridSize / 2) - foundPairs.size - foundPowerUps.size - foundMatches.size
 
                 display = drawDisplay()
             }
@@ -147,40 +145,55 @@ class ExperimentationTableDisplay {
             currentExperiment = Experiments.entries.find { it.name == group("experiment") } ?: return
 
             val item = event.item ?: return
+            val name = convertToReward(item)
             if (isOutOfBounds(event.slotId, currentExperiment)) return
 
-            toCheck.put(event.slotId, item)
-            lastClicked.put(event.slotId, item.displayName)
+            toCheck[event.slotId] = item
+            lastClicked.put(event.slotId, name)
         }
     }
 
     private fun drawDisplay() = buildList {
-        val openInventory = InventoryUtils.getItemsInOpenChest()
         add("§6Experimentation Data")
         add("")
+        if (foundPairs.size >= 1) add("§2Found")
         for (pair in foundPairs) {
-            add("§a${openInventory.get(pair.first.first).stack.getLore()[2]} - Found")
+            val prefix = determinePrefix(foundPairs.indexOf(pair), foundPairs.lastIndex)
+            add(" $prefix §a${pair.first.second}")
         }
+        if (foundMatches.size >= 1) add("§eMatched")
         for (pair in foundMatches) {
-            add("§e${openInventory.get(pair.first.first).stack.getLore()[2]} - Matched")
+            val prefix = determinePrefix(foundMatches.indexOf(pair), foundMatches.lastIndex)
+            add(" $prefix §e${pair.first.second}")
         }
+        if (foundPowerUps.size >= 1) add("§bPowerUp")
         for (power in foundPowerUps) {
-            add("§b${power.value} - Found")
+            val prefix = determinePrefix(foundPowerUps.entries.indexOf(power), foundPowerUps.size - 1)
+            add(" $prefix §b${power.value}")
         }
         add("")
-        add("§l§cNot found")
-        add("§ePairs - $possiblePairs")
-        add("§7Normals - ${foundNormals.size}")
+        add("§4Not found")
+        add(" ├ §ePairs - $possiblePairs")
+        add(" └ §7Normals - ${foundNormals.size}")
     }
 
-    private fun isPowerUp(reward: String) =
-        reward in listOf("Clicks", "Instant Find", "Click")
+    private fun convertToReward(item: ItemStack) =
+        if (item.displayName.removeColor() == "Enchanted Book") item.getLore()[2].removeColor() else item.displayName
+
+    private fun determinePrefix(index: Int, lastIndex: Int) =
+        if (index == lastIndex) "└" else "├"
 
     private fun hasFoundPair(firstSlot: Int, secondSlot: Int, firstName: String, secondName: String) =
         firstSlot != secondSlot && firstName == secondName
 
-    private fun hasFoundMatch(itemName: String, itemSlot: Int) =
-        uncoveredItems.any { (slot, name) -> slot != itemSlot && name == itemName }
+    private fun hasFoundMatch(reward: String, itemSlot: Int) =
+        uncoveredItems.any { (slot, name) -> slot != itemSlot && name == reward } && foundMatches.none { it.first.second == reward }
+
+    private fun isPowerUp(reward: String) =
+        powerUpPattern.matches(reward)
+
+    private fun isReward(reward: String) =
+        rewardPattern.matches(reward)
 
     private fun isOutOfBounds(slot: Int, experiment: Experiments) =
         slot <= startSlot || slot >= startSlot + experiment.gridSize + 6
