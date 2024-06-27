@@ -452,8 +452,7 @@ object HypixelData {
             foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
             newIsland = getIslandType(foundIsland, guesting)
         }
-        
-        
+
         // TODO dont send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != newIsland) {
             val oldIsland = skyBlockIsland
