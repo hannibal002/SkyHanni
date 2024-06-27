@@ -59,7 +59,6 @@ object DungeonHighlightClickedBlocks {
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
-        if (DungeonAPI.inBossRoom) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
         val position = event.position
