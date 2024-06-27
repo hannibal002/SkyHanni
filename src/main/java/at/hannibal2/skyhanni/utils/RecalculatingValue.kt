@@ -6,23 +6,18 @@ import kotlin.time.Duration
 
 class RecalculatingValue<T>(private val expireTime: Duration, private val calculation: () -> T) : ReadOnlyProperty<Any?, T> {
 
-    private var currentValue = calculation()
+    private var currentValue: T? = null
     private var lastAccessTime = SimpleTimeMark.farPast()
 
-    @Deprecated("use by RecalculatingValue instead")
+    @Deprecated("use \"by RecalculatingValue\" instead")
     fun getValue(): T {
         if (lastAccessTime.passedSince() > expireTime) {
             currentValue = calculation()
             lastAccessTime = SimpleTimeMark.now()
         }
-        return currentValue
+        return currentValue!!
     }
 
-    override fun getValue(thisRef: Any?, property: KProperty<*>): T {
-        if (lastAccessTime.passedSince() > expireTime) {
-            currentValue = calculation()
-            lastAccessTime = SimpleTimeMark.now()
-        }
-        return currentValue
-    }
+    @Suppress("DEPRECATION")
+    override fun getValue(thisRef: Any?, property: KProperty<*>): T = getValue()
 }
