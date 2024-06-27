@@ -1,12 +1,12 @@
-//
-// TODO LIST
-// V2 RELEASE
-//  - Bank API (actually maybe not, I like the current design)
-//  - countdown events like fishing festival + fiesta when its not on tablist
-//  - improve hide coin difference to also work with bits, motes, etc
-//  - color options in the purse etc lines
-//  - choose the amount of decimal places in shorten nums
-//
+/**
+ * TODO LIST
+ *  - Bank API (actually maybe not, I like the current design)
+ *  - countdown events like fishing festival + fiesta when its not on tablist
+ *  - improve hide coin difference to also work with bits, motes, etc
+ *  - color options in the purse etc lines
+ *  - choose the amount of decimal places in shorten nums
+ *  - heavily optimize elements and events by only updating them when absolutely needed
+ */
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -214,7 +213,7 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        DelayedRun.runNextTick { updateIslandEntries() }
+        updateIslandEntries()
     }
 
     private fun updateIslandEntries() {

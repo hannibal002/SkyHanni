@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsManager.C
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsManager.Companion.showChunkedStatsIsland
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 
+// internal, widget and scoreboard
+// a bit of everything
 object ChunkedStats : ScoreboardElement() {
     override fun getDisplay() = getChunkedStats().chunked(chunkedConfig.maxStatsPerLine)
         .map { it.joinToString(" §f| ") }

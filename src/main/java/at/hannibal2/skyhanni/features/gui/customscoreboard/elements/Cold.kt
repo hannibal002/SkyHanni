@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
+// internal
+// update with cold update event
 object Cold : ScoreboardElement() {
     override fun getDisplay(): String? {
         val cold = -MiningAPI.cold

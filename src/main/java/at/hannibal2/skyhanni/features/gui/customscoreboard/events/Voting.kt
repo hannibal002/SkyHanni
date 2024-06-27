@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
+// scoreboard
+// scoreboard update event
 object Voting : ScoreboardEvent() {
 
     private val patterns = listOf(
@@ -15,6 +17,8 @@ object Voting : ScoreboardEvent() {
     )
 
     override fun getDisplay() = patterns.allMatches(getSbLines())
+
+    // TODO: add area check
 
     override val configLine = "§7(All Voting Lines)"
 

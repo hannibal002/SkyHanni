@@ -265,6 +265,8 @@ object CollectionUtils {
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
         takeIf { null !in this } as? List<T>
 
+    fun <T> List<T>.takeIfNotEmpty(): List<T>? = takeIf { it.isNotEmpty() }
+
     // TODO add cache
     fun MutableList<Renderable>.addString(
         text: String,

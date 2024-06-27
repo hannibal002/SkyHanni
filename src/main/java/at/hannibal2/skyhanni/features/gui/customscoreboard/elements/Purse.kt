@@ -7,6 +7,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getPurseEarned
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 
+// internal
+// purse change event (add total purse to event)
 object Purse : ScoreboardElement() {
     override fun getDisplay(): String? {
         var purse = formatNumber(PurseAPI.currentPurse)

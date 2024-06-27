@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
+// scoreboard
+// scoreboard update event
 object Broodmother : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.broodmotherPattern.firstMatches(getSbLines())
 

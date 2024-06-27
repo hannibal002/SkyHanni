@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsLine
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
+// internal
+// update with bits update event
 object Bits : ScoreboardElement() {
     override fun getDisplay(): String? {
         val bits = formatNumber(BitsAPI.bits.coerceAtLeast(0))

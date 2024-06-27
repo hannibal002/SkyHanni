@@ -437,12 +437,12 @@ object HypixelData {
     }
 
     private fun checkIsland(event: WidgetUpdateEvent) {
-        val islandType: IslandType
+        val newIsland: IslandType
         val foundIsland: String
         if (event.isClear()) {
 
             TabListData.fullyLoaded = false
-            islandType = IslandType.NONE
+            newIsland = IslandType.NONE
             foundIsland = ""
 
         } else {
@@ -450,18 +450,20 @@ object HypixelData {
             // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
             val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
             foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
-            islandType = getIslandType(foundIsland, guesting)
+            newIsland = getIslandType(foundIsland, guesting)
         }
 
-        if (skyBlockIsland != islandType) {
-            IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
-            if (islandType == IslandType.UNKNOWN) {
+        if (skyBlockIsland != newIsland) {
+            val oldIsland = skyBlockIsland
+            skyBlockIsland = newIsland
+            IslandChangeEvent(newIsland, oldIsland).postAndCatch()
+
+            if (newIsland == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
                 loggerIslandChange.log("Unknown: '$foundIsland'")
             } else {
-                loggerIslandChange.log(islandType.name)
+                loggerIslandChange.log(newIsland.name)
             }
-            skyBlockIsland = islandType
             if (TabListData.fullyLoaded) {
                 TabWidget.reSendEvents()
             }

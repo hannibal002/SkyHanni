@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBank
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 
+// widget
+// update with widget update event
 object Bank : ScoreboardElement() {
     override fun getDisplay(): String? {
         val bank = getBank()

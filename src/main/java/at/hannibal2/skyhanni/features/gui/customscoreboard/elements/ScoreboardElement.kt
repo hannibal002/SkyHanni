@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getElementsFromAny
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine
 
 abstract class ScoreboardElement {
     /**
@@ -23,7 +24,7 @@ abstract class ScoreboardElement {
     //  Suggestion: https://discord.com/channels/997079228510117908/1226508204762992733
 
 
-    fun getLines() = if (isVisible()) getElementsFromAny(getDisplay()) else listOf()
+    open fun getLines(): List<ScoreboardLine> = if (isVisible()) getElementsFromAny(getDisplay()) else listOf()
 
     private fun isVisible(): Boolean {
         if (!informationFilteringConfig.hideIrrelevantLines) return true

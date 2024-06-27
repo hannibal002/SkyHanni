@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 
+// scoreboard
+// scoreboard update event
 object Heat : ScoreboardElement() {
     override fun getDisplay(): String? {
         val heat = getHeat()

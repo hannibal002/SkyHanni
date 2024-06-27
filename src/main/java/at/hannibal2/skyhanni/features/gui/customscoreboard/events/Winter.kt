@@ -5,6 +5,8 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
+// scoreboard
+// scoreboard update event
 object Winter : ScoreboardEvent() {
 
     private val patterns = listOf(
