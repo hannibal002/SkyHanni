@@ -106,7 +106,7 @@ object DungeonHighlightClickedBlocks {
             event.drawColor(position, block.colour)
             if (config.showTextEnabled) {
                 event.drawString(position.add(0.5, 0.5, 0.5), block.displayText, true)
-            }else {
+            } else {
                 return
             }
         }
