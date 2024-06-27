@@ -15,37 +15,37 @@ public class HighlightClickedBlocksConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Chest colour", desc = "Colour of clicked chests")
+    @ConfigOption(name = "Chest Colour", desc = "Colour of clicked chests")
     @ConfigEditorColour
     public String chestColour = "0:178:85:255:85";
 
     @Expose
-    @ConfigOption(name = "Trapped chest colour", desc = "Colour of clicked trapped chests")
+    @ConfigOption(name = "Trapped Chest Colour", desc = "Colour of clicked trapped chests")
     @ConfigEditorColour
     public String trappedChestColour = "0:178:0:170:0";
 
     @Expose
-    @ConfigOption(name = "Locked chest colour", desc = "Colour of clicked locked chests")
+    @ConfigOption(name = "Locked Chest Colour", desc = "Colour of clicked locked chests")
     @ConfigEditorColour
     public String lockedChestColour = "0:178:255:85:85";
 
     @Expose
-    @ConfigOption(name = "Wither essence colour", desc = "Colour of clicked wither essence")
+    @ConfigOption(name = "Wither Essence Colour", desc = "Colour of clicked wither essence")
     @ConfigEditorColour
     public String witherEssenceColour = "0:178:255:85:255";
 
     @Expose
-    @ConfigOption(name = "Lever colour", desc = "Colour of clicked levers")
+    @ConfigOption(name = "Lever Colour", desc = "Colour of clicked levers")
     @ConfigEditorColour
     public String leverColour = "0:178:255:255:85";
 
     @Expose
-    @ConfigOption(name = "Show text", desc = "If enabled shows a text telling you what you clicked with the highlight.")
+    @ConfigOption(name = "Show Text", desc = "If enabled shows a text telling you what you clicked with the highlight.")
     @ConfigEditorBoolean
     public boolean showTextEnabled = true;
 
     @Expose
-    @ConfigOption(name = "Random colour", desc = "If enabled makes the colours random.")
+    @ConfigOption(name = "Random Colour", desc = "If enabled makes the colours random.")
     @ConfigEditorBoolean
     public boolean randomColourEnabled = false;
 
