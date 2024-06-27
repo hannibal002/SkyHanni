@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -28,33 +29,40 @@ object DungeonHighlightClickedBlocks {
 
     private val config get() = SkyHanniMod.feature.dungeon.clickedBlocks
     private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
-    private var colorIndex = 0
-    private val colors = LorenzColor.entries.filter {
-        it !in listOf(
-            LorenzColor.BLACK,
-            LorenzColor.WHITE,
-            LorenzColor.CHROMA,
-            LorenzColor.GRAY,
-            LorenzColor.DARK_GRAY,
-        )
-    }
-
-    private fun getRandomColor(): LorenzColor {
-        var id = colorIndex + 1
-        if (id == colors.size) id = 0
-        colorIndex = id
-        return colors[colorIndex]
-    }
 
     private val patternGroup = RepoPattern.group("dungeons.highlightclickedblock")
     private val leverPattern by patternGroup.pattern(
         "lever",
-        "§cYou hear the sound of something opening...",
+        "§cYou hear the sound of something opening\\.\\.\\.",
     )
     private val lockedPattern by patternGroup.pattern(
         "locked",
         "§cThat chest is locked!",
     )
+    private const val WATER_ROOM_ID = "-60,-60"
+    private const val WITHER_ESSENCE_TEXTURE =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
+
+    private var colorIndex = 0
+
+    private val ignoredColors = listOf(
+        LorenzColor.BLACK,
+        LorenzColor.WHITE,
+        LorenzColor.CHROMA,
+        LorenzColor.GRAY,
+        LorenzColor.DARK_GRAY,
+    )
+
+    private val allowedColors by lazy { LorenzColor.entries.filter { it !in ignoredColors } }
+
+    private fun getRandomColor(): Color {
+        var id = colorIndex + 1
+        if (id == allowedColors.size) id = 0
+        colorIndex = id
+        return allowedColors[colorIndex].toColor()
+    }
+
+    private val inWaterRoom by RecalculatingValue(1.seconds) { DungeonAPI.getRoomID() == WATER_ROOM_ID }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -65,7 +73,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.colour = config.lockedChestColour.toChromaColor()
+            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color = config.lockedChestColor.toChromaColor()
         }
     }
 
@@ -80,24 +88,24 @@ object DungeonHighlightClickedBlocks {
         val type = when (position.getBlockAt()) {
             Blocks.chest -> ClickedBlockType.CHEST
             Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
-            Blocks.lever -> ClickedBlockType.LEVER
-            Blocks.skull -> ClickedBlockType.WITHER_ESSENCE
+            Blocks.lever -> {
+                if (inWaterRoom) return
+                ClickedBlockType.LEVER
+            }
+
+            Blocks.skull -> {
+                if (BlockUtils.getTextureFromSkull(position) != WITHER_ESSENCE_TEXTURE) return
+                ClickedBlockType.WITHER_ESSENCE
+            }
             else -> return
         }
 
-        if (type == ClickedBlockType.WITHER_ESSENCE) {
-            if (BlockUtils.getTextureFromSkull(position) != WITHER_ESSENCE_TEXTURE) return
-        }
-
-        val inWaterRoom = DungeonAPI.getRoomID() == WATER_ROOM_ID
-        if (inWaterRoom && type == ClickedBlockType.LEVER) return
-
-        val color = if (config.randomColor) getRandomColor().toColor() else type.color()
+        val color = if (config.randomColor) getRandomColor() else type.color()
         val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + type.display
         blocks[position] = ClickedBlock(displayText, color)
     }
 
-    enum class ClickedBlockType(val display: String, val color: () -> Color) {
+    private enum class ClickedBlockType(val display: String, val color: () -> Color) {
         LEVER("Lever", { config.leverColor.toChromaColor() }),
         CHEST("Chest", { config.chestColor.toChromaColor() }),
         TRAPPED_CHEST("Trapped Chest", { config.trappedChestColor.toChromaColor() }),
@@ -121,7 +129,7 @@ object DungeonHighlightClickedBlocks {
         event.move(52, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }
 
-    class ClickedBlock(val displayText: String, var color: Color)
+    private class ClickedBlock(val displayText: String, var color: Color)
 
     fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
 
