@@ -49,7 +49,7 @@ public class HighlightClickedBlocksConfig {
     @ConfigEditorBoolean
     public boolean randomColor = false;
 
-    @ConfigOption(name = "Reset Colors", desc = "Resets the colors of the highlights to default ones.")
+    @ConfigOption(name = "Reset Colours", desc = "Resets the colours of the highlights to default ones.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable reset = () -> {
         chestColor = "0:178:85:255:85";
