@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 
+// internal
 object Slayer : ScoreboardElement() {
     override fun getDisplay() = buildList {
         if (!SlayerAPI.hasActiveSlayerQuest()) return@buildList

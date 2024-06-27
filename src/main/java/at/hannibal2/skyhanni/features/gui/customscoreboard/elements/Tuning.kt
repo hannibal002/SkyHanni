@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.maxw
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 
+// internal
 object Tuning : ScoreboardElement() {
     override fun getDisplay(): Any {
         val tunings = MaxwellAPI.tunings ?: return "§cTalk to \"Maxwell\"!"

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 
+// scoreboard
 object Motes : ScoreboardElement() {
     override fun getDisplay(): String? {
         val motes = formatStringNum(getMotes())

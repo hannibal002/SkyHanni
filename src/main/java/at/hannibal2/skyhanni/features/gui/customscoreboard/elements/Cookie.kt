@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
+// internal
 object Cookie : ScoreboardElement() {
     override fun getDisplay() = buildString {
         append("§dCookie Buff§f: ")

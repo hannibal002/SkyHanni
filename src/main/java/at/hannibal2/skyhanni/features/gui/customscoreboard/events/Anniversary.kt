@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
+// scoreboard
 object Anniversary : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.anniversaryPattern.firstMatches(getSbLines())
 

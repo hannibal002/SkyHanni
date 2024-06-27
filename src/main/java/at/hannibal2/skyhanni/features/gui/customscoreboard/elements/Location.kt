@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
+// internal and scoreboard
 object Location : ScoreboardElement() {
     override fun getDisplay() = listOfNotNull(
         HypixelData.skyBlockAreaWithSymbol,

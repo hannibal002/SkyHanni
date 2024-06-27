@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSoulflow
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 
+// widget
 object Soulflow : ScoreboardElement() {
     override fun getDisplay(): String? {
         val soulflow = getSoulflow()

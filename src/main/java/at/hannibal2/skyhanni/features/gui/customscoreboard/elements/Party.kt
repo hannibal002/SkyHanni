@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.part
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
+// internal
 object Party : ScoreboardElement() {
     override fun getDisplay() = buildList {
         if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList

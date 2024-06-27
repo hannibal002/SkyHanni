@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
+// scoreboard
 object Carnival : ScoreboardEvent() {
 
     private val patterns = listOf(

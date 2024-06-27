@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 
+// tablist (widget possibly)
 object ActiveTablist : ScoreboardEvent() {
     // Some Active Events are better not shown from the tablist,
     // but from other locations like the scoreboard

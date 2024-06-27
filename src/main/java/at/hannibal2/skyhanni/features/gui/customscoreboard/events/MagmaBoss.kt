@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
+// scoreboard
 object MagmaBoss : ScoreboardEvent() {
 
     private val patterns = listOf(

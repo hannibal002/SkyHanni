@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
+// scoreboard
 object Rift : ScoreboardEvent() {
 
     private val patterns = listOf(

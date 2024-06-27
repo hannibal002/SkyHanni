@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getGems
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
+// widget
 object Gems : ScoreboardElement() {
     override fun getDisplay(): String? {
         val gems = getGems()

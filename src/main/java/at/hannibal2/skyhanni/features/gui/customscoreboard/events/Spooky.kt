@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TabListData
 
+// scoreboard
 object Spooky : ScoreboardEvent() {
     override fun getDisplay() = buildList {
         ScoreboardPattern.spookyPattern.firstMatches(getSbLines())?.let { time ->

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.disp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 
+// internal
 object Powder : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val powderTypes = HotmAPI.Powder.entries

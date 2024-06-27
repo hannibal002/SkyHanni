@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
+// scoreboard
 object Visiting : ScoreboardElement() {
     override fun getDisplay() = ScoreboardPattern.visitingPattern.firstMatches(ScoreboardData.sidebarLinesFormatted)
 
