@@ -11,11 +11,12 @@ plugins {
     kotlin("jvm") version "1.9.0"
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
     `maven-publish`
+    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
     id("moe.nea.shot") version "1.0.0"
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.25.Beta.26"
+version = "0.26.Beta.13"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -90,6 +91,8 @@ dependencies {
 
     headlessLwjgl(libs.headlessLwjgl)
 
+    compileOnly(ksp(project(":annotation-processors"))!!)
+
     shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
         isTransitive = false
     }
@@ -106,9 +109,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // May 4, 2024, 4:05 PM GMT+2
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.2.2
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.2.2:all") {
+    // June 3, 2024, 9:30 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -129,6 +132,7 @@ dependencies {
 
     implementation("net.hypixel:mod-api:0.3.1")
 }
+
 configurations.getByName("minecraftNamed").dependencies.forEach {
     shot.applyTo(it as HasConfigurableAttributes<*>)
 }
@@ -147,6 +151,12 @@ kotlin {
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
     }
+    sourceSets.main {
+        kotlin.srcDir("build/generated/ksp/main/kotlin")
+    }
+    sourceSets.test {
+        kotlin.srcDir("build/generated/ksp/test/kotlin")
+    }
 }
 
 // Minecraft configuration:
@@ -157,7 +167,7 @@ loom {
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
             }
-            arg("--tweakClass", "org.spongepowered.asm.launch.MixinTweaker")
+            arg("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
             arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
             arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
         }
@@ -186,7 +196,7 @@ loom {
 // Tasks:
 tasks.processResources {
     inputs.property("version", version)
-    filesMatching("mcmod.info") {
+    filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
     }
 }
@@ -225,7 +235,7 @@ tasks.withType(Jar::class) {
         this["ForceLoadAsMod"] = "true"
         this["Main-Class"] = "SkyHanniInstallerFrame"
 
-        this["TweakClass"] = "org.spongepowered.asm.launch.MixinTweaker"
+        this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
 }
@@ -290,6 +300,3 @@ publishing.publications {
         }
     }
 }
-
-
-

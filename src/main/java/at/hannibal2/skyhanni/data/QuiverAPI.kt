@@ -1,15 +1,14 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -21,17 +20,17 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemBow
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-private var infinityQuiverLevelMultiplier = 0.03f
 
+@SkyHanniModule
 object QuiverAPI {
     private val storage get() = ProfileStorageData.profileSpecific
     var currentArrow: ArrowType?
@@ -45,9 +44,14 @@ object QuiverAPI {
             storage?.arrows?.arrowAmount = value
         }
     var currentAmount: Int
-        get() = arrowAmount[currentArrow?.internalName]?.toInt() ?: 0
+        get() = currentArrow?.amount ?: 0
         set(value) {
-            arrowAmount[currentArrow?.internalName ?: return] = value
+            currentArrow?.amount = value
+        }
+    var ArrowType.amount: Int
+        get() = arrowAmount[this.internalName] ?: 0
+        set(value) {
+            arrowAmount[this.internalName] = value
         }
 
     private var arrows: List<ArrowType> = listOf()
@@ -87,7 +91,7 @@ object QuiverAPI {
         "(?:§.)*You've added (?:§.)*(?<type>.*) x(?<amount>.*) (?:§.)*to your quiver!"
     )
 
-    // Bows that don't use the players arrows, checked using the SkyBlock Id
+    // Bows that don't use the players arrows, checked using the SkyBlock ID
     private val fakeBowsPattern by group.pattern("fakebows", "^(BOSS_SPIRIT_BOW|CRYPT_BOW)$")
     private val quiverInventoryNamePattern by group.pattern("quivername", "^Quiver$")
     private val quiverInventoryPattern by group.pattern(
@@ -120,7 +124,7 @@ object QuiverAPI {
                     "Unknown arrow type: $type",
                     "message" to message,
                 )
-            arrowAmount[ranOutType.internalName] = 0
+            ranOutType.amount = 0
             postUpdateEvent(ranOutType)
         }
 
@@ -134,19 +138,17 @@ object QuiverAPI {
                     "message" to message,
                 )
 
-            arrowAmount.addOrPut(filledUpType.internalName, amount)
+            filledUpType.amount += amount
             if (filledUpType == currentArrow) {
                 postUpdateEvent()
             }
             return
-
         }
 
         fillUpPattern.matchMatcher(message) {
             val flintAmount = group("flintAmount").formatInt()
 
-            FLINT_ARROW_TYPE?.let { arrowAmount.addOrPut(it.internalName, flintAmount) }
-
+            FLINT_ARROW_TYPE?.let { it.amount += flintAmount }
             if (currentArrow == FLINT_ARROW_TYPE) {
                 postUpdateEvent()
             }
@@ -156,7 +158,6 @@ object QuiverAPI {
         addedToQuiverPattern.matchMatcher(message) {
             val type = group("type")
             val amount = group("amount").formatInt()
-
             val filledUpType = getArrowByNameOrNull(type)
                 ?: return ErrorManager.logErrorWithData(
                     UnknownArrowType("Unknown arrow type: $type"),
@@ -164,7 +165,7 @@ object QuiverAPI {
                     "message" to message,
                 )
 
-            arrowAmount.addOrPut(filledUpType.internalName, amount)
+            filledUpType.amount += amount
             if (filledUpType == currentArrow) {
                 postUpdateEvent()
             }
@@ -202,8 +203,7 @@ object QuiverAPI {
             if (stack.getItemCategoryOrNull() != ItemCategory.ARROW) continue
             val arrow = stack.getInternalNameOrNull() ?: continue
             val arrowType = getArrowByNameOrNull(arrow) ?: continue
-
-            arrowAmount.addOrPut(arrowType.internalName, stack.stackSize)
+            arrowType.amount += stack.stackSize
         }
     }
 
@@ -270,11 +270,11 @@ object QuiverAPI {
     }
 
     private fun postUpdateEvent(arrowType: ArrowType? = currentArrow) {
-        QuiverUpdateEvent(arrowType, currentAmount, wearingSkeletonMasterChestplate).postAndCatch()
+        QuiverUpdateEvent(arrowType, currentAmount).postAndCatch()
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(2)) {
             checkChestplate()
@@ -285,9 +285,6 @@ object QuiverAPI {
     // Load arrows from repo
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val itemData = event.getConstant<ItemsJson>("Items")
-        infinityQuiverLevelMultiplier = itemData.enchant_multiplier["infinite_quiver"] ?: 0.03f
-
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.asInternalName()) }
 

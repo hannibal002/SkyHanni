@@ -4,14 +4,15 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -20,6 +21,7 @@ import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object MythologicalCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
@@ -79,7 +81,7 @@ object MythologicalCreatureTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        MythologicalCreatureType.entries.forEach { creatureType ->
+        for (creatureType in MythologicalCreatureType.entries) {
             if (creatureType.pattern.matches(event.message)) {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tracker.modify {
@@ -100,8 +102,7 @@ object MythologicalCreatureTracker {
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
-        data.count.entries.sortedByDescending { it.value }.forEach { (creatureType, amount) ->
-
+        for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
                 val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
                 " §7$percentage"

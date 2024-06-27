@@ -58,10 +58,16 @@ public class MobsConfig {
     public boolean arachneBossHighlighter = true;
 
     @Expose
+    @ConfigOption(name = "Line to Arachne", desc = "Draw a line pointing to where Arachne is currently at.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean lineToArachne = false;
+
+    @Expose
     @ConfigOption(
         name = "Area Boss Timer",
-        desc = "Show a timer when Area Bosses respawn. " +
-            "§cMay take 20-30 seconds to calibrate correctly."
+        desc = "Show a timer when Area Bosses respawn.\n" +
+            "§eMay take 20 - 30 seconds to calibrate correctly."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -70,8 +76,8 @@ public class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Arachne Spawn Timer",
-        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long " +
-            "until the boss will spawn. §cTimer may be 1-2 seconds off."
+        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long until the boss will spawn. " +
+            "§eTimer may be 1 - 2 seconds off."
     )
     @ConfigEditorBoolean
     @FeatureToggle

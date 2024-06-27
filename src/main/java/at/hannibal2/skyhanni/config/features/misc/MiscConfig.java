@@ -108,21 +108,27 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
-    @ConfigOption(name = "Show Outside SB", desc = "Show these features outside of SkyBlock.")
+    @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
 
     @Expose
-    @ConfigOption(name = "Exp Bottles", desc = "Hides all the experience orbs lying on the ground.")
+    @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideExpBottles = false;
 
     @Expose
+    @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideTemporaryArmorstands = true;
+
+    @Expose
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the Item names directly inside the Brewing Stand.")
+    @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean brewingStandOverlay = true;
@@ -135,7 +141,7 @@ public class MiscConfig {
     public boolean hideScoreboardNumbers = false;
 
     @Expose
-    @ConfigOption(name = "Hide Piggy", desc = "Replacing 'Piggy' with 'Purse' in the Scoreboard.")
+    @ConfigOption(name = "Hide Piggy", desc = "Replace 'Piggy' with 'Purse' in the Scoreboard.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hidePiggyScoreboard = true;
@@ -153,7 +159,7 @@ public class MiscConfig {
     public boolean hideExplosions = false;
 
     @Expose
-    @ConfigOption(name = "CH Join", desc = "Helps buy a Pass for accessing the Crystal Hollows if needed.")
+    @ConfigOption(name = "CH Join", desc = "Help buy a pass for accessing the Crystal Hollows if needed.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean crystalHollowsJoin = true;
@@ -165,7 +171,7 @@ public class MiscConfig {
     public boolean hideFireOverlay = false;
 
     @Expose
-    @ConfigOption(name = "Better Sign Editing", desc = "Allows pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
+    @ConfigOption(name = "Better Sign Editing", desc = "Allow pasting (Ctrl+V), copying (Ctrl+C), and deleting whole words/lines (Ctrl+Backspace/Ctrl+Shift+Backspace) in signs.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean betterSignEditing = true;
@@ -193,19 +199,13 @@ public class MiscConfig {
     public boolean restorePieceOfWizardPortalLore = true;
 
     @Expose
-    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim account upgrades when complete.")
+    @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim community shop account and profile upgrades when complete.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean accountUpgradeReminder = true;
 
     @Expose
-    @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean superpairsClicksAlert = false;
-
-    @Expose
-    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fixing NEU Heavy Pearl detection.")
+    @ConfigOption(name = "NEU Heavy Pearls", desc = "Fix NEU's Heavy Pearl detection.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixNeuHeavyPearls = true;
@@ -224,8 +224,16 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Limbo Playtime Detailed",
+        desc = "Show your total time in limbo in the detailed /playtime.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showLimboTimeInPlaytimeDetailed = true;
+
+    @Expose
+    @ConfigOption(
         name = "Lesser Orb of Healing Hider",
-        desc = "Hides the Lesser Orb of Healing.")
+        desc = "Hide the Lesser Orb of Healing.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean lesserOrbHider = false;
@@ -246,20 +254,32 @@ public class MiscConfig {
     public Position inventoryLoadPos = new Position(394, 124, false, true);
 
     @Expose
-    @ConfigOption(name = "Fix Ghost Entities", desc = "Removes ghost entities caused by a Hypixel bug. " +
-        "This included Diana, Dungeon and Crimson Isle mobs and nametags.")
+    @ConfigOption(name = "Fix Ghost Entities", desc = "Remove ghost entities caused by a Hypixel bug.\n" +
+        "This includes Diana, Dungeon and Crimson Isle mobs and nametags.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fixGhostEntities = true;
 
     @Expose
-    @ConfigOption(name = "Replace Roman Numerals", desc = "Replaces Roman Numerals with Arabic Numerals on any item.")
+    @ConfigOption(name = "Replace Roman Numerals", desc = "Replace Roman Numerals with Arabic Numerals on any item.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean replaceRomanNumerals = false;
+
+    @Expose
+    @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean unknownPerkpocalypseMayorWarning = true;
 
     @ConfigOption(name = "Hide Far Entities", desc = "")
     @Accordion
     @Expose
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
+
+    @Expose
+    @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean maintainGameVolume = false;
 }

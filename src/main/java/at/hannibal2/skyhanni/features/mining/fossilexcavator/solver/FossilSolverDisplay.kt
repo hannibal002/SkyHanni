@@ -11,20 +11,22 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object FossilSolverDisplay {
 
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
@@ -184,7 +186,7 @@ object FossilSolverDisplay {
         if (!isEnabled()) return
 
         if (inExcavatorMenu) {
-            // render here so they can move it around. As if you press key while doing the excavator you lose the scrap
+            // Render here so they can move it around. As if you press key while doing the excavator you lose the scrap
             config.position.renderString("§eExcavator solver gui", posLabel = "Fossil Excavator Solver")
             return
         }

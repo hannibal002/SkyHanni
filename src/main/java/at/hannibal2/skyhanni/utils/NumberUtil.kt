@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.NumberFormat
 import java.util.TreeMap
 import kotlin.math.pow
@@ -33,22 +33,28 @@ object NumberUtil {
             5 to "V",
             4 to "IV",
             1 to "I",
-        )
+        ),
     )
+
+    @Deprecated("outdated", ReplaceWith("value.shortFormat(preciseBillions)"))
+    fun format(value: Number, preciseBillions: Boolean = false): String = value.shortFormat(preciseBillions)
+
+    // 1234 -> 1.2k
+    fun Number.shortFormat(preciseBillions: Boolean = false): String {
+        return compactFormat(this, preciseBillions)
+    }
 
     /**
      * This code was modified and taken under CC BY-SA 3.0 license
      * @link https://stackoverflow.com/a/30661479
      * @author assylias
      */
-
-    @JvmStatic
-    fun format(value: Number, preciseBillions: Boolean = false): String {
+    private fun compactFormat(value: Number, preciseBillions: Boolean = false): String {
         @Suppress("NAME_SHADOWING")
         val value = value.toLong()
-        // Long.MIN_VALUE == -Long.MIN_VALUE so we need an adjustment here
-        if (value == Long.MIN_VALUE) return format(Long.MIN_VALUE + 1, preciseBillions)
-        if (value < 0) return "-" + format(-value, preciseBillions)
+        // Long.MIN_VALUE == -Long.MIN_VALUE, so we need an adjustment here
+        if (value == Long.MIN_VALUE) return compactFormat(Long.MIN_VALUE + 1, preciseBillions)
+        if (value < 0) return "-" + compactFormat(-value, preciseBillions)
 
         if (value < 1000) return value.toString() // deal with small numbers
 
@@ -163,6 +169,8 @@ object NumberUtil {
             romanSymbols[this]!!
         } else romanSymbols[l] + (this - l).toRoman()
     }
+
+    fun Number.toStringWithPlus() = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()
 
     private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int) = if (lastNumber > decimal) {
         lastDecimal - decimal

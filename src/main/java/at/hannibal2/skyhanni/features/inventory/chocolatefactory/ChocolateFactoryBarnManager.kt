@@ -1,21 +1,26 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ChocolateFactoryBarnManager {
 
     private val config get() = ChocolateFactoryAPI.config
+    private val hoppityConfig get() = HoppityEggsManager.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private val newRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
@@ -52,12 +57,14 @@ object ChocolateFactoryBarnManager {
         rabbitDuplicatePattern.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
             val amount = group("amount").formatLong()
-            if (config.showDuplicateTime) {
+            if (config.showDuplicateTime && !hoppityConfig.compactChat) {
                 val format = ChocolateFactoryAPI.timeUntilNeed(amount).format(maxUnits = 2)
-                event.chatComponent.appendText("\n§7(§a+§b$format §aof production§7)")
-                ChocolateAmount.averageChocPerSecond()
+                DelayedRun.runNextTick {
+                    ChatUtils.chat("§7(§a+§b$format §aof production§7)")
+                }
             }
             ChocolateAmount.addToAll(amount)
+            HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {
@@ -86,24 +93,19 @@ object ChocolateFactoryBarnManager {
         if (profileStorage.maxRabbits == -1) {
             ChatUtils.clickableChat(
                 "Open your chocolate factory to see your barn's capacity status!",
-                onClick = {
-                    HypixelCommands.chocolateFactory()
-                }
+                onClick = { HypixelCommands.chocolateFactory() },
+                "§eClick to run /cf!",
             )
             return
         }
 
         if (config.rabbitCrushOnlyDuringHoppity && !ChocolateFactoryAPI.isHoppityEvent()) return
 
+        val fullLevel = if (profileStorage.currentRabbits == profileStorage.maxRabbits) "full" else "almost full"
         ChatUtils.clickableChat(
-            message = if (profileStorage.currentRabbits == profileStorage.maxRabbits) {
-                "§cYour barn is full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
-            } else {
-                "§cYour barn is almost full! §7(${barnStatus()}). §cUpgrade it so they don't get crushed"
-            },
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            }
+            "§cYour barn is $fullLevel §7(${barnStatus()}). §cUpgrade it so they don't get crushed!",
+            onClick = { HypixelCommands.chocolateFactory() },
+            "§eClick to run /cf!",
         )
         SoundUtils.playBeepSound()
         lastBarnFullWarning = SimpleTimeMark.now()

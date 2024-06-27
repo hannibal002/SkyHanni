@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.chat.playerchat.PlayerChatFilter
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.changeColor
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
 import at.hannibal2.skyhanni.utils.ComponentSpan
@@ -34,7 +35,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
  * Listening to the player chat events, and applying custom chat options to them.
  * E.g. part order, rank hider, etc
  */
-class PlayerNameFormatter {
+@SkyHanniModule
+object PlayerNameFormatter {
     private val config get() = SkyHanniMod.feature.chat.playerMessage
 
     private val patternGroup = RepoPattern.group("data.chat.player.name")
@@ -85,7 +87,7 @@ class PlayerNameFormatter {
         if (!isEnabled()) return
         event.chatComponent = StringUtils.replaceIfNeeded(
             event.chatComponent,
-            Text.text("§bCo-Op > ") {
+            Text.text("§bCo-op > ") {
                 appendSibling(nameFormat(event.authorComponent))
                 appendText("§f: ")
                 appendSibling(event.messageComponent.intoComponent())

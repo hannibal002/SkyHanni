@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
@@ -7,10 +8,13 @@ import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -18,16 +22,23 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object FishingAPI {
+
+    private val trophyArmorNames by RepoPattern.pattern(
+        "fishing.trophyfishing.armor",
+        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+    )
 
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
     private val waterBlocks = listOf(Blocks.water, Blocks.flowing_water)
@@ -43,17 +54,17 @@ object FishingAPI {
     var bobber: EntityFishHook? = null
     var bobberHasTouchedWater = false
 
-    @SubscribeEvent
-    fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !holdingRod) return
-        val entity = event.entity ?: return
-        if (entity !is EntityFishHook) return
-        if (entity.angler != Minecraft.getMinecraft().thePlayer) return
+    var wearingTrophyArmor = false
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
+        if (!holdingRod) return
+        if (event.entity.angler != Minecraft.getMinecraft().thePlayer) return
 
         lastCastTime = SimpleTimeMark.now()
-        bobber = entity
+        bobber = event.entity
         bobberHasTouchedWater = false
-        FishingBobberCastEvent(entity).postAndCatch()
+        FishingBobberCastEvent(event.entity).postAndCatch()
     }
 
     private fun resetBobber() {
@@ -69,6 +80,11 @@ object FishingAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
+        if (event.isMod(5)) {
+            wearingTrophyArmor = isWearingTrophyArmor()
+        }
+
         val bobber = bobber ?: return
         if (bobber.isDead) {
             resetBobber()
@@ -90,7 +106,7 @@ object FishingAPI {
 
     fun NEUInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
+    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @SubscribeEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
@@ -103,8 +119,8 @@ object FishingAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        lavaRods = data.lava_fishing_rods
-        waterRods = data.water_fishing_rods
+        lavaRods = data.lavaFishingRods
+        waterRods = data.waterFishingRods
     }
 
     private fun getAllowedBlocks() = if (holdingLavaRod) lavaBlocks else waterBlocks
@@ -144,5 +160,9 @@ object FishingAPI {
             return 2
         }
         return 1
+    }
+
+    private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
+        trophyArmorNames.matches(it?.getInternalName()?.asString())
     }
 }

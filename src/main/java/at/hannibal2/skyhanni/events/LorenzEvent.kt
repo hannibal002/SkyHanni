@@ -1,23 +1,26 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.EventCounter
 import at.hannibal2.skyhanni.mixins.hooks.getValue
 import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.mixins.transformers.AccessorEventBus
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.launchwrapper.Launch
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.IEventListener
 
+@Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
 abstract class LorenzEvent : Event() {
 
     private val eventName by lazy {
         this::class.simpleName!!
     }
 
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postAndCatch() = postAndCatchAndBlock {}
 
     companion object {
@@ -27,9 +30,10 @@ abstract class LorenzEvent : Event() {
                 return 0
             }
         }
-        val isInGuardedEventHandler get() = eventHandlerDepth > 0 || LorenzUtils.isInDevEnvironment()
+        val isInGuardedEventHandler get() = eventHandlerDepth > 0 || PlatformUtils.isDevEnvironment
     }
 
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postAndCatchAndBlock(
         printError: Boolean = true,
         stopOnFirstError: Boolean = false,
@@ -58,7 +62,11 @@ abstract class LorenzEvent : Event() {
         eventHandlerDepth--
         if (errors > visibleErrors) {
             val hiddenErrors = errors - visibleErrors
-            ChatUtils.error("$hiddenErrors more errors in $eventName are hidden!")
+            ChatUtils.chat(
+                Text.text(
+                    "§c[SkyHanni-${SkyHanniMod.version}] $hiddenErrors more errors in $eventName are hidden!",
+                ),
+            )
         }
         return if (isCancelable) isCanceled else false
     }
@@ -68,9 +76,10 @@ abstract class LorenzEvent : Event() {
         return listenerList.getListeners(accessorEventBus.busId)
     }
 
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
 
-    // TODO let walker use this function for all 101 other uses
+    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun cancel() {
         isCanceled = true
     }

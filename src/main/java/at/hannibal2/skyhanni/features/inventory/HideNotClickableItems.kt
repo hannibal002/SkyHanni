@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
@@ -12,7 +13,8 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
@@ -31,31 +33,32 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
-class HideNotClickableItems {
+@SkyHanniModule
+object HideNotClickableItems {
 
     private val config get() = SkyHanniMod.feature.inventory.hideNotClickable
 
     private var hideReason = ""
     private var showGreenLine = false
 
-    private var lastClickTime = 0L
-    private var bypassUntil = 0L
+    private var lastClickTime = SimpleTimeMark.farPast()
 
     private val hideNpcSellFilter = MultiFilter()
     private val hideInStorageFilter = MultiFilter()
@@ -73,10 +76,10 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
-        hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
-        hideInStorageFilter.load(hideNotClickable.hide_in_storage)
-        hidePlayerTradeFilter.load(hideNotClickable.hide_player_trade)
-        notAuctionableFilter.load(hideNotClickable.not_auctionable)
+        hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
+        hideInStorageFilter.load(hideNotClickable.hideInStorage)
+        hidePlayerTradeFilter.load(hideNotClickable.hidePlayerTrade)
+        notAuctionableFilter.load(hideNotClickable.notAuctionable)
         updateSalvageList(hideNotClickable.salvage)
     }
 
@@ -95,8 +98,8 @@ class HideNotClickableItems {
     @SubscribeEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        if (isDisabled()) return
-        if (bypasssActive()) return
+        if (!isEnabled()) return
+        if (bypassActive()) return
         if (event.gui !is GuiChest) return
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
@@ -112,10 +115,9 @@ class HideNotClickableItems {
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: ItemTooltipEvent) {
-        if (isDisabled()) return
-        if (event.toolTip == null) return
-        if (bypasssActive()) return
+    fun onTooltip(event: LorenzToolTipEvent) {
+        if (!isEnabled()) return
+        if (bypassActive()) return
 
         val guiChest = Minecraft.getMinecraft().currentScreen
         if (guiChest !is GuiChest) return
@@ -132,10 +134,10 @@ class HideNotClickableItems {
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
-                ChatUtils.error("No hide reason for not clickable item!")
+                ErrorManager.skyHanniError("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
-                if (config.itemsBypass) {
+                if (config.itemsBypass && !hideReason.contains("SkyBlock Menu")) {
                     event.toolTip.add("  §7(Bypass by holding the ${KeyboardManager.getModifierKeyName()} key)")
                 }
             }
@@ -144,9 +146,9 @@ class HideNotClickableItems {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (isDisabled()) return
+        if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
-        if (bypasssActive()) return
+        if (bypassActive()) return
         if (event.gui !is GuiChest) return
         val chestName = InventoryUtils.openInventoryName()
 
@@ -158,22 +160,16 @@ class HideNotClickableItems {
         val stack = slot.stack
 
         if (hide(chestName, stack)) {
-            event.isCanceled = true
+            event.cancel()
 
-            if (System.currentTimeMillis() > lastClickTime + 5_000) {
-                lastClickTime = System.currentTimeMillis()
+            if (lastClickTime.passedSince() > 5.seconds) {
+                lastClickTime = SimpleTimeMark.now()
             }
             return
         }
     }
 
-    private fun bypasssActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown()
-
-    private fun isDisabled(): Boolean {
-        if (bypassUntil > System.currentTimeMillis()) return true
-
-        return !config.items
-    }
+    private fun bypassActive() = config.itemsBypass && KeyboardManager.isModifierKeyDown()
 
     private fun hide(chestName: String, stack: ItemStack): Boolean {
         hideReason = ""
@@ -440,7 +436,7 @@ class HideNotClickableItems {
             return true
         }
 
-        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy") return false
+        if (stack.cleanName() == "Green Candy" || stack.cleanName() == "Purple Candy" || stack.cleanName() == "Dark Candy") return false
 
         hideReason = "This item is not a spooky candy!"
         return true
@@ -602,6 +598,8 @@ class HideNotClickableItems {
         if (result) hideReason = "This item cannot be auctioned!"
         return result
     }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.items
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

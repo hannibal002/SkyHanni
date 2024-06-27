@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -15,6 +16,7 @@ import net.minecraftforge.fml.common.gameevent.TickEvent
 import net.minecraftforge.fml.common.gameevent.TickEvent.RenderTickEvent
 import java.awt.Color
 
+@SkyHanniModule
 object RenderableTooltips {
 
     private var tooltip: DeferredTooltip? = null
@@ -73,7 +75,7 @@ object RenderableTooltips {
         RenderHelper.disableStandardItemLighting()
         GlStateManager.enableDepth()
 
-        val zLevel = 300f
+        val zLevel = 400f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
         RenderUtils.drawGradientRect(
