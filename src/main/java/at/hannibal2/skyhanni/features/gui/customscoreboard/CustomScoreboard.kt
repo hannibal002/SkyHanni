@@ -40,7 +40,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -214,7 +213,7 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        DelayedRun.runNextTick { updateIslandEntries() }
+        updateIslandEntries()
     }
 
     private fun updateIslandEntries() {
