@@ -13,9 +13,11 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
@@ -43,17 +45,27 @@ object DungeonHighlightClickedBlocks {
         colorIndex = id
         return colors[colorIndex]
     }
+    
+    private val patternGroup = RepoPattern.group ("dungeons.highlightclickedblock")
+    private val leverPattern by patternGroup.pattern(
+        "lever",
+        "§cYou hear the sound of something opening...",
+    )
+    private val lockedPattern by patternGroup.pattern(
+        "locked",
+        "§cThat chest is locked!",
+    )
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (event.message == "§cYou hear the sound of something opening...") {
+        if (leverPattern.matches(event.message)) {
             event.blockedReason = "dungeon_highlight_clicked_block"
         }
 
-        if (event.message == "§cThat chest is locked!") {
-            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color = config.lockedChestColor.toChromaColor()
+        if (lockedPattern.matches(event.message)) {
+            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.colour = config.lockedChestColour.toChromaColor()
         }
     }
 
