@@ -9,53 +9,53 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HighlightClickedBlocksConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.")
+    @ConfigOption(name = "Enabled", desc = "Highlight levers, chests, and wither essence when clicked in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Chest Colour", desc = "Colour of clicked chests")
+    @ConfigOption(name = "Chest Color", desc = "Color of clicked chests.")
     @ConfigEditorColour
-    public String chestColour = "0:178:85:255:85";
+    public String chestColor = "0:178:85:255:85";
 
     @Expose
-    @ConfigOption(name = "Trapped Chest Colour", desc = "Colour of clicked trapped chests")
+    @ConfigOption(name = "Trapped Chest Color", desc = "Color of clicked trapped chests.")
     @ConfigEditorColour
-    public String trappedChestColour = "0:178:0:170:0";
+    public String trappedChestColor = "0:178:0:170:0";
 
     @Expose
-    @ConfigOption(name = "Locked Chest Colour", desc = "Colour of clicked locked chests")
+    @ConfigOption(name = "Locked Chest Color", desc = "Color of clicked locked chests.")
     @ConfigEditorColour
-    public String lockedChestColour = "0:178:255:85:85";
+    public String lockedChestColor = "0:178:255:85:85";
 
     @Expose
-    @ConfigOption(name = "Wither Essence Colour", desc = "Colour of clicked wither essence")
+    @ConfigOption(name = "Wither Essence Color", desc = "Color of clicked wither essence.")
     @ConfigEditorColour
-    public String witherEssenceColour = "0:178:255:85:255";
+    public String witherEssenceColor = "0:178:255:85:255";
 
     @Expose
-    @ConfigOption(name = "Lever Colour", desc = "Colour of clicked levers")
+    @ConfigOption(name = "Lever Color", desc = "Color of clicked levers.")
     @ConfigEditorColour
-    public String leverColour = "0:178:255:255:85";
+    public String leverColor = "0:178:255:255:85";
 
     @Expose
-    @ConfigOption(name = "Show Text", desc = "If enabled shows a text telling you what you clicked with the highlight.")
+    @ConfigOption(name = "Show Text", desc = "Shows a text saying what you clicked with the highlight.")
     @ConfigEditorBoolean
-    public boolean showTextEnabled = true;
+    public boolean showText = true;
 
     @Expose
-    @ConfigOption(name = "Random Colour", desc = "If enabled makes the colours random.")
+    @ConfigOption(name = "Random Color", desc = "If enabled makes the colors random.")
     @ConfigEditorBoolean
-    public boolean randomColourEnabled = false;
+    public boolean randomColor = false;
 
-    @ConfigOption(name = "Reset Colours", desc = "Resets the colours of the highlights to default ones.")
+    @ConfigOption(name = "Reset Colors", desc = "Resets the colors of the highlights to default ones.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable reset = () -> {
-        chestColour = "0:178:85:255:85";
-        trappedChestColour = "0:178:0:170:0";
-        lockedChestColour = "0:178:255:85:85";
-        witherEssenceColour = "0:178:255:85:255";
-        leverColour = "0:178:255:255:85";
+        chestColor = "0:178:85:255:85";
+        trappedChestColor = "0:178:0:170:0";
+        lockedChestColor = "0:178:255:85:85";
+        witherEssenceColor = "0:178:255:85:255";
+        leverColor = "0:178:255:255:85";
     };
 }
