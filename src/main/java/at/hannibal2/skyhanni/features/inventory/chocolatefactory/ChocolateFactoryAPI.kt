@@ -163,7 +163,7 @@ object ChocolateFactoryAPI {
     fun timeTowerChargeDuration() =
         if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
 
-    private fun timeTowerMultiplier(): Double {
+    fun timeTowerMultiplier(): Double {
         var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1
         if (HoppityCollectionStats.hasFoundRabbit("Mu")) multiplier += 0.7
         return multiplier
