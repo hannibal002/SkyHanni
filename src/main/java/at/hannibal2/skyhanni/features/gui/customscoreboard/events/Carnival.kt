@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 // scoreboard
+// scoreboard update event
 object Carnival : ScoreboardEvent() {
 
     private val patterns = listOf(

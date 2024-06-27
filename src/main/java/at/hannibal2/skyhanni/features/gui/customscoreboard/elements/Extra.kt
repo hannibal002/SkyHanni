@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.amountOfUnknownLines
 import at.hannibal2.skyhanni.features.gui.customscoreboard.unconfirmedUnknownLines
 
 // internal
+// can just be called from unknown lines handler
 object Extra : ScoreboardElement() {
     override fun getDisplay(): Any? {
         if (unconfirmedUnknownLines.isEmpty()) return null

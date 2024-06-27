@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 // scoreboard
+// scoreboard update event
 object Objective : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val objective = ScoreboardPattern.objectivePattern.firstMatches(ScoreboardData.sidebarLinesFormatted) ?: return@buildList

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 // internal
+// 1s timer
 object FlightDuration : ScoreboardEvent() {
     override fun getDisplay() = "Flight Duration: §a${FlightDurationAPI.flightDuration.format(maxUnits = 2)}"
 

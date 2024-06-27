@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 
 // internal and item in hand
+// quiver update event and item in hand event
 object Quiver : ScoreboardElement() {
     override fun getDisplay(): String {
         val currentArrow = QuiverAPI.currentArrow ?: return "§cChange your Arrow once"

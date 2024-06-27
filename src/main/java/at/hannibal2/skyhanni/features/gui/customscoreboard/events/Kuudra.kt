@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 // scoreboard
+// scoreboard update event
 object Kuudra : ScoreboardEvent() {
 
     private val patterns = listOf(

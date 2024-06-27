@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.disp
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
 
 // internal
+// update on config load
 object Footer : ScoreboardElement() {
     override fun getDisplay() = listOf(
         displayConfig.titleAndFooter.customFooter

@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
 
 // tablist
+// tablist update event (maybe possible with widgets)
 object PlayerAmount : ScoreboardElement() {
     override fun getDisplay(): String {
         val max = if (displayConfig.showMaxIslandPlayers) {

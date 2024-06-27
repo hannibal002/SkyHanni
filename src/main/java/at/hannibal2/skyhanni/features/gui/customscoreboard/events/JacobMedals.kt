@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 // scoreboard
+// scoreboard update event
 object JacobMedals : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.medalsPattern.allMatches(getSbLines())
 

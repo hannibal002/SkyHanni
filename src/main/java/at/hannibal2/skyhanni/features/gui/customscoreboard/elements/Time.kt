@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 
 // internal and scoreboard
+// 1s update
 object Time : ScoreboardElement() {
     override fun getDisplay(): String {
         val symbol = getGroup(ScoreboardPattern.timePattern, ScoreboardData.sidebarLinesFormatted, "symbol") ?: ""

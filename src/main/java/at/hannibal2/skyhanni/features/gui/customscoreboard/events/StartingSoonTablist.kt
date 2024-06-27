@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 
 // widget
+// widget update event
 object StartingSoonTablist : ScoreboardEvent() {
     override fun getDisplay(): List<String>? {
         val name = getTablistEvent() ?: return null

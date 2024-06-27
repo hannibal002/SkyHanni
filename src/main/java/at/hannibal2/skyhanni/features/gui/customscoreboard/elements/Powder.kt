@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.info
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNumber
 
 // internal
+// 1s internal while on mining islands?
 object Powder : ScoreboardElement() {
     override fun getDisplay() = buildList {
         val powderTypes = HotmAPI.Powder.entries

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.curr
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 
 // everything
+// extensive list of things that can update this
 object Events : ScoreboardElement() {
     override fun getDisplay() =
         if (eventsConfig.showAllActiveEvents) currentIslandEvents.mapNotNull { it.getLinesOrNull() }.flatten()

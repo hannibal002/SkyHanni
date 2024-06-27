@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getCopper
 
 // scoreboard
+// scoreboard update event
 object Copper : ScoreboardElement() {
     override fun getDisplay(): String? {
         val copper = formatStringNum(getCopper())

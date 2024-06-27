@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
 
 // scoreboard
+// scoreboard update event
 object NorthStars : ScoreboardElement() {
     override fun getDisplay(): String? {
         val northStars = formatStringNum(getNorthStars())

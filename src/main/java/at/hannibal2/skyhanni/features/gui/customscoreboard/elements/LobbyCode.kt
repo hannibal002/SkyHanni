@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 
 // internal
+// update on island change and every second while in dungeons
 object LobbyCode : ScoreboardElement() {
     override fun getDisplay(): String? {
         val lobbyCode = HypixelData.serverId ?: return null

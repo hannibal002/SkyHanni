@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 // scoreboard
+// scoreboard update event
 object MagmaBoss : ScoreboardEvent() {
 
     private val patterns = listOf(

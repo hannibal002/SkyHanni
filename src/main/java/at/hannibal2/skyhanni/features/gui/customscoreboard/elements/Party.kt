@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 // internal
+// add party update event
 object Party : ScoreboardElement() {
     override fun getDisplay() = buildList {
         if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList

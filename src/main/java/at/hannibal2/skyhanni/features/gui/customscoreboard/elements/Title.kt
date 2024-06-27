@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Compan
 import at.hannibal2.skyhanni.utils.LorenzUtils
 
 // internal and scoreboard
+// config change event or scoreboard update event
 object Title : ScoreboardElement() {
     override fun getDisplay(): Any {
         val alignment = displayConfig.titleAndFooter.alignTitleAndFooter

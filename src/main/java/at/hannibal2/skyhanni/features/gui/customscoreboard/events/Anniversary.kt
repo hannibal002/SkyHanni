@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 // scoreboard
+// scoreboard update event
 object Anniversary : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.anniversaryPattern.firstMatches(getSbLines())
 

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.allMatches
 
 // scoreboard
+// scoreboard update event
 object Damage : ScoreboardEvent() {
 
     private val patterns = listOf(
