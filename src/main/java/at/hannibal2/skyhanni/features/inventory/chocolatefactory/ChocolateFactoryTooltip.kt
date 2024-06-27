@@ -44,6 +44,7 @@ object ChocolateFactoryTooltip {
     }
 
     private fun chocPerTimeTower(): Int {
+        val profileStorage = profileStorage ?: return 0
         val amountPerSecond = profileStorage.rawChocPerSecond * ChocolateFactoryAPI.timeTowerMultiplier()
         val amountPerHour = amountPerSecond * 60 * 60
         return amountPerHour.toInt()
