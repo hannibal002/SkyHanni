@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.FarmingContestEvent
@@ -57,6 +58,11 @@ object JacobContestStatsSummary {
             }
         }
         blocksBroken = 0
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(52, "garden.config", "garden.config.contestSummaryConfig")
     }
 
     private fun getBlocksPerSecondColor(blocksPerSecond: Double) = when {
