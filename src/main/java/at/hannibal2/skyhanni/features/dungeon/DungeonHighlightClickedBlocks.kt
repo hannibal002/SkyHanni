@@ -44,16 +44,16 @@ object DungeonHighlightClickedBlocks {
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
 
     private var colorIndex = 0
-
-    private val ignoredColors = listOf(
-        LorenzColor.BLACK,
-        LorenzColor.WHITE,
-        LorenzColor.CHROMA,
-        LorenzColor.GRAY,
-        LorenzColor.DARK_GRAY,
-    )
-
-    private val allowedColors by lazy { LorenzColor.entries.filter { it !in ignoredColors } }
+    private val allowedColors by lazy {
+        val ignoredColors = listOf(
+            LorenzColor.BLACK,
+            LorenzColor.WHITE,
+            LorenzColor.CHROMA,
+            LorenzColor.GRAY,
+            LorenzColor.DARK_GRAY,
+        )
+        LorenzColor.entries.filter { it !in ignoredColors }
+    }
 
     private fun getRandomColor(): Color {
         var id = colorIndex + 1
@@ -73,7 +73,7 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color = config.lockedChestColor.toChromaColor()
+            blocks.lastOrNull { it.value.isChest }?.value?.color = config.lockedChestColor.toChromaColor()
         }
     }
 
@@ -81,9 +81,7 @@ object DungeonHighlightClickedBlocks {
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
-
         val position = event.position
-        if (blocks.containsKey(position)) return
 
         val type = when (position.getBlockAt()) {
             Blocks.chest -> ClickedBlockType.CHEST
@@ -102,7 +100,7 @@ object DungeonHighlightClickedBlocks {
 
         val color = if (config.randomColor) getRandomColor() else type.color()
         val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + type.display
-        blocks[position] = ClickedBlock(displayText, color)
+        blocks[position] = ClickedBlock(displayText, color, type.isChest)
     }
 
     private enum class ClickedBlockType(val display: String, val color: () -> Color) {
@@ -110,6 +108,9 @@ object DungeonHighlightClickedBlocks {
         CHEST("Chest", { config.chestColor.toChromaColor() }),
         TRAPPED_CHEST("Trapped Chest", { config.trappedChestColor.toChromaColor() }),
         WITHER_ESSENCE("Wither Essence", { config.witherEssenceColor.toChromaColor() }),
+        ;
+
+        val isChest get() = this == CHEST || this == TRAPPED_CHEST
     }
 
     @SubscribeEvent
@@ -129,8 +130,8 @@ object DungeonHighlightClickedBlocks {
         event.move(52, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }
 
-    private class ClickedBlock(val displayText: String, var color: Color)
+    private class ClickedBlock(val displayText: String, var color: Color, val isChest: Boolean)
 
-    fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
+    private fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
 
 }
