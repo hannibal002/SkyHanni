@@ -1,21 +1,26 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo.neu;
+package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 
+import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import net.minecraft.item.Item
 
-data class NeuReforgeStoneJson(
-    @Expose val internalName: NEUInternalName,
+data class NeuReforgeJson(
+    @Expose val internalName: NEUInternalName?,
     @Expose val reforgeName: String,
     @Expose @SerializedName("itemTypes") val rawItemTypes: Any,
     @Expose val requiredRarities: List<LorenzRarity>,
-    @Expose val reforgeCosts: Map<LorenzRarity, Long>,
-    @Expose val reforgeStats: Map<LorenzRarity, Map<String, Double>>,
+    @Expose val reforgeCosts: Map<LorenzRarity, Long>?,
+    @Expose val reforgeStats: Map<LorenzRarity, SkyblockStatList>?,
     @Expose @SerializedName("reforgeAbility") val rawReforgeAbility: Any?,
 ) {
 
     private lateinit var reforgeAbilityField: Map<LorenzRarity, String>
+    private lateinit var itemTypeField: Pair<String, List<NEUInternalName>>
 
     val reforgeAbility
         get() = if (this::reforgeAbilityField.isInitialized) reforgeAbilityField
@@ -27,7 +32,7 @@ data class NeuReforgeStoneJson(
 
                 is Map<*, *> -> (this.rawReforgeAbility as? Map<String, String>)?.mapKeys {
                     LorenzRarity.valueOf(
-                        it.key.uppercase().replace(" ", "_")
+                        it.key.uppercase().replace(" ", "_"),
                     )
                 } ?: emptyMap()
 
@@ -36,28 +41,27 @@ data class NeuReforgeStoneJson(
             reforgeAbilityField
         }
 
-    /* used in ReforgeAPI which isn't in beta yet
-        val itemType: Pair<String, List<NEUInternalName>> by lazy {
+    val itemType: Pair<String, List<NEUInternalName>>
+        get() = if (this::itemTypeField.isInitialized) itemTypeField
+        else run {
             val any = this.rawItemTypes
-            return@lazy when (any) {
+            return when (any) {
                 is String -> {
                     any.replace("/", "_AND_").uppercase() to emptyList()
                 }
 
                 is Map<*, *> -> {
                     val type = "SPECIAL_ITEMS"
-                    val map = any as? Map<String, List<String>> ?: return@lazy type to emptyList()
+                    val map = any as? Map<String, List<String>> ?: return type to emptyList()
                     val internalNames = map["internalName"]?.map { it.asInternalName() } ?: emptyList()
                     val itemType = map["itemid"]?.map {
                         NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
-                    }?.flatten()
-                        ?: emptyList()
+                    }?.flatten() ?: emptyList()
                     type to (internalNames + itemType)
                 }
 
                 else -> throw IllegalStateException()
             }
         }
-*/
 }
 

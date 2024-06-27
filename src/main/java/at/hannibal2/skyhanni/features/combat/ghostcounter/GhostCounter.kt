@@ -321,10 +321,11 @@ object GhostCounter {
             notifyCTModule = false
             if (isUsingCTGhostCounter()) {
                 ChatUtils.clickableChat(
-                    "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data ? Click here to import data",
+                    "GhostCounterV3 ChatTriggers module has been detected, do you want to import saved data? Click here to import data",
                     onClick = {
                         GhostUtil.importCTGhostCounterData()
                     },
+                    "§eClick to import data!",
                     prefixColor = "§6",
                     oneTimeClick = true
                 )

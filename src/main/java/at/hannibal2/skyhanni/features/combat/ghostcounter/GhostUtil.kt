@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.features.combat.ghostcounter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import io.github.moulberry.notenoughupdates.util.Utils
 import java.io.FileReader
 
@@ -85,7 +86,7 @@ object GhostUtil {
             c.ctDataImported = true
             ChatUtils.chat("§aImported data successfully!")
         } else
-            ChatUtils.error("GhostCounterV3 ChatTriggers module not found!")
+            ErrorManager.skyHanniError("GhostCounterV3 ChatTriggers module not found!")
     }
 
     fun String.formatText(option: GhostData.Option) = formatText(option.getInt(), option.getInt(true))
@@ -132,7 +133,7 @@ object GhostUtil {
                 if (GhostCounter.config.showMax) GhostCounter.bestiaryCurrentKill.addSeparators() else currentKill.addSeparators()
             )
                 .replace("%percentNumber%", percent(GhostCounter.bestiaryCurrentKill.toDouble()))
-                .replace("%killNeeded%", NumberUtil.format(killNeeded))
+                .replace("%killNeeded%", killNeeded.shortFormat())
                 .replace("%currentLevel%", currentLevel)
                 .replace("%nextLevel%", nextLevel)
                 .replace("&", "§")
