@@ -22,6 +22,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PurseHistory {
 
+    private val config get() = SkyHanniMod.feature.misc.dataHistory
+
     var lastSave = SimpleTimeMark.farPast()
     var lastPrice = 0.0
 
@@ -33,15 +35,13 @@ object PurseHistory {
         if (!isEnabled()) return
         if (!event.repeatSeconds(5)) return
 
-        val purse = purse()
+        val purse = (PurseAPI.currentPurse / 1.million).round(2)
         val change = lastPrice != purse
         val interval = if (change) 20.seconds else 20.minutes
         if (lastSave.passedSince() > interval) {
             save(purse)
         }
     }
-
-    fun purse() = (PurseAPI.currentPurse / 1.million).round(2)
 
     private fun save(purse: Double) {
         val dataPoints = dataPoints ?: return
@@ -64,9 +64,22 @@ object PurseHistory {
         return currentTime.atZone(currentZone).format(formatter)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.dataHistory.purse
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.purse
 
     fun onCommand() {
+        if (!LorenzUtils.inSkyBlock) {
+            ChatUtils.userError("Only available on SkyBlock!")
+            return
+        }
+        if (!config.purse) {
+            ChatUtils.chatAndOpenConfig(
+                "§cPurse history is disabled!",
+                config::purse,
+            )
+            return
+        }
+
+
         val dataPoints = dataPoints
         if (dataPoints == null) {
             ErrorManager.logErrorStateWithData(
