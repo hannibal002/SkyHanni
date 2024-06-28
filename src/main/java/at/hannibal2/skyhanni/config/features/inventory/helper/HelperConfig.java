@@ -73,7 +73,7 @@ public class HelperConfig {
 
         @Expose
         @ConfigLink(owner = EnchantingConfig.class, field = "experimentationTableDisplay")
-        public Position informationDisplayPosition = new Position(0, 200, true, true);
+        public Position informationDisplayPosition = new Position(-220, 70, false, true);
 
         @Expose
         @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
