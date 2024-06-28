@@ -453,6 +453,7 @@ object HypixelData {
             newIsland = getIslandType(foundIsland, guesting)
         }
 
+        // TODO dont send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != newIsland) {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
