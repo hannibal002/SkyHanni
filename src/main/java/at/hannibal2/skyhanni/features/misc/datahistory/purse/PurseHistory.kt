@@ -82,7 +82,6 @@ object PurseHistory {
             return
         }
 
-
         val dataPoints = dataPoints
         if (dataPoints == null) {
             ErrorManager.logErrorStateWithData(
