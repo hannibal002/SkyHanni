@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc.purse
+package at.hannibal2.skyhanni.features.misc.datahistory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import kotlinx.coroutines.launch
