@@ -40,7 +40,7 @@ object AttributeOverlay {
         index: Int,
     ) {
         val scale = 0.5714286f
-        val color = if (goodRoll) "§c" else "§b"
+        val color = if (goodRoll) "§e" else "§b"
         val attributeString = color + attribute.type.shortName
         val attributeWidth = attributeString.width()
         val attributeX = x + attributeWidth + (if (index == 1) 16 - attributeWidth * scale else 0).toInt()
