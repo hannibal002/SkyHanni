@@ -131,6 +131,9 @@ dependencies {
     testImplementation("io.mockk:mockk:1.12.5")
 
     implementation("net.hypixel:mod-api:0.3.1")
+
+    // Chart Rendering
+    implementation("org.jfree:jfreechart:1.5.3")
 }
 
 configurations.getByName("minecraftNamed").dependencies.forEach {
