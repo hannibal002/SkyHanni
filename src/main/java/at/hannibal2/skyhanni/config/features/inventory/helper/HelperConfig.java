@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.config.features.inventory.helper;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HelperConfig {
@@ -64,6 +66,16 @@ public class HelperConfig {
 
     public static class EnchantingConfig {
         @Expose
+        @ConfigOption(name = "Experimentation Table Display", desc = "Shows a display with useful information for the experimentation table while doing experiments.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean experimentationTableDisplay = false;
+
+        @Expose
+        @ConfigLink(owner = EnchantingConfig.class, field = "experimentationTableDisplay")
+        public Position informationDisplayPosition = new Position(0, 200, true, true);
+
+        @Expose
         @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
         @ConfigEditorBoolean
         @FeatureToggle
@@ -76,4 +88,27 @@ public class HelperConfig {
         public boolean ultraRareBookAlert = false;
     }
 
+    public enum Experiments {
+        NONE("", 0),
+        BEGINNER("Beginner", 14),
+        HIGH("High", 20),
+        GRAND("Grand", 20),
+        SUPREME("Supreme", 28),
+        TRANSCENDENT("Transcendent", 28),
+        METAPHYSICAL("Metaphysical", 28),
+        ;
+
+        public final String name;
+        public final int gridSize;
+
+        Experiments(String name, int gridSize) {
+            this.name = name;
+            this.gridSize = gridSize;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 }
