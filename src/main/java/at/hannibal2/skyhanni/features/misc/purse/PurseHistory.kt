@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.Gson
-import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -77,12 +76,10 @@ object PurseHistory {
             return
         }
 
-        SkyHanniMod.coroutineScope.launch {
-            TimeChartRenderer.openTimeChart(
-                dataPoints,
-                title = "Purse History",
-                label = "Coins (Millions)",
-            )
-        }
+        TimeChartRenderer.openTimeChart(
+            dataPoints,
+            title = "Purse History",
+            label = "Coins (Millions)",
+        )
     }
 }

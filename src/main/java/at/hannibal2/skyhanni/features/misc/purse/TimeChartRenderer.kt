@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.purse
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import kotlinx.coroutines.launch
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartFrame
 import org.jfree.chart.JFreeChart
@@ -17,8 +19,10 @@ import java.util.Date
 
 object TimeChartRenderer {
     fun openTimeChart(dataPoints: List<DataPoint>, title: String, label: String) {
-        val chart = createAndFormatChart(title, dataPoints, label)
-        renderChart(title, chart)
+        SkyHanniMod.coroutineScope.launch {
+            val chart = createAndFormatChart(title, dataPoints, label)
+            renderChart(title, chart)
+        }
     }
 
     private fun renderChart(title: String, chart: JFreeChart) {
