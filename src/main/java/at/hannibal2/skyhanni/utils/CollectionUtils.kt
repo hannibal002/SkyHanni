@@ -264,13 +264,9 @@ object CollectionUtils {
 
     fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
 
-    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean {
-        return this.toSet() == other.toSet()
-    }
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
 
-    fun <T> Pair<T, T>.toSet(): Set<T> {
-        return setOf(this.first, this.second)
-    }
+    fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
 
     // TODO add cache
     fun MutableList<Renderable>.addString(
