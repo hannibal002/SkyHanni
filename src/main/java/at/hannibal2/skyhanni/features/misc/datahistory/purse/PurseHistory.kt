@@ -26,8 +26,9 @@ object PurseHistory {
 
     private val config get() = SkyHanniMod.feature.misc.dataHistory
 
-    var lastSave = SimpleTimeMark.farPast()
+    // no need to handle profile switch here. Instead, this updates the history on profile switch.
     var lastPrice = 0.0
+    var lastSave = SimpleTimeMark.farPast()
 
     val dataPoints: MutableList<DataPoint>?
         get() = ProfileStorageData.profileSpecific?.historyData?.purse
