@@ -22,7 +22,7 @@ object ExperimentationTableDisplay {
     private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
 
     private var display = emptyList<String>()
-    private const val startSlot = 9
+    private val startSlot = 9
 
     private var uncoveredItems = mutableMapOf<Int, String>()
     private var possiblePairs = 0
