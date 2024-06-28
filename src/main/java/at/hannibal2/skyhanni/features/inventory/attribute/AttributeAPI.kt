@@ -15,7 +15,7 @@ import java.util.regex.Pattern
 @SkyHanniModule
 object AttributeAPI {
 
-    var goodRolls = listOf<GoodRollItem>()
+    private var goodRolls = listOf<GoodRollItem>()
 
     enum class AttributeType(val displayName: String, val internalName: String, val shortName: String) {
         ARACHNO("Arachno", "arachno", "AR"),
@@ -61,6 +61,7 @@ object AttributeAPI {
         override fun toString() = displayName
 
         companion object {
+
             fun getByInternalNameOrNull(internalName: String) = entries.firstOrNull { it.internalName == internalName }
 
             fun getByInternalName(internalName: String) = getByInternalNameOrNull(internalName) ?: UNKNOWN
@@ -69,7 +70,7 @@ object AttributeAPI {
 
     data class Attribute(val type: AttributeType, val level: Int)
 
-    data class GoodRollItem(val regex: Pattern, val attributes: List<Pair<AttributeType, AttributeType>>)
+    private data class GoodRollItem(val regex: Pattern, val attributes: List<Pair<AttributeType, AttributeType>>)
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -82,9 +83,6 @@ object AttributeAPI {
                 first to second
             }
             GoodRollItem(regex, list)
-        }
-        goodRolls.forEach {
-            println("GoodRollItem(regex=${it.regex}, attributes=${it.attributes.joinToString(", ")})")
         }
     }
 

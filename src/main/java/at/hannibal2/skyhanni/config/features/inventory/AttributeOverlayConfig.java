@@ -9,7 +9,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class AttributeOverlayConfig {
@@ -23,45 +22,7 @@ public class AttributeOverlayConfig {
     @Expose
     @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown")
     @ConfigEditorDraggableList
-    public List<AttributeAPI.AttributeType> attributesList = new ArrayList<>(Arrays.asList(
-        AttributeAPI.AttributeType.ARACHNO,
-        AttributeAPI.AttributeType.ATTACK_SPEED,
-        AttributeAPI.AttributeType.BLAZING,
-        AttributeAPI.AttributeType.COMBO,
-        AttributeAPI.AttributeType.ELITE,
-        AttributeAPI.AttributeType.ENDER,
-        AttributeAPI.AttributeType.IGNITION,
-        AttributeAPI.AttributeType.LIFE_RECOVERY,
-        AttributeAPI.AttributeType.MANA_STEAL,
-        AttributeAPI.AttributeType.MIDAS_TOUCH,
-        AttributeAPI.AttributeType.UNDEAD,
-        AttributeAPI.AttributeType.WARRIOR,
-        AttributeAPI.AttributeType.DEADEYE,
-        AttributeAPI.AttributeType.ARACHNO_RESISTANCE,
-        AttributeAPI.AttributeType.BLAZING_RESISTANCE,
-        AttributeAPI.AttributeType.BREEZE,
-        AttributeAPI.AttributeType.DOMINANCE,
-        AttributeAPI.AttributeType.ENDER_RESISTANCE,
-        AttributeAPI.AttributeType.EXPERIENCE,
-        AttributeAPI.AttributeType.FORTITUDE,
-        AttributeAPI.AttributeType.LIFE_REGENERATION,
-        AttributeAPI.AttributeType.LIFELINE,
-        AttributeAPI.AttributeType.MAGIC_FIND,
-        AttributeAPI.AttributeType.MANA_POOL,
-        AttributeAPI.AttributeType.MANA_REGENERATION,
-        AttributeAPI.AttributeType.VITALITY,
-        AttributeAPI.AttributeType.SPEED,
-        AttributeAPI.AttributeType.UNDEAD_RESISTANCE,
-        AttributeAPI.AttributeType.VETERAN,
-        AttributeAPI.AttributeType.BLAZING_FORTUNE,
-        AttributeAPI.AttributeType.FISHING_EXPERIENCE,
-        AttributeAPI.AttributeType.INFECTION,
-        AttributeAPI.AttributeType.DOUBLE_HOOK,
-        AttributeAPI.AttributeType.FISHERMAN,
-        AttributeAPI.AttributeType.FISHING_SPEED,
-        AttributeAPI.AttributeType.HUNTER,
-        AttributeAPI.AttributeType.TROPHY_HUNTER
-    ));
+    public List<AttributeAPI.AttributeType> attributesList = new ArrayList<>(AttributeAPI.AttributeType.getEntries());
 
     @Expose
     @ConfigOption(
