@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.datahistory
 
+import ChartScreen
 import at.hannibal2.skyhanni.SkyHanniMod
 import kotlinx.coroutines.launch
+import net.minecraftforge.common.MinecraftForge
 import org.jfree.chart.ChartFactory
-import org.jfree.chart.ChartFrame
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.plot.XYPlot
@@ -21,14 +22,9 @@ object TimeChartRenderer {
     fun openTimeChart(dataPoints: List<DataPoint>, title: String, label: String) {
         SkyHanniMod.coroutineScope.launch {
             val chart = createAndFormatChart(title, dataPoints, label)
-            renderChart(title, chart)
-        }
-    }
-
-    private fun renderChart(title: String, chart: JFreeChart) {
-        ChartFrame("SkyHanni $title", chart).apply {
-            pack()
-            isVisible = true
+            val screen = ChartScreen(chart)
+            SkyHanniMod.screenToOpen = screen
+            MinecraftForge.EVENT_BUS.register(screen)
         }
     }
 
