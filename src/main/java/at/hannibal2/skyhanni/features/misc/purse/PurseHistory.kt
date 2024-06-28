@@ -78,7 +78,11 @@ object PurseHistory {
         }
 
         SkyHanniMod.coroutineScope.launch {
-            PurseChartRenderer.render(dataPoints)
+            TimeChartRenderer.openTimeChart(
+                dataPoints,
+                title = "Purse History",
+                label = "Coins (Millions)",
+            )
         }
     }
 }

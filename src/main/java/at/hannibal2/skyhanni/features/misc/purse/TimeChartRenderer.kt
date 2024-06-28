@@ -15,24 +15,24 @@ import java.text.NumberFormat
 import java.time.Instant
 import java.util.Date
 
-object PurseChartRenderer {
-    fun render(dataPoints: List<DataPoint>) {
-        val chart = createAndFormatChart(dataPoints)
-        renderChart(chart)
+object TimeChartRenderer {
+    fun openTimeChart(dataPoints: List<DataPoint>, title: String, label: String) {
+        val chart = createAndFormatChart(title, dataPoints, label)
+        renderChart(title, chart)
     }
 
-    private fun renderChart(chart: JFreeChart) {
-        ChartFrame("SkyHanni Purse History", chart).apply {
+    private fun renderChart(title: String, chart: JFreeChart) {
+        ChartFrame("SkyHanni $title", chart).apply {
             pack()
             isVisible = true
         }
     }
 
-    private fun createAndFormatChart(dataPoints: List<DataPoint>): JFreeChart {
-        val dataset = loadData(dataPoints)
+    private fun createAndFormatChart(title: String, dataPoints: List<DataPoint>, label: String): JFreeChart {
+        val dataset = loadData(title, dataPoints)
 
         val chart = ChartFactory.createTimeSeriesChart(
-            "Purse History", "Time", "Coins (Millions)", dataset, false, false, false,
+            title, "Time", label, dataset, false, false, false,
         )
 
         val plot = chart.plot as XYPlot
@@ -50,8 +50,8 @@ object PurseChartRenderer {
         return chart
     }
 
-    private fun loadData(dataPoints: List<DataPoint>): TimeSeriesCollection {
-        val series = TimeSeries("Purse History")
+    private fun loadData(title: String, dataPoints: List<DataPoint>): TimeSeriesCollection {
+        val series = TimeSeries(title)
         for (point in dataPoints) {
             series.add(Millisecond(Date.from(Instant.ofEpochMilli(point.time))), point.value)
         }
