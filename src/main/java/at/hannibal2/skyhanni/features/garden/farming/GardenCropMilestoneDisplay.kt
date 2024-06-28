@@ -319,7 +319,7 @@ object GardenCropMilestoneDisplay {
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(buildList {
             addCropIconRenderable(mushroom)
-            addString("§7Mushroom Tier $nextTier")
+            addString("§7Mushroom Milestone $nextTier")
         })
 
         lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.string("§e$haveFormat§8/§e$needFormat")
