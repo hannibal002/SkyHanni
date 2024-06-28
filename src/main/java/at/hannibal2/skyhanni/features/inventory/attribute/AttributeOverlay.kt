@@ -14,6 +14,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object AttributeOverlay {
 
+    private const val SCALE = 0.5714286f
+
     private val config get() = SkyHanniMod.feature.inventory.attributeOverlay
 
     @SubscribeEvent
@@ -39,19 +41,18 @@ object AttributeOverlay {
         goodRoll: Boolean,
         index: Int,
     ) {
-        val scale = 0.5714286f
         val color = if (goodRoll) "§e" else "§b"
         val attributeString = color + attribute.type.shortName
         val attributeWidth = attributeString.width()
-        val attributeX = x + attributeWidth + (if (index == 1) 16 - attributeWidth * scale else 0).toInt()
+        val attributeX = x + attributeWidth + (if (index == 1) 16 - attributeWidth * SCALE else 0).toInt()
         val attributeY = y
-        drawSlotText(attributeX, attributeY, attributeString, scale)
+        drawSlotText(attributeX, attributeY, attributeString, SCALE)
 
         val levelString = "§a${attribute.level}"
         val levelWidth = levelString.width()
-        val levelX = x + levelWidth + (if (index == 1) 16 - levelWidth * scale else 0).toInt()
-        val levelY = y + (10 * scale).toInt()
-        drawSlotText(levelX, levelY, levelString, scale)
+        val levelX = x + levelWidth + (if (index == 1) 16 - levelWidth * SCALE else 0).toInt()
+        val levelY = y + (10 * SCALE).toInt()
+        drawSlotText(levelX, levelY, levelString, SCALE)
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
