@@ -235,6 +235,5 @@ object ExperimentationTableDisplay {
         slot <= startSlot || slot >= startSlot + experiment.gridSize + 6
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.experimentationTableDisplay &&
-            InventoryUtils.openInventoryName().startsWith("Superpairs (")
+        LorenzUtils.inSkyBlock && config.experimentationTableDisplay && InventoryUtils.openInventoryName().startsWith("Superpairs (")
 }
