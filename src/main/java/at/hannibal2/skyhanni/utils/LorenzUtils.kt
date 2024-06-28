@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
+import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -57,7 +58,7 @@ object LorenzUtils {
     /**
      * Consider using [IslandType.isInIsland] instead
      */
-    val skyBlockIsland get() = HypixelData.skyBlockIsland
+    val skyBlockIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
@@ -90,6 +91,7 @@ object LorenzUtils {
 
     private var previousApril = false
 
+    // TODO move into lorenz logger. then rewrite lorenz logger and use something different entirely
     fun SimpleDateFormat.formatCurrentTime(): String = this.format(System.currentTimeMillis())
 
     // TODO move to string utils
@@ -130,10 +132,12 @@ object LorenzUtils {
     fun formatPercentage(percentage: Double, format: String?): String =
         DecimalFormat(format).format(percentage * 100).replace(',', '.') + "%"
 
+    // TODO move into chat utils
     fun consoleLog(text: String) {
         SkyHanniMod.consoleLog(text)
     }
 
+    // TODO move into crimson api
     fun getPointsForDojoRank(rank: String): Int {
         return when (rank) {
             "S" -> 1000
@@ -146,6 +150,7 @@ object LorenzUtils {
         }
     }
 
+    // TODO move into time utils
     fun getSBMonthByName(month: String): Int {
         var monthNr = 0
         for (i in 1..12) {
@@ -165,6 +170,7 @@ object LorenzUtils {
 
     fun getPlayer(): EntityPlayerSP? = Minecraft.getMinecraft()?.thePlayer
 
+    // TODO move into renderable utils
     fun fillTable(
         data: List<DisplayTableEntry>,
         padding: Int = 1,
@@ -203,6 +209,7 @@ object LorenzUtils {
         lines[index] = ChatComponentText(text.capAtMinecraftLength(91))
     }
 
+    // TODO move into string api
     fun colorCodeToRarity(colorCode: Char): String {
         return when (colorCode) {
             'f' -> "Common"
@@ -309,15 +316,20 @@ object LorenzUtils {
         }
     }
 
+    // TODO move into mayor api
     private val recalculateDerpy =
         RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
+    // TODO move into mayor api
     val isDerpy get() = recalculateDerpy.getValue()
 
+    // TODO move into mayor api
     fun Int.derpy() = if (isDerpy) this / 2 else this
 
+    // TODO move into mayor api
     fun Int.ignoreDerpy() = if (isDerpy) this * 2 else this
 
+    // TODO move into json api
     val JsonPrimitive.asIntOrNull get() = takeIf { it.isNumber }?.asInt
 
     fun sendTitle(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
@@ -356,6 +368,7 @@ object LorenzUtils {
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
+    // TODO move into Mining API
     fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() ||
         IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
 
@@ -374,6 +387,7 @@ object LorenzUtils {
         return !lastGuiTime.isInPast()
     }
 
+    // TODO move into location utils
     fun AxisAlignedBB.getCorners(y: Double): List<LorenzVec> {
         val cornerOne = LorenzVec(minX, y, minZ)
         val cornerTwo = LorenzVec(minX, y, maxZ)
