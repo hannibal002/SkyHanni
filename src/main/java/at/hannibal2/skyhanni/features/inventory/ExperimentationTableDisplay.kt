@@ -42,15 +42,15 @@ object ExperimentationTableDisplay {
     private val patternGroup = RepoPattern.group("enchanting.experiments")
     private val superpairsPattern by patternGroup.pattern(
         "superpairs",
-        "Superpairs \\((?<experiment>.+)\\)"
+        "Superpairs \\((?<experiment>.+)\\)",
     )
     private val powerUpPattern by patternGroup.pattern(
         "powerups",
-        "Gained \\+\\d Clicks?|Instant Find|\\+\\S* XP"
+        "Gained \\+\\d Clicks?|Instant Find|\\+\\S* XP",
     )
     private val rewardPattern by patternGroup.pattern(
         "rewards",
-        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment The Fish"
+        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment The Fish",
     )
 
     @SubscribeEvent
@@ -92,8 +92,10 @@ object ExperimentationTableDisplay {
 
                         when {
                             foundPair && !skip -> {
-                                foundPairs.add(ItemPair(
-                                        Pair(slot, reward), Pair(lastSlotClicked, lastItemName))
+                                foundPairs.add(
+                                    ItemPair(
+                                        Pair(slot, reward), Pair(lastSlotClicked, lastItemName),
+                                    ),
                                 )
                                 foundMatches.removeAll { it.first.second == reward }
                                 lastClicked.clear()
@@ -102,8 +104,10 @@ object ExperimentationTableDisplay {
 
                             foundMatch && !skip -> {
                                 val match = uncoveredItems.entries.find { it.value == reward }?.key ?: return
-                                foundMatches.add(ItemPair(
-                                        Pair(slot, reward), Pair(match, reward))
+                                foundMatches.add(
+                                    ItemPair(
+                                        Pair(slot, reward), Pair(match, reward),
+                                    ),
                                 )
                                 skip = true
                             }
@@ -123,7 +127,7 @@ object ExperimentationTableDisplay {
 
                     display = drawDisplay()
                 }
-            }
+            },
         )
     }
 
