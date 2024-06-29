@@ -60,7 +60,9 @@ object InventoryUtils {
 
     fun getCurrentExperiment(): Experiments? {
         val inventory = openInventoryName()
-        return if (inventory.startsWith("Superpairs (")) Experiments.entries.find { it.name == inventory.substringAfter("(").substringBefore(")") } else null
+        return if (inventory.startsWith("Superpairs (")) Experiments.entries.find {
+            it.name == inventory.substringAfter("(").substringBefore(")")
+        } else null
     }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem

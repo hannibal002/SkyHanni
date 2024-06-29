@@ -90,7 +90,7 @@ object ExperimentsDisplay {
     }
 
     private fun checkItems(check: MutableList<Pair<Int, ItemStack>>): List<String> {
-        currentExperiment =InventoryUtils.getCurrentExperiment() ?: return listOf()
+        currentExperiment = InventoryUtils.getCurrentExperiment() ?: return listOf()
         if (check.isEmpty()) return drawDisplay()
 
         check.forEachIndexed { index, (slot, _) ->

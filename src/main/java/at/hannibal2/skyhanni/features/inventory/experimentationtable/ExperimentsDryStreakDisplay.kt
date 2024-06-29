@@ -38,7 +38,7 @@ object ExperimentsDryStreakDisplay {
         "inventories",
         "(?:Superpairs|Chronomatron|Ultrasequencer) (?:\\(.+\\)|➜ Stakes|Rewards)|Experimentation Table",
     )
-   private val enchantingExpChatPattern by patternGroup.pattern(
+    private val enchantingExpChatPattern by patternGroup.pattern(
         "exp",
         "^ \\+(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp$",
     )
