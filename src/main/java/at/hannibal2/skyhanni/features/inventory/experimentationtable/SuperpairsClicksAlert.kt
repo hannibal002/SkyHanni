@@ -65,6 +65,6 @@ object SuperpairsClicksAlert {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(46, "misc.superpairsClicksAlert", "inventory.helper.enchanting.superpairsClicksAlert")
+        event.move(52, "inventory.helper.enchanting.superpairsClicksAlert", "inventory.experimentationTable.superpairsClicksAlert")
     }
 }

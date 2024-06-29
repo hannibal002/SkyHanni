@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -92,6 +93,11 @@ object UltraRareBookAlert {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         enchantsFound = false
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(52, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
     }
 
     private fun isEnabled(inventoryName: String) =
