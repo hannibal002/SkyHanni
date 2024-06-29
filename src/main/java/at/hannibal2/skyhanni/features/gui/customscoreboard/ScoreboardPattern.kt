@@ -212,7 +212,7 @@ object ScoreboardPattern {
     )
     val miningEventPattern by miningSb.pattern(
         "miningevent",
-        "Event: (?:§.)+.*",
+        "Event: §.§L.*",
     )
     val miningEventZonePattern by miningSb.pattern(
         "miningeventzone",
