@@ -66,15 +66,9 @@ object ExperimentsProfitTracker {
             )
         }
 
-        override fun getCoinName(item: TrackedItem) = "§bEnchanting Exp"
+        override fun getCoinName(item: TrackedItem) = ""
 
-        override fun getCoinDescription(item: TrackedItem): List<String> {
-            val experimentsExp = item.totalAmount.shortFormat()
-            return listOf(
-                "§7Doing Experiments gives you Enchanting Exp.",
-                "§7You got §6$experimentsExp Exp §7that way.",
-            )
-        }
+        override fun getCoinDescription(item: TrackedItem) = listOf<String>()
 
         @Expose
         var experimentsDone = 0L
