@@ -17,10 +17,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import java.util.regex.Pattern
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 object CustomScoreboardUtils {
 
-    internal fun getGroup(pattern: Pattern, list: List<String>, group: String) =
+    private fun getGroup(pattern: Pattern, list: List<String>, group: String) =
         list.map { it.removeResets().trimWhiteSpace() }.firstNotNullOfOrNull { line ->
             pattern.matchGroup(line, group)
         }
@@ -28,8 +29,8 @@ object CustomScoreboardUtils {
     fun getProfileTypeSymbol() = when {
         HypixelData.ironman -> "§7♲ "
         HypixelData.stranded -> "§a☀ "
-        HypixelData.bingo -> ScoreboardData.sidebarLinesFormatted.firstNotNullOfOrNull {
-            BingoAPI.getIconFromScoreboard(it)?.plus(" ")
+        HypixelData.bingo -> getSbLines().firstNotNullOfOrNull {
+            BingoAPI.getIconFromScoreboard(it)?.plus(" ") // TODO: add bingo rank to bingo api
         } ?: "§e❤ "
 
         else -> "§e"
@@ -43,12 +44,11 @@ object CustomScoreboardUtils {
 
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
 
-    internal fun getMotes() = getGroup(ScoreboardPattern.motesPattern, ScoreboardData.sidebarLinesFormatted, "motes") ?: "0"
+    internal fun getMotes() = getGroup(SbPattern.motesPattern, getSbLines(), "motes") ?: "0"
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
-    internal fun getPurseEarned() =
-        getGroup(PurseAPI.coinsPattern, ScoreboardData.sidebarLinesFormatted, "earned")?.let { " §7(§e+$it§7)§6" }
+    internal fun getPurseEarned() = getGroup(PurseAPI.coinsPattern, getSbLines(), "earned")?.let { " §7(§e+$it§7)§6" }
 
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
         group("amount") + (groupOrNull("personal")?.let { "§7 / §6$it" } ?: "")
@@ -62,16 +62,17 @@ object CustomScoreboardUtils {
         "§b${getBits()}§7/§b${getBitsAvailable()}"
     } else "§b${getBits()}"
 
-    internal fun getCopper() =
-        getGroup(ScoreboardPattern.copperPattern, ScoreboardData.sidebarLinesFormatted, "copper") ?: "0"
+    internal fun getCopper() = getGroup(SbPattern.copperPattern, getSbLines(), "copper") ?: "0"
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
-    internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, ScoreboardData.sidebarLinesFormatted, "heat")
+    internal fun getHeat() = getGroup(SbPattern.heatPattern, getSbLines(), "heat")
 
-    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, ScoreboardData.sidebarLinesFormatted, "northStars") ?: "0"
+    internal fun getNorthStars() = getGroup(SbPattern.northstarsPattern, getSbLines(), "northStars") ?: "0"
 
-    internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { group("event") }
+    internal fun getTimeSymbol() = getGroup(SbPattern.timePattern, getSbLines(), "symbol") ?: ""
+
+    internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { groupOrNull("color") + group("event") }
 
     internal fun getElementsFromAny(element: Any?): List<ScoreboardLine> = when (element) {
         null -> listOf()
