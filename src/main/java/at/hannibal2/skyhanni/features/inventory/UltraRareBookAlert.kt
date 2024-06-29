@@ -46,7 +46,7 @@ object UltraRareBookAlert {
         "§9(?<enchant>.*)"
     )
 
-    public var enchantsFound = false
+    var enchantsFound = false
 
     private var lastNotificationTime = SimpleTimeMark.farPast()
 

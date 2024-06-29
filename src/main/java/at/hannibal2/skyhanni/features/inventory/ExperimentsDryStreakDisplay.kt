@@ -87,19 +87,21 @@ object ExperimentsDryStreakDisplay {
     private fun drawDisplay() = buildList {
         if (!config.attemptsSince && !config.xpSince) return@buildList
 
-        add("§4Dry-Streak since last ULTRA-RARE")
         storage?.let {
+            add("§cDry-Streak since last §5ULTRA-RARE")
+
+            val colorPrefix = "§e"
             val attemptsSince = it.attemptsSince
             val xpSince = it.xpSince.shortFormat()
             val attemptsSuffix = if (attemptsSince == 1) "" else "s"
 
             when {
                 config.attemptsSince && config.xpSince -> {
-                    add("§c ├ $attemptsSince Attempt$attemptsSuffix")
-                    add("§c └ $xpSince XP")
+                    add("$colorPrefix ├ $attemptsSince Attempt$attemptsSuffix")
+                    add("$colorPrefix └ $xpSince XP")
                 }
-                config.attemptsSince -> add("§c └ $attemptsSince Attempt$attemptsSuffix")
-                config.xpSince -> add("§c └ $xpSince XP")
+                config.attemptsSince -> add("$colorPrefix └ $attemptsSince Attempt$attemptsSuffix")
+                config.xpSince -> add("$colorPrefix └ $xpSince XP")
             }
         }
     }
