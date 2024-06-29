@@ -28,11 +28,12 @@ object AttributeOverlay {
 
         val isGoodRoll = attributes.isGoodRoll(internalName)
         attributes.toList().filter { (attr, level) ->
-            val isInConfig = (attr in config.attributesList && level >= config.minimumLevel)
-            val godRoll = !config.hideNonGoodRolls || isGoodRoll
-            isInConfig && godRoll
+            val inConfig = attr in config.attributesList
+            val isLevel = level >= config.minimumLevel
+            val goodRoll = !config.hideNonGoodRolls || isGoodRoll
+            inConfig && (goodRoll || isLevel)
         }.forEachIndexed { index, attribute ->
-            event.drawAttribute(attribute, isGoodRoll && config.highlightGodrolls, index)
+            event.drawAttribute(attribute, isGoodRoll && config.highlightGoodRolls, index)
         }
     }
 
