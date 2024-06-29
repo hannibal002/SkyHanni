@@ -41,7 +41,7 @@ public class AttributeOverlayConfig {
             "§c want to suggest changes, please do so in the discord."
     )
     @ConfigEditorBoolean
-    public boolean highlightGoodRolls = true;
+    public boolean highlightGoodrolls = true;
 
     @Expose
     @ConfigOption(name = "Hide non Good Rolls", desc = "Hides attributes that are not considered good rolls.")

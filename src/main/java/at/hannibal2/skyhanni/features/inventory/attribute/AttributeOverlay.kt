@@ -33,7 +33,7 @@ object AttributeOverlay {
             val goodRoll = !config.hideNonGoodRolls || isGoodRoll
             inConfig && (goodRoll || isLevel)
         }.forEachIndexed { index, attribute ->
-            event.drawAttribute(attribute, isGoodRoll && config.highlightGoodRolls, index)
+            event.drawAttribute(attribute, isGoodRoll && config.highlightGoodrolls, index)
         }
     }
 
