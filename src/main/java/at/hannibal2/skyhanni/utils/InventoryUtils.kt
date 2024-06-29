@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.features.inventory.ExperimentationTableConfig.Experiments
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -55,6 +56,11 @@ object InventoryUtils {
     fun inStorage() = openInventoryName().let {
         (it.contains("Storage") && !it.contains("Rift Storage"))
             || it.contains("Ender Chest") || it.contains("Backpack")
+    }
+
+    fun getCurrentExperiment(): Experiments? {
+        val inventory = openInventoryName()
+        return if (inventory.startsWith("Superpairs (")) Experiments.entries.find { it.name == inventory.substringAfter("(").substringBefore(")") } else null
     }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem

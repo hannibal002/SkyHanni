@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -29,21 +29,17 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object UltraRareBookAlert {
 
-    private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
 
     private val patternGroup = RepoPattern.group("data.enchanting")
-    private val superpairsGui by patternGroup.pattern(
-        "inventory.experimentstable.gui",
-        "Superpairs.*"
-    )
-    private val ultraRarePattern by patternGroup.pattern(
+    val ultraRarePattern by patternGroup.pattern(
         "inventory.experimentstable.ultrarare",
-        "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX"
+        "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX",
     )
-    private val bookPattern by patternGroup.pattern(
+    val bookPattern by patternGroup.pattern(
         "inventory.experimentstable.book",
-        "§9(?<enchant>.*)"
+        "§9(?<enchant>.*)",
     )
 
     private var enchantsFound = false
@@ -58,9 +54,7 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.ultraRareBookAlert) return
-        if (!superpairsGui.matches(InventoryUtils.openInventoryName())) return
+        if (!isEnabled(InventoryUtils.openInventoryName())) return
         if (lastNotificationTime.passedSince() > 5.seconds) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
@@ -80,10 +74,8 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.ultraRareBookAlert) return
+        if (!isEnabled(event.inventoryName)) return
         if (enchantsFound) return
-        if (!superpairsGui.matches(event.inventoryName)) return
 
         for (lore in event.inventoryItems.map { it.value.getLore() }) {
             val firstLine = lore.firstOrNull() ?: continue
@@ -101,4 +93,7 @@ object UltraRareBookAlert {
     fun onInventoryClose(event: InventoryCloseEvent) {
         enchantsFound = false
     }
+
+    private fun isEnabled(inventoryName: String) =
+        config.ultraRareBookAlert && LorenzUtils.inSkyBlock && InventoryUtils.getCurrentExperiment() != null
 }

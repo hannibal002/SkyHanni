@@ -39,6 +39,10 @@ public class InventoryConfig {
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
+    @Category(name = "Experimentation Table", desc = "QOL features for the Experimentation Table.")
+    public ExperimentationTableConfig experimentationTable = new ExperimentationTableConfig();
+
+    @Expose
     @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
     public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 

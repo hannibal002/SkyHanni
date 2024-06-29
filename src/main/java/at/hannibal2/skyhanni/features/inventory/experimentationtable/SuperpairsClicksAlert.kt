@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.inventory
+package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -14,7 +14,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SuperpairsClicksAlert {
 
-    private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
 
     private var roundsNeeded = -1
     private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")

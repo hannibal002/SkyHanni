@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -264,6 +265,10 @@ object Commands {
             "shresetpestprofittracker",
             "Resets the Pest Profit Tracker",
         ) { PestProfitTracker.resetCommand() }
+        registerCommand(
+            "shresetexperimentsprofittracker",
+            "Resets the Experiments Profit Tracker",
+        ) { ExperimentsProfitTracker.resetCommand() }
         registerCommand(
             "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker",
