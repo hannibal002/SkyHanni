@@ -58,6 +58,17 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
+    public ExperimentsDryStreakStorage dryStreakStorage = new ExperimentsDryStreakStorage();
+
+    public static class ExperimentsDryStreakStorage {
+        @Expose
+        public int attemptsSince = 0;
+
+        @Expose
+        public int xpSince = 0;
+    }
+
+    @Expose
     public String currentPet = "";
 
     @Expose

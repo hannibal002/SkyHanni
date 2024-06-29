@@ -46,7 +46,7 @@ object UltraRareBookAlert {
         "§9(?<enchant>.*)"
     )
 
-    private var enchantsFound = false
+    public var enchantsFound = false
 
     private var lastNotificationTime = SimpleTimeMark.farPast()
 
@@ -58,9 +58,7 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.ultraRareBookAlert) return
-        if (!superpairsGui.matches(InventoryUtils.openInventoryName())) return
+        if (!isEnabled(InventoryUtils.openInventoryName())) return
         if (lastNotificationTime.passedSince() > 5.seconds) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
@@ -80,10 +78,8 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.ultraRareBookAlert) return
+        if (!isEnabled(event.inventoryName)) return
         if (enchantsFound) return
-        if (!superpairsGui.matches(event.inventoryName)) return
 
         for (lore in event.inventoryItems.map { it.value.getLore() }) {
             val firstLine = lore.firstOrNull() ?: continue
@@ -101,4 +97,7 @@ object UltraRareBookAlert {
     fun onInventoryClose(event: InventoryCloseEvent) {
         enchantsFound = false
     }
+
+    private fun isEnabled(inventoryName: String) =
+        config.ultraRareBookAlert && LorenzUtils.inSkyBlock && superpairsGui.matches(inventoryName)
 }
