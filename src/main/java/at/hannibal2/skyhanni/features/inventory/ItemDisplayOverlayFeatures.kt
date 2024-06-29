@@ -86,7 +86,7 @@ object ItemDisplayOverlayFeatures {
     )
     private val skyblockLevelPattern by patternGroup.pattern(
         "skyblocklevel",
-        "§7Your SkyBlock Level: §\\S\\[(?<level>§\\S\\d+)§\\S]"
+        "§7Your SkyBlock Level: §8\\[(?<level>§\\S\\d+)§8]"
     )
 
     @SubscribeEvent
