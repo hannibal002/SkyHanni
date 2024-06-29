@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.PET_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -82,6 +83,10 @@ object ItemDisplayOverlayFeatures {
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+    )
+    private val skyblockLevelPattern by patternGroup.pattern(
+        "skyblocklevel",
+        "§7Your SkyBlock Level: §\\S\\[(?<level>§\\S\\d+)§\\S]"
     )
 
     @SubscribeEvent
@@ -264,6 +269,12 @@ object ItemDisplayOverlayFeatures {
             lore.matchFirst(bingoGoalRankPattern) {
                 val rank = group("rank").formatLong()
                 if (rank < 10000) return "§6${rank.shortFormat()}"
+            }
+        }
+
+        if (SKYBLOCK_LEVEL.isSelected() && chestName == "SkyBlock Menu" && itemName == "SkyBlock Leveling") {
+            lore.matchFirst(skyblockLevelPattern) {
+                return group("level")
             }
         }
 
