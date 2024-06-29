@@ -101,9 +101,9 @@ object ChocolateFactoryBarnManager {
 
         if (config.rabbitCrushOnlyDuringHoppity && !ChocolateFactoryAPI.isHoppityEvent()) return
 
-        val fullLevel = if (profileStorage.currentRabbits == profileStorage.maxRabbits) "almost full" else "full"
+        val fullLevel = if (profileStorage.currentRabbits == profileStorage.maxRabbits) "full" else "almost full"
         ChatUtils.clickableChat(
-            "§cYour barn is $fullLevel! §7(${barnStatus()}). §cUpgrade it so they don't get crushed",
+            "§cYour barn is $fullLevel §7(${barnStatus()}). §cUpgrade it so they don't get crushed!",
             onClick = { HypixelCommands.chocolateFactory() },
             "§eClick to run /cf!",
         )
