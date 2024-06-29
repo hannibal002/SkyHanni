@@ -51,7 +51,7 @@ object CustomScoreboardUtils {
     internal fun getPurseEarned() = getGroup(PurseAPI.coinsPattern, getSbLines(), "earned")?.let { " §7(§e+$it§7)§6" }
 
     internal fun getBank() = TabWidget.BANK.matchMatcherFirstLine {
-        group("amount") + (groupOrNull("personal")?.let { "§7 / §6$it" } ?: "")
+        group("amount") + (groupOrNull("personal")?.let { " §7/ §6$it" } ?: "")
     } ?: "0"
 
     internal fun getBits() = formatNumber(BitsAPI.bits.coerceAtLeast(0))
