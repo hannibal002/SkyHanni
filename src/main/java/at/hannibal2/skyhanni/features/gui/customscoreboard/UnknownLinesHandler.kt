@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
@@ -147,7 +148,7 @@ object UnknownLinesHandler {
             SbPattern.wtfAreThoseLinesPattern,
             SbPattern.timeLeftPattern,
             SbPattern.darkAuctionCurrentItemPattern,
-            SbPattern.coldPattern,
+            MiningAPI.coldPattern,
             SbPattern.riftHotdogTitlePattern,
             SbPattern.riftHotdogEatenPattern,
             SbPattern.mineshaftNotStartedPattern,

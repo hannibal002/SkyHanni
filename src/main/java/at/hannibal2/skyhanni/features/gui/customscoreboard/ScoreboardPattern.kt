@@ -27,10 +27,6 @@ object ScoreboardPattern {
         "heat",
         "Heat: (?<heat>.*)",
     )
-    val coldPattern by mainSb.pattern(
-        "cold",
-        "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
-    )
     val copperPattern by mainSb.pattern(
         "copper",
         "(?:§.)*Copper: (?:§.)*(?<copper>[\\d,]+).*",
@@ -41,11 +37,11 @@ object ScoreboardPattern {
     )
     val lobbyCodePattern by mainSb.pattern(
         "lobbycode",
-        "\\s*§.(?:\\d{2}/\\d{2}/\\d{2}|Server closing: [\\d:]+) §8(?<code>.*)",
+        "\\s*§.(?:\\d{2}/?){3} §8(?<code>.*)",
     )
     val datePattern by mainSb.pattern(
         "date",
-        "\\s*(?:Late |Early )?(?:Spring|Summer|Autumn|Winter) \\d{1,2}(?:st|nd|rd|th)?.*",
+        "\\s*(?:(?:Late|Early) )?(?:Spring|Summer|Autumn|Winter) \\d+(?:st|nd|rd|th)?.*",
     )
 
     /**
@@ -54,7 +50,7 @@ object ScoreboardPattern {
      */
     val timePattern by mainSb.pattern(
         "time",
-        "\\s*§7\\d{1,2}:\\d{2}(?:am|pm)\\s*(?<symbol>(§b☽|§e☀|§.⚡|§.☔))?.*",
+        "\\s*§7\\d+:\\d+(?:am|pm)\\s*(?<symbol>§b☽|§e☀|§.⚡|§.☔)?.*",
     )
     val footerPattern by mainSb.pattern(
         "footer",
@@ -85,11 +81,11 @@ object ScoreboardPattern {
     private val multiUseSb = scoreboardGroup.group("multiuse")
     val autoClosingPattern by multiUseSb.pattern(
         "autoclosing",
-        "(?:§.)*Auto-closing in: §c(?:\\d{1,2}:)?\\d{1,2}",
+        "(?:§.)*Auto-closing in: §c(?:\\d+:)?\\d+",
     )
     val startingInPattern by multiUseSb.pattern(
         "startingin",
-        "(?:§.)*Starting in: §.(?:\\d{1,2}:)?\\d{1,2}",
+        "(?:§.)*Starting in: §.(?:\\d+:)?\\d+",
     )
     val timeElapsedPattern by multiUseSb.pattern(
         "timeelapsed",
@@ -124,7 +120,7 @@ object ScoreboardPattern {
     )
     val teammatesPattern by dungeonSb.pattern(
         "teammates",
-        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>[a-zA-Z0-9_]{2,16}) ((?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
+        "(?:§.)*(?<classAbbv>\\[\\w]) (?:§.)*(?<username>\\w{2,16}) ((?:§.)*(?<classLevel>\\[Lvl?(?<level>[\\w,.]+)?]?)|(?:§.)*(?<health>[\\w,.]+)(?:§.)*.?)",
     )
     val floor3GuardiansPattern by dungeonSb.pattern(
         "floor3guardians",
@@ -135,7 +131,7 @@ object ScoreboardPattern {
     private val kuudraSb = scoreboardGroup.group("kuudra")
     val wavePattern by kuudraSb.pattern(
         "wave",
-        "(?:§.)*Wave: (?:§.)*\\d+(?:§.)*( §.- §.\\d+:\\d+)?",
+        "(?:§.)*Wave: (?:§.)*\\d+(?:§.)*(?: §.- §.\\d+:\\d+)?",
     )
     val tokensPattern by kuudraSb.pattern(
         "tokens",
@@ -212,11 +208,11 @@ object ScoreboardPattern {
     )
     val windCompassArrowPattern by miningSb.pattern(
         "windcompassarrow",
-        "\\s*(?:§[a-zA-Z0-9]|[⋖⋗≈])+\\s*(?:§[a-zA-Z0-9]|[⋖⋗≈])*\\s*",
+        "\\s*(?:§.|[⋖⋗≈])+\\s*(?:§.|[⋖⋗≈])*\\s*",
     )
     val miningEventPattern by miningSb.pattern(
         "miningevent",
-        "Event: §.§L.*",
+        "Event: (?:§.)+.*",
     )
     val miningEventZonePattern by miningSb.pattern(
         "miningeventzone",
@@ -228,7 +224,7 @@ object ScoreboardPattern {
     )
     val raffleTicketsPattern by miningSb.pattern(
         "raffletickets",
-        "Tickets: §a\\d+ §7\\(\\d{1,3}\\.\\d%\\)",
+        "Tickets: §a\\d+ §7\\([\\d.,]+%\\)",
     )
     val rafflePoolPattern by miningSb.pattern(
         "rafflepool",
@@ -283,7 +279,7 @@ object ScoreboardPattern {
     )
     val magmaBossPattern by combatSb.pattern(
         "magmaboss",
-        "§7Boss: §[c6e]\\d{1,3}%",
+        "§7Boss: §[c6e]\\d+%",
     )
     val damageSoakedPattern by combatSb.pattern(
         "damagesoaked",
@@ -307,7 +303,7 @@ object ScoreboardPattern {
     )
     val bossHealthBarPattern by combatSb.pattern(
         "magmabosshealthbar",
-        "§.(?:\\d{1,2}(?:\\.\\d)?M|\\d{1,3}k)§f/§a10M§c❤",
+        "§.(?:\\d+(?:\\.\\d)?M|\\d+k)§f/§a10M§c❤",
     )
     val broodmotherPattern by combatSb.pattern(
         "broodmother",
@@ -315,11 +311,11 @@ object ScoreboardPattern {
     )
     val bossHPPattern by combatSb.pattern(
         "bosshp",
-        "(?:Protector|Dragon) HP: §a(?:,?\\d{1,3})* §c❤",
+        "(?:Protector|Dragon) HP: §a[\\d,.]* §c❤",
     )
     val bossDamagePattern by combatSb.pattern(
         "bossdamage",
-        "Your Damage: §c(?:,?\\d{1,3}(?:\\.\\d)?)*",
+        "Your Damage: §c[\\d,.]+",
     )
     val slayerQuestPattern by combatSb.pattern(
         "slayerquest",
@@ -334,7 +330,7 @@ object ScoreboardPattern {
     )
     val redstonePattern by miscSb.pattern(
         "redstone",
-        "\\s*(?:§.)*⚡ §cRedstone: (?:§.)*\\d{1,3}%",
+        "\\s*(?:§.)*⚡ §cRedstone: (?:§.)*\\d+%",
     )
     val visitingPattern by miscSb.pattern(
         "visiting",
@@ -342,11 +338,11 @@ object ScoreboardPattern {
     )
     val dojoChallengePattern by miscSb.pattern(
         "dojochallenge",
-        "(?:§.)*Challenge: (?:§.)*(?<challenge>[\\w ]+)",
+        "(?:§.)*Challenge: (?:§.)*(?<challenge>.+)",
     )
     val dojoDifficultyPattern by miscSb.pattern(
         "dojodifficulty",
-        "(?:§.)*Difficulty: (?:§.)*(?<difficulty>[\\w ]+)",
+        "(?:§.)*Difficulty: (?:§.)*(?<difficulty>.+)",
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
@@ -397,23 +393,23 @@ object ScoreboardPattern {
     private val eventsSb = scoreboardGroup.group("events")
     val travelingZooPattern by eventsSb.pattern(
         "travelingzoo",
-        "§aTraveling Zoo§f \\d{0,2}:\\d{2}",
+        "§aTraveling Zoo§f \\d*:\\d+",
     )
     val newYearPattern by eventsSb.pattern(
         "newyear",
-        "§dNew Year Event!§f \\d{0,2}?:?\\d{2}",
+        "§dNew Year Event!§f \\d*?:?\\d+",
     )
     val spookyPattern by eventsSb.pattern(
         "spooky",
-        "§6Spooky Festival§f \\d{0,2}?:?\\d{2}",
+        "§6Spooky Festival§f \\d*?:?\\d+",
     )
     val winterEventStartPattern by eventsSb.pattern(
         "wintereventstart",
-        "(?:§.)*Event Start: §.\\d+:\\d+",
+        "(?:§.)*Event Start: §.\\d*:?\\d+",
     )
     val winterNextWavePattern by eventsSb.pattern(
         "wintereventnextwave",
-        "(?:§.)*Next Wave: (?:§.)*(?:\\d+:\\d+|Soon!)",
+        "(?:§.)*Next Wave: (?:§.)*(?:\\d*:?\\d+|Soon!)",
     )
     val winterWavePattern by eventsSb.pattern(
         "wintereventwave",
@@ -429,7 +425,7 @@ object ScoreboardPattern {
     )
     val winterCubeDmgPattern by eventsSb.pattern(
         "wintereventcubedmg",
-        "(?:§.)*Your Cube Damage: §.\\d+",
+        "(?:§.)*Your Cube Damage: §.[\\d.,]+",
     )
 
     // rift
@@ -492,7 +488,7 @@ object ScoreboardPattern {
      */
     val carnivalFruitsPattern by carnivalSb.pattern(
         "fruits",
-        "(?:§f)?Fruits: §.\\d+§.\\/§.\\d+",
+        "(?:§f)?Fruits: §.\\d+§./§.\\d+",
     )
 
     /**
