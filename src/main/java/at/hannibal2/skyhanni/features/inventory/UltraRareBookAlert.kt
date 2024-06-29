@@ -37,16 +37,16 @@ object UltraRareBookAlert {
         "inventory.experimentstable.gui",
         "Superpairs.*"
     )
-    private val ultraRarePattern by patternGroup.pattern(
+    val ultraRarePattern by patternGroup.pattern(
         "inventory.experimentstable.ultrarare",
         "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX"
     )
-    private val bookPattern by patternGroup.pattern(
+    val bookPattern by patternGroup.pattern(
         "inventory.experimentstable.book",
         "§9(?<enchant>.*)"
     )
 
-    var enchantsFound = false
+    private var enchantsFound = false
 
     private var lastNotificationTime = SimpleTimeMark.farPast()
 

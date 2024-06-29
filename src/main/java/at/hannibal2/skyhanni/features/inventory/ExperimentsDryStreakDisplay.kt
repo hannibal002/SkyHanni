@@ -4,11 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.inventory.UltraRareBookAlert.enchantsFound
+import at.hannibal2.skyhanni.features.inventory.UltraRareBookAlert.bookPattern
+import at.hannibal2.skyhanni.features.inventory.UltraRareBookAlert.ultraRarePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -27,17 +30,21 @@ object ExperimentsDryStreakDisplay {
     private var display = emptyList<String>()
 
     private var inExperiment = false
+    private var enchantsFound = false
+    private var didJustFind = false
 
     private val patternGroup = RepoPattern.group("enchanting.experiments.drystreak")
     private val superpairsPattern by patternGroup.pattern(
         "superpairs",
-        "Superpairs \\((?<experiment>.+)\\)")
+        "Superpairs \\((?<experiment>.+)\\)",
+    )
     private val experimentInventoriesPattern by patternGroup.pattern(
         "inventories",
-        "(?:Superpairs|Chronomatron|Ultrasequencer) (?:\\(.+\\)|➜ Stakes|Rewards)|Experimentation Table")
+        "(?:Superpairs|Chronomatron|Ultrasequencer) (?:\\(.+\\)|➜ Stakes|Rewards)|Experimentation Table",
+    )
     private val enchantingExpChatPattern by patternGroup.pattern(
         "exp",
-        "^ \\+(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp$"
+        "^ \\+(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp$",
     )
 
     @SubscribeEvent
@@ -48,8 +55,13 @@ object ExperimentsDryStreakDisplay {
         display = drawDisplay()
         config.dryStreakDisplayPosition.renderStrings(
             display,
-            posLabel = "Experiment Dry Streak Display"
+            posLabel = "Experiment Dry Streak Display",
         )
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
+        if (event.inventoryName == "Experimentation Table" && didJustFind) didJustFind = false
     }
 
     @SubscribeEvent
@@ -58,26 +70,37 @@ object ExperimentsDryStreakDisplay {
 
         if (superpairsPattern.matches(event.inventoryName)) {
             inExperiment = true
-            if (enchantsFound) {
-                val storage = storage ?: return
-                storage.attemptsSince = 0
-                storage.xpSince = 0
+            for (lore in event.inventoryItems.map { it.value.getLore() }) {
+                val firstLine = lore.firstOrNull() ?: continue
+                if (!ultraRarePattern.matches(firstLine)) continue
+                val bookNameLine = lore.getOrNull(2) ?: continue
+                bookPattern.matchMatcher(bookNameLine) {
+                    val storage = storage ?: return
+                    storage.attemptsSince = 0
+                    storage.xpSince = 0
+                    didJustFind = true
+                    enchantsFound = true
+                }
             }
         }
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        if (didJustFind) inExperiment = false
+
         if (inExperiment && !enchantsFound) {
             val storage = storage ?: return
             storage.attemptsSince += 1
-            inExperiment = false
         }
+        enchantsFound = false
+        inExperiment = false
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.enabled || !LorenzUtils.inSkyBlock) return
+        if (!isEnabled() || didJustFind) return
+
         enchantingExpChatPattern.matchMatcher(event.message.removeColor()) {
             val storage = storage ?: return
             storage.xpSince += group("amount").substringBefore(",").toInt() * 1000
