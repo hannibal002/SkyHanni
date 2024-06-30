@@ -22,15 +22,12 @@ object RegexUtils {
     }
 
     @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
-    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        pattern.firstMatcher(this, consumer)
+    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.firstMatcher(this, consumer)
 
-    inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? =
-        firstMatcher(list.asSequence(), consumer)
+    inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
 
     @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer() }"))
-    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        pattern.matchAll(this, consumer)
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.matchAll(this, consumer)
 
     inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T): T? {
         for (line in list) {
