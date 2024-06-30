@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -195,14 +196,13 @@ object HoppityEggsManager {
 
     // TODO move logic into second passed event and cache
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isActive()) return
         if (!config.showClaimedEggs) return
         if (isBusy()) return
 
-        val displayList = HoppityEggType.entries
-            .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
-            .toMutableList()
+        val displayList =
+            HoppityEggType.entries.map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }.toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
 
         if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
@@ -215,7 +215,12 @@ object HoppityEggsManager {
         }
         if (displayList.size == 1) return
 
-        config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
+        val clickableDisplayList = listOf(Renderable.clickAndHover(
+            Renderable.verticalContainer(displayList.map(Renderable::string)),
+            tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
+            onClick = { HypixelCommands.warp(config.warpDestination) }
+        ))
+        config.position.renderRenderables(clickableDisplayList, posLabel = "Hoppity Eggs")
     }
 
     private fun formatEggsCollected(collectedEggs: Int): String =
@@ -257,7 +262,7 @@ object HoppityEggsManager {
                 ChatUtils.clickableChat(
                     message,
                     onClick = { HypixelCommands.warp(config.warpDestination) },
-                    "§eClick to /warp ${config.warpDestination}!"
+                    "§eClick to ${"/warp ${config.warpDestination}".trim()}!"
                 )
             } else {
                 ChatUtils.clickableChat(
