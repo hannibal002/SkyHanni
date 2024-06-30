@@ -23,7 +23,7 @@ informative. With SkyHanni, you'll get:
 * **Entity/Item Highlighters:** Easily spot important mobs in the world and items in inventory.
 * **And much more!**
 
-SkyHanni is especially helpful when doing the Garden, any Slayers, Bingo, Diana, and Rift.
+SkyHanni is especially helpful when doing activities like farming, slayers, Bingo, Diana, Fishing, or Rift.
 
 ## Getting Started
 
