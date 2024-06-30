@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -408,6 +409,11 @@ object ChatFilter {
         "§d[\\w']+ the Fairy§r§f: Have a great life!".toPattern()
     )
 
+    // §e§ka§a>>   §aAchievement Unlocked: §6§r§6Agile§r§a   <<§e§ka
+    private val achievementGetPatterns = listOf(
+        "§e§k.§a>> {3}§aAchievement Unlocked: .* {3}<<§e§k.".toPattern()
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -430,6 +436,7 @@ object ChatFilter {
         "solo_class" to soloClassPatterns,
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
+        "achievement_get" to achievementGetPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -480,6 +487,8 @@ object ChatFilter {
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
+
+        config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
         config.others && isOthers(message) -> othersMsg
 
