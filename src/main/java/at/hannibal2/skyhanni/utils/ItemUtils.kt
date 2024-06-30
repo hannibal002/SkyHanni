@@ -44,8 +44,8 @@ object ItemUtils {
     }
 
     // TODO change else janni is sad
-    fun isCoopSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any {
+    fun ItemStack.isCoopSoulBound(): Boolean =
+        getLore().any {
             it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
         }
 
