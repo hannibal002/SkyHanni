@@ -2,16 +2,19 @@
   SkyHanni: Mod for Hypixel SkyBlock
 </h1>
 
+![sh_logo](https://github.com/hannibal002/SkyHanni/assets/24389977/2f52afa0-0330-434e-ba1c-f2affee96bc1)
+
 <div align="center">
 
-  [![Discord](https://img.shields.io/discord/997079228510117908?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/skyhanni-997079228510117908)
-  [![Made with Kotlin](https://img.shields.io/badge/Made%20With-Kotlin-orange?style=for-the-badge&logo=kotlin&logocolor=white)](https://kotlinlang.org/)
-  [![Downloads](https://img.shields.io/github/downloads/hannibal002/SkyHanni/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/hannibal002/SkyHanni/releases)
+[![Discord](https://img.shields.io/discord/997079228510117908?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/skyhanni-997079228510117908)
+[![Made with Kotlin](https://img.shields.io/badge/Made%20With-Kotlin-orange?style=for-the-badge&logo=kotlin&logocolor=white)](https://kotlinlang.org/)
+[![Downloads](https://img.shields.io/github/downloads/hannibal002/SkyHanni/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/hannibal002/SkyHanni/releases)
 </div>
 
 ## Improve Your SkyBlock Experience
 
-SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hypixel SkyBlock, making your gameplay smoother and more informative.  With SkyHanni, you'll get:
+SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hypixel SkyBlock, making your gameplay smoother and more
+informative. With SkyHanni, you'll get:
 
 * **Helpful GUIs:** Access important information at a glance.
 * **Extra Chat Messages:** Receive reminders and helpful tips.
@@ -43,4 +46,5 @@ Interested in making SkyHanni even better? Check out our [contributing guide](CO
 
 ---
 
-**SkyHanni is part of a thriving 1.8.9 modding community. Explore other awesome mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) to create your ultimate SkyBlock setup!**
+**SkyHanni is part of a thriving 1.8.9 modding community. Explore other awesome mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) to
+create your ultimate SkyBlock setup!**
