@@ -79,4 +79,10 @@ object RegexUtils {
         }
         return null
     }
+
+    fun Iterable<Pattern>.matches(string: String?): Boolean {
+        if (string == null) return false
+        return this.any { it.matches(string) }
+    }
+
 }

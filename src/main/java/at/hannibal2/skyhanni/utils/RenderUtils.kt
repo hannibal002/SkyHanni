@@ -1731,7 +1731,7 @@ object RenderUtils {
         RoundedRectangleShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
 
         GlStateManager.pushMatrix()
-        ShaderManager.enableShader("rounded_rect")
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECTANGLE)
 
         Gui.drawRect(x - 5, y - 5, x + width + 5, y + height + 5, color)
 
@@ -1784,7 +1784,7 @@ object RenderUtils {
         RoundedRectangleOutlineShader.borderBlur = max(1 - blur, 0f)
 
         GlStateManager.pushMatrix()
-        ShaderManager.enableShader("rounded_rect_outline")
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_RECT_OUTLINE)
 
         drawGradientRect(
             x - borderAdjustment,

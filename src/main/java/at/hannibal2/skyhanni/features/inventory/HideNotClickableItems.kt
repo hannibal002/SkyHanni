@@ -26,7 +26,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isCoopSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -68,7 +70,7 @@ object HideNotClickableItems {
 
     private val seedsPattern by RepoPattern.pattern(
         "inventory.hidenotclickable.seeds",
-        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3"
+        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
     )
 
     private val netherWart by lazy { "NETHER_STALK".asInternalName() }
@@ -304,7 +306,7 @@ object HideNotClickableItems {
             "CLOAK",
             "BELT",
             "GLOVES",
-            "BRACELET"
+            "BRACELET",
         )
         for (type in list) {
             if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
@@ -338,7 +340,7 @@ object HideNotClickableItems {
 
         // TODO make check if player is on private island
 
-        if (!ItemUtils.isSoulBound(stack)) return false
+        if (!stack.isSoulBound()) return false
 
         hideReason = "This item cannot be stored into a chest!"
         return true
@@ -445,7 +447,7 @@ object HideNotClickableItems {
     private fun hidePlayerTrade(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
-        if (ItemUtils.isCoopSoulBound(stack)) {
+        if (stack.isCoopSoulBound()) {
             hideReason = "Soulbound items cannot be traded!"
             return true
         }
@@ -582,7 +584,7 @@ object HideNotClickableItems {
     }
 
     private fun isNotAuctionable(stack: ItemStack): Boolean {
-        if (ItemUtils.isCoopSoulBound(stack)) {
+        if (stack.isCoopSoulBound()) {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
         }
