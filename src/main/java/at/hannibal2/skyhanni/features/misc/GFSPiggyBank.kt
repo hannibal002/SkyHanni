@@ -39,6 +39,7 @@ object GFSPiggyBank {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
+        // TODO: change once regexutils pr (empa) is merged
         patternList.matchMatchers(event.message) {
             GetFromSackAPI.getFromChatMessageSackItems(ENCHANTED_PORK)
         }
