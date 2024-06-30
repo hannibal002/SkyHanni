@@ -34,11 +34,12 @@ object GFSPiggyBank {
         "§cYou died, lost [\\d.,]* coins and your piggy bank broke!",
     )
 
+    private val patternList = listOf(crackedPattern, brokePattern)
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        val message = event.message
-        listOf(crackedPattern, brokePattern).matchMatchers(message) {
+        patternList.matchMatchers(event.message) {
             GetFromSackAPI.getFromChatMessageSackItems(ENCHANTED_PORK)
         }
     }
