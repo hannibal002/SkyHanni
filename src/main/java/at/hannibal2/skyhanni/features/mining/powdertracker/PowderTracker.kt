@@ -339,7 +339,7 @@ object PowderTracker {
     }
 
     private fun MutableList<List<Any>>.addPerHour(
-        map: MutableMap<PowderChestReward, Long>,
+        map: Map<PowderChestReward, Long>,
         reward: PowderChestReward,
         info: ResourceInfo,
     ) {
