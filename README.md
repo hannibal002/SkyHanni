@@ -14,13 +14,12 @@
 
 ## Improve Your SkyBlock Experience
 
-SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hypixel SkyBlock, making your gameplay smoother and more
-informative. With SkyHanni, you'll get:
+SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hypixel SkyBlock. With SkyHanni, you'll get:
 
 * **Helpful GUIs:** Access important information at a glance.
 * **Extra Chat Messages:** Receive reminders and helpful tips.
 * **Message Hiders:** Control which messages you see in chat.
-* **Entity/Item Highlighters:** Easily spot important mobs in the world and items in inventory.
+* **Entity/Item Highlighters:** Focus on important mobs or items in the world/your inventory.
 * **And much more!**
 
 SkyHanni is especially helpful when doing activities like farming, slayers, Bingo, Diana, Fishing, or Rift.
@@ -31,19 +30,19 @@ SkyHanni is especially helpful when doing activities like farming, slayers, Bing
 2. **Set up:** Type `/sh` or `/skyhanni` in-game to change your settings.
 3. **Explore:** See all the features [here](docs/FEATURES.md).
 
-## Discord Support
+## Discord & Support
 
-Join our friendly community, give us feedback or simply chat with us!
+Give feedback or just chat with others on our discord!
 
 * **Bug Reports:** Use the #bug-reports channel.
 * **Feature Suggestions:** Use the #suggestions channel.
 * **General Chat:** Chat with other SkyHanni users in #general.
 
-[Join the SkyHanni Discord](https://discord.gg/skyhanni-997079228510117908)
+[Join the discord community](https://discord.gg/skyhanni-997079228510117908)
 
 ## Contributing
 
-Interested in making SkyHanni even better? Check out our [contributing guide](CONTRIBUTING.md) and become part of the development team!
+Interested in writing your own SkyHanni feature or fix that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for coding infos.
 
 ---
 
