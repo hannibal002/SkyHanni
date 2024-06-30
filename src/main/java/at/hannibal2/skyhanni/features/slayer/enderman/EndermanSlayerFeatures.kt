@@ -102,7 +102,6 @@ object EndermanSlayerFeatures {
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!IslandType.THE_END.isInIsland()) return
 
-
         if (beaconConfig.highlightBeacon) {
             endermenWithBeacons.removeIf { it.isDead || !hasBeaconInHand(it) }
 
@@ -111,26 +110,38 @@ object EndermanSlayerFeatures {
             }
         }
 
-        for ((location, time) in sittingBeacon) {
-            if (location.distanceToPlayer() > 20) continue
-            if (beaconConfig.showLine) {
+        drawSittingBeacon(event)
+        drawFlyingBeacon(event)
+        drawNukekubiSkulls(event)
+    }
+
+    private fun drawNukekubiSkulls(event: LorenzRenderWorldEvent) {
+        for (skull in nukekubiSkulls) {
+            if (skull.isDead) continue
+            if (config.highlightNukekebi) {
+                event.drawDynamicText(
+                    skull.getLorenzVec().add(-0.5, 1.5, -0.5),
+                    "§6Nukekubi Skull",
+                    1.6,
+                    ignoreBlocks = false,
+                )
+            }
+            if (config.drawLineToNukekebi) {
+                val skullLocation = event.exactLocation(skull)
+                if (skullLocation.distanceToPlayer() > 20) continue
+                if (!skullLocation.canBeSeen()) continue
                 event.draw3DLine(
                     event.exactPlayerEyeLocation(),
-                    location.add(0.5, 1.0, 0.5),
-                    beaconConfig.lineColor.toChromaColor(),
-                    beaconConfig.lineWidth,
+                    skullLocation.add(0.5, 1.0, 0.5),
+                    LorenzColor.GOLD.toColor(),
+                    3,
                     true,
                 )
             }
-
-            if (beaconConfig.highlightBeacon) {
-                val duration = 5.seconds - time.passedSince()
-                val durationFormat = duration.format(showMilliSeconds = true)
-                event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
-                event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
-                event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
-            }
         }
+    }
+
+    private fun drawFlyingBeacon(event: LorenzRenderWorldEvent) {
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
@@ -149,29 +160,27 @@ object EndermanSlayerFeatures {
                 )
             }
         }
+    }
 
-        for (skull in nukekubiSkulls) {
-            if (!skull.isDead) {
-                if (config.highlightNukekebi) {
-                    event.drawDynamicText(
-                        skull.getLorenzVec().add(-0.5, 1.5, -0.5),
-                        "§6Nukekubi Skull",
-                        1.6,
-                        ignoreBlocks = false,
-                    )
-                }
-                if (config.drawLineToNukekebi) {
-                    val skullLocation = event.exactLocation(skull)
-                    if (skullLocation.distanceToPlayer() > 20) continue
-                    if (!skullLocation.canBeSeen()) continue
-                    event.draw3DLine(
-                        event.exactPlayerEyeLocation(),
-                        skullLocation.add(0.5, 1.0, 0.5),
-                        LorenzColor.GOLD.toColor(),
-                        3,
-                        true,
-                    )
-                }
+    private fun drawSittingBeacon(event: LorenzRenderWorldEvent) {
+        for ((location, time) in sittingBeacon) {
+            if (location.distanceToPlayer() > 20) continue
+            if (beaconConfig.showLine) {
+                event.draw3DLine(
+                    event.exactPlayerEyeLocation(),
+                    location.add(0.5, 1.0, 0.5),
+                    beaconConfig.lineColor.toChromaColor(),
+                    beaconConfig.lineWidth,
+                    true,
+                )
+            }
+
+            if (beaconConfig.highlightBeacon) {
+                val duration = 5.seconds - time.passedSince()
+                val durationFormat = duration.format(showMilliSeconds = true)
+                event.drawColor(location, beaconConfig.beaconColor.toChromaColor(), alpha = 1f)
+                event.drawWaypointFilled(location, beaconConfig.beaconColor.toChromaColor(), true, true)
+                event.drawDynamicText(location.add(y = 1), "§4Beacon §b$durationFormat", 1.8)
             }
         }
     }
