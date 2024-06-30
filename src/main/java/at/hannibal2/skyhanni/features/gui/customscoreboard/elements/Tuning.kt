@@ -15,14 +15,14 @@ object Tuning : ScoreboardElement() {
 
         val title = pluralize(tunings.size, "Tuning")
 
-        if (maxwellConfig.compactTuning) {
+        return if (maxwellConfig.compactTuning) {
             val tuningDisplay = tunings.take(3).joinToString("§7, ") { tuning ->
                 with(tuning) {
                     if (displayConfig.displayNumbersFirst) "$color$value$icon"
                     else "$color$icon$value"
                 }
             }
-            return if (displayConfig.displayNumbersFirst) "$tuningDisplay §f$title"
+            if (displayConfig.displayNumbersFirst) "$tuningDisplay §f$title"
             else "$title: $tuningDisplay"
         } else {
             val tuningAmount = maxwellConfig.tuningAmount.coerceAtLeast(1)
@@ -32,7 +32,7 @@ object Tuning : ScoreboardElement() {
                     else "$name: $color$value$icon"
                 }
             }
-            return listOf("$title:") + tuningList
+            listOf("$title:") + tuningList
         }
     }
 

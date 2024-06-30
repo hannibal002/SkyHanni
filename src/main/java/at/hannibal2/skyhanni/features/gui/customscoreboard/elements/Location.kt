@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 // internal and scoreboard
 // area change event and on scoreboard update in garden
 object Location : ScoreboardElement() {
-    override fun getDisplay() = listOfNotNull(
+    override fun getDisplay() = listOf(
         HypixelData.skyBlockAreaWithSymbol,
         ScoreboardPattern.plotPattern.firstMatches(ScoreboardData.sidebarLinesFormatted),
     )

@@ -1,17 +1,15 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.events
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getSbLines
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 // scoreboard
-// scoreboard update event
+// widget update event
 object Broodmother : ScoreboardEvent() {
-    override fun getDisplay() = ScoreboardPattern.broodmotherPattern.firstMatches(getSbLines())
+    override fun getDisplay() = TabWidget.BROODMOTHER.lines
 
-    override val configLine = "§4Broodmother§7: §eDormant"
+    override val configLine = "Broodmother§7: §eDormant"
 
     override fun showIsland() = IslandType.SPIDER_DEN.isInIsland()
 }
