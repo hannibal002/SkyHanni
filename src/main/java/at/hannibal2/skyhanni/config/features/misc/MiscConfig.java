@@ -122,6 +122,7 @@ public class MiscConfig {
     @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to hideTemporaryArmorStands
     public boolean hideTemporaryArmorstands = true;
 
     @Expose

@@ -79,7 +79,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    // TODO renmae to armorDropTracker
+    // TODO rename to armorDropTracker
     public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose

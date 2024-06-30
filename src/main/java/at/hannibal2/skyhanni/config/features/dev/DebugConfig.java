@@ -127,8 +127,9 @@ public class DebugConfig {
     public boolean currentAreaDebug = true;
 
     @Expose
-    @ConfigOption(name = "Oreblock Name", desc = "Show the OreBlock you are currently looking at.")
+    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
     @ConfigEditorBoolean
+    // TODO rename to rayTracedOreBlock
     public boolean raytracedOreblock = true;
 
     @Expose
