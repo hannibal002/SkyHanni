@@ -32,13 +32,13 @@ SkyHanni is especially helpful when doing activities like farming, slayers, Bing
 
 ## Discord & Support
 
-Give feedback or just chat with others on our discord!
+Give feedback or just chat with others on our community discord!
 
 * **Bug Reports:** Use the #bug-reports channel.
 * **Feature Suggestions:** Use the #suggestions channel.
 * **General Chat:** Chat with other SkyHanni users in #general.
 
-[Join the discord community](https://discord.gg/skyhanni-997079228510117908)
+[Join the discord](https://discord.gg/skyhanni-997079228510117908)
 
 ## Contributing
 
