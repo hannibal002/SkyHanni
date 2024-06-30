@@ -80,7 +80,7 @@ object ShaderManager {
                 ErrorManager.logErrorWithData(
                     OpenGLException("Shader compilation error."),
                     errorMessage,
-                    "GLSL Compilation Error:\n" to errorLog
+                    "GLSL Compilation Error:\n" to errorLog,
                 )
             } else {
                 LorenzUtils.consoleLog("$errorMessage $errorLog")
