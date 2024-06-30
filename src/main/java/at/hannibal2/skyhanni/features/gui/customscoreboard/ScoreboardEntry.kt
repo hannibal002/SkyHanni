@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Copper
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Date
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.EmptyLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Events
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Extra
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Footer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Gems
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Heat
@@ -33,6 +32,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Soulflow
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Time
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Tuning
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Unknown
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Visiting
 
 enum class ScoreboardEntry(val element: ScoreboardElement) {
@@ -67,7 +67,7 @@ enum class ScoreboardEntry(val element: ScoreboardElement) {
     MAYOR(Mayor),
     PARTY(Party),
     FOOTER(Footer),
-    EXTRA(Extra),
+    EXTRA(Unknown),
     EMPTY_LINE(EmptyLine),
     EMPTY_LINE2(EmptyLine),
     EMPTY_LINE3(EmptyLine),
