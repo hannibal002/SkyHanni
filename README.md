@@ -46,5 +46,5 @@ Interested in making SkyHanni even better? Check out our [contributing guide](CO
 
 ---
 
-**SkyHanni is part of a thriving 1.8.9 modding community. Explore other awesome mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) to
-create your ultimate SkyBlock setup!**
+**SkyHanni is part of an active modding community. Explore other useful mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) to
+complete SkyBlock setup!**
