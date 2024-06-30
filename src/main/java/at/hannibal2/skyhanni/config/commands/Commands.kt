@@ -396,7 +396,7 @@ object Commands {
         ) { CroesusChestTracker.resetChest() }
         registerCommand(
             "shkingfix",
-            "Resetting the local King Talisman Helper offset.",
+            "Resets the local King Talisman Helper offset.",
         ) { KingTalismanHelper.kingFix() }
         registerCommand(
             "shupdate",

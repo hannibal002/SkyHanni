@@ -11,7 +11,6 @@ enum class SkyblockStat(val icon: String) {
     STRENGTH("§c❁"),
     INTELLIGENCE("§b✎"),
 
-    // TODO rename to CRITICAL
     CRIT_DAMAGE("§9☠"),
     CRIT_CHANCE("§9☣"),
     FEROCITY("§c⫽"),

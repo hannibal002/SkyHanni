@@ -50,6 +50,7 @@
       <w>coflnet</w>
       <w>coords</w>
       <w>craftable</w>
+      <w>crit</w>
       <w>cropie</w>
       <w>crosshair</w>
       <w>deathmite</w>
@@ -146,6 +147,7 @@
       <w>mineman</w>
       <w>miniboss</w>
       <w>mirrorverse</w>
+      <w>misclick</w>
       <w>missclick</w>
       <w>mmclick</w>
       <w>mobtracker</w>
