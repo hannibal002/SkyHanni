@@ -252,8 +252,14 @@ interface Renderable {
             val neuFocus = NEUItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
-            val result = isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen &&
-                !isInNeuPv && !isInSkytilsPv && !neuFocus
+            val result = isGuiScreen &&
+                isGuiPositionEditor &&
+                inMenu &&
+                isNotInSignAndOnSlot &&
+                isConfigScreen &&
+                !isInNeuPv &&
+                !isInSkytilsPv &&
+                !neuFocus
 
             if (debug) {
                 if (!result) {
