@@ -25,6 +25,7 @@
             <w>bossbar</w>
             <w>broodfather</w>
             <w>broodmother</w>
+            <w>burningsoul</w>
             <w>cadycous</w>
             <w>carrolyn</w>
             <w>cata</w>
@@ -99,6 +100,7 @@
             <w>jerries</w>
             <w>jerrypocalypse</w>
             <w>jyrre</w>
+            <w>kada</w>
             <w>kaeso</w>
             <w>keybind</w>
             <w>keybinds</w>
@@ -113,6 +115,7 @@
             <w>lclick</w>
             <w>lerp</w>
             <w>livids</w>
+            <w>locraw</w>
             <w>matriach</w>
             <w>mawdredge</w>
             <w>maxor</w>
@@ -146,9 +149,11 @@
             <w>opengenerowmenu</w>
             <w>opti</w>
             <w>oruo</w>
+            <w>overworld</w>
             <w>packmaster</w>
             <w>peridot</w>
             <w>perkpocalypse</w>
+            <w>pesterminator</w>
             <w>pickblock</w>
             <w>pickobulus</w>
             <w>pickonimbus</w>
@@ -159,6 +164,7 @@
             <w>punchcard</w>
             <w>pyrochaos</w>
             <w>quazii</w>
+            <w>ragnarock</w>
             <w>rclick</w>
             <w>recombobulated</w>
             <w>recombobulator</w>

@@ -1241,7 +1241,7 @@
 
 #### Rift Fixes
 
-+ Fixed Rift NPC shops being treated as over world ones for selling items to them. -
++ Fixed Rift NPC shops being treated as Overworld ones for selling items to them. -
   Alexia Luna (https://github.com/hannibal002/SkyHanni/pull/1494)
 + Fixed Blood Effigies timers in the Rift. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1649)
     + Fixed timers showing even when above the set respawn time.
@@ -1354,7 +1354,7 @@
   Luna (https://github.com/hannibal002/SkyHanni/pull/1706)
 + Fixed bugged minion name tags on your private island when opening a minion. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1630)
-+ Fixed supercrafted items being incorrectly added to profit trackers. -
++ Fixed super-crafted items being incorrectly added to profit trackers. -
   Empa (https://github.com/hannibal002/SkyHanni/pull/1784)
 + Fixed typo in the Mythological Creature Tracker reset command. -
   Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1800)
@@ -1383,7 +1383,7 @@
 + Added offset to tick event. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
 + Made dungeon milestone use repo instead of local patterns. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1342)
-+ Unprivate LorenzVec.toCleanString. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1344)
++ Removed private modifier from LorenzVec.toCleanString. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1344)
 + Removed Old TimeMark Class. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1322)
 + Remove a lot of usage of fixed rate timers and replace with a new event. -
   CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1264)
@@ -3056,7 +3056,7 @@
 + Created Matcher.groupOrNull. - walker
 + cleanPlayerName respects playerRankHider option now. - hannibal2
 + Replaced ItemWarnEntry with VisitorReward. This should fix some errors. - hannibal2
-+ GardenNextJacobContest now uses SimpleTimeMark. SimpleTimeMark is storable in the config and comparable - hannibal2
++ GardenNextJacobContest now uses SimpleTimeMark. SimpleTimeMark can now be saved in the config directly and compared - hannibal2
 + No longer sending contest data to elite close to new year. - hannibal2
 + Added RepoPatterns. - nea
 + Use LorenzToolTipEvent over ItemTooltipEvent if possible. - hannibal2
@@ -3190,7 +3190,7 @@
 + Add log clearing. - CalMWolfs
 + Add auto-prefix to chat message methods. - walker
 + Added support for extra data in error manager. - hannibal2
-+ Added /readcropmilestonefromclipboard. - hannibal2
++ Added /shreadcropmilestonefromclipboard. - hannibal2
     + This command reads the clipboard content, in the format of users sending crop milestone step data.
     + The new data gets compared to the currently saved data, differences are getting replaced and the result gets put
       into the clipboard. The clipboard context can be used to update the repo content.
@@ -3304,7 +3304,7 @@
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 + Added support for showing the Primal Fear data from tab list as GUI elements. - Erymanthus
-+ Play warning sound when the next Primal Fear can spawn. - thunderblade73
++ Play warning sound when the next Primal Fear can spawn. - Thunderblade73
 
 #### Commands
 

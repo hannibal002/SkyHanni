@@ -884,7 +884,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 + Support for showing the primal fear data from tab list as GUI elements. - Erymanthus
-+ Play warning sound when the next Primal Fear can spawn. - thunderblade73
++ Play warning sound when the next Primal Fear can spawn. - Thunderblade73
 + Unique Gifting Opportunities. - nea
     + Highlight players who you haven't given gifts to yet.
     + Only highlight ungifted players while holding a gift.
