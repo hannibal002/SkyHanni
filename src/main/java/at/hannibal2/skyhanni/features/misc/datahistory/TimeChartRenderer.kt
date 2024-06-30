@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.datahistory
 import ChartScreen
 import at.hannibal2.skyhanni.SkyHanniMod
 import kotlinx.coroutines.launch
-import net.minecraftforge.common.MinecraftForge
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.NumberAxis
@@ -24,7 +23,6 @@ object TimeChartRenderer {
             val chart = createAndFormatChart(title, dataPoints, label)
             val screen = ChartScreen(chart)
             SkyHanniMod.screenToOpen = screen
-            MinecraftForge.EVENT_BUS.register(screen)
         }
     }
 
