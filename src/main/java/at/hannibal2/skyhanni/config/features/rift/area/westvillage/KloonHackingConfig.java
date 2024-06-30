@@ -8,13 +8,13 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class KloonHackingConfig {
 
     @Expose
-    @ConfigOption(name = "Hacking Solver", desc = "Highlights the correct button to click in the hacking inventory.")
+    @ConfigOption(name = "Hacking Solver", desc = "Highlight the correct button to click in the hacking inventory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean solver = true;
 
     @Expose
-    @ConfigOption(name = "Color Guide", desc = "Tells you which color to pick.")
+    @ConfigOption(name = "Color Guide", desc = "Show which color to pick.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean colour = true;

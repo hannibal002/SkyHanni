@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -45,6 +46,15 @@ object HoppityEggsManager {
     )
 
     /**
+     * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
+     * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
+     */
+    val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "egg.bought",
+        "§aYou bought §r§.(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!"
+    )
+
+    /**
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §fArnie §7(§F§LCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §aPenelope §7(§A§LUNCOMMON§7)!
      * REGEX-TEST: §D§LHOPPITY'S HUNT §7You found §6Solomon §7(§6§LLEGENDARY§7)!
@@ -57,10 +67,11 @@ object HoppityEggsManager {
     /**
      * REGEX-TEST: §d§lNEW RABBIT! §6+2 Chocolate §7and §6+0.003x Chocolate §7per second!
      * REGEX-TEST: §d§lNEW RABBIT! §6+0.02x Chocolate §7per second!
+     * REGEX-TEST: §d§lNEW RABBIT! §7Your §dTime Tower §7charge time is now §a7h§7!
      */
     val newRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.found.new",
-        "§d§lNEW RABBIT! §6\\+(?<chocolate>.*) Chocolate §7and §6\\+(?<perSecond>.*)x Chocolate §7per second!"
+        "§d§lNEW RABBIT! (?:((§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!)|(?<other>.*))"
     )
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
@@ -175,6 +186,7 @@ object HoppityEggsManager {
                 ChatUtils.clickableChat(
                     "Click here to share the location of this chocolate egg with the server!",
                     onClick = onClick,
+                    "§eClick to share!",
                     expireAt = 30.seconds.fromNow(),
                     oneTimeClick = true
                 )
@@ -184,14 +196,13 @@ object HoppityEggsManager {
 
     // TODO move logic into second passed event and cache
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isActive()) return
         if (!config.showClaimedEggs) return
         if (isBusy()) return
 
-        val displayList = HoppityEggType.entries
-            .map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }
-            .toMutableList()
+        val displayList =
+            HoppityEggType.entries.map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }.toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
 
         if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
@@ -204,7 +215,12 @@ object HoppityEggsManager {
         }
         if (displayList.size == 1) return
 
-        config.position.renderStrings(displayList, posLabel = "Hoppity Eggs")
+        val clickableDisplayList = listOf(Renderable.clickAndHover(
+            Renderable.verticalContainer(displayList.map(Renderable::string)),
+            tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
+            onClick = { HypixelCommands.warp(config.warpDestination) }
+        ))
+        config.position.renderRenderables(clickableDisplayList, posLabel = "Hoppity Eggs")
     }
 
     private fun formatEggsCollected(collectedEggs: Int): String =
@@ -223,14 +239,13 @@ object HoppityEggsManager {
     }
 
     private fun checkWarn() {
+        val allEggsRemaining = HoppityEggType.allEggsRemaining()
         if (!warningActive) {
-            warningActive = !HoppityEggType.allEggsRemaining()
+            warningActive = !allEggsRemaining
         }
 
-        if (warningActive) {
-            if (HoppityEggType.allEggsRemaining()) {
-                warn()
-            }
+        if (warningActive && allEggsRemaining) {
+            warn()
         }
     }
 
@@ -247,7 +262,7 @@ object HoppityEggsManager {
                 ChatUtils.clickableChat(
                     message,
                     onClick = { HypixelCommands.warp(config.warpDestination) },
-                    "§eClick to /warp ${config.warpDestination}!"
+                    "§eClick to ${"/warp ${config.warpDestination}".trim()}!"
                 )
             } else {
                 ChatUtils.clickableChat(

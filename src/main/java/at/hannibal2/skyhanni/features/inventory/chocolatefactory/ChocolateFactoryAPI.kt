@@ -35,11 +35,11 @@ object ChocolateFactoryAPI {
     val patternGroup = RepoPattern.group("misc.chocolatefactory")
     val chocolateAmountPattern by patternGroup.pattern(
         "chocolate.amount",
-        "(?<amount>[\\d,]+) Chocolate"
+        "(?<amount>[\\d,]+) Chocolate",
     )
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
-        "Hoppity|Chocolate Factory Milestones"
+        "Hoppity|Chocolate Factory Milestones",
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -78,19 +78,23 @@ object ChocolateFactoryAPI {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
 
         if (chocolateFactoryInventoryNamePattern.matches(event.inventoryName)) {
-            chocolateFactoryPaused = true
-            ChocolateFactoryStats.updateDisplay()
+            if (config.enabled) {
+                chocolateFactoryPaused = true
+                ChocolateFactoryStats.updateDisplay()
+            }
             return
         }
         if (event.inventoryName != "Chocolate Factory") return
         inChocolateFactory = true
 
-        factoryUpgrades = emptyList()
-        DelayedRun.runNextTick {
-            ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+        if (config.enabled) {
+            factoryUpgrades = emptyList()
+            DelayedRun.runNextTick {
+                ChocolateFactoryDataLoader.updateInventoryItems(event.inventoryItems)
+            }
         }
     }
 
@@ -151,6 +155,7 @@ object ChocolateFactoryAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
+    // TODO add debug toggle
     fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
@@ -158,7 +163,7 @@ object ChocolateFactoryAPI {
     fun timeTowerChargeDuration() =
         if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
 
-    private fun timeTowerMultiplier(): Double {
+    fun timeTowerMultiplier(): Double {
         var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1
         if (HoppityCollectionStats.hasFoundRabbit("Mu")) multiplier += 0.7
         return multiplier
