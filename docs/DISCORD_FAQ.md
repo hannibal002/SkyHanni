@@ -25,7 +25,9 @@ _Frequently Asked Questions_
 > Run the command `/shclearcontestdata` to clear the Jacob contest data.
 
 > **8: How can I get bigger crop hitboxes?**
-> Use [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with more features and performance improvements) or [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hitboxes in 1.8.9.
+> Use Patcher or PolyPatcher to have 1.12 hitboxes in 1.8.9.
+> - [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with more features and performance improvements)
+> - [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>)
 
 > **9: Why does my Item Tracker feature not track this item?**
 > 1. Check if the item goes directly into your sacks. 
