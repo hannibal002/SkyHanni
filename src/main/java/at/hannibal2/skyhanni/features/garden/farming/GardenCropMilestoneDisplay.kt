@@ -237,7 +237,7 @@ object GardenCropMilestoneDisplay {
         }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext &&
+            if (currentTier > 46 && currentTier == previousNext &&
                 nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
             ) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
@@ -246,7 +246,7 @@ object GardenCropMilestoneDisplay {
         }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext &&
+            if (currentTier > 46 && currentTier == previousNext &&
                 nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
             ) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
@@ -319,7 +319,7 @@ object GardenCropMilestoneDisplay {
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(buildList {
             addCropIconRenderable(mushroom)
-            addString("§7Mushroom Tier $nextTier")
+            addString("§7Mushroom Milestone $nextTier")
         })
 
         lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.string("§e$haveFormat§8/§e$needFormat")
@@ -338,7 +338,7 @@ object GardenCropMilestoneDisplay {
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
         lineMap[MushroomTextEntry.PERCENTAGE] = Renderable.string("§7Percentage: §e$percentageFormat")
 
-        if (currentTier >= 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
+        if (currentTier > 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
             GardenCropMilestones.onOverflowLevelUp(mushroom, currentTier - 1, nextTier - 1)
             lastMushWarnedLevel = currentTier
         }
