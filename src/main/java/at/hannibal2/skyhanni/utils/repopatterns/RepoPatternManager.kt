@@ -213,6 +213,11 @@ object RepoPatternManager {
             arrayPattern.wasOverridden = false
         }
 
+        if (localLoading) {
+            setDefaultPatterns()
+            return
+        }
+
         if (patternMap.mapTo(mutableSetOf()) { it.first } != patternMap.indices.toSet()) {
             logger.error("Incorrect index set for $arrayPattern")
             setDefaultPatterns()
