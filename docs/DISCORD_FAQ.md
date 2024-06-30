@@ -24,8 +24,8 @@ _Frequently Asked Questions_
 > **7: My Jacob Contest Display crops are wrong, how do I fix this?**
 > Run the command `/shclearcontestdata` to clear the Jacob contest data.
 
-> **8: How can I get bigger crop hit boxes?**
-> Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hitboxes in 1.8.9.
+> **8: How can I get bigger crop hitboxes?**
+> Use [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with more features and performance improvements) or [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hitboxes in 1.8.9.
 
 > **9: Why does my Item Tracker feature not track this item?**
 > 1. Check if the item goes directly into your sacks. 
@@ -55,10 +55,10 @@ _Frequently Asked Questions_
 > **12: Why can I still see the normal Scoreboard when using Custom Scoreboard?**
 > Most of the time, this is a mod conflict.
 > If you are using [Sidebar Mod](https://github.com/Alexdoru/SidebarMod), please remove this mod.
-> If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.7 or newer to resolve this issue.
+> If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.8 or newer to resolve this issue.
 > If you are using [Apec](https://github.com/BananaFructa/Apec/) and want to remove their Scoreboard, you need to remove Apec since they don't have an option to disable their Scoreboard.
 > If you don't use any of these mods, make sure the option to "Hide Vanilla Scoreboard" is actually enabled.
 
 
-*This FAQ was last updated on June 26th, 2024.
+*This FAQ was last updated on July 1st, 2024.
 If you believe there's something that should be added to this list, please tell us, so we can add it.*
