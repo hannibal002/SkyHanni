@@ -58,6 +58,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.commons.io.FilenameUtils
 import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
@@ -70,8 +71,7 @@ object GhostCounter {
     val config get() = SkyHanniMod.feature.combat.ghostCounter
     val storage get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
-    val s = File.separator
-    var ghostCounterV3File = File(""".${s}config${s}ChatTriggers${s}modules${s}GhostCounterV3$s.persistantData.json""")
+    var ghostCounterV3File = File(FilenameUtils.separatorsToSystem("./config/ChatTriggers/modules/GhostCounterV3/.persistantData.json"))
 
     private val patternGroup = RepoPattern.group("combat.ghostcounter")
     private val skillXPPattern by patternGroup.pattern(
