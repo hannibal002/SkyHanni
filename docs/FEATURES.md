@@ -100,7 +100,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highlights your selected class in green if it's available.
 + Kismet tracking for dungeon chests. - Thunderblade73
     + Highlight chests which have been rerolled inside Croesus
-    + Shows kismet amount at the reroll button
+    + Shows kismet amount at the re-roll button
 + SA Jump Notification. - CarsCupcake (https://github.com/hannibal002/SkyHanni/pull/852)
     + Warn shorty before a Shadow Assassin jumps to you in dungeons.
 + Notifications for architect on puzzle fail. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1197)
@@ -244,7 +244,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Option to hide the nametag of your spawned summoning mobs.
 - Option to mark the own summoning mobs in green.
 - Summoning Mob Display (Show the health of your spawned summoning mobs listed in an extra GUI element and hiding the
-  corresponding spawning/despawning chat messages)
+  corresponding spawning/de-spawning chat messages)
 
 </details>
 <details open><summary>
@@ -322,7 +322,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Works in crystal hollows too (worm fishing)
     + Keybind to manually reset the barn/worm fishing timer. - CarsCupcake
     + Warning sound when the worm fishing cap of 60 is hit. - CarsCupcake
-    + Has support for the gamemode Stranded. - hannibal2
+    + Has support for the game mode Stranded. - hannibal2
 + **Shark Fish Counter** - Counts how many sharks have been caught.
 + **Odger waypoint** - Show the Odger waypoint when trophy fishes are in the inventory and no lava rod in hand.
 + Showing fished item names
@@ -457,10 +457,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Griffin Pet Warning**
     + Warn when holding an Ancestral Spade while no Griffin pet is selected.
 + **Inquisitor Sharing**
-    + Share aypoints for inquisitors you find with your party.
+    + Share waypoints for inquisitors you find with your party.
     + Show a timer until the inquisitor will despawn.
 + Diana Profit Tracker. - hannibal2
-    + Same options as slayer and fising trackers.
+    + Same options as slayer and fishing trackers.
 + Highlight for the Minos Inquisitors to make them easier to see. - Cad
 + Mythological Mob Tracker. - hannibal2
     + Counts the different mythological mobs you have dug up.
@@ -520,7 +520,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Highlight corrupted mobs.
 + **Arachne Minis Hider** - Hides the nametag above arachne minis.
 + **Arachne Boss Highlighter** - Highlight the arachne boss in red and mini bosses and orange.
-+ "Line to Arachne" setting, just like with slayer minibosses. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/1888)
++ "Line to Arachne" setting, just like with slayer mini bosses. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/1888)
 + Countdown for Arachne spawn. - Cad
     + Supports quick spawns.
 + Option to hide the vanilla particles around enderman
@@ -557,7 +557,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Garden Level Display** - Show the current garden level and progress to the next level.
 + **Fake garden level up** message: - hannibal2
     + In 10k garden exp steps after level 15.
-    + Uses the overflow exp that hypixel still caluclates (maybe official upgrade with more garden levels in the
+    + Uses the overflow exp that hypixel still calculates (maybe official upgrade with more garden levels in the
       future?).
     + Click on the message to open the garden level display. - J10a1n15
 + **Farming Weight and Leaderboard**
@@ -570,7 +570,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
   switching to a different pet for leveling.
 + **Money per Hour**
     + Displays the money per hour YOU get with YOUR crop/minute value when selling the items to bazaar.
-    + Suppports the dicer drops from melon and pumpkins as well. - CalMWolfs
+    + Supports the dicer drops from melon and pumpkins as well. - CalMWolfs
     + Supports armor drops. - CalMWolfs
 + Farming contest timer.
 + Wrong fungi cutter mode warning.
@@ -764,7 +764,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide already completed kloon terminal waypoints
 + **Crux Talisman Progress** Display - HiZe
     + Show bonuses you get from the talisman
-+ **Lazer Parkour** Solver - CalMWolfs
++ **Laser Parkour** Solver - CalMWolfs
     + Highlights the location of the invisible blocks in the Mirrorverse
 + Mirrorverse **Dance Room Helper** - HiZe
     + Helps to solve the dance room in the Mirrorverse by showing multiple tasks at once.
@@ -784,7 +784,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Living Metal Suit Progress - HiZe
     + Display progress Living Metal Suit (Default disabled)
     + Option to show a compacted version of the overlay when the set is maxed
-+ Highlight for Blobbercysts in Bacte fight in colloseum in rift - HiZe
++ Highlight for Blobbercysts in Bacte fight in colosseum in rift - HiZe
 + Show a line between **Defense blocks** and the mob and highlight the blocks - hannibal2
     + Hide particles around Defense Blocks
 + Show a moving animation between **Living Metal** and the next block - hannibal2
@@ -880,7 +880,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Thanks Tobbbb for the coordinates!
     + Support for hiding basket waypoints once you have clicked on them. - hannibal2
     + Option to show only the closest basket. - hannibal2
-+ Help with the 2023 Halloween visitor challenge (ephemeral dingsibumsi or something) - nea
++ Help with the 2023 Halloween visitor challenge (Ephemeral Gratitude) - nea
     + New Visitor Ping: Pings you when you are less than 10 seconds away from getting a new visitor.
     + Accept Hotkey: Accept a visitor when you press this keybind while in the visitor GUI.
 + Support for showing the primal fear data from tab list as GUI elements. - Erymanthus
@@ -916,7 +916,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Factory Chat Filters. - RobotHanzo (https://github.com/hannibal002/SkyHanni/pull/1574)
     + Hide chocolate factory upgrade and employee promotion messages.
 + Copy Chocolate Factory Stats to clipboard. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
-+ Highlight unbought items in Hoppity shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
++ Highlight non-purchased items in Hoppity shop. - seraid (https://github.com/hannibal002/SkyHanni/pull/1517)
 + Added time tower status to the chocolate factory stats. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1506)
     + Also can notify you when you get a new charge or your charges are full.
 + Extra tooltip stats about upgrades for the chocolate factory. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1594)
@@ -991,7 +991,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 </summary>
 
-+ Highlights NPCs in the stranded menu that are placeable but havent been placed. - walker
++ Highlights NPCs in the stranded menu that are placeable but haven't been placed. - walker
 
 </details>
 <details open><summary>
@@ -1036,7 +1036,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Tia Relay Waypoint** - Show the next Relay waypoint for Tia The Fairy, where maintenance for the abiphone network
   needs to be done.
 + **Tia Relay Helper** - Helps with solving the sound puzzle.
-+ **Hide dead entities** - Similar to Skytil's feature for inside dungeon, but for everywhere.
++ **Hide dead entities** - Similar to Skytils' feature for inside dungeon, but for everywhere.
 + **Tps Display** - Show the Tps of the current server.
 + **Particle Hider** - Hide blaze particles, fire block particles, fireball particles, near redstone particles, far
   particles or smoke particles.
@@ -1084,7 +1084,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Option to highlight items that are full in the sack inventory.
 + **Ghost Counter** (Contributed by HiZe)
     + Shows number of ghosts killed in the Mist in Dwarven Mines
-    + Shows kill combo, coins per scavenger, all item drops, bestiarity, magic find and more
+    + Shows kill combo, coins per scavenger, all item drops, bestiary, magic find and more
     + Each display line is highly customizable
 + **Frozen Treasure Tracker** (Contributed by CalMWolfs)
     + Show different items collected while breaking treasures in the Glacial Cave in Jerry's Workshop
@@ -1103,7 +1103,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + **Ender Node Tracker** - pretz
     + Tracks items and profit obtained from collecting ender nodes and killing normal endermen.
 + **Harp Keybinds** - NetheriteMiner
-    + In Melodys Harp, press buttons with your number row on the keyboard instead of clicking.
+    + In Melody's Harp, press buttons with your number row on the keyboard instead of clicking.
 + **Teleport Pad Compact Name**
     + Hide the 'Warp to' and 'No Destination' texts over teleport pads.
     + Only on Private island.
@@ -1127,10 +1127,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Allows to change those settings anytime again with /shdefaultoptions.
 + Show alert when reaching max super-pairs clicks. - pretz
     + Plays a beep sound and sends a message in chat when the player reaches the maximum number of clicks gained for
-      super-pairs minigames.
+      super-pairs mini games.
 + Anniversary Event Active Player Ticket Timer. - nea
     + Option to play a sound as well.
-+ **Travor Trapper** Features in Farming Islands
++ **Trevor Trapper** Features in Farming Islands
     + Trapper Cooldown GUI. - NetheriteMiner
         + Show the cooldown on screen in an overlay (intended for abiphone users).
     + **Trevor the Trapper Tracker**. - CalMWolfs
@@ -1145,7 +1145,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Change the scale with plus and minus keys. - CalMWolfs
 + **Compact Tab List**.
     + Compacts the tablist to make it look much nicer (old SBA feature, but fewer bugs). - CalMWolfs
-    + Option to hide Hypixel advertisment banners. - CalMWolfs
+    + Option to hide Hypixel advertisement banners. - CalMWolfs
     + **Advanced Player List**. - hannibal2
         + Customize the player list (inside the tab list) in various ways.
         + Change the sort order of players: Default, SkyBlock Level, alphabetical name, Iron Man first/bingo level,
@@ -1256,7 +1256,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Highly customizable: Colors, display sizes.
     + Estimated Price Integration.
     + Favorite slots; option to only display favorite slots.
-+ Added a Chat Message if the Perkapocalypse Mayor is unknown. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2009)
++ Added a Chat Message if the Perkpocalypse Mayor is unknown. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2009)
 + Added a source download verification checker. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1914)
     + Warns you when the mod has been downloaded from an untrusted source (not the official GitHub or Modrinth).
 + Shows a list of items that can be crafted with the items in your inventory when inside the crafting menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1334)
