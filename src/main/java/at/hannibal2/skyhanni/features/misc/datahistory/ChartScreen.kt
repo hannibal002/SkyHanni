@@ -52,7 +52,13 @@ class ChartScreen(private val chart: JFreeChart) : GuiScreen() {
                 val xOffset = (event.resolution.scaledWidth - chartWidth) / 2
                 val yOffset = (event.resolution.scaledHeight - chartHeight) / 2
 
-                drawTexturedModalRect(xOffset, yOffset, 0, 0, chartWidth, chartHeight)
+//                 drawTexturedModalRect(xOffset, yOffset, 0, 0, chartWidth, chartHeight)
+                drawModalRectWithCustomSizedTexture(
+                    xOffset, yOffset,
+                    0f, 0f,
+                    chartWidth, chartHeight,
+                    chartWidth.toFloat(), chartHeight.toFloat(),
+                )
             }
         }
     }
