@@ -168,7 +168,7 @@ object EndermanSlayerFeatures {
             if (beaconConfig.showLine) {
                 event.draw3DLine(
                     event.exactPlayerEyeLocation(),
-                    location.add(0.5, 1.0, 0.5),
+                    location.add(y = 1.0),
                     beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
                     true,

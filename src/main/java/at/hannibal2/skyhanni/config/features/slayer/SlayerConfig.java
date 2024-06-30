@@ -13,8 +13,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class SlayerConfig {
 
     @Expose
-    @Category(name = "Endermen", desc = "Endermen Slayer Feature")
+    @Category(name = "Enderman", desc = "Enderman Slayer Feature")
     @Accordion
+    // TODO rename to "enderman"
     public EndermanConfig endermen = new EndermanConfig();
 
     @Expose
