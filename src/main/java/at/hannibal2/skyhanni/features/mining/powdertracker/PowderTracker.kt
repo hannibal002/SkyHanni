@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -105,16 +106,14 @@ object PowderTracker {
         calculateResourceHour(chestInfo)
         calculateResourceHour(hardStoneInfo)
 
-        for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
-            if (line.contains("2x Powder")) {
-                if (eventEnded) return
-                doublePowder = true
-                val durationLine = TabWidget.EVENT.lines.getOrNull(index + 1) ?: return
-                tablistEventDuration.matchMatcher(durationLine) {
-                    val duration = group("duration")
-                    powderTimer = TimeUtils.getDuration(duration)
-                    tracker.update()
-                }
+
+        TabWidget.EVENT.lines.nextAfter({ it.contains("2x Powder") })?.let { durationLine ->
+            if (eventEnded) return
+            doublePowder = true
+            tablistEventDuration.matchMatcher(durationLine) {
+                val duration = group("duration")
+                powderTimer = TimeUtils.getDuration(duration)
+                tracker.update()
             }
         }
 
