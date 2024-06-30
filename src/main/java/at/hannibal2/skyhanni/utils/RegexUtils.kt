@@ -50,6 +50,7 @@ object RegexUtils {
 
     fun List<Pattern>.allMatches(list: List<String>): List<String> = list.filter { line -> any { it.matches(line) } }
     fun List<Pattern>.anyMatches(list: List<String>?): Boolean = list?.any { line -> any { it.matches(line) } } ?: false
+    fun List<Pattern>.anyMatches(string: String): Boolean = any { it.matches(string) }
 
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
