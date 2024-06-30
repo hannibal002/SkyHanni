@@ -47,4 +47,4 @@ Interested in writing your own SkyHanni feature or fix that one annoying bug you
 ---
 
 **SkyHanni is part of an active modding community. Explore other useful mods [here](https://sbmw.ca/mod-lists/skyblock-mod-list/) to
-complete SkyBlock setup!**
+complete your SkyBlock setup!**
