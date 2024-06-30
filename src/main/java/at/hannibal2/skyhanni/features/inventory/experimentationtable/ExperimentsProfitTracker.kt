@@ -1,28 +1,36 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsDryStreakDisplay.experimentInventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -40,6 +48,8 @@ object ExperimentsProfitTracker {
     private var inExperiment = false
     private var inExperimentationTable = false
     private var lastExperimentTime = SimpleTimeMark.farPast()
+    private var lastSplashes = mutableListOf<ItemStack>()
+    private var lastSplashTime = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("enchanting.experiments.profittracker")
     val experimentsDropPattern by patternGroup.pattern(
@@ -50,11 +60,16 @@ object ExperimentsProfitTracker {
         "exp",
         "(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp",
     )
+    private val experienceBottlePattern by patternGroup.pattern(
+        "xpbottle",
+        "(?:Titanic |Grand |\\b)Experience Bottle",
+    )
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
             experimentsDone = 0L
             xpGained = 0L
+            startCost = 0
         }
 
         override fun getDescription(timesGained: Long): List<String> {
@@ -75,6 +90,9 @@ object ExperimentsProfitTracker {
 
         @Expose
         var xpGained = 0L
+
+        @Expose
+        var startCost: Long = 0
     }
 
     @SubscribeEvent
@@ -100,9 +118,40 @@ object ExperimentsProfitTracker {
     }
 
     @SubscribeEvent
+    fun onItemClick(event: ItemClickEvent) {
+        if (event.clickType == ClickType.RIGHT_CLICK) {
+            val item = event.itemInHand ?: return
+            if (experienceBottlePattern.matches(item.displayName.removeColor())) {
+                lastSplashTime = SimpleTimeMark.now()
+                lastSplashes.add(item)
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
-        if (experimentInventoriesPattern.matches(event.inventoryName)) inExperimentationTable = true
+        if (experimentInventoriesPattern.matches(event.inventoryName)) {
+            inExperimentationTable = true
+            if (lastSplashTime.passedSince() < 30.seconds) {
+                var startCostTemp = 0
+                val iterator = lastSplashes.iterator()
+                while (iterator.hasNext()) {
+                    val item = iterator.next()
+                    val internalName = item.getInternalName()
+                    val price = internalName.getPrice()
+                    val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
+                    val maxPrice = npcPrice.coerceAtLeast(price)
+                    startCostTemp += maxPrice.round(0).toInt()
+                    iterator.remove()
+                }
+                println(startCostTemp)
+                tracker.modify {
+                    it.startCost += startCostTemp * 1
+                }
+                lastSplashTime = SimpleTimeMark.farPast()
+            }
+        }
         if (InventoryUtils.getCurrentExperiment() != null) inExperiment = true
     }
 
@@ -116,16 +165,26 @@ object ExperimentsProfitTracker {
             }
             inExperiment = false
         }
-        if (inExperimentationTable) inExperimentationTable = false
+        if (inExperimentationTable) {
+            lastExperimentTime = SimpleTimeMark.now()
+            inExperimentationTable = false
+        }
     }
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lExperiments Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this)
+        val profit = tracker.drawItems(data, { true }, this) - data.startCost
 
         val experimentsDone = data.experimentsDone
         addAsSingletonList("")
-        addAsSingletonList("§eExperiments Done: §a${experimentsDone.addSeparators()}",)
+        addAsSingletonList("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+        val startCostFormat = data.startCost.shortFormat()
+        addAsSingletonList(
+            Renderable.hoverTips(
+                "§eExperiments Start Cost: §c$startCostFormat",
+                listOf("§7You paid §c$startCostFormat §7in total", "§7for starting experiments."),
+            ),
+        )
         addAsSingletonList(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
         addAsSingletonList("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
 
