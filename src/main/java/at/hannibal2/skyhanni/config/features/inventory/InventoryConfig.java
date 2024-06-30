@@ -57,12 +57,12 @@ public class InventoryConfig {
     @Expose
     @Category(name = "Chocolate Factory", desc = "Features to help you master the Chocolate Factory idle game.")
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
-  
+
     @Expose
     @Category(name = "Craftable Item List", desc = "")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
-  
+
     @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
@@ -107,6 +107,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Pocket Sack-In-A-Sack", desc = "")
     @Accordion
     public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
+
+    @Expose
+    @ConfigOption(name = "Page Scrolling", desc = "")
+    @Accordion
+    public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
@@ -174,10 +179,11 @@ public class InventoryConfig {
     public boolean vacuumBagCap = true;
 
     @Expose
-    @ConfigOption(name = "Quick Craft Confirmation", desc = "Require Ctrl+Click to craft items that aren't often quick crafted "
-        +
-        "(e.g. armor, weapons, accessories). " +
-        "Sack items can be crafted normally.")
+    @ConfigOption(name = "Quick Craft Confirmation",
+        desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
+            "(e.g. armor, weapons, accessories). " +
+            "Sack items can be crafted normally."
+    )
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean quickCraftingConfirmation = false;

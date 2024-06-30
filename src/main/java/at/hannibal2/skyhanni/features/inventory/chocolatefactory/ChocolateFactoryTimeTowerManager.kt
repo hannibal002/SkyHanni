@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -22,7 +23,12 @@ object ChocolateFactoryTimeTowerManager {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
-    private var lastTimeTowerReminder = SimpleTimeMark.farPast()
+    private var wasTimeTowerRecentlyActive = false
+
+    @SubscribeEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        wasTimeTowerRecentlyActive = false
+    }
 
     private const val HOVER_TEXT = "§eClick to run /cf!"
 
@@ -35,11 +41,9 @@ object ChocolateFactoryTimeTowerManager {
             profileStorage.currentTimeTowerEnds = SimpleTimeMark.farPast()
         }
 
-        if (ChocolateFactoryAPI.inChocolateFactory) return
+        checkTimeTowerExpired()
 
-        if (config.timeTowerReminder) {
-            timeTowerReminder()
-        }
+        if (ChocolateFactoryAPI.inChocolateFactory) return
 
         val nextCharge = profileStorage.nextTimeTower
 
@@ -49,10 +53,10 @@ object ChocolateFactoryTimeTowerManager {
             val nextTimeTower = profileStorage.nextTimeTower + profileStorage.timeTowerCooldown.hours
             profileStorage.nextTimeTower = nextTimeTower
 
-            if (!config.timeTowerWarning) return
+            if (!config.timeTowerWarning || timeTowerActive()) return
             ChatUtils.clickableChat(
                 "Your Time Tower has another charge available §7(${timeTowerCharges()})§e, " +
-                    "Click here to use one",
+                    "Click here to use one.",
                 onClick = { HypixelCommands.chocolateFactory() },
                 HOVER_TEXT,
             )
@@ -61,6 +65,22 @@ object ChocolateFactoryTimeTowerManager {
             return
         }
         checkTimeTowerWarning(false)
+    }
+
+    private fun checkTimeTowerExpired() {
+        val isTimeTowerActive = timeTowerActive()
+        if (!isTimeTowerActive && wasTimeTowerRecentlyActive && config.timeTowerReminder && currentCharges() > 0) {
+            val charges = StringUtils.pluralize(currentCharges(), "charge", "charges", withNumber = true)
+            ChatUtils.clickableChat(
+                "§cYour Time Tower just expired and has $charges remaining. Click here to use one.",
+                onClick = {
+                    HypixelCommands.chocolateFactory()
+                },
+                hover = "§eClick to run /cf!",
+            )
+            SoundUtils.playBeepSound()
+        }
+        wasTimeTowerRecentlyActive = isTimeTowerActive
     }
 
     fun checkTimeTowerWarning(inInventory: Boolean) {
@@ -76,7 +96,7 @@ object ChocolateFactoryTimeTowerManager {
             "§cYour Time Tower is full §7(${timeTowerCharges()})§c, " +
                 "Use one to avoid wasting time tower usages!",
             onClick = { HypixelCommands.chocolateFactory() },
-            HOVER_TEXT
+            HOVER_TEXT,
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()
@@ -104,22 +124,6 @@ object ChocolateFactoryTimeTowerManager {
     }
 
     private fun timeTowerEnds(): SimpleTimeMark = profileStorage?.currentTimeTowerEnds ?: SimpleTimeMark.farPast()
-
-    private fun timeTowerReminder() {
-        if (lastTimeTowerReminder.passedSince() < 20.seconds) return
-
-        val timeUntil = timeTowerEnds().timeUntil()
-        if (timeUntil < 1.minutes && timeUntil.isPositive()) {
-            ChatUtils.clickableChat(
-                "§cYour Time Tower is about to end! " +
-                    "Open the Chocolate Factory to avoid wasting the multiplier!",
-                onClick = { HypixelCommands.chocolateFactory() },
-                HOVER_TEXT
-            )
-            SoundUtils.playBeepSound()
-            lastTimeTowerReminder = SimpleTimeMark.now()
-        }
-    }
 
     fun timeTowerFullTimeMark(): SimpleTimeMark {
         val profileStorage = profileStorage ?: return SimpleTimeMark.farPast()
