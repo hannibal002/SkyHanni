@@ -1,6 +1,7 @@
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.texture.DynamicTexture
 import org.jfree.chart.JFreeChart
 import org.lwjgl.opengl.GL11
@@ -60,13 +61,16 @@ class ChartScreen(private val chart: JFreeChart) : GuiScreen() {
 
         val chartTexture = chartTexture ?: return
 
+        GlStateManager.resetColor()
         GL11.glBindTexture(GL11.GL_TEXTURE_2D, chartTexture.getGlTextureId())
 
+        GlStateManager.resetColor()
         drawModalRectWithCustomSizedTexture(
             xOffset, yOffset,
             0f, 0f,
             chartWidth, chartHeight,
             chartWidth.toFloat(), chartHeight.toFloat(),
         )
+        GlStateManager.resetColor()
     }
 }

@@ -340,7 +340,7 @@ object Commands {
         registerCommand(
             "shpursehistory",
             "Shows the history of your purse over time",
-        ) { PurseHistory.onCommand() }
+        ) { PurseHistory.onCommand(it) }
     }
 
     private fun usersBugFix() {

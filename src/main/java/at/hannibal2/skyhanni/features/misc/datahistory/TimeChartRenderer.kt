@@ -16,11 +16,14 @@ import java.awt.Color
 import java.text.NumberFormat
 import java.time.Instant
 import java.util.Date
+import kotlin.time.Duration
 
 object TimeChartRenderer {
-    fun openTimeChart(dataPoints: List<DataPoint>, title: String, label: String) {
+    fun openTimeChart(dataPoints: List<DataPoint>, duration: Duration, title: String, label: String) {
+        val begin = System.currentTimeMillis() - duration.inWholeMilliseconds
+        val filteredData = dataPoints.filter { it.time > begin }
         SkyHanniMod.coroutineScope.launch {
-            val chart = createAndFormatChart(title, dataPoints, label)
+            val chart = createAndFormatChart(title, filteredData, label)
             val screen = ChartScreen(chart)
             SkyHanniMod.screenToOpen = screen
         }

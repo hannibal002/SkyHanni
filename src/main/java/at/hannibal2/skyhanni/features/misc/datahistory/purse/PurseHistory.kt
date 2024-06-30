@@ -13,11 +13,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.million
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TimeUtils
 import com.google.gson.Gson
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -69,7 +71,7 @@ object PurseHistory {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.purse
 
-    fun onCommand() {
+    fun onCommand(args: Array<String>) {
         if (!LorenzUtils.inSkyBlock) {
             ChatUtils.userError("Only available on SkyBlock!")
             return
@@ -91,8 +93,13 @@ object PurseHistory {
             return
         }
 
+        val duration = args.getOrNull(0)?.let {
+            TimeUtils.getDuration(it)
+        } ?: Duration.INFINITE
+
         TimeChartRenderer.openTimeChart(
             dataPoints,
+            duration,
             title = "Purse History",
             label = "Coins (Millions)",
         )
