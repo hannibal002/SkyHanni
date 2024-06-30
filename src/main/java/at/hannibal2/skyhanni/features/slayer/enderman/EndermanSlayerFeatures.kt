@@ -132,7 +132,7 @@ object EndermanSlayerFeatures {
                 if (!skullLocation.canBeSeen()) continue
                 event.draw3DLine(
                     event.exactPlayerEyeLocation(),
-                    skullLocation.add(0.5, 1.0, 0.5),
+                    skullLocation.add(y = 1),
                     LorenzColor.GOLD.toColor(),
                     3,
                     true,
@@ -168,7 +168,7 @@ object EndermanSlayerFeatures {
             if (beaconConfig.showLine) {
                 event.draw3DLine(
                     event.exactPlayerEyeLocation(),
-                    location.add(y = 1.0),
+                    location.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
                     true,
