@@ -25,7 +25,7 @@ _Frequently Asked Questions_
 > Run the command `/shclearcontestdata` to clear the Jacob contest data.
 
 > **8: How can I get bigger crop hit boxes?**
-> Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hitboxes in 1.8.9.
+> Use [Patcher](<https://sk1er.club/mods/patcher>) to have 1.12 hit boxes in 1.8.9.
 
 > **9: Why does my Item Tracker feature not track this item?**
 > 1. Check if the item goes directly into your sacks. 
