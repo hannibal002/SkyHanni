@@ -22,27 +22,27 @@ SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hy
 * **Entity/Item Highlighters:** Focus on important mobs or items in the world/your inventory.
 * **And much more!**
 
-SkyHanni is especially helpful when doing activities like farming, slayers, Bingo, Diana, Fishing, or Rift.
+SkyHanni is especially helpful when doing activities like farming, slayers, Bingo, Diana, fishing, or Rift.
 
 ## Getting Started
 
 1. **Install:**  Check out the [installation guide](docs/INSTALLING.md).
-2. **Set up:** Type `/sh` or `/skyhanni` in-game to change your settings.
+2. **Set Up:** Type `/sh` or `/skyhanni` in-game to change your settings.
 3. **Explore:** See all the features [here](docs/FEATURES.md).
 
 ## Discord & Support
 
-Give feedback or just chat with others on our community discord!
+Give feedback or just chat with others on our community Discord!
 
-* **Bug Reports:** Use the #bug-reports channel.
-* **Feature Suggestions:** Use the #suggestions channel.
-* **General Chat:** Chat with other SkyHanni users in #general.
+* **Bug Reports:** Use the `#bug-reports` channel.
+* **Feature Suggestions:** Use the `#suggestions channel`.
+* **General Chat:** Chat with other SkyHanni users in `skyblock-#general`.
 
-[Join the discord](https://discord.gg/skyhanni-997079228510117908)
+[Join the Discord](https://discord.gg/skyhanni-997079228510117908)
 
 ## Contributing
 
-Interested in writing your own SkyHanni feature or fix that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for coding infos.
+Interested in writing your own SkyHanni feature or fixing that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for more information.
 
 ---
 
