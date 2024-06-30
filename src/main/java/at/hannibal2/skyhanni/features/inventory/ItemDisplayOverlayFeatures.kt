@@ -84,9 +84,14 @@ object ItemDisplayOverlayFeatures {
         "bingogoalrank",
         "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
     )
+
+    /**
+     * REGEX-TEST: §7Your SkyBlock Level: §8[§a156§8]
+     * REGEX-TEST: §7Your SkyBlock Level: §8[§5399§8]
+     */
     private val skyblockLevelPattern by patternGroup.pattern(
         "skyblocklevel",
-        "§7Your SkyBlock Level: §8\\[(?<level>§\\S\\d+)§8]"
+        "§7Your SkyBlock Level: §8\\[(?<level>§.\\d+)§8]"
     )
 
     @SubscribeEvent
