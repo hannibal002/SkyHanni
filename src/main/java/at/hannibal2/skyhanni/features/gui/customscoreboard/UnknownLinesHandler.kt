@@ -28,6 +28,8 @@ internal var confirmedLinesCache = SizeLimitedSet<String>(100)
 internal var confirmedUnknownLines = listOf<String>()
 internal var unconfirmedUnknownLines = listOf<String>()
 
+internal var pastUnknownLines = SizeLimitedSet<String>(100)
+
 internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { line, cause -> if (cause == RemovalCause.EXPIRED) onRemoval(line) }
 
 private fun onRemoval(line: String) {
@@ -45,6 +47,7 @@ private fun onRemoval(line: String) {
         "Island" to LorenzUtils.skyBlockIsland,
         "Area" to HypixelData.skyBlockArea,
         "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        "Previous Unknown Lines" to pastUnknownLines.toSet(),
         noStackTrace = true,
         betaOnly = true,
     )
@@ -247,6 +250,7 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter { it !in unknownLinesSet }
 
         unknownLines.forEach {
+            pastUnknownLines += it
             ChatUtils.debug("Unknown Scoreboard line: '$it'")
             unknownLinesSet.add(it)
         }

@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -228,13 +229,18 @@ object CustomScoreboard {
             if (!config.enabled.get()) {
                 add("Custom Scoreboard disabled.")
             } else {
+                add("Custom Scoreboard Lines:")
                 ScoreboardEntry.entries.forEach { entry ->
                     add(
-                        "${entry.name.firstLetterUppercase()} - " +
+                        "   ${entry.name.firstLetterUppercase()} - " +
                             "island: ${entry.element.showIsland()} - " +
                             "show: ${entry.element.showWhen()} - " +
                             "${entry.element.getLines().map { it.display }}",
                     )
+                }
+                pastUnknownLines.toSet().takeIfNotEmpty()?.let { set ->
+                    add("Recent Unknown Lines:")
+                    set.forEach { add("   $it") }
                 }
             }
         }
