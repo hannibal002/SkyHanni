@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -253,7 +254,21 @@ object GardenVisitorFeatures {
             }
         }
         if (hasIngredients) {
-            list.add(" §7(§aCraftable!§7)")
+            val leftToCraft = amount - amountInSacks
+            list.add(" §7(")
+            list.add(
+                Renderable.optionalLink(
+                    "§aCraftable!",
+                    {
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            LorenzUtils.setTextIntoSign("$leftToCraft")
+                        } else {
+                            HypixelCommands.viewRecipe(internalName.toString())
+                        }
+                    },
+                ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
+            )
+            list.add("§7)")
         }
     }
 
