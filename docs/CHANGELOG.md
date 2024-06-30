@@ -2555,7 +2555,7 @@
 + Fixed GUI positions moving into the bottom-right corner when leaving the GUI position editor while pressing the mouse
   button on next reopen. - hannibal2
 + Fixed parts of Compact Tab List being uncoloured. - CalMWolfs
-+ Fixed Compact Tab List' Toggle Tab not working when using patcher. - hannibal2
++ Fixed Compact Tab List' Toggle Tab not working when using Patcher. - hannibal2
 + Fixed Skill progress display size too small when not using the progress bar. - Thunderblade73
 + Fixed the skill progress bar trying to get out of the screen. - HiZe
 + Fixed the negative time remaining in the skill ETA display. - HiZe
