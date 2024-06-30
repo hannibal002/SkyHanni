@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isCoopSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -339,7 +340,7 @@ object HideNotClickableItems {
 
         // TODO make check if player is on private island
 
-        if (!ItemUtils.isSoulBound(stack)) return false
+        if (!stack.isSoulBound()) return false
 
         hideReason = "This item cannot be stored into a chest!"
         return true
