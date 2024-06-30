@@ -250,10 +250,10 @@ interface Renderable {
             val openGui = guiScreen?.javaClass?.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NEUItems.neuHasFocus()
-            val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
+            val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
             val result = isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen &&
-                !isInNeuPv && !isInSkyTilsPv && !neuFocus
+                !isInNeuPv && !isInSkytilsPv && !neuFocus
 
             if (debug) {
                 if (!result) {
@@ -266,7 +266,7 @@ interface Renderable {
                     if (!isConfigScreen) logger.log("isConfigScreen")
                     if (isInNeuPv) logger.log("isInNeuPv")
                     if (neuFocus) logger.log("neuFocus")
-                    if (isInSkyTilsPv) logger.log("isInSkyTilsPv")
+                    if (isInSkytilsPv) logger.log("isInSkytilsPv")
                     logger.log("")
                 } else {
                     logger.log("allowed click")
@@ -647,7 +647,7 @@ interface Renderable {
             }
         }
 
-        fun fixedSizeCollum(
+        fun fixedSizeColumn(
             content: Renderable,
             height: Int,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,

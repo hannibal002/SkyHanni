@@ -37,7 +37,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun addItem(internalName: NEUInternalName, amount: Int) {
         modify {
-            it.additem(internalName, amount)
+            it.addItem(internalName, amount)
         }
         getSharedTracker()?.let {
             val hidden = it.get(DisplayMode.TOTAL).items[internalName]!!.hidden

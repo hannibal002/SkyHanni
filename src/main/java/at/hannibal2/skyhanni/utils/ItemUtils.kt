@@ -292,7 +292,7 @@ object ItemUtils {
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
-        // This workaround fixes 'Tubto Cacti I Book'
+        // This workaround fixes 'Turbo Cacti I Book'
         val input = (if (originalInput.endsWith(" Book")) {
             originalInput.replace(" Book", "")
         } else originalInput).removeResets()

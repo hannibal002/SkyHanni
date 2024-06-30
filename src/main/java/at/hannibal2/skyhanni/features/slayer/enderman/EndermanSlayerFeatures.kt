@@ -180,7 +180,7 @@ object EndermanSlayerFeatures {
             it.isDead
         }
 
-        // Removing the beacon if It's still there after 7 sesconds.
+        // Removing the beacon if It's still there after 7 seconds.
         // This is just a workaround for the cases where the ServerBlockChangeEvent don't detect the beacon despawn info.
         val toRemove = sittingBeacon.filter { it.value.passedSince() > 7.seconds }
         if (toRemove.isNotEmpty()) {

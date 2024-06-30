@@ -206,7 +206,7 @@ object DiscordLocationKey {
         "The Wasteland",
         "Throne Room"
     )
-    // list of nether locations because there are sooo many (truncated some according to scoreboard)
+    // list of nether locations because there are soo many (truncated some according to scoreboard)
 
     private val specialRiftRPC = mapOf(
         "Enigma's Crib" to "wyld-woods",

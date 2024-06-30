@@ -37,7 +37,7 @@ class HotswapSupportImpl : HotswapSupportHandle {
                     ?.makeAccessible()
                     ?.removeFinal()
                 if (instanceField != null) {
-                    ChatUtils.chat("Reinjected static instance $newInstance!")
+                    ChatUtils.chat("Re-injected static instance $newInstance!")
                     instanceField.set(null, newInstance)
                 }
                 SkyHanniMod.modules.add(newInstance)

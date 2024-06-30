@@ -71,7 +71,7 @@ object ShaderManager {
         ShaderHelper.glShaderSource(shaderID, source.toString())
         ShaderHelper.glCompileShader(shaderID)
 
-        if (ShaderHelper.glGetShaderi(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
+        if (ShaderHelper.glGetShaderInt(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
             val errorMessage = "Failed to compile shader $fileName${type.extension}. Features that utilise this " +
                 "shader will not work correctly, if at all"
             val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))
