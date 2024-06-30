@@ -124,6 +124,7 @@ object EndermanSlayerFeatures {
                     "§6Nukekubi Skull",
                     1.6,
                     ignoreBlocks = false,
+                    maxDistance = 20,
                 )
             }
             if (config.drawLineToNukekebi) {
