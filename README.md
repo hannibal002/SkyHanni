@@ -27,7 +27,7 @@ SkyHanni is especially helpful when doing activities like farming, slayers, Bing
 ## Getting Started
 
 1. **Install:**  Check out the [installation guide](docs/INSTALLING.md).
-2. **Set Up:** Type `/sh` or `/skyhanni` in-game to change your settings.
+2. **Set Up:** Type `/sh` or `/skyhanni` in-game to configure your settings.
 3. **Explore:** See all the features [here](docs/FEATURES.md).
 
 ## Discord & Support
@@ -35,8 +35,8 @@ SkyHanni is especially helpful when doing activities like farming, slayers, Bing
 Give feedback or just chat with others on our community Discord!
 
 * **Bug Reports:** Use the `#bug-reports` channel.
-* **Feature Suggestions:** Use the `#suggestions channel`.
-* **General Chat:** Chat with other SkyHanni users in `skyblock-#general`.
+* **Feature Suggestions:** Use the `#suggestions` channel.
+* **General Chat:** Chat with other SkyHanni users in `skyblock-#general` channel.
 
 [Join the Discord](https://discord.gg/skyhanni-997079228510117908)
 
