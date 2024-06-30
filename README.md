@@ -2,9 +2,10 @@
   SkyHanni: Mod for Hypixel SkyBlock
 </h1>
 
-![sh_logo](https://github.com/hannibal002/SkyHanni/assets/24389977/2f52afa0-0330-434e-ba1c-f2affee96bc1)
 
 <div align="center">
+
+![sh_logo](https://github.com/hannibal002/SkyHanni/assets/24389977/2f52afa0-0330-434e-ba1c-f2affee96bc1)
 
 [![Discord](https://img.shields.io/discord/997079228510117908?label=discord&color=9089DA&logo=discord&style=for-the-badge)](https://discord.gg/skyhanni-997079228510117908)
 [![Made with Kotlin](https://img.shields.io/badge/Made%20With-Kotlin-orange?style=for-the-badge&logo=kotlin&logocolor=white)](https://kotlinlang.org/)
