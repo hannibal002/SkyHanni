@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -52,24 +53,47 @@ object ExperimentsProfitTracker {
     private var lastSplashTime = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("enchanting.experiments.profittracker")
+
+    /**
+     * REGEX-TEST:  +Smite VII
+     * REGEX-TEST:  +42,000 Enchanting Exp
+     */
     val experimentsDropPattern by patternGroup.pattern(
         "drop",
         "^ \\+(?<reward>.*)\$",
     )
+
+    /**
+     * REGEX-TEST: 131k Enchanting Exp
+     * REGEX-TEST: 42,000 Enchanting Exp
+     */
     val enchantingExpPattern by patternGroup.pattern(
         "exp",
         "(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp",
     )
+
+    /**
+     * REGEX-TEST: Titanic Experience Bottle
+     */
     private val experienceBottlePattern by patternGroup.pattern(
         "xpbottle",
         "(?:Titanic |Grand |\\b)Experience Bottle",
+    )
+
+    /**
+     * REGEX-TEST: ☕ You renewed the experiment table! (1/3)
+     */
+    private val experimentRenewPattern by patternGroup.pattern(
+        "renew",
+        "^☕ You renewed the experiment table! \\((?<current>\\d)/3\\)$",
     )
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
             experimentsDone = 0L
             xpGained = 0L
-            startCost = 0
+            bitCost = 0L
+            startCost = 0L
         }
 
         override fun getDescription(timesGained: Long): List<String> {
@@ -92,7 +116,10 @@ object ExperimentsProfitTracker {
         var xpGained = 0L
 
         @Expose
-        var startCost: Long = 0
+        var bitCost = 0L
+
+        @Expose
+        var startCost = 0L
     }
 
     @SubscribeEvent
@@ -114,6 +141,12 @@ object ExperimentsProfitTracker {
 
             if (config.hideMessage) event.blockedReason = "experiment_drop"
             return
+        }
+        experimentRenewPattern.matchMatcher(event.message.removeColor()) {
+            val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
+            tracker.modify {
+                it.bitCost += increments.getValue(group("current").toInt())
+            }
         }
     }
 
@@ -145,9 +178,8 @@ object ExperimentsProfitTracker {
                     startCostTemp += maxPrice.round(0).toInt()
                     iterator.remove()
                 }
-                println(startCostTemp)
                 tracker.modify {
-                    it.startCost += startCostTemp * 1
+                    it.startCost -= startCostTemp
                 }
                 lastSplashTime = SimpleTimeMark.farPast()
             }
@@ -173,16 +205,20 @@ object ExperimentsProfitTracker {
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§e§lExperiments Profit Tracker")
-        val profit = tracker.drawItems(data, { true }, this) - data.startCost
+        val profit = tracker.drawItems(data, { true }, this) + data.startCost
 
         val experimentsDone = data.experimentsDone
         addAsSingletonList("")
         addAsSingletonList("§eExperiments Done: §a${experimentsDone.addSeparators()}")
-        val startCostFormat = data.startCost.shortFormat()
+        val startCostFormat = data.startCost.absoluteValue.shortFormat()
+        val bitCostFormat = data.bitCost.shortFormat()
         addAsSingletonList(
             Renderable.hoverTips(
-                "§eExperiments Start Cost: §c$startCostFormat",
-                listOf("§7You paid §c$startCostFormat §7in total", "§7for starting experiments."),
+                "§eTotal Cost: §c-$startCostFormat§e/§b-$bitCostFormat",
+                listOf(
+                    "§7You paid §c$startCostFormat §7coins and", "§b$bitCostFormat §7bits for starting",
+                    "§7experiments.",
+                ),
             ),
         )
         addAsSingletonList(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
