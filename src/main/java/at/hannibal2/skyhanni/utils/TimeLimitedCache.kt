@@ -1,17 +1,18 @@
 package at.hannibal2.skyhanni.utils
 
 import com.google.common.cache.CacheBuilder
+import com.google.common.cache.RemovalCause
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
 class TimeLimitedCache<K : Any, V : Any>(
     expireAfterWrite: Duration,
-    private val removalListener: (K?, V?) -> Unit = { _, _ -> },
+    private val removalListener: (K?, V?, RemovalCause) -> Unit = { _, _, _ -> },
 ) : Iterable<Map.Entry<K, V>> {
 
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-        .removalListener { removalListener(it.key, it.value) }
+        .removalListener { removalListener(it.key, it.value, it.cause) }
         .build<K, V>()
 
     // TODO IntelliJ cant replace this, find another way?
