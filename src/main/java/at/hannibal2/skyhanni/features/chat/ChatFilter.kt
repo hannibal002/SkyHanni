@@ -46,7 +46,7 @@ object ChatFilter {
 
     private val lobbyMessages = listOf(
         // prototype
-        "  §r§f§l➤ §r§6You have reached your Hype limit! Add Hype to Prototype Lobby minigames by right-clicking with the Hype Diamond!",
+        "  §r§f§l➤ §r§6You have reached your Hype limit! Add Hype to Prototype Lobby mini games by right-clicking with the Hype Diamond!",
     )
     private val lobbyMessagesContains = listOf(
         // prototype

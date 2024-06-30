@@ -360,12 +360,12 @@ object GardenPlotAPI {
 
         // Render horizontal
         val buildLimit = minHeight + 11
-        val ints = if (showBuildLimit) {
+        val iterable = if (showBuildLimit) {
             (minHeight..maxHeight step 4) + buildLimit
         } else {
             minHeight..maxHeight step 4
         }
-        for (y in ints) {
+        for (y in iterable) {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
             val isRedLine = y == buildLimit
             val color = if (isRedLine) Color.red else lineColor

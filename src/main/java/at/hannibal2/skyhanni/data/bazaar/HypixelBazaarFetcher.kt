@@ -94,7 +94,7 @@ object HypixelBazaarFetcher {
         failedAttempts++
         if (failedAttempts <= HIDDEN_FAILED_ATTEMPTS) {
             nextFetchTime = SimpleTimeMark.now() + 15.seconds
-            ChatUtils.debug("$userMessage. (errorMessage=${e.message}, failedAttepmts=$failedAttempts, $fetchType")
+            ChatUtils.debug("$userMessage. (errorMessage=${e.message}, failedAttempts=$failedAttempts, $fetchType")
             e.printStackTrace()
         } else {
             nextFetchTime = SimpleTimeMark.now() + 15.minutes
@@ -102,7 +102,7 @@ object HypixelBazaarFetcher {
                 e,
                 userMessage,
                 "fetchType" to fetchType,
-                "failedAttepmts" to failedAttempts,
+                "failedAttempts" to failedAttempts,
                 "rawResponse" to rawResponse,
             )
         }

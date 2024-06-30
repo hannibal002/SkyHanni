@@ -80,7 +80,7 @@ object FlareDisplay {
             if (!entity.canBeSeen()) continue
             if (entity.ticksExisted.ticks > MAX_FLARE_TIME) continue
             if (isAlreadyKnownFlare(entity)) continue
-            getFlareTypeForTexuture(entity)?.let {
+            getFlareTypeForTexture(entity)?.let {
                 flares.add(Flare(it, entity))
             }
         }
@@ -131,7 +131,7 @@ object FlareDisplay {
 
     private fun getFlareForType(type: FlareType): Flare? = flares.firstOrNull { it.type == type }
 
-    private fun getFlareTypeForTexuture(entity: EntityArmorStand): FlareType? =
+    private fun getFlareTypeForTexture(entity: EntityArmorStand): FlareType? =
         flareSkins.entries.firstOrNull { entity.hasSkullTexture(it.key) }?.value
 
     private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =

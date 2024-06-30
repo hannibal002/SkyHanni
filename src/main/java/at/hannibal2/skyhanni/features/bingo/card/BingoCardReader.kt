@@ -73,7 +73,7 @@ object BingoCardReader {
             }
 
             val done = lore.any { it.contains("GOAL REACHED") }
-            val communtyGoalPercentage = readCommuntyGoalPercentage(lore)
+            val communityGoalPercentage = readCommunityGoalPercentage(lore)
             val hiddenGoalData = getHiddenGoalData(name, description, goalType)
             val visualDescription = hiddenGoalData.tipNote
 
@@ -89,7 +89,7 @@ object BingoCardReader {
                 this.done = done
                 this.hiddenGoalData = hiddenGoalData
             }
-            communtyGoalPercentage?.let {
+            communityGoalPercentage?.let {
                 bingoGoalDifference(bingoGoal, it)
                 bingoGoal.communtyGoalPercentage = it
             }
@@ -111,7 +111,7 @@ object BingoCardReader {
         ChatUtils.chat("$color${bingoGoal.displayName}: $oldFormat §b->" + " $newFormat")
     }
 
-    private fun readCommuntyGoalPercentage(lore: List<String>): Double? {
+    private fun readCommunityGoalPercentage(lore: List<String>): Double? {
         for (line in lore) {
             percentagePattern.matchMatcher(line) {
                 return group("percentage").toDouble() / 100

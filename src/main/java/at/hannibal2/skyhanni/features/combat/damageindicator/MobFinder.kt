@@ -356,7 +356,7 @@ class MobFinder {
         }
 
         entity.hasMaxHealth(1_500_000) -> {
-            EntityResult(bossType = BossType.GAIA_CONSTURUCT)
+            EntityResult(bossType = BossType.GAIA_CONSTRUCT)
         }
 
         entity.hasMaxHealth(100_000_000) -> {

@@ -120,7 +120,7 @@ object DianaFixChat {
         if (hasSetToggleMusic) {
             ChatUtils.chat("Toggling the hypixel music has worked, good job!")
         } else if (hasSetParticleQuality) {
-            ChatUtils.chat("Changing the particle qualilty has worked, good job!")
+            ChatUtils.chat("Changing the particle quality has worked, good job!")
         }
 
         hasSetParticleQuality = false
