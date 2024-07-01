@@ -64,10 +64,11 @@ object ScoreboardPattern {
         "yearvotes",
         "(?<yearvotes>^§6Year \\d+ Votes\$)",
     )
-    /*
-    * REGEX-TEST: §f||||||||||||||| §aFoxy
-    * REGEX-TEST: §d|§f|||||||||||||| §dDiaz
-    */
+
+    /**
+     * REGEX-TEST: §f||||||||||||||| §aFoxy
+     * REGEX-TEST: §d|§f|||||||||||||| §dDiaz
+     */
     val votesPattern by mainSb.pattern(
         "votes",
         "§.\\|+(§f)?\\|+ §.+",
