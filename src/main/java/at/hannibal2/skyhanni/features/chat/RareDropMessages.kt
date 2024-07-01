@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -14,10 +15,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.isVowel
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
@@ -36,29 +40,33 @@ object RareDropMessages {
      */
     private val petDroppedPattern by petGroup.pattern(
         "droppedmessage",
-        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> .*)"
+        "(?<start>(?:§.)*PET DROP! )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> .*)",
     )
+
     /**
      * REGEX-TEST: §5§lGREAT CATCH! §r§bYou found a §r§7[Lvl 1] §r§aGuardian§r§b.
      */
     private val petFishedPattern by petGroup.pattern(
         "fishedmessage",
-        "(?<start>(?:§.)*GREAT CATCH! (?:§.)*You found a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
+        "(?<start>(?:§.)*GREAT CATCH! (?:§.)*You found a (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
     )
+
     /**
      * REGEX-TEST: §aYou claimed a §5Tarantula Pet§a! §r§aYou can manage your Pets in the §r§fPets Menu§r§a in your §r§fSkyBlock Menu§r§a.
      */
     private val petClaimedPattern by petGroup.pattern(
         "claimedmessage",
-        "(?<start>(?:§.)*You claimed a )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*You can manage your Pets.*)"
+        "(?<start>(?:§.)*You claimed a )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*You can manage your Pets.*)",
     )
+
     /**
      * REGEX-TEST: §b[MVP§r§c+§r§b] Empa_§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
      */
     private val petObtainedPattern by petGroup.pattern(
         "obtainedmessage",
-        "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)"
+        "(?<start>.*has obtained (?:§.)*\\[Lvl 1] )(?:§.)*§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end>.*)",
     )
+
     /**
      * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §fBlue Whale Pet
      * REGEX-TEST: §e[NPC] Oringo§f: §b✆ §f§r§8• §5Giraffe Pet
@@ -77,8 +85,14 @@ object RareDropMessages {
     )
 
     private val petPatterns = listOf(
-        petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern, oringoPattern
+        petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern, oringoPattern,
     )
+
+    private val ignoredBookIslands = listOf(
+        IslandType.DARK_AUCTION,
+        IslandType.DUNGEON_HUB,
+        IslandType.CATACOMBS,
+    ).toTypedArray()
 
     private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
 
@@ -95,8 +109,8 @@ object RareDropMessages {
             val rarityName = colorCodeToRarity(rarityColor.first()).uppercase()
             val petName = group("petName")
             val end = group("end")
-            if (start.endsWith("a ") && rarityName.matches("(?i)[aeiou].*".toRegex()))
-                start = start.replace(" $".toRegex(), "n ")
+            if (start.endsWith("a ") && rarityName.first().isVowel())
+                start = start.substring(0..start.length - 2) + "n "
 
             event.chatComponent = ChatComponentText(
                 "$start§$rarityColor§l$rarityName §$rarityColor$petName$end"
@@ -107,13 +121,19 @@ object RareDropMessages {
     @SubscribeEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (event.amount != 1) return
         if (!config.enchantedBook) return
         val internalName = event.internalName
-        if (event.amount != 1) return
-        val isEnchantedBook = internalName.getItemStack().getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
-        if (!isEnchantedBook) return
+        val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
+        if (category != ItemCategory.ENCHANTED_BOOK) return
+        if (inAnyIsland(*ignoredBookIslands)) return
 
-        if (ChatUtils.chatLines.none { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) }) {
+        val anyRecent = ChatUtils.chatLines.none {
+            it.passedSinceSent() < 1.seconds &&
+                (enchantedBookPattern.matches(it.message) || internalName.itemName in it.message.removeColor())
+        }
+
+        if (anyRecent) {
             var message = "§r§6§lRARE DROP! ${internalName.itemName}"
             userLuck?.takeIf { it != 0f }?.let { luck ->
                 var luckString = luck.round(2).toString()
@@ -121,7 +141,6 @@ object RareDropMessages {
                 message += " §a($luckString ✴ SkyHanni User Luck"
             }
             ChatUtils.chat(message, prefix = false)
-            println(message)
             return
         }
         ChatUtils.editFirstMessage(

@@ -29,7 +29,7 @@ object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
 
-    fun ItemStack.cleanName() = this.displayName.removeColor()
+    fun ItemStack.cleanName() = displayName.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
@@ -347,16 +347,18 @@ object ItemUtils {
 
     fun NEUInternalName.isRune(): Boolean = contains("_RUNE;")
 
-    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.itemName: String
         get() = getInternalName().itemName
 
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
-    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NEUInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NEUInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
 
     private fun NEUInternalName.grabItemName(): String {

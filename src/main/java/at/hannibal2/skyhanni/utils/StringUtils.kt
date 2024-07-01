@@ -559,4 +559,8 @@ object StringUtils {
     fun String.width(): Int {
         return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
     }
+
+    private val vowels = "aeiouAEIOU".toSet()
+
+    fun Char.isVowel(): Boolean = this in vowels
 }
