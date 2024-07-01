@@ -73,12 +73,12 @@ object CarryTracker {
             val carries = customer.carries
             for (carry in carries.toList()) {
                 if (!newCarry.type.sameType(carry.type)) continue
-                carries.remove(carry)
                 val newAmountRequested = carry.requested + amountRequested
                 if (newAmountRequested < 1) {
                     ChatUtils.userError("New carry amount requested must be positive!")
                     return
                 }
+                carries.remove(carry)
                 val updatedCarry = Carry(carryType, newAmountRequested)
                 updatedCarry.done = carry.done
                 carries.add(updatedCarry)
