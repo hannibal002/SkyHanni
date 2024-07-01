@@ -101,7 +101,7 @@ object CarryTracker {
 
     fun onCommand(args: Array<String>) {
         if (args.size < 2 || args.size > 3) {
-            ChatUtils.userError("Usage:\n/§cshcarry <customer name> <type> <amountRequested>\n/§cshcarry <type> <price>")
+            ChatUtils.userError("Usage:\n§c/shcarry <customer name> <type> <amountRequested>\n§c/shcarry <type> <price>")
             return
         }
         if (args.size == 2) {
