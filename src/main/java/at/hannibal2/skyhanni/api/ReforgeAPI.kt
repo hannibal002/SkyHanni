@@ -68,7 +68,7 @@ object ReforgeAPI {
 
         val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
 
-        val lowercaseName = name.lowercase()
+        val lowercaseName = name.lowercase().replace('-', '_')
 
         fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
 
