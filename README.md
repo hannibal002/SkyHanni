@@ -36,7 +36,7 @@ Give feedback or just chat with others on our community Discord!
 
 * **Bug Reports:** Use the `#bug-reports` channel.
 * **Feature Suggestions:** Use the `#suggestions` channel.
-* **General Chat:** Chat with other SkyHanni users in `skyblock-#general` channel.
+* **General Chat:** Chat with other SkyHanni users in `#skyblock-general` channel.
 
 [Join the Discord](https://discord.gg/skyhanni-997079228510117908)
 
