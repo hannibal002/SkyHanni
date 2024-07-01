@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -141,10 +143,12 @@ object TunnelsMaps {
 
     /** @return Errors with an empty String */
     private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
-        possibleLocations.keys.firstOrNull() { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
+        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
     }
 
     private var clickTranslate = mapOf<Int, String>()
+
+    private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".asInternalName() }
 
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -423,6 +427,13 @@ object TunnelsMaps {
         nextSpotKey(event)
     }
 
+    @SubscribeEvent
+    fun onItemClick(event: ItemClickEvent) {
+        if (!isEnabled() || !config.leftClickPigeon) return
+        if (event.itemInHand?.getInternalNameOrNull() != ROYAL_PIGEON) return
+        nextSpot()
+    }
+
     private fun campfireKey(event: LorenzKeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
         if (config.travelScroll) {
@@ -446,15 +457,16 @@ object TunnelsMaps {
 
     private fun nextSpotKey(event: LorenzKeyPressEvent) {
         if (event.keyCode != config.nextSpotHotkey) return
+        nextSpot()
+    }
+
+    private fun nextSpot() {
         if (!nextSpotDelay.isInPast()) return
         nextSpotDelay = 0.5.seconds.fromNow()
         goal = getNext()
     }
 
-    val areas = setOf(
-        "Glacite Tunnels", "Dwarven Base Camp", "Glacite Lake", "Fossil Research Center"
-    )
+    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Glacite Lake", "Fossil Research Center")
 
-    private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isInIsland() && config.enable && areas.contains(LorenzUtils.skyBlockArea)
+    private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
 }
