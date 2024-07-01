@@ -21,10 +21,11 @@ object ChocolateFactoryBlockOpen {
      * REGEX-TEST: /cf test
      * REGEX-TEST: /chocolatefactory
      * REGEX-TEST: /chocolatefactory123456789
+     * REGEX-TEST: /factory
      */
     private val commandPattern by RepoPattern.pattern(
         "inventory.chocolatefactory.opencommand",
-        "\\/(?:cf|chocolatefactory)(?: .*)?",
+        "\\/(?:cf|(?:chocolate)?factory)(?: .*)?",
     )
 
     private var commandSentTimer = SimpleTimeMark.farPast()

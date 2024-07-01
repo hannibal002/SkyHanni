@@ -453,6 +453,7 @@ object HypixelData {
             islandType = getIslandType(foundIsland, guesting)
         }
 
+        // TODO dont send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {
