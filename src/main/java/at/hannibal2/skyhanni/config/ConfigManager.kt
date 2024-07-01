@@ -39,7 +39,6 @@ import java.nio.file.StandardCopyOption
 import java.util.EnumMap
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
-import kotlin.reflect.KMutableProperty1
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (LorenzUtils.isBetaVersion()) {
@@ -106,6 +105,7 @@ class ConfigManager {
         // commands
         "features.garden.GardenConfig.cropSpeedMeterPos",
         "features.misc.MiscConfig.collectionCounterPos",
+        "features.misc.MiscConfig.carryPosition",
         "features.misc.MiscConfig.lockedMouseDisplay",
 
         // debug features
