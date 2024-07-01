@@ -292,7 +292,7 @@ object CarryTracker {
     }
 
     fun getSlayerType(name: String): SlayerType? = when (name.lowercase()) {
-        "rev", "revenant", "zombie" -> SlayerType.REVENANT
+        "rev", "revenant", "zombie", "zomb" -> SlayerType.REVENANT
         "tara", "tarantula", "spider", "brood", "broodmother" -> SlayerType.TARANTULA
         "sven", "wolf", "packmaster" -> SlayerType.SVEN
         "voidling", "void", "voidgloom", "eman", "enderman" -> SlayerType.VOID
