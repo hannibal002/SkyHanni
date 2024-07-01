@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
@@ -206,7 +206,8 @@ object EstimatedItemValueCalculator {
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
-        return (1..10).mapNotNull { lowerLevel ->
+        val intRange = if (config.useAttributeComposite) 1..10 else level..level
+        return intRange.mapNotNull { lowerLevel ->
             "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()
                 ?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
         }.minOrNull()
@@ -572,9 +573,10 @@ object EstimatedItemValueCalculator {
         val map = mutableMapOf<String, Double>()
 
         //todo use repo
-        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
+        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
         val onlyTierOnePrices =
             listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
+        val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
@@ -600,6 +602,16 @@ object EstimatedItemValueCalculator {
                     5 -> multiplier = 16
                 }
                 level = 1
+            }
+            if (rawName in onlyTierFivePrices) {
+                when (rawLevel) {
+                    6 -> multiplier = 2
+                    7 -> multiplier = 4
+                    8 -> multiplier = 8
+                    9 -> multiplier = 16
+                    10 -> multiplier = 32
+                }
+                level = 5
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
@@ -729,5 +741,12 @@ object EstimatedItemValueCalculator {
         list.add("§7Gemstone Slot Unlock Cost: §6" + totalPrice.shortFormat())
         list += priceMap.sortedDesc().keys
         return totalPrice
+    }
+
+    private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: -1.0
+
+    private fun NEUInternalName.getPriceOrNull(): Double? {
+        val useSellPrice = config.bazaarPriceSource == EstimatedItemValueConfig.BazaarPriceSource.BUY_ORDER
+        return getPriceOrNull(useSellPrice)
     }
 }
