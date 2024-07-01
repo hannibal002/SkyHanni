@@ -37,7 +37,7 @@ object FishingAPI {
 
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
@@ -106,7 +106,7 @@ object FishingAPI {
 
     fun NEUInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
+    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @SubscribeEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {

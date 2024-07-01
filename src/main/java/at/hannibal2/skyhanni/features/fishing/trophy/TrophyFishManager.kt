@@ -55,9 +55,10 @@ object TrophyFishManager {
         }
         if (changed) {
             ChatUtils.clickableChat(
-                "Click here to load data from NEU PV!", onClick = {
+                "Click here to load Trophy Fishing data from NEU PV!", onClick = {
                     updateFromNeuPv(savedFishes, neuData)
                 },
+                "§eClick to load!",
                 oneTimeClick = true
             )
         }
