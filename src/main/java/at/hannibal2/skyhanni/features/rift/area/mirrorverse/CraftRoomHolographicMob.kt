@@ -39,7 +39,7 @@ object CraftRoomHolographicMob {
     )
 
     @SubscribeEvent
-    fun onSecondPassed(event: LorenzTickEvent) {
+    fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         for (entity in entitiesList) {
             entity.moveTo(entity.position.up(.1), (entity.yaw + 5) % 360)
