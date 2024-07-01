@@ -26,4 +26,9 @@ public class MirrorVerseConfig {
     @Accordion
     @Expose
     public TubulatorConfig tubulatorConfig = new TubulatorConfig();
+
+    @ConfigOption(name = "Craft Room", desc = "")
+    @Accordion
+    @Expose
+    public CraftRoomConfig craftRoom = new CraftRoomConfig();
 }
