@@ -26,8 +26,8 @@ _Frequently Asked Questions_
 
 > **8: How can I get bigger crop hitboxes?**
 > Use Patcher or PolyPatcher to have 1.12 hitboxes in 1.8.9.
-> - [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with more features and performance improvements)
 > - [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>)
+> - [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with OneConfig, slightly different features, and bug fixes)
 
 > **9: Why does my Item Tracker feature not track this item?**
 > 1. Check if the item goes directly into your sacks. 
