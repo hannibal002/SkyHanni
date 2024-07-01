@@ -72,7 +72,7 @@ object CarryTracker {
             if (!customer.name.equals(customerName, ignoreCase = true)) continue
             val carries = customer.carries
             for (carry in carries.toList()) {
-                if (!newCarry.sameCarry(carry)) continue
+                if (!newCarry.type.sameType(carry.type)) continue
                 carries.remove(carry)
                 val newAmountRequested = carry.requested + amountRequested
                 if (newAmountRequested < 1) {
@@ -108,8 +108,6 @@ object CarryTracker {
         customers.add(customer)
         return customer
     }
-
-    fun Carry.sameCarry(other: Carry): Boolean = type.sameType(other.type)
 
     fun CarryType.sameType(other: CarryType): Boolean = name == other.name && tier == other.tier
 
