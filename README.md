@@ -12,7 +12,7 @@
 [![Downloads](https://img.shields.io/github/downloads/hannibal002/SkyHanni/total?label=downloads&color=208a19&logo=github&style=for-the-badge)](https://github.com/hannibal002/SkyHanni/releases)
 </div>
 
-## Improve Your SkyBlock Experience
+## What it does
 
 SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hypixel SkyBlock. With SkyHanni, you'll get:
 
@@ -20,7 +20,7 @@ SkyHanni is a Forge mod for Minecraft 1.8.9 that adds many useful features to Hy
 * **Extra Chat Messages:** Receive reminders and helpful tips.
 * **Message Hiders:** Control which messages you see in chat.
 * **Entity/Item Highlighters:** Focus on important mobs or items in the world/your inventory.
-* **And much more!**
+* **[And much more!](docs/FEATURES.md)**
 
 SkyHanni is especially helpful when doing activities like farming, slayers, Bingo, Diana, fishing, or Rift.
 
