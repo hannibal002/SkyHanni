@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -99,7 +101,7 @@ object CarryTracker {
 
     fun onCommand(args: Array<String>) {
         if (args.size < 2 || args.size > 3) {
-            ChatUtils.userError("Usage:\n/shcarry <customer name> <type> <amountRequested>\n/shcarry <type> <price>")
+            ChatUtils.userError("Usage:\n/§cshcarry <customer name> <type> <amountRequested>\n/§cshcarry <type> <price>")
             return
         }
         if (args.size == 2) {
@@ -146,13 +148,12 @@ object CarryTracker {
         ChatUtils.chat("Started carry: §b$customerName §8x$amountRequested ${newCarry.type}")
     }
 
-    private fun getCarryType(rawType: String): CarryType? =
-        carryTypes.getOrPut(rawType) {
-            createCarryType(rawType) ?: run {
-                ChatUtils.userError("Unknown carry type: '$rawType'")
-                return null
-            }
+    private fun getCarryType(rawType: String): CarryType? = carryTypes.getOrPut(rawType) {
+        createCarryType(rawType) ?: run {
+            ChatUtils.userError("Unknown carry type: '$rawType'")
+            return null
         }
+    }
 
 
     private fun setPrice(rawType: String, rawPrice: String) {
@@ -195,8 +196,8 @@ object CarryTracker {
                 val missing = requested - done
 
                 val color = if (done > requested) "§c" else if (done == requested) "§a" else "§e"
-                val cost = formatCost(carry.type.pricePer)
-                val text = "$color$done§8/$color$requested$cost"
+                val cost = formatCost(carry.type.pricePer?.let { it * requested })
+                val text = "$color$done§8/$color$requested $cost"
                 list.add(
                     Renderable.clickAndHover(
                         Renderable.string("  ${carry.type} $text"),
@@ -208,14 +209,25 @@ object CarryTracker {
                             add("§7Missing: §e$missing")
                             add("")
                             if (cost != "") {
-                                add("§7Cost per: §e${cost.trim()}")
-                                add("")
+                                add("§7Total cost: §e${cost}")
+                                add("§7Cost per carry: §e${formatCost(carry.type.pricePer)}")
+                            } else {
+                                add("§cNo price set for this carry!")
+                                add("§7Set a price with §e/shcarry <type> <price>")
                             }
-                            add("§eClick to remove this carry!")
+                            add("")
+                            add("§eClick to send current progress in the party chat!")
+                            add("§eControl-click to remove this carry!")
                         },
                         onClick = {
-                            carries.remove(carry)
-                            update()
+                            if (KeyboardManager.isModifierKeyDown()) {
+                                carries.remove(carry)
+                                update()
+                            } else {
+                                HypixelCommands.partyChat(
+                                    "${customer.name} ${carry.type.toString().removeColor()} carry: $done/$requested",
+                                )
+                            }
                         },
                     ),
                 )
@@ -230,21 +242,24 @@ object CarryTracker {
         val totalCostFormat = formatCost(totalCost)
         if (totalCostFormat != "") {
             val paidFormat = "§6${customer.alreadyPaid.formatNum()}"
-            val diffFormat = formatCost(totalCost - customer.alreadyPaid)
+            val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
-                    Renderable.string("§b$customerName $paidFormat§8/${totalCostFormat.trim()}"),
+                    Renderable.string("§b$customerName $paidFormat§8/${totalCostFormat}"),
                     tips = listOf(
                         "§7Carries for §b$customerName",
                         "",
-                        "§7Total cost: $totalCostFormat",
+                        "§7Total cost: ${totalCostFormat}",
                         "§7Already paid: $paidFormat",
-                        "§7Still missing: $diffFormat",
+                        "§7Still missing: ${missingFormat}",
                         "",
-                        "§eClick to send infos in party chat!",
+                        "§eClick to send missing coins in party chat!",
                     ),
                     onClick = {
-                        HypixelCommands.partyChat("$customerName Carry: ")
+                        HypixelCommands.partyChat(
+                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " +
+                                "still missing: ${missingFormat.removeColor()}",
+                        )
                     },
                 ),
             )
@@ -262,7 +277,7 @@ object CarryTracker {
         }?.takeIf { it != 0.0 }
     }
 
-    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else " §6${totalCost.formatNum()}"
+    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.formatNum()}"
 
     fun createCarryType(input: String): CarryType? {
         if (input.length == 1) return null
@@ -276,17 +291,16 @@ object CarryTracker {
         return null
     }
 
-    fun getSlayerType(name: String): SlayerType? =
-        when (name.lowercase()) {
-            "rev", "revenant", "zombie" -> SlayerType.REVENANT
-            "tara", "tarantula", "spider", "brood", "broodmother" -> SlayerType.TARANTULA
-            "sven", "wolf", "packmaster" -> SlayerType.SVEN
-            "voidling", "void", "voidgloom", "eman", "enderman" -> SlayerType.VOID
-            "inferno", "demon", "demonlord", "blaze" -> SlayerType.INFERNO
-            "blood", "bloodfiend", "vamp", "vampire", "riftstalker" -> SlayerType.VAMPIRE
+    fun getSlayerType(name: String): SlayerType? = when (name.lowercase()) {
+        "rev", "revenant", "zombie" -> SlayerType.REVENANT
+        "tara", "tarantula", "spider", "brood", "broodmother" -> SlayerType.TARANTULA
+        "sven", "wolf", "packmaster" -> SlayerType.SVEN
+        "voidling", "void", "voidgloom", "eman", "enderman" -> SlayerType.VOID
+        "inferno", "demon", "demonlord", "blaze" -> SlayerType.INFERNO
+        "blood", "bloodfiend", "vamp", "vampire", "riftstalker" -> SlayerType.VAMPIRE
 
-            else -> null
-        }
+        else -> null
+    }
 
 
     class Customer(
