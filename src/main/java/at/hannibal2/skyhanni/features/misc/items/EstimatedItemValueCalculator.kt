@@ -16,8 +16,10 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -536,6 +538,17 @@ object EstimatedItemValueCalculator {
         var price = internalName.getPrice()
         if (price == -1.0) {
             price = 0.0
+        }
+
+        // If craft cost price is greater than npc price, and there is no ah/bz price, use craft cost instead
+        internalName.getNpcPriceOrNull()?.let { npcPrice ->
+            if (price == npcPrice) {
+                internalName.getRawCraftCostOrNull()?.let { rawCraftPrice ->
+                    if (rawCraftPrice > npcPrice) {
+                        price = rawCraftPrice
+                    }
+                }
+            }
         }
 
         val name = internalName.itemName

@@ -145,9 +145,13 @@ object ScoreboardPattern {
         "tokens",
         "^(§.)*Tokens: §.[\\w,]+$",
     )
+
+    /**
+     * REGEX-TEST: Submerges In: §e01m 00s
+     */
     val submergesPattern by kuudraSb.pattern(
         "submerges",
-        "^(§.)*Submerges In: (§.)*[\\w,?:]+$",
+        "(?:§.)*Submerges In: (?:§.)*[\\w\\s]+",
     )
 
     // farming
