@@ -118,6 +118,8 @@ object ExperimentsDisplay {
 
             possiblePairs = calculatePossiblePairs()
 
+            lastClicked.removeIf { it.first == slot }
+
             return drawDisplay()
         }
         possiblePairs = calculatePossiblePairs()
@@ -127,6 +129,7 @@ object ExperimentsDisplay {
     private fun handlePowerUp(slot: Int, reward: String) {
         foundPowerUps[slot] = reward
         possiblePairs--
+        lastClicked.removeIf { it.first == slot }
         if (reward == "Instant Find") instantFind = true
     }
 
