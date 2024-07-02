@@ -2,13 +2,13 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.ExperimentationTableConfig.Experiments
-import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -24,7 +24,8 @@ object ExperimentsDisplay {
     private var display = emptyList<String>()
     private val startSlot = 9
 
-    private var uncoveredItems = mutableMapOf<Int, String>()
+    private var uncoveredAt = 0
+    private var uncoveredItems = mutableListOf<Pair<Int, String>>()
     private var possiblePairs = 0
 
     data class ItemPair(val first: Pair<Int, String>, val second: Pair<Int, String>)
@@ -33,16 +34,13 @@ object ExperimentsDisplay {
     private var foundMatches = mutableListOf<ItemPair>()
     private var foundPairs = mutableListOf<ItemPair>()
     private var foundPowerUps = mutableMapOf<Int, String>()
-    private var toCheck = mutableListOf<Pair<Int, ItemStack>>()
-    private var lastClicked = mutableListOf<Int>()
+    private var toCheck = mutableListOf<Pair<Int, Int>>()
+    private var lastClicked = mutableListOf<Pair<Int, Int>>()
+    private var lastItemsCached = mutableMapOf<Int, ItemStack>()
     private var currentExperiment = Experiments.NONE
+    private var instantFind = false
 
     private val patternGroup = RepoPattern.group("enchanting.experiments")
-    private val superpairsPattern by patternGroup.pattern(
-        "superpairs",
-        "Superpairs \\((?<experiment>.+)\\)",
-    )
-
     private val powerUpPattern by patternGroup.pattern(
         "powerups",
         "Gained \\+\\d Clicks?|Instant Find|\\+\\S* XP",
@@ -55,14 +53,21 @@ object ExperimentsDisplay {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        foundNormals.clear()
-        foundPairs.clear()
+        display = emptyList()
+
+        uncoveredAt = 0
         uncoveredItems.clear()
-        foundPowerUps.clear()
+        possiblePairs = 0
+
+        foundNormals.clear()
         foundMatches.clear()
+        foundPairs.clear()
+        foundPowerUps.clear()
         toCheck.clear()
         lastClicked.clear()
-        display = emptyList()
+        lastItemsCached.clear()
+        currentExperiment = Experiments.NONE
+        instantFind = false
     }
 
     @SubscribeEvent
@@ -76,24 +81,47 @@ object ExperimentsDisplay {
     }
 
     @SubscribeEvent
-    fun onSlotClick(event: SlotClickEvent) {
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         currentExperiment = InventoryUtils.getCurrentExperiment() ?: return
 
-        val item = event.item ?: return
-        if (isOutOfBounds(event.slotId, currentExperiment)) return
+        for (slotIndex in startSlot + 1..startSlot + currentExperiment.gridSize + 5) {
+            if (uncoveredItems.any { it.first == slotIndex }) continue
+            val slot = InventoryUtils.getItemAtSlotIndex(slotIndex) ?: continue
+            val lastState = lastItemsCached[slotIndex] ?: slot
+            val lastStateName = lastState.displayName.removeColor()
+            if (rewardPattern.matches(lastStateName) || powerUpPattern.matches(lastStateName)) {
+                if (isOutOfBounds(slotIndex, currentExperiment)) continue
 
-        if (toCheck.none { it.first == event.slotId && it.second == item }) {
-            toCheck.add(Pair(event.slotId, item))
+                if (slot != lastState && toCheck.none { it.first == slotIndex }) {
+                    toCheck.add(Pair(slotIndex, uncoveredAt))
+                    uncoveredAt += 1
+                }
+            }
+
+            lastItemsCached[slotIndex] = slot
         }
-        lastClicked.add(event.slotId)
     }
 
-    private fun checkItems(check: MutableList<Pair<Int, ItemStack>>): List<String> {
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isEnabled()) return
+        currentExperiment = InventoryUtils.getCurrentExperiment() ?: return
+
+        if (isOutOfBounds(event.slotId, currentExperiment)) return
+
+        if (lastClicked.none { it.first == event.slotId && it.second == uncoveredAt }) {
+            uncoveredAt += 1
+            lastClicked.add(Pair(event.slotId, uncoveredAt))
+        }
+        display = checkItems(lastClicked)
+    }
+
+    private fun checkItems(check: MutableList<Pair<Int, Int>>): List<String> {
         currentExperiment = InventoryUtils.getCurrentExperiment() ?: return listOf()
         if (check.isEmpty()) return drawDisplay()
 
-        check.forEachIndexed { index, (slot, _) ->
+        check.forEachIndexed { index, (slot, uncovered) ->
             val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return drawDisplay()
             val itemName = itemNow.displayName.removeColor()
 
@@ -101,17 +129,16 @@ object ExperimentsDisplay {
                 return drawDisplay()
 
             val reward = convertToReward(itemNow)
-            uncoveredItems.putIfAbsent(slot, reward)
+            if (uncoveredItems.none { it.first == slot }) uncoveredItems.add(Pair(slot, reward))
 
             when {
                 isPowerUp(reward) -> handlePowerUp(slot, reward)
-                isReward(itemName) -> handleReward(index, slot, reward)
+                isReward(itemName) -> handleReward(index, slot, uncovered, reward)
             }
 
             possiblePairs = calculatePossiblePairs()
 
             check.removeAt(index)
-            removeAtOrNull(index - 1, lastClicked) ?: return drawDisplay()
 
             return drawDisplay()
         }
@@ -122,24 +149,25 @@ object ExperimentsDisplay {
     private fun handlePowerUp(slot: Int, reward: String) {
         foundPowerUps[slot] = reward
         possiblePairs--
-        lastClicked.clear()
-        if (reward == "Instant Find") lastClicked.add(slot)
+        if (reward == "Instant Find") instantFind = true
     }
 
-    private fun handleReward(index: Int, slot: Int, reward: String) {
+    private fun handleReward(index: Int, slot: Int, uncovered: Int, reward: String) {
         val lastSlotClicked =
-            lastClicked.getOrNull(lastClicked.size - 2) ?: lastClicked.getOrNull(index)
+            uncoveredItems.getOrNull(uncovered) ?: uncoveredItems.getOrNull(index) ?: return
 
-        lastSlotClicked?.let {
-            val lastItem = InventoryUtils.getItemAtSlotIndex(it) ?: return
+        lastSlotClicked.let {
+            val lastItem = InventoryUtils.getItemAtSlotIndex(it.first) ?: return
             val lastItemName = convertToReward(lastItem)
+
+            val wasLastOrIsNew = (uncoveredItems.indexOf(lastSlotClicked) + 1) % 2 == 1
 
             if (isWaiting(lastItemName)) return
 
             when {
-                lastItemName == "Instant Find" -> handleFoundPair(slot, reward, it, lastItemName)
-                hasFoundPair(slot, it, reward, lastItemName) -> handleFoundPair(slot, reward, it, lastItemName)
-                hasFoundMatch(reward, slot) -> handleFoundMatch(slot, reward)
+                instantFind -> handleFoundPair(slot, reward, it.first, lastItemName)
+                hasFoundPair(slot, it.first, reward, lastItemName) && !wasLastOrIsNew -> handleFoundPair(slot, reward, it.first, lastItemName)
+                hasFoundMatch(slot, reward) -> handleFoundMatch(slot, reward)
                 else -> handleNormalReward(slot, reward)
             }
         }
@@ -153,12 +181,11 @@ object ExperimentsDisplay {
     ) {
         foundPairs.add(ItemPair(Pair(slot, reward), Pair(lastSlotClicked, lastItemName)))
         foundMatches.removeAll { it.first.second == reward }
-        lastClicked.removeIf { lastClicked.indexOf(it) <= lastClicked.indexOf(slot) }
         foundNormals.entries.removeIf { it.value == reward }
     }
 
     private fun handleFoundMatch(slot: Int, reward: String) {
-        val match = uncoveredItems.entries.find { it.value == reward }?.key ?: return
+        val match = uncoveredItems.find { it.second == reward }?.first ?: return
         foundMatches.add(ItemPair(Pair(slot, reward), Pair(match, reward)))
         foundNormals.entries.removeIf { it.value == reward }
     }
@@ -172,10 +199,6 @@ object ExperimentsDisplay {
 
     private fun calculatePossiblePairs() =
         (currentExperiment.gridSize / 2) - foundPairs.size - foundPowerUps.size - foundMatches.size
-
-    private fun removeAtOrNull(index: Int, collection: MutableList<Int>): Int? {
-        return if (index in collection.indices) collection.removeAt(index) else null
-    }
 
     private fun drawDisplay() = buildList {
         add("§6Experimentation Data")
@@ -215,7 +238,7 @@ object ExperimentsDisplay {
         secondName: String,
     ) = firstSlot != secondSlot && firstName == secondName
 
-    private fun hasFoundMatch(reward: String, itemSlot: Int) =
+    private fun hasFoundMatch(itemSlot: Int, reward: String) =
         uncoveredItems.any { (slot, name) -> slot != itemSlot && name == reward } &&
             foundMatches.none { it.first.second == reward }
 
@@ -228,8 +251,8 @@ object ExperimentsDisplay {
             .contains(itemName)
 
     private fun isOutOfBounds(slot: Int, experiment: Experiments) =
-        slot <= startSlot || slot >= startSlot + experiment.gridSize + 6
+        slot <= startSlot || slot >= startSlot + experiment.gridSize + 6 || listOf(17,18,26,27,35,36).contains(slot)
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.experimentationTableDisplay && InventoryUtils.openInventoryName().startsWith("Superpairs (")
+        config.experimentationTableDisplay && InventoryUtils.openInventoryName().startsWith("Superpairs (")
 }
