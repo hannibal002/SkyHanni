@@ -175,12 +175,12 @@ object ExperimentsDisplay {
         val match = uncoveredItems.find { it.second == reward }?.first ?: return
         foundMatches.add(ItemPair(Pair(slot, reward), Pair(match, reward)))
         foundNormals.entries.removeIf { it.value == reward }
-        lastClicked.removeIf { it.first == slot || it.first == match}
+        lastClicked.removeIf { it.first == slot || it.first == match }
     }
 
     private fun handleNormalReward(slot: Int, reward: String) {
         if (foundMatches.none { it.first.second == reward }) foundNormals[slot] = reward
-        lastClicked.removeIf { it.first == slot}
+        lastClicked.removeIf { it.first == slot }
     }
 
     private fun calculatePossiblePairs() =
