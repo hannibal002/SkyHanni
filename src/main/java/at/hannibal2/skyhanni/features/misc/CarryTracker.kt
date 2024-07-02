@@ -150,7 +150,7 @@ object CarryTracker {
 
     private fun getCarryType(rawType: String): CarryType? = carryTypes.getOrPut(rawType) {
         createCarryType(rawType) ?: run {
-            ChatUtils.userError("Unknown carry type: '$rawType'")
+            ChatUtils.userError("Unknown carry type: '$rawType'! Use e.g. rev5, sven4, eman3, blaze2..")
             return null
         }
     }
