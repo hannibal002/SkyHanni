@@ -15,7 +15,7 @@ public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Barn Fishing Timer",
-        desc = "Show the time and amount of sea creatures nearby while barn fishing."
+        desc = "Show the time and amount of own sea creatures nearby while barn fishing."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -56,7 +56,7 @@ public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Worm Cap Alert",
-        desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 60."
+        desc = "Alerts you with title and sound if you hit the Worm Sea Creature limit of 20."
     )
     @ConfigEditorBoolean
     public boolean wormLimitAlert = true;
