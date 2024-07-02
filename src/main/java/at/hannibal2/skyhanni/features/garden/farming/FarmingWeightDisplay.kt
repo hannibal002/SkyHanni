@@ -310,7 +310,7 @@ object FarmingWeightDisplay {
 
         val timeFormat = if (weightPerSecond != -1.0) {
             val timeTillOvertake = try {
-                (weightUntilOvertake / weightPerSecond).minutes
+                (weightUntilOvertake / weightPerSecond).seconds
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
                     e,
