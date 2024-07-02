@@ -1,6 +1,8 @@
 defaultEnabled = true
-defaultAccount = "main"
+defaultAccount = "alt"
 
 [accounts.main]
 type = "microsoft"
 
+[accounts.alt]
+type = "microsoft"
