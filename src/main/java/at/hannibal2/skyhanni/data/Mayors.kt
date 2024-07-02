@@ -16,7 +16,16 @@ enum class Mayor(
     DIANA("Diana", "§2", Perk.LUCKY, Perk.MYTHOLOGICAL_RITUAL, Perk.PET_XP_BUFF, Perk.SHARING_IS_CARING),
     DIAZ("Diaz", "§6", Perk.VOLUME_TRADING, Perk.SHOPPING_SPREE, Perk.STOCK_EXCHANGE, Perk.LONG_TERM_INVESTMENT),
     FINNEGAN("Finnegan", "§c", Perk.FARMING_SIMULATOR, Perk.PELT_POCALYPSE, Perk.GOATED, Perk.BLOOMING_BUSINESS),
-    FOXY("Foxy", "§d", Perk.SWEET_BENEVOLENCE, Perk.A_TIME_FOR_GIVING, Perk.CHIVALROUS_CARNIVAL, Perk.EXTRA_EVENT_MINING, Perk.EXTRA_EVENT_FISHING, Perk.EXTRA_EVENT_SPOOKY),
+    FOXY(
+        "Foxy",
+        "§d",
+        Perk.SWEET_BENEVOLENCE,
+        Perk.A_TIME_FOR_GIVING,
+        Perk.CHIVALROUS_CARNIVAL,
+        Perk.EXTRA_EVENT_MINING,
+        Perk.EXTRA_EVENT_FISHING,
+        Perk.EXTRA_EVENT_SPOOKY,
+    ),
     MARINA("Marina", "§b", Perk.FISHING_XP_BUFF, Perk.LUCK_OF_THE_SEA, Perk.FISHING_FESTIVAL, Perk.DOUBLE_TROUBLE),
     PAUL("Paul", "§c", Perk.MARAUDER, Perk.EZPZ, Perk.BENEDICTION),
 
@@ -54,7 +63,7 @@ enum class Mayor(
                     "mayor name not in Mayor enum",
                     "name" to name,
                     "perksJson" to perksJson,
-                    betaOnly = true
+                    betaOnly = true,
                 )
                 return null
             }
@@ -79,7 +88,7 @@ enum class Mayor(
             val foxyExtraEventPairs = mapOf(
                 "Spooky Festival" to "Extra Event (Spooky)",
                 "Mining Fiesta" to "Extra Event (Mining)",
-                "Fishing Festival" to "Extra Event (Fishing)"
+                "Fishing Festival" to "Extra Event (Fishing)",
             )
 
             foxyExtraEventPattern.matchMatcher(this.description) {
