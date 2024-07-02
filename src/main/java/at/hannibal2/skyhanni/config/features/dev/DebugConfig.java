@@ -66,6 +66,11 @@ public class DebugConfig {
     public boolean showNpcPrice = false;
 
     @Expose
+    @ConfigOption(name = "Show Craft Price", desc = "Show craft price in item lore.")
+    @ConfigEditorBoolean
+    public boolean showCraftPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
     @ConfigEditorBoolean
     public boolean showBZPrice = false;
