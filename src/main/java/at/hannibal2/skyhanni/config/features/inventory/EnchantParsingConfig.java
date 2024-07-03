@@ -39,7 +39,8 @@ public class EnchantParsingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level.")
+    @ConfigOption(name = "Perfect Enchantment Color", desc = "The color an enchantment will be at max level. " +
+        "§eIf SkyHanni chroma is disabled this will default to §6Gold.")
     @ConfigEditorDropdown
     public Property<LorenzColor> perfectEnchantColor = Property.of(LorenzColor.CHROMA);
 
@@ -86,7 +87,7 @@ public class EnchantParsingConfig {
     public Property<Boolean> hideVanillaEnchants = Property.of(true);
 
     @Expose
-    @ConfigOption(name = "Hide Enchant Description", desc = "Hides the enchant description after each enchant if available.")
+    @ConfigOption(name = "Hide Enchant Description", desc = "Hide the enchant description after each enchant if available.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> hideEnchantDescriptions = Property.of(false);

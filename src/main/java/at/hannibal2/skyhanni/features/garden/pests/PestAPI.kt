@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestSpawnEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
@@ -18,6 +21,7 @@ import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.locked
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.name
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.pests
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.uncleared
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -26,16 +30,17 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchFirst
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PestAPI {
 
     val config get() = GardenAPI.config.pests
@@ -48,7 +53,9 @@ object PestAPI {
         }
 
     var lastPestKillTime = SimpleTimeMark.farPast()
+    var lastTimeVacuumHold = SimpleTimeMark.farPast()
 
+    // TODO move into repo
     val vacuumVariants = listOf(
         "SKYMART_VACUUM".asInternalName(),
         "SKYMART_TURBO_VACUUM".asInternalName(),
@@ -121,40 +128,38 @@ object PestAPI {
     var firstScoreboardCheck = false
 
     private fun fixPests(loop: Int = 2) {
-        val accurateAmount = getPlotsWithAccuratePests().sumOf { it.pests }
-        val inaccurateAmount = getPlotsWithInaccuratePests().size
-        if (scoreboardPests == accurateAmount + inaccurateAmount) { // if we can assume all inaccurate plots have 1 pest each
-            for (plot in getPlotsWithInaccuratePests()) {
-                plot.pests = 1
-                plot.isPestCountInaccurate = false
-            }
-        } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
-            val plot = getPlotsWithInaccuratePests().firstOrNull() ?: return
-            plot.pests = scoreboardPests - accurateAmount
-            plot.isPestCountInaccurate = false
-        } else if (accurateAmount + inaccurateAmount > scoreboardPests) { // when logic fails and we reach impossible pest counts
-            getInfestedPlots().forEach {
-                it.pests = 0
-                it.isPestCountInaccurate = true
-            }
-            if (loop > 0) {
-                DelayedRun.runDelayed(2.seconds) {
-                    fixPests(loop - 1)
+        DelayedRun.runDelayed(2.seconds) {
+            val accurateAmount = getPlotsWithAccuratePests().sumOf { it.pests }
+            val inaccurateAmount = getPlotsWithInaccuratePests().size
+            if (scoreboardPests == accurateAmount + inaccurateAmount) { // if we can assume all inaccurate plots have 1 pest each
+                for (plot in getPlotsWithInaccuratePests()) {
+                    plot.pests = 1
+                    plot.isPestCountInaccurate = false
                 }
+            } else if (inaccurateAmount == 1) { // if we can assume all the inaccurate pests are in the only inaccurate plot
+                val plot = getPlotsWithInaccuratePests().firstOrNull() ?: return@runDelayed
+                plot.pests = scoreboardPests - accurateAmount
+                plot.isPestCountInaccurate = false
+            } else if (accurateAmount + inaccurateAmount > scoreboardPests) { // when logic fails and we reach impossible pest counts
+                getInfestedPlots().forEach {
+                    it.pests = 0
+                    it.isPestCountInaccurate = true
+                }
+                if (loop > 0) {
+                    fixPests(loop - 1)
+                } else sendPestError()
             }
-            else sendPestError()
         }
     }
 
     private fun updatePests() {
         if (!firstScoreboardCheck) return
         fixPests()
-        PestUpdateEvent().postAndCatch()
+        PestUpdateEvent().post()
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onPestSpawn(event: PestSpawnEvent) {
-        if (!GardenAPI.inGarden()) return
         PestSpawnTimer.lastSpawnTime = SimpleTimeMark.now()
         val plotNames = event.plotNames
         for (plotName in plotNames) {
@@ -199,14 +204,14 @@ object PestAPI {
                 val plotList = group("plots").removeColor().split(", ").map { it.toInt() }
                 if (plotList.sorted() == getInfestedPlots().map { it.id }.sorted()) return
 
-                GardenPlotAPI.plots.forEach {
-                    if (plotList.contains(it.id)) {
-                        if (!it.isPestCountInaccurate && it.pests == 0) {
-                            it.isPestCountInaccurate = true
+                for (plot in GardenPlotAPI.plots) {
+                    if (plotList.contains(plot.id)) {
+                        if (!plot.isPestCountInaccurate && plot.pests == 0) {
+                            plot.isPestCountInaccurate = true
                         }
                     } else {
-                        it.pests = 0
-                        it.isPestCountInaccurate = false
+                        plot.pests = 0
+                        plot.isPestCountInaccurate = false
                     }
                 }
                 updatePests()
@@ -215,10 +220,10 @@ object PestAPI {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!firstScoreboardCheck) return
-        checkScoreboardLines(event.newList)
+        checkScoreboardLines(event.scoreboard)
     }
 
     @SubscribeEvent
@@ -246,8 +251,16 @@ object PestAPI {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastPestKillTime = SimpleTimeMark.farPast()
+        lastTimeVacuumHold = SimpleTimeMark.farPast()
         gardenJoinTime = SimpleTimeMark.now()
         firstScoreboardCheck = false
+    }
+
+    @SubscribeEvent
+    fun onItemInHandChange(event: ItemInHandChangeEvent) {
+        if (!GardenAPI.inGarden()) return
+        if (event.oldItem !in vacuumVariants) return
+        lastTimeVacuumHold = SimpleTimeMark.now()
     }
 
     private fun getPlotsWithAccuratePests() = GardenPlotAPI.plots.filter { it.pests > 0 && !it.isPestCountInaccurate }
@@ -268,10 +281,9 @@ object PestAPI {
     }
 
     private fun removeNearestPest() {
-        val plot = getNearestInfestedPlot() ?: run {
-            ChatUtils.error("Can not remove nearest pest: No infested plots detected.")
-            return
-        }
+        val plot = getNearestInfestedPlot()
+            ?: ErrorManager.skyHanniError("Can not remove nearest pest: No infested plots detected.")
+
         if (!plot.isPestCountInaccurate) plot.pests--
         scoreboardPests--
         updatePests()

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 
 object ChocolatePositionChange {
@@ -13,7 +14,7 @@ object ChocolatePositionChange {
     fun update(position: Int?, leaderboard: String) {
         position ?: return
         val storage = storage ?: return
-        val lastTime = storage.lastTime?.let { SimpleTimeMark(it) }
+        val lastTime = storage.lastTime
         val lastPosition = storage.lastPosition
         val lastLeaderboard = storage.lastLeaderboard
 
@@ -23,7 +24,7 @@ object ChocolatePositionChange {
             var message = "§b$lastLb §c-> §b$leaderboard"
             val change = lastPosition - position
             val color = if (change > 0) "§a+" else "§c"
-            message += "\n §7Changed by $color${change.addSeparators()} spots"
+            message += "\n §7Changed by $color${change.addSeparators()} ${StringUtils.pluralize(change, "spot")}"
 
             lastTime?.let {
                 message += " §7in §b${it.passedSince().format(maxUnits = 2)}"
@@ -33,7 +34,7 @@ object ChocolatePositionChange {
             }
         }
 
-        storage.lastTime = SimpleTimeMark.now().toMillis()
+        storage.lastTime = SimpleTimeMark.now()
         storage.lastLeaderboard = leaderboard
         storage.lastPosition = position
     }

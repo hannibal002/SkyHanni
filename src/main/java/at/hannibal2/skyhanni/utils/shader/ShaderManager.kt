@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils.shader
 
 import at.hannibal2.skyhanni.features.chroma.StandardChromaShader
 import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
+import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -27,39 +28,22 @@ object ShaderManager {
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
         ROUNDED_RECT_OUTLINE(RoundedRectangleOutlineShader.INSTANCE),
+        DARKEN(DarkenShader.INSTANCE)
         ;
 
-        companion object {
-
-            fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
-                "standard_chroma" -> STANDARD_CHROMA.shader
-                "textured_chroma" -> TEXTURED_CHROMA.shader
-                "rounded_rect" -> ROUNDED_RECTANGLE.shader
-                "rounded_rect_outline" -> ROUNDED_RECT_OUTLINE.shader
-                else -> {
-                    null
-                }
-            }
-        }
+        fun enableShader() = enableShader(this)
     }
 
-    private val shaders: MutableMap<String, Shader> = mutableMapOf()
     private var activeShader: Shader? = null
 
-    fun enableShader(shaderName: String) {
-        var shader = shaders[shaderName]
+    fun enableShader(shader: Shaders) {
+        val shaderInstance = shader.shader
 
-        if (shader == null) {
-            shader = Shaders.getShaderInstance(shaderName)
-            if (shader == null) return
-            shaders[shaderName] = shader
-        }
+        if (!shaderInstance.created) return
 
-        if (!shader.created) return
-
-        activeShader = shader
-        shader.enable()
-        shader.updateUniforms()
+        activeShader = shaderInstance
+        shaderInstance.enable()
+        shaderInstance.updateUniforms()
     }
 
     fun attachShader(shaderProgram: Int, shaderID: Int) {
@@ -96,7 +80,7 @@ object ShaderManager {
                 ErrorManager.logErrorWithData(
                     OpenGLException("Shader compilation error."),
                     errorMessage,
-                    "GLSL Compilation Error:\n" to errorLog
+                    "GLSL Compilation Error:\n" to errorLog,
                 )
             } else {
                 LorenzUtils.consoleLog("$errorMessage $errorLog")

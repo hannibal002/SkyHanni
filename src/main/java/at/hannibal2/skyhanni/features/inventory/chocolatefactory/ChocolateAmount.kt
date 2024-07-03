@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
 
 enum class ChocolateAmount(val chocolate: () -> Long) {
     CURRENT({ profileStorage?.currentChocolate ?: 0 }),
@@ -25,34 +24,14 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
     }
 
     fun timeUntilGoal(goal: Long): Duration {
-        val profileStorage = ChocolateFactoryAPI.profileStorage ?: return Duration.ZERO
-
-        val updatedAgo = SimpleTimeMark(profileStorage.lastDataSave).passedSince().inWholeSeconds
-
-        val baseMultiplier = profileStorage.rawChocolateMultiplier
-        val rawChocolatePerSecond = profileStorage.rawChocPerSecond
-        val timeTowerMultiplier = baseMultiplier + profileStorage.timeTowerLevel * 0.1
-
-        if (rawChocolatePerSecond == 0) return Duration.INFINITE
-
-        var needed = goal - chocolate()
-        val secondsUntilTowerExpires = ChocolateFactoryTimeTowerManager.timeTowerActiveDuration().inWholeSeconds
-
-        val timeTowerChocPerSecond = rawChocolatePerSecond * timeTowerMultiplier
-
-        val secondsAtRate = needed / timeTowerChocPerSecond
-        if (secondsAtRate < secondsUntilTowerExpires) {
-            return secondsAtRate.seconds - updatedAgo.seconds
-        }
-
-        needed -= (secondsUntilTowerExpires * timeTowerChocPerSecond).toLong()
-        val basePerSecond = rawChocolatePerSecond * baseMultiplier
-        return (needed / basePerSecond + secondsUntilTowerExpires).seconds - updatedAgo.seconds
+        val profileStorage = profileStorage ?: return Duration.ZERO
+        val updatedAgo = profileStorage.lastDataSave.passedSince()
+        return ChocolateFactoryAPI.timeUntilNeed(goal - chocolate()) - updatedAgo
     }
 
     companion object {
         fun chocolateSinceUpdate(): Long {
-            val lastUpdate = SimpleTimeMark(profileStorage?.lastDataSave ?: return 0)
+            val lastUpdate = profileStorage?.lastDataSave ?: return 0
             val currentTime = SimpleTimeMark.now()
             val secondsSinceUpdate = (currentTime - lastUpdate).inWholeSeconds
 
@@ -84,14 +63,22 @@ enum class ChocolateAmount(val chocolate: () -> Long) {
                 it.currentChocolate += amount
                 it.chocolateThisPrestige += amount
                 it.chocolateAllTime += amount
-                updateBestUpgrade(amount)
+                updateBestUpgrade()
             }
         }
 
-        private fun updateBestUpgrade(price: Long) {
+        fun addToCurrent(amount: Long) {
             profileStorage?.let {
+                it.currentChocolate += amount
+                updateBestUpgrade()
+            }
+        }
+
+        private fun updateBestUpgrade() {
+            profileStorage?.let {
+                if (it.bestUpgradeAvailableAt.isFarPast() || it.bestUpgradeCost == 0L) return
                 val canAffordAt = SimpleTimeMark.now() + CURRENT.timeUntilGoal(it.bestUpgradeCost)
-                it.bestUpgradeAvailableAt = canAffordAt.toMillis()
+                it.bestUpgradeAvailableAt = canAffordAt
             }
         }
     }

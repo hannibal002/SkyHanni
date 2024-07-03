@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import net.minecraft.item.EnumDyeColor
+import net.minecraft.util.EnumChatFormatting
 import java.awt.Color
 
 enum class LorenzColor(val chatColorCode: Char, private val color: Color, private val coloredLabel: String) {
@@ -24,6 +25,17 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
     CHROMA('Z', Color(0, 0, 0, 0), "§ZChroma") // If chroma, go transparent instead of color code.
     ;
 
+    val next by lazy {
+        when (this) {
+            WHITE -> BLACK
+            CHROMA -> BLACK
+            else -> {
+                val index = entries.indexOf(this)
+                entries[index + 1]
+            }
+        }
+    }
+
     fun getChatColor(): String = "§$chatColorCode"
 
     fun toColor(): Color = color
@@ -40,6 +52,31 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
     fun toConfigColour(): String = "0:255:${color.red}:${color.green}:${color.blue}"
 
+    fun toDyeColor(): EnumDyeColor = when (this) {
+        WHITE -> EnumDyeColor.WHITE
+        GOLD -> EnumDyeColor.ORANGE
+        AQUA -> EnumDyeColor.MAGENTA
+        BLUE -> EnumDyeColor.LIGHT_BLUE
+        YELLOW -> EnumDyeColor.YELLOW
+        GREEN -> EnumDyeColor.LIME
+        LIGHT_PURPLE -> EnumDyeColor.PINK
+        DARK_GRAY -> EnumDyeColor.GRAY
+        GRAY -> EnumDyeColor.SILVER
+        DARK_AQUA -> EnumDyeColor.CYAN
+        DARK_PURPLE -> EnumDyeColor.PURPLE
+        DARK_BLUE -> EnumDyeColor.BLUE
+//         GOLD -> EnumDyeColor.BROWN
+        DARK_GREEN -> EnumDyeColor.GREEN
+        DARK_RED -> EnumDyeColor.RED
+        BLACK -> EnumDyeColor.BLACK
+        RED -> EnumDyeColor.RED
+
+        CHROMA -> EnumDyeColor.WHITE
+    }
+
+    fun toChatFormatting(): EnumChatFormatting? =
+        EnumChatFormatting.entries.firstOrNull { it.toString() == getChatColor() }
+
     companion object {
 
         fun EnumDyeColor.toLorenzColor() = when (this) {
@@ -54,13 +91,19 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
             EnumDyeColor.BLUE -> BLUE
             EnumDyeColor.PURPLE -> DARK_PURPLE
             EnumDyeColor.YELLOW -> YELLOW
-            else -> {
-                ErrorManager.logErrorWithData(
-                    Exception("Unknown dye color: $this"),
-                    "Unknown dye color: $this"
-                )
-                null
-            }
+            EnumDyeColor.ORANGE -> GOLD
+            EnumDyeColor.LIGHT_BLUE -> BLUE
+            EnumDyeColor.CYAN -> DARK_AQUA
+            EnumDyeColor.BROWN -> GOLD
+            EnumDyeColor.BLACK -> BLACK
+        }
+
+        fun Char.toLorenzColor(): LorenzColor? = entries.firstOrNull { it.chatColorCode == this } ?: run {
+            ErrorManager.logErrorWithData(
+                Exception("Unknown chat color: $this"),
+                "Unknown chat color: $this"
+            )
+            null
         }
     }
 }

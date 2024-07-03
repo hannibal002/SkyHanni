@@ -17,13 +17,7 @@ object NEUVersionCheck {
         try {
             Class.forName("io.github.moulberry.notenoughupdates.NotEnoughUpdates")
         } catch (e: Throwable) {
-            neuWarning(
-                "NotEnoughUpdates is missing!\n" +
-                    "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
-                    "You currently need NEU version 2.2.0 or later.\n" +
-                    "NEU 2.1 is NOT the latest version.\n" +
-                    "Use these links to download the latest version:"
-            )
+            neuWarning("missing")
             return
         }
 
@@ -35,21 +29,19 @@ object NEUVersionCheck {
             }
         } catch (_: Throwable) {
         }
-        neuWarning(
-            "NotEnoughUpdates is outdated!\n" +
-                "You currently need NEU version 2.2.0 or later.\n" +
-                "NEU 2.1 is NOT the latest version.\n" +
-                "Use these links to download the latest version:"
-        )
+        neuWarning("outdated")
     }
 
-    private fun neuWarning(text: String) {
+    private fun neuWarning(what: String) {
         openPopupWindow(
-            text,
+            "NotEnoughUpdates is $what!\n" +
+                "SkyHanni requires the latest version of NotEnoughUpdates to work.\n" +
+                "Use these links to download the latest version:",
             Pair("Join SkyHanni Discord", "https://discord.com/invite/skyhanni-997079228510117908"),
             Pair("Open SkyHanni GitHub", "https://github.com/hannibal002/SkyHanni"),
             Pair("Join NEU Discord", "https://discord.gg/moulberry"),
-            Pair("Download NEU 2.2.0", "https://github.com/NotEnoughUpdates/NotEnoughUpdates/releases/tag/2.2.0"),
+            Pair("Download NEU from GitHub", "https://github.com/NotEnoughUpdates/NotEnoughUpdates/releases/latest"),
+            Pair("Download NEU from Modrinth", "https://modrinth.com/mod/notenoughupdates/version/latest"),
         )
         closeMinecraft()
     }

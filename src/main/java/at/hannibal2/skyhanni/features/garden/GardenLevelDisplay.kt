@@ -8,30 +8,32 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.format
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
-class GardenLevelDisplay {
+@SkyHanniModule
+object GardenLevelDisplay {
 
     private val config get() = GardenAPI.config.gardenLevels
     private var useRomanNumerals: Boolean
@@ -91,14 +93,13 @@ class GardenLevelDisplay {
         if (!config.overflowChat) return
         val newLevel = GardenAPI.getGardenLevel()
         if (newLevel != oldLevel + 1 || newLevel <= 15) return
-        LorenzUtils.runDelayed(50.milliseconds) {
+        DelayedRun.runDelayed(50.milliseconds) {
             // TODO utils function that is shared with Crop Milestone Display
             ChatUtils.clickableChat(
                 " \n§b§lGARDEN LEVEL UP §8$oldLevel ➜ §b$newLevel\n" +
                     " §8+§aRespect from Elite Farmers and SkyHanni members :)\n ",
-                onClick = {
-                    HypixelCommands.gardenLevels()
-                },
+                onClick = { HypixelCommands.gardenLevels() },
+                "§eClick to view your Garden Level progress and rewards!",
                 prefix = false
             )
 
@@ -171,7 +172,7 @@ class GardenLevelDisplay {
             if (next && line.contains("                    ")) {
                 val progress = overflow / needForOnlyNextLvl
                 val progressBar = StringUtils.progressBar(progress, 20)
-                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${format(needForOnlyNextLvl)}")
+                iterator.set("$progressBar §e${overflow.addSeparators()}§6/§e${needForOnlyNextLvl.shortFormat()}")
                 iterator.add("")
                 iterator.add("§b§lOVERFLOW XP:")
                 iterator.add("§7▸ ${overflowTotal.addSeparators()}")

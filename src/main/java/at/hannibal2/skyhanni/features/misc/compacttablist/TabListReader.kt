@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.features.misc.compacttablist
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.findMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // heavily inspired by SBA code
+@SkyHanniModule
 object TabListReader {
 
     private val config get() = SkyHanniMod.feature.gui.compactTabList
@@ -24,17 +26,26 @@ object TabListReader {
         "username",
         "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
     )
+    /**
+     * REGEX-TEST: §r§r§7You have a §r§cGod Potion §r§7active! §r§d12 Hours§r
+     */
     private val godPotPattern by patternGroup.pattern(
         "effects.godpot",
-        "You have a God Potion active! (?<timer>[\\w ]+)"
+        "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r"
     )
+    /**
+     * REGEX-TEST: §r§r§a§lActive Effects§r
+     */
     private val activeEffectPattern by patternGroup.pattern(
         "effects.active",
         "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
+    /**
+     * REGEX-TEST: §r§r§7§r§7You have §r§e1 §r§7active effect. Use "§r§6/effects§r§7" to see it!§r
+     */
     private val effectCountPattern by patternGroup.pattern(
         "effects.count",
-        "You have (?<effectCount>[0-9]+) active effect"
+        "You have (?:§.)*(?<effectCount>[0-9]+) (?:§.)*active effect"
     )
     private val cookiePattern by patternGroup.pattern(
         "cookie",

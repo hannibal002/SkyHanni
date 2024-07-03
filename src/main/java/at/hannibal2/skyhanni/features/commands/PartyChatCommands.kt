@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.TabCompletionEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object PartyChatCommands {
 
     private val config get() = SkyHanniMod.feature.misc.partyCommands
@@ -95,7 +97,8 @@ object PartyChatCommands {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +
                     "Unignore them using /shignore remove <player> or click here!",
-                onClick = { blacklistModify(event.author) }
+                onClick = { blacklistModify(event.author) },
+                "§eClick to ignore ${event.author}!",
             )
             return
         }
@@ -103,7 +106,7 @@ object PartyChatCommands {
             if (config.showIgnoredReminder) {
                 ChatUtils.chat(
                     "§cIgnoring chat command from $name. " +
-                        "Change your party chat command settings or /friend (best) them."
+                        "Change your party chat command settings or /friend (best) them.",
                 )
             }
             return
@@ -162,11 +165,15 @@ object PartyChatCommands {
             }
 
             "clear" -> {
-                ChatUtils.clickableChat("Are you sure you want to do this? Click here to confirm.",
+                ChatUtils.clickableChat(
+                    "Are you sure you want to do this? Click here to confirm.",
                     onClick = {
                         storage.blacklistedUsers.clear()
                         ChatUtils.chat("Cleared your ignored players list!")
-                    })
+                    },
+                    "§eClick to confirm.",
+                    oneTimeClick = true,
+                )
             }
 
             else -> blacklistModify(firstArg)
@@ -200,9 +207,7 @@ object PartyChatCommands {
                 }
             }
         } else {
-            blacklist.forEach {
-                message += "\n§e$it"
-            }
+            blacklist.forEach { message += "\n§e$it" }
         }
         ChatUtils.chat(message)
     }

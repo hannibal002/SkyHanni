@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.profileStorage
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object ChocolateFactoryTooltip {
 
     private val config get() = ChocolateFactoryAPI.config
@@ -43,7 +45,7 @@ object ChocolateFactoryTooltip {
 
     private fun chocPerTimeTower(): Int {
         val profileStorage = profileStorage ?: return 0
-        val amountPerSecond = profileStorage.rawChocPerSecond * profileStorage.timeTowerLevel * .1
+        val amountPerSecond = profileStorage.rawChocPerSecond * ChocolateFactoryAPI.timeTowerMultiplier()
         val amountPerHour = amountPerSecond * 60 * 60
         return amountPerHour.toInt()
     }

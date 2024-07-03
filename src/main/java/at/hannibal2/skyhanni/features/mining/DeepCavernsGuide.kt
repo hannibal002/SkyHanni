@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -19,13 +21,13 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import io.github.moulberry.notenoughupdates.events.ReplaceItemEvent
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DeepCavernsGuide {
+@SkyHanniModule
+object DeepCavernsGuide {
 
     private val config get() = SkyHanniMod.feature.mining.deepCavernsGuide
 
@@ -110,6 +112,7 @@ class DeepCavernsGuide {
                 onClick = {
                     SkyHanniMod.repo.updateRepo()
                 },
+                "§eClick to update the repo!",
                 prefixColor = "§c"
             )
         }
@@ -123,15 +126,15 @@ class DeepCavernsGuide {
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (show) return
-        if (event.inventory is ContainerLocalMenu && showStartIcon && event.slotNumber == 49) {
-            event.replaceWith(startIcon)
+        if (event.inventory is ContainerLocalMenu && showStartIcon && event.slot == 49) {
+            event.replace(startIcon)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showStartIcon && event.slotId == 49) {
-            event.isCanceled = true
+            event.cancel()
             ChatUtils.chat("Manually enabled Deep Caverns Guide.")
             start()
         }
