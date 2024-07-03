@@ -121,7 +121,6 @@ object ExperimentsDisplay {
 
             if (lastClicked.size >= 2 && !instantFind) lastClicked.clear()
             toCheck.removeIf { it.first == slot }
-            instantFind = false
 
             return drawDisplay()
         }
@@ -150,6 +149,7 @@ object ExperimentsDisplay {
             when {
                 instantFind -> {
                     handleFoundPair(slot, reward, it.first, lastItemName)
+                    instantFind = false
                 }
 
                 hasFoundPair(slot, it.first, reward, lastItemName) -> handleFoundPair(
@@ -187,7 +187,7 @@ object ExperimentsDisplay {
     }
 
     private fun calculatePossiblePairs() =
-        (currentExperiment.gridSize / 2) - foundPairs.size - foundPowerUps.size - foundMatches.size - foundNormals.size
+        (currentExperiment.gridSize / 2) - foundPairs.size - 2 - foundMatches.size - foundNormals.size
 
     private fun drawDisplay() = buildList {
         add("§6Experimentation Data")
@@ -208,10 +208,15 @@ object ExperimentsDisplay {
                 determinePrefix(foundPowerUps.entries.indexOf(power), foundPowerUps.size - 1)
             add(" $prefix §b${power.value}")
         }
-        add("")
-        add("§4Not found")
-        add(" ├ §ePairs - $possiblePairs")
-        add(" └ §7Normals - ${foundNormals.size}")
+        val toAdd = mutableListOf<String>()
+        if (possiblePairs >= 1) toAdd.add("§ePairs - ${possiblePairs}")
+        if (2 - foundPowerUps.size >= 1) toAdd.add("§bPowerUps - ${2 - foundPowerUps.size}")
+        if (foundNormals.isNotEmpty()) toAdd.add("§7Normals - ${foundNormals.size}")
+
+        if (toAdd.isNotEmpty()) {
+            add(""); add("§4Not found")
+        }
+        for (string in toAdd) if (string != toAdd.last()) add(" ├ $string") else add(" └ $string")
     }
 
     private fun convertToReward(item: ItemStack) =
