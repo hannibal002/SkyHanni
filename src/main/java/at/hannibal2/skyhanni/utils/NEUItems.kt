@@ -42,6 +42,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -54,35 +55,39 @@ object NEUItems {
     private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
+    private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
 
     private val hypixelApiGson by lazy {
         BaseGsonBuilder.gson()
-            .registerTypeAdapter(HypixelApiTrophyFish::class.java, object : TypeAdapter<HypixelApiTrophyFish>() {
-                override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
+            .registerTypeAdapter(
+                HypixelApiTrophyFish::class.java,
+                object : TypeAdapter<HypixelApiTrophyFish>() {
+                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
-                override fun read(reader: JsonReader): HypixelApiTrophyFish {
-                    val trophyFish = mutableMapOf<String, Int>()
-                    var totalCaught = 0
-                    reader.beginObject()
-                    while (reader.hasNext()) {
-                        val key = reader.nextName()
-                        if (key == "total_caught") {
-                            totalCaught = reader.nextInt()
-                            continue
-                        }
-                        if (reader.peek() == JsonToken.NUMBER) {
-                            val valueAsString = reader.nextString()
-                            if (valueAsString.isInt()) {
-                                trophyFish[key] = valueAsString.toInt()
+                    override fun read(reader: JsonReader): HypixelApiTrophyFish {
+                        val trophyFish = mutableMapOf<String, Int>()
+                        var totalCaught = 0
+                        reader.beginObject()
+                        while (reader.hasNext()) {
+                            val key = reader.nextName()
+                            if (key == "total_caught") {
+                                totalCaught = reader.nextInt()
                                 continue
                             }
+                            if (reader.peek() == JsonToken.NUMBER) {
+                                val valueAsString = reader.nextString()
+                                if (valueAsString.isInt()) {
+                                    trophyFish[key] = valueAsString.toInt()
+                                    continue
+                                }
+                            }
+                            reader.skipValue()
                         }
-                        reader.skipValue()
+                        reader.endObject()
+                        return HypixelApiTrophyFish(totalCaught, trophyFish)
                     }
-                    reader.endObject()
-                    return HypixelApiTrophyFish(totalCaught, trophyFish)
-                }
-            }.nullSafe())
+                }.nullSafe(),
+            )
             .create()
     }
 
@@ -94,7 +99,7 @@ object NEUItems {
         Utils.createItemStack(
             ItemStack(Blocks.barrier).item,
             "§cMissing Repo Item",
-            "§cYour NEU repo seems to be out of date"
+            "§cYour NEU repo seems to be out of date",
         )
     }
 
@@ -119,7 +124,7 @@ object NEUItems {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error reading hypixel player api data",
-                "data" to apiData
+                "data" to apiData,
             )
         }
     }
@@ -192,7 +197,10 @@ object NEUItems {
         return getNpcPriceOrNull() ?: getRawCraftCostOrNull()
     }
 
-    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost
+    // If NEU fails to calculate the craft costs, we calculate it ourself.
+    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
+        getRecipes(this).map { ItemUtils.getRecipePrice(it) }.minOrNull()
+    }
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
@@ -210,13 +218,14 @@ object NEUItems {
                     "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
                     "Discord if this is the case.",
                 "Item name" to this.asString(),
-                "repo commit" to manager.latestRepoCommit
+                "repo commit" to manager.latestRepoCommit,
             )
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack): Boolean =
-        manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
+
+    fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
 
     const val itemFontSize = 2.0 / 3.0
 
@@ -224,7 +233,7 @@ object NEUItems {
         x: Float,
         y: Float,
         scaleMultiplier: Double = itemFontSize,
-        rescaleSkulls: Boolean = true
+        rescaleSkulls: Boolean = true,
     ) {
         val item = checkBlinkItem()
         val isSkull = rescaleSkulls && item.item === Items.skull
@@ -280,13 +289,24 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
+    fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
+        itemIdCache[item]?.let {
+            return it
+        }
+        val result = allNeuRepoItems()
+            .filter { Item.getByNameOrId(it.value.get("itemid").asString) == item }
+            .keys.map { it.asInternalName() }
+        itemIdCache[item] = result
+        return result
+    }
+
     fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
                 "Could not load recipe data.",
                 "Failed to find item multiplier",
-                "internalName" to internalName
+                "internalName" to internalName,
             )
             return internalName.makePrimitiveStack()
         }

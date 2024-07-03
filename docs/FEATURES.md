@@ -56,6 +56,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 - Many other messages (Not separated into own categories yet)
 + More chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
++ Add config option to hide achievement spam on Alpha. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2076)
 
 </details>
 <details open><summary>
@@ -206,6 +207,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Favorite Power Stones. - saga (https://github.com/hannibal002/SkyHanni/pull/2002)
     + Highlighted in the Thaumaturgy inventory.
     + Shift-click to add/remove them.
++ Add Page Scrolling. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2164)
+    + Allows scrolling in any inventory with multiple pages.
++ Add Reforge Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1437)
+    + Add reforge locking similar to SkyblockAddons.
+    + Work with Hex.
+    + Show a list of all possible reforges for the item, with stats.
+    + The reforge list can be sorted by a specific stat.
+    + Optionally show the different stat values compared to the current reforge.
 
 </details>
 <details open><summary>
@@ -816,6 +825,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Fully customizable: change what items or stats to show.
     + Has support for the maxed Great Explorer perk.
     + Option to hide while not grinding powder.
+    + Added Compacted Hard Stone to Powder Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2138)
 + Deep Caverns Parkour. - hannibal2
     + Shows a parkour to the bottom of Deep Caverns and to Rhys.
 + Display upcoming mining events. - CalMWolfs
@@ -937,6 +947,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + This data is partially enriched using the duplicate egg location tracker.
 + Rabbit Pet Warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2087)
     + Warns when using the Egglocator without having a Mythic Rabbit Pet selected.
++ Flash your screen when a special stray rabbit appears. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2040)
+    + Option to also flash on normal stray rabbits.
++ Added an option to block Chocolate Factory access without a mythic rabbit pet. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2124)
++ Add reminder that the Time Tower is expired and has extra charges available. - appable (https://github.com/hannibal002/SkyHanni/pull/2133)
+    + Replaces the previous Time Tower Reminder feature.
 
 </details>
 <details open><summary>
@@ -1203,6 +1218,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Hide the Hypixel Scoreboard, add a custom Image as a background, rounded corners.
     + Supports colored month names & better garden plot names.
     + A ton of settings.
+    + Added Chunked Stats as a draggable list to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1341)
+        + Select and prioritize the order of the stats you want to see.
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
 + Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
@@ -1242,6 +1259,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added a Chat Message if the Perkapocalypse Mayor is unknown. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2009)
 + Added a source download verification checker. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1914)
     + Warns you when the mod has been downloaded from an untrusted source (not the official GitHub or Modrinth).
++ Shows a list of items that can be crafted with the items in your inventory when inside the crafting menu. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1334)
+    + Click on an item to open /recipe.
+    + Option to include items from inside sacks.
+    + Option to include vanilla items.
 
 </details>
 <details open><summary>

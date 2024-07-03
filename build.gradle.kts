@@ -16,7 +16,7 @@ plugins {
 }
 
 group = "at.hannibal2.skyhanni"
-version = "0.26.Beta.12"
+version = "0.26.Beta.14"
 
 val gitHash by lazy {
     val baos = ByteArrayOutputStream()
@@ -196,7 +196,7 @@ loom {
 // Tasks:
 tasks.processResources {
     inputs.property("version", version)
-    filesMatching("mcmod.info") {
+    filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
     }
 }
@@ -300,6 +300,3 @@ publishing.publications {
         }
     }
 }
-
-
-
