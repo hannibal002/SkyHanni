@@ -2,30 +2,32 @@ package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.formatDouble
 import at.hannibal2.skyhanni.utils.LorenzUtils.formatPercentage
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class DragonFeatures {
+@SkyHanniModule
+object DragonFeatures {
 
-    private val config get() = SkyHanniMod.configManager.features.combat.dragon
-    private val configProtector get() = SkyHanniMod.configManager.features.combat.endstoneProtectorChat
+    private val config get() = SkyHanniMod.feature.combat.dragon
+    private val configProtector get() = SkyHanniMod.feature.combat.endstoneProtectorChat
 
     private val dragonNames = listOf("Protector", "Old", "Wise", "Unstable", "Young", "Strong", "Superior")
 
@@ -38,47 +40,73 @@ class DragonFeatures {
     private val scoreBoardGroup = repoGroup.group("scoreboard")
     private val tabListGroup = repoGroup.group("tablist")
 
+    /** REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! §r§7(§r§e2§r§7/§r§a8§r§7)
+     * REGEX-TEST: §5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7(§r§a8§r§7/§r§a8§r§7)
+     */
     private val eyePlaced by chatGroup.pattern(
         "eye.placed.you",
-        "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)"
+        "§5☬ §r§dYou placed a Summoning Eye! §r§7\\(§r§e\\d§r§7\\/§r§a8§r§7\\)|§5☬ §r§dYou placed a Summoning Eye! Brace yourselves! §r§7\\(§r§a8§r§7\\/§r§a8§r§7\\)",
     )
+
+    /** REGEX-TEST: §5You recovered a Summoning Eye!
+     */
     private val eyeRemoved by chatGroup.pattern("eye.removed.you", "§5You recovered a Summoning Eye!")
 
+    /** REGEX-TEST: §5☬ §r§dThe Dragon Egg has spawned!
+     */
     private val eggSpawned by chatGroup.pattern("egg.spawn", "§5☬ §r§dThe Dragon Egg has spawned!")
+
+    /** REGEX-TEST: §f                      §r§6§lPROTECTOR DRAGON DOWN!
+     */
     private val endStartLineDragon by chatGroup.pattern(
         "end.boss",
-        "§f +§r§6§l(?<Dragon>${dragonNamesUpperCaseAsRegex}) DRAGON DOWN!"
+        "§f +§r§6§l(?<Dragon>${dragonNamesUpperCaseAsRegex}) DRAGON DOWN!",
     )
+
+    /** REGEX-TEST: §f                    §r§6§lENDSTONE PROTECTOR DOWN!
+     */
     private val endStartLineProtector by protectorRepoGroup.pattern(
         "chat.end.boss",
-        "§f +§r§6§l ENDSTONE PROTECTOR DOWN!"
+        "§f +§r§6§l ENDSTONE PROTECTOR DOWN!",
     )
+
+    /** REGEX-TEST: §f                   §r§eYour Damage: §r§a88,966 §r§7(Position #5)
+     */
     private val endPosition by chatGroup.pattern(
         "end.position",
-        "§f +§r§eYour Damage: §r§a(?<Damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<Position>\\d+)\\)"
+        "§f +§r§eYour Damage: §r§a(?<Damage>[\\d.,]+) (?:§r§d§l\\(NEW RECORD!\\) )?§r§7\\(Position #(?<Position>\\d+)\\)",
     )
 
     // val endFinalHit by chatGroup.pattern("end.final", "§f                 §r§b[^ ]+ (?<Name>.*)§r§f §r§7dealt the final blow.")
+    /** REGEX-TEST: §f             §r§e§l1st Damager §r§7- §r§a[VIP] Jarre07§r§f §r§7- §r§e9,659,033
+     * REGEX-TEST: §f          §r§6§l2nd Damager §r§7- §r§b[MVP§r§9+§r§b] FlamingZoom§r§f §r§7- §r§e1,459,691
+     * REGEX-TEST: §f          §r§c§l3rd Damager §r§7- §r§b[MVP§r§f+§r§b] Dustbringer§r§f §r§7- §r§e1,091,163
+     */
     private val endLeaderboard by chatGroup.pattern(
         "end.place",
-        "§f +§r§.§l(?<Position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<Name>.*)§r§. §r§7- §r§e(?<Damage>[\\d.,]+)"
+        "§f +§r§.§l(?<Position>\\d+).. Damager §r§7- §r§.(?:\\[[^ ]+\\] )?(?<Name>.*)§r§. §r§7- §r§e(?<Damage>[\\d.,]+)",
     )
+
+    /** REGEX-TEST: §f                       §r§eZealots Contributed: §r§a27§r§e/100
+     */
     private val endZealots by protectorRepoGroup.pattern(
         "chat.end.zealot",
-        "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100"
+        "§f +§r§eZealots Contributed: §r§a(?<Amount>\\d+)§r§e/100",
     )
+
+    /** REGEX-TEST: §5☬ §r§d§lThe §r§5§c§lProtector Dragon§r§d§l has spawned!
+     */
     private val dragonSpawn by chatGroup.pattern(
         "spawn",
-        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>${dragonNamesAsRegex}) Dragon§r§d§l has spawned!"
+        "§5☬ §r§d§lThe §r§5§c§l(?<Dragon>${dragonNamesAsRegex}) Dragon§r§d§l has spawned!",
     )
     private val scoreDamage by scoreBoardGroup.pattern("damage", "Your Damage: §c(?<Damage>[\\w,.]+)")
     private val scoreDragon by scoreBoardGroup.pattern("dragon", "Dragon HP: .*")
 
     // private val scoreProtector by protectorRepoGroup.pattern("scoreboard.protector", "Protector HP: .*")
-    private val fightInfo by tabListGroup.pattern("fight.info", "§b§lDragon Fight: §r§f\\(\\w+\\)")
     private val tabDamage by tabListGroup.pattern(
         "fight.player",
-        ".*§r§f(?<Name>.+): §r§c(?<Damage>[\\d.]+)(?<Unit>[kM])?❤"
+        ".*§r§f(?<Name>.+): §r§c(?<Damage>[\\d.]+)(?<Unit>[kM])?❤",
     )
 
     private var yourEyes = 0
@@ -92,7 +120,8 @@ class DragonFeatures {
         }
 
     private enum class Type {
-        golem, dragon
+        golem,
+        dragon
     }
 
     private var endType: Type? = null
@@ -103,6 +132,7 @@ class DragonFeatures {
     private var currentDamage = 0.0
     private var currentTopDamage = 0.0
     private var currentPlace: Int? = null
+    private var widgetActive = false
     private var egg = true
 
     private fun resetEnd() {
@@ -118,6 +148,7 @@ class DragonFeatures {
         currentTopDamage = 0.0
         currentDamage = 0.0
         currentPlace = null
+        widgetActive = false
         yourEyes = 0
     }
 
@@ -212,11 +243,11 @@ class DragonFeatures {
                     when (endType) {
                         Type.dragon -> {
                             val weight = calculateDragonWeight(
-                                yourEyes, endPlace, endTopDamage, endDamage
+                                yourEyes, endPlace, endTopDamage, endDamage,
                             )
 
                             printWeight(weight)
-                            reset()
+                            DragonFeatures.reset() // love name collisions
                         }
 
                         Type.golem -> {
@@ -241,30 +272,30 @@ class DragonFeatures {
     }
 
     private fun printWeight(weight: Double) {
-        ChatUtils.chat("§f                §r§eYour Weight: §r§a${formatDouble(weight)}")
+        ChatUtils.chat("§f                §r§eYour Weight: §r§a${weight.round(0).addSeparators()}")
     }
 
     @SubscribeEvent
-    fun onScoreBoard(event: ScoreboardChangeEvent) {
+    fun onScoreBoard(event: ScoreboardUpdateEvent) {
         if (!(enableDisplay())) return
-        val index = event.newList.indexOfFirst { scoreDragon.matches(it) }
+        val index = event.scoreboard.indexOfFirst { scoreDragon.matches(it) }
         if (index == -1) return
         if (egg) {
             dragonSpawned = true
         }
-        scoreDamage.matchMatcher(event.newList[index + 1]) {
+        scoreDamage.matchMatcher(event.scoreboard[index + 1]) {
             currentDamage = this.group("Damage").replace(",", "").toDouble()
         }
 
     }
 
     @SubscribeEvent
-    fun onTabList(event: TabListUpdateEvent) {
+    fun onTabList(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.DRAGON)) return
         if (!(enableDisplay() && dragonSpawned)) return
-        val infoIndex = event.tabList.indexOfFirst { fightInfo.matches(it) }
-        if (infoIndex == -1) return
-        for (i in 1..3) {
-            tabDamage.matchMatcher(event.tabList[infoIndex + i]) {
+        widgetActive = true
+        for (i in 1 until event.lines.size) {
+            tabDamage.matchMatcher(event.lines[i]) {
                 if (i == 1) {
                     currentTopDamage = this.group("Damage").toDouble() * this.group("Unit").let {
                         when (it) {
@@ -281,22 +312,30 @@ class DragonFeatures {
         }
     }
 
+    private val widgetErrorGUI = listOf(Renderable.string("§cDragon Widget is disabled!"))
+
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent) {
         if (!(enableDisplay() && dragonSpawned)) return
         config.displayPosition.renderRenderables(
-            listOf(
-                Renderable.hoverTips(
-                    "§6Current Weight: §f${
-                        calculateDragonWeight(yourEyes, currentPlace ?: 6, currentTopDamage, currentDamage)
-                            .round(1).addSeparators()
-                    }",
-                    listOf(
-                        "Eyes: $yourEyes",
-                        "Place: ${currentPlace ?: if (currentDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"}",
-                        "Damage Ratio: ${formatPercentage(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0))}%"))),
-            posLabel = "Dragon Weight")
+            if (!widgetActive) widgetErrorGUI else display(),
+            posLabel = "Dragon Weight",
+        )
     }
+
+    private fun display() = listOf(
+        Renderable.hoverTips(
+            "§6Current Weight: §f${
+                calculateDragonWeight(yourEyes, currentPlace ?: 6, currentTopDamage, currentDamage)
+                    .round(1).addSeparators()
+            }",
+            listOf(
+                "Eyes: $yourEyes",
+                "Place: ${currentPlace ?: if (currentDamage != 0.0) "unknown, assuming 6th" else "not damaged yet"}",
+                "Damage Ratio: ${formatPercentage(currentDamage / (currentTopDamage.takeIf { it != 0.0 } ?: 1.0))}%",
+            ),
+        ),
+    )
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
