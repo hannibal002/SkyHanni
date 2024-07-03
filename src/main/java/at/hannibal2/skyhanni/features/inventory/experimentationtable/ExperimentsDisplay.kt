@@ -132,7 +132,7 @@ object ExperimentsDisplay {
         foundPowerUps[slot] = reward
         possiblePairs--
         lastClicked.removeIf { it.first == slot }
-        if (reward != "Instant Find") instantFind = true
+        if (reward == "Instant Find") instantFind = true
     }
 
     private fun handleReward(index: Int, slot: Int, uncovered: Int, reward: String) {
@@ -214,7 +214,8 @@ object ExperimentsDisplay {
         if (foundNormals.isNotEmpty()) toAdd.add("§7Normals - ${foundNormals.size}")
 
         if (toAdd.isNotEmpty()) {
-            add(""); add("§4Not found")
+            add("")
+            add("§4Not found")
         }
         for (string in toAdd) if (string != toAdd.last()) add(" ├ $string") else add(" └ $string")
     }
