@@ -4,8 +4,9 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -62,32 +63,33 @@ object GardenCropMilestoneFix {
             val amount = group("amount").toInt()
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + (amount * multiplier.second)
+                cropType.getCounter() + (amount * primitiveStack.amount)
             )
             GardenCropMilestoneDisplay.update()
         }
         pestRareDropPattern.matchMatcher(event.message) {
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + multiplier.second
+                cropType.getCounter() + primitiveStack.amount
             )
             GardenCropMilestoneDisplay.update()
         }
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        event.tabList.matchFirst(tabListPattern) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
+        event.lines.matchFirst(tabListPattern) {
             val tier = group("tier").toInt()
             val percentage = group("percentage").toDouble()
             val cropName = group("crop")

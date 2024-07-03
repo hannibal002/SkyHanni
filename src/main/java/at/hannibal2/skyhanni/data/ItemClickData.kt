@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -12,15 +13,14 @@ import net.minecraft.network.play.client.C02PacketUseEntity
 import net.minecraft.network.play.client.C07PacketPlayerDigging
 import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 import net.minecraft.network.play.client.C0APacketAnimation
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ItemClickData {
 
-    @SubscribeEvent
-    fun onItemClickSend(event: PacketEvent.SendEvent) {
+    @HandleEvent
+    fun onItemClickSend(event: PacketSentEvent) {
         val packet = event.packet
-        event.isCanceled = when {
+        val cancelled = when {
             packet is C08PacketPlayerBlockPlacement -> {
                 if (packet.placedBlockDirection != 255) {
                     val position = packet.position.toLorenzVec()
@@ -57,6 +57,10 @@ object ItemClickData {
             else -> {
                 return
             }
+        }
+
+        if (cancelled) {
+            event.cancel()
         }
     }
 

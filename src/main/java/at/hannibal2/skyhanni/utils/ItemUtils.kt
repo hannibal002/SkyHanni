@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
@@ -45,14 +44,13 @@ object ItemUtils {
     }
 
     // TODO change else janni is sad
-    fun isCoopSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any {
+    fun ItemStack.isCoopSoulBound(): Boolean =
+        getLore().any {
             it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
         }
 
     // TODO change else janni is sad
-    fun isSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
+    fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
@@ -61,10 +59,8 @@ object ItemUtils {
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
         val player = Minecraft.getMinecraft().thePlayer
-        if (player == null) {
-            ChatUtils.error("getItemsInInventoryWithSlots: player is null!")
-            return list
-        }
+            ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
+
         for (slot in player.openContainer.inventorySlots) {
             if (slot.hasStack) {
                 list.add(slot.stack)
@@ -122,6 +118,13 @@ object ItemUtils {
 
     // Checks for hypixel enchantments in the attributes
     fun ItemStack.hasEnchantments() = getEnchantments()?.isNotEmpty() ?: false
+
+    fun ItemStack.removeEnchants(): ItemStack = apply {
+        val tag = tagCompound ?: NBTTagCompound()
+        tag.removeTag("ench")
+        tag.removeTag("StoredEnchantments")
+        tagCompound = tag
+    }
 
     fun ItemStack.getSkullTexture(): String? {
         if (item != Items.skull) return null

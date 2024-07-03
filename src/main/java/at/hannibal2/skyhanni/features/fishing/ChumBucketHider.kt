@@ -36,7 +36,7 @@ object ChumBucketHider {
         if (entity !is EntityArmorStand) return
 
         if (entity in hiddenEntities) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
@@ -47,7 +47,7 @@ object ChumBucketHider {
             if (name.contains(LorenzUtils.getPlayerName()) && !config.hideOwn.get()) return
             titleEntity.add(entity)
             hiddenEntities.add(entity)
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
@@ -57,7 +57,7 @@ object ChumBucketHider {
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
-                    event.isCanceled = true
+                    event.cancel()
                     return
                 }
             }
@@ -69,7 +69,7 @@ object ChumBucketHider {
             for (title in titleEntity.toSet()) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
-                    event.isCanceled = true
+                    event.cancel()
                     return
                 }
             }

@@ -77,9 +77,9 @@ enum class Mayor(
         fun Mayor.setAssumeMayor(perks: List<Perk>) {
             perks.forEach { it.isActive = false }
             activePerks.clear()
-            perks.filter { perks.contains(it) }.forEach {
-                it.isActive = true
-                activePerks.add(it)
+            for (perk in perks.filter { perks.contains(it) }) {
+                perk.isActive = true
+                activePerks.add(perk)
             }
         }
 

@@ -112,6 +112,7 @@ object DeepCavernsGuide {
                 onClick = {
                     SkyHanniMod.repo.updateRepo()
                 },
+                "§eClick to update the repo!",
                 prefixColor = "§c"
             )
         }
@@ -133,7 +134,7 @@ object DeepCavernsGuide {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showStartIcon && event.slotId == 49) {
-            event.isCanceled = true
+            event.cancel()
             ChatUtils.chat("Manually enabled Deep Caverns Guide.")
             start()
         }

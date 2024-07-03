@@ -5,6 +5,7 @@ package at.hannibal2.skyhanni.features.misc.discordrpc
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.feature
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.logger
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.LineEntry
 import at.hannibal2.skyhanni.config.features.misc.DiscordRPCConfig.PriorityEntry
@@ -89,9 +90,8 @@ object DiscordRPCManager : IPCListener {
                 "Discord Rich Presence was unable to start! " +
                     "This usually happens when you join SkyBlock when Discord is not started. " +
                     "Please run /shrpcstart to retry once you have launched Discord.",
-                onClick = {
-                    startCommand()
-                }
+                onClick = { startCommand() },
+                "§eClick to run /shrpcstart!"
             )
         }
     }
@@ -186,7 +186,7 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         stop()
     }

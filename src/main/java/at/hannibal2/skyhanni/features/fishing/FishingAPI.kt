@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.FishingBobberInWaterEvent
@@ -36,7 +37,7 @@ object FishingAPI {
 
     private val trophyArmorNames by RepoPattern.pattern(
         "fishing.trophyfishing.armor",
-        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
     )
 
     val lavaBlocks = listOf(Blocks.lava, Blocks.flowing_lava)
@@ -55,17 +56,15 @@ object FishingAPI {
 
     var wearingTrophyArmor = false
 
-    @SubscribeEvent
-    fun onJoinWorld(event: EntityEnterWorldEvent) {
-        if (!LorenzUtils.inSkyBlock || !holdingRod) return
-        val entity = event.entity ?: return
-        if (entity !is EntityFishHook) return
-        if (entity.angler != Minecraft.getMinecraft().thePlayer) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onJoinWorld(event: EntityEnterWorldEvent<EntityFishHook>) {
+        if (!holdingRod) return
+        if (event.entity.angler != Minecraft.getMinecraft().thePlayer) return
 
         lastCastTime = SimpleTimeMark.now()
-        bobber = entity
+        bobber = event.entity
         bobberHasTouchedWater = false
-        FishingBobberCastEvent(entity).postAndCatch()
+        FishingBobberCastEvent(event.entity).postAndCatch()
     }
 
     private fun resetBobber() {
@@ -107,7 +106,7 @@ object FishingAPI {
 
     fun NEUInternalName.isWaterRod() = this in waterRods
 
-    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.FISHING_BAIT
+    fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
     @SubscribeEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
@@ -120,8 +119,8 @@ object FishingAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
-        lavaRods = data.lava_fishing_rods
-        waterRods = data.water_fishing_rods
+        lavaRods = data.lavaFishingRods
+        waterRods = data.waterFishingRods
     }
 
     private fun getAllowedBlocks() = if (holdingLavaRod) lavaBlocks else waterBlocks

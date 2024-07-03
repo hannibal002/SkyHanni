@@ -34,7 +34,7 @@ object MiscFeatures {
             EnumParticleTypes.EXPLOSION_LARGE,
             EnumParticleTypes.EXPLOSION_HUGE,
             EnumParticleTypes.EXPLOSION_NORMAL,
-            -> event.isCanceled = true
+            -> event.cancel()
 
             else -> {}
         }
