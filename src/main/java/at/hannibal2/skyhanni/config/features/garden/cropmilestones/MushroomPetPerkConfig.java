@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,7 +44,8 @@ public class MushroomPetPerkConfig {
 
     public enum MushroomTextEntry implements HasLegacyId {
         TITLE("§6Mooshroom Cow Perk", 0),
-        MUSHROOM_TIER("§7Mushroom Tier 8", 1),
+        // TODO change to mushroom milestone
+        MUSHROOM_TIER("§7Mushroom Milestone 8", 1),
         NUMBER_OUT_OF_TOTAL("§e6,700§8/§e15,000", 2),
         TIME("§7In §b12m 34s", 3),
         PERCENTAGE("§7Percentage: §e12.34%", 4),
@@ -74,5 +76,6 @@ public class MushroomPetPerkConfig {
     }
 
     @Expose
+    @ConfigLink(owner = MushroomPetPerkConfig.class, field = "enabled")
     public Position pos = new Position(-112, -143, false, true);
 }

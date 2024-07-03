@@ -9,7 +9,6 @@ import net.minecraft.client.shader.ShaderLinkHelper
 import org.apache.commons.lang3.StringUtils
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.OpenGLException
-import java.util.function.Supplier
 
 /**
  * Superclass for shader objects to compile and attach vertex and fragment shaders to the shader program
@@ -100,7 +99,13 @@ abstract class Shader(val vertex: String, val fragment: String) {
 
     fun disable() = ShaderHelper.glUseProgram(0)
 
-    fun <T> registerUniform(uniformType: Uniform.UniformType<T>, name: String, uniformValuesSupplier: Supplier<T>) {
+    /**
+     * @param uniformType Type of uniform, there should be a 1 to 1 equivalent to that in the shader file
+     * @param name The name of the uniform in the shader file. This should match exactly to the name given
+     * to the uniform in the shader file.
+     * @param uniformValuesSupplier The supplier that changes / sets the uniform's value
+     */
+    fun <T> registerUniform(uniformType: Uniform.UniformType<T>, name: String, uniformValuesSupplier: () -> T) {
         uniforms.add(Uniform(this, uniformType, name, uniformValuesSupplier))
     }
 }

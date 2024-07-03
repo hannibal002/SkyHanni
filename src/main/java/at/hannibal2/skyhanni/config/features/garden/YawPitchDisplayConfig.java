@@ -3,14 +3,15 @@ package at.hannibal2.skyhanni.config.features.garden;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class YawPitchDisplayConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Displays yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
+    @ConfigOption(name = "Enable", desc = "Display yaw and pitch while holding a farming tool. Automatically fades out if there is no movement.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -50,7 +51,7 @@ public class YawPitchDisplayConfig {
     @Expose
     @ConfigOption(name = "Show Outside Garden", desc = "The overlay will work outside of the Garden.")
     @ConfigEditorBoolean
-    public boolean showEverywhere = false;
+    public boolean showOutsideGarden = false;
 
     @Expose
     @ConfigOption(name = "Ignore Timeout", desc = "Ignore the timeout after not moving mouse.")
@@ -58,7 +59,9 @@ public class YawPitchDisplayConfig {
     public boolean showAlways = false;
 
     @Expose
+    @ConfigLink(owner = YawPitchDisplayConfig.class, field = "enabled")
     public Position pos = new Position(445, 225, false, true);
     @Expose
+    @ConfigLink(owner = YawPitchDisplayConfig.class, field = "showOutsideGarden")
     public Position posOutside = new Position(445, 225, false, true);
 }

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.mixins.hooks.tryToReplaceScoreboardLine
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import io.github.moulberry.notenoughupdates.util.SkyBlockTime
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.time.LocalDate
 import java.time.ZoneId
 import kotlin.time.Duration
@@ -19,9 +19,36 @@ object TimeUtils {
         showMilliSeconds: Boolean = false,
         longName: Boolean = false,
         maxUnits: Int = -1,
-    ): String = formatDuration(
-        inWholeMilliseconds - 999, biggestUnit, showMilliSeconds, longName, maxUnits
-    )
+    ): String {
+        var millis = inWholeMilliseconds
+        val parts = mutableMapOf<TimeUnit, Int>()
+
+        for (unit in TimeUnit.entries) {
+            if (unit.ordinal >= biggestUnit.ordinal) {
+                val factor = unit.factor
+                parts[unit] = (millis / factor).toInt()
+                millis %= factor
+            }
+        }
+
+        var currentUnits = 0
+        val result = buildString {
+            for ((unit, value) in parts) {
+                if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
+                    val formatted = value.addSeparators()
+                    val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
+                        val formattedMillis = (millis / 100).toInt()
+                        "$formatted.$formattedMillis"
+                    } else formatted
+
+                    val name = unit.getName(value, longName)
+                    append("$text$name ")
+                    if (maxUnits != -1 && ++currentUnits == maxUnits) break
+                }
+            }
+        }
+        return result.trim()
+    }
 
     fun Duration.timerColor(default: String = "§f") = when (this) {
         in 0.seconds..60.seconds -> "§c"
@@ -30,60 +57,11 @@ object TimeUtils {
         else -> default
     }
 
-    @Deprecated("Has an offset of one second", ReplaceWith("use kotlin Duration"))
-    fun formatDuration(
-        millis: Long,
-        biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = false,
-        longName: Boolean = false,
-        maxUnits: Int = -1,
-    ): String {
-        // TODO: if this weird offset gets removed, also remove that subtraction from formatDuration(kotlin.time.Duration)
-        var milliseconds = millis + 999
-        val map = mutableMapOf<TimeUnit, Int>()
-        for (unit in TimeUnit.entries) {
-            if (unit.ordinal >= biggestUnit.ordinal) {
-                val factor = unit.factor
-                map[unit] = (milliseconds / factor).toInt()
-                milliseconds %= factor
-            }
-        }
+    val Duration.inWholeTicks: Int get() = (inWholeMilliseconds / 50).toInt()
 
-        val builder = StringBuilder()
-        var count = 0
-        for ((unit, value) in map.entries) {
-            if (value > 0 || builder.isNotEmpty() || unit == TimeUnit.SECOND) {
-                builder.append(value.addSeparators())
-                val name = if (longName) {
-                    " " + unit.longName + if (value > 1) "s" else ""
-                } else {
-                    unit.shortName
-                }
+    fun getDuration(string: String) = getMillis(string.replace("m", "m ").replace("  ", " ").trim())
 
-                if (unit == TimeUnit.SECOND) {
-                    if (showMilliSeconds) {
-                        val formatMillis = milliseconds / 100
-                        builder.append(".")
-                        builder.append(formatMillis)
-                    }
-                    builder.append(name)
-                } else {
-                    builder.append("$name ")
-                }
-
-                count++
-                if (maxUnits != -1 && count == maxUnits) break
-            }
-        }
-        return builder.toString().trim()
-    }
-
-    @Deprecated("Do no longer use long for time", ReplaceWith("getDuration(string)"))
-    fun getMillis(string: String) = getDuration(string).inWholeMilliseconds
-
-    fun getDuration(string: String) = getMillis_(string.replace("m", "m ").replace("  ", " ").trim())
-
-    private fun getMillis_(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
+    private fun getMillis(string: String) = UtilsPatterns.timeAmountPattern.matchMatcher(string.lowercase().trim()) {
         val years = group("y")?.toLong() ?: 0L
         val days = group("d")?.toLong() ?: 0L
         val hours = group("h")?.toLong() ?: 0L
@@ -116,35 +94,50 @@ object TimeUtils {
                 seconds + minutes
             }
 
-            1 -> {
-                split[0].toInt() * 1000
-            }
+            1 -> split[0].toInt() * 1000
 
-            else -> {
-                throw RuntimeException("Invalid format: '$string'")
-            }
-        }.toLong().toDuration(DurationUnit.MILLISECONDS)
+            else -> throw RuntimeException("Invalid format: '$string'")
+        }.milliseconds
     }
 
-    fun SkyBlockTime.formatted(): String {
-        val hour = if (this.hour > 12) this.hour - 12 else this.hour
-        val timeOfDay = if (this.hour > 11) "pm" else "am" // hooray for 12-hour clocks
-        var minute = this.minute.toString()
-        if (minute.length != 2) {
-            minute = minute.padStart(2, '0')
-        }
-
+    fun SkyBlockTime.formatted(
+        dayAndMonthElement: Boolean = true,
+        yearElement: Boolean = true,
+        hoursAndMinutesElement: Boolean = true,
+    ): String {
+        val hour = (this.hour + 11) % 12 + 1
+        val timeOfDay = if (this.hour > 11) "pm" else "am"
+        val minute = this.minute.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
         val day = this.day
         val daySuffix = SkyBlockTime.daySuffix(day)
         val year = this.year
-        return "$month $day$daySuffix, Year $year $hour:${minute}$timeOfDay" // Early Winter 1st Year 300, 12:03pm
+
+        val datePart = when {
+            yearElement -> "$month $day$daySuffix, Year $year"
+            dayAndMonthElement -> "$month $day$daySuffix"
+            else -> ""
+        }
+        val timePart = if (hoursAndMinutesElement) "$hour:$minute$timeOfDay" else ""
+
+        /**
+         * We replace the line here, because the user might want color month names
+         */
+        return tryToReplaceScoreboardLine(
+            if (datePart.isNotEmpty() && timePart.isNotEmpty()) {
+                "$datePart, $timePart"
+            } else {
+                "$datePart$timePart".trim()
+            },
+        ) ?: ""
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
 
     val Long.ticks get() = (this * 50).milliseconds
     val Int.ticks get() = (this * 50).milliseconds
+
+    val Float.minutes get() = toDouble().minutes
 }
 
 private const val FACTOR_SECONDS = 1000L
@@ -160,4 +153,10 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     MINUTE(FACTOR_MINUTES, "m", "Minute"),
     SECOND(FACTOR_SECONDS, "s", "Second"),
     ;
+
+    fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
+        " $longName" + if (value > 1) "s" else ""
+    } else shortName
+
+    fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
@@ -21,6 +22,7 @@ import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object DanceRoomHelper {
 
     private var display = emptyList<String>()
@@ -37,6 +39,7 @@ object DanceRoomHelper {
             if (instructions.isEmpty()) {
                 add("§cError fetching Dance Room Instructions!")
                 add("§cTry §e/shreloadlocalrepo §cor §e/shupdaterepo")
+                // TODO make clickable
             }
             for ((lineIndex, line) in instructions.withIndex()) {
                 addLine(lineIndex, line)?.let { add(it) }
@@ -110,7 +113,7 @@ object DanceRoomHelper {
     }
 
     @SubscribeEvent
-    fun onSound(event: PlaySoundEvent) {
+    fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() || !inRoom) return
         if ((event.soundName == "random.burp" && event.volume == 0.8f) || (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)) {
             index = 0
@@ -128,7 +131,7 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
-        if (config.hideOriginalTitle && inRoom) event.isCanceled = true
+        if (config.hideOriginalTitle && inRoom) event.cancel()
     }
 
     private fun startCountdown(seconds: Int, milliseconds: Int) {
@@ -157,7 +160,7 @@ object DanceRoomHelper {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
             if (entity is EntityOtherPlayerMP && inRoom) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

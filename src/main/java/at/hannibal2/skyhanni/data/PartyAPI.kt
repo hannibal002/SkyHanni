@@ -1,24 +1,27 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpaceAndResets
+import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.random.Random
 
+@SkyHanniModule
 object PartyAPI {
 
     private val patternGroup = RepoPattern.group("data.party")
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
-        "§eYou have joined (?<name>.*)'s §eparty!"
+        "§eYou have joined (?<name>.*)'s? §eparty!"
     )
     private val othersJoinedPartyPattern by patternGroup.pattern(
         "others.joined",
@@ -44,9 +47,13 @@ object PartyAPI {
         "others.disconnect",
         "(?<name>.*) §ewas removed from your party because they disconnected\\."
     )
-    private val transferPattern by patternGroup.pattern(
-        "others.transfer",
-        "The party was transferred to .* because (?<name>.*) left"
+    private val transferOnLeavePattern by patternGroup.pattern(
+        "others.transfer.leave",
+        "The party was transferred to (?<newowner>.*) because (?<name>.*) left"
+    )
+    private val transferVoluntaryPattern by patternGroup.pattern(
+        "others.transfer.voluntary",
+        "The party was transferred to (?<newowner>.*) by .*"
     )
     private val disbandedPattern by patternGroup.pattern(
         "others.disband",
@@ -61,8 +68,8 @@ object PartyAPI {
         "§6Party Members \\(\\d+\\)"
     )
     private val partyMemberListPattern by patternGroup.pattern(
-        "members.list",
-        "Party (?:Leader|Moderators|Members): (?<names>.*)"
+        "members.list.withkind",
+        "Party (?<kind>Leader|Moderators|Members): (?<names>.*)"
     )
     private val kuudraFinderJoinPattern by patternGroup.pattern(
         "kuudrafinder.join",
@@ -75,6 +82,8 @@ object PartyAPI {
 
     val partyMembers = mutableListOf<String>()
 
+    var partyLeader: String? = null
+
     fun listMembers() {
         val size = partyMembers.size
         if (size == 0) {
@@ -83,7 +92,11 @@ object PartyAPI {
         }
         ChatUtils.chat("Tracked party members §7($size) §f:", prefixColor = "§a")
         for (member in partyMembers) {
-            ChatUtils.chat(" §a- §7$member", false)
+            ChatUtils.chat(" §a- §7$member" + if (partyLeader == member) " §a(Leader)" else "", false)
+        }
+
+        if (partyLeader == LorenzUtils.getPlayerName()) {
+            ChatUtils.chat("§aYou are leader")
         }
 
         if (Random.nextDouble() < 0.1) {
@@ -93,16 +106,26 @@ object PartyAPI {
     }
 
     @SubscribeEvent
+    fun onPartyChat(event: PartyChatEvent) {
+        val name = event.author.cleanPlayerName()
+        addPlayer(name)
+    }
+
+    @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val message = event.message.trimWhiteSpaceAndResets().removeResets()
+        val message = event.message.trimWhiteSpace().removeResets()
 
         // new member joined
         youJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
+            partyLeader = name
             addPlayer(name)
         }
         othersJoinedPartyPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
+            if (partyMembers.isEmpty()) {
+                partyLeader = LorenzUtils.getPlayerName()
+            }
             addPlayer(name)
         }
         othersInThePartyPattern.matchMatcher(message) {
@@ -136,23 +159,28 @@ object PartyAPI {
             val name = group("name").cleanPlayerName()
             partyMembers.remove(name)
         }
-        transferPattern.matchMatcher(message.removeColor()) {
+        transferOnLeavePattern.matchMatcher(message.removeColor()) {
             val name = group("name").cleanPlayerName()
+            partyLeader = group("newowner").cleanPlayerName()
             partyMembers.remove(name)
+        }
+        transferVoluntaryPattern.matchMatcher(message.removeColor()) {
+            partyLeader = group("newowner").cleanPlayerName()
         }
 
         // party disbanded
         disbandedPattern.matchMatcher(message) {
-            partyMembers.clear()
+            partyLeft()
         }
         kickedPattern.matchMatcher(message) {
-            partyMembers.clear()
+            partyLeft()
         }
         if (message == "§eYou left the party." ||
             message == "§cThe party was disbanded because all invites expired and the party was empty." ||
-            message == "§cYou are not currently in a party."
+            message == "§cYou are not currently in a party." ||
+            message == "§cYou are not in a party."
         ) {
-            partyMembers.clear()
+            partyLeft()
         }
 
         // party list
@@ -161,9 +189,14 @@ object PartyAPI {
         }
 
         partyMemberListPattern.matchMatcher(message.removeColor()) {
+            val kind = group("kind")
+            val isPartyLeader = kind == "Leader"
             for (name in group("names").split(" ● ")) {
                 val playerName = name.replace(" ●", "").cleanPlayerName()
                 addPlayer(playerName)
+                if (isPartyLeader) {
+                    partyLeader = playerName
+                }
             }
         }
     }
@@ -172,5 +205,10 @@ object PartyAPI {
         if (partyMembers.contains(playerName)) return
         if (playerName == LorenzUtils.getPlayerName()) return
         partyMembers.add(playerName)
+    }
+
+    private fun partyLeft() {
+        partyMembers.clear()
+        partyLeader = null
     }
 }

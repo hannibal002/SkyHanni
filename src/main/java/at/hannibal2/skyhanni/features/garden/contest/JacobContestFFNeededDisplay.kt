@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getLatestTrueFarmingFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getLatestBlocksPerSecond
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -14,19 +15,22 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
+import kotlin.time.Duration.Companion.milliseconds
 
-class JacobContestFFNeededDisplay {
+@SkyHanniModule
+object JacobContestFFNeededDisplay {
 
     private val config get() = GardenAPI.config
     private var display = emptyList<List<Any>>()
-    private var lastToolTipTime = 0L
+    private var lastToolTipTime = SimpleTimeMark.farPast()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
 
     @SubscribeEvent
-    fun onTooltip(event: RenderItemTooltipEvent) {
+    fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!isEnabled()) return
 
         if (!InventoryUtils.openInventoryName().contains("Your Contests")) return
@@ -35,18 +39,17 @@ class JacobContestFFNeededDisplay {
         val oldData = cache[stack]
         if (oldData != null) {
             display = oldData
-            lastToolTipTime = System.currentTimeMillis()
+            lastToolTipTime = SimpleTimeMark.now()
             return
         }
 
-        val name = stack.name ?: return
-        val time = FarmingContestAPI.getSbTimeFor(name) ?: return
+        val time = FarmingContestAPI.getSbTimeFor(stack.name) ?: return
         val contest = FarmingContestAPI.getContestAtTime(time) ?: return
 
         val newDisplay = drawDisplay(contest)
         display = newDisplay
         cache[stack] = newDisplay
-        lastToolTipTime = System.currentTimeMillis()
+        lastToolTipTime = SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -114,10 +117,10 @@ class JacobContestFFNeededDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inInventory) return
-        if (System.currentTimeMillis() > lastToolTipTime + 200) return
+        if (lastToolTipTime.passedSince() < 200.milliseconds) return
         config.farmingFortuneForContestPos.renderStringsAndItems(display, posLabel = "Jacob Contest Crop Data")
     }
 

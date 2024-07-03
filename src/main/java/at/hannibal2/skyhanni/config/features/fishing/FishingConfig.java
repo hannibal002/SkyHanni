@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.TrophyFishingConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FishingConfig {
 
@@ -56,6 +57,11 @@ public class FishingConfig {
     public FishingProfitTrackerConfig fishingProfitTracker = new FishingProfitTrackerConfig();
 
     @Expose
+    @ConfigOption(name = "Totem of Corruption", desc = "")
+    @Accordion
+    public TotemOfCorruptionConfig totemOfCorruption = new TotemOfCorruptionConfig();
+
+    @Expose
     @ConfigOption(name = "Sea Creature Tracker", desc = "")
     @Accordion
     public SeaCreatureTrackerConfig seaCreatureTracker = new SeaCreatureTrackerConfig();
@@ -70,16 +76,17 @@ public class FishingConfig {
     public boolean sharkFishCounter = false;
 
     @Expose
+    @ConfigLink(owner = FishingConfig.class, field = "sharkFishCounter")
     public Position sharkFishCounterPos = new Position(10, 10, false, true);
 
     @Expose
-    @ConfigOption(name = "Shorten Fishing Message", desc = "Shortens the chat message that says what type of Sea Creature you have fished.")
+    @ConfigOption(name = "Shorten Fishing Message", desc = "Shorten the chat message that says what type of Sea Creature you have fished.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shortenFishingMessage = false;
 
     @Expose
-    @ConfigOption(name = "Compact Double Hook", desc = "Adds Double Hook to the Sea Creature chat message instead of in a previous line.")
+    @ConfigOption(name = "Compact Double Hook", desc = "Add Double Hook to the Sea Creature chat message instead of in a previous line.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactDoubleHook = true;

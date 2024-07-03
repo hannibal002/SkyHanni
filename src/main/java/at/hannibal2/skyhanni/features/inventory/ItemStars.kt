@@ -3,18 +3,20 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
+import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.event.entity.player.ItemTooltipEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ItemStars {
+@SkyHanniModule
+object ItemStars {
 
     private val config get() = SkyHanniMod.feature.inventory
 
@@ -28,12 +30,12 @@ class ItemStars {
     private val armorParts = listOf("Helmet", "Chestplate", "Leggings", "Boots")
 
     @SubscribeEvent(priority = EventPriority.LOW)
-    fun onTooltip(event: ItemTooltipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
 
-        val itemName = stack.name ?: return
+        val itemName = stack.name
         val stars = getStars(itemName)
 
         if (stars > 0) {
@@ -51,8 +53,8 @@ class ItemStars {
         val data = event.getConstant<ItemsJson>("Items")
         armorNames.clear()
         tiers.clear()
-        armorNames.addAll(data.crimson_armors)
-        for (tier in data.crimson_tiers) {
+        armorNames.addAll(data.crimsonArmors)
+        for (tier in data.crimsonTiers) {
             tiers[tier.key] = tier.value
         }
     }
@@ -61,7 +63,7 @@ class ItemStars {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
-        val number = getCrimsonStars(stack.name ?: return)
+        val number = getCrimsonStars(stack.name)
         if (number != -1) {
             event.stackTip = number.toString()
         }

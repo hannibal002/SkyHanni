@@ -4,21 +4,24 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object MythologicalCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.event.diana.mythologicalMobtracker
@@ -49,14 +52,19 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!"
     )
 
-    private val tracker = SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
-    { drawDisplay(it) }
+    private val tracker =
+        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker })
+        { drawDisplay(it) }
 
     class Data : TrackerData() {
 
         override fun reset() {
             count.clear()
+            creaturesSinceLastInquisitor = 0
         }
+
+        @Expose
+        var creaturesSinceLastInquisitor: Int = 0
 
         @Expose
         var count: MutableMap<MythologicalCreatureType, Int> = mutableMapOf()
@@ -73,14 +81,20 @@ object MythologicalCreatureTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        MythologicalCreatureType.entries.forEach { creatureType ->
+        for (creatureType in MythologicalCreatureType.entries) {
             if (creatureType.pattern.matches(event.message)) {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-                tracker.modify { it.count.addOrPut(creatureType, 1) }
+                tracker.modify {
+                    it.count.addOrPut(creatureType, 1)
 
-                if (config.hideChat) {
-                    event.blockedReason = "mythological_creature_dug"
+                    // TODO migrate to abstract feature in the future
+                    if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
+                        event.chatComponent =
+                            ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                        it.creaturesSinceLastInquisitor = 0
+                    } else it.creaturesSinceLastInquisitor++
                 }
+                if (config.hideChat) event.blockedReason = "mythological_creature_dug"
             }
         }
     }
@@ -88,8 +102,7 @@ object MythologicalCreatureTracker {
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
-        data.count.entries.sortedByDescending { it.value }.forEach { (creatureType, amount) ->
-
+        for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
                 val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
                 " §7$percentage"
@@ -98,6 +111,7 @@ object MythologicalCreatureTracker {
             addAsSingletonList(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
         }
         addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
+        addAsSingletonList(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
     }
 
     @SubscribeEvent
@@ -114,8 +128,8 @@ object MythologicalCreatureTracker {
         tracker.renderDisplay(config.position)
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetmythologicalcreatureracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled

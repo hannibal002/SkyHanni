@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -10,7 +13,8 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class GardenYawAndPitch {
+@SkyHanniModule
+object GardenYawAndPitch {
 
     private val config get() = GardenAPI.config.yawPitchDisplay
     private var lastChange = SimpleTimeMark.farPast()
@@ -19,10 +23,9 @@ class GardenYawAndPitch {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
+        if (!LorenzUtils.onHypixel) return
+        if (!isEnabled()) return
         if (GardenAPI.hideExtraGuis()) return
-        if (!GardenAPI.inGarden() && !config.showEverywhere) return
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
         val player = Minecraft.getMinecraft().thePlayer
@@ -56,5 +59,14 @@ class GardenYawAndPitch {
     @SubscribeEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastChange = SimpleTimeMark.farPast()
+    }
+
+    private fun isEnabled() =
+        config.enabled && ((OutsideSbFeature.YAW_AND_PITCH.isSelected() && !LorenzUtils.inSkyBlock) ||
+            (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)))
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(18, "garden.yawPitchDisplay.showEverywhere", "garden.yawPitchDisplay.showOutsideGarden")
     }
 }

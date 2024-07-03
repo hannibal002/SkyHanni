@@ -5,13 +5,16 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LocationUtils.isInside
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.util.AxisAlignedBB
@@ -21,16 +24,57 @@ import kotlin.math.floor
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object GardenPlotAPI {
 
     private val patternGroup = RepoPattern.group("garden.plot")
+
+    /**
+     * REGEX-TEST: §aPlot §7- §b4
+     */
     private val plotNamePattern by patternGroup.pattern(
         "name",
         "§.Plot §7- §b(?<name>.*)"
     )
+
+    /**
+     * REGEX-TEST: §aThe Barn
+     */
+    private val barnNamePattern by patternGroup.pattern(
+        "barnname",
+        "§.(?<name>The Barn)"
+    )
+
+    /**
+     * REGEX-TEST: §7Cleanup: §b0% Completed
+     */
+    private val uncleanedPlotPattern by patternGroup.pattern(
+        "uncleaned",
+        "§7Cleanup: .* (?:§.)*Completed"
+    )
+
+    /**
+     * REGEX-TEST: §aUnlocked Garden §r§aPlot §r§7- §r§b10§r§a!
+     */
+    private val unlockPlotChatPattern by patternGroup.pattern(
+        "chat.unlock",
+        "§aUnlocked Garden §r§aPlot §r§7- §r§b(?<plot>.*)§r§a!"
+    )
+
+    /**
+     * REGEX-TEST: §aPlot §r§7- §r§b10 §r§ais now clean!
+     */
+    private val cleanPlotChatPattern by patternGroup.pattern(
+        "chat.clean",
+        "§aPlot §r§7- §r§b(?<plot>.*) §r§ais now clean!"
+    )
     private val plotSprayedPattern by patternGroup.pattern(
         "spray.target",
         "§a§lSPRAYONATOR! §r§7You sprayed §r§aPlot §r§7- §r§b(?<plot>.*) §r§7with §r§a(?<spray>.*)§r§7!"
+    )
+    private val portableWasherPattern by patternGroup.pattern(
+        "spray.cleared.portablewasher",
+        "§9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
     )
 
     var plots = listOf<Plot>()
@@ -59,6 +103,18 @@ object GardenPlotAPI {
 
         @Expose
         var sprayHasNotified: Boolean,
+
+        @Expose
+        var isBeingPasted: Boolean,
+
+        @Expose
+        var isPestCountInaccurate: Boolean,
+
+        @Expose
+        var locked: Boolean,
+
+        @Expose
+        var uncleared: Boolean,
     )
 
     data class SprayData(
@@ -66,7 +122,20 @@ object GardenPlotAPI {
         val type: SprayType,
     )
 
-    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) { PlotData(id, "$id", 0, null, null, false) }
+    private fun Plot.getData() = GardenAPI.storage?.plotData?.getOrPut(id) {
+        PlotData(
+            id,
+            "$id",
+            0,
+            null,
+            null,
+            false,
+            false,
+            false,
+            true,
+            false,
+        )
+    }
 
     var Plot.name: String
         get() = getData()?.name ?: "$id"
@@ -92,6 +161,30 @@ object GardenPlotAPI {
             !it.sprayHasNotified && it.sprayExpiryTime?.isInPast() == true
         } == true
 
+    var Plot.isBeingPasted: Boolean
+        get() = this.getData()?.isBeingPasted ?: false
+        set(value) {
+            this.getData()?.isBeingPasted = value
+        }
+
+    var Plot.isPestCountInaccurate: Boolean
+        get() = this.getData()?.isPestCountInaccurate ?: false
+        set(value) {
+            this.getData()?.isPestCountInaccurate = value
+        }
+
+    var Plot.uncleared: Boolean
+        get() = this.getData()?.uncleared ?: false
+        set(value) {
+            this.getData()?.uncleared = value
+        }
+
+    var Plot.locked: Boolean
+        get() = this.getData()?.locked ?: false
+        set(value) {
+            this.getData()?.locked = value
+        }
+
     fun Plot.markExpiredSprayAsNotified() {
         getData()?.apply { sprayHasNotified = true }
     }
@@ -104,12 +197,23 @@ object GardenPlotAPI {
         }
     }
 
-    fun Plot.isBarn() = id == -1
+    private fun Plot.removeSpray() {
+        getData()?.apply {
+            sprayType = null
+            sprayExpiryTime = SimpleTimeMark.now()
+            sprayHasNotified = true
+        }
+    }
+
+    fun Plot.isBarn() = id == 0
 
     fun Plot.isPlayerInside() = box.isPlayerInside()
 
+    fun closestCenterPlot(location: LorenzVec) = plots.find { it.box.isInside(location) }?.middle
+
     fun Plot.sendTeleportTo() {
-        ChatUtils.sendCommandToServer("tptoplot $name")
+        if (isBarn()) HypixelCommands.teleportToPlot("barn")
+        else HypixelCommands.teleportToPlot(name)
         LockMouseLook.autoDisable()
     }
 
@@ -117,7 +221,7 @@ object GardenPlotAPI {
         val plotMap = listOf(
             listOf(21, 13, 9, 14, 22),
             listOf(15, 5, 1, 6, 16),
-            listOf(10, 2, -1, 3, 11),
+            listOf(10, 2, 0, 3, 11),
             listOf(17, 7, 4, 8, 18),
             listOf(23, 19, 12, 20, 24),
         )
@@ -154,6 +258,24 @@ object GardenPlotAPI {
 
             plot?.setSpray(spray, 30.minutes)
         }
+        cleanPlotChatPattern.matchMatcher(event.message) {
+            val plotId = group("plot").toInt()
+            val plot = getPlotByID(plotId)
+            plot?.uncleared = false
+        }
+        unlockPlotChatPattern.matchMatcher(event.message) {
+            val plotId = group("plot").toInt()
+            val plot = getPlotByID(plotId)
+            plot?.locked = false
+        }
+
+        portableWasherPattern.matchMatcher(event.message) {
+            for (plot in plots) {
+                if (plot.currentSpray != null) {
+                    plot.removeSpray()
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -162,14 +284,31 @@ object GardenPlotAPI {
         if (event.inventoryName != "Configure Plots") return
 
         for (plot in plots) {
-            val itemName = event.inventoryItems[plot.inventorySlot]?.name ?: continue
-            plotNamePattern.matchMatcher(itemName) {
+            val itemStack = event.inventoryItems[plot.inventorySlot] ?: continue
+            val lore = itemStack.getLore()
+            plotNamePattern.matchMatcher(itemStack.name) {
+                val plotName = group("name")
+                plot.name = plotName
+            }
+            barnNamePattern.matchMatcher(itemStack.name) {
                 plot.name = group("name")
+            }
+            plot.locked = false
+            plot.isBeingPasted = false
+            for (line in lore) {
+                if (line.contains("§7Cost:")) plot.locked = true
+                if (line.contains("§7Pasting in progress:")) plot.isBeingPasted = true
+                plot.uncleared = false
+                uncleanedPlotPattern.matchMatcher(line) {
+                    plot.uncleared = true
+                }
             }
         }
     }
 
     fun getPlotByName(plotName: String) = plots.firstOrNull { it.name == plotName }
+
+    fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
     fun LorenzRenderWorldEvent.renderPlot(
         plot: Plot,
@@ -195,7 +334,7 @@ object GardenPlotAPI {
             for (j in 0..plotSize step plotSize) {
                 val start = LorenzVec(chunkMinX + i, minHeight, chunkMinZ + j)
                 val end = LorenzVec(chunkMinX + i, maxHeight, chunkMinZ + j)
-                tryDraw3DLine(start, end, cornerColor, 2, true)
+                tryDraw3DLine(start, end, cornerColor, 3, true)
             }
         }
 
@@ -204,9 +343,9 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX + x, minHeight, chunkMinZ)
             val end = LorenzVec(chunkMinX + x, maxHeight, chunkMinZ)
             // Front lines
-            tryDraw3DLine(start, end, lineColor, 1, true)
+            tryDraw3DLine(start, end, lineColor, 2, true)
             // Back lines
-            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(z = plotSize), end.add(z = plotSize), lineColor, 2, true)
         }
 
         // Render vertical on Z-Axis
@@ -214,9 +353,9 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX, minHeight, chunkMinZ + z)
             val end = LorenzVec(chunkMinX, maxHeight, chunkMinZ + z)
             // Left lines
-            tryDraw3DLine(start, end, lineColor, 1, true)
+            tryDraw3DLine(start, end, lineColor, 2, true)
             // Right lines
-            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 1, true)
+            tryDraw3DLine(start.add(x = plotSize), end.add(x = plotSize), lineColor, 2, true)
         }
 
         // Render horizontal
@@ -230,7 +369,7 @@ object GardenPlotAPI {
             val start = LorenzVec(chunkMinX, y, chunkMinZ)
             val isRedLine = y == buildLimit
             val color = if (isRedLine) Color.red else lineColor
-            val depth = if (isRedLine) 2 else 1
+            val depth = if (isRedLine) 3 else 2
             // (minX, minZ) -> (minX, minZ + 96)
             tryDraw3DLine(start, start.add(z = plotSize), color, depth, true)
             // (minX, minZ + 96) -> (minX + 96, minZ + 96)

@@ -37,11 +37,11 @@ follow [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/m
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-_An explanation how to use intellij and branches will follow here soon.
+_An explanation how to use intellij and branches will follow here soon._
 
-Please use a prefix for the name of the PR (E.g. Feature, Fix, Backend, Change).
+Please use a prefix for the name of the PR (E.g. Feature, Improvement, Fix, Backend, ...).
 
-You can write in the description of the pr the wording for the changelog as well (optional).
+When writing the description of the PR, ensure you fill out the template with the necessary information, including the "WHAT" section, and the changelog entries.
 
 If your PR relies on another PR, please include this information at the beginning of the description. Consider using a
 format like "- #821" to illustrate the dependency.
@@ -53,13 +53,20 @@ format like "- #821" to illustrate the dependency.
   and [Java](https://www.oracle.com/java/technologies/javase/codeconventions-contents.html).
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
-    - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy)
+  - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
     - The mod has, according to Hypixel rules, illegal features ("cheat mod/client").
     - If you can improve the existing feature in a meaningful way.
 - All new classes should be written in Kotlin, with a few exceptions:
     - Config files in `at.hannibal2.skyhanni.config.features`
     - Mixin classes in `at.hannibal2.skyhanni.mixins.transformers`
-  - Java classes that represent JSON data objects in `at.hannibal2.skyhanni.data.jsonobjects`
+- New features should be made in Kotlin objects unless there is a specific reason for it not to.
+    - If the feature needs to use forge events or a repo pattern, annotate it with `@SkyHanniModule`
+    - This will automatically register it to the forge event bus and load the repo patterns
+- Avoid using deprecated functions.
+    - These functions are marked for removal in future versions.
+    - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
+- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+    - Config files should still be made in Java.
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
 - Please use existing utils methods.
@@ -70,17 +77,20 @@ format like "- #821" to illustrate the dependency.
 - Please try to avoid using `System.currentTimeMillis()`. Use our own class `SimpleTimeMark` instead.
     - See [this commit](https://github.com/hannibal002/SkyHanni/commit/3d748cb79f3a1afa7f1a9b7d0561e5d7bb284a9b)
       as an example.
-- Try to avoid using kotlin's `!!` (catch if not null) feature.
+- Try to avoid using Kotlin's `!!` (catch if not null) feature.
     - Replace it with `?:` (if null return this).
     - This will most likely not be possible to avoid when working with objects from java.
 - Don't forget to add `@FeatureToggle` to new standalone features (not options to that feature) in the config.
-- Do not use `e.printStackTrace()`, use `CopyErrorCommand.logError(e, "explanation for users")` instead.
-- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.postAndCatch()` instead.
+- Do not use `e.printStackTrace()`, use `ErrorManager.logErrorWithData(error, "explanation for users", ...extraOptionalData)` instead.
+- Do not use `MinecraftForge.EVENT_BUS.post(event)`, use `event.post()` instead.
 - Do not use `toRegex()` or `toPattern()`, use `RepoPattern` instead.
     - See [RepoPattern.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/utils/repopatterns/RepoPattern.kt)
 for more information and usages.
     - The pattern variables are named in the scheme `variableNamePattern`
 - Please use Regex instead of String comparison when it is likely Hypixel will change the message in the future.
+- Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
+  the main thread.
+- When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
 
 ## Software Used in SkyHanni
 
@@ -97,20 +107,16 @@ This start script will automatically download all required libraries.
 
 ### NotEnoughUpdates
 
-SkyHanni requires NEU.
+SkyHanni requires **[NotEnoughUpdates](https://github.com/NotEnoughUpdates/NotEnoughUpdates/)**.
 We use NEU to get auction house and bazaar price data for items and to read
 the [NEU Item Repo](https://github.com/NotEnoughUpdates/NotEnoughUpdates-REPO) for item internal names, display names
 and recipes.
-
-For more information, see https://github.com/NotEnoughUpdates/NotEnoughUpdates
 
 ### Config
 
 SkyHanni stores the config (settings and user data) as a json object in a single text file.
 For rendering the /sh config (categories, toggles, search, etc.),
-SkyHanni uses **MoulConfig**, the same config system as NotEnoughUpdates.
-
-For more information, see https://github.com/NotEnoughUpdates/MoulConfig
+SkyHanni uses **[MoulConfig](https://github.com/NotEnoughUpdates/MoulConfig)**, the same config system as NotEnoughUpdates.
 
 ### Elite Farmers API
 
@@ -145,42 +151,23 @@ folder for how to properly do this. You also may have to disable repo auto updat
 ### Discord IPC
 
 DiscordIPC is a service that SkyHanni uses to send information from SkyBlock to Discord in Rich Presence. <br>
-Specifically, we use [NetheriteMiner's Fork](https://github.com/NetheriteMiner/DiscordIPC) of a fork of a fork of a fork of
-the [original](https://github.com/jagrosh/DiscordIPC).
-For info on usage, look
-at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
+For info on usage, look at [DiscordRPCManager.kt](https://github.com/hannibal002/SkyHanni/blob/beta/src/main/java/at/hannibal2/skyhanni/features/misc/discordrpc/DiscordRPCManager.kt)
 
 ### Auto Updater
 
 We use the [auto update library](https://github.com/nea89o/libautoupdate) from nea89.
 
-## Additional Useful Developement Tools
+## Additional Useful Development Tools
 
 ### DevAuth
 
 [DevAuth](https://github.com/DJtheRedstoner/DevAuth) is a tool that allows logging in to a Minecraft account while
-debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar, put it into the
-`mods` folder, and start the Minecraft launcher manually.
+debugging in IntelliJ. This is very useful for coding live on Hypixel without the need to compile a jar.
 
 - The library is already downloaded by Gradle.
-- Create the config folder (Windows only). For other OSes, use the guide from DJtheRedstoner.
-    - Navigate to `C:\Users\<your username>`
-    - Create a new folder `.devauth`
-    - Navigate to `C:\Users\<your username>\.devauth`
-    - Create a new file `config.toml`
-    - Paste this text into the file: (Don't change anything.)
-
-```
-defaultEnabled = true
-
-defaultAccount = "main"
-
-[accounts.main]
-type = "microsoft"
-```
-
+- SkyHanni will automatically set up DevAuth.
 - Start Minecraft inside IntelliJ normally.
-    - Click on the link in the console and verify with a Mojang account.
+    - Click on the link in the console and verify with a Microsoft account.
     - The verification process will reappear every few days (after the session token expires).
 
 ### Hot Swap

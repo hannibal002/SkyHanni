@@ -1,3 +1,5 @@
+import at.hannibal2.skyhanni.tweaker.DownloadSourceChecker;
+
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -94,6 +96,8 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
 
     public static void main(String[] args) {
         try {
+            DownloadSourceChecker.init();
+
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
             SkyHanniInstallerFrame frame = new SkyHanniInstallerFrame();
             frame.centerFrame(frame);
@@ -641,25 +645,6 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
         }
         return version;
     }
-
-//    private String getVersionFromMcmodInfo() {
-//        String version = "";
-//        try {
-//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(Objects.requireNonNull(getClass()
-//                    .getClassLoader()
-//                    .getResourceAsStream("mcmod.info"), "mcmod.info not found.")));
-//            while ((version = bufferedReader.readLine()) != null) {
-//                if (version.contains("\"version\": \"")) {
-//                    version = version.split(Pattern.quote("\"version\": \""))[1];
-//                    version = version.substring(0, version.length() - 2);
-//                    break;
-//                }
-//            }
-//        } catch (Exception ex) {
-//            // It's okay, I guess just don't use the version lol.
-//        }
-//        return version;
-//    }
 
     private File getThisFile() {
         try {

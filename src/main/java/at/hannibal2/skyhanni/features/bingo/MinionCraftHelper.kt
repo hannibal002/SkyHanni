@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -15,9 +16,10 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonArray
@@ -28,7 +30,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class MinionCraftHelper {
+@SkyHanniModule
+object MinionCraftHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo
 
@@ -119,7 +122,7 @@ class MinionCraftHelper {
                 if (!allIngredients.contains(rawId)) continue
                 if (!isAllowed(allMinions, rawId)) continue
 
-                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
+                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
                 val old = otherItems.getOrDefault(itemId, 0)
                 otherItems[itemId] = old + item.stackSize * multiplier
             }
@@ -130,7 +133,7 @@ class MinionCraftHelper {
     }
 
     private fun isAllowed(allMinions: List<NEUInternalName>, internalName: NEUInternalName): Boolean {
-        val a = NEUItems.getMultiplier(internalName)
+        val primitiveStack = NEUItems.getPrimitiveMultiplier(internalName)
         for (minion in allMinions) {
             val recipes = NEUItems.getRecipes(minion)
 
@@ -139,8 +142,8 @@ class MinionCraftHelper {
                     val ingredientInternalName = ingredient.internalItemId.asInternalName()
                     if (ingredientInternalName == internalName) return true
 
-                    val b = NEUItems.getMultiplier(ingredientInternalName)
-                    if (a.first == b.first && a.second < b.second) return true
+                    val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
+                    if (primitiveStack.internalName == ingredientPrimitive.internalName && primitiveStack.amount < ingredientPrimitive.amount) return true
                 }
             }
         }
@@ -206,7 +209,7 @@ class MinionCraftHelper {
             }
             var allDone = true
             for ((rawId, need) in map) {
-                val (itemId, multiplier) = NEUItems.getMultiplier(rawId)
+                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
                 val needAmount = need * multiplier
                 val have = otherItems.getOrDefault(itemId, 0)
                 val percentage = have.toDouble() / needAmount
@@ -222,8 +225,8 @@ class MinionCraftHelper {
                         return
                     }
                     val format = LorenzUtils.formatPercentage(percentage)
-                    val haveFormat = LorenzUtils.formatInteger(have)
-                    val needFormat = LorenzUtils.formatInteger(needAmount)
+                    val haveFormat = have.addSeparators()
+                    val needFormat = needAmount.addSeparators()
                     newDisplay.add("$itemName§8: §e$format §8(§7$haveFormat§8/§7$needFormat§8)")
                     allDone = false
                 }
@@ -265,19 +268,17 @@ class MinionCraftHelper {
         if (event.inventoryName != "Crafted Minions") return
 
         for ((_, b) in event.inventoryItems) {
-            val name = b.name ?: continue
+            val name = b.name
             if (!name.startsWith("§e")) continue
             val internalName = NEUInternalName.fromItemName("$name I")
                 .replace("MINION", "GENERATOR").replace(";", "_").replace("CAVE_SPIDER", "CAVESPIDER")
-            if (!tierOneMinionsDone.contains(internalName)) {
-                tierOneMinionsDone.add(internalName)
-            }
+            tierOneMinionsDone.add(internalName)
         }
     }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.transform(19, "#player.bingoSessions") { element ->
+        event.transform(26, "#player.bingoSessions") { element ->
             for ((_, data) in element.asJsonObject.entrySet()) {
                 fixTierOneMinions(data.asJsonObject)
             }
@@ -286,11 +287,12 @@ class MinionCraftHelper {
     }
 
     private fun fixTierOneMinions(data: JsonObject) {
+        val uniqueEntries = mutableSetOf<String>()
         val newList = JsonArray()
         var counter = 0
         for (entry in data["tierOneMinionsDone"].asJsonArray) {
             val name = entry.asString
-            if (!name.startsWith("INTERNALNAME:")) {
+            if (!name.startsWith("INTERNALNAME:") && uniqueEntries.add(name)) {
                 newList.add(entry)
             } else {
                 counter++

@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.nether.reputationhelper.dailykuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
+import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.DailyMiniBossHelper
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -24,12 +24,13 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
-    val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
+    private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
     val questHelper = DailyQuestHelper(this)
     val miniBossHelper = DailyMiniBossHelper(this)
@@ -41,6 +42,18 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     private var display = emptyList<List<Any>>()
     private var dirty = true
+    var tabListQuestsMissing = false
+
+    /**
+     *  c - Barbarian Not Accepted
+     *  d - Mage Not Accepted
+     *  e - Accepted
+     *  a - Completed
+     */
+    val tabListQuestPattern by RepoPattern.pattern(
+        "crimson.reputation.tablist",
+        " §r§[cdea].*"
+    )
 
     init {
         skyHanniMod.loadModule(questHelper)
@@ -75,7 +88,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!dirty && display.isEmpty()) {
             dirty = true
         }
@@ -85,17 +98,16 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
 
         if (event.repeatSeconds(3)) {
-            TabListData.getTabList()
-                .filter { it.contains("Reputation:") }
-                .forEach {
-                    factionType = if (it.contains("Mage")) {
-                        FactionType.MAGE
-                    } else if (it.contains("Barbarian")) {
-                        FactionType.BARBARIAN
-                    } else {
-                        FactionType.NONE
-                    }
+            val list = TabListData.getTabList().filter { it.contains("Reputation:") }
+            for (line in list) {
+                factionType = if (line.contains("Mage")) {
+                    FactionType.MAGE
+                } else if (line.contains("Barbarian")) {
+                    FactionType.BARBARIAN
+                } else {
+                    FactionType.NONE
                 }
+            }
         }
     }
 
@@ -112,17 +124,23 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         // TODO test
         if (factionType == FactionType.NONE) return
 
-        newList.addAsSingletonList("Reputation Helper:")
-        questHelper.render(newList)
-        miniBossHelper.render(newList)
-        kuudraBossHelper.render(newList)
+        newList.addAsSingletonList("§e§lReputation Helper")
+        if (tabListQuestsMissing) {
+            newList.addAsSingletonList("§cFaction Quests Widget not found!")
+            newList.addAsSingletonList("§7Open §e/tab §7and enable it!")
+        } else {
+            questHelper.render(newList)
+            miniBossHelper.render(newList)
+            kuudraBossHelper.render(newList)
+        }
+
 
         display = newList
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun renderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled) return
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!config.enabled.get()) return
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
         if (config.useHotkey && !config.hotkey.isKeyHeld()) {

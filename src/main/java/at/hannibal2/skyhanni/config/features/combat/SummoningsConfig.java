@@ -3,13 +3,14 @@ package at.hannibal2.skyhanni.config.features.combat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SummoningsConfig {
 
     @Expose
-    @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground. " +
+    @ConfigOption(name = "Summoning Soul Display", desc = "Show the name of dropped Summoning Souls laying on the ground.\n" +
         "§cNot working in Dungeons if Skytils' 'Hide Non-Starred Mobs Nametags' feature is enabled!")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -22,6 +23,7 @@ public class SummoningsConfig {
     public boolean summoningMobDisplay = false;
 
     @Expose
+    @ConfigLink(owner = SummoningsConfig.class, field = "summoningMobDisplay")
     public Position summoningMobDisplayPos = new Position(10, 10, false, true);
 
     @Expose
@@ -31,8 +33,13 @@ public class SummoningsConfig {
     public boolean summoningMobHideNametag = false;
 
     @Expose
-    @ConfigOption(name = "Summoning Mob Color", desc = "Marks own summons green.")
+    @ConfigOption(name = "Summoning Mob Color", desc = "Mark own summons green.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean summoningMobColored = false;
+
+    @Expose
+    @ConfigOption(name = "Summon Chat Messages", desc = "Sends a chat message when a summon dies and hides other summon related messages.")
+    @ConfigEditorBoolean
+    public boolean summonMessages = false;
 }

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.seconds
@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.seconds
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
-    getStorage: (Storage.ProfileSpecific) -> Data,
+    getStorage: (ProfileSpecificStorage) -> Data,
     drawDisplay: (Data) -> List<List<Any>>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
@@ -30,8 +30,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
-
-    private var lastClickDelay = 0L
 
     fun addCoins(coins: Int) {
         addItem(SKYBLOCK_COIN, coins)
@@ -108,7 +106,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 internalName.itemName
             }
 
-            val priceFormat = NumberUtil.format(price)
+            val priceFormat = price.shortFormat()
             val hidden = itemProfit.hidden
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
@@ -129,26 +127,27 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
 
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore) {
-                if (System.currentTimeMillis() > lastClickDelay + 150) {
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(
+                displayName, lore,
+                onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
                         ChatUtils.chat("Removed $cleanName §efrom $name.")
-                        lastClickDelay = System.currentTimeMillis() + 500
                     } else {
                         modify {
                             it.items[internalName]?.hidden = !hidden
                         }
-                        lastClickDelay = System.currentTimeMillis()
                     }
                     update()
+
                 }
-            } else Renderable.string(displayName)
+            ) else Renderable.string(displayName)
 
             lists.addAsSingletonList(renderable)
         }
         if (hiddenItemTexts.size > 0) {
-            lists.addAsSingletonList(Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts))
+            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts)
+            lists.addAsSingletonList(text)
         }
 
         return profit
@@ -180,12 +179,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     }
 
     fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
-        val profitFormat = profit.addSeparators()
+        val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
         val tips = if (totalAmount > 0) {
             val profitPerCatch = profit / totalAmount
-            val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
+            val profitPerCatchFormat = profitPerCatch.shortFormat()
             listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
         } else emptyList()
 

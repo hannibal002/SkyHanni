@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
-import io.github.moulberry.moulconfig.internal.GlScissorStack
-import io.github.moulberry.moulconfig.internal.RenderUtils
-import io.github.moulberry.moulconfig.internal.TextRenderUtils
 import io.github.moulberry.notenoughupdates.util.Utils
+import io.github.notenoughupdates.moulconfig.internal.GlScissorStack
+import io.github.notenoughupdates.moulconfig.internal.RenderUtils
+import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -104,19 +104,19 @@ class DefaultConfigOptionGui(
             mc.displayGuiScreen(null)
         }
         button("Turn all on", listOf()) {
-            resetSuggestionState.entries.forEach { entry ->
+            for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_ON)
                 orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
         }
         button("Turn all off", listOf()) {
-            resetSuggestionState.entries.forEach { entry ->
+            for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_OFF)
                 orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }
         }
         button("Leave all untouched", listOf()) {
-            resetSuggestionState.entries.forEach { entry ->
+            for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
                 orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
             }

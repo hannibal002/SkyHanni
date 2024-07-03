@@ -4,17 +4,18 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 // TODO moulconfig runnable support
 public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Best Crop Time",
-        desc = "Lists all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
+        desc = "List all crops and their ETA till next milestone. Sorts for best crop for getting garden or SkyBlock levels.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean bestDisplay = false;
@@ -86,10 +87,11 @@ public class NextConfig {
     @Expose
     @ConfigOption(
         name = "Hide Title",
-        desc = "Hides the 'Best Crop Time' line entirely.")
+        desc = "Hide the 'Best Crop Time' line entirely.")
     @ConfigEditorBoolean
     public boolean bestHideTitle = false;
 
     @Expose
+    @ConfigLink(owner = NextConfig.class, field = "bestDisplay")
     public Position displayPos = new Position(-200, -200, false, true);
 }

@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.slayer.endermen;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class EndermanConfig {
     @Expose
@@ -13,7 +13,7 @@ public class EndermanConfig {
     public EndermanBeaconConfig beacon = new EndermanBeaconConfig();
 
     @Expose
-    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlights the Enderman Slayer Nukekubi Skulls (Eyes).")
+    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlight the Enderman Slayer Nukekubi Skulls (Eyes).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightNukekebi = false;

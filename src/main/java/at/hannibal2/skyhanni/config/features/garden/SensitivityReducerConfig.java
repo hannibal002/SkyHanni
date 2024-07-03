@@ -2,19 +2,20 @@ package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 import org.lwjgl.input.Keyboard;
 
 public class SensitivityReducerConfig {
     @Expose
     @ConfigOption(
         name = "Mode",
-        desc = "Lowers mouse sensitivity while in the garden.")
+        desc = "Lower mouse sensitivity while in the garden.")
     @ConfigEditorDropdown
     public Mode mode = Mode.OFF;
 
@@ -27,6 +28,7 @@ public class SensitivityReducerConfig {
         Mode(String str) {
             this.str = str;
         }
+
         @Override
         public String toString() {
             return str;
@@ -39,14 +41,14 @@ public class SensitivityReducerConfig {
     public int keybind = Keyboard.KEY_N;
 
     @Expose
-    @ConfigOption(name = "Reducing factor", desc = "Changes by how much the sensitivity is lowered by.")
+    @ConfigOption(name = "Reducing factor", desc = "Change by how much the sensitivity is lowered by.")
     @ConfigEditorSlider(minValue = 1, maxValue = 50, minStep = 1)
     public Property<Float> reducingFactor = Property.of(15.0F);
 
     @Expose
     @ConfigOption(
         name = "Show GUI",
-        desc = "Shows the GUI element while the feature is enabled.")
+        desc = "Show the GUI element while the feature is enabled.")
     @ConfigEditorBoolean
     public boolean showGUI = true;
 
@@ -65,5 +67,6 @@ public class SensitivityReducerConfig {
     public Property<Boolean> onlyPlot = Property.of(true);
 
     @Expose
+    @ConfigLink(owner = SensitivityReducerConfig.class, field = "showGUI")
     public Position position = new Position(400, 400, 0.8f);
 }

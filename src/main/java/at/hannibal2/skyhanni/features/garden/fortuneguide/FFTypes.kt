@@ -1,6 +1,18 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
 enum class FFTypes {
-    TOTAL, BASE, REFORGE, ABILITY, GREEN_THUMB, BASE_FF, ANITA, FARMING_LVL, COMMUNITY_SHOP, PLOTS,
-    CAKE, PET_ITEM
+    TOTAL,
+    BASE,
+    REFORGE,
+    GEMSTONE,
+    ABILITY,
+    GREEN_THUMB,
+    PESTERMINATOR,
+    FARMING_LVL,
+    BESTIARY,
+    PLOTS,
+    ANITA,
+    COMMUNITY_SHOP,
+    CAKE,
+    PET_ITEM,
 }

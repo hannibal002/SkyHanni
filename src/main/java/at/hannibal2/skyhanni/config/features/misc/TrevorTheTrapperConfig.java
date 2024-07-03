@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Enable Data Tracker",
-        desc = "Tracks all of your data from doing Trevor Quests.\n" +
+        desc = "Track all of your data from doing Trevor Quests.\n" +
             "Shows based on the setting below."
     )
     @ConfigEditorBoolean
@@ -41,7 +42,7 @@ public class TrevorTheTrapperConfig {
     @Expose
     @ConfigOption(
         name = "Show Between Quests",
-        desc = "Shows the tracker during and between quests otherwise it will only show during them." +
+        desc = "Show the tracker during and between quests otherwise it will only show during them.\n" +
             "Will show in the Trapper's Den regardless. §cToggle 'Enable Data Tracker' above."
     )
     @ConfigEditorBoolean
@@ -107,10 +108,12 @@ public class TrevorTheTrapperConfig {
     }
 
     @Expose
+    @ConfigLink(owner = TrevorTheTrapperConfig.class, field = "dataTracker")
     public Position position = new Position(10, 80, false, true);
 
     @Expose
-    @ConfigOption(name = "Trapper Solver", desc = "Assists you in finding Trevor's mobs. §eNote: May not always work as expected. " +
+    @ConfigOption(name = "Trapper Solver", desc = "Assist in finding Trevor's mobs.\n" +
+        "§eNote: May not always work as expected.\n" +
         "§cWill not help you to find rabbits or sheep in the Oasis!")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -155,5 +158,6 @@ public class TrevorTheTrapperConfig {
     public boolean trapperCooldownGui = false;
 
     @Expose
+    @ConfigLink(owner = TrevorTheTrapperConfig.class, field = "trapperCooldownGui")
     public Position trapperCooldownPos = new Position(10, 10, false, true);
 }

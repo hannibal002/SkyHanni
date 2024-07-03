@@ -2,11 +2,13 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BrewingStandOverlay {
+@SkyHanniModule
+object BrewingStandOverlay {
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
@@ -16,7 +18,7 @@ class BrewingStandOverlay {
         if (event.inventoryName != "Brewing Stand") return
 
         val stack = event.stack
-        val name = stack.name ?: return
+        val name = stack.name
 
         val slotNumber = event.slot.slotNumber
         when (slotNumber) {

@@ -6,15 +6,18 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenInventoryNumbers {
+@SkyHanniModule
+object GardenInventoryNumbers {
 
     private val config get() = GardenAPI.config.number
 
@@ -32,28 +35,25 @@ class GardenInventoryNumbers {
 
             val crop = GardenCropMilestones.getCropTypeByLore(event.stack) ?: return
             val counter = crop.getCounter()
-            val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop)
+            val allowOverflow = GardenAPI.config.cropMilestones.overflow.inventoryStackSize
+            val currentTier = GardenCropMilestones.getTierForCropCount(counter, crop, allowOverflow)
             event.stackTip = "" + currentTier
         }
 
         if (InventoryUtils.openInventoryName() == "Crop Upgrades") {
             if (!config.cropUpgrades) return
 
-            event.stack.getLore()
-                .map { upgradeTierPattern.matcher(it) }
-                .filter { it.matches() }
-                .map { it.group("tier") }
-                .forEach { event.stackTip = "" + it }
+            event.stack.getLore().matchFirst(upgradeTierPattern) {
+                event.stackTip = group("tier")
+            }
         }
 
         if (InventoryUtils.openInventoryName() == "Composter Upgrades") {
             if (!config.composterUpgrades) return
 
-            event.stack.name?.let {
-                ComposterUpgrade.regex.matchMatcher(it) {
-                    val level = group("level")?.romanToDecimalIfNecessary() ?: 0
-                    event.stackTip = "$level"
-                }
+            ComposterUpgrade.regex.matchMatcher(event.stack.name) {
+                val level = group("level")?.romanToDecimalIfNecessary() ?: 0
+                event.stackTip = "$level"
             }
         }
     }

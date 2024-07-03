@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,7 +45,7 @@ public class EnderNodeConfig {
     @Expose
     @ConfigOption(
         name = "Only While Holding Tool",
-        desc = "Only shows the tracker if holding a pickaxe, drill or gauntlet in hand."
+        desc = "Only show the tracker if holding a pickaxe, drill or gauntlet in hand."
     )
     @ConfigEditorBoolean
     public boolean onlyPickaxe = false;
@@ -126,5 +127,6 @@ public class EnderNodeConfig {
     }
 
     @Expose
+    @ConfigLink(owner = EnderNodeConfig.class, field = "enabled")
     public Position position = new Position(10, 80, false, true);
 }

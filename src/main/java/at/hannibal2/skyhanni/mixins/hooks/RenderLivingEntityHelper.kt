@@ -1,75 +1,76 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import net.minecraft.entity.EntityLivingBase
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class RenderLivingEntityHelper {
+@SkyHanniModule
+object RenderLivingEntityHelper {
+
+    private val entityColorMap = mutableMapOf<EntityLivingBase, Int>()
+    private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+
+    private val entityNoHurtTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         entityColorMap.clear()
         entityColorCondition.clear()
 
-        entityNoHurTime.clear()
-        entityNoHurTimeCondition.clear()
+        entityNoHurtTimeCondition.clear()
     }
 
-    companion object {
+    fun <T : EntityLivingBase> removeEntityColor(entity: T) {
+        entityColorMap.remove(entity)
+        entityColorCondition.remove(entity)
+    }
 
-        private val entityColorMap = mutableMapOf<EntityLivingBase, Int>()
-        private val entityColorCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+    fun <T : EntityLivingBase> setEntityColor(entity: T, color: Int, condition: () -> Boolean) {
+        entityColorMap[entity] = color
+        entityColorCondition[entity] = condition
+    }
 
-        private val entityNoHurTime = mutableListOf<EntityLivingBase>()
-        private val entityNoHurTimeCondition = mutableMapOf<EntityLivingBase, () -> Boolean>()
+    fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
+        entityNoHurtTimeCondition[entity] = condition
+    }
 
-        fun <T : EntityLivingBase> removeEntityColor(entity: T) {
-            entityColorMap.remove(entity)
-            entityColorCondition.remove(entity)
-        }
+    fun <T : EntityLivingBase> setEntityColorWithNoHurtTime(entity: T, color: Int, condition: () -> Boolean) {
+        setEntityColor(entity, color, condition)
+        setNoHurtTime(entity, condition)
+    }
 
-        fun <T : EntityLivingBase> setEntityColor(entity: T, color: Int, condition: () -> Boolean) {
-            entityColorMap[entity] = color
-            entityColorCondition[entity] = condition
-        }
+    fun <T : EntityLivingBase> removeNoHurtTime(entity: T) {
+        entityNoHurtTimeCondition.remove(entity)
+    }
 
-        fun <T : EntityLivingBase> setNoHurtTime(entity: T, condition: () -> Boolean) {
-            entityNoHurTime.add(entity)
-            entityNoHurTimeCondition[entity] = condition
-        }
+    fun <T : EntityLivingBase> removeCustomRender(entity: T) {
+        removeEntityColor(entity)
+        removeNoHurtTime(entity)
+    }
 
-        fun <T : EntityLivingBase> setColorMultiplier(entity: T): Int {
-            if (!SkyHanniDebugsAndTests.globalRender) return 0
-            if (entityColorMap.containsKey(entity)) {
-                val condition = entityColorCondition[entity]!!
-                if (condition.invoke()) {
-                    return entityColorMap[entity]!!
-                }
+    @JvmStatic
+    fun <T : EntityLivingBase> internalSetColorMultiplier(entity: T): Int {
+        if (!SkyHanniDebugsAndTests.globalRender) return 0
+        if (entityColorMap.containsKey(entity)) {
+            val condition = entityColorCondition[entity]!!
+            if (condition.invoke()) {
+                return entityColorMap[entity]!!
             }
-
-            // TODO remove event
-            if (!SkyHanniDebugsAndTests.globalRender) return 0
-            val event = RenderMobColoredEvent(entity, 0)
-            event.postAndCatch()
-            return event.color
         }
+        return 0
+    }
 
-        fun <T : EntityLivingBase> changeHurtTime(entity: T): Int {
-            if (!SkyHanniDebugsAndTests.globalRender) return 0
-            if (entityNoHurTime.contains(entity)) {
-                val condition = entityNoHurTimeCondition[entity]!!
-                if (condition.invoke()) {
-                    return 0
-                }
+    @JvmStatic
+    fun <T : EntityLivingBase> internalChangeHurtTime(entity: T): Int {
+        if (!SkyHanniDebugsAndTests.globalRender) return entity.hurtTime
+        run {
+            val condition = entityNoHurtTimeCondition[entity] ?: return@run
+            if (condition.invoke()) {
+                return 0
             }
-
-            // TODO remove event
-            val event = ResetEntityHurtEvent(entity, false)
-            event.postAndCatch()
-            return if (event.shouldReset) 0 else entity.hurtTime
         }
+        return entity.hurtTime
     }
 }

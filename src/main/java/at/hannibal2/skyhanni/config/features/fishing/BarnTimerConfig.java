@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.config.features.fishing;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorKeybind;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
 
 public class BarnTimerConfig {
@@ -38,7 +39,7 @@ public class BarnTimerConfig {
     @Expose
     @ConfigOption(
         name = "Winter Fishing",
-        desc = "Show the Barn Fishing Timer on the Jerry's Workshop."
+        desc = "Show the Barn Fishing Timer on the Jerry's Workshop island."
     )
     @ConfigEditorBoolean
     public boolean winterIsland = true;
@@ -60,7 +61,7 @@ public class BarnTimerConfig {
     public boolean wormLimitAlert = true;
 
     @Expose
-    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manualy")
+    @ConfigOption(name = "Reset Timer Hotkey", desc = "Press this key to reset the timer manually.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int manualResetTimer = Keyboard.KEY_NONE;
 
@@ -74,5 +75,6 @@ public class BarnTimerConfig {
     public int alertTime = 330;
 
     @Expose
+    @ConfigLink(owner = BarnTimerConfig.class, field = "enabled")
     public Position pos = new Position(10, 10, false, true);
 }

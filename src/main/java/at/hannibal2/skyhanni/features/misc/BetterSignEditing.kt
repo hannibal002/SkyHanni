@@ -4,22 +4,22 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ClipboardUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.lwjgl.input.Keyboard
 
-class BetterSignEditing {
+@SkyHanniModule
+object BetterSignEditing {
 
     private var pasteLastClicked = false
     private var copyLastClicked = false
-    private var deleteWordLastClicked = false
+    private var deleteLastClicked = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -33,18 +33,20 @@ class BetterSignEditing {
     }
 
     private fun checkDeleting(gui: GuiScreen?) {
-        val deleteWordClicked = Keyboard.KEY_BACK.isKeyHeld() && KeyboardManager.isModifierKeyDown()
-        if (!deleteWordLastClicked && deleteWordClicked && gui is AccessorGuiEditSign) {
+        val deleteClicked = KeyboardManager.isDeleteWordDown() || KeyboardManager.isDeleteLineDown()
+        if (!deleteLastClicked && deleteClicked && gui is AccessorGuiEditSign) {
             SkyHanniMod.coroutineScope.launch {
-                val newLine = if (KeyboardManager.isShiftKeyDown()) "" else {
+                val newLine = if (KeyboardManager.isDeleteLineDown()) ""
+                else if (KeyboardManager.isDeleteWordDown()) {
                     val currentLine = gui.tileSign.signText[gui.editLine].unformattedText
-                    val lastSpaceIndex = currentLine.lastIndexOf(' ')
-                    if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 1) else ""
-                }
+
+                    val lastSpaceIndex = currentLine.trimEnd().lastIndexOf(' ')
+                    if (lastSpaceIndex >= 0) currentLine.substring(0, lastSpaceIndex + 2) else ""
+                } else return@launch
                 LorenzUtils.setTextIntoSign(newLine, gui.editLine)
             }
         }
-        deleteWordLastClicked = deleteWordClicked
+        deleteLastClicked = deleteClicked
     }
 
     private fun checkCopying(gui: GuiScreen?) {

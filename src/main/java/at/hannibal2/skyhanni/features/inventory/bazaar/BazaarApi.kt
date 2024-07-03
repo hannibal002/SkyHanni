@@ -2,81 +2,92 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.events.BazaarOpenedProductEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BazaarApi {
+@SkyHanniModule
+object BazaarApi {
 
     private var loadedNpcPriceData = false
 
-    companion object {
+    val holder = BazaarDataHolder()
+    var inBazaarInventory = false
+    private var currentSearchedItem = ""
 
-        val holder = BazaarDataHolder()
-        var inBazaarInventory = false
-        private var currentSearchedItem = ""
+    var currentlyOpenedProduct: NEUInternalName? = null
 
-        var currentlyOpenedProduct: NEUInternalName? = null
+    fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
 
-        fun getBazaarDataByName(name: String): BazaarData? = NEUItems.getInternalNameOrNull(name)?.getBazaarData()
+    fun NEUInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
+        ErrorManager.skyHanniError(
+            "Can not find bazaar data for $itemName",
+            "internal name" to this
+        )
+    }
 
-        fun NEUInternalName.getBazaarData() = if (isBazaarItem()) {
-            holder.getData(this)
-        } else null
+    fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
-        fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
+    fun NEUInternalName.isBazaarItem() = getBazaarData() != null
 
-        fun NEUInternalName.isBazaarItem() = NEUItems.manager.auctionManager.getBazaarInfo(asString()) != null
+    fun searchForBazaarItem(internalName: NEUInternalName, amount: Int = -1) {
+        searchForBazaarItem(internalName.itemNameWithoutColor, amount)
+    }
 
-        fun searchForBazaarItem(displayName: String, amount: Int = -1) {
-            if (!LorenzUtils.inSkyBlock) return
-            if (NEUItems.neuHasFocus()) return
-            if (LorenzUtils.noTradeMode) return
-            if (LorenzUtils.inDungeons || LorenzUtils.inKuudraFight) return
-            ChatUtils.sendCommandToServer("bz ${displayName.removeColor()}")
-            if (amount != -1) OSUtils.copyToClipboard(amount.toString())
-            currentSearchedItem = displayName.removeColor()
-        }
+    fun searchForBazaarItem(displayName: String, amount: Int = -1) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (NEUItems.neuHasFocus()) return
+        if (LorenzUtils.noTradeMode) return
+        if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
+        HypixelCommands.bazaar(displayName.removeColor())
+        if (amount != -1) OSUtils.copyToClipboard(amount.toString())
+        currentSearchedItem = displayName.removeColor()
     }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inBazaarInventory = checkIfInBazaar(event)
         if (inBazaarInventory) {
-            val itemName = getOpenedProduct(event.inventoryItems) ?: return
-            val openedProduct = NEUItems.getInternalNameOrNull(itemName)
+            val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
             currentlyOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).postAndCatch()
         }
     }
 
-    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): String? {
+    private fun getOpenedProduct(inventoryItems: Map<Int, ItemStack>): NEUInternalName? {
         val buyInstantly = inventoryItems[10] ?: return null
 
         if (buyInstantly.displayName != "§aBuy Instantly") return null
         val bazaarItem = inventoryItems[13] ?: return null
 
-        return bazaarItem.displayName
+        return NEUInternalName.fromItemName(bazaarItem.displayName)
     }
 
     @SubscribeEvent
@@ -99,10 +110,7 @@ class BazaarApi {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
 
-        for (slot in chest.inventorySlots) {
-            if (slot == null) continue
-            val stack = slot.stack ?: continue
-
+        for ((slot, stack) in chest.getAllItems()) {
             if (chest.inventorySlots.indexOf(slot) !in 9..44) {
                 continue
             }

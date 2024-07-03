@@ -7,20 +7,21 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.RenderMobColoredEvent
-import at.hannibal2.skyhanni.events.ResetEntityHurtEvent
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonHideItems {
+@SkyHanniModule
+object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
@@ -29,25 +30,25 @@ class DungeonHideItems {
 
     // TODO put in skull data repo part
 
-    private val soulWeaverHider =
+    private const val SOUL_WEAVER_HIDER =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMmYyNGVkNjg3NTMwNGZhNGExZjBjNzg1YjJjYjZhNmE3MjU2M2U5ZjNlMjRlYTU1ZTE4MTc4NDUyMTE5YWE2NiJ9fX0="
-    private val blessingTexture =
+    private const val BLESSING_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTkzZTIwNjg2MTc4NzJjNTQyZWNkYTFkMjdkZjRlY2U5MWM2OTk5MDdiZjMyN2M0ZGRiODUzMDk0MTJkMzkzOSJ9fX0="
 
-    private val reviveStoneTexture =
+    private const val REVIVE_STONE_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYjZhNzZjYzIyZTdjMmFiOWM1NDBkMTI0NGVhZGJhNTgxZjVkZDllMThmOWFkYWNmMDUyODBhNWI0OGI4ZjYxOCJ9fX0K"
 
-    private val premiumFleshTexture =
+    private const val PREMIUM_FLESH_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMWE3NWU4YjA0NGM3MjAxYTRiMmU4NTZiZTRmYzMxNmE1YWFlYzY2NTc2MTY5YmFiNTg3MmE4ODUzNGI4MDI1NiJ9fX0K"
 
-    private val abilityOrbTexture =
+    private const val ABILITY_ORB_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTAxZTA0MGNiMDFjZjJjY2U0NDI4MzU4YWUzMWQyZTI2NjIwN2M0N2NiM2FkMTM5NzA5YzYyMDEzMGRjOGFkNCJ9fX0="
-    private val supportOrbTexture =
+    private const val SUPPORT_ORB_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTMxYTRmYWIyZjg3ZGI1NDMzMDEzNjUxN2I0NTNhYWNiOWQ3YzBmZTc4NDMwMDcwOWU5YjEwOWNiYzUxNGYwMCJ9fX0="
-    private val damageOrbTexture =
+    private const val DAMAGE_ORB_TEXTURE =
         "eyJ0aW1lc3RhbXAiOjE1NzQ5NTEzMTkwNDQsInByb2ZpbGVJZCI6IjE5MjUyMWI0ZWZkYjQyNWM4OTMxZjAyYTg0OTZlMTFiIiwicHJvZmlsZU5hbWUiOiJTZXJpYWxpemFibGUiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2FiODZkYTJlMjQzYzA1ZGMwODk4YjBjYzVkM2U2NDg3NzE3MzE3N2UwYTIzOTQ0MjVjZWMxMDAyNTljYjQ1MjYifX19"
 
-    private val healerFairyTexture =
+    private const val HEALER_FAIRY_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvOTZjM2UzMWNmYzY2NzMzMjc1YzQyZmNmYjVkOWE0NDM0MmQ2NDNiNTVjZDE0YzljNzdkMjczYTIzNTIifX19"
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean {
@@ -57,18 +58,18 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
 
         if (entity is EntityItem) {
             val stack = entity.entityItem
             if (config.hideReviveStone && stack.cleanName() == "Revive Stone") {
-                event.isCanceled = true
+                event.cancel()
             }
 
             if (config.hideJournalEntry && stack.cleanName() == "Journal Entry") {
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
@@ -78,44 +79,44 @@ class DungeonHideItems {
         val skullTexture = head?.getSkullTexture()
         if (config.hideSuperboomTNT) {
             if (entity.name.startsWith("§9Superboom TNT")) {
-                event.isCanceled = true
+                event.cancel()
             }
 
             if (head != null && head.cleanName() == "Superboom TNT") {
-                event.isCanceled = true
+                event.cancel()
                 hideParticles[entity] = System.currentTimeMillis()
             }
         }
 
         if (config.hideBlessing) {
             if (entity.name.startsWith("§dBlessing of ")) {
-                event.isCanceled = true
+                event.cancel()
             }
 
-            if (skullTexture == blessingTexture) {
-                event.isCanceled = true
+            if (skullTexture == BLESSING_TEXTURE) {
+                event.cancel()
             }
         }
 
         if (config.hideReviveStone) {
             if (entity.name == "§6Revive Stone") {
-                event.isCanceled = true
+                event.cancel()
             }
 
-            if (skullTexture == reviveStoneTexture) {
-                event.isCanceled = true
+            if (skullTexture == REVIVE_STONE_TEXTURE) {
+                event.cancel()
                 hideParticles[entity] = System.currentTimeMillis()
             }
         }
 
         if (config.hidePremiumFlesh) {
             if (entity.name == "§9Premium Flesh") {
-                event.isCanceled = true
+                event.cancel()
                 hideParticles[entity] = System.currentTimeMillis()
             }
 
-            if (skullTexture == premiumFleshTexture) {
-                event.isCanceled = true
+            if (skullTexture == PREMIUM_FLESH_TEXTURE) {
+                event.cancel()
             }
         }
 
@@ -126,23 +127,23 @@ class DungeonHideItems {
                 if (lastMove + 100 > System.currentTimeMillis()) {
                     return
                 }
-                event.isCanceled = true
+                event.cancel()
             }
         }
 
         if (config.hideHealerOrbs) {
             when {
-                entity.name.startsWith("§c§lDAMAGE §e") -> event.isCanceled = true
-                entity.name.startsWith("§c§lABILITY DAMAGE §e") -> event.isCanceled = true
-                entity.name.startsWith("§a§lDEFENSE §e") -> event.isCanceled = true
+                entity.name.startsWith("§c§lDAMAGE §e") -> event.cancel()
+                entity.name.startsWith("§c§lABILITY DAMAGE §e") -> event.cancel()
+                entity.name.startsWith("§a§lDEFENSE §e") -> event.cancel()
             }
 
             when (skullTexture) {
-                abilityOrbTexture,
-                supportOrbTexture,
-                damageOrbTexture,
+                ABILITY_ORB_TEXTURE,
+                SUPPORT_ORB_TEXTURE,
+                DAMAGE_ORB_TEXTURE,
                 -> {
-                    event.isCanceled = true
+                    event.cancel()
                     hideParticles[entity] = System.currentTimeMillis()
                     return
                 }
@@ -151,23 +152,23 @@ class DungeonHideItems {
 
         if (config.hideHealerFairy) {
             // Healer Fairy texture is stored in id 0, not id 4 for some reasos.
-            if (entity.inventory[0]?.getSkullTexture() == healerFairyTexture) {
-                event.isCanceled = true
+            if (entity.inventory[0]?.getSkullTexture() == HEALER_FAIRY_TEXTURE) {
+                event.cancel()
                 return
             }
         }
 
         if (config.hideSoulweaverSkulls) {
-            if (skullTexture == soulWeaverHider) {
-                event.isCanceled = true
+            if (skullTexture == SOUL_WEAVER_HIDER) {
+                event.cancel()
                 return
             }
         }
     }
 
     @SubscribeEvent
-    fun onReceivePacket(event: ReceiveParticleEvent) {
-        if (!LorenzUtils.inDungeons) return
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
+        if (!DungeonAPI.inDungeon()) return
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location
@@ -175,10 +176,10 @@ class DungeonHideItems {
             val distance = packetLocation.distance(armorStand.getLorenzVec())
             if (distance < 2) {
                 if (event.type == EnumParticleTypes.FIREWORKS_SPARK) {
-                    event.isCanceled = true
+                    event.cancel()
                 }
                 if (event.type == EnumParticleTypes.REDSTONE) {
-                    event.isCanceled = true
+                    event.cancel()
                 }
             }
         }
@@ -186,41 +187,22 @@ class DungeonHideItems {
 
     @SubscribeEvent
     fun onEntityMove(event: EntityMoveEvent) {
-        if (!LorenzUtils.inDungeons) return
+        if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity
         if (entity !is EntityArmorStand) return
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
-        }
-    }
-
-    @SubscribeEvent
-    fun onRenderMobColored(event: RenderMobColoredEvent) {
-        if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
-        val entity = event.entity
-        if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
-            val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-            if (lastMove + 200 > System.currentTimeMillis()) {
-                event.color = LorenzColor.GOLD.toColor().withAlpha(60)
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(60))
+            {
+                shouldColorMovingSkull(entity)
             }
         }
     }
 
-    @SubscribeEvent
-    fun onResetEntityHurtTime(event: ResetEntityHurtEvent) {
-        if (!LorenzUtils.inDungeons) return
-        if (!SkyHanniMod.feature.dungeon.highlightSkeletonSkull) return
-        val entity = event.entity
-        if (entity is EntityArmorStand && isSkeletonSkull(entity)) {
-            val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-            if (lastMove + 200 > System.currentTimeMillis()) {
-                event.shouldReset = true
-            }
-        }
-    }
+    private fun shouldColorMovingSkull(entity: Entity) =
+        SkyHanniMod.feature.dungeon.highlightSkeletonSkull && movingSkeletonSkulls[entity]?.let { it + 200 > System.currentTimeMillis() } ?: false
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

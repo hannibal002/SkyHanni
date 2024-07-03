@@ -3,14 +3,15 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.client.event.RenderLivingEvent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TerracottaPhase {
+@SkyHanniModule
+object TerracottaPhase {
 
     private val config get() = SkyHanniMod.feature.dungeon.terracottaPhase
 
@@ -30,21 +31,21 @@ class TerracottaPhase {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: RenderLivingEvent.Specials.Pre<EntityLivingBase>) {
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (isActive() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isActive() && config.hideParticles) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
     private fun isActive() = isEnabled() && inTerracottaPhase
 
     private fun isEnabled() =
-        LorenzUtils.inDungeons && DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonAPI.DungeonFloor.F6
+        DungeonAPI.inDungeon() && DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F6
 }

@@ -4,43 +4,31 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.StringUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object SeaCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val trophyArmorNames by RepoPattern.pattern(
-        "fishing.trophyfishing.armor",
-        "(BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
-    )
-
     private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
     { drawDisplay(it) }
-    private var lastArmorCheck = SimpleTimeMark.farPast()
-    private var isTrophyFishing = false
 
     class Data : TrackerData() {
 
@@ -89,7 +77,7 @@ object SeaCreatureTracker {
         val realAmount = data.amount.filter { filter(it.key) }
 
         val total = realAmount.sumAllValues()
-        realAmount.entries.sortedByDescending { it.value }.forEach { (name, amount) ->
+        for ((name, amount) in realAmount.entries.sortedByDescending { it.value }) {
             val displayName = SeaCreatureManager.allFishingMobs[name]?.displayName ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Sea Creature Tracker can not display a name correctly",
@@ -167,20 +155,10 @@ object SeaCreatureTracker {
         tracker.renderDisplay(config.position)
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetseacreaturetracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && !isTrophyFishing && !LorenzUtils.inKuudraFight
-
-    private fun isWearingTrophyArmor(): Boolean = InventoryUtils.getArmor().all {
-        trophyArmorNames.matches(it?.getInternalName()?.asString())
-    }
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (lastArmorCheck.passedSince() < 3.seconds) return
-        lastArmorCheck = SimpleTimeMark.now()
-        isTrophyFishing = isWearingTrophyArmor()
-    }
+    private fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.enabled && !FishingAPI.wearingTrophyArmor && !LorenzUtils.inKuudraFight
 }

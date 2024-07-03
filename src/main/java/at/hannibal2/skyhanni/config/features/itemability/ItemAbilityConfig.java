@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.config.features.itemability;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ItemAbilityConfig {
 
@@ -18,6 +18,7 @@ public class ItemAbilityConfig {
     @Expose
     @ConfigOption(name = "Ability Cooldown Background", desc = "Show the cooldown color of item abilities in the background.")
     @ConfigEditorBoolean
+    // TODO rename to "background"
     public boolean itemAbilityCooldownBackground = false;
 
     @Expose
@@ -37,7 +38,7 @@ public class ItemAbilityConfig {
 
     @Expose
     @ConfigOption(name = "Depleted Bonzo's Masks",
-        desc = "Highlights used Bonzo's Masks and Spirit Masks with a background.")
+        desc = "Highlight used Bonzo's Masks and Spirit Masks with a background.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean depletedBonzosMasks = false;

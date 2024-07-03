@@ -17,17 +17,21 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ObtainCrys
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.PartialProgressItemsStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.ProgressionStep
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.steps.SkillLevelStep
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BingoNextStepHelper {
+@SkyHanniModule
+object BingoNextStepHelper {
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var dirty = true
@@ -59,74 +63,69 @@ class BingoNextStepHelper {
     private val islands = mutableMapOf<IslandType, IslandVisitStep>()
     private val rhysTaskName = "30x Enchanted Minerals (Redstone, Lapis Lazuli, Coal) (for Rhys)"
 
-    companion object {
+    private val finalSteps = mutableListOf<NextStep>()
+    private var currentSteps = emptyList<NextStep>()
+    var currentHelp = emptyList<String>()
 
-        private val finalSteps = mutableListOf<NextStep>()
-        private var currentSteps = emptyList<NextStep>()
-        var currentHelp = emptyList<String>()
+    fun command() {
+        updateResult(true)
+    }
 
-        fun command() {
-            updateResult(true)
-        }
-
-        private fun updateResult(print: Boolean = false) {
+    private fun updateResult(print: Boolean = false) {
+        if (print) println()
+        currentSteps = listOf()
+        for (step in finalSteps) {
+            printRequirements(step, print)
             if (print) println()
-            currentSteps = listOf()
-            for (step in finalSteps) {
-                printRequirements(step, print)
-                if (print) println()
-            }
-
-            currentHelp = drawDisplay(print)
         }
 
-        private fun drawDisplay(print: Boolean): MutableList<String> {
-            val newCurrentHelp = mutableListOf<String>()
-            newCurrentHelp.add("§6Bingo Step Helper:")
+        currentHelp = drawDisplay(print)
+    }
 
-            if (currentSteps.isEmpty()) {
-                newCurrentHelp.add("§cOpen the §e/bingo §ccard.")
-            }
-            for (currentStep in currentSteps) {
-                val text = getName(currentStep)
-                newCurrentHelp.add("  §7$text")
-                if (print) println(text)
-            }
-            if (print) println()
-            return newCurrentHelp
+    private fun drawDisplay(print: Boolean): MutableList<String> {
+        val newCurrentHelp = mutableListOf<String>()
+        newCurrentHelp.add("§6Bingo Step Helper:")
+
+        if (currentSteps.isEmpty()) {
+            newCurrentHelp.add("§cOpen the §e/bingo §ccard.")
         }
+        for (currentStep in currentSteps) {
+            val text = getName(currentStep)
+            newCurrentHelp.add("  §7$text")
+            if (print) println(text)
+        }
+        if (print) println()
+        return newCurrentHelp
+    }
 
-        private fun printRequirements(step: NextStep, print: Boolean, parentDone: Boolean = false, depth: Int = 0) {
-            if (print) println(getName(step, parentDone, depth))
-            var requirementsToDo = 0
-            for (requirement in step.requirements) {
-                printRequirements(requirement, print, step.done || parentDone, depth + 1)
-                if (!requirement.done) {
-                    requirementsToDo++
-                }
-            }
-
-            if (!step.done && !parentDone && requirementsToDo == 0 && !currentSteps.contains(step)) {
-                currentSteps = currentSteps.editCopy { add(step) }
+    private fun printRequirements(step: NextStep, print: Boolean, parentDone: Boolean = false, depth: Int = 0) {
+        if (print) println(getName(step, parentDone, depth))
+        var requirementsToDo = 0
+        for (requirement in step.requirements) {
+            printRequirements(requirement, print, step.done || parentDone, depth + 1)
+            if (!requirement.done) {
+                requirementsToDo++
             }
         }
 
-        private fun getName(step: NextStep, parentDone: Boolean = false, depth: Int = 0): String {
-            val prefix = "  ".repeat(depth) + if (step.done) "[DONE] " else if (parentDone) "[done] " else ""
-            val suffix = if (step is ProgressionStep) progressDisplay(step) else ""
-            return prefix + step.displayName + suffix
+        if (!step.done && !parentDone && requirementsToDo == 0 && !currentSteps.contains(step)) {
+            currentSteps = currentSteps.editCopy { add(step) }
         }
+    }
 
-        private fun progressDisplay(step: ProgressionStep): String {
-            val having = step.amountHaving
-            return if (having > 0) {
-                val needed = step.amountNeeded
-                val percentage = LorenzUtils.formatPercentage(having.toDouble() / needed)
-                val havingFormat = LorenzUtils.formatInteger(having)
-                val neededFormat = LorenzUtils.formatInteger(needed)
-                " $percentage ($havingFormat/$neededFormat)"
-            } else ""
-        }
+    private fun getName(step: NextStep, parentDone: Boolean = false, depth: Int = 0): String {
+        val prefix = "  ".repeat(depth) + if (step.done) "[DONE] " else if (parentDone) "[done] " else ""
+        val suffix = if (step is ProgressionStep) progressDisplay(step) else ""
+        return prefix + step.displayName + suffix
+    }
+
+    private fun progressDisplay(step: ProgressionStep): String {
+        val having = step.amountHaving
+        return if (having > 0) {
+            val needed = step.amountNeeded
+            val percentage = LorenzUtils.formatPercentage(having.toDouble() / needed)
+            " $percentage (${having.addSeparators()}/${needed.addSeparators()})"
+        } else ""
     }
 
     init {
@@ -183,7 +182,7 @@ class BingoNextStepHelper {
             if (step is ItemsStep) {
                 var totalCount = 0L
                 for ((itemName, multiplier) in step.variants) {
-                    val count = InventoryUtils.countItemsInLowerInventory { it.name?.removeColor() == itemName }
+                    val count = InventoryUtils.countItemsInLowerInventory { it.name.removeColor() == itemName }
                     totalCount += count * multiplier
                 }
                 if (step.amountHaving != totalCount) {
@@ -263,7 +262,7 @@ class BingoNextStepHelper {
 
     private fun readDescription(description: String): NextStep? {
         collectionPattern.matchMatcher(description) {
-            val amount = group("amount").replace(",", "").toInt()
+            val amount = group("amount").formatInt()
             val name = group("name")
 
             return CollectionStep(name, amount) withItemIslandRequirement name

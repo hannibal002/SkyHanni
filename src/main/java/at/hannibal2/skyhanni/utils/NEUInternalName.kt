@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.test.command.ErrorManager
+
 class NEUInternalName private constructor(private val internalName: String) {
 
     companion object {
@@ -17,10 +19,14 @@ class NEUInternalName private constructor(private val internalName: String) {
             return map.getOrPut(internalName) { NEUInternalName(internalName) }
         }
 
-        fun fromItemNameOrNull(itemName: String): NEUInternalName? = ItemNameResolver.getInternalNameOrNull(itemName)
+        fun fromItemNameOrNull(itemName: String): NEUInternalName? =
+            ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet"))
 
         fun fromItemName(itemName: String): NEUInternalName =
-            fromItemNameOrNull(itemName) ?: throw Error("NEUInternalName is null for item name '$itemName'")
+            fromItemNameOrNull(itemName) ?: ErrorManager.skyHanniError(
+                "NEUInternalName is null for item name: '$itemName'",
+                "inventoryName" to InventoryUtils.openInventoryName()
+            )
     }
 
     fun asString() = internalName

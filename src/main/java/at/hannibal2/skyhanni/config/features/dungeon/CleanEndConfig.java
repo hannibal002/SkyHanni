@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.config.features.dungeon;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CleanEndConfig {
     @Expose
@@ -15,7 +15,7 @@ public class CleanEndConfig {
 
     @Expose
     @ConfigOption(name = "Ignore Guardians", desc = "Ignore F3 and M3 Guardians from the clean end feature when " +
-        "sneaking. Makes it easier to kill them after the boss died already. Thanks Hypixel.")
+        "sneaking. Makes it easier to kill them after the boss dies. Thanks Hypixel.")
     @ConfigEditorBoolean
     public boolean F3IgnoreGuardians = false;
 }

@@ -1,20 +1,35 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
+import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
+import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.AxisAlignedBB
+import net.minecraftforge.client.event.RenderLivingEvent
+import net.minecraftforge.fml.common.eventhandler.Event
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object EntityUtils {
 
     fun EntityLivingBase.hasNameTagWith(
@@ -27,47 +42,21 @@ object EntityUtils {
         return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
     }
 
-    fun EntityLivingBase.getAllNameTagsWith(
-        y: Int,
-        contains: String,
-        debugRightEntity: Boolean = false,
-        inaccuracy: Double = 1.6,
-        debugWrongEntity: Boolean = false,
-    ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = y)
-        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlockPos()
-        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
-        val clazz = EntityArmorStand::class.java
-        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-        return found.filter {
-            val result = it.name.contains(contains)
-            if (debugWrongEntity && !result) {
-                LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
+    fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
+        val list = mutableListOf<EntityOtherPlayerMP>()
+        for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
+            if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
+                list.add(entity)
             }
-            if (debugRightEntity && result) {
-                LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
-                LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
-            }
-            result
         }
+        return list
     }
 
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = 3)
-        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
-        val b = center.add(radius, radius + 3, radius).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
-        val clazz = EntityArmorStand::class.java
-        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-        return found.filter {
-            val result = it.name.contains(contains)
-            result
-        }
+    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().add(y = 3), radius).filter {
+        it.name.contains(contains)
     }
 
     fun EntityLivingBase.getNameTagWith(
@@ -76,14 +65,17 @@ object EntityUtils {
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
-    ): EntityArmorStand? {
+    ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
+
+    fun EntityLivingBase.getAllNameTagsWith(
+        y: Int,
+        contains: String,
+        debugRightEntity: Boolean = false,
+        inaccuracy: Double = 1.6,
+        debugWrongEntity: Boolean = false,
+    ): List<EntityArmorStand> {
         val center = getLorenzVec().add(y = y)
-        val a = center.add(-inaccuracy, -inaccuracy - 3, -inaccuracy).toBlockPos()
-        val b = center.add(inaccuracy, inaccuracy + 3, inaccuracy).toBlockPos()
-        val alignedBB = AxisAlignedBB(a, b)
-        val clazz = EntityArmorStand::class.java
-        val found = worldObj.getEntitiesWithinAABB(clazz, alignedBB)
-        return found.find {
+        return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.name.contains(contains)
             if (debugWrongEntity && !result) {
                 LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
@@ -91,10 +83,19 @@ object EntityUtils {
             if (debugRightEntity && result) {
                 LorenzUtils.consoleLog("mob: " + center.printWithAccuracy(2))
                 LorenzUtils.consoleLog("nametag: " + it.getLorenzVec().printWithAccuracy(2))
-                LorenzUtils.consoleLog("accuracy: " + it.getLorenzVec().subtract(center).printWithAccuracy(3))
+                LorenzUtils.consoleLog("accuracy: " + (it.getLorenzVec() - center).printWithAccuracy(3))
             }
             result
         }
+    }
+
+    private fun getArmorStandsInRadius(center: LorenzVec, radius: Double): List<EntityArmorStand> {
+        val a = center.add(-radius, -radius - 3, -radius).toBlockPos()
+        val b = center.add(radius, radius + 3, radius).toBlockPos()
+        val alignedBB = AxisAlignedBB(a, b)
+        val clazz = EntityArmorStand::class.java
+        val worldObj = Minecraft.getMinecraft()?.theWorld ?: return emptyList()
+        return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
     }
 
     fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
@@ -104,7 +105,7 @@ object EntityUtils {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
 
-        if (!boss && !LorenzUtils.inDungeons) {
+        if (!boss && !DungeonAPI.inDungeon()) {
             // Corrupted
             if (maxHealth == health * 3 * derpyMultiplier) return true
             // Runic
@@ -132,6 +133,9 @@ object EntityUtils {
     inline fun <reified T : Entity> getEntitiesNearby(location: LorenzVec, radius: Double): Sequence<T> =
         getEntities<T>().filter { it.distanceTo(location) < radius }
 
+    inline fun <reified T : Entity> getEntitiesNearbyIgnoreY(location: LorenzVec, radius: Double): Sequence<T> =
+        getEntities<T>().filter { it.distanceToIgnoreY(location) < radius }
+
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
@@ -139,7 +143,7 @@ object EntityUtils {
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
-    fun EntityPlayer.isNPC() = uniqueID == null || uniqueID.version() != 4
+    fun EntityPlayer.isNPC() = !isRealPlayer()
 
     fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
 
@@ -157,4 +161,61 @@ object EntityUtils {
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
+
+    @SubscribeEvent
+    fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
+        val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
+        SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
+        val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
+        if (shEvent.postAndCatch()) {
+            event.cancel()
+        }
+    }
+
+    @SubscribeEvent
+    fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
+        SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
+    }
+
+    fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
+    fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
+    fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
+
+    fun Entity.cleanName() = this.name.removeColor()
+
+    /**
+     * @return a fake player with the same skin as the real player
+     */
+    fun getFakePlayer(): EntityOtherPlayerMP {
+        val mc = Minecraft.getMinecraft()
+        return object : EntityOtherPlayerMP(
+            mc.theWorld,
+            mc.thePlayer.gameProfile
+        ) {
+            override fun getLocationSkin() =
+                mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
+
+            override fun getTeam() = object : ScorePlayerTeam(null, null) {
+                override fun getNameTagVisibility() = EnumVisible.NEVER
+            }
+
+            override fun isWearing(part: EnumPlayerModelParts?) =
+                mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+        }
+    }
+}
+
+private fun Event.cancel() {
+    isCanceled = true
 }

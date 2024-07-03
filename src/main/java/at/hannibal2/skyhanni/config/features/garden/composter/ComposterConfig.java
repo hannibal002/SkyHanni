@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ComposterConfig {
     @Expose
@@ -53,7 +54,7 @@ public class ComposterConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: The Bazaar or Sacks.")
+    @ConfigOption(name = "Retrieve From", desc = "Change where to retrieve the materials from in the composter overlay: Bazaar or Sacks.")
     @ConfigEditorDropdown
     public RetrieveFromEntry retrieveFrom = RetrieveFromEntry.SACKS;
 
@@ -86,15 +87,17 @@ public class ComposterConfig {
     }
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
     public Position overlayOrganicMatterPos = new Position(140, 152, false, true);
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "overlay")
     public Position overlayFuelExtrasPos = new Position(-320, 152, false, true);
 
     @Expose
     @ConfigOption(
         name = "Composter Display",
-        desc = "Displays the Composter data from the tab list as GUI element."
+        desc = "Display the Composter data from the tab list as GUI element."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -129,7 +132,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Round Amount Needed",
-        desc = "Rounds the amount needed to fill your Composter down so that you don't overspend."
+        desc = "Round the amount needed to fill your Composter down so that you don't overspend."
     )
     @ConfigEditorBoolean
     public boolean roundDown = true;
@@ -137,7 +140,7 @@ public class ComposterConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Upgrade",
-        desc = "Highlight Upgrades that can be bought right now."
+        desc = "Highlight upgrades that can be bought right now."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -158,8 +161,10 @@ public class ComposterConfig {
     public NotifyLowConfig notifyLow = new NotifyLowConfig();
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "displayEnabled")
     public Position displayPos = new Position(-390, 10, false, true);
 
     @Expose
+    @ConfigLink(owner = ComposterConfig.class, field = "displayEnabled")
     public Position outsideGardenPos = new Position(-363, 13, false, true);
 }

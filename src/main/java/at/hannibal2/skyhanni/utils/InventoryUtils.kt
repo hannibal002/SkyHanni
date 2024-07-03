@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -33,10 +34,20 @@ object InventoryUtils {
         } else ""
     }
 
+    fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
-    fun getItemsInOwnInventory() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filterNotNull()
-    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer.inventory.mainInventory
+    fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
+
+    fun getItemsInOwnInventory() =
+        getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
+
+    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
+
+    // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
+    fun getItemsInHotbar() =
+        getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
 
     fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
@@ -72,6 +83,43 @@ object InventoryUtils {
 
     fun isSlotInPlayerInventory(itemStack: ItemStack): Boolean {
         val screen = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return false
-        return screen.slotUnderMouse.inventory is InventoryPlayer && screen.slotUnderMouse.stack == itemStack
+        val slotUnderMouse = screen.slotUnderMouse ?: return false
+        return slotUnderMouse.inventory is InventoryPlayer && slotUnderMouse.stack == itemStack
+    }
+
+    fun isItemInInventory(name: NEUInternalName) = name.getAmountInInventory() > 0
+
+    fun ContainerChest.getUpperItems(): Map<Slot, ItemStack> = buildMap {
+        for ((slot, stack) in getAllItems()) {
+            if (slot.slotNumber != slot.slotIndex) continue
+            this[slot] = stack
+        }
+    }
+
+    fun ContainerChest.getLowerItems(): Map<Slot, ItemStack> = buildMap {
+        for ((slot, stack) in getAllItems()) {
+            if (slot.slotNumber == slot.slotIndex) continue
+            this[slot] = stack
+        }
+    }
+
+    fun ContainerChest.getAllItems(): Map<Slot, ItemStack> = buildMap {
+        for (slot in inventorySlots) {
+            if (slot == null) continue
+            val stack = slot.stack ?: continue
+            this[slot] = stack
+        }
+    }
+
+    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
+
+    fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
+
+    fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+
+    fun clickSlot(slot: Int) {
+        val windowId = getWindowId() ?: return
+        val controller = Minecraft.getMinecraft().playerController
+        controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
     }
 }

@@ -6,14 +6,14 @@ import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
-import net.minecraft.client.Minecraft
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object PlayerTabComplete {
 
-    private val config get() = SkyHanniMod.feature.commands.tabComplete
+    private val config get() = SkyHanniMod.feature.misc.commands.tabComplete
     private var vipVisits = listOf<String>()
 
     @SubscribeEvent
@@ -30,6 +30,7 @@ object PlayerTabComplete {
     enum class PlayerCategory {
         FRIENDS,
         ISLAND_PLAYERS,
+        PARTY,
     }
 
     fun handleTabComplete(command: String): List<String>? {
@@ -48,25 +49,26 @@ object PlayerTabComplete {
 
             "pv" to listOf(), // NEU's Profile Viewer
             "shmarkplayer" to listOf(), // SkyHanni's Mark Player
+
+            "trade" to listOf(PlayerCategory.FRIENDS, PlayerCategory.PARTY)
         )
         val ignored = commands[command] ?: return null
 
         return buildList {
 
             if (config.friends && PlayerCategory.FRIENDS !in ignored) {
-                FriendAPI.getAllFriends().filter { it.bestFriend || !config.onlyBestFriends }
+                FriendAPI.getAllFriends()
+                    .filter { it.bestFriend || !config.onlyBestFriends }
                     .forEach { add(it.name) }
             }
 
             if (config.islandPlayers && PlayerCategory.ISLAND_PLAYERS !in ignored) {
-                for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
-                    if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
-                        add(entity.name)
-                    }
+                for (entity in EntityUtils.getPlayerEntities()) {
+                    add(entity.name)
                 }
             }
 
-            if (config.party) {
+            if (config.party && PlayerCategory.PARTY !in ignored) {
                 for (member in PartyAPI.partyMembers) {
                     add(member)
                 }

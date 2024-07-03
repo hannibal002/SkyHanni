@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.test.garden
 
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorListener
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.mockkObject
@@ -26,27 +28,27 @@ class VisitorListenerTest {
         mockkObject(VisitorAPI)
         every { VisitorAPI.addVisitor(any()) } returns true
 
-        listener = VisitorListener()
+        listener = VisitorListener
     }
 
     @Test
     fun `onTablistUpdate it should add new visitors to the list`() {
         listener.onTabListUpdate(
-            TabListUpdateEvent(
+            fakeTabWidget(
                 mutableListOf(
-                    "§b§lVisitors:",
-                    "§cSpaceman",
-                    "§cGrandma Wolf",
+                    "§b§lVisitors: §r§f(3)",
+                    " §r§cSpaceman",
+                    " §r§6Madame Eleanor Q. Goldsworth III §r§fCarrot §r§c333 C §r§3107k FXP §r§275 GXP",
+                    " §r§fJacob",
                     "ThePlayerName",
-                    "Jacob",
                     "",
-                )
-            )
+                ),
+            ),
         )
 
         verify { VisitorAPI.addVisitor("§fJacob") }
         verify { VisitorAPI.addVisitor("§cSpaceman") }
-        verify { VisitorAPI.addVisitor("§cGrandma Wolf") }
+        verify { VisitorAPI.addVisitor("§6Madame Eleanor Q. Goldsworth III") }
     }
 
     @Test
@@ -56,9 +58,9 @@ class VisitorListenerTest {
         )
 
         listener.onTabListUpdate(
-            TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
-            )
+            fakeTabWidget(
+                mutableListOf("§b§lVisitors: §r§f(0)", ""),
+            ),
         )
 
         verify { VisitorAPI.removeVisitor("§fJacob") }
@@ -70,14 +72,18 @@ class VisitorListenerTest {
             mockk { every { visitorName } returns "§fJacob" },
         )
 
-        every { LorenzUtils.lastWorldSwitch } returns System.currentTimeMillis()
+        every { LorenzUtils.lastWorldSwitch } returns SimpleTimeMark.now()
 
         listener.onTabListUpdate(
-            TabListUpdateEvent(
-                mutableListOf("§b§lVisitors:", "")
-            )
+            fakeTabWidget(
+                mutableListOf("§b§lVisitors: §r§f(0)", ""),
+            ),
         )
 
         verify(exactly = 0) { VisitorAPI.removeVisitor("§fJacob") }
+    }
+
+    private fun fakeTabWidget(lines: List<String>): WidgetUpdateEvent {
+        return WidgetUpdateEvent(TabWidget.VISITORS, lines)
     }
 }

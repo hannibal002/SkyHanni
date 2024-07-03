@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,6 +22,7 @@ import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.P
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.FTX;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.GEMSTONE_POWDER;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.GOLD_ESSENCE;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.HARD_STONE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.JADE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.MITHRIL_POWDER;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.ROBOTRON;
@@ -28,6 +30,7 @@ import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.P
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SAPPHIRE;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_1;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_2;
+import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.SPACER_3;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOPAZ;
 import static at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry.TOTAL_CHESTS;
 
@@ -45,11 +48,6 @@ public class PowderTrackerConfig {
     public boolean onlyWhenPowderGrinding = false;
 
     @Expose
-    @ConfigOption(name = "Great Explorer", desc = "Enable this if your Great Explorer perk is maxed.")
-    @ConfigEditorBoolean
-    public boolean greatExplorerMaxed = false;
-
-    @Expose
     @ConfigOption(
         name = "Text Format",
         desc = "Drag text to change the appearance of the overlay."
@@ -64,6 +62,8 @@ public class PowderTrackerConfig {
         DIAMOND_ESSENCE,
         GOLD_ESSENCE,
         SPACER_2,
+        HARD_STONE,
+        SPACER_3,
         RUBY,
         SAPPHIRE,
         AMBER,
@@ -84,6 +84,8 @@ public class PowderTrackerConfig {
         DIAMOND_ESSENCE("§b129 §bDiamond Essence §7(600/h)", 7),
         GOLD_ESSENCE("§b234 §6Gold Essence §7(700/h)", 8),
         SPACER_2("", 9),
+        HARD_STONE("§b1000 §fHard Stone §bCompacted §7(500/h)"),
+        SPACER_3(""),
         RUBY("§50§7-§90§7-§a0§f-0 §cRuby Gemstone", 10),
         SAPPHIRE("§50§7-§90§7-§a0§f-0 §bSapphire Gemstone", 11),
         AMBER("§50§7-§90§7-§a0§f-0 §6Amber Gemstone", 12),
@@ -97,7 +99,7 @@ public class PowderTrackerConfig {
         CONTROL_SWITCH("§b14 §9Control Switch", 20),
         SYNTHETIC_HEART("§b14 §9Synthetic Heart", 21),
         TOTAL_ROBOT_PARTS("§b14 §9Total Robot Parts", 22),
-        GOBLIN_EGGS("§90§7-§a0§7-§c0§f-§e0§f-§30 §fGoblin Egg", 23),
+        GOBLIN_EGGS("§30§7-§c0§7-§e0§f-§a0§f-§90 §fGoblin Egg", 23),
         WISHING_COMPASS("§b12 §aWishing Compass", 24),
         SLUDGE_JUICE("§b320 §aSludge Juice", 25),
         ASCENSION_ROPE("§b2 §9Ascension Rope", 26),
@@ -134,6 +136,7 @@ public class PowderTrackerConfig {
     }
 
     @Expose
+    @ConfigLink(owner = PowderTrackerConfig.class, field = "enabled")
     public Position position = new Position(-274, 0, false, true);
 
 }

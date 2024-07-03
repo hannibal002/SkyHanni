@@ -5,8 +5,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,8 +16,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -24,6 +25,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object VerminTracker {
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.vermintracker")
@@ -66,18 +68,16 @@ object VerminTracker {
         var count: MutableMap<VerminType, Int> = mutableMapOf()
     }
 
-    enum class VerminType(val vermin: String, val pattern: Pattern) {
-        SILVERFISH("§aSilverfish", silverfishPattern),
-        SPIDER("§aSpiders", spiderPattern),
-        FLY("§aFlies", flyPattern),
+    enum class VerminType(val order: Int, val vermin: String, val pattern: Pattern) {
+        FLY(1, "§aFlies", flyPattern),
+        SPIDER(2, "§aSpiders", spiderPattern),
+        SILVERFISH(3, "§aSilverfish", silverfishPattern),
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!RiftAPI.inRift()) return
-        if (event.repeatSeconds(1)) {
-            checkVacuum()
-        }
+        checkVacuum()
     }
 
     private fun checkVacuum() {
@@ -87,7 +87,7 @@ object VerminTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        VerminType.entries.forEach { verminType ->
+        for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
                 tracker.modify { it.count.addOrPut(verminType, 1) }
 
@@ -152,7 +152,7 @@ object VerminTracker {
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7Vermin Tracker:")
-        data.count.entries.sortedByDescending { it.value }.forEach { (vermin, amount) ->
+        for ((vermin, amount) in data.count.entries.sortedBy { it.key.order }) {
             val verminName = vermin.vermin
             addAsSingletonList(" §7- §e${amount.addSeparators()} $verminName")
         }
@@ -176,8 +176,8 @@ object VerminTracker {
         }
     }
 
-    fun resetCommand(args: Array<String>) {
-        tracker.resetCommand(args, "shresetvermintracker")
+    fun resetCommand() {
+        tracker.resetCommand()
     }
 
     private fun isEnabled() = RiftAPI.inRift() && config.enabled

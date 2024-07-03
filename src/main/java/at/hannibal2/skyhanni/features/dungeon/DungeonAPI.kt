@@ -1,29 +1,40 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
+import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonAPI {
+@SkyHanniModule
+object DungeonAPI {
 
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
     private val uniqueClassBonus =
@@ -36,77 +47,126 @@ class DungeonAPI {
     private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
-    companion object {
+    var dungeonFloor: String? = null
+    var started = false
+    var completed = false
+    var inBossRoom = false
+    var playerClass: DungeonClass? = null
+    var playerClassLevel = -1
+    var isUniqueClass = false
 
-        var dungeonFloor: String? = null
-        var started = false
-        var inBossRoom = false
-        var playerClass: DungeonClass? = null
-        var playerClassLevel = -1
-        var isUniqueClass = false
+    val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
-        val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-        private val timePattern =
-            "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
+    private val patternGroup = RepoPattern.group("dungeon")
 
-        fun inDungeon() = dungeonFloor != null
+    /**
+     * REGEX-TEST: Time Elapsed: §a01m 17s
+     * REGEX-TEST: Time Elapsed: §a14s
+     */
+    private val timePattern by patternGroup.pattern(
+        "time",
+        "Time Elapsed: §.(?:(?<minutes>\\d+)m )?(?<seconds>\\d+)s",
+    )
 
-        fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
+    private val dungeonComplete by patternGroup.pattern(
+        "complete",
+        "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
+    )
+    private val dungeonRoomPattern by patternGroup.pattern(
+        "room",
+        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
+    )
+    private val blessingPattern by patternGroup.pattern(
+        "blessings",
+        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
+    )
+    private val noBlessingPattern by patternGroup.pattern(
+        "noblessings",
+        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r",
+    )
 
-        fun handleBossMessage(rawMessage: String) {
-            if (!inDungeon()) return
-            val message = rawMessage.removeColor()
-            val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
-            if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
-                DungeonBossRoomEnterEvent().postAndCatch()
-                inBossRoom = true
+    enum class DungeonBlessings(var power: Int) {
+        LIFE(0),
+        POWER(0),
+        STONE(0),
+        WISDOM(0),
+        TIME(0);
+
+        val displayName by lazy { name.firstLetterUppercase() }
+
+        companion object {
+            fun reset() {
+                entries.forEach { it.power = 0 }
             }
         }
+    }
 
-        private fun checkBossName(bossName: String): Boolean {
-            val correctBoss = when (dungeonFloor!!) {
-                "E" -> "The Watcher"
-                "F1", "M1" -> "Bonzo"
-                "F2", "M2" -> "Scarf"
-                "F3", "M3" -> "The Professor"
-                "F4", "M4" -> "Thorn"
-                "F5", "M5" -> "Livid"
-                "F6", "M6" -> "Sadan"
-                "F7", "M7" -> "Maxor"
-                else -> null
-            } ?: return false
+    fun inDungeon(): Boolean = IslandType.CATACOMBS.isInIsland()
 
-            // Livid has a prefix in front of the name, so we check ends with to cover all the livids
-            return bossName.endsWith(correctBoss)
+    fun isOneOf(vararg floors: String): Boolean = dungeonFloor?.equalsOneOf(*floors) == true
+
+    fun handleBossMessage(rawMessage: String) {
+        if (!inDungeon()) return
+        val message = rawMessage.removeColor()
+        val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
+        if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
+            DungeonBossRoomEnterEvent().postAndCatch()
+            inBossRoom = true
         }
+    }
 
-        fun getTime(): String {
-            loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
-                timePattern.matchMatcher(line.removeColor()) {
-                    if (!matches()) continue@loop
-                    return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
-                }
-            }
-            return ""
-        }
+    private fun checkBossName(bossName: String): Boolean {
+        val correctBoss = when (dungeonFloor!!) {
+            "E" -> "The Watcher"
+            "F1", "M1" -> "Bonzo"
+            "F2", "M2" -> "Scarf"
+            "F3", "M3" -> "The Professor"
+            "F4", "M4" -> "Thorn"
+            "F5", "M5" -> "Livid"
+            "F6", "M6" -> "Sadan"
+            "F7", "M7" -> "Maxor"
+            else -> null
+        } ?: return false
 
-        fun getCurrentBoss(): DungeonFloor? {
-            val floor = dungeonFloor ?: return null
-            return DungeonFloor.valueOf(floor.replace("M", "F"))
-        }
+        // Livid has a prefix in front of the name, so we check ends with to cover all the livids
+        return bossName.endsWith(correctBoss)
+    }
 
-        fun getRoomID() = ScoreboardData.sidebarLines.firstOrNull()?.removeColor()?.split(" ")?.getOrNull(2)
+    fun getTime(): String = ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
+        "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
+    } ?: ""
+
+    fun getCurrentBoss(): DungeonFloor? {
+        val floor = dungeonFloor ?: return null
+        return DungeonFloor.valueOf(floor.replace("M", "F"))
+    }
+
+    fun getRoomID(): String? = ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
+        group("roomId")
+    }
+
+
+    fun getColor(level: Int): String = when {
+        level >= 50 -> "§c§l"
+        level >= 45 -> "§c"
+        level >= 40 -> "§6"
+        level >= 35 -> "§d"
+        level >= 30 -> "§9"
+        level >= 25 -> "§b"
+        level >= 20 -> "§2"
+        level >= 15 -> "§a"
+        level >= 10 -> "§e"
+        level >= 5 -> "§f"
+        else -> "§7"
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (dungeonFloor == null) {
-            for (line in ScoreboardData.sidebarLinesFormatted) {
-                floorPattern.matchMatcher(line) {
-                    val floor = group("floor")
-                    dungeonFloor = floor
-                    DungeonEnterEvent(floor).postAndCatch()
-                }
+            ScoreboardData.sidebarLinesFormatted.matchFirst(floorPattern) {
+                val floor = group("floor")
+                dungeonFloor = floor
+                DungeonEnterEvent(floor).postAndCatch()
             }
         }
         if (dungeonFloor != null && playerClass == null) {
@@ -115,11 +175,30 @@ class DungeonAPI {
                     it.contains(LorenzUtils.getPlayerName())
                 }?.removeColor() ?: ""
 
-            DungeonClass.entries.forEach {
-                if (playerTeam.contains("(${it.scoreboardName} ")) {
+            for (dungeonClass in DungeonClass.entries) {
+                if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                     val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
-                    playerClass = it
+                    playerClass = dungeonClass
                     playerClassLevel = level
+                }
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onTabUpdate(event: TablistFooterUpdateEvent) {
+        if (!inDungeon()) return
+        for (line in event.footer.split("\n")) {
+            if (noBlessingPattern.matches(line)) {
+                DungeonBlessings.reset()
+                return
+            }
+            val matcher = blessingPattern.matcher(line)
+            if (matcher.find()) {
+                val type = matcher.group("type") ?: continue
+                val amount = matcher.group("amount").romanToDecimalIfNecessary()
+                if (DungeonBlessings.valueOf(type.uppercase()).power != amount) {
+                    DungeonBlessings.valueOf(type.uppercase()).power = amount
                 }
             }
         }
@@ -133,6 +212,8 @@ class DungeonAPI {
         isUniqueClass = false
         playerClass = null
         playerClassLevel = -1
+        completed = false
+        DungeonBlessings.reset()
     }
 
     @SubscribeEvent
@@ -153,6 +234,12 @@ class DungeonAPI {
             if (matches() && boss != null && boss !in bossCollections) {
                 bossCollections.addOrPut(boss, 1)
             }
+            return
+        }
+        dungeonComplete.matchMatcher(event.message) {
+            completed = true
+            DungeonCompleteEvent(floor).postAndCatch()
+            return
         }
     }
 
@@ -182,7 +269,7 @@ class DungeonAPI {
                         val lore = inventoryItems[4]?.getLore() ?: return
                         val line = lore.find { it.contains("Total Kills:") } ?: return
                         val kills = totalKillsPattern.matchMatcher(line) {
-                            group("kills").formatNumber().toInt()
+                            group("kills").formatInt()
                         } ?: return
                         bossCollections[floor] = kills
                     }
@@ -221,7 +308,7 @@ class DungeonAPI {
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 
-        if (!LorenzUtils.inDungeons) {
+        if (!inDungeon()) {
             event.addIrrelevant("not in dungeons")
             return
         }
@@ -235,22 +322,11 @@ class DungeonAPI {
             add("playerClass: $playerClass")
             add("isUniqueClass: $isUniqueClass")
             add("playerClassLevel: $playerClassLevel")
-        }
-    }
-
-    enum class DungeonFloor(private val bossName: String) {
-        ENTRANCE("The Watcher"),
-        F1("Bonzo"),
-        F2("Scarf"),
-        F3("The Professor"),
-        F4("Thorn"),
-        F5("Livid"),
-        F6("Sadan"),
-        F7("Necron");
-
-        companion object {
-
-            fun byBossName(bossName: String) = DungeonFloor.entries.firstOrNull { it.bossName == bossName }
+            add("")
+            add("Blessings: ")
+            DungeonBlessings.entries.forEach {
+                add("  ${it.displayName} ${it.power}")
+            }
         }
     }
 
@@ -259,6 +335,20 @@ class DungeonAPI {
         BERSERK("Berserk"),
         HEALER("Healer"),
         MAGE("Mage"),
-        TANK("Tank")
+        TANK("Tank"),
+    }
+
+    enum class DungeonChest(val inventory: String) {
+        WOOD("Wood Chest"),
+        GOLD("Gold Chest"),
+        DIAMOND("Diamond Chest"),
+        EMERALD("Emerald Chest"),
+        OBSIDIAN("Obsidian Chest"),
+        BEDROCK("Bedrock Chest"),
+        ;
+
+        companion object {
+            fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
+        }
     }
 }

@@ -5,60 +5,70 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object PartyCommands {
 
-    private val config get() = SkyHanniMod.feature.commands
+    private val config get() = SkyHanniMod.feature.misc.commands
 
     fun kickOffline() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
-        ChatUtils.sendCommandToServer("party kickoffline")
+        HypixelCommands.partyKickOffline()
     }
 
     fun disband() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
-        ChatUtils.sendCommandToServer("party disband")
+        HypixelCommands.partyDisband()
     }
 
     fun warp() {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
-        ChatUtils.sendCommandToServer("party warp")
+        HypixelCommands.partyWarp()
     }
 
     fun kick(args: Array<String>) {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
-        if (args.size > 1 && config.partyKickReason) {
-            ChatUtils.sendCommandToServer("pc Kicking ${args[0]}: ${args.drop(1).joinToString(" ").trim()}")
+        val kickedPlayer = args[0]
+        val kickedReason = args.drop(1).joinToString(" ").trim()
+        if (kickedReason.isNotEmpty() && config.partyKickReason) {
+            HypixelCommands.partyChat("Kicking $kickedPlayer: $kickedReason")
         }
-        ChatUtils.sendCommandToServer("party kick ${args[0]}")
+        HypixelCommands.partyKick(kickedPlayer)
     }
 
     fun transfer(args: Array<String>) {
         if (args.isEmpty()) {
-            ChatUtils.sendCommandToServer("pt")
+            if (LimboTimeTracker.inLimbo) {
+                LimboTimeTracker.printStats(true)
+                return
+            }
+            HypixelCommands.playtime()
             return
         }
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
-        ChatUtils.sendCommandToServer("party transfer ${args[0]}")
+        HypixelCommands.partyTransfer(args[0])
     }
 
     fun promote(args: Array<String>) {
         if (!config.shortCommands) return
         if (PartyAPI.partyMembers.isEmpty()) return
         if (args.isEmpty()) return
-        ChatUtils.sendCommandToServer("party promote ${args[0]}")
+        HypixelCommands.partyPromote(args[0])
     }
 
     @SubscribeEvent
-    fun onSendCommand(event: MessageSendToServerEvent) {
+    fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.partyKickReason) {
             return
         }
@@ -67,14 +77,14 @@ object PartyCommands {
         ) {
             return
         }
-        val args = event.message.split(" ")
-        if (args.size < 3) return
-        val kickedPlayer = args[2]
-        val kickReason = args.drop(3).joinToString(" ").trim()
+        val args = event.message.substringAfter("kick").trim().split(" ")
+        if (args.isEmpty()) return
+        val kickedPlayer = args[0]
+        val kickReason = args.drop(1).joinToString(" ").trim()
         if (kickReason.isEmpty()) return
         event.cancel()
-        ChatUtils.sendCommandToServer("pc Kicking $kickedPlayer: $kickReason")
-        ChatUtils.sendCommandToServer("p kick $kickedPlayer")
+        HypixelCommands.partyChat("Kicking $kickedPlayer: $kickReason")
+        HypixelCommands.partyKick(kickedPlayer)
     }
 
     fun customTabComplete(command: String): List<String>? {
@@ -84,11 +94,12 @@ object PartyCommands {
 
         if (command == "p" || command == "party") {
             val friends = if (config.tabComplete.friends) {
-                FriendAPI.getAllFriends().filter { it.bestFriend || config.tabComplete.onlyBestFriends }.map { it.name }
+                FriendAPI.getAllFriends().filter { it.bestFriend || !config.tabComplete.onlyBestFriends }.map { it.name }
             } else {
                 emptyList<String>()
             }
-            return friends + getPartyCommands()
+            val allOnLobby = EntityUtils.getPlayerEntities().map { it.name }
+            return friends + getPartyCommands() + allOnLobby
         }
         return null
     }
@@ -102,6 +113,8 @@ object PartyCommands {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(5, "commands.usePartyTransferAlias", "commands.shortCommands")
+
+        event.move(31, "commands", "misc.commands")
     }
 }
 

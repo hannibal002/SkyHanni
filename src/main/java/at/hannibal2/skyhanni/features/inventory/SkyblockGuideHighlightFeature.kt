@@ -5,14 +5,16 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import at.hannibal2.skyhanni.utils.StringUtils.anyMatches
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
@@ -67,6 +69,7 @@ class SkyblockGuideHighlightFeature private constructor(
         objectList.add(this)
     }
 
+    @SkyHanniModule
     companion object {
 
         private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuideConfig
@@ -85,9 +88,6 @@ class SkyblockGuideHighlightFeature private constructor(
         fun onInventoryClose(event: InventoryCloseEvent) = close()
 
         @SubscribeEvent
-        fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) = close()
-
-        @SubscribeEvent
         fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
@@ -100,7 +100,8 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             if (activeObject == null) return
 
-            event.gui.inventorySlots.inventorySlots.filter { missing.contains(it.slotNumber) }
+            event.gui.inventorySlots.inventorySlots
+                .filter { missing.contains(it.slotNumber) }
                 .forEach { it highlight LorenzColor.RED }
         }
 
@@ -124,7 +125,7 @@ class SkyblockGuideHighlightFeature private constructor(
 
             for ((slot, item) in event.inventoryItems) {
                 if (slot == 4) continue // Overview Item
-                val loreAndName = listOf(item.name ?: "") + item.getLore()
+                val loreAndName = listOf(item.name) + item.getLore()
                 if (!current.conditionPattern.anyMatches(loreAndName)) continue
                 missing.add(slot)
             }
@@ -144,7 +145,7 @@ class SkyblockGuideHighlightFeature private constructor(
         private val openWikiOnClick: (GuiContainerEvent.SlotClickEvent) -> Unit = { event ->
             val internalName = event.item?.getInternalName()
             if (internalName != null) {
-                LorenzUtils.sendCommandToServer("wiki ${internalName.asString()}")
+                HypixelCommands.wiki(internalName.asString())
             }
         }
 
@@ -174,7 +175,7 @@ class SkyblockGuideHighlightFeature private constructor(
                 "travel",
                 "Core ➜ Fast Travels Unlocked",
                 taskOnlyCompleteOncePattern,
-                { LorenzUtils.sendCommandToServer("wiki MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
+                { HypixelCommands.wiki("MUSEUM_TRAVEL_SCROLL") }, // The items do not have proper internal names and using the fact that all travel scrolls lead to the same wiki page
                 openWikiTooltip
             )
             SkyblockGuideHighlightFeature(

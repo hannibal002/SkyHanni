@@ -20,9 +20,18 @@
 package at.hannibal2.skyhanni.config.core.config;
 
 import at.hannibal2.skyhanni.SkyHanniMod;
+import at.hannibal2.skyhanni.config.ConfigGuiManager;
+import at.hannibal2.skyhanni.config.Features;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper;
+import io.github.notenoughupdates.moulconfig.gui.MoulConfigEditor;
+import io.github.notenoughupdates.moulconfig.processor.ProcessedOption;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
+import org.jetbrains.annotations.NotNull;
+
+import java.lang.reflect.Field;
 
 public class Position {
     @Expose
@@ -38,6 +47,8 @@ public class Position {
     private boolean centerX;
     @Expose
     private boolean centerY;
+
+    public transient Field linkField;
 
     private boolean clicked = false;
     public String internalName = null;
@@ -80,7 +91,7 @@ public class Position {
     }
 
     public float getEffectiveScale() {
-        return Math.max(Math.min(getScale() * SkyHanniMod.getFeature().gui.globalScale, 10F), 0.1F);
+        return Math.max(Math.min(getScale() * SkyHanniMod.feature.gui.globalScale, 10F), 0.1F);
     }
 
     public float getScale() {
@@ -202,5 +213,23 @@ public class Position {
             this.y += screenHeight - objHeight;
         }
         return deltaY;
+    }
+
+    public boolean canJumpToConfigOptions() {
+        return linkField != null && ConfigGuiManager.INSTANCE.getEditorInstance().getProcessedConfig().getOptionFromField(linkField) != null;
+    }
+
+    public void jumpToConfigOptions() {
+        MoulConfigEditor<Features> editor = ConfigGuiManager.INSTANCE.getEditorInstance();
+        if (linkField == null) return;
+        ProcessedOption option = editor.getProcessedConfig().getOptionFromField(linkField);
+        if (option == null) return;
+        editor.search("");
+        if (!editor.goToOption(option)) return;
+        SkyHanniMod.Companion.setScreenToOpen(new GuiScreenElementWrapper(editor));
+    }
+
+    public void setLink(@NotNull ConfigLink configLink) throws NoSuchFieldException {
+        linkField = configLink.owner().getField(configLink.field());
     }
 }

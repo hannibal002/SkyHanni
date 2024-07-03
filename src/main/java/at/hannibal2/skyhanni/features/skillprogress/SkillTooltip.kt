@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -13,13 +13,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SkillTooltip {
+@SkyHanniModule
+object SkillTooltip {
 
-    private val config get() = SkyHanniMod.feature.skillProgress
-    private val overflowConfig get() = config.overflowConfig
-    private val customGoalConfig get() = config.customGoalConfig
+    private val overflowConfig get() = SkillProgress.config.overflowConfig
+    private val customGoalConfig get() = SkillProgress.config.customGoalConfig
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
@@ -31,7 +32,7 @@ class SkillTooltip {
             val split = stack.cleanName().split(" ")
             val skillName = split.first()
             val skill = SkillType.getByNameOrNull(skillName) ?: return
-            val useRoman = split.last().toIntOrNull() == null
+            val useRoman = split.last().isRoman()
             val skillInfo = SkillAPI.storage?.get(skill) ?: return
             val showCustomGoal = skillInfo.customGoalLevel != 0 && customGoalConfig.enableInSkillMenuTooltip
             var next = false
@@ -66,9 +67,9 @@ class SkillTooltip {
                     val xpFor50 = SkillUtil.xpRequiredForLevel(50.0)
                     val xpFor60 = SkillUtil.xpRequiredForLevel(60.0)
 
-                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50 .. 59) xpFor50
-                        else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
-                        else 0
+                    have += if (skillInfo.overflowLevel >= 60 && skill in excludedSkills || skillInfo.overflowLevel in 50..59) xpFor50
+                    else if (skillInfo.overflowLevel >= 60 && skill !in excludedSkills) xpFor60
+                    else 0
 
                     val progress = have.toDouble() / need
                     val progressBar = StringUtils.progressBar(progress)

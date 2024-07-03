@@ -5,13 +5,15 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.StringUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonDeathCounter {
+@SkyHanniModule
+object DungeonDeathCounter {
+    private val config get() = SkyHanniMod.feature.dungeon
 
     private var display = ""
     private var deaths = 0
@@ -51,7 +53,7 @@ class DungeonDeathCounter {
         deathPatternsList.any { it.matches(message) }
 
     @SubscribeEvent(receiveCanceled = true)
-    fun onChatPacket(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
         if (isDeathMessage(event.message)) {
@@ -91,13 +93,11 @@ class DungeonDeathCounter {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        SkyHanniMod.feature.dungeon.deathCounterPos.renderString(
-            DungeonMilestonesDisplay.color + display,
+        config.deathCounterPos.renderString(
+            DungeonMilestonesDisplay.colour + display,
             posLabel = "Dungeon Death Counter"
         )
     }
 
-    private fun isEnabled(): Boolean {
-        return LorenzUtils.inDungeons && SkyHanniMod.feature.dungeon.deathCounterDisplay
-    }
+    private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.deathCounterDisplay
 }

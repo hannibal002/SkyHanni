@@ -1,28 +1,24 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.withAlpha
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.event.entity.EntityJoinWorldEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 
-class HighlightInquisitors {
+@SkyHanniModule
+object HighlightInquisitors {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    @SubscribeEvent
-    fun onJoinWorld(event: EntityJoinWorldEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+    @HandleEvent
+    fun onInquisitorFound(event: InquisitorFoundEvent) {
         if (!config.highlightInquisitors) return
 
-        val entity = event.entity
+        val inquisitor = event.inquisitorEntity
 
-        if (entity is EntityPlayer && entity.name == "Minos Inquisitor") {
-            RenderLivingEntityHelper.setEntityColor(entity, LorenzColor.AQUA.toColor().withAlpha(127)) { config.highlightInquisitors }
-            RenderLivingEntityHelper.setNoHurtTime(entity) { config.highlightInquisitors }
-        }
+        val color = config.color.toChromaColorInt()
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(inquisitor, color) { config.highlightInquisitors }
     }
 }

@@ -1,26 +1,30 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
+import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matches
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class ItemAddManager {
+@SkyHanniModule
+object ItemAddManager {
     enum class Source {
         ITEM_ADD,
         SACKS,
-        ;
     }
 
     private val ARCHFIEND_DICE = "ARCHFIEND_DICE".asInternalName()
@@ -28,7 +32,7 @@ class ItemAddManager {
 
     private val diceRollChatPattern by RepoPattern.pattern(
         "data.itemmanager.diceroll",
-        "§eYour §r§(5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤"
+        "§eYour §r§(5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤",
     )
 
     private var inSackInventory = false
@@ -42,7 +46,7 @@ class ItemAddManager {
     }
 
     @SubscribeEvent
-    fun onInventoryClose(event: GuiContainerEvent.CloseWindowEvent) {
+    fun onInventoryClose(event: InventoryCloseEvent) {
         if (inSackInventory) {
             inSackInventory = false
             lastSackInventoryLeave = SimpleTimeMark.now()
@@ -57,11 +61,12 @@ class ItemAddManager {
 
         for (sackChange in event.sackChanges) {
             val change = sackChange.delta
-            if (change > 0) {
-                val internalName = sackChange.internalName
+            val internalName = sackChange.internalName
+            if (change > 0 && internalName !in superCraftedItems) {
                 Source.SACKS.addItem(internalName, change)
             }
         }
+        superCraftedItems.clear()
     }
 
     @SubscribeEvent
@@ -83,11 +88,17 @@ class ItemAddManager {
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
+    private var superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (diceRollChatPattern.matches(event.message)) {
             lastDiceRoll = SimpleTimeMark.now()
+        }
+        craftedPattern.matchMatcher(event.message) {
+            val internalName = NEUInternalName.fromItemName(group("item"))
+            if (!SackAPI.sackListInternalNames.contains(internalName.asString())) return@matchMatcher
+            superCraftedItems.add(internalName)
         }
     }
 }

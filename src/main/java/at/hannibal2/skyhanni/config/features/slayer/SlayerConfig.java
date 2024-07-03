@@ -5,10 +5,10 @@ import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeConfig;
 import at.hannibal2.skyhanni.config.features.slayer.endermen.EndermanConfig;
 import at.hannibal2.skyhanni.config.features.slayer.vampire.VampireConfig;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.Category;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SlayerConfig {
 
@@ -19,6 +19,7 @@ public class SlayerConfig {
 
     @Expose
     @Category(name = "Blaze", desc = "Blaze Slayer Features")
+    // TODO rename to "blaze"
     public BlazeConfig blazes = new BlazeConfig();
 
     @Expose
@@ -52,7 +53,7 @@ public class SlayerConfig {
     public boolean slayerMinibossHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Line to Miniboss", desc = "Adds a line to every Slayer Mini-Boss around you.")
+    @ConfigOption(name = "Line to Miniboss", desc = "Add a line to every Slayer Mini-Boss around you.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean slayerMinibossLine = false;
@@ -64,13 +65,13 @@ public class SlayerConfig {
     public boolean hideMobNames = false;
 
     @Expose
-    @ConfigOption(name = "Quest Warning", desc = "Warning when wrong Slayer quest is selected, or killing mobs for the wrong Slayer.")
+    @ConfigOption(name = "Quest Warning", desc = "Warn when wrong Slayer quest is selected, or killing mobs for the wrong Slayer.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questWarning = true;
 
     @Expose
-    @ConfigOption(name = "Quest Warning Title", desc = "Sends a title when warning.")
+    @ConfigOption(name = "Quest Warning Title", desc = "Send a title when warning.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questWarningTitle = true;

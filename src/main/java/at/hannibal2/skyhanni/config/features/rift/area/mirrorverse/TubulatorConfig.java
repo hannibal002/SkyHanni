@@ -2,16 +2,16 @@ package at.hannibal2.skyhanni.config.features.rift.area.mirrorverse;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorColour;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorSlider;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
-import io.github.moulberry.moulconfig.observer.Property;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class TubulatorConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Highlights the location of the invisible Tubulator blocks (Laser Parkour).")
+    @ConfigOption(name = "Enabled", desc = "Highlight the location of the invisible Tubulator blocks (Laser Parkour).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -22,7 +22,7 @@ public class TubulatorConfig {
     public Property<Integer> lookAhead = Property.of(2);
 
     @Expose
-    @ConfigOption(name = "Outline", desc = "Outlines the top edge of the platforms.")
+    @ConfigOption(name = "Outline", desc = "Outline the top edge of the platforms.")
     @ConfigEditorBoolean
     public boolean outline = true;
 

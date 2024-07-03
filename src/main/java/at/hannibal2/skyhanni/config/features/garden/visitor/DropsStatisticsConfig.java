@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -30,11 +31,11 @@ public class DropsStatisticsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tallies up statistic about visitors and the rewards you have received from them."
+        desc = "Tally statistics about visitors and the rewards you have received from them."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = true;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(
@@ -115,22 +116,23 @@ public class DropsStatisticsConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
+    @ConfigOption(name = "Display Numbers First", desc = "Whether the number or drop name displays first.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = true;
 
     @Expose
-    @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
+    @ConfigOption(name = "Display Icons", desc = "Replace the drop names with icons.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayIcons = false;
 
     @Expose
-    @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+    @ConfigOption(name = "Only on Barn Plot", desc = "Only show the overlay while on the Barn plot.")
     @ConfigEditorBoolean
     public boolean onlyOnBarn = true;
 
     @Expose
+    @ConfigLink(owner = DropsStatisticsConfig.class, field = "enabled")
     public Position pos = new Position(5, 20, false, true);
 }

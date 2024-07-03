@@ -3,9 +3,10 @@ package at.hannibal2.skyhanni.config.features.minion;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
-import io.github.moulberry.moulconfig.annotations.Accordion;
-import io.github.moulberry.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.moulberry.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MinionsConfig {
 
@@ -33,20 +34,28 @@ public class MinionsConfig {
     @Expose
     @ConfigOption(name = "Hopper Profit Display", desc = "Use the hopper's held coins and the last empty time to calculate the coins per day.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean hopperProfitDisplay = true;
 
     @Expose
-    @ConfigOption(name = "Show Xp", desc = "Shows how much skill experience you will get when picking up items from the minion storage.")
+    @ConfigOption(name = "Show Xp", desc = "Show how much skill experience you will get when picking up items from the minion storage.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean xpDisplay = true;
 
     @Expose
+    @ConfigLink(owner = MinionsConfig.class, field = "hopperProfitDisplay")
     public Position hopperProfitPos = new Position(360, 90, false, true);
 
     @Expose
-    @ConfigOption(name = "Hide Mob Nametag", desc = "Hiding the nametag of mobs close to minions.")
+    @ConfigOption(name = "Hide Mob Nametag", desc = "Hide the nametags of mobs close to minions.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideMobsNametagNearby = false;
+
+    @Expose
+    @ConfigOption(name = "Inferno Fuel Blocker", desc = "Prevent picking up the fuel or minion while there is active fuel.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean infernoFuelBlocker = false;
 }

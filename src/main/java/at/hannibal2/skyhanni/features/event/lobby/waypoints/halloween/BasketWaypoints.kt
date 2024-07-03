@@ -6,16 +6,17 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.anyContains
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BasketWaypoints {
+@SkyHanniModule
+object BasketWaypoints {
 
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.halloweenBasket
     private var closest: Basket? = null
@@ -26,8 +27,7 @@ class BasketWaypoints {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isHalloween) return
 
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         val message = event.message
         if (message.startsWith("§a§lYou found a Candy Basket! §r") || message == "§cYou already found this Candy Basket!") {
@@ -40,14 +40,11 @@ class BasketWaypoints {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            isHalloween = checkScoreboardHalloweenSpecific()
-        }
+        isHalloween = checkScoreboardHalloweenSpecific()
 
         if (isHalloween) {
             if (config.onlyClosest) {
@@ -62,8 +59,7 @@ class BasketWaypoints {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!HypixelData.hypixelLive) return // don't show outside live hypixel network (it's disabled on alpha)
-        if (LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
         if (!isHalloween) return
 
         if (config.allWaypoints) {
@@ -75,15 +71,13 @@ class BasketWaypoints {
         }
 
         if (config.allEntranceWaypoints) {
-            for (basketEntrance in BasketEntrances.entries) {
+            for (basketEntrance in BasketEntrance.entries) {
                 if (!basketEntrance.basket.any { it.shouldShow() }) continue
                 event.drawWaypointFilled(basketEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(basketEntrance.waypoint, "§e" + basketEntrance.basketEntranceName, 1.5)
             }
             return
         }
-
-        if (LorenzUtils.skyBlockArea == "?") return
     }
 
     private fun Basket.shouldShow(): Boolean {
@@ -94,10 +88,15 @@ class BasketWaypoints {
         return if (config.onlyClosest) closest == this else true
     }
 
+    // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next halloween event
     private fun checkScoreboardHalloweenSpecific(): Boolean {
-        val list = ScoreboardData.sidebarLinesFormatted
-        return list.anyContains("Hypixel Level") && list.anyContains("Halloween") && list.anyContains("Baskets")
+        val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
+        val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Halloween") }
+        val c = ScoreboardData.sidebarLinesFormatted.any { it.contains("Baskets") }
+        return a && b && c
     }
+
+    private fun isEnabled() = HypixelData.hypixelLive && !LorenzUtils.inSkyBlock
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

@@ -1,30 +1,36 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.Storage
 import at.hannibal2.skyhanni.config.features.garden.visitor.DropsStatisticsConfig.DropsStatisticsTextEntry
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorAcceptEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatNumber
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenVisitorDropStatistics {
 
     private val config get() = GardenAPI.config.visitors.dropsStatistics
@@ -35,7 +41,7 @@ object GardenVisitorDropStatistics {
     private var totalVisitors = 0
     var coinsSpent = 0L
 
-    var lastAccept = 0L
+    var lastAccept = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("garden.visitor.droptracker")
     private val acceptPattern by patternGroup.pattern(
@@ -99,39 +105,39 @@ object GardenVisitorDropStatistics {
     fun onChat(event: LorenzChatEvent) {
         if (!GardenAPI.onBarnPlot) return
         if (!ProfileStorageData.loaded) return
-        if (lastAccept - System.currentTimeMillis() > 0 || lastAccept - System.currentTimeMillis() <= -1000) return
+        if (lastAccept.passedSince() > 1.seconds) return
 
         val message = event.message.removeColor().trim()
         val storage = GardenAPI.storage?.visitorDrops ?: return
 
         copperPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.copper += amount
             saveAndUpdate()
         }
         farmingExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber()
+            val amount = group("amount").formatInt()
             storage.farmingExp += amount
             saveAndUpdate()
         }
         gardenExpPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             if (amount > 80) return // some of the low visitor milestones will get through but will be minimal
             storage.gardenExp += amount
             saveAndUpdate()
         }
         bitsPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.bits += amount
             saveAndUpdate()
         }
         mithrilPowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.mithrilPowder += amount
             saveAndUpdate()
         }
         gemstonePowderPattern.matchMatcher(message) {
-            val amount = group("amount").formatNumber().toInt()
+            val amount = group("amount").formatInt()
             storage.gemstonePowder += amount
             saveAndUpdate()
         }
@@ -155,7 +161,7 @@ object GardenVisitorDropStatistics {
     /**
      * Do not change the order of the elements getting added to the list. See DropsStatisticsTextEntry for the order.
      */
-    private fun drawDisplay(storage: Storage.ProfileSpecific.GardenStorage.VisitorDrops) = buildList<List<Any>> {
+    private fun drawDisplay(storage: ProfileSpecificStorage.GardenStorage.VisitorDrops) = buildList<List<Any>> {
         addAsSingletonList("§e§lVisitor Statistics")
         addAsSingletonList(format(totalVisitors, "Total", "§e", ""))
         val visitorRarities = storage.visitorRarities
@@ -218,8 +224,14 @@ object GardenVisitorDropStatistics {
 
     fun format(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
-        if (amount is Long) return NumberUtil.format(amount)
+        if (amount is Long) return amount.shortFormat()
         return "$amount"
+    }
+
+    //todo this should just save when changed not once a second
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        saveAndUpdate()
     }
 
     fun saveAndUpdate() {
@@ -231,6 +243,30 @@ object GardenVisitorDropStatistics {
         storage.coinsSpent = coinsSpent
         storage.rewardsCount = rewardsCount
         display = formatDisplay(drawDisplay(storage))
+    }
+
+    fun resetCommand() {
+        val storage = GardenAPI.storage?.visitorDrops ?: return
+        ChatUtils.clickableChat(
+            "Click here to reset Visitor Drops Statistics.",
+            onClick = {
+                acceptedVisitors = 0
+                deniedVisitors = 0
+                totalVisitors = 0
+                coinsSpent = 0
+                storage.copper = 0
+                storage.bits = 0
+                storage.farmingExp = 0
+                storage.gardenExp = 0
+                storage.gemstonePowder = 0
+                storage.mithrilPowder = 0
+                storage.visitorRarities = arrayListOf(0, 0, 0, 0, 0)
+                storage.rewardsCount = mapOf<VisitorReward, Int>()
+                ChatUtils.chat("Visitor Drop Statistics reset!")
+                saveAndUpdate()
+            },
+            "§eClick to reset!",
+        )
     }
 
     @SubscribeEvent
@@ -279,5 +315,9 @@ object GardenVisitorDropStatistics {
 }
 
 enum class VisitorRarity {
-    UNCOMMON, RARE, LEGENDARY, MYTHIC, SPECIAL,
+    UNCOMMON,
+    RARE,
+    LEGENDARY,
+    MYTHIC,
+    SPECIAL,
 }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig.NumberFormatEntry
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -11,26 +10,25 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ShowMotesNpcSellPrice {
+@SkyHanniModule
+object ShowMotesNpcSellPrice {
 
     private val config get() = RiftAPI.config.motes
 
@@ -50,7 +48,7 @@ class ShowMotesNpcSellPrice {
         if (inInventory) {
             config.inventoryValue.position.renderStringsAndItems(
                 display,
-                itemScale = 1.3,
+                itemScale = 0.7,
                 posLabel = "Inventory Motes Value"
             )
         }
@@ -59,26 +57,12 @@ class ShowMotesNpcSellPrice {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isInventoryValueEnabled()) return
-        if (event.isMod(10))
-            processItems()
-    }
-
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onDrawSelectedTemplate(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!isInventoryValueEnabled()) return
-        val name = InventoryUtils.openInventoryName()
-        if (!name.contains("Rift Storage")) return
-        for ((_, indexes) in Renderable.list) {
-            for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (indexes.contains(slot.slotIndex)) {
-                    slot highlight LorenzColor.GREEN
-                }
-            }
-        }
+        if (!event.isMod(10, 1)) return
+        processItems()
     }
 
     @SubscribeEvent
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
+    fun onTooltip(event: LorenzToolTipEvent) {
         if (!isShowPriceEnabled()) return
 
         val itemStack = event.itemStack
@@ -109,7 +93,6 @@ class ShowMotesNpcSellPrice {
         itemMap.clear()
         slotList.clear()
         inInventory = false
-        Renderable.list.clear()
     }
 
     private fun processItems() {
@@ -165,7 +148,14 @@ class ShowMotesNpcSellPrice {
                     add("")
                     add("§6Total value: §d$price coins")
                 }
-                add(Renderable.hoverTips("§6${stack.displayName}: §b$price", tips, indexes = index, stack = stack))
+                add(
+                    Renderable.hoverTips(
+                        "§6${stack.displayName}: §b$price",
+                        tips,
+                        highlightsOnHoverSlots = index,
+                        stack = stack
+                    )
+                )
             })
         }
         val total = itemMap.values.fold(0.0) { acc, pair -> acc + pair.second }.formatPrice()
@@ -190,7 +180,7 @@ class ShowMotesNpcSellPrice {
     }
 
     private fun Double.formatPrice(): String = when (config.inventoryValue.formatType) {
-        NumberFormatEntry.SHORT -> NumberUtil.format(this)
+        NumberFormatEntry.SHORT -> this.shortFormat()
         NumberFormatEntry.LONG -> this.addSeparators()
         else -> "0"
     }

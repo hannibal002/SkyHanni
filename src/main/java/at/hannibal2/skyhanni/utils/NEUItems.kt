@@ -1,20 +1,34 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
+import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
+import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonToken
+import com.google.gson.stream.JsonWriter
 import io.github.moulberry.notenoughupdates.NEUManager
 import io.github.moulberry.notenoughupdates.NEUOverlay
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.recipes.CraftingRecipe
@@ -28,17 +42,54 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
+@SkyHanniModule
 object NEUItems {
 
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val multiplierCache = mutableMapOf<NEUInternalName, Pair<NEUInternalName, Int>>()
+    private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
+    private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
+
+    private val hypixelApiGson by lazy {
+        BaseGsonBuilder.gson()
+            .registerTypeAdapter(
+                HypixelApiTrophyFish::class.java,
+                object : TypeAdapter<HypixelApiTrophyFish>() {
+                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
+
+                    override fun read(reader: JsonReader): HypixelApiTrophyFish {
+                        val trophyFish = mutableMapOf<String, Int>()
+                        var totalCaught = 0
+                        reader.beginObject()
+                        while (reader.hasNext()) {
+                            val key = reader.nextName()
+                            if (key == "total_caught") {
+                                totalCaught = reader.nextInt()
+                                continue
+                            }
+                            if (reader.peek() == JsonToken.NUMBER) {
+                                val valueAsString = reader.nextString()
+                                if (valueAsString.isInt()) {
+                                    trophyFish[key] = valueAsString.toInt()
+                                    continue
+                                }
+                            }
+                            reader.skipValue()
+                        }
+                        reader.endObject()
+                        return HypixelApiTrophyFish(totalCaught, trophyFish)
+                    }
+                }.nullSafe(),
+            )
+            .create()
+    }
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
     val allInternalNames = mutableListOf<NEUInternalName>()
@@ -48,7 +99,7 @@ object NEUItems {
         Utils.createItemStack(
             ItemStack(Blocks.barrier).item,
             "§cMissing Repo Item",
-            "§cYour NEU repo seems to be out of date"
+            "§cYour NEU repo seems to be out of date",
         )
     }
 
@@ -63,23 +114,43 @@ object NEUItems {
         allItemsCache = readAllNeuItems()
     }
 
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getInternalNameFromItemName()"))
-    fun getRawInternalName(itemName: String): String = NEUInternalName.fromItemName(itemName).asString()
+    @SubscribeEvent
+    fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
+        val apiData = event.data ?: return
+        try {
+            val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
+            NeuProfileDataLoadedEvent(playerData).postAndCatch()
+
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(
+                e, "Error reading hypixel player api data",
+                "data" to apiData,
+            )
+        }
+    }
 
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
-            val name = manager.createItem(rawInternalName).displayName.removeColor().lowercase()
+            var name = manager.createItem(rawInternalName).displayName.lowercase()
             val internalName = rawInternalName.asInternalName()
+
+            // TODO remove one of them once neu is consistent
+            name = name.removePrefix("§f§f§7[lvl 1➡100] ")
+            name = name.removePrefix("§7[lvl 1➡100] ")
+
+            if (name.contains("[lvl 1➡100]")) {
+                if (PlatformUtils.isDevEnvironment) {
+                    error("wrong name: '$name'")
+                }
+                println("wrong name: '$name'")
+            }
             map[name] = internalName
             allInternalNames.add(internalName)
         }
         return map
     }
-
-    @Deprecated("moved", ReplaceWith("NEUInternalName.fromItemNameOrNull(itemName)"))
-    fun getInternalNameOrNull(itemName: String): NEUInternalName? = NEUInternalName.fromItemNameOrNull(itemName)
 
     fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery(manager)
         .withCurrentGuiContext()
@@ -89,7 +160,7 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
+    fun NEUInternalName.getPrice(useSellPrice: Boolean = false) = getPriceOrNull(useSellPrice) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
@@ -103,37 +174,39 @@ object NEUItems {
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
-    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
+    fun NEUInternalName.getPriceOrNull(useSellPrice: Boolean = false): Double? {
         if (this == NEUInternalName.WISP_POTION) {
             return 20_000.0
         }
-        val result = manager.auctionManager.getBazaarOrBin(asString(), useSellingPrice)
-        if (result != -1.0) return result
+
+        getBazaarData()?.let {
+            return if (useSellPrice) it.sellOfferPrice else it.instantBuyPrice
+        }
+
+        val result = manager.auctionManager.getLowestBin(asString())
+        if (result != -1L) return result.toDouble()
 
         if (equals("JACK_O_LANTERN")) {
-            return getPrice("PUMPKIN", useSellingPrice) + 1
+            return "PUMPKIN".asInternalName().getPrice(useSellPrice) + 1
         }
         if (equals("GOLDEN_CARROT")) {
             // 6.8 for some players
             return 7.0 // NPC price
         }
-        return getNpcPriceOrNull()
+
+        return getNpcPriceOrNull() ?: getRawCraftCostOrNull()
     }
 
-    @Deprecated("Use NEUInternalName", ReplaceWith("internalName.asInternalName().getPrice(useSellingPrice)"))
-    fun getPrice(internalName: String, useSellingPrice: Boolean = false): Double =
-        internalName.asInternalName().getPrice(useSellingPrice)
+    // If NEU fails to calculate the craft costs, we calculate it ourself.
+    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
+        getRecipes(this).map { ItemUtils.getRecipePrice(it) }.minOrNull()
+    }
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
     fun getItemStackOrNull(internalName: String) = internalName.asInternalName().getItemStackOrNull()
-
-    // TODO remove
-    @Deprecated("Use NEUInternalName rather than String", ReplaceWith("getItemStack()"))
-    fun getItemStack(internalName: String): ItemStack =
-        internalName.asInternalName().getItemStack()
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
@@ -145,30 +218,38 @@ object NEUItems {
                     "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
                     "Discord if this is the case.",
                 "Item name" to this.asString(),
-                "repo commit" to manager.latestRepoCommit
+                "repo commit" to manager.latestRepoCommit,
             )
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack): Boolean =
-        manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
 
-    fun ItemStack.renderOnScreen(x: Float, y: Float, scaleMultiplier: Double = 1.0) {
+    fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
+
+    const val itemFontSize = 2.0 / 3.0
+
+    fun ItemStack.renderOnScreen(
+        x: Float,
+        y: Float,
+        scaleMultiplier: Double = itemFontSize,
+        rescaleSkulls: Boolean = true,
+    ) {
         val item = checkBlinkItem()
-        val isSkull = item.item === Items.skull
+        val isSkull = rescaleSkulls && item.item === Items.skull
 
-        val baseScale = (if (isSkull) 0.8f else 0.6f)
+        val baseScale = (if (isSkull) 4f / 3f else 1f)
         val finalScale = baseScale * scaleMultiplier
-        val diff = ((finalScale - baseScale) * 10).toFloat()
 
         val translateX: Float
         val translateY: Float
         if (isSkull) {
-            translateX = x - 2 - diff
-            translateY = y - 2 - diff
+            val skullDiff = ((scaleMultiplier) * 2.5).toFloat()
+            translateX = x - skullDiff
+            translateY = y - skullDiff
         } else {
-            translateX = x - diff
-            translateY = y - diff
+            translateX = x
+            translateY = y
         }
 
         GlStateManager.pushMatrix()
@@ -192,7 +273,7 @@ object NEUItems {
         private const val lightScaling = 2.47f // Adjust as needed
         private const val g = 0.6f // Original Value taken from RenderHelper
         private const val lightIntensity = lightScaling * g
-        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16);
+        private val itemLightBuffer = GLAllocation.createDirectFloatBuffer(16)
 
         init {
             itemLightBuffer.clear()
@@ -208,17 +289,26 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
-    fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
-        if (multiplierCache.contains(internalName)) {
-            return multiplierCache[internalName]!!
+    fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
+        itemIdCache[item]?.let {
+            return it
         }
+        val result = allNeuRepoItems()
+            .filter { Item.getByNameOrId(it.value.get("itemid").asString) == item }
+            .keys.map { it.asInternalName() }
+        itemIdCache[item] = result
+        return result
+    }
+
+    fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
+        multiplierCache[internalName]?.let { return it }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
-                "Cound not load recipe data.",
+                "Could not load recipe data.",
                 "Failed to find item multiplier",
-                "internalName" to internalName
+                "internalName" to internalName,
             )
-            return Pair(internalName, 1)
+            return internalName.makePrimitiveStack()
         }
         for (recipe in getRecipes(internalName)) {
             if (recipe !is CraftingRecipe) continue
@@ -254,36 +344,27 @@ object NEUItems {
             val current = map.iterator().next().toPair()
             val id = current.first
             return if (current.second > 1) {
-                val child = getMultiplier(id, tryCount + 1)
-                val result = Pair(child.first, child.second * current.second)
+                val child = getPrimitiveMultiplier(id, tryCount + 1)
+                val result = child.multiply(current.second)
                 multiplierCache[internalName] = result
                 result
             } else {
-                Pair(internalName, 1)
+                internalName.makePrimitiveStack()
             }
         }
 
-        val result = Pair(internalName, 1)
+        val result = internalName.makePrimitiveStack()
         multiplierCache[internalName] = result
         return result
     }
 
-    @Deprecated("Do not use strings as id", ReplaceWith("getMultiplier with NEUInternalName"))
-    fun getMultiplier(internalName: String, tryCount: Int = 0): Pair<String, Int> {
-        val pair = getMultiplier(internalName.asInternalName(), tryCount)
-        return Pair(pair.first.asString(), pair.second)
-    }
-
     fun getRecipes(internalName: NEUInternalName): Set<NeuRecipe> {
-        if (recipesCache.contains(internalName)) {
-            return recipesCache[internalName]!!
+        return recipesCache.getOrPut(internalName) {
+            manager.getRecipesFor(internalName.asString())
         }
-        val recipes = manager.getRecipesFor(internalName.asString())
-        recipesCache[internalName] = recipes
-        return recipes
     }
 
-    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
+    fun NeuRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { allIngredients() }
 
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
@@ -310,4 +391,6 @@ object NEUItems {
         val jsonObject = ConfigManager.gson.fromJson(jsonString, JsonObject::class.java)
         return manager.jsonToStack(jsonObject, false)
     }
+
+    fun NeuRecipe.allIngredients(): Set<Ingredient> = ingredients
 }

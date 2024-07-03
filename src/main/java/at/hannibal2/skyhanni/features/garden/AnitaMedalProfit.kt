@@ -5,36 +5,34 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.ItemUtils.nameWithEnchantment
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AnitaMedalProfit {
+@SkyHanniModule
+object AnitaMedalProfit {
 
     private val config get() = GardenAPI.config.anitaShop
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
 
-    companion object {
-
-        var inInventory = false
-    }
+    var inInventory = false
 
     enum class MedalType(val displayName: String, val factorBronze: Int) {
         GOLD("§6Gold medal", 8),
@@ -58,27 +56,27 @@ class AnitaMedalProfit {
 
         inInventory = true
 
-        val table = mutableMapOf<Pair<String, String>, Pair<Double, NEUInternalName>>()
-        for ((_, item) in event.inventoryItems) {
+        val table = mutableListOf<DisplayTableEntry>()
+        for ((slot, item) in event.inventoryItems) {
             try {
-                readItem(item, table)
+                readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in AnitaMedalProfit while reading item '${item.nameWithEnchantment}'",
+                    e, "Error in AnitaMedalProfit while reading item '${item.itemName}'",
                     "item" to item,
-                    "name" to item.nameWithEnchantment,
+                    "name" to item.itemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
                 )
             }
         }
 
-        val newList = mutableListOf<List<Any>>()
-        newList.addAsSingletonList("§eMedal Profit")
-        LorenzUtils.fillTable(newList, table)
+        val newList = mutableListOf<Renderable>()
+        newList.add(Renderable.string("§eMedal Profit"))
+        newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
     }
 
-    private fun readItem(item: ItemStack, table: MutableMap<Pair<String, String>, Pair<Double, NEUInternalName>>) {
+    private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item) ?: return
         if (itemName == " ") return
         if (itemName == "§cClose") return
@@ -90,7 +88,7 @@ class AnitaMedalProfit {
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
-        var internalName = NEUItems.getInternalNameOrNull(name)
+        var internalName = NEUInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
             internalName = item.getInternalName()
         }
@@ -99,14 +97,32 @@ class AnitaMedalProfit {
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost
-        val format = NumberUtil.format(profit)
+        val profitFormat = profit.shortFormat()
         val color = if (profit > 0) "§6" else "§c"
-        table[Pair(itemName, "$color$format")] = Pair(profit, internalName)
+
+        val hover = listOf(
+            itemName,
+            "",
+            "§7Item price: §6${itemPrice.shortFormat()} ",
+            // TODO add more exact material cost breakdown
+            "§7Material cost: §6${fullCost.shortFormat()} ",
+            "§7Final profit: §6${profitFormat} ",
+        )
+        table.add(
+            DisplayTableEntry(
+                itemName,
+                "$color$profitFormat",
+                profit,
+                internalName,
+                hover,
+                highlightsOnHoverSlots = listOf(slot)
+            )
+        )
     }
 
-    private fun getItemName(item: ItemStack): String? {
-        val name = item.name ?: return null
-        val isEnchantedBook = name.removeColor() == "Enchanted Book"
+    private fun getItemName(item: ItemStack): String {
+        val name = item.name
+        val isEnchantedBook = item.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK
         return if (isEnchantedBook) {
             item.itemName
         } else name
@@ -118,7 +134,10 @@ class AnitaMedalProfit {
         for (rawItemName in requiredItems) {
             val pair = ItemUtils.readItemAmount(rawItemName)
             if (pair == null) {
-                ChatUtils.error("Could not read item '$rawItemName'")
+                ErrorManager.logErrorStateWithData(
+                    "Error in Anita Medal Contest", "Could not read item amount",
+                    "rawItemName" to rawItemName,
+                )
                 continue
             }
 
@@ -157,10 +176,9 @@ class AnitaMedalProfit {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (inInventory) {
-            config.medalProfitPos.renderStringsAndItems(
+            config.medalProfitPos.renderRenderables(
                 display,
                 extraSpace = 5,
-                itemScale = 1.7,
                 posLabel = "Anita Medal Profit"
             )
         }
