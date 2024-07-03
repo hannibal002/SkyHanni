@@ -37,11 +37,13 @@ object FishingTimer {
     private val lastSeaCreatureFished = SimpleTimeMark.farPast()
     private var lastNameFished: String? = null
     private val recentMobs = TimeLimitedSet<Mob>(2.seconds)
-    private val currentCap = RecalculatingValue(1.seconds) {
-        when (LorenzUtils.skyBlockIsland) {
-            IslandType.CRYSTAL_HOLLOWS -> 20
-            IslandType.CRIMSON_ISLE -> 5
-            else -> config.fishingCapAmount
+    private val currentCap by lazy {
+        RecalculatingValue(1.seconds) {
+            when (LorenzUtils.skyBlockIsland) {
+                IslandType.CRYSTAL_HOLLOWS -> 20
+                IslandType.CRIMSON_ISLE -> 5
+                else -> config.fishingCapAmount
+            }
         }
     }
 
