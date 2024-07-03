@@ -62,7 +62,7 @@ object PlayerChatManager {
      */
     private val guildPattern by patternGroup.pattern(
         "guild",
-        "§2Guild > (?<author>.+?)(?<guildRank> §e\\[\\w*])?§f: (?<message>.*)"
+        "§2Guild > (?<author>.+?) ?(?<guildRank>§e\\[\\w*])?§f: (?<message>.*)",
     )
 
     /**
