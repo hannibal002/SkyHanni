@@ -80,7 +80,7 @@ object ExperimentsDisplay {
             display,
             posLabel = "Experiment Information Display",
         )
-        display = checkItems(lastClicked)
+        display = checkItems(toCheck)
     }
 
     @SubscribeEvent
@@ -93,6 +93,7 @@ object ExperimentsDisplay {
         if (lastClicked.none { it.first == event.slotId && it.second == uncoveredAt } && lastClick.passedSince() > 100.milliseconds) {
             lastClicked.add(Pair(event.slotId, uncoveredAt))
             lastClick = SimpleTimeMark.now()
+            toCheck.add(event.slotId to uncoveredAt)
             uncoveredAt += 1
         }
     }
@@ -118,7 +119,9 @@ object ExperimentsDisplay {
 
             possiblePairs = calculatePossiblePairs()
 
-            lastClicked.removeIf { it.first == slot }
+            if (lastClicked.size >= 2 && !instantFind) lastClicked.clear()
+            toCheck.removeIf { it.first == slot }
+            instantFind = false
 
             return drawDisplay()
         }
@@ -130,12 +133,13 @@ object ExperimentsDisplay {
         foundPowerUps[slot] = reward
         possiblePairs--
         lastClicked.removeIf { it.first == slot }
-        if (reward == "Instant Find") instantFind = true
+        if (reward != "Instant Find") instantFind = true
     }
 
     private fun handleReward(index: Int, slot: Int, uncovered: Int, reward: String) {
-        val lastSlotClicked = if (!instantFind && (lastClicked.any { it.second == uncovered - 1 })) lastClicked.getOrNull(uncovered - 1)
-            ?: return else lastClicked.getOrNull(index) ?: return
+        val lastSlotClicked =
+            if (!instantFind && (lastClicked.any { it.second == uncovered - 1 })) lastClicked.find { it.second == uncovered - 1 }
+                ?: return else lastClicked.find { it.second == uncovered } ?: return
 
         lastSlotClicked.let {
             val lastItem = InventoryUtils.getItemAtSlotIndex(it.first) ?: return
@@ -146,7 +150,6 @@ object ExperimentsDisplay {
             when {
                 instantFind -> {
                     handleFoundPair(slot, reward, it.first, lastItemName)
-                    instantFind = false
                 }
 
                 hasFoundPair(slot, it.first, reward, lastItemName) -> handleFoundPair(
@@ -171,19 +174,16 @@ object ExperimentsDisplay {
         foundPairs.add(ItemPair(Pair(slot, reward), Pair(lastSlotClicked, lastItemName)))
         foundMatches.removeAll { it.first.second == reward }
         foundNormals.entries.removeIf { it.value == reward }
-        lastClicked.removeIf { it.first == slot || it.first == lastSlotClicked }
     }
 
     private fun handleFoundMatch(slot: Int, reward: String) {
         val match = uncoveredItems.find { it.second == reward }?.first ?: return
         foundMatches.add(ItemPair(Pair(slot, reward), Pair(match, reward)))
         foundNormals.entries.removeIf { it.value == reward }
-        lastClicked.removeIf { it.first == slot || it.first == match }
     }
 
     private fun handleNormalReward(slot: Int, reward: String) {
         if (foundMatches.none { it.first.second == reward }) foundNormals[slot] = reward
-        lastClicked.removeIf { it.first == slot }
     }
 
     private fun calculatePossiblePairs() =

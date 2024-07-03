@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsDryStreakDisplay.experimentInventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
@@ -137,7 +138,7 @@ object ExperimentsProfitTracker {
             }
             val internalName = NEUInternalName.fromItemNameOrNull(group("reward")) ?: return
 
-            tracker.addItem(internalName, 1)
+            if (!experienceBottlePattern.matches(group("reward"))) tracker.addItem(internalName, 1)
 
             if (config.hideMessage) event.blockedReason = "experiment_drop"
             return
@@ -147,6 +148,20 @@ object ExperimentsProfitTracker {
             tracker.modify {
                 it.bitCost += increments.getValue(group("current").toInt())
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onItemAddInInventory(event: ItemAddInInventoryEvent) {
+        if (!isEnabled()) return
+        if (lastExperimentTime.passedSince() > 3.seconds) return
+
+        val internalName = event.internalName
+
+        if (listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE").contains(internalName.asString())) {
+            val amount = event.amount
+
+            tracker.addItem(internalName, amount)
         }
     }
 
