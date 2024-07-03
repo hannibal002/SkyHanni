@@ -120,8 +120,8 @@ object DragonFeatures {
         }
 
     private enum class Type {
-        golem,
-        dragon
+        GOLEM,
+        DRAGON
     }
 
     private var endType: Type? = null
@@ -221,12 +221,12 @@ object DragonFeatures {
                     reset()
                     return
                 }
-                endType = Type.dragon
+                endType = Type.DRAGON
             }
 
             endStartLineProtector.matches(message) -> {
                 if (!configProtector) return
-                endType = Type.golem
+                endType = Type.GOLEM
             }
 
             else -> {
@@ -241,7 +241,7 @@ object DragonFeatures {
                     endPlace = this.group("Position")?.toInt() ?: -1
                     endDamage = this.group("Damage").replace(",", "").toDouble()
                     when (endType) {
-                        Type.dragon -> {
+                        Type.DRAGON -> {
                             val weight = calculateDragonWeight(
                                 yourEyes, endPlace, endTopDamage, endDamage,
                             )
@@ -250,7 +250,7 @@ object DragonFeatures {
                             DragonFeatures.reset() // love name collisions
                         }
 
-                        Type.golem -> {
+                        Type.GOLEM -> {
 
                             // NO reset because of Zealot Line
                         }
@@ -260,7 +260,7 @@ object DragonFeatures {
                     return
                 }
                 endZealots.matchMatcher(message) {
-                    if (endType != Type.golem) return@matchMatcher
+                    if (endType != Type.GOLEM) return@matchMatcher
                     val zealots = this.group("Amount").toInt()
                     val weight = calculateProtectorWeight(zealots, endPlace, endTopDamage, endDamage)
                     printWeight(weight)
