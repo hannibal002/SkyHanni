@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 
 object HypixelCommands {
@@ -135,6 +136,14 @@ object HypixelCommands {
 
     fun chatPrompt(prompt: String) {
         send("chatprompt $prompt")
+    }
+
+    fun widget(islandType: IslandType? = null) {
+        if (islandType == null) {
+            send("widget")
+        } else {
+            send("widget $islandType")
+        }
     }
 
     private fun send(command: String) {

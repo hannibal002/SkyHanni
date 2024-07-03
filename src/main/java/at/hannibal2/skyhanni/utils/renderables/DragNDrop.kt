@@ -21,7 +21,7 @@ object DragNDrop {
 
     private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
 
-    @SubscribeEvent
+    @SubscribeEvent(receiveCanceled = true)
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
         isInvalidDrop = false
     }
@@ -33,13 +33,13 @@ object DragNDrop {
             currentDrag = null
             return
         }
-        GlStateManager.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 0f)
+        GlStateManager.translate(event.mouseX.toFloat(), event.mouseY.toFloat(), 300f)
         if (isInvalidDrop) {
             invalidItem.render(event.mouseX, event.mouseY)
         } else {
             item.onRender(event.mouseX, event.mouseY)
         }
-        GlStateManager.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), 0f)
+        GlStateManager.translate(-event.mouseX.toFloat(), -event.mouseY.toFloat(), -300f)
     }
 
     fun draggable(
@@ -54,6 +54,10 @@ object DragNDrop {
         bypassChecks = bypassChecks,
         condition = condition,
     )
+
+    fun setDrag(item: DragItem<*>) {
+        currentDrag = item
+    }
 
     fun droppable(
         display: Renderable,
