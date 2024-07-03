@@ -32,6 +32,7 @@ enum class ItemCategory {
     BOOTS,
     HATCESSORY,
     ACCESSORY,
+    CARNIVAL_MASK,
     POWER_STONE,
     TRAVEL_SCROLL,
     REFORGE_STONE,
