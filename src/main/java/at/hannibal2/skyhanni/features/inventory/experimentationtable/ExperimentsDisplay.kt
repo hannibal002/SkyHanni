@@ -37,7 +37,6 @@ object ExperimentsDisplay {
     private var foundPowerUps = mutableMapOf<Int, String>()
     private var toCheck = mutableListOf<Pair<Int, Int>>()
     private var lastClicked = mutableListOf<Pair<Int, Int>>()
-    private var lastItemsCached = mutableMapOf<Int, ItemStack>()
     private var lastClick = SimpleTimeMark.farPast()
     private var currentExperiment = Experiments.NONE
     private var instantFind = false
@@ -67,7 +66,6 @@ object ExperimentsDisplay {
         foundPowerUps.clear()
         toCheck.clear()
         lastClicked.clear()
-        lastItemsCached.clear()
         lastClick = SimpleTimeMark.farPast()
         currentExperiment = Experiments.NONE
         instantFind = false
@@ -119,7 +117,12 @@ object ExperimentsDisplay {
 
             possiblePairs = calculatePossiblePairs()
 
-            if (lastClicked.size >= 2 && !instantFind) lastClicked.clear()
+            val since = clicksSinceSeparator(lastClicked)
+
+            if ((since >= 2 || (since == -1 && lastClicked.size >= 2)) && !instantFind) {
+                lastClicked.add(-1 to uncoveredAt)
+                uncoveredAt += 1
+            }
             toCheck.removeIf { it.first == slot }
 
             return drawDisplay()
@@ -132,13 +135,14 @@ object ExperimentsDisplay {
         foundPowerUps[slot] = reward
         possiblePairs--
         lastClicked.removeIf { it.first == slot }
+        uncoveredAt -= 1
         if (reward == "Instant Find") instantFind = true
     }
 
     private fun handleReward(index: Int, slot: Int, uncovered: Int, reward: String) {
         val lastSlotClicked =
-            if (!instantFind && (lastClicked.any { it.second == uncovered - 1 })) lastClicked.find { it.second == uncovered - 1 }
-                ?: return else lastClicked.find { it.second == uncovered } ?: return
+            if (!instantFind && lastClicked.none { it.first == -1 && it.second == uncovered - 1 } && lastClicked.size != 1)
+                lastClicked.find { it.second == uncovered - 1 } ?: return else lastClicked.find { it.second == uncovered } ?: return
 
         lastSlotClicked.let {
             val lastItem = InventoryUtils.getItemAtSlotIndex(it.first) ?: return
@@ -150,6 +154,8 @@ object ExperimentsDisplay {
                 instantFind -> {
                     handleFoundPair(slot, reward, it.first, lastItemName)
                     instantFind = false
+                    lastClicked.add(-1 to uncoveredAt)
+                    uncoveredAt += 1
                 }
 
                 hasFoundPair(slot, it.first, reward, lastItemName) -> handleFoundPair(
@@ -183,11 +189,11 @@ object ExperimentsDisplay {
     }
 
     private fun handleNormalReward(slot: Int, reward: String) {
-        if (foundMatches.none { it.first.second == reward }) foundNormals[slot] = reward
+        if (foundMatches.none { it.first.second == reward } && foundPairs.none { it.first.second == reward }) foundNormals[slot] = reward
     }
 
     private fun calculatePossiblePairs() =
-        (currentExperiment.gridSize / 2) - foundPairs.size - 2 - foundMatches.size - foundNormals.size
+        ((currentExperiment.gridSize - 2) / 2) - foundPairs.size - foundMatches.size - foundNormals.size
 
     private fun drawDisplay() = buildList {
         add("§6Experimentation Data")
@@ -235,7 +241,8 @@ object ExperimentsDisplay {
 
     private fun hasFoundMatch(itemSlot: Int, reward: String) =
         uncoveredItems.any { (slot, name) -> slot != itemSlot && name == reward } &&
-            foundMatches.none { it.first.second == reward }
+            foundMatches.none { it.first.second == reward } &&
+            foundPairs.none { it.first.second == reward }
 
     private fun isPowerUp(reward: String) = powerUpPattern.matches(reward)
 
@@ -245,8 +252,13 @@ object ExperimentsDisplay {
         listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!")
             .contains(itemName)
 
+    private fun clicksSinceSeparator(list: MutableList<Pair<Int, Int>>): Int {
+        val lastIndex = list.indexOfLast { it.first == -1 }
+        return if (lastIndex != -1) list.size - 1 - lastIndex else -1
+    }
+
     private fun isOutOfBounds(slot: Int, experiment: Experiments) =
-        slot <= startSlot || slot >= startSlot + experiment.gridSize + 6 || listOf(17, 18, 26, 27, 35, 36).contains(slot)
+        slot <= startSlot || slot >= startSlot + experiment.gridSize + 7 || listOf(17, 18, 26, 27, 35, 36).contains(slot)
 
     private fun isEnabled() =
         config.experimentationTableDisplay && InventoryUtils.openInventoryName().startsWith("Superpairs (")

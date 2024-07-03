@@ -63,7 +63,7 @@ object ExperimentsDryStreakDisplay {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || didJustFind) return
 
         if (InventoryUtils.getCurrentExperiment() != null) {
             inExperiment = true
@@ -73,9 +73,11 @@ object ExperimentsDryStreakDisplay {
                 val bookNameLine = lore.getOrNull(2) ?: continue
                 bookPattern.matchMatcher(bookNameLine) {
                     val storage = storage ?: return
-                    ChatUtils.chat("§a§lDRY-STREAK ENDED! §eYou have (finally) " +
-                        "found a §5ULTRA-RARE §eafter §3${storage.xpSince} Enchanting Exp " +
-                        "§e and §2${storage.attemptsSince} attempts§e!")
+                    ChatUtils.chat(
+                        "§a§lDRY-STREAK ENDED! §eYou have (finally) " +
+                            "found a §5ULTRA-RARE §eafter §3${storage.xpSince.shortFormat()} Enchanting Exp " +
+                            "§e and §2${storage.attemptsSince} attempts§e!",
+                    )
                     storage.attemptsSince = 0
                     storage.xpSince = 0
                     didJustFind = true
@@ -123,6 +125,7 @@ object ExperimentsDryStreakDisplay {
                     add("$colorPrefix ├ $attemptsSince Attempt$attemptsSuffix")
                     add("$colorPrefix └ $xpSince XP")
                 }
+
                 config.attemptsSince -> add("$colorPrefix └ $attemptsSince Attempt$attemptsSuffix")
                 config.xpSince -> add("$colorPrefix └ $xpSince XP")
             }
