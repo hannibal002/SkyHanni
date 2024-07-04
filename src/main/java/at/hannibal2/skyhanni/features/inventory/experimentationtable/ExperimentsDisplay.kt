@@ -88,6 +88,8 @@ object ExperimentsDisplay {
         currentExperiment = InventoryUtils.getCurrentExperiment() ?: return
 
         if (isOutOfBounds(event.slotId, currentExperiment)) return
+        val item = event.item ?: return
+        if (item.displayName.removeColor() == "?") return
 
         if (lastClicked.none { it.first == event.slotId && it.second == uncoveredAt } && lastClick.passedSince() > 100.milliseconds) {
             lastClicked.add(Pair(event.slotId, uncoveredAt))
@@ -250,7 +252,7 @@ object ExperimentsDisplay {
     private fun isReward(reward: String) = rewardPattern.matches(reward)
 
     private fun isWaiting(itemName: String) =
-        listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!", "?")
+        listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!")
             .contains(itemName)
 
     private fun clicksSinceSeparator(list: MutableList<Pair<Int, Int>>): Int {
