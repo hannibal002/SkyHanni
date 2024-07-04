@@ -204,6 +204,7 @@ object ExperimentsProfitTracker {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
+        if (lastExperimentTime.passedSince() < 3.seconds) return
 
         if (inExperiment || inExperimentationTable) {
             lastExperimentTime = SimpleTimeMark.now()
