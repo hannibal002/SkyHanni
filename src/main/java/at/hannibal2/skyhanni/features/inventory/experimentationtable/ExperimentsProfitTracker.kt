@@ -9,12 +9,12 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsDryStreakDisplay.experimentInventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -52,6 +52,7 @@ object ExperimentsProfitTracker {
     private var lastExperimentTime = SimpleTimeMark.farPast()
     private var lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
+    private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
 
     private val patternGroup = RepoPattern.group("enchanting.experiments.profittracker")
 
@@ -59,7 +60,7 @@ object ExperimentsProfitTracker {
      * REGEX-TEST:  +Smite VII
      * REGEX-TEST:  +42,000 Enchanting Exp
      */
-    val experimentsDropPattern by patternGroup.pattern(
+    private val experimentsDropPattern by patternGroup.pattern(
         "drop",
         "^ \\+(?<reward>.*)\$",
     )
@@ -68,7 +69,7 @@ object ExperimentsProfitTracker {
      * REGEX-TEST: 131k Enchanting Exp
      * REGEX-TEST: 42,000 Enchanting Exp
      */
-    val enchantingExpPattern by patternGroup.pattern(
+    private val enchantingExpPattern by patternGroup.pattern(
         "exp",
         "(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp",
     )
@@ -125,43 +126,33 @@ object ExperimentsProfitTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
-        if (lastExperimentTime.passedSince() > 3.seconds) return
+        if (!isEnabled() || lastExperimentTime.passedSince() > 3.seconds) return
 
-        experimentsDropPattern.matchMatcher(event.message.removeColor()) {
-            enchantingExpPattern.matchMatcher(group("reward")) {
+        val message = event.message.removeColor()
+
+        experimentsDropPattern.matchMatcher(message) {
+            val reward = group("reward")
+
+            enchantingExpPattern.matchMatcher(reward) {
                 tracker.modify {
                     it.xpGained += group("amount").substringBefore(",").toInt() * 1000
                 }
                 if (config.hideMessage) event.blockedReason = "experiment_drop"
                 return
             }
-            val internalName = NEUInternalName.fromItemNameOrNull(group("reward")) ?: return
 
+            val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
             if (!experienceBottlePattern.matches(group("reward"))) tracker.addItem(internalName, 1)
 
             if (config.hideMessage) event.blockedReason = "experiment_drop"
             return
         }
-        experimentRenewPattern.matchMatcher(event.message.removeColor()) {
+
+        experimentRenewPattern.matchMatcher(message) {
             val increments = mapOf(1 to 150, 2 to 300, 3 to 500)
             tracker.modify {
                 it.bitCost += increments.getValue(group("current").toInt())
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onItemAddInInventory(event: ItemAddInInventoryEvent) {
-        if (!isEnabled()) return
-        if (lastExperimentTime.passedSince() > 3.seconds) return
-
-        val internalName = event.internalName
-
-        if (listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE").contains(internalName.asString())) {
-            val amount = event.amount
-
-            tracker.addItem(internalName, amount)
         }
     }
 
@@ -200,20 +191,26 @@ object ExperimentsProfitTracker {
             }
         }
         if (InventoryUtils.getCurrentExperiment() != null) inExperiment = true
+
+        val addToTracker = lastExperimentTime.passedSince() <= 3.seconds
+        for (item in InventoryUtils.getItemsInOwnInventory()) {
+            val internalName = item.getInternalNameOrNull() ?: continue
+            if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
+
+            handleExpBottle(item, internalName, addToTracker)
+        }
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
-        if (inExperiment) {
+
+        if (inExperiment || inExperimentationTable) {
             lastExperimentTime = SimpleTimeMark.now()
             tracker.modify {
-                it.experimentsDone++
+                if (inExperiment) it.experimentsDone++
             }
             inExperiment = false
-        }
-        if (inExperimentationTable) {
-            lastExperimentTime = SimpleTimeMark.now()
             inExperimentationTable = false
         }
     }
@@ -259,6 +256,15 @@ object ExperimentsProfitTracker {
 
     fun resetCommand() {
         tracker.resetCommand()
+    }
+
+    private fun handleExpBottle(item: ItemStack, internalName: NEUInternalName, addToTracker: Boolean) {
+        val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
+        if (lastInInv >= item.stackSize) return lastBottlesInInventory.set(internalName, item.stackSize)
+        val currentInInv = item.stackSize - if (addToTracker) lastInInv else 0
+
+        lastBottlesInInventory[internalName] = currentInInv
+        if (addToTracker) tracker.addItem(internalName, currentInInv)
     }
 
     fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock

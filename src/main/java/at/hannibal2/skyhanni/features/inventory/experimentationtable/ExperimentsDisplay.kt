@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -261,5 +262,5 @@ object ExperimentsDisplay {
         slot <= startSlot || slot >= startSlot + experiment.gridSize + 7 || listOf(17, 18, 26, 27, 35, 36).contains(slot)
 
     private fun isEnabled() =
-        config.experimentationTableDisplay && InventoryUtils.openInventoryName().startsWith("Superpairs (")
+        config.experimentationTableDisplay && LorenzUtils.inSkyBlock && InventoryUtils.openInventoryName().startsWith("Superpairs (")
 }
