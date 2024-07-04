@@ -31,7 +31,6 @@ object ExperimentsDryStreakDisplay {
     private var display = emptyList<String>()
 
     private var inExperiment = false
-    private var enchantsFound = false
     private var didJustFind = false
 
     private val patternGroup = RepoPattern.group("enchanting.experiments.drystreak")
@@ -81,7 +80,6 @@ object ExperimentsDryStreakDisplay {
                     storage.attemptsSince = 0
                     storage.xpSince = 0
                     didJustFind = true
-                    enchantsFound = true
                 }
             }
         }
@@ -90,12 +88,10 @@ object ExperimentsDryStreakDisplay {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (didJustFind) inExperiment = false
+        if (!inExperiment) return
 
-        if (inExperiment && !enchantsFound) {
-            val storage = storage ?: return
-            storage.attemptsSince += 1
-        }
-        enchantsFound = false
+        val storage = storage ?: return
+        storage.attemptsSince += 1
         inExperiment = false
     }
 
