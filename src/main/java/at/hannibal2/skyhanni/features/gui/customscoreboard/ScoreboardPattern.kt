@@ -419,11 +419,11 @@ object ScoreboardPattern {
     )
     val winterEventStartPattern by eventsSb.pattern(
         "wintereventstart",
-        "(§.)*Event Start: §.\\d+:\\d+$",
+        "(§.)*Event Start: §.[\\d:]+$",
     )
     val winterNextWavePattern by eventsSb.pattern(
         "wintereventnextwave",
-        "(§.)*Next Wave: (§.)*(\\d+:\\d+|Soon!)$",
+        "(§.)*Next Wave: (§.)*([\\d:]+|Soon!)$",
     )
     val winterWavePattern by eventsSb.pattern(
         "wintereventwave",
@@ -435,11 +435,11 @@ object ScoreboardPattern {
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
-        "(§.)*Your Total Damage: §.\\d+.*$",
+        "(§.)*Your Total Damage: §.[\\d+,.]+.*$",
     )
     val winterCubeDmgPattern by eventsSb.pattern(
         "wintereventcubedmg",
-        "(§.)*Your Cube Damage: §.\\d+$",
+        "(§.)*Your Cube Damage: §.[\\d+,.]+$",
     )
 
     // rift
