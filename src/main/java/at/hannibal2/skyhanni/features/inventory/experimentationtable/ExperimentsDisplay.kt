@@ -250,7 +250,7 @@ object ExperimentsDisplay {
     private fun isReward(reward: String) = rewardPattern.matches(reward)
 
     private fun isWaiting(itemName: String) =
-        listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!")
+        listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!", "?")
             .contains(itemName)
 
     private fun clicksSinceSeparator(list: MutableList<Pair<Int, Int>>): Int {
