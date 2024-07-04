@@ -18,9 +18,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ExperimentsDryStreakDisplay {
@@ -32,6 +34,7 @@ object ExperimentsDryStreakDisplay {
 
     private var inExperiment = false
     private var didJustFind = false
+    private var lastExperimentTime = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("enchanting.experiments.drystreak")
     val experimentInventoriesPattern by patternGroup.pattern(
@@ -88,11 +91,12 @@ object ExperimentsDryStreakDisplay {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (didJustFind) inExperiment = false
-        if (!inExperiment) return
+        if (!inExperiment || lastExperimentTime.passedSince() < 3.seconds) return
 
         val storage = storage ?: return
-        storage.attemptsSince += 1
+        lastExperimentTime = SimpleTimeMark.now()
         inExperiment = false
+        storage.attemptsSince += 1
     }
 
     @SubscribeEvent
