@@ -24,7 +24,6 @@ object ExperimentsDisplay {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
 
     private var display = emptyList<String>()
-    private val startSlot = 9
 
     private var uncoveredAt = 0
     private var uncoveredItems = mutableListOf<Pair<Int, String>>()
@@ -55,6 +54,7 @@ object ExperimentsDisplay {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
+        println(listOf(uncoveredAt, uncoveredItems, foundNormals, foundMatches, foundPairs, foundPowerUps, toCheck, lastClicked))
         display = emptyList()
 
         uncoveredAt = 0
@@ -261,7 +261,7 @@ object ExperimentsDisplay {
     }
 
     private fun isOutOfBounds(slot: Int, experiment: Experiments) =
-        slot <= startSlot || slot >= startSlot + experiment.gridSize + 7 || listOf(17, 18, 26, 27, 35, 36).contains(slot)
+        slot <= experiment.startSlot || slot >= experiment.startSlot + experiment.gridSize + 7 || listOf(17, 18, 26, 27, 35, 36).contains(slot)
 
     private fun isEnabled() =
         config.experimentationTableDisplay && LorenzUtils.inSkyBlock && InventoryUtils.openInventoryName().startsWith("Superpairs (")

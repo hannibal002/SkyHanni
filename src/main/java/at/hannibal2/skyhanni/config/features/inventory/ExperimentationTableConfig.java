@@ -89,21 +89,23 @@ public class ExperimentationTableConfig {
     public boolean ultraRareBookAlert = false;
 
     public enum Experiments {
-        NONE("", 0),
-        BEGINNER("Beginner", 14),
-        HIGH("High", 20),
-        GRAND("Grand", 20),
-        SUPREME("Supreme", 28),
-        TRANSCENDENT("Transcendent", 28),
-        METAPHYSICAL("Metaphysical", 28),
+        NONE("", 0, 0),
+        BEGINNER("Beginner", 14, 18),
+        HIGH("High", 20, 9),
+        GRAND("Grand", 20, 9),
+        SUPREME("Supreme", 28, 9),
+        TRANSCENDENT("Transcendent", 28, 9),
+        METAPHYSICAL("Metaphysical", 28, 9),
         ;
 
         public final String name;
         public final int gridSize;
+        public final int startSlot;
 
-        Experiments(String name, int gridSize) {
+        Experiments(String name, int gridSize, int startSlot) {
             this.name = name;
             this.gridSize = gridSize;
+            this.startSlot = startSlot;
         }
 
         @Override
