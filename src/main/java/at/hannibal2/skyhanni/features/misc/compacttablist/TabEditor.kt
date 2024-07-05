@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage.TabList.TabPro
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.DragItem
@@ -34,6 +36,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemBlock
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -78,19 +81,19 @@ object TabEditor {
 
     private var lastClicked = SimpleTimeMark.farPast()
 
-    private fun createItem(slot: Slot?, windowId: Int) = if (slot?.stack == null) Renderable.placeholder(
+    private fun createItem(stack: ItemStack?, slotId: Int, windowId: Int) = if (stack == null) Renderable.placeholder(
         0,
         0,
     ) else Renderable.multiClickAndHover(
         Renderable.drawInsideRoundedRect(
-            Renderable.itemStack(slot.stack),
-            (TabWidgetSettings.highlights[slot.slotIndex] ?: LorenzColor.GRAY).toColor(), // TODO
+            Renderable.itemStack(stack),
+            (TabWidgetSettings.highlights[slotId] ?: LorenzColor.GRAY).toColor(), // TODO
         ),
-        toolTips[slot.slotNumber]?.let { listOf(slot.stack.displayName) + it } ?: listOf("NULL"),
+        toolTips[slotId]?.let { listOf(stack.displayName) + it } ?: listOf("NULL"),
         bypassChecks = true,
         click = mapOf(
             0 to {
-                DragNDrop.setDrag(TabItem(slot))
+                DragNDrop.setDrag(TabItem(stack, slotId))
                 /* if (lastClicked.passedSince() > 500.milliseconds) {
                     Minecraft.getMinecraft().playerController.windowClick(
                         windowId, slot.slotIndex, 0, 0, Minecraft.getMinecraft().thePlayer,
@@ -101,7 +104,7 @@ object TabEditor {
             1 to {
                 if (lastClicked.passedSince() > 500.milliseconds) {
                     Minecraft.getMinecraft().playerController.windowClick(
-                        windowId, slot.slotIndex, 1, 0, Minecraft.getMinecraft().thePlayer,
+                        windowId, slotId, 1, 0, Minecraft.getMinecraft().thePlayer,
                     )
                     lastClicked = SimpleTimeMark.now()
                 }
@@ -109,7 +112,7 @@ object TabEditor {
             2 to {
                 if (lastClicked.passedSince() > 500.milliseconds) {
                     Minecraft.getMinecraft().playerController.windowClick(
-                        windowId, slot.slotIndex, 0, 0, Minecraft.getMinecraft().thePlayer,
+                        windowId, slotId, 0, 0, Minecraft.getMinecraft().thePlayer,
                     )
                     lastClicked = SimpleTimeMark.now()
                 }
@@ -117,22 +120,45 @@ object TabEditor {
         ),
     )
 
+    private fun createItem(slot: Slot?, windowId: Int) = createItem(slot?.stack, slot?.slotNumber ?: 0, windowId)
+
+    private var mainInv = mutableMapOf<Int, ItemStack>()
+    private var secondInv = mutableMapOf<Int, ItemStack>()
+    private var lastNameOfSecond = ""
+
+    @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!inEditor) return
+        val cache = when {
+            TabWidgetSettings.mainPageSettingPattern.matches(event.inventoryName) -> mainInv
+            TabWidgetSettings.shownSettingPattern.matches(event.inventoryName) -> secondInv
+            else -> return
+        }
+        if (cache === secondInv && event.inventoryName != lastNameOfSecond) {
+            secondInv.clear()
+        }
+        for ((slotID, item) in event.inventoryItemsWithNull) {
+            if (item == null) continue
+            cache[slotID] = item
+        }
+    }
+
     private class TabTarget() : Droppable {
         override fun handle(drop: Any?) {
             val item = drop as TabItem
             if (lastClicked.passedSince() < 500.milliseconds) return
-            InventoryUtils.clickSlot(item.slot.slotIndex)
+            InventoryUtils.clickSlot(item.slotId)
             lastClicked = SimpleTimeMark.now()
         }
 
         override fun validTarget(item: Any?): Boolean = item is TabItem
     }
 
-    private class TabItem(val slot: Slot) : DragItem<TabItem> {
+    private class TabItem(val stack: ItemStack, val slotId: Int) : DragItem<TabItem> {
         override fun get(): TabItem = this
 
         override fun onRender(mouseX: Int, mouseY: Int) {
-            Renderable.itemStack(slot.stack).render(0, 0)
+            Renderable.itemStack(stack).render(0, 0)
         }
 
     }
@@ -142,10 +168,8 @@ object TabEditor {
         if (!inEditor) return
         val container = event.container
         val windowId = container.windowId
-        container.inventorySlots?.forEach {
-            if (it == null) return@forEach
-            if (it.stack == null) return@forEach
-            toolTips[it.slotNumber] = it.stack.getLore()
+        mainInv.forEach { (slotNumber, stack) ->
+            toolTips[slotNumber] = stack.getLore()
         }
 
         GlStateManager.pushMatrix()
@@ -158,14 +182,16 @@ object TabEditor {
         event.drawDefaultBackground()
         Renderable.withMousePosition(event.mouseX, event.mouseY) {
             Renderable.horizontalContainer(
-                createItem(container.inventorySlots[13], windowId).toSingletonListOrEmpty(),
+                createItem(mainInv[13], 13, windowId).toSingletonListOrEmpty(),
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             ).renderYAligned(0, 0, height)
 
             Renderable.horizontalContainer(
-                container.inventorySlots.subList(19, 39)
-                    .filterNot { it.stack == null || it.stack.item == ItemBlock.getItemFromBlock(Blocks.stained_glass_pane) }
-                    .sortedBy { it.stack.cleanName().drop(2) }.map { createItem(it, windowId) },
+                (19..39).mapNotNull {
+                    val stack = mainInv[it] ?: return@mapNotNull null
+                    if (stack.item == ItemBlock.getItemFromBlock(Blocks.stained_glass_pane)) return@mapNotNull null
+                    it to stack
+                }.sortedBy { it.second.cleanName().drop(2) }.map { createItem(it.second, it.first, windowId) },
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.BOTTOM,
             ).renderXYAligned(0, 0, width, height)
