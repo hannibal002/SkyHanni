@@ -143,6 +143,11 @@ object CollectionUtils {
         return newList
     }
 
+    inline fun <reified T, reified K : MutableList<T>> K.transformAt(index: Int, transform: T.() -> T): K {
+        this[index] = transform(this[index])
+        return this
+    }
+
     /**
      * This does not work inside a [buildList] block
      */

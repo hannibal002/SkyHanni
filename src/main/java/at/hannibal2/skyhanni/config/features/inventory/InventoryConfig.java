@@ -250,4 +250,9 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeHeldInLore = false;
+
+    @Expose
+    @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid.")
+    @ConfigEditorBoolean
+    public boolean stonkOfStonkPrice = true;
 }
