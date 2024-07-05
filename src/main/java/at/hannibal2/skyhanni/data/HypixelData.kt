@@ -394,7 +394,7 @@ object HypixelData {
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.getCurrentServerData().serverIP) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
