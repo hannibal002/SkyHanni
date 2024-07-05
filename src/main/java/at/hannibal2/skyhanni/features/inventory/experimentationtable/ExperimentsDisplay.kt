@@ -54,7 +54,6 @@ object ExperimentsDisplay {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        println(listOf(uncoveredAt, uncoveredItems, foundNormals, foundMatches, foundPairs, foundPowerUps, toCheck, lastClicked))
         display = emptyList()
 
         uncoveredAt = 0
@@ -261,7 +260,9 @@ object ExperimentsDisplay {
     }
 
     private fun isOutOfBounds(slot: Int, experiment: Experiments) =
-        slot <= experiment.startSlot || slot >= experiment.startSlot + experiment.gridSize + 7 || listOf(17, 18, 26, 27, 35, 36).contains(slot)
+        slot <= experiment.startSlot
+            || slot >= experiment.startSlot + experiment.gridSize + 7
+            || listOf(17, 18, 26, 27, 35, 36).contains(slot)
 
     private fun isEnabled() =
         config.experimentationTableDisplay && LorenzUtils.inSkyBlock && InventoryUtils.openInventoryName().startsWith("Superpairs (")
