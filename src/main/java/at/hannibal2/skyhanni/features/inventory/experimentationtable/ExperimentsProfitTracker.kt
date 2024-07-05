@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsDryStreakDisplay.experimentInventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -53,6 +54,7 @@ object ExperimentsProfitTracker {
     private var lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
     private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
+    private var currentBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
 
     private val patternGroup = RepoPattern.group("enchanting.experiments.profittracker")
 
@@ -190,28 +192,28 @@ object ExperimentsProfitTracker {
                 lastSplashTime = SimpleTimeMark.farPast()
             }
         }
-        if (InventoryUtils.getCurrentExperiment() != null) inExperiment = true
 
         val addToTracker = lastExperimentTime.passedSince() <= 3.seconds
         for (item in InventoryUtils.getItemsInOwnInventory()) {
             val internalName = item.getInternalNameOrNull() ?: continue
             if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
-
-            handleExpBottle(item, internalName, addToTracker)
+            currentBottlesInInventory.addOrPut(internalName, item.stackSize)
         }
+        handleExpBottles(addToTracker)
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
-        if (lastExperimentTime.passedSince() < 3.seconds) return
 
-        if (inExperiment || inExperimentationTable) {
+        if (InventoryUtils.getCurrentExperiment() != null) {
             lastExperimentTime = SimpleTimeMark.now()
             tracker.modify {
-                if (inExperiment) it.experimentsDone++
+                it.experimentsDone++
             }
-            inExperiment = false
+        }
+        if (inExperimentationTable) {
+            lastExperimentTime = SimpleTimeMark.now()
             inExperimentationTable = false
         }
     }
@@ -259,13 +261,22 @@ object ExperimentsProfitTracker {
         tracker.resetCommand()
     }
 
-    private fun handleExpBottle(item: ItemStack, internalName: NEUInternalName, addToTracker: Boolean) {
-        val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
-        if (lastInInv >= item.stackSize) return lastBottlesInInventory.set(internalName, item.stackSize)
-        val currentInInv = item.stackSize - if (addToTracker) lastInInv else 0
+    private fun handleExpBottles(addToTracker: Boolean) {
+        for (bottleType in currentBottlesInInventory) {
+            val internalName = bottleType.key
+            val amount = bottleType.value
 
-        lastBottlesInInventory[internalName] = currentInInv
-        if (addToTracker) tracker.addItem(internalName, currentInInv)
+            val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
+            if (lastInInv >= amount || lastInInv == 0) {
+                currentBottlesInInventory[internalName] = 0
+                lastBottlesInInventory[internalName] = amount
+                continue
+            }
+
+            lastBottlesInInventory[internalName] = amount
+            currentBottlesInInventory[internalName] = 0
+            if (addToTracker) tracker.addItem(internalName, amount - lastInInv)
+        }
     }
 
     fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
