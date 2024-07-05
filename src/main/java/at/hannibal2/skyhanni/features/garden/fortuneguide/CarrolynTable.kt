@@ -27,7 +27,7 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
     FINE_FLOUR(
         CropType.WHEAT,
         "Fine Flour",
-        "WHEAT EXPORTATION COMPLETE!",
+        "WHEATS EXPORTATION COMPLETE!",
         "[NPC] Carrolyn: Thank you for the flour.", // TODO confirm this, since this is only a estimate
     )
     ;
