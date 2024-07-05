@@ -11,11 +11,44 @@ enum class Mayor(
     val color: String,
     vararg val perks: Perk,
 ) {
-    AATROX("Aatrox", "§3", Perk.SLASHED_PRICING, Perk.SLAYER_XP_BUFF, Perk.PATHFINDER),
-    COLE("Cole", "§e", Perk.PROSPECTION, Perk.MINING_XP_BUFF, Perk.MINING_FIESTA, Perk.MOLTEN_FORGE),
-    DIANA("Diana", "§2", Perk.LUCKY, Perk.MYTHOLOGICAL_RITUAL, Perk.PET_XP_BUFF, Perk.SHARING_IS_CARING),
-    DIAZ("Diaz", "§6", Perk.VOLUME_TRADING, Perk.SHOPPING_SPREE, Perk.STOCK_EXCHANGE, Perk.LONG_TERM_INVESTMENT),
-    FINNEGAN("Finnegan", "§c", Perk.FARMING_SIMULATOR, Perk.PELT_POCALYPSE, Perk.GOATED, Perk.BLOOMING_BUSINESS),
+    AATROX(
+        "Aatrox",
+        "§3",
+        Perk.SLASHED_PRICING,
+        Perk.SLAYER_XP_BUFF,
+        Perk.PATHFINDER
+    ),
+    COLE(
+        "Cole",
+        "§e",
+        Perk.PROSPECTION,
+        Perk.MINING_XP_BUFF,
+        Perk.MINING_FIESTA,
+        Perk.MOLTEN_FORGE
+    ),
+    DIANA(
+        "Diana",
+        "§2",
+        Perk.LUCKY,
+        Perk.MYTHOLOGICAL_RITUAL,
+        Perk.PET_XP_BUFF,
+        Perk.SHARING_IS_CARING
+    ),
+    DIAZ(
+        "Diaz",
+        "§6",
+        Perk.VOLUME_TRADING,
+        Perk.SHOPPING_SPREE,
+        Perk.STOCK_EXCHANGE,
+        Perk.LONG_TERM_INVESTMENT
+    ),
+    FINNEGAN(
+        "Finnegan",
+        "§c",
+        Perk.FARMING_SIMULATOR,
+        Perk.PELT_POCALYPSE,
+        Perk.GOATED,
+        Perk.BLOOMING_BUSINESS),
     FOXY(
         "Foxy",
         "§d",
@@ -26,12 +59,43 @@ enum class Mayor(
         Perk.EXTRA_EVENT_FISHING,
         Perk.EXTRA_EVENT_SPOOKY,
     ),
-    MARINA("Marina", "§b", Perk.FISHING_XP_BUFF, Perk.LUCK_OF_THE_SEA, Perk.FISHING_FESTIVAL, Perk.DOUBLE_TROUBLE),
-    PAUL("Paul", "§c", Perk.MARAUDER, Perk.EZPZ, Perk.BENEDICTION),
+    MARINA(
+        "Marina",
+        "§b",
+        Perk.FISHING_XP_BUFF,
+        Perk.LUCK_OF_THE_SEA,
+        Perk.FISHING_FESTIVAL,
+        Perk.DOUBLE_TROUBLE
+    ),
+    PAUL(
+        "Paul",
+        "§c",
+        Perk.MARAUDER,
+        Perk.EZPZ,
+        Perk.BENEDICTION
+    ),
 
-    SCORPIUS("Scorpius", "§d", Perk.BRIBE, Perk.DARKER_AUCTIONS),
-    JERRY("Jerry", "§d", Perk.PERKPOCALYPSE, Perk.STATSPOCALYPSE, Perk.JERRYPOCALYPSE),
-    DERPY("Derpy", "§d", Perk.TURBO_MINIONS, Perk.AH_TAX, Perk.DOUBLE_MOBS_HP, Perk.MOAR_SKILLZ),
+    SCORPIUS(
+        "Scorpius",
+        "§d",
+        Perk.BRIBE,
+        Perk.DARKER_AUCTIONS
+    ),
+    JERRY(
+        "Jerry",
+        "§d",
+        Perk.PERKPOCALYPSE,
+        Perk.STATSPOCALYPSE,
+        Perk.JERRYPOCALYPSE
+    ),
+    DERPY(
+        "Derpy",
+        "§d",
+        Perk.TURBO_MINIONS,
+        Perk.AH_TAX,
+        Perk.DOUBLE_MOBS_HP,
+        Perk.MOAR_SKILLZ
+    ),
 
     UNKNOWN("Unknown", "§c"),
     DISABLED("§cDisabled", "§7"),
