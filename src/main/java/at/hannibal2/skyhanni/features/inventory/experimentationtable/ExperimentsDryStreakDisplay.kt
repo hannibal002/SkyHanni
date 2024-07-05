@@ -85,7 +85,7 @@ object ExperimentsDryStreakDisplay {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (didJustFind || InventoryUtils.getCurrentExperiment() != null) return
+        if (didJustFind || InventoryUtils.getCurrentExperiment() == null) return
 
         val storage = storage ?: return
         storage.attemptsSince += 1

@@ -194,11 +194,6 @@ object ExperimentsProfitTracker {
         }
 
         val addToTracker = lastExperimentTime.passedSince() <= 3.seconds
-        for (item in InventoryUtils.getItemsInOwnInventory()) {
-            val internalName = item.getInternalNameOrNull() ?: continue
-            if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
-            currentBottlesInInventory.addOrPut(internalName, item.stackSize)
-        }
         handleExpBottles(addToTracker)
     }
 
@@ -214,6 +209,7 @@ object ExperimentsProfitTracker {
         }
         if (inExperimentationTable) {
             lastExperimentTime = SimpleTimeMark.now()
+            handleExpBottles(true)
             inExperimentationTable = false
         }
     }
@@ -262,6 +258,11 @@ object ExperimentsProfitTracker {
     }
 
     private fun handleExpBottles(addToTracker: Boolean) {
+        for (item in InventoryUtils.getItemsInOwnInventory()) {
+            val internalName = item.getInternalNameOrNull() ?: continue
+            if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
+            currentBottlesInInventory.addOrPut(internalName, item.stackSize)
+        }
         for (bottleType in currentBottlesInInventory) {
             val internalName = bottleType.key
             val amount = bottleType.value
