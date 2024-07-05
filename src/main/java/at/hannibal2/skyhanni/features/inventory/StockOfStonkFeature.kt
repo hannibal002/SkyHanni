@@ -17,13 +17,24 @@ object StockOfStonkFeature {
 
     private val config get() = SkyHanniMod.feature.inventory.stonkOfStonkPrice
 
-    private val inventoryPattern by RepoPattern.pattern("inventory.stockofstonk.inventory", "Stonks Auction")
-    private val itemPattern by RepoPattern.pattern("inventory.stockofstonk.item", "§dStonks Auction")
-    private val topPattern by RepoPattern.pattern(
-        "inventory.stockofstonk.top",
+    private val repoGroup = RepoPattern.group("inventory.stockofstonks")
+
+    private val inventoryPattern by repoGroup.pattern(
+        "inventory",
+        "Stonks Auction",
+    )
+    private val itemPattern by repoGroup.pattern(
+        "item",
+        "§dStonks Auction",
+    )
+    private val topPattern by repoGroup.pattern(
+        "top",
         "§5§o§7§7▶ §c§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
     )
-    private val bidPattern by RepoPattern.pattern("inventory.stockofstonk.bid", "§5§o§7   Minimum Bid: §6(?<amount>[\\d,]+) Coins")
+    private val bidPattern by repoGroup.pattern(
+        "bid",
+        "§5§o§7   Minimum Bid: §6(?<amount>[\\d,]+) Coins",
+    )
 
     @SubscribeEvent
     fun onLorenzToolTip(event: LorenzToolTipEvent) {
