@@ -254,5 +254,6 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean stonkOfStonkPrice = true;
 }
