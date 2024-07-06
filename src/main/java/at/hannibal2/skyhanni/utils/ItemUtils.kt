@@ -423,9 +423,13 @@ object ItemUtils {
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe): Double =
-        neededItems(recipe).map {
+    // TODO remove debugs once stack overflow is found
+    fun getRecipePrice(recipe: NeuRecipe): Double {
+        println("getRecipePrice ${recipe.title}")
+        return neededItems(recipe).map {
+            println("ingredient: ${it.key}")
             it.key.getPrice() * it.value
         }.sum()
+    }
 
 }
