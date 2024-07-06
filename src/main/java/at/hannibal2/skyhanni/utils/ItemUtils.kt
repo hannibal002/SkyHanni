@@ -423,13 +423,15 @@ object ItemUtils {
         return neededItems
     }
 
-    // TODO remove debugs once stack overflow is found
-    fun getRecipePrice(recipe: NeuRecipe): Double {
-        println("getRecipePrice ${recipe.title}")
-        return neededItems(recipe).map {
-            println("ingredient: ${it.key}")
-            it.key.getPrice() * it.value
+    fun getRecipePrice(recipe: NeuRecipe): Double =
+        neededItems(recipe).map {
+            // prevents stack overflow errors with ENDERMAN_MONSTER
+            if (it.key.endsWith("_MONSTER")) {
+                0.0
+            } else {
+                it.key.getPrice() * it.value
+            }
         }.sum()
-    }
+
 
 }
