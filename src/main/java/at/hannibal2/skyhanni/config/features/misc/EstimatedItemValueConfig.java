@@ -41,7 +41,7 @@ public class EstimatedItemValueConfig {
     @Expose
     @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
     @ConfigEditorBoolean
-    public boolean exactPrice = false;
+    public Property<Boolean> exactPrice = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Show Armor Value", desc = "Show the value of the full armor set in the Wardrobe inventory.")
@@ -52,22 +52,22 @@ public class EstimatedItemValueConfig {
     @Expose
     @ConfigOption(name = "Ignore Helmet Skins", desc = "Ignore helmet Skins from the total value.")
     @ConfigEditorBoolean
-    public boolean ignoreHelmetSkins = false;
+    public Property<Boolean> ignoreHelmetSkins = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Ignore Armor Dyes", desc = "Ignore Armor Dyes from the total value.")
     @ConfigEditorBoolean
-    public boolean ignoreArmorDyes = false;
+    public Property<Boolean> ignoreArmorDyes = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Ignore Runes", desc = "Ignore Runes from the total value.")
     @ConfigEditorBoolean
-    public boolean ignoreRunes = false;
+    public Property<Boolean> ignoreRunes = Property.of(false);
 
     @Expose
     @ConfigOption(name = "Bazaar Price Source", desc = "Use Instant Buy or Buy Order.")
     @ConfigEditorDropdown
-    public BazaarPriceSource bazaarPriceSource = BazaarPriceSource.BUY_ORDER;
+    public Property<BazaarPriceSource> bazaarPriceSource = Property.of(BazaarPriceSource.BUY_ORDER);
 
     public enum BazaarPriceSource {
         INSTANT_BUY("Instant Buy"),
@@ -92,7 +92,7 @@ public class EstimatedItemValueConfig {
             "This will drastically decrease the estimated value but might be correct when buying multiple low tier items and combining them."
     )
     @ConfigEditorBoolean
-    public boolean useAttributeComposite = false;
+    public Property<Boolean> useAttributeComposite = Property.of(false);
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")

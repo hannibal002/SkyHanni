@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -116,8 +116,18 @@ object EstimatedItemValue {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.enchantmentsCap.onToggle {
-            cache.clear()
+        with(config) {
+            ConditionalUtils.onToggle(
+                enchantmentsCap,
+                exactPrice,
+                ignoreHelmetSkins,
+                ignoreArmorDyes,
+                ignoreRunes,
+                bazaarPriceSource,
+                useAttributeComposite,
+            ) {
+                cache.clear()
+            }
         }
     }
 
@@ -206,7 +216,7 @@ object EstimatedItemValue {
 
         if (basePrice == totalPrice) return listOf()
 
-        val numberFormat = if (config.exactPrice) {
+        val numberFormat = if (config.exactPrice.get()) {
             totalPrice.roundToLong().addSeparators()
         } else {
             totalPrice.shortFormat()
