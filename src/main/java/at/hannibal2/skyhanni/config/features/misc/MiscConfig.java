@@ -122,6 +122,7 @@ public class MiscConfig {
     @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to hideTemporaryArmorStands
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
@@ -276,4 +277,10 @@ public class MiscConfig {
     @Accordion
     @Expose
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
+
+    @Expose
+    @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean maintainGameVolume = false;
 }

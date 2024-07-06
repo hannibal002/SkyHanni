@@ -89,12 +89,13 @@ object SummoningMobManager {
 
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.Summon) {
-        // since MobEvent.DeSpawn can be fired while outside sb
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.summonMessages) return
         val mob = event.mob
         if (mob !in mobs) return
         mobs -= mob
+
+        // since MobEvent.DeSpawn can be fired while outside sb
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.summonMessages) return
 
         if (!mob.isInRender()) return
         DelayedRun.runNextTick {

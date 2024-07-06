@@ -77,7 +77,7 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Pet:",
     ),
-    PET_TRANING(
+    PET_TRAINING(
         // language=RegExp
         "(?:§.)*Pet Training:",
     ),
@@ -306,7 +306,7 @@ enum class TabWidget(
     SCRAP(
         // language=RegExp
         "Scrap: (?:§.)*(?<amount>\\d)(?:§.)*/(?:§.)*\\d",
-    )
+    ),
 
     ;
 
@@ -315,7 +315,7 @@ enum class TabWidget(
 
     /** The current active information from tab list.
      *
-     * When the widget isn't visible it will be empty
+     * When the widget isn't visible, it will be empty
      * */
     var lines: List<String> = emptyList()
         private set
