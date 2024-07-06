@@ -21,7 +21,7 @@ object ArmorStackDisplay {
      */
     private val armorStackPattern by RepoPattern.pattern(
         "combat.armorstack.actionbar",
-        " (§6|§6§l)(?<stack>\\d+[ᝐ⁑|҉Ѫ⚶])"
+        " (?:§6|§6§l)(?<stack>\\d+[ᝐ⁑|҉Ѫ⚶])"
     )
 
     @SubscribeEvent
@@ -35,8 +35,8 @@ object ArmorStackDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || display.isEmpty()) return
-        config.stackDisplayPos.renderString(display, posLabel = "Stack Display")
+        if (!isEnabled()) return
+        config.stackDisplayPosition.renderString(display, posLabel = "Stack Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
