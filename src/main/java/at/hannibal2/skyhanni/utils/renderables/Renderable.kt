@@ -260,7 +260,9 @@ interface Renderable {
                 isNotInSignAndOnSlot &&
                 isConfigScreen &&
                 !isInNeuPv &&
-                !isInSkytilsPv && !neuFocus && !isChartScreen
+                !isInSkytilsPv &&
+                !neuFocus &&
+                !isChartScreen
 
             if (debug) {
                 if (!result) {
