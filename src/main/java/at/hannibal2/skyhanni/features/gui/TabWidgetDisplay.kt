@@ -19,7 +19,7 @@ enum class TabWidgetDisplay(private val configName: String?, vararg val widgets:
     PROFILE(null, TabWidget.PROFILE),
     PLAYER_LIST("Players", TabWidget.PLAYER_LIST),
     PET(null, TabWidget.PET),
-    PET_TRAINING("Pet Upgrade Info", TabWidget.PET_SITTER, TabWidget.PET_TRANING),
+    PET_TRAINING("Pet Upgrade Info", TabWidget.PET_SITTER, TabWidget.PET_TRAINING),
     STATS(null, TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS),
     DUNGEON_TEAM("Dungeon Info about every person", TabWidget.DUNGEON_PARTY),
     DUNGEON_PUZZLE("Dungeon Info about puzzles", TabWidget.DUNGEON_PUZZLE),
