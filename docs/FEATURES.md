@@ -401,6 +401,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show a line to the beacon. - hannibal2
     + Warning when enderman slayer beacon spawns - dragon99z
 + Highlight enderman slayer Nukekubi (Skulls) - dragon99z
++ Add a line to Nukekebi Skull. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2148)
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
 + Cooldown when the Fire Pillar from the Blaze Slayer will kill you.
@@ -1263,6 +1264,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Click on an item to open /recipe.
     + Option to include items from inside sacks.
     + Option to include vanilla items.
++ Add Armor Stack Display. - Xupie (https://github.com/hannibal002/SkyHanni/pull/1811)
+    + Display the number of stacks on armor pieces like Crimson, Terror etc.
 
 </details>
 <details open><summary>
