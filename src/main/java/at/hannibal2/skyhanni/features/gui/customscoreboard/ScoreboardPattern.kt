@@ -71,7 +71,7 @@ object ScoreboardPattern {
      */
     val votesPattern by mainSb.pattern(
         "votes",
-        "§.\\|+(§f)?\\|+ §.+",
+        "§.\\|+(?:§f)?\\|+ §.+",
     )
     val waitingForVotePattern by mainSb.pattern(
         "waitingforvote",
