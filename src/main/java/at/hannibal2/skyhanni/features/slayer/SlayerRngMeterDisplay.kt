@@ -145,11 +145,11 @@ object SlayerRngMeterDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        readRngmeterInventory(event)
+        readRngMeterInventory(event)
         readSlayerInventory(event)
     }
 
-    private fun readRngmeterInventory(event: InventoryFullyOpenedEvent) {
+    private fun readRngMeterInventory(event: InventoryFullyOpenedEvent) {
         val name = inventoryNamePattern.matchMatcher(event.inventoryName) {
             group("name")
         } ?: return
