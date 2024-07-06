@@ -3,8 +3,10 @@ on:
     pull_request:
         types: [ opened, edited, labeled ]
 
+
 permissions:
-    issues: write
+    contents: read
+    pull-requests: write
 
 jobs:
     assign-label:
