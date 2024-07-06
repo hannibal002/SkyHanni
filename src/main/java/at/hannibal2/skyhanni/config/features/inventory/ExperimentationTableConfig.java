@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.config.features.garden.pests.PestProfitTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -89,23 +88,27 @@ public class ExperimentationTableConfig {
     public boolean ultraRareBookAlert = false;
 
     public enum Experiments {
-        NONE("", 0, 0),
-        BEGINNER("Beginner", 14, 18),
-        HIGH("High", 20, 9),
-        GRAND("Grand", 20, 9),
-        SUPREME("Supreme", 28, 9),
-        TRANSCENDENT("Transcendent", 28, 9),
-        METAPHYSICAL("Metaphysical", 28, 9),
+        NONE("", 0, 0, 0, 0),
+        BEGINNER("Beginner", 14, 18, 35, 1),
+        HIGH("High", 20, 10, 43, 2),
+        GRAND("Grand", 20, 10, 43, 2),
+        SUPREME("Supreme", 28, 9, 44, 1),
+        TRANSCENDENT("Transcendent", 28, 9, 44, 1),
+        METAPHYSICAL("Metaphysical", 28, 9, 44, 1),
         ;
 
         public final String name;
         public final int gridSize;
         public final int startSlot;
+        public final int endSlot;
+        public final int sideSpace;
 
-        Experiments(String name, int gridSize, int startSlot) {
+        Experiments(String name, int gridSize, int startSlot, int endSlot, int sideSpace) {
             this.name = name;
             this.gridSize = gridSize;
             this.startSlot = startSlot;
+            this.endSlot = endSlot;
+            this.sideSpace = sideSpace;
         }
 
         @Override

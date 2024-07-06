@@ -259,10 +259,13 @@ object ExperimentsDisplay {
         return if (lastIndex != -1) list.size - 1 - lastIndex else -1
     }
 
-    private fun isOutOfBounds(slot: Int, experiment: Experiments) =
-        slot <= experiment.startSlot ||
-            slot >= experiment.startSlot + experiment.gridSize + 7 ||
-            listOf(17, 18, 26, 27, 35, 36).contains(slot)
+    private fun isOutOfBounds(slot: Int, experiment: Experiments): Boolean {
+        val sideSpaces1 = listOf(17, 18, 26, 27, 35, 36)
+        val sideSpaces2 = listOf(16, 17, 18, 19, 25, 26, 27, 28, 34, 35, 36, 37)
+        return slot <= experiment.startSlot ||
+            slot >= experiment.endSlot ||
+            (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
+    }
 
     private fun isEnabled() =
         config.experimentationTableDisplay && LorenzUtils.inSkyBlock && InventoryUtils.openInventoryName().startsWith("Superpairs (")
