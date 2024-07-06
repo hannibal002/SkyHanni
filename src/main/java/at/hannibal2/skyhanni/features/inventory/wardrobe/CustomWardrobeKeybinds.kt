@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.clickSlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -32,11 +33,17 @@ object CustomWardrobeKeybinds {
     fun onGui(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         val slots = WardrobeAPI.slots.filter { it.isInCurrentPage() }
+        println(keybinds)
 
-        for ((key, index) in keybinds.withIndex().map { it.value to it.index }) {
-            if (!key.isKeyClicked()) continue
+        for ((index, key) in keybinds.withIndex()) {
+            println("$index runniung $key")
+            if (!key.isKeyHeld()) continue
+            println("$index clicked")
             if (lastClick.passedSince() < 200.milliseconds) break
+            println("$index passed")
             val slot = slots.getOrNull(index) ?: continue
+
+            println(slot)
 
             event.cancel()
 
