@@ -441,8 +441,6 @@ object ChocolateFactoryDataLoader {
     private fun findBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
         val profileStorage = profileStorage ?: return
 
-        // removing time tower here as people like to determine when to buy it themselves
-        // - Updated to be configurable with a config option instead of removing it statically
         val ttFiltered = list.filter {
             config.chocolateUpgradeWarnings.upgradeWarningTimeTower.get() || it.slotIndex != ChocolateFactoryAPI.timeTowerIndex
         }
