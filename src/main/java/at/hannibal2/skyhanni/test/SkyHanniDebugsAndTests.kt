@@ -46,6 +46,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
@@ -466,6 +467,15 @@ object SkyHanniDebugsAndTests {
 
         val npcPrice = internalName.getNpcPriceOrNull() ?: return
         event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
+    }
+
+    @SubscribeEvent
+    fun onSHowCraftPrice(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showCraftPrice) return
+        val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
+
+        event.toolTip.add("§7Craft price: ${price.addSeparators()}")
     }
 
     @SubscribeEvent

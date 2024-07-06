@@ -254,8 +254,13 @@ interface Renderable {
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
             val isChartScreen = guiScreen is ChartScreen
 
-            val result = isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen &&
-                !isInNeuPv && !isInSkytilsPv && !neuFocus && !isChartScreen
+            val result = isGuiScreen &&
+                isGuiPositionEditor &&
+                inMenu &&
+                isNotInSignAndOnSlot &&
+                isConfigScreen &&
+                !isInNeuPv &&
+                !isInSkytilsPv && !neuFocus && !isChartScreen
 
             if (debug) {
                 if (!result) {
@@ -395,7 +400,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 DarkenShader.darknessLevel = amount
-                ShaderManager.enableShader("darken")
+                ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
                 this@darken.render(posX, posY)
                 ShaderManager.disableShader()
             }
@@ -650,7 +655,7 @@ interface Renderable {
             }
         }
 
-        fun fixedSizeCollum(
+        fun fixedSizeColumn(
             content: Renderable,
             height: Int,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
