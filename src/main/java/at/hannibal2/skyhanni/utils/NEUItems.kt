@@ -197,7 +197,10 @@ object NEUItems {
         return getNpcPriceOrNull() ?: getRawCraftCostOrNull()
     }
 
-    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost
+    // If NEU fails to calculate the craft costs, we calculate it ourself.
+    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
+        getRecipes(this).map { ItemUtils.getRecipePrice(it) }.minOrNull()
+    }
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -62,6 +63,36 @@ public class EstimatedItemValueConfig {
     @ConfigOption(name = "Ignore Runes", desc = "Ignore Runes from the total value.")
     @ConfigEditorBoolean
     public boolean ignoreRunes = false;
+
+    @Expose
+    @ConfigOption(name = "Bazaar Price Source", desc = "Use Instant Buy or Buy Order.")
+    @ConfigEditorDropdown
+    public BazaarPriceSource bazaarPriceSource = BazaarPriceSource.BUY_ORDER;
+
+    public enum BazaarPriceSource {
+        INSTANT_BUY("Instant Buy"),
+        BUY_ORDER("Buy Order"),
+        ;
+        private final String str;
+
+        BazaarPriceSource(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
+
+    @Expose
+    @ConfigOption(
+        name = "Use Attribute Price",
+        desc = "Show composite price for attributes instead of lowest bin. " +
+            "This will drastically decrease the estimated value but might be correct when buying multiple low tier items and combining them."
+    )
+    @ConfigEditorBoolean
+    public boolean useAttributeComposite = false;
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
