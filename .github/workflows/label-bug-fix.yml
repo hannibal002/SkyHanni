@@ -10,10 +10,9 @@ jobs:
                 env:
                     TITLE: ${{ github.event.pull_request.title }}
                     LABEL: Bug Fix - Sooner than Very Soon
-                    repoToken: "${{ secrets.GITHUB_TOKEN }}"
                 uses: actions/github-script@v7
                 with:
-                    github-token: ${{ env.repoToken }}
+                    github-token: ${{ secrets.MY_PAT }}
                     script: |
                         if(process.env.TITLE.split(":")[0].toUpperCase().includes("FIX")){
                           github.rest.issues.addLabels({
