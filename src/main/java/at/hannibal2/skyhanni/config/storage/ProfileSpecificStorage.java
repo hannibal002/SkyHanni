@@ -151,9 +151,6 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Integer hoppityShopYearOpened = null;
-
-        @Expose
-        public List<ChocolateFactoryUpgrade> upgradeList = new ArrayList<>();
     }
 
     @Expose

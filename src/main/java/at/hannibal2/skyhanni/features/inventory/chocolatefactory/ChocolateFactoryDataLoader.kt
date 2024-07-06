@@ -154,8 +154,6 @@ object ChocolateFactoryDataLoader {
         config.chocolateUpgradeWarnings.upgradeWarningTimeTower.whenChanged { _, _ ->
             ChocolateFactoryAPI.factoryUpgrades.takeIf { it.isNotEmpty() }?.let {
                 findBestUpgrades(it)
-            } ?: profileStorage?.let {
-                findBestUpgrades(it.upgradeList)
             } ?: run {
                 ChatUtils.clickableChat(
                     "Could not determine your current statistics to get next upgrade. Open CF to fix this!",
@@ -200,9 +198,6 @@ object ChocolateFactoryDataLoader {
         ChocolateFactoryStats.updateDisplay()
 
         processInventory(list, inventory)
-
-        //Store list for use in async changes to config
-        profileStorage.upgradeList = list
 
         findBestUpgrades(list)
         ChocolateFactoryAPI.factoryUpgrades = list
