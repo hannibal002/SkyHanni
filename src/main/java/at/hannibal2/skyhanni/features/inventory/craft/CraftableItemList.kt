@@ -114,7 +114,7 @@ object CraftableItemList {
             "§8x$amountFormat ${internalName.itemName}",
             tips = tooltip,
             onClick = {
-                HypixelCommands.viewRecipe(internalName.asString())
+                HypixelCommands.viewRecipe(internalName.itemName)
             },
         )
     }

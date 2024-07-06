@@ -10,15 +10,19 @@ object PetAPI {
     private val patternGroup = RepoPattern.group("misc.pet")
     private val petMenuPattern by patternGroup.pattern(
         "menu.title",
-        "Pets(?: \\(\\d+/\\d+\\) )?"
+        "Pets(?: \\(\\d+/\\d+\\) )?",
     )
+
+    /**
+     * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
+     */
     private val petItemName by patternGroup.pattern(
         "item.name",
-        "(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)"
+        "(?<favorite>§.⭐ )?(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)",
     )
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
-        "(§f§f)?§7\\[Lvl 1➡(100|200)] (?<name>.*)"
+        "(?:§f§f)?§7\\[Lvl 1➡(?:100|200)] (?<name>.*)",
     )
 
     private val ignoredPetStrings = listOf(

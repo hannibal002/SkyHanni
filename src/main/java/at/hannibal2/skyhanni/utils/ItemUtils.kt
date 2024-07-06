@@ -295,7 +295,7 @@ object ItemUtils {
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
-        // This workaround fixes 'Tubto Cacti I Book'
+        // This workaround fixes 'Turbo Cacti I Book'
         val input = (if (originalInput.endsWith(" Book")) {
             originalInput.replace(" Book", "")
         } else originalInput).removeResets()
@@ -425,7 +425,13 @@ object ItemUtils {
 
     fun getRecipePrice(recipe: NeuRecipe): Double =
         neededItems(recipe).map {
-            it.key.getPrice() * it.value
+            // prevents stack overflow errors with ENDERMAN_MONSTER
+            if (it.key.endsWith("_MONSTER")) {
+                0.0
+            } else {
+                it.key.getPrice() * it.value
+            }
         }.sum()
+
 
 }

@@ -93,7 +93,7 @@ object HoppityEggLocator {
             }
         }
 
-        var islandEggsLocations = HoppityEggLocations.islandLocations ?: return
+        var islandEggsLocations = HoppityEggLocations.islandLocations
 
         if (shouldShowAllEggs()) {
             if (config.hideDuplicateWaypoints) {
@@ -145,10 +145,8 @@ object HoppityEggLocator {
                         )
                         drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
                     }
-                    if (!drawLocations) {
-                        if (config.showLine) {
-                            draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
-                        }
+                    if (!drawLocations && config.showLine) {
+                        draw3DLine(eyeLocation, it.add(0.5, 0.5, 0.5), LorenzColor.GREEN.toColor(), 2, false)
                     }
                 }
             }
@@ -224,7 +222,7 @@ object HoppityEggLocator {
         lastGuessMade = SimpleTimeMark.now()
         possibleEggLocations = emptyList()
 
-        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations
         val listSize = validParticleLocations.size
 
         if (listSize < 5) return
@@ -270,7 +268,7 @@ object HoppityEggLocator {
     }
 
     fun isValidEggLocation(location: LorenzVec): Boolean =
-        HoppityEggLocations.islandLocations?.any { it.distance(location) < 5.0 } ?: false
+        HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
 
     private fun ReceiveParticleEvent.isVillagerParticle() =
         type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1

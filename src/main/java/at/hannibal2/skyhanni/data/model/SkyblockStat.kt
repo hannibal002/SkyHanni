@@ -10,6 +10,7 @@ enum class SkyblockStat(val icon: String) {
     DEFENSE("§a❈"),
     STRENGTH("§c❁"),
     INTELLIGENCE("§b✎"),
+
     CRIT_DAMAGE("§9☠"),
     CRIT_CHANCE("§9☣"),
     FEROCITY("§c⫽"),

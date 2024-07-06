@@ -249,7 +249,7 @@ object DungeonAPI {
         val bossCollections = bossStorage ?: return
 
         if (event.inventoryName == "Boss Collections") {
-            readallCollections(bossCollections, event.inventoryItems)
+            readAllCollections(bossCollections, event.inventoryItems)
         } else if (event.inventoryName.endsWith(" Collection")) {
             readOneMaxCollection(bossCollections, event.inventoryItems, event.inventoryName)
         }
@@ -278,7 +278,7 @@ object DungeonAPI {
         }
     }
 
-    private fun readallCollections(
+    private fun readAllCollections(
         bossCollections: MutableMap<DungeonFloor, Int>,
         inventoryItems: Map<Int, ItemStack>,
     ) {
