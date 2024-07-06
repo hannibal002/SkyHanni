@@ -268,14 +268,20 @@ object ExperimentsProfitTracker {
             val amount = bottleType.value
 
             val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
-            if (lastInInv >= amount || lastInInv == 0) {
+            if (lastInInv >= amount) {
                 currentBottlesInInventory[internalName] = 0
                 lastBottlesInInventory[internalName] = amount
                 continue
             }
+            if (lastInInv == 0) {
+                currentBottlesInInventory[internalName] = 0
+                lastBottlesInInventory[internalName] = amount
+                if (addToTracker && lastExperimentTime.passedSince() <= 3.seconds) tracker.addItem(internalName, amount)
+                continue
+            }
 
-            lastBottlesInInventory[internalName] = amount
             currentBottlesInInventory[internalName] = 0
+            lastBottlesInInventory[internalName] = amount
             if (addToTracker) tracker.addItem(internalName, amount - lastInInv)
         }
     }
