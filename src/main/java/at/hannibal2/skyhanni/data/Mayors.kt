@@ -48,7 +48,8 @@ enum class Mayor(
         Perk.FARMING_SIMULATOR,
         Perk.PELT_POCALYPSE,
         Perk.GOATED,
-        Perk.BLOOMING_BUSINESS),
+        Perk.BLOOMING_BUSINESS
+    ),
     FOXY(
         "Foxy",
         "§d",
