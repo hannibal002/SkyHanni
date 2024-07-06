@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -43,9 +43,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -59,6 +61,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
+@SkyHanniModule
 object MinionFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.minions
@@ -87,6 +90,19 @@ object MinionFeatures {
         "item.collect",
         "^§aCollect All$"
     )
+
+    var lastMinion: LorenzVec? = null
+    private var lastStorage: LorenzVec? = null
+    var minionInventoryOpen = false
+    var minionStorageInventoryOpen = false
+
+    private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
+        get() {
+            return ProfileStorageData.profileSpecific?.minions
+        }
+        set(value) {
+            ProfileStorageData.profileSpecific?.minions = value
+        }
 
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
@@ -359,8 +375,8 @@ object MinionFeatures {
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
-                val duration = System.currentTimeMillis() - lastEmptied
-                val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
+                val passedSince = SimpleTimeMark(lastEmptied).passedSince()
+                val format = passedSince.format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
                 event.drawString(location.add(y = 1.15), text, true)
             }
@@ -381,7 +397,7 @@ object MinionFeatures {
         if (entity.customNameTag.contains("§c❤")) {
             val loc = entity.getLorenzVec()
             if (minions.any { it.key.distance(loc) < 5 }) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
@@ -399,19 +415,6 @@ object MinionFeatures {
             config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
     }
-
-    var lastMinion: LorenzVec? = null
-    var lastStorage: LorenzVec? = null
-    var minionInventoryOpen = false
-    var minionStorageInventoryOpen = false
-
-    private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
-        get() {
-            return ProfileStorageData.profileSpecific?.minions
-        }
-        set(value) {
-            ProfileStorageData.profileSpecific?.minions = value
-        }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

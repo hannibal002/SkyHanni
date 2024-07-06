@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvents;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
@@ -17,7 +17,7 @@ public class EventsConfig {
         desc = "Drag your list to select the priority of each event."
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardEvents> eventEntries = new ArrayList<>(ScoreboardEvents.defaultOption);
+    public List<ScoreboardEvent> eventEntries = new ArrayList<>(ScoreboardEvent.defaultOption);
 
     @Expose
     @ConfigOption(name = "Show all active events", desc = "Show all active events in the scoreboard instead of the one with the highest priority.")

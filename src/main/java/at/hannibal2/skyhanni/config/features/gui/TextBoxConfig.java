@@ -11,12 +11,12 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class TextBoxConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enables showing the textbox while in SkyBlock.")
+    @ConfigOption(name = "Enabled", desc = "Enable showing the textbox while in SkyBlock.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Only in GUI", desc = "Only show the textbox while an Inventory is open.")
+    @ConfigOption(name = "Only in GUI", desc = "Only show the textbox while an inventory is open.")
     @ConfigEditorBoolean
     public boolean onlyInGUI = false;
 

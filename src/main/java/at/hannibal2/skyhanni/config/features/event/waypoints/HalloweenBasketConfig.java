@@ -8,13 +8,15 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class HalloweenBasketConfig {
 
     @Expose
-    @ConfigOption(name = "Basket Waypoints", desc = "Show all Halloween Basket waypoints.\nShoutout to §bTobbbb §7for the coordinates.\n(AS OF 2023)")
+    @ConfigOption(name = "Basket Waypoints", desc = "Show all Halloween Basket waypoints.\n" +
+        "Coordinates by §bTobbbb§7. (last updated: 2023)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean allWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25. Coordinates by §bErymanthus§7.")
+    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #23, #24, and #25.\n" +
+        "Coordinates by §bErymanthus§7.")
     @ConfigEditorBoolean
     public boolean allEntranceWaypoints = false;
 

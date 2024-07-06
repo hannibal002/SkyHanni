@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI.addCropIcon
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderSingleLineWithItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -54,6 +54,7 @@ import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GardenNextJacobContest {
 
     private var dispatcher = Dispatchers.IO
@@ -251,9 +252,8 @@ object GardenNextJacobContest {
                 } else {
                     ChatUtils.clickableChat(
                         "§2Click here to submit this year's farming contests. Thank you for helping everyone out!",
-                        onClick = {
-                            shareContests()
-                        },
+                        onClick = { shareContests() },
+                        "§eClick to submit!",
                         oneTimeClick = true
                     )
                 }
@@ -309,6 +309,7 @@ object GardenNextJacobContest {
                     SkyHanniMod.feature.storage.contestSendingAsked = true
                     ChatUtils.chat("§2Enabled automatic sharing of future contests!")
                 },
+                "§eClick to enable autosharing!",
                 oneTimeClick = true
             )
         }
@@ -563,9 +564,11 @@ object GardenNextJacobContest {
                 }
             } else {
                 ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
-                ChatUtils.clickableChat("Click here to open your calendar!", onClick = {
-                    HypixelCommands.calendar()
-                })
+                ChatUtils.clickableChat(
+                    "Click here to open your calendar!",
+                    onClick = { HypixelCommands.calendar() },
+                    "§eClick to run /calendar!"
+                )
             }
 
             if (newContests.count() == MAX_CONTESTS_PER_YEAR) {

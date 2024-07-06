@@ -11,7 +11,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class OptimalSpeedConfig {
     @Expose
     @ConfigOption(name = "Show on HUD", desc = "Show the optimal speed for your current tool in the hand.\n" +
-        "(Thanks MelonKingDE for the default values).")
+        "(Thanks §bMelonKingDE §7for the default values).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showOnHUD = false;
@@ -22,7 +22,7 @@ public class OptimalSpeedConfig {
     public boolean warning = false;
 
     @Expose
-    @ConfigOption(name = "Rancher Boots", desc = "Allows you to set the optimal speed in the Rancher Boots overlay by clicking on the presets.")
+    @ConfigOption(name = "Rancher Boots", desc = "Set the optimal speed in the Rancher Boots overlay by clicking on the presets.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean signEnabled = true;

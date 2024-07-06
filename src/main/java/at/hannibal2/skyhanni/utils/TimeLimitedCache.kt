@@ -4,10 +4,10 @@ import com.google.common.cache.CacheBuilder
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
 
-class TimeLimitedCache<K: Any, V: Any>(
+class TimeLimitedCache<K : Any, V : Any>(
     expireAfterWrite: Duration,
     private val removalListener: (K?, V?) -> Unit = { _, _ -> },
-): Iterable<Map.Entry<K, V>> {
+) : Iterable<Map.Entry<K, V>> {
 
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
@@ -24,6 +24,8 @@ class TimeLimitedCache<K: Any, V: Any>(
     fun getOrPut(key: K, defaultValue: () -> V) = getOrNull(key) ?: defaultValue().also { set(key, it) }
 
     fun clear() = cache.invalidateAll()
+
+    fun remove(key: K) = cache.invalidate(key)
 
     fun entries(): Set<Map.Entry<K, V>> = cache.asMap().entries
 

@@ -30,10 +30,10 @@ object HotmAPI {
             }
         } == true
 
-    enum class Powder() {
-        MITHRIL,
-        GEMSTONE,
-        GLACITE,
+    enum class Powder(val displayName: String, val color: String) {
+        MITHRIL("Mithril", "§2"),
+        GEMSTONE("Gemstone", "§d"),
+        GLACITE("Glacite", "§b"),
 
         ;
 

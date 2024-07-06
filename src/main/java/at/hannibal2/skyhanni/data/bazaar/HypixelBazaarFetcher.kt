@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -13,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,6 +23,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 // https://api.hypixel.net/#tag/SkyBlock/paths/~1v2~1skyblock~1bazaar/get
+@SkyHanniModule
 object HypixelBazaarFetcher {
     private const val URL = "https://api.hypixel.net/v2/skyblock/bazaar"
     private const val HIDDEN_FAILED_ATTEMPTS = 3
@@ -61,7 +63,7 @@ object HypixelBazaarFetcher {
     private fun process(products: Map<String, BazaarProduct>) = products.mapNotNull { (key, product) ->
         val internalName = NEUItems.transHypixelNameToInternalName(key)
         val sellOfferPrice = product.buySummary.minOfOrNull { it.pricePerUnit } ?: 0.0
-        val insantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
+        val instantBuyPrice = product.sellSummary.maxOfOrNull { it.pricePerUnit } ?: 0.0
 
         if (product.quickStatus.isEmpty()) {
             return@mapNotNull null
@@ -70,11 +72,10 @@ object HypixelBazaarFetcher {
         if (internalName.getItemStackOrNull() == null) {
             // Items that exist in Hypixel's Bazaar API, but not in NEU repo (not visible in the ingame bazaar).
             // Should only include Enchants
-            if (LorenzUtils.debug)
-                println("Unknown bazaar product: $key/$internalName")
+            if (LorenzUtils.debug) println("Unknown bazaar product: $key/$internalName")
             return@mapNotNull null
         }
-        internalName to BazaarData(internalName.itemName, sellOfferPrice, insantBuyPrice, product)
+        internalName to BazaarData(internalName.itemName, sellOfferPrice, instantBuyPrice, product)
     }.toMap()
 
     private fun BazaarQuickStatus.isEmpty(): Boolean = with(this) {
@@ -93,7 +94,7 @@ object HypixelBazaarFetcher {
         failedAttempts++
         if (failedAttempts <= HIDDEN_FAILED_ATTEMPTS) {
             nextFetchTime = SimpleTimeMark.now() + 15.seconds
-            ChatUtils.debug("$userMessage. (errorMessage=${e.message}, failedAttepmts=$failedAttempts, $fetchType")
+            ChatUtils.debug("$userMessage. (errorMessage=${e.message}, failedAttempts=$failedAttempts, $fetchType")
             e.printStackTrace()
         } else {
             nextFetchTime = SimpleTimeMark.now() + 15.minutes
@@ -101,8 +102,8 @@ object HypixelBazaarFetcher {
                 e,
                 userMessage,
                 "fetchType" to fetchType,
-                "failedAttepmts" to failedAttempts,
-                "rawResponse" to rawResponse
+                "failedAttempts" to failedAttempts,
+                "rawResponse" to rawResponse,
             )
         }
     }

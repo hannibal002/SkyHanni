@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -20,6 +21,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object ChocolateFactoryCustomReminder {
     private val configReminder get() = ChocolateFactoryAPI.config.customReminder
     private val configUpgradeWarnings get() = ChocolateFactoryAPI.config.chocolateUpgradeWarnings
@@ -61,6 +63,7 @@ object ChocolateFactoryCustomReminder {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val item = event.item ?: return
+        if (event.clickedButton != 0) return
         // TODO add support for prestige and for Chocolate Milestone
         val cost = ChocolateFactoryAPI.getChocolateBuyCost(item.getLore()) ?: return
         val duration = ChocolateAmount.CURRENT.timeUntilGoal(cost)
@@ -108,9 +111,14 @@ object ChocolateFactoryCustomReminder {
     private fun update() {
         display = mutableListOf<Renderable>().also { list ->
             getTargetDescription()?.let {
-                list.add(Renderable.clickAndHover(it, listOf("§eClick to remove the goal!"), onClick = {
-                    reset()
-                }))
+                list.add(
+                    Renderable.clickAndHover(
+                        it, listOf("§eClick to remove the goal!"),
+                        onClick = {
+                            reset()
+                        },
+                    ),
+                )
             }
         }
     }
@@ -136,10 +144,13 @@ object ChocolateFactoryCustomReminder {
         if (configUpgradeWarnings.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        ChatUtils.clickableChat("You can now purchase §f$targetName §ein Chocolate factory!",
+        ChatUtils.clickableChat(
+            "You can now purchase §f$targetName §ein Chocolate factory!",
             onClick = {
                 HypixelCommands.chocolateFactory()
-            })
+            },
+            "§eClick to run /cf!",
+        )
     }
 
     private fun reset() {
