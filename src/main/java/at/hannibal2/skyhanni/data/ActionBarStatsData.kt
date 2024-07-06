@@ -30,6 +30,10 @@ enum class ActionBarStatsData(@Language("RegExp") rawPattern: String) {
         // language=RegExp
         ".*(§b\\+\\d+ SkyBlock XP §.\\([^()]+\\)§b \\(\\d+/\\d+\\)).*"
     ),
+    ARMOR_STACK(
+        // language=RegExp
+        ".* (?:§6|§6§l)(?<type>\\d+[ᝐ⁑|҉Ѫ⚶]).*"
+    ),
     ;
 
     private val repoKey = name.replace("_", ".").lowercase()

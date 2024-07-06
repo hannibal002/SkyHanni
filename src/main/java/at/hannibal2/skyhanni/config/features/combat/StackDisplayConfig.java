@@ -17,4 +17,13 @@ public class StackDisplayConfig {
     @Expose
     @ConfigLink(owner = StackDisplayConfig.class, field = "enabled")
     public Position position = new Position(480, -210, 1.9f);
+
+    @Expose
+    @ConfigOption(name = "Show Timer", desc = "Displays a timer that shows when you lose a stack.")
+    @ConfigEditorBoolean
+    public boolean showTimer = true;
+
+    @Expose
+    @ConfigLink(owner = StackDisplayConfig.class, field = "enabled")
+    public Position timerPosition = new Position(466, -190, 1.9f);
 }
