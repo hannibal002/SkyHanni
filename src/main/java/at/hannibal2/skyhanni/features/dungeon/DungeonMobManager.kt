@@ -9,11 +9,11 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -43,7 +43,7 @@ object DungeonMobManager {
         }
         onToggle(
             fel.highlight,
-            fel.colour
+            fel.colour,
         ) {
             if (fel.highlight.get()) {
                 if (felOnTheGround.isEmpty()) {
@@ -124,7 +124,7 @@ object DungeonMobManager {
                     event.exactPlayerEyeLocation(),
                     fel.colour.get().toChromaColor(),
                     3,
-                    true
+                    true,
                 )
             }
         }
@@ -137,7 +137,7 @@ object DungeonMobManager {
                 false,
                 extraSize = -0.2,
                 minimumAlpha = 0.8f,
-                inverseAlphaScale = true
+                inverseAlphaScale = true,
             )
             !mob.isInvisible()
         }
