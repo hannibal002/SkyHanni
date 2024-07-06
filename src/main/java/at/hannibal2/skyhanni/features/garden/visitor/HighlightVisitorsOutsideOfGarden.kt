@@ -69,13 +69,11 @@ object HighlightVisitorsOutsideOfGarden {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.highlightVisitors) return
+        val color = LorenzColor.DARK_RED.toColor().withAlpha(50)
         EntityUtils.getEntities<EntityLivingBase>()
             .filter { it !is EntityArmorStand && isVisitor(it) }
             .forEach {
-                RenderLivingEntityHelper.setEntityColor(
-                    it,
-                    LorenzColor.DARK_RED.toColor().withAlpha(50)
-                ) { config.highlightVisitors }
+                RenderLivingEntityHelper.setEntityColor(it, color) { config.highlightVisitors }
             }
     }
 

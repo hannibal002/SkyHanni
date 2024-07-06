@@ -95,14 +95,14 @@ object GuiEditManager {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values().toList(),
             2,
-            Minecraft.getMinecraft().currentScreen as? GuiContainer
+            Minecraft.getMinecraft().currentScreen as? GuiContainer,
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
             lastHotkeyReminded = SimpleTimeMark.now()
             ChatUtils.chat(
                 "§eTo edit hidden GUI elements:\n" +
                     " §7- §e1. Set a key in /sh edit.\n" +
-                    " §7- §e2. Click that key while the GUI element is visible."
+                    " §7- §e2. Click that key while the GUI element is visible.",
             )
         }
     }
@@ -144,4 +144,5 @@ object GuiEditManager {
     }
 }
 
+// TODO remove
 class Vector2i(val x: Int, val y: Int)

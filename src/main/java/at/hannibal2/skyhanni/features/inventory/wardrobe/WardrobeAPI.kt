@@ -9,10 +9,11 @@ import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -21,6 +22,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -32,7 +34,7 @@ object WardrobeAPI {
     private val repoGroup = RepoPattern.group("inventory.wardrobe")
     private val inventoryPattern by repoGroup.pattern(
         "inventory.name",
-        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)"
+        "Wardrobe \\((?<currentPage>\\d+)/\\d+\\)",
     )
 
     /**
@@ -40,10 +42,10 @@ object WardrobeAPI {
      */
     private val equippedSlotPattern by repoGroup.pattern(
         "equippedslot",
-        "§7Slot \\d+: §aEquipped"
+        "§7Slot \\d+: §aEquipped",
     )
 
-    private const val FIRST_SLOT = 36
+    const val FIRST_SLOT = 36
     private const val FIRST_HELMET_SLOT = 0
     private const val FIRST_CHESTPLATE_SLOT = 9
     private const val FIRST_LEGGINGS_SLOT = 18
@@ -93,12 +95,12 @@ object WardrobeAPI {
         if (slot.isEmpty()) return@buildList
         add("§aEstimated Armor Value:")
         var totalPrice = 0.0
-        for (stack in slot.armor.filterNotNull()) {
+        for (stack in slot.armor.filterNotNull().filter { it.getInternalNameOrNull() != null }) {
             val price = EstimatedItemValueCalculator.getTotalPrice(stack)
-            add("  §7- ${stack.name}: §6${NumberUtil.format(price)}")
+            add("  §7- ${stack.name}: §6${price.shortFormat()}")
             totalPrice += price
         }
-        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${NumberUtil.format(totalPrice)} coins")
+        if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
     @SubscribeEvent
@@ -109,7 +111,7 @@ object WardrobeAPI {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 

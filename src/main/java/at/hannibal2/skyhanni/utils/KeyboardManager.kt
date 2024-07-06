@@ -88,7 +88,7 @@ object KeyboardManager {
             lastClickedMouseButton = -1
         }
 
-        // I don't know when this is needed
+        // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
         if (Keyboard.getEventKey() == 0) {
             LorenzKeyPressEvent(Keyboard.getEventCharacter().code + 256).postAndCatch()
         }
@@ -112,8 +112,11 @@ object KeyboardManager {
         if (this == 0) return false
         return if (this < 0) {
             Mouse.isButtonDown(this + 100)
+        } else if (this >= Keyboard.KEYBOARD_SIZE) {
+            val pressedKey = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
+            Keyboard.getEventKeyState() && this == pressedKey
         } else {
-            KeybindHelper.isKeyDown(this)
+            Keyboard.isKeyDown(this)
         }
     }
 

@@ -13,7 +13,7 @@ public class EndermanConfig {
     public EndermanBeaconConfig beacon = new EndermanBeaconConfig();
 
     @Expose
-    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlights the Enderman Slayer Nukekubi Skulls (Eyes).")
+    @ConfigOption(name = "Highlight Nukekubi Skulls", desc = "Highlight the Enderman Slayer Nukekubi Skulls (Eyes).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightNukekebi = false;

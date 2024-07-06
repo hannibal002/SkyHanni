@@ -73,7 +73,7 @@ object MiningEventTracker {
 
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
-        if (!LorenzUtils.inAdvancedMiningIsland()) return
+        if (!isMiningIsland()) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         if (!eventEndTime.isInPast()) {
             return
@@ -89,7 +89,7 @@ object MiningEventTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inAdvancedMiningIsland()) return
+        if (!isMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {
             sendData(group("event"), null)
@@ -102,13 +102,15 @@ object MiningEventTracker {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())) return
+        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !isMiningIsland())) return
         if (!canRequestAt.isInPast()) return
 
         fetchData()
     }
 
     private fun sendData(eventName: String, time: String?) {
+        // we now ignore mineshaft events.
+        if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
 
@@ -227,4 +229,7 @@ object MiningEventTracker {
             if (element.asString == "BOTH") JsonPrimitive("ALL") else element
         }
     }
+
+    // ignoring mineshaft here is intentional
+    fun isMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }

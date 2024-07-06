@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
@@ -97,15 +97,15 @@ object AnitaMedalProfit {
         if (itemPrice < 0) return
 
         val profit = itemPrice - fullCost
-        val profitFormat = NumberUtil.format(profit)
+        val profitFormat = profit.shortFormat()
         val color = if (profit > 0) "§6" else "§c"
 
         val hover = listOf(
             itemName,
             "",
-            "§7Item price: §6${NumberUtil.format(itemPrice)} ",
+            "§7Item price: §6${itemPrice.shortFormat()} ",
             // TODO add more exact material cost breakdown
-            "§7Material cost: §6${NumberUtil.format(fullCost)} ",
+            "§7Material cost: §6${fullCost.shortFormat()} ",
             "§7Final profit: §6${profitFormat} ",
         )
         table.add(

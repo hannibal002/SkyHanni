@@ -53,7 +53,7 @@ public class SlayerConfig {
     public boolean slayerMinibossHighlight = false;
 
     @Expose
-    @ConfigOption(name = "Line to Miniboss", desc = "Adds a line to every Slayer Mini-Boss around you.")
+    @ConfigOption(name = "Line to Miniboss", desc = "Add a line to every Slayer Mini-Boss around you.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean slayerMinibossLine = false;
@@ -65,13 +65,13 @@ public class SlayerConfig {
     public boolean hideMobNames = false;
 
     @Expose
-    @ConfigOption(name = "Quest Warning", desc = "Warning when wrong Slayer quest is selected, or killing mobs for the wrong Slayer.")
+    @ConfigOption(name = "Quest Warning", desc = "Warn when wrong Slayer quest is selected, or killing mobs for the wrong Slayer.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questWarning = true;
 
     @Expose
-    @ConfigOption(name = "Quest Warning Title", desc = "Sends a title when warning.")
+    @ConfigOption(name = "Quest Warning Title", desc = "Send a title when warning.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean questWarningTitle = true;

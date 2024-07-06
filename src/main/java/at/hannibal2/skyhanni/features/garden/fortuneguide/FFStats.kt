@@ -145,11 +145,11 @@ object FFStats {
 
     private fun getGenericFF(): Map<FFTypes, Double> = buildMap {
         val storage = GardenAPI.storage?.fortune ?: return emptyMap()
-        this[FFTypes.BASE_FF] = 100.0
         this[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
-        this[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
+        this[FFTypes.BESTIARY] = storage.bestiary
         this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
         this[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
+        this[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
         if (cakeExpireTime.isInFuture() || cakeExpireTime.isFarPast()) {
             this[FFTypes.CAKE] = 5.0
         } else {

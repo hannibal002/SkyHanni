@@ -21,7 +21,7 @@ object ColorUtils {
     fun blendRGB(start: Color, end: Color, percent: Double) = Color(
         (start.red * (1 - percent) + end.red * percent).toInt(),
         (start.green * (1 - percent) + end.green * percent).toInt(),
-        (start.blue * (1 - percent) + end.blue * percent).toInt()
+        (start.blue * (1 - percent) + end.blue * percent).toInt(),
     )
 
     /** Darkens a color by a [factor]. The lower the [factor], the darker the color. */
@@ -29,8 +29,10 @@ object ColorUtils {
         (red * factor).toInt().coerceIn(0, 255),
         (green * factor).toInt().coerceIn(0, 255),
         (blue * factor).toInt().coerceIn(0, 255),
-        alpha
+        alpha,
     )
+
+    val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
 
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
 

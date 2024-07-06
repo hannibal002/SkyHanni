@@ -8,7 +8,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 public class SpacingConfig {
 
     @Expose
-    @ConfigOption(name = "Global Scale", desc = "Controls the scale of the entirety of the wardrobe.")
+    @ConfigOption(name = "Global Scale", desc = "Control the scale of the entirety of the wardrobe.")
     @ConfigEditorSlider(
         minValue = 30,
         maxValue = 200,

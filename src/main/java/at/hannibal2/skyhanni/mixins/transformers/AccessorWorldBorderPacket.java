@@ -5,7 +5,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(S44PacketWorldBorder.class)
-public interface AccessorWorldBoarderPacket {
+public interface AccessorWorldBorderPacket {
     @Accessor("action")
     S44PacketWorldBorder.Action getAction();
 

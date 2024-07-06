@@ -31,7 +31,7 @@ public class DropsStatisticsConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Tallies up statistic about visitors and the rewards you have received from them."
+        desc = "Tally statistics about visitors and the rewards you have received from them."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -116,19 +116,19 @@ public class DropsStatisticsConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Display Numbers First", desc = "Determines whether the number or drop name displays first. " +
+    @ConfigOption(name = "Display Numbers First", desc = "Whether the number or drop name displays first.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = true;
 
     @Expose
-    @ConfigOption(name = "Display Icons", desc = "Replaces the drop names with icons. " +
+    @ConfigOption(name = "Display Icons", desc = "Replace the drop names with icons.\n" +
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayIcons = false;
 
     @Expose
-    @ConfigOption(name = "Only on Barn Plot", desc = "Only shows the overlay while on the Barn plot.")
+    @ConfigOption(name = "Only on Barn Plot", desc = "Only show the overlay while on the Barn plot.")
     @ConfigEditorBoolean
     public boolean onlyOnBarn = true;
 

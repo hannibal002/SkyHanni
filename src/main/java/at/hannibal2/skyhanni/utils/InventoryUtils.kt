@@ -76,7 +76,7 @@ object InventoryUtils {
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
             booleanField.get(storage) as Boolean
         } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
             false
         }
     }
@@ -111,9 +111,9 @@ object InventoryUtils {
         }
     }
 
-    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? {
-        return getItemsInOpenChest().find { it.slotIndex == slotIndex }?.stack
-    }
+    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
+
+    fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
 

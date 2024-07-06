@@ -38,23 +38,31 @@ object PowderTracker {
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
     private val pickedPattern by patternGroup.pattern(
         "picked",
-        "§6You have successfully picked the lock on this chest!"
+        "§6You have successfully picked the lock on this chest!",
     )
     private val uncoveredPattern by patternGroup.pattern(
         "uncovered",
-        "§aYou uncovered a treasure chest!"
+        "§aYou uncovered a treasure chest!",
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",
-        ".*§r§b§l2X POWDER STARTED!.*"
+        ".*§r§b§l2X POWDER STARTED!.*",
     )
     private val powderEndedPattern by patternGroup.pattern(
         "powder.ended",
-        ".*§r§b§l2X POWDER ENDED!.*"
+        ".*§r§b§l2X POWDER ENDED!.*",
     )
     private val powderBossBarPattern by patternGroup.pattern(
         "powder.bossbar",
-        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r"
+        "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
+    )
+
+    /**
+     * REGEX-TEST: §b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!
+     */
+    private val compactedPattern by patternGroup.pattern(
+        "compacted",
+        "§b§lCOMPACT! §r§fYou found an §r§aEnchanted Hard Stone§r§f!",
     )
 
     private var lastChestPicked = SimpleTimeMark.farPast()
@@ -64,6 +72,7 @@ object PowderTracker {
     private val diamondEssenceInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val goldEssenceInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private val chestInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
+    private val hardStoneInfo = ResourceInfo(0L, 0L, 0, 0.0, mutableListOf())
     private var doublePowder = false
     private var powderTimer = ""
     private val gemstones = listOf(
@@ -72,7 +81,7 @@ object PowderTracker {
         "Amber" to "§6",
         "Amethyst" to "§5",
         "Jade" to "§a",
-        "Topaz" to "§e"
+        "Topaz" to "§e",
     )
 
     init {
@@ -87,6 +96,7 @@ object PowderTracker {
         calculateResourceHour(diamondEssenceInfo)
         calculateResourceHour(goldEssenceInfo)
         calculateResourceHour(chestInfo)
+        calculateResourceHour(hardStoneInfo)
 
         doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
         powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
@@ -101,18 +111,21 @@ object PowderTracker {
         }
     }
 
-    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker })
-    { formatDisplay(drawDisplay(it)) }
+    private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {
 
         override fun reset() {
             rewards.clear()
             totalChestPicked = 0
+            totalHardStoneCompacted = 0
         }
 
         @Expose
         var totalChestPicked = 0
+
+        @Expose
+        var totalHardStoneCompacted = 0
 
         @Expose
         var rewards: MutableMap<PowderChestReward, Long> = mutableMapOf()
@@ -153,13 +166,20 @@ object PowderTracker {
         powderStartedPattern.matchMatcher(msg) { doublePowder = true }
         powderEndedPattern.matchMatcher(msg) { doublePowder = false }
 
+        compactedPattern.matchMatcher(msg) {
+            tracker.modify {
+                it.totalHardStoneCompacted += 1
+            }
+        }
+
         for (reward in PowderChestReward.entries) {
             reward.chatPattern.matchMatcher(msg) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
                     var amount = group("amount").formatLong()
-                    if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder)
+                    if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder) {
                         amount *= 2
+                    }
                     it.rewards[reward] = count + amount
                 }
             }
@@ -192,6 +212,9 @@ object PowderTracker {
         chestInfo.perHour = 0.0
         chestInfo.stoppedChecks = 0
         chestInfo.perMin.clear()
+        hardStoneInfo.perHour = 0.0
+        hardStoneInfo.stoppedChecks = 0
+        hardStoneInfo.perMin.clear()
         doublePowder = false
         tracker.update()
     }
@@ -240,6 +263,7 @@ object PowderTracker {
         calculate(data, diamondEssenceInfo, PowderChestReward.DIAMOND_ESSENCE)
         calculate(data, goldEssenceInfo, PowderChestReward.GOLD_ESSENCE)
         calculateChest(data)
+        calculateHardStone(data)
 
         val chestPerHour = format(chestInfo.perHour)
         addAsSingletonList("§d${data.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
@@ -252,11 +276,10 @@ object PowderTracker {
         addAsSingletonList("")
         addPerHour(rewards, entries[46], diamondEssenceInfo)
         addPerHour(rewards, entries[47], goldEssenceInfo)
-
-
         addAsSingletonList("")
-
-
+        val hardStonePerHour = format(hardStoneInfo.perHour)
+        addAsSingletonList("§b${data.totalHardStoneCompacted.addSeparators()} §fHard Stone §bCompacted §7($hardStonePerHour/h)")
+        addAsSingletonList("")
         for ((gem, color) in gemstones) {
             var totalGemstone = 0L
 
@@ -289,7 +312,7 @@ object PowderTracker {
         val redEgg = rewards.getOrDefault(PowderChestReward.RED_GOBLIN_EGG, 0)
         val yellowEgg = rewards.getOrDefault(PowderChestReward.YELLOW_GOBLIN_EGG, 0)
         val blueEgg = rewards.getOrDefault(PowderChestReward.BLUE_GOBLIN_EGG, 0)
-        addAsSingletonList("§9$goblinEgg§7-§a$greenEgg§7-§c$redEgg§f-§e$yellowEgg§f-§3$blueEgg §fGoblin Egg")
+        addAsSingletonList("§3$blueEgg§7-§c$redEgg§7-§e$yellowEgg§f-§a$greenEgg§f-§9$goblinEgg §fGoblin Egg")
 
         for (reward in entries.subList(37, 46)) {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
@@ -339,6 +362,10 @@ object PowderTracker {
 
     private fun calculateChest(data: Data) {
         chestInfo.estimated = data.totalChestPicked.toLong()
+    }
+
+    private fun calculateHardStone(data: Data) {
+        hardStoneInfo.estimated = data.totalHardStoneCompacted.toLong()
     }
 
     private fun convert(roughCount: Long): Gem {
