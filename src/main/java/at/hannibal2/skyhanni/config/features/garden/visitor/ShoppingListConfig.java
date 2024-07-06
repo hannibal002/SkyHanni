@@ -16,7 +16,7 @@ public class ShoppingListConfig {
     public boolean display = true;
 
     @Expose
-    // TODO renmae "position"
+    // TODO rename "position"
     @ConfigLink(owner = ShoppingListConfig.class, field = "display")
     public Position pos = new Position(180, 170, false, true);
 
