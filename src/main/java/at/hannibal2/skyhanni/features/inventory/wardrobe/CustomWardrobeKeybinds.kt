@@ -33,17 +33,11 @@ object CustomWardrobeKeybinds {
     fun onGui(event: GuiKeyPressEvent) {
         if (!isEnabled()) return
         val slots = WardrobeAPI.slots.filter { it.isInCurrentPage() }
-        println(keybinds)
 
         for ((index, key) in keybinds.withIndex()) {
-            println("$index runniung $key")
             if (!key.isKeyHeld()) continue
-            println("$index clicked")
             if (lastClick.passedSince() < 200.milliseconds) break
-            println("$index passed")
             val slot = slots.getOrNull(index) ?: continue
-
-            println(slot)
 
             event.cancel()
 
