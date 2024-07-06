@@ -66,7 +66,7 @@ abstract class Shader(val vertex: String, val fragment: String) {
 
         ShaderHelper.glLinkProgram(shaderProgram)
 
-        if (ShaderHelper.glGetProgrami(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
+        if (ShaderHelper.glGetProgramInt(shaderProgram, ShaderHelper.GL_LINK_STATUS) == GL11.GL_FALSE) {
             val errorMessage = "Failed to link vertex shader $vertex and fragment shader $fragment. Features that " +
                 "utilise this shader will not work correctly, if at all"
             val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderProgram, 1024))
