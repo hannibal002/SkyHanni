@@ -4,13 +4,13 @@ on:
         types: [ opened, edited, labeled ]
 
 
-permissions:
-    contents: read
-    pull-requests: write
 
 jobs:
     assign-label:
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            pull-requests: write
         steps:
             -   name: label
                 env:
