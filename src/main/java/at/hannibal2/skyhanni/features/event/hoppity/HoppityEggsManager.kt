@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -70,6 +71,12 @@ object HoppityEggsManager {
         "rabbit.found.new",
         "§d§lNEW RABBIT! (?:((§6\\+(?<chocolate>.*) Chocolate §7and )?§6\\+(?<perSecond>.*)x Chocolate §7per second!)|(?<other>.*))",
     )
+
+    val duplicateRabbitFound by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.duplicate",
+        "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate"
+    )
+
     private val noEggsLeftPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.noneleft",
         "§cThere are no hidden Chocolate Rabbit Eggs nearby! Try again later!",
@@ -212,7 +219,7 @@ object HoppityEggsManager {
     private fun warn() {
         if (!config.warnUnclaimedEggs) return
         if (ReminderUtils.isBusy() && !config.warnWhileBusy) return
-        if (lastWarnTime.passedSince() < 30.seconds) return
+        if (lastWarnTime.passedSince() < 1.minutes) return
 
         lastWarnTime = now()
         val amount = HoppityEggType.entries.size

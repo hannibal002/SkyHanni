@@ -189,8 +189,10 @@
 + Added Carnival lines to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1995)
 + Made the unclaimed eggs GUI clickable. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/1934)
 + Improve punctuation in the rabbit barn full/almost full messages. - Luna (https://github.com/hannibal002/SkyHanni/pull/2146)
-+ Seperate option for Unclaimed Eggs warning while "Busy". - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2091)
++ Separate option for Unclaimed Eggs warning while "Busy". - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2091)
     + In the Rift, Kuudra, Dungeons, etc.
++ Hoppity and Chocolate reminders/warnings now appear less frequently and are less intrusive. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2196)
++ Add a configuration option to allow Time Tower to appear in the Chocolate Factory next upgrade list. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2142)
 
 #### Mining Improvements
 
@@ -361,6 +363,7 @@
 + Fix Custom Scoreboard Error while voting. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2184)
 + Fix Custom Scoreboard Error during the Winter Event. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2192)
 + Fix Custom Scoreboard Error in Kuudra. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2176)
++ Fix New Mayor perks not showing up on the Scoreboard. - Stella (https://github.com/hannibal002/SkyHanni/pull/2187)
 
 #### Dungeon Fixes
 
@@ -414,6 +417,7 @@
 + Fix favorited pets not being detected. - Empa (https://github.com/hannibal002/SkyHanni/pull/2188)
 + Fix wrong item prices in Estimated Item Value when the craft price is higher than the NPC price and the item is soulbound. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2173)
     + E.g. for Gillsplash (fishing equipment).
++ Fix Custom Wardrobe Keybinds not working. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2198)
 
 #### Combat Fixes
 
@@ -452,6 +456,7 @@
 + Fix launchers showing SkyHanni as LibNinePatch. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2147)
 + Fix "/worldedit right" setting the left position. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2179)
 + Fix a bug in the Hypixel detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2193)
++ Fix random Stack Overflow Errors. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2199)
 
 ### Technical Details
 
@@ -551,6 +556,10 @@
 + Add carnival mask to item category. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2189)
 + Fix pattern for Dragon Widget. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2190)
 + Changed the readme.md file. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2174)
++ Add Mob Detection First Seen Event. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2096)
++ Mob Detection now runs every tick instead of every other tick. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2096)
++ RepoPattern locale loading now works inversely for the development environment. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2069)
++ Move Hoppity Rabbit chat patterns to the eggs manager. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/2144)
 
 ### Removed Features
 
