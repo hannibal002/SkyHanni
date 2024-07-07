@@ -423,15 +423,9 @@ object ItemUtils {
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe): Double =
+    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
         neededItems(recipe).map {
-            // prevents stack overflow errors with ENDERMAN_MONSTER
-            if (it.key.endsWith("_MONSTER")) {
-                0.0
-            } else {
-                it.key.getPrice() * it.value
-            }
+            it.key.getPrice(pastRecipes = pastRecipes) * it.value
         }.sum()
-
 
 }
