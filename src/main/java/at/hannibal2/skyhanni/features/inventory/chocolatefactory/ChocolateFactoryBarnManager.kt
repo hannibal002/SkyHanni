@@ -23,15 +23,6 @@ object ChocolateFactoryBarnManager {
     private val hoppityConfig get() = HoppityEggsManager.config
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
-    private val newRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.new",
-        "§d§lNEW RABBIT! §6\\+\\d+ Chocolate §7and §6\\+0.\\d+x Chocolate §7per second!"
-    )
-    private val rabbitDuplicatePattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "rabbit.duplicate",
-        "§7§lDUPLICATE RABBIT! §6\\+(?<amount>[\\d,]+) Chocolate"
-    )
-
     /**
      * REGEX-TEST: §c§lBARN FULL! §fOlivette §7got §ccrushed§7! §6+290,241 Chocolate
      */
@@ -47,14 +38,14 @@ object ChocolateFactoryBarnManager {
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        newRabbitPattern.matchMatcher(event.message) {
+        HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
             val profileStorage = profileStorage ?: return
             profileStorage.currentRabbits += 1
             trySendBarnFullMessage()
             HoppityEggsManager.shareWaypointPrompt()
         }
 
-        rabbitDuplicatePattern.matchMatcher(event.message) {
+        HoppityEggsManager.duplicateRabbitFound.matchMatcher(event.message) {
             HoppityEggsManager.shareWaypointPrompt()
             val amount = group("amount").formatLong()
             if (config.showDuplicateTime && !hoppityConfig.compactChat) {
