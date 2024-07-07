@@ -279,7 +279,7 @@ object ChocolateFactoryDataLoader {
         item.getLore().matchFirst(barnAmountPattern) {
             profileStorage.currentRabbits = group("rabbits").formatInt()
             profileStorage.maxRabbits = group("max").formatInt()
-            ChocolateFactoryBarnManager.trySendBarnFullMessage()
+            ChocolateFactoryBarnManager.trySendBarnFullMessage(inventory = true)
         }
     }
 
