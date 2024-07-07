@@ -423,9 +423,9 @@ object ItemUtils {
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe): Double =
+    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
         neededItems(recipe).map {
-            it.key.getPrice() * it.value
+            it.key.getPrice(pastRecipes = pastRecipes) * it.value
         }.sum()
 
 }

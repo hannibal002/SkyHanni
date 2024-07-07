@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
@@ -208,7 +209,7 @@ object EstimatedItemValueCalculator {
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
-        val intRange = if (config.useAttributeComposite) 1..10 else level..level
+        val intRange = if (config.useAttributeComposite.get()) 1..10 else level..level
         return intRange.mapNotNull { lowerLevel ->
             "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()
                 ?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
@@ -480,18 +481,18 @@ object EstimatedItemValueCalculator {
         internalName: NEUInternalName,
         list: MutableList<String>,
         label: String,
-        shouldIgnorePrice: Boolean,
+        shouldIgnorePrice: Property<Boolean>,
     ): Double {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
         val displayName = name ?: "§c${internalName.asString()}"
-        val color = if (shouldIgnorePrice) "§7" else "§6"
+        val color = if (shouldIgnorePrice.get()) "§7" else "§6"
         list.add("§7$label: $displayName §7($color" + price.shortFormat() + "§7)")
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
 
-        return if (shouldIgnorePrice) 0.0 else price
+        return if (shouldIgnorePrice.get()) 0.0 else price
     }
 
     private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
@@ -759,7 +760,7 @@ object EstimatedItemValueCalculator {
     private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: -1.0
 
     private fun NEUInternalName.getPriceOrNull(): Double? {
-        val useSellPrice = config.bazaarPriceSource == EstimatedItemValueConfig.BazaarPriceSource.BUY_ORDER
+        val useSellPrice = config.bazaarPriceSource.get() == EstimatedItemValueConfig.BazaarPriceSource.BUY_ORDER
         return getPriceOrNull(useSellPrice)
     }
 }
