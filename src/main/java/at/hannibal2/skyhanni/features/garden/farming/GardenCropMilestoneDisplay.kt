@@ -237,7 +237,7 @@ object GardenCropMilestoneDisplay {
         }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext &&
+            if (currentTier > 46 && currentTier == previousNext &&
                 nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
             ) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
@@ -246,7 +246,7 @@ object GardenCropMilestoneDisplay {
         }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext &&
+            if (currentTier > 46 && currentTier == previousNext &&
                 nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
             ) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
@@ -338,7 +338,7 @@ object GardenCropMilestoneDisplay {
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
         lineMap[MushroomTextEntry.PERCENTAGE] = Renderable.string("§7Percentage: §e$percentageFormat")
 
-        if (currentTier >= 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
+        if (currentTier > 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
             GardenCropMilestones.onOverflowLevelUp(mushroom, currentTier - 1, nextTier - 1)
             lastMushWarnedLevel = currentTier
         }

@@ -50,7 +50,7 @@ object FixGhostEntities {
             recentlySpawnedEntities.addLast(packet.entityID)
         } else if (packet is S13PacketDestroyEntities) {
             for (entityID in packet.entityIDs) {
-                // ingore entities that got properly spawned and then removed
+                // ignore entities that got properly spawned and then removed
                 if (entityID !in recentlySpawnedEntities) {
                     recentlyRemovedEntities.addLast(entityID)
                     if (recentlyRemovedEntities.size == 10) {

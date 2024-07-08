@@ -25,6 +25,11 @@ public class CombatConfig {
     public QuiverConfig quiverConfig = new QuiverConfig();
 
     @Expose
+    @ConfigOption(name = "Armor Stack Display", desc = "")
+    @Accordion
+    public StackDisplayConfig stackDisplayConfig = new StackDisplayConfig();
+
+    @Expose
     @ConfigOption(name = "Summonings", desc = "")
     @Accordion
     public SummoningsConfig summonings = new SummoningsConfig();
