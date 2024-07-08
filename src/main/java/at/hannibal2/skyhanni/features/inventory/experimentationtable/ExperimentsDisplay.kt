@@ -91,8 +91,10 @@ object ExperimentsDisplay {
         if (isOutOfBounds(event.slotId, currentExperiment)) return
         val item = event.item ?: return
         if (item.displayName.removeColor() == "?") return
+        val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
 
         if (lastClicked.none { it.first == event.slotId && it.second == uncoveredAt } && lastClick.passedSince() > 100.milliseconds) {
+            if (clicksItem != null && clicksItem.displayName.removeColor().split(" ")[1] == "0") return
             lastClicked.add(Pair(event.slotId, uncoveredAt))
             lastClick = SimpleTimeMark.now()
             toCheck.add(event.slotId to uncoveredAt)
