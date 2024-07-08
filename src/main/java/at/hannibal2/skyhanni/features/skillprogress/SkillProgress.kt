@@ -149,7 +149,7 @@ object SkillProgress {
         allDisplay = formatAllDisplay(drawAllDisplay())
         etaDisplay = drawETADisplay()
 
-        if (event.repeatSeconds(2)) {
+        if (event.repeatSeconds(1)) {
             update()
             updateSkillInfo()
         }
@@ -503,8 +503,7 @@ object SkillProgress {
             xpInfo.xpGainQueue.removeLast()
         }
 
-        var totalGain = 0f
-        for (f in xpInfo.xpGainQueue) totalGain += f
+        val totalGain = xpInfo.xpGainQueue.sum()
 
         xpInfo.xpGainHour = totalGain * (60 * 60) / xpInfo.xpGainQueue.size
         xpInfo.isActive = true
