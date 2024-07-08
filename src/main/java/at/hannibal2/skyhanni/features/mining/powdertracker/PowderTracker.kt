@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.mining.powdertracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
+import at.hannibal2.skyhanni.data.BossbarData
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -58,6 +59,10 @@ object PowderTracker {
         "powder.bossbar",
         "§e§lPASSIVE EVENT §b§l2X POWDER §e§lRUNNING FOR §a§l(?<time>.*)§r",
     )
+
+    /**
+     * REGEX-TEST: Ends in: §r§b5m 27s
+     */
     private val tablistEventDuration by patternGroup.pattern(
         "powder.duration",
         "Ends in: §r§b(?<duration>.*)",
@@ -105,16 +110,27 @@ object PowderTracker {
         calculateResourceHour(chestInfo)
         calculateResourceHour(hardStoneInfo)
 
-        for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
-            if (line.contains("2x Powder")) {
-                if (eventEnded) return
-                doublePowder = true
-                val durationLine = TabWidget.EVENT.lines.getOrNull(index + 1) ?: return
-                tablistEventDuration.matchMatcher(durationLine) {
-                    val duration = group("duration")
-                    powderTimer = TimeUtils.getDuration(duration)
-                    tracker.update()
+        if (TabWidget.EVENT.isActive) {
+            for ((index, line) in TabWidget.EVENT.lines.withIndex()) {
+                if (line.contains("2x Powder")) {
+                    if (eventEnded) return
+                    doublePowder = true
+                    val durationLine = TabWidget.EVENT.lines.getOrNull(index + 1) ?: return
+                    tablistEventDuration.matchMatcher(durationLine) {
+                        val duration = group("duration")
+                        powderTimer = TimeUtils.getDuration(duration)
+                        tracker.update()
+                    }
                 }
+            }
+        } else {
+            doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
+            powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
+                val duration = group("time")
+                powderTimer = TimeUtils.getDuration(duration)
+
+                doublePowder = powderTimer > Duration.ZERO
+                tracker.update()
             }
         }
 
