@@ -53,37 +53,37 @@ object SkillButtonInInventory {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (event.inventory is ContainerLocalMenu && showItem) {
-            if (event.slot == 50 && overflowConfig.tooltipButtonInSkillMenu) {
-                val itemToShow = if (overflowConfig.enableInSkillMenuTooltip) toggleTooltipEnabled else toggleTooltipDisabled
-                event.replace(itemToShow)
-            }
-            if (event.slot == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
-                val itemToShow = if (overflowConfig.enableInSkillMenuAsStackSize) toggleStackSizeEnabled else toggleStackSizeDisabled
-                event.replace(itemToShow)
-            }
-            if (event.slot == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
-                val itemToShow = if (customGoalConfig.enableInSkillMenuTooltip) toggleCustomGoalEnabled else toggleCustomGoalDisabled
-                event.replace(itemToShow)
-            }
+        if (!(event.inventory is ContainerLocalMenu && showItem)) return
+
+        if (event.slot == 50 && overflowConfig.tooltipButtonInSkillMenu) {
+            val itemToShow = if (overflowConfig.enableInSkillMenuTooltip) toggleTooltipEnabled else toggleTooltipDisabled
+            event.replace(itemToShow)
+        }
+        if (event.slot == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
+            val itemToShow = if (overflowConfig.enableInSkillMenuAsStackSize) toggleStackSizeEnabled else toggleStackSizeDisabled
+            event.replace(itemToShow)
+        }
+        if (event.slot == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
+            val itemToShow = if (customGoalConfig.enableInSkillMenuTooltip) toggleCustomGoalEnabled else toggleCustomGoalDisabled
+            event.replace(itemToShow)
         }
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (showItem) {
-            if (event.slotId == 50 && overflowConfig.tooltipButtonInSkillMenu) {
-                event.isCanceled = true
-                overflowConfig.enableInSkillMenuTooltip = !overflowConfig.enableInSkillMenuTooltip
-            }
-            if (event.slotId == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
-                event.isCanceled = true
-                overflowConfig.enableInSkillMenuAsStackSize = !overflowConfig.enableInSkillMenuAsStackSize
-            }
-            if (event.slotId == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
-                event.isCanceled = true
-                customGoalConfig.enableInSkillMenuTooltip = !customGoalConfig.enableInSkillMenuTooltip
-            }
+        if (!showItem) return
+
+        if (event.slotId == 50 && overflowConfig.tooltipButtonInSkillMenu) {
+            event.isCanceled = true
+            overflowConfig.enableInSkillMenuTooltip = !overflowConfig.enableInSkillMenuTooltip
+        }
+        if (event.slotId == 51 && overflowConfig.stackSizeButtonInSkillMenu) {
+            event.isCanceled = true
+            overflowConfig.enableInSkillMenuAsStackSize = !overflowConfig.enableInSkillMenuAsStackSize
+        }
+        if (event.slotId == 52 && customGoalConfig.customGoalButtonInSkillMenu) {
+            event.isCanceled = true
+            customGoalConfig.enableInSkillMenuTooltip = !customGoalConfig.enableInSkillMenuTooltip
         }
     }
 }

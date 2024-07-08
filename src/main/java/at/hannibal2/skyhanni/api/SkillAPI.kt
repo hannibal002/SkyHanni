@@ -467,66 +467,18 @@ object SkillAPI {
                 }
 
                 "goal" -> {
-                    val rawSkill = it[1].lowercase()
-                    val skillType = SkillType.getByNameOrNull(rawSkill)
-                    if (skillType == null) {
-                        ChatUtils.userError("Unknown Skill type: $rawSkill")
-                        return
-                    }
-                    val skill = storage?.get(skillType) ?: return
-                    skill.customGoalLevel = 0
-                    ChatUtils.chat("Custom goal level for §b${skillType.displayName} §ereset")
-                    return
+                    resetSkillGoal(it[1].lowercase())
                 }
 
                 "icon" -> {
-                    val rawSkill = it[1].lowercase()
-                    val skillType = SkillType.getByNameOrNull(rawSkill)
-                    if (skillType == null) {
-                        ChatUtils.userError("Unknown Skill type: $rawSkill")
-                        return
-                    }
-                    val skill = storage?.get(skillType) ?: return
-                    val stack = InventoryUtils.getItemInHand()
-                    if (stack == null) {
-                        ChatUtils.chat("Icon for ${skillType.displayName} has been reset.")
-                        skill.item = null
-                        return
-                    }
-                    skill.item = stack
-                    ChatUtils.chat("Changed item for skill ${skillType.displayName}")
-                    return
+                    setSkillIcon(it[1].lowercase())
                 }
             }
         }
         if (it.size == 3) {
             when (first) {
                 "goal" -> {
-                    val rawSkill = it[1].lowercase()
-                    val skillType = SkillType.getByNameOrNull(rawSkill)
-                    if (skillType == null) {
-                        ChatUtils.userError("Unknown Skill type: $rawSkill")
-                        return
-                    }
-                    val rawLevel = it[2]
-                    val targetLevel = rawLevel.toIntOrNull()
-                    if (targetLevel == null) {
-                        ChatUtils.userError("$rawLevel is not a valid number.")
-                        return
-                    }
-                    val skill = storage?.get(skillType) ?: return
-
-                    if (targetLevel <= skill.overflowLevel) {
-                        ChatUtils.userError(
-                            "Custom goal level ($targetLevel) must be greater than your current level " +
-                                "(${skill.overflowLevel}).",
-                        )
-                        return
-                    }
-
-                    skill.customGoalLevel = targetLevel
-                    ChatUtils.chat("Custom goal level for §b${skillType.displayName} §eset to §b$targetLevel")
-                    return
+                    setSkillGoal(it[1].lowercase(), it[2])
                 }
             }
         }
@@ -559,6 +511,62 @@ object SkillAPI {
             ).joinToString("\n"),
             prefix = false,
         )
+    }
+
+    private fun setSkillIcon(rawSkill: String) {
+        val skillType = SkillType.getByNameOrNull(rawSkill)
+        if (skillType == null) {
+            ChatUtils.userError("Unknown Skill type: $rawSkill")
+            return
+        }
+        val skill = storage?.get(skillType) ?: return
+        val stack = InventoryUtils.getItemInHand()
+        if (stack == null) {
+            ChatUtils.chat("Icon for ${skillType.displayName} has been reset.")
+            skill.item = null
+            return
+        }
+        skill.item = stack
+        ChatUtils.chat("Changed item for skill ${skillType.displayName}")
+        return
+    }
+
+    private fun setSkillGoal(rawSkill: String, level: String) {
+        val skillType = SkillType.getByNameOrNull(rawSkill)
+        if (skillType == null) {
+            ChatUtils.userError("Unknown Skill type: $rawSkill")
+            return
+        }
+        val targetLevel = level.toIntOrNull()
+        if (targetLevel == null) {
+            ChatUtils.userError("$level is not a valid number.")
+            return
+        }
+        val skill = storage?.get(skillType) ?: return
+
+        if (targetLevel <= skill.overflowLevel) {
+            ChatUtils.userError(
+                "Custom goal level ($targetLevel) must be greater than your current level " +
+                    "(${skill.overflowLevel}).",
+            )
+            return
+        }
+
+        skill.customGoalLevel = targetLevel
+        ChatUtils.chat("Custom goal level for §b${skillType.displayName} §eset to §b$targetLevel")
+        return
+    }
+
+    private fun resetSkillGoal(rawSkill: String) {
+        val skillType = SkillType.getByNameOrNull(rawSkill)
+        if (skillType == null) {
+            ChatUtils.userError("Unknown Skill type: $rawSkill")
+            return
+        }
+        val skill = storage?.get(skillType) ?: return
+        skill.customGoalLevel = 0
+        ChatUtils.chat("Custom goal level for §b${skillType.displayName} §ereset")
+        return
     }
 
     data class SkillInfo(
