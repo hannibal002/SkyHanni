@@ -35,11 +35,12 @@ object ExperimentsDisplay {
     private var foundMatches = mutableListOf<ItemPair>()
     private var foundPairs = mutableListOf<ItemPair>()
     private var foundPowerUps = mutableMapOf<Int, String>()
+    private var foundExperiences = mutableListOf<Pair<String, Int>>()
     private var toCheck = mutableListOf<Pair<Int, Int>>()
     private var lastClicked = mutableListOf<Pair<Int, Int>>()
     private var lastClick = SimpleTimeMark.farPast()
     private var currentExperiment = Experiments.NONE
-    private var instantFind = false
+    private var instantFind = 0
 
     private val patternGroup = RepoPattern.group("enchanting.experiments")
     private val powerUpPattern by patternGroup.pattern(
@@ -64,11 +65,12 @@ object ExperimentsDisplay {
         foundMatches.clear()
         foundPairs.clear()
         foundPowerUps.clear()
+        foundExperiences.clear()
         toCheck.clear()
         lastClicked.clear()
         lastClick = SimpleTimeMark.farPast()
         currentExperiment = Experiments.NONE
-        instantFind = false
+        instantFind = 0
     }
 
     @SubscribeEvent
@@ -111,6 +113,7 @@ object ExperimentsDisplay {
 
             val reward = convertToReward(itemNow)
             if (uncoveredItems.none { it.first == slot }) uncoveredItems.add(Pair(slot, reward))
+            if (foundExperiences.none { it.first == reward }) foundExperiences.add(Pair(reward, itemNow.itemDamage))
 
             when {
                 isPowerUp(reward) -> handlePowerUp(slot, reward)
@@ -121,7 +124,7 @@ object ExperimentsDisplay {
 
             val since = clicksSinceSeparator(lastClicked)
 
-            if ((since >= 2 || (since == -1 && lastClicked.size >= 2)) && !instantFind) {
+            if ((since >= 2 || (since == -1 && lastClicked.size >= 2)) && instantFind == 0) {
                 lastClicked.add(-1 to uncoveredAt)
                 uncoveredAt += 1
             }
@@ -138,12 +141,12 @@ object ExperimentsDisplay {
         possiblePairs--
         lastClicked.removeIf { it.first == slot }
         uncoveredAt -= 1
-        if (reward == "Instant Find") instantFind = true
+        if (reward == "Instant Find") instantFind += 1
     }
 
     private fun handleReward(index: Int, slot: Int, uncovered: Int, reward: String) {
         val lastSlotClicked =
-            if (!instantFind && lastClicked.none { it.first == -1 && it.second == uncovered - 1 } && lastClicked.size != 1)
+            if (instantFind == 0 && lastClicked.none { it.first == -1 && it.second == uncovered - 1 } && lastClicked.size != 1)
                 lastClicked.find { it.second == uncovered - 1 } ?: return else lastClicked.find { it.second == uncovered } ?: return
 
         lastSlotClicked.let {
@@ -153,9 +156,9 @@ object ExperimentsDisplay {
             if (isWaiting(lastItemName)) return
 
             when {
-                instantFind -> {
+                instantFind >= 1 -> {
                     handleFoundPair(slot, reward, it.first, lastItemName)
-                    instantFind = false
+                    instantFind -= 1
                     lastClicked.add(-1 to uncoveredAt)
                     uncoveredAt += 1
                 }
@@ -191,7 +194,9 @@ object ExperimentsDisplay {
     }
 
     private fun handleNormalReward(slot: Int, reward: String) {
-        if (foundMatches.none { it.first.second == reward } && foundPairs.none { it.first.second == reward }) foundNormals[slot] = reward
+        if (foundMatches.none { it.first.second == reward } &&
+            foundPairs.none { it.first.second == reward } &&
+            foundExperiences.count { it.first == reward } <= 1) foundNormals[slot] = reward
     }
 
     private fun calculatePossiblePairs() =

@@ -209,8 +209,10 @@ object ExperimentsProfitTracker {
         }
         if (inExperimentationTable) {
             lastExperimentTime = SimpleTimeMark.now()
-            handleExpBottles(true)
             inExperimentationTable = false
+        }
+        if (lastExperimentTime.passedSince() <= 3.seconds) {
+            handleExpBottles(true)
         }
     }
 
