@@ -173,7 +173,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
-    // TODO remove this workaround once hypixel fixes the bug that amount is not in tab list for minibosses
+    // TODO remove this workaround once hypixel fixes the bug that amount is not in tab list for mini bosses
     private fun fixMinibossAmount(quest: Quest, stack: ItemStack) {
         if (quest !is MiniBossQuest) return
         val storedAmount = quest.needAmount

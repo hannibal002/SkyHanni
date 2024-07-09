@@ -380,8 +380,8 @@ object GriffinBurrowHelper {
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
-            val keyname = KeyboardManager.getKeyName(config.keyBindWarp)
-            " §7(§ePress $keyname§7)"
+            val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
+            " §7(§ePress $keyName§7)"
         } else ""
         if (lastTitleSentTime.passedSince() > 2.seconds) {
             lastTitleSentTime = SimpleTimeMark.now()

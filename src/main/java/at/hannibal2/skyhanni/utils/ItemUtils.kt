@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -14,6 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
+import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -44,14 +47,13 @@ object ItemUtils {
     }
 
     // TODO change else janni is sad
-    fun isCoopSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any {
+    fun ItemStack.isCoopSoulBound(): Boolean =
+        getLore().any {
             it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
         }
 
     // TODO change else janni is sad
-    fun isSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
+    fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
@@ -293,7 +295,7 @@ object ItemUtils {
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
-        // This workaround fixes 'Tubto Cacti I Book'
+        // This workaround fixes 'Turbo Cacti I Book'
         val input = (if (originalInput.endsWith(" Book")) {
             originalInput.replace(" Book", "")
         } else originalInput).removeResets()
@@ -340,7 +342,7 @@ object ItemUtils {
                 "internal name" to pet.getInternalName(),
                 "item name" to name,
                 "rarity id" to rarityId,
-                "inventory name" to InventoryUtils.openInventoryName()
+                "inventory name" to InventoryUtils.openInventoryName(),
             )
         }
         return rarity
@@ -410,4 +412,20 @@ object ItemUtils {
         }
         return list
     }
+
+    fun neededItems(recipe: NeuRecipe): Map<NEUInternalName, Int> {
+        val neededItems = mutableMapOf<NEUInternalName, Int>()
+        for (ingredient in recipe.ingredients) {
+            val material = ingredient.internalItemId.asInternalName()
+            val amount = ingredient.count.toInt()
+            neededItems.addOrPut(material, amount)
+        }
+        return neededItems
+    }
+
+    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
+        neededItems(recipe).map {
+            it.key.getPrice(pastRecipes = pastRecipes) * it.value
+        }.sum()
+
 }
