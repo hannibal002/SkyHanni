@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
 import at.hannibal2.skyhanni.data.BossbarData
-import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -39,11 +38,7 @@ object PowderTracker {
     private val patternGroup = RepoPattern.group("mining.powder.tracker")
     private val pickedPattern by patternGroup.pattern(
         "picked",
-        "§6You have successfully picked the lock on this chest!",
-    )
-    private val uncoveredPattern by patternGroup.pattern(
-        "uncovered",
-        "§aYou uncovered a treasure chest!",
+        "  §r§6§lCHEST LOCKPICKED ",
     )
     private val powderStartedPattern by patternGroup.pattern(
         "powder.started",
@@ -145,16 +140,6 @@ object PowderTracker {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val msg = event.message
-
-        if (HotmData.GREAT_EXPLORER.let { it.enabled && it.isMaxLevel }) {
-            uncoveredPattern.matchMatcher(msg) {
-                tracker.modify {
-                    it.totalChestPicked += 1
-                }
-                isGrinding = true
-                lastChestPicked = SimpleTimeMark.now()
-            }
-        }
 
         pickedPattern.matchMatcher(msg) {
             tracker.modify {
