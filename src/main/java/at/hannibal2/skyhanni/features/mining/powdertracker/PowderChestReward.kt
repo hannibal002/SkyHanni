@@ -27,7 +27,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
     FLAWLESS_RUBY_GEMSTONE(
         "§5Flawless Ruby Gemstone",
-        ".*§9❤ Flawless Ruby Gemstone(?: §r§8x(?<amount>.*))?",
+        ".*§5❤ Flawless Ruby Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_SAPPHIRE_GEMSTONE(
@@ -44,7 +44,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
     FLAWLESS_SAPPHIRE_GEMSTONE(
         "§5Flawless Sapphire Gemstone",
-        ".*§9✎ Flawless Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
+        ".*§5✎ Flawless Sapphire Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_AMBER_GEMSTONE(
@@ -61,7 +61,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
     FLAWLESS_AMBER_GEMSTONE(
         "§5Flawless Amber Gemstone",
-        ".*§9⸕ Flawless Amber Gemstone(?: §r§8x(?<amount>.*))?",
+        ".*§5⸕ Flawless Amber Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_AMETHYST_GEMSTONE(
@@ -78,7 +78,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
     FLAWLESS_AMETHYST_GEMSTONE(
         "§5Flawless Amethyst Gemstone",
-        ".*§9❈ Flawless Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
+        ".*§5❈ Flawless Amethyst Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     ROUGH_JADE_GEMSTONE(
@@ -112,7 +112,7 @@ enum class PowderChestReward(val displayName: String, pattern: String) {
     ),
     FLAWLESS_TOPAZ_GEMSTONE(
         "§5Flawless Topaz Gemstone",
-        ".*§9✧ Flawless Topaz Gemstone(?: §r§8x(?<amount>.*))?",
+        ".*§5✧ Flawless Topaz Gemstone(?: §r§8x(?<amount>.*))?",
     ),
 
     FTX_3070(
