@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.inventory.ExperimentationTableConfig.ExperimentMessages
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -131,22 +132,30 @@ object ExperimentsProfitTracker {
         if (!isEnabled() || lastExperimentTime.passedSince() > 3.seconds) return
 
         val message = event.message.removeColor()
+        if (message == "You claimed the Superpairs rewards!" && ExperimentMessages.DONE.isSelected())
+            event.blockedReason = "CLAIM_MESSAGE"
 
         experimentsDropPattern.matchMatcher(message) {
             val reward = group("reward")
+
+            event.blockedReason = when {
+                enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
+                experienceBottlePattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
+                reward == "Metaphysical Serum" && ExperimentMessages.SERUM.isSelected() -> "SERUM_DROP"
+                reward == "Experiment The Fish" && ExperimentMessages.FISH.isSelected() -> "FISH_DROP"
+                ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
+                else -> ""
+            }
 
             enchantingExpPattern.matchMatcher(reward) {
                 tracker.modify {
                     it.xpGained += group("amount").substringBefore(",").toInt() * 1000
                 }
-                if (config.hideMessage) event.blockedReason = "experiment_drop"
                 return
             }
 
             val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
             if (!experienceBottlePattern.matches(group("reward"))) tracker.addItem(internalName, 1)
-
-            if (config.hideMessage) event.blockedReason = "experiment_drop"
             return
         }
 
@@ -287,6 +296,8 @@ object ExperimentsProfitTracker {
             if (addToTracker) tracker.addItem(internalName, amount - lastInInv)
         }
     }
+
+    fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
     fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
 }

@@ -5,9 +5,13 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ExperimentationTableConfig {
 
@@ -24,9 +28,9 @@ public class ExperimentationTableConfig {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Hide Message", desc = "Hide the messages sent after completing Add-on/Main experiments.")
-        @ConfigEditorBoolean
-        public boolean hideMessage = false;
+        @ConfigOption(name = "Hide Messages", desc = "Change the messages to be hidden after completing Add-on/Main experiments.")
+        @ConfigEditorDraggableList
+        public List<ExperimentMessages> hideMessages = new ArrayList<>();
 
         @Expose
         @ConfigOption(name = "Time displayed", desc = "Time displayed after completing an experiment.")
@@ -86,6 +90,27 @@ public class ExperimentationTableConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean ultraRareBookAlert = false;
+
+    public enum ExperimentMessages {
+        DONE("§eYou claimed the §dSuperpairs §erewards!"),
+        EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
+        ENCHANTMENTS("§8 +§9Smite VII §8(§7Enchantment Drops§8)"),
+        BOTTLES("§8 +§9Titanic Experience Bottle §8(§7Bottle Drops§8)"),
+        SERUM("§8 +§5Metaphysical Serum"),
+        FISH("§8 +§cExperiment The Fish")
+        ;
+
+        private final String str;
+
+        ExperimentMessages(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     public enum Experiments {
         NONE("", 0, 0, 0, 0),

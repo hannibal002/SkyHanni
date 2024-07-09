@@ -173,7 +173,7 @@ object ExperimentsDisplay {
                 )
 
                 hasFoundMatch(slot, reward) -> handleFoundMatch(slot, reward)
-                else -> handleNormalReward(slot, reward)
+                else -> handleNormalReward(slot, reward, lastItem)
             }
         }
     }
@@ -186,19 +186,19 @@ object ExperimentsDisplay {
     ) {
         foundPairs.add(ItemPair(Pair(slot, reward), Pair(lastSlotClicked, lastItemName)))
         foundMatches.removeAll { it.first.second == reward }
-        foundNormals.entries.removeIf { it.value == reward }
+        foundNormals.entries.removeIf { it.key == slot || it.key == lastSlotClicked }
     }
 
     private fun handleFoundMatch(slot: Int, reward: String) {
         val match = uncoveredItems.find { it.second == reward }?.first ?: return
         foundMatches.add(ItemPair(Pair(slot, reward), Pair(match, reward)))
-        foundNormals.entries.removeIf { it.value == reward }
+        foundNormals.entries.removeIf { it.key == slot || it.key == match }
     }
 
-    private fun handleNormalReward(slot: Int, reward: String) {
+    private fun handleNormalReward(slot: Int, reward: String, item: ItemStack) {
         if (foundMatches.none { it.first.second == reward } &&
             foundPairs.none { it.first.second == reward } &&
-            foundExperiences.count { it.first == reward } <= 1) foundNormals[slot] = reward
+            foundExperiences.count { it.first == reward && it.second == item.itemDamage } <= 1) foundNormals[slot] = reward
     }
 
     private fun calculatePossiblePairs() =
