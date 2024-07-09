@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -133,6 +134,24 @@ public class PowderTrackerConfig {
         public String toString() {
             return str;
         }
+    }
+
+    @Expose
+    @ConfigOption(name = "Chest Timer", desc = "")
+    @Accordion
+    public ChestTimer chestTimer = new ChestTimer();
+
+    public static class ChestTimer {
+
+        @Expose
+        @ConfigOption(name = "Chest Timer", desc = "")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean enabled = true;
+
+        @Expose
+        @ConfigLink(owner = PowderTrackerConfig.class, field = "onlyWhenPowderGrinding")
+        public Position position = new Position(100, 100, false, true);
     }
 
     @Expose
