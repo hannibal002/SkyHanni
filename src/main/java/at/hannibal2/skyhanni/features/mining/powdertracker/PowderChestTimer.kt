@@ -5,10 +5,9 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -16,12 +15,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,34 +30,38 @@ object PowderChestTimer {
 
     private val config get() = SkyHanniMod.feature.mining.powderTracker.chestTimer
 
-    private var spawnedChest = mapOf<LorenzVec, SimpleTimeMark>()
-    private var display = listOf<Renderable>()
+    private var display = Renderable.string("Chest Timer")
+    private var time = SimpleTimeMark.farPast()
+    private val chestSet = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
+
+    @SubscribeEvent
+    fun onSound(event: PlaySoundEvent) {
+        if (!isEnabled()) return
+        if (event.soundName == "random.levelup" && event.pitch == 1.0f && event.volume == 1.0f) {
+            time = SimpleTimeMark.now()
+        }
+    }
 
     @SubscribeEvent
     fun onRenderGui(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.position.renderRenderables(display, posLabel = "Powder Chest Timer")
+        config.position.renderRenderable(display, posLabel = "Powder Chest Timer")
     }
 
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
-        if (location.distanceToPlayer() > 20) return
+        if (location.distanceToPlayer() > 15) return
         val oldBlock = event.old
         val newBlock = event.new
 
-        if (oldBlock == "air" && newBlock == "chest") {
-            spawnedChest = spawnedChest.editCopy {
-                put(location, SimpleTimeMark.now().plus(1.minutes))
-            }
-        }
-
-        if (oldBlock == "chest" && newBlock == "air") {
-            spawnedChest = spawnedChest.editCopy {
-                remove(location)
-            }
+        if (newBlock == "chest" && oldBlock != "chest") {
+            if (time.passedSince() > 100.milliseconds) return
+            chestSet[location] = SimpleTimeMark.now().plus(60500.milliseconds)
+        } else if (oldBlock == "chest" && newBlock != "chest") {
+            chestSet.remove(location)
         }
     }
 
@@ -64,39 +69,27 @@ object PowderChestTimer {
     fun onSecondPassed(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        spawnedChest = spawnedChest.editCopy {
-            removeFirst { it.value.timeUntil() < 0.seconds }
-        }
-
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): List<Renderable> {
-        if (spawnedChest.isEmpty()) return emptyList()
+    private fun drawDisplay(): Renderable {
+        if (chestSet.entries().isEmpty()) return Renderable.string("")
 
-        val list = mutableListOf<Renderable>()
-        val count = spawnedChest.size
+        val count = chestSet.entries().size
         val name = StringUtils.pluralize(count, "chest")
-        val first = spawnedChest.values.first()
-        val timeUntil = first.timeUntil()
-        val color = if (timeUntil.inWholeSeconds < 10) "§c" else "§e"
+        val first = chestSet.last()
+        val timeUntil = first.value.timeUntil()
+        val color = timeUntil.colorForTime().getChatColor()
 
-        list.add(Renderable.string("$color$timeUntil §8(§e$count §b$name§8)"))
-
-        return list
+        return Renderable.string("$color$timeUntil §8(§e$count §b$name§8)")
     }
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        for ((loc, time) in spawnedChest) {
+        for ((loc, time) in chestSet) {
 
-            val color = when (time.timeUntil().inWholeSeconds) {
-                in 0..9 -> LorenzColor.RED
-                in 10..29 -> LorenzColor.GOLD
-                in 30..60 -> LorenzColor.GREEN
-                else -> LorenzColor.WHITE
-            }
+            val color = time.timeUntil().colorForTime()
 
             event.drawWaypointFilled(loc, color.toColor(), seeThroughBlocks = false)
             val y = if (loc.y <= LocationUtils.playerLocation().y) 1.25 else -0.25
@@ -107,5 +100,14 @@ object PowderChestTimer {
         }
     }
 
-    private fun isEnabled() = config.enabled && IslandType.CRIMSON_ISLE.isInIsland()
+    private fun Duration.colorForTime(): LorenzColor {
+        return when (this.inWholeSeconds) {
+            in 0..9 -> LorenzColor.RED
+            in 10..29 -> LorenzColor.GOLD
+            in 30..60 -> LorenzColor.GREEN
+            else -> LorenzColor.WHITE
+        }
+    }
+
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }
