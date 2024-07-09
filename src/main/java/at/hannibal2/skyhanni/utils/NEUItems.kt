@@ -176,8 +176,9 @@ object NEUItems {
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
     fun NEUInternalName.getPriceOrNull(useSellPrice: Boolean = false, pastRecipes: List<NeuRecipe> = emptyList()): Double? {
-        if (this == NEUInternalName.WISP_POTION) {
-            return 20_000.0
+        when (this) {
+            NEUInternalName.WISP_POTION -> return 20_000.0
+            NEUInternalName.SKYBLOCK_COIN -> return 1.0
         }
 
         getBazaarData()?.let {
@@ -202,7 +203,9 @@ object NEUItems {
     fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
         manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
             getRecipes(this).filter { it !in pastRecipes }
-                .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }.minOrNull()
+                .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }
+                .filter { it >= 0 }
+                .minOrNull()
         }
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
