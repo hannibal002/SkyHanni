@@ -17,11 +17,11 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object CompactEnchantingExp {
+object CompactExperimentRewards {
 
     private val enabled get() = SkyHanniMod.feature.chat.compactEnchantingExp
 
-    private var gainedExperience = mutableListOf<Int>()
+    private var gainedRewards = mutableListOf<String>()
     private var lastTimeTableOpened = SimpleTimeMark.farPast()
 
     /**
@@ -34,13 +34,9 @@ object CompactEnchantingExp {
         "Superpairs (?:\\(.+\\)|Rewards)",
     )
 
-    /**
-     * REGEX-TEST:  +141k Enchanting Exp
-     * REGEX-TEST:  +134k Enchanting Exp
-     */
-    private val enchantingExpPattern by patternGroup.pattern(
-        "exp",
-        "^ \\+(?<amount>\\d+)k Enchanting Exp\$",
+    private val experimentsDropPattern by patternGroup.pattern(
+        "drop",
+        "^ §r§8\\+(?<reward>.*)\$",
     )
 
     @SubscribeEvent
@@ -54,29 +50,30 @@ object CompactEnchantingExp {
     fun onChat(event: LorenzChatEvent) {
         if (!enabled || lastTimeTableOpened.passedSince() >= 3.seconds || event.blockedReason != "") return
 
-        event.message.removeColor().let { message ->
-            enchantingExpPattern.matchMatcher(message) {
-                val amount = group("amount").toInt()
+        if (event.message.removeColor() == "You claimed the Superpairs rewards!") {
+            event.blockedReason = "COMPACT_REWARDS"
+            return
+        }
 
-                gainedExperience.add(amount)
-                event.blockedReason = "COMPACT_EXP"
+        event.message.let { message ->
+            experimentsDropPattern.matchMatcher(message) {
+                val reward = group("reward")
+
+                gainedRewards.add(reward)
+                event.blockedReason = "COMPACT_REWARDS"
 
                 DelayedRun.runDelayed(100.milliseconds) {
-                    if (gainedExperience.last() == amount) {
-                        val totalExp = gainedExperience.sum()
-                        val maxExp = gainedExperience.maxOrNull()
-                        val chatMessage = " §8+§3${totalExp}k Enchanting Exp"
+                    if (gainedRewards.last() == reward) {
+                        val chatMessage = "§eYou claimed the §dSuperpairs §erewards!"
 
                         val expList = mutableListOf<String>().apply {
-                            add("§3${maxExp}k §8(§7base§8)")
-                            gainedExperience.removeIf { it == maxExp }
-                            gainedExperience.forEach {
-                                add(" §2+ §3${it}k §8(§7pair§8)")
+                            gainedRewards.forEach {
+                                add("§8+$it")
                             }
                         }
 
                         ChatUtils.hoverableChat(chatMessage, expList, null, false)
-                        gainedExperience.clear()
+                        gainedRewards.clear()
                     }
                 }
             }

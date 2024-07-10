@@ -89,7 +89,7 @@ public class ChatConfig {
     public boolean compactBestiaryMessage = true;
 
     @Expose
-    @ConfigOption(name = "Compact Enchanting Exp", desc = "Compact the Enchanting Exp gained from Experiments, only showing additional information when hovering.")
+    @ConfigOption(name = "Compact Experiment Rewards", desc = "Compact the rewards gained from Experiments, only showing additional information when hovering.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactEnchantingExp = false;
