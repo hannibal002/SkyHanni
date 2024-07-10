@@ -157,6 +157,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<String, Long> straysExtraChocMs = new HashMap<>();
+
+        @Expose
+        public Map<String, Integer> goldenTypesCaught = new HashMap<>();
     }
 
     @Expose
