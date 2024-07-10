@@ -18,7 +18,7 @@ object Spooky : ScoreboardEvent() {
                     .removeResets()
                     .split("\n")
                     .firstOrNull { it.startsWith("§7Your Candy:") }
-                    ?.removePrefix("§7Your Candy:") ?: "§cCandy not found",
+                    ?.removePrefix("§7Your Candy: ") ?: "§cCandy not found",
             )
         }
     }
