@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 
 // internal
-// 1s timer
+// scoreboard update
 object FlightDuration : ScoreboardEvent() {
     override fun getDisplay() = ScoreboardPattern.flightDurationPattern.firstMatches(getSbLines())?.trim()
 
