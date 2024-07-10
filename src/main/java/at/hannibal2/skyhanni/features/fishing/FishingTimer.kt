@@ -6,12 +6,15 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -23,6 +26,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -34,8 +38,16 @@ object FishingTimer {
     private val barnLocation = LorenzVec(108, 89, -252)
     private val mobMap = mutableMapOf<Mob, SimpleTimeMark>()
 
-    private val lastSeaCreatureFished = SimpleTimeMark.farPast()
+    private var lastSeaCreatureFished = SimpleTimeMark.farPast()
     private var lastNameFished: String? = null
+
+    private var babyMagmaSlugsToFind = 0
+    private var lastMagmaSlugLocation: LorenzVec? = null
+    private var lastMagmaSlugTime = SimpleTimeMark.farPast()
+    private var recentBabyMagmaSlugs = TimeLimitedSet<Mob>(2.seconds)
+
+    private var mobsToFind = 0
+
     private val recentMobs = TimeLimitedSet<Mob>(2.seconds)
     private val currentCap by lazy {
         RecalculatingValue(1.seconds) {
@@ -73,16 +85,31 @@ object FishingTimer {
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
-        if (event.mob.name !in SeaCreatureManager.allFishingMobs) return
-        recentMobs.add(event.mob)
+        val mob = event.mob
+        if (babyMagmaSlugsToFind != 0 && mob.name == "Baby Magma Slug") {
+            recentBabyMagmaSlugs += mob
+            handleBabySlugs()
+            return
+        }
+        if (mob.name !in SeaCreatureManager.allFishingMobs) return
+        recentMobs += mob
         handle()
     }
 
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (!isEnabled()) return
-        mobMap -= event.mob
-        recentMobs.remove(event.mob)
+        val mob = event.mob
+        if (mob in mobMap) {
+            mobMap -= mob
+            if (mob.name == "Magma Slug") {
+                lastMagmaSlugLocation = mob.baseEntity.getLorenzVec()
+                babyMagmaSlugsToFind += 3
+                lastMagmaSlugTime = SimpleTimeMark.now()
+                handleBabySlugs()
+            }
+        }
+        recentMobs -= mob
         updateInfo()
     }
 
@@ -90,18 +117,47 @@ object FishingTimer {
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
+        lastSeaCreatureFished = SimpleTimeMark.now()
         lastNameFished = event.seaCreature.name
+        mobsToFind = if (event.doubleHook) 2 else 1
         handle()
     }
 
     private fun handle() {
         if (lastSeaCreatureFished.passedSince() > 2.seconds) return
-        val mob = recentMobs.toSet().filter { it.name == lastNameFished }
-            .minByOrNull { it.baseEntity.distanceToPlayer() } ?: return
+        val name = lastNameFished ?: return
+        val mobs = recentMobs.filter { it.name == name && it !in mobMap }
+            .sortedBy { it.baseEntity.distanceToPlayer() }
+            .take(mobsToFind).ifEmpty { return }
+        mobsToFind -= mobs.size
+        mobs.forEach { mob ->
+            mobMap[mob] = SimpleTimeMark.now()
+            mob.highlight(LorenzColor.LIGHT_PURPLE.toColor())
+        }
+        if (mobsToFind == 0) {
+            recentMobs.clear()
+            lastNameFished = null
+        }
+        updateInfo()
+    }
 
-        mobMap[mob] = SimpleTimeMark.now()
-        recentMobs.clear()
-        lastNameFished = null
+    private fun handleBabySlugs() {
+        if (lastMagmaSlugTime.passedSince() > 2.seconds) return
+        if (babyMagmaSlugsToFind == 0) return
+        val location = lastMagmaSlugLocation ?: return
+        val slugs = recentBabyMagmaSlugs.filter { it !in mobMap }
+            .sortedBy { it.baseEntity.distanceTo(location) }
+            .take(babyMagmaSlugsToFind).ifEmpty { return }
+        babyMagmaSlugsToFind -= slugs.size
+        slugs.forEach { mob ->
+            mobMap[mob] = SimpleTimeMark.now()
+            mob.highlight(LorenzColor.LIGHT_PURPLE.toColor())
+        }
+        if (babyMagmaSlugsToFind == 0) {
+            recentBabyMagmaSlugs.clear()
+            lastMagmaSlugLocation = null
+        }
+        updateInfo()
     }
 
     @SubscribeEvent
@@ -151,6 +207,19 @@ object FishingTimer {
         val countColor = if (config.fishingCapAlert && currentCount >= currentCap.getValue()) "§c" else "§e"
         val name = StringUtils.pluralize(currentCount, "sea creature")
         return "$timeColor$timeFormat §8($countColor$currentCount §b$name§8)"
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        mobMap.clear()
+        recentMobs.clear()
+        babyMagmaSlugsToFind = 0
+        lastMagmaSlugLocation = null
+        lastMagmaSlugTime = SimpleTimeMark.farPast()
+        recentBabyMagmaSlugs.clear()
+        mobsToFind = 0
+        currentCount = 0
+        startTime = SimpleTimeMark.farPast()
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
