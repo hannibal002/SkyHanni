@@ -89,6 +89,12 @@ public class ChatConfig {
     public boolean compactBestiaryMessage = true;
 
     @Expose
+    @ConfigOption(name = "Compact Enchanting Exp", desc = "Compact the Enchanting Exp gained from Experiments, only showing additional information when hovering.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactEnchantingExp = false;
+
+    @Expose
     @ConfigOption(name = "Arachne Hider", desc = "Hide chat messages about the Arachne Fight while outside of §eArachne's Sanctuary§7.")
     @ConfigEditorBoolean
     @FeatureToggle
