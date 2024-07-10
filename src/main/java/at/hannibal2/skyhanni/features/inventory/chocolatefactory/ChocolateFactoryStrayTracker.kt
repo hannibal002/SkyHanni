@@ -219,14 +219,15 @@ object ChocolateFactoryStrayTracker {
         val formattedExtraTime = extraChocMs.let { if (it == 0.milliseconds) "0s" else it.format() }
 
         straysDisplay = listOfNotNull(
-            Renderable.string("§6§lStray Tracker"),
+            Renderable.hoverTips(
+                "§6§lStray Tracker",
+                tips = listOf("§a+§b${formattedExtraTime} §afrom strays§7")
+            ),
             extractHoverableOfRarity("common"),
             extractHoverableOfRarity("uncommon"),
             extractHoverableOfRarity("rare"),
             extractHoverableOfRarity("epic"),
             extractHoverableOfRarity("legendary"),
-            Renderable.string(""),
-            Renderable.string("§a+§b${formattedExtraTime} §afrom strays§7"),
         )
     }
 
