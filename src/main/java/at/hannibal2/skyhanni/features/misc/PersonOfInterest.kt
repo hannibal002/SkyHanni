@@ -58,12 +58,18 @@ object PersonOfInterest {
         val playerLeft = poi.filter { it in notifyList && it !in currentLobbyPlayers }.toSet()
 
         if (playerJoined.isNotEmpty()) {
-            ChatUtils.chat("§b${playerJoined.joinToString(", ")} §6joined your lobby.")
+            ChatUtils.chat(
+                String.format(config.joinMessage.replace("§", "&"), playerJoined.joinToString(", ")),
+                config.usePrefix,
+            )
             notifyList.addAll(playerJoined)
         }
 
         if (playerLeft.isNotEmpty()) {
-            ChatUtils.chat("§b${playerLeft.joinToString(", ")} §cleft your lobby.")
+            ChatUtils.chat(
+                String.format(config.leftMessage.replace("§", "&"), playerLeft.joinToString(", ")),
+                config.usePrefix,
+            )
             notifyList.removeAll(playerLeft)
         }
     }

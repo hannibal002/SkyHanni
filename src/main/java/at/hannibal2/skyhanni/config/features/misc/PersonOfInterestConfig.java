@@ -18,4 +18,19 @@ public class PersonOfInterestConfig {
     @ConfigOption(name = "Players List", desc = "Players list you want to be notified for.\n§cCase sensitive, separated by comma.")
     @ConfigEditorText
     public String playersList = "hypixel";
+
+    @Expose
+    @ConfigOption(name = "Use Prefix", desc = "Should the [SkyHanni] prefix should be in the join/leave message ?")
+    @ConfigEditorBoolean
+    public boolean usePrefix = true;
+
+    @Expose
+    @ConfigOption(name = "Join Message", desc = "Configure the message when someone join.")
+    @ConfigEditorText
+    public String joinMessage = "&b%s &ajoined your lobby.";
+
+    @Expose
+    @ConfigOption(name = "Left Message", desc = "Configure the message when someone leave.")
+    @ConfigEditorText
+    public String leftMessage = "&b%s &cleft your lobby.";
 }
