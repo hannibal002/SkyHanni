@@ -90,7 +90,7 @@ object HoppityEggDisplayManager {
         if (displayList.size == 1) return emptyList()
 
         return listOf(
-            if(config.warpUnclaimedEggs) Renderable.clickAndHover(
+            if (config.warpUnclaimedEggs) Renderable.clickAndHover(
                 Renderable.verticalContainer(displayList.map(Renderable::string)),
                 tips = listOf("§eClick to ${"/warp ${HoppityEggsManager.config.warpDestination}".trim()}!"),
                 onClick = { HypixelCommands.warp(HoppityEggsManager.config.warpDestination) },
