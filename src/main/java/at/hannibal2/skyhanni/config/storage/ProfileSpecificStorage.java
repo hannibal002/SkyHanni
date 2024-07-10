@@ -151,6 +151,12 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Integer hoppityShopYearOpened = null;
+
+        @Expose
+        public Map<String, Integer> straysCaught = new HashMap<>();
+
+        @Expose
+        public Map<String, Long> straysExtraChocMs = new HashMap<>();
     }
 
     @Expose
