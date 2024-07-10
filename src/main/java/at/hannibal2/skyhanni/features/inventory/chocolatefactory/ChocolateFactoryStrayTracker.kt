@@ -1,28 +1,21 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.Arrays
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChocolateFactoryStrayTracker {
@@ -35,7 +28,7 @@ object ChocolateFactoryStrayTracker {
 
     private val strayCaughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.caught",
-        ".* §d§lCAUGHT!.*"
+        ".* §d§lCAUGHT!.*",
     )
 
     /**
@@ -45,35 +38,35 @@ object ChocolateFactoryStrayTracker {
      */
     private val strayLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.loreinfo",
-        "§7You caught a stray (?<rabbit>.*) .*§6\\+(?<amount>[\\d,]*)[ §6]Chocolate§7!"
+        "§7You caught a stray (?<rabbit>.*) .*§6\\+(?<amount>[\\d,]*)[ §6]Chocolate§7!",
     )
 
     private val goldenStrayHoardPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.goldenhoard",
-        "§7You caught a stray (?<rabbit>.*) .*§6A hoard of §aStray Rabbits §r§7has appeared!"
+        "§7You caught a stray (?<rabbit>.*) .*§6A hoard of §aStray Rabbits §r§7has appeared!",
     )
 
     private val fishTheRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.fish",
-        "§7You caught a stray §9Fish the Rabbit§7!§7You have already found §9Fish the*§Rabbit*7, so you received .*§6\\+(?<amount>[\\d,]*) Chocolate§7!"
+        "§7You caught a stray §9Fish the Rabbit§7!§7You have already found §9Fish the*§Rabbit*7, so you received .*§6\\+(?<amount>[\\d,]*) Chocolate§7!",
     )
 
     @SubscribeEvent
     fun onTick(event: SecondPassedEvent) {
-        if(!LorenzUtils.inSkyBlock) return
-        if(!config.strayRabbitTracker) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.strayRabbitTracker) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         val profileStorage = profileStorage ?: return
         InventoryUtils.getItemsInOpenChest().filter {
             !claimedStraysSlots.contains(it.slotIndex)
         }.forEach {
             strayCaughtPattern.matchMatcher(it.stack.name) {
-                if(it.stack.getLore().isEmpty()) return
+                if (it.stack.getLore().isEmpty()) return
                 claimedStraysSlots.add(it.slotIndex)
                 val loreText = it.stack.getLore().toTypedArray().joinToString("")
                 ChatUtils.chat("§d§lStray Matched!\n§6§lLore§r§7: ${loreText.replace("§", "*")}")
                 strayLorePattern.matchMatcher(loreText) {
-                    val rarity = group("rabbit").let {rab ->
+                    val rarity = group("rabbit").let { rab ->
                         when {
                             rab.startsWith("§f") -> "common"
                             rab.startsWith("§a") -> "uncommon"
@@ -86,7 +79,8 @@ object ChocolateFactoryStrayTracker {
                     val amount = group("amount").formatLong()
                     val format = ChocolateFactoryAPI.timeUntilNeed(amount + 1)
                     profileStorage.straysCaught[rarity] = profileStorage.straysCaught[rarity]?.plus(1) ?: 1
-                    profileStorage.straysExtraChocMs[rarity] = profileStorage.straysExtraChocMs[rarity]?.plus(format.inWholeMilliseconds) ?: format.inWholeMilliseconds
+                    profileStorage.straysExtraChocMs[rarity] = profileStorage.straysExtraChocMs[rarity]?.plus(format.inWholeMilliseconds)
+                        ?: format.inWholeMilliseconds
                     //Asynchronously update to immediately reflect caught stray
                     updateStraysDisplay()
                 }
@@ -95,7 +89,7 @@ object ChocolateFactoryStrayTracker {
         InventoryUtils.getItemsInOpenChest().filter {
             claimedStraysSlots.contains(it.slotIndex)
         }.forEach {
-            if(!strayCaughtPattern.matches(it.stack.name)) {
+            if (!strayCaughtPattern.matches(it.stack.name)) {
                 claimedStraysSlots.removeAt(claimedStraysSlots.indexOf(it.slotIndex))
             }
         }
@@ -103,15 +97,15 @@ object ChocolateFactoryStrayTracker {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return;
-        if(!ChocolateFactoryAPI.inChocolateFactory) return;
+        if (!LorenzUtils.inSkyBlock) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
         updateStraysDisplay()
     }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if(!config.strayRabbitTracker) return
+        if (!config.strayRabbitTracker) return
 
         config.strayRabbitTrackerPosition.renderRenderables(straysDisplay, posLabel = "Stray Tracker")
     }
@@ -127,7 +121,7 @@ object ChocolateFactoryStrayTracker {
     private fun updateStraysDisplay() {
         val profileStorage = profileStorage ?: return
         val extraChocMs = profileStorage.straysExtraChocMs.values.sum().milliseconds
-        val formattedExtraTime = extraChocMs.let { if(it == 0.milliseconds) "0s" else it.format() }
+        val formattedExtraTime = extraChocMs.let { if (it == 0.milliseconds) "0s" else it.format() }
 
         straysDisplay = listOfNotNull(
             Renderable.string("§6§lStray Tracker"),
@@ -137,7 +131,7 @@ object ChocolateFactoryStrayTracker {
             extractHoverableOfRarity("epic"),
             extractHoverableOfRarity("legendary"),
             Renderable.string(""),
-            Renderable.string("§a+§b${formattedExtraTime} §afrom strays§7")
+            Renderable.string("§a+§b${formattedExtraTime} §afrom strays§7"),
         )
     }
 
@@ -150,14 +144,14 @@ object ChocolateFactoryStrayTracker {
         val extraChocFormat = rarityExtraChocMs?.format() ?: ""
 
         val lineHeader = rarityFormatMap[rarity] ?: ""
-        val lineFormat = "${lineHeader}${caughtString}";
+        val lineFormat = "${lineHeader}${caughtString}"
 
         return if (rarityExtraChocMs == null) {
             Renderable.string(lineFormat)
         } else {
             Renderable.hoverTips(
                 Renderable.string(lineFormat),
-                tips = listOf("§a+§b${extraChocFormat} §aof production§7")
+                tips = listOf("§a+§b${extraChocFormat} §aof production§7"),
             )
         }
     }
