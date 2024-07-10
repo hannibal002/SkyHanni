@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -50,6 +51,13 @@ object PowderChestTimer {
     }
 
     @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        if (!isEnabled()) return
+
+        chestSet.clear()
+    }
+
+    @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
@@ -77,7 +85,7 @@ object PowderChestTimer {
 
         val count = chestSet.entries().size
         val name = StringUtils.pluralize(count, "chest")
-        val first = chestSet.last()
+        val first = chestSet.lastOrNull() ?: return Renderable.string("")
         val timeUntil = first.value.timeUntil()
         val color = timeUntil.colorForTime().getChatColor()
 
