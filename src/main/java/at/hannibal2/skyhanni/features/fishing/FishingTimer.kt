@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -130,10 +129,7 @@ object FishingTimer {
             .sortedBy { it.baseEntity.distanceToPlayer() }
             .take(mobsToFind).ifEmpty { return }
         mobsToFind -= mobs.size
-        mobs.forEach { mob ->
-            mobMap[mob] = SimpleTimeMark.now()
-            mob.highlight(LorenzColor.LIGHT_PURPLE.toColor())
-        }
+        mobs.forEach { mobMap[it] = SimpleTimeMark.now() }
         if (mobsToFind == 0) {
             recentMobs.clear()
             lastNameFished = null
@@ -149,10 +145,7 @@ object FishingTimer {
             .sortedBy { it.baseEntity.distanceTo(location) }
             .take(babyMagmaSlugsToFind).ifEmpty { return }
         babyMagmaSlugsToFind -= slugs.size
-        slugs.forEach { mob ->
-            mobMap[mob] = SimpleTimeMark.now()
-            mob.highlight(LorenzColor.LIGHT_PURPLE.toColor())
-        }
+        slugs.forEach { mobMap[it] = SimpleTimeMark.now() }
         if (babyMagmaSlugsToFind == 0) {
             recentBabyMagmaSlugs.clear()
             lastMagmaSlugLocation = null
