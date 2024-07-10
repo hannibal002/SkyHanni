@@ -116,7 +116,7 @@ object JacobContestTimeNeeded {
     ) {
         var lowBPSWarning = listOf<String>()
         val rawSpeed = speed.toDouble()
-        val speedForFormular = crop.getBps()?.let {
+        val speedForFormula = crop.getBps()?.let {
             if (it < 15) {
                 val v = rawSpeed / it
                 (v * 19.9).toInt()
@@ -132,7 +132,7 @@ object JacobContestTimeNeeded {
                 showLine = "§9${crop.cropName} §cBracket not revealed!"
                 continue
             }
-            val timeInMinutes = (amount.toDouble() / speedForFormular).seconds
+            val timeInMinutes = (amount.toDouble() / speedForFormula).seconds
             val formatDuration = timeInMinutes.format()
             val color = if (timeInMinutes < 20.minutes) "§b" else "§c"
             var marking = ""

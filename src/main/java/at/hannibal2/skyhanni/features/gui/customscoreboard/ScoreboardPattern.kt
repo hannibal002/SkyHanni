@@ -60,9 +60,14 @@ object ScoreboardPattern {
         "yearvotes",
         "§6Year \\d+ Votes",
     )
+
+    /**
+     * REGEX-TEST: §f||||||||||||||| §aFoxy
+     * REGEX-TEST: §d|§f|||||||||||||| §dDiaz
+     */
     val votesPattern by mainSb.pattern(
         "votes",
-        "§[caebd]\\|+(?:§f)?\\|+ §.+",
+        "§.\\|+(?:§f)?\\|+ §.+",
     )
     val waitingForVotePattern by mainSb.pattern(
         "waitingforvote",
@@ -137,9 +142,13 @@ object ScoreboardPattern {
         "tokens",
         "(?:§.)*Tokens: §.[\\w,]+",
     )
+
+    /**
+     * REGEX-TEST: Submerges In: §e01m 00s
+     */
     val submergesPattern by kuudraSb.pattern(
         "submerges",
-        "(?:§.)*Submerges In: (?:§.)*[\\w,?:]+",
+        "(?:§.)*Submerges In: (?:§.)*[\\w\\s]+",
     )
 
     // farming
@@ -405,11 +414,11 @@ object ScoreboardPattern {
     )
     val winterEventStartPattern by eventsSb.pattern(
         "wintereventstart",
-        "(?:§.)*Event Start: §.\\d*:?\\d+",
+        "(§.)*Event Start: §.[\\d:]+$",
     )
     val winterNextWavePattern by eventsSb.pattern(
         "wintereventnextwave",
-        "(?:§.)*Next Wave: (?:§.)*(?:\\d*:?\\d+|Soon!)",
+        "(§.)*Next Wave: (§.)*([\\d:]+|Soon!)$",
     )
     val winterWavePattern by eventsSb.pattern(
         "wintereventwave",
@@ -421,11 +430,11 @@ object ScoreboardPattern {
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
-        "(?:§.)*Your Total Damage: §.\\d+.*",
+        "(§.)*Your Total Damage: §.[\\d+,.]+.*$",
     )
     val winterCubeDmgPattern by eventsSb.pattern(
         "wintereventcubedmg",
-        "(?:§.)*Your Cube Damage: §.[\\d.,]+",
+        "(§.)*Your Cube Damage: §.[\\d+,.]+$",
     )
 
     // rift

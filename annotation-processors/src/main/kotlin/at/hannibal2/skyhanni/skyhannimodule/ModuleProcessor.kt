@@ -90,10 +90,10 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
             error("${warnings.size} errors related to event annotations found, please fix them before continuing. Click on the kspKotlin build log for more information.")
         }
 
-        val dependencies = symbols.mapNotNull { it.containingFile }.toTypedArray()
-        val deps = Dependencies(true, *dependencies)
+        val sources = symbols.mapNotNull { it.containingFile }.toTypedArray()
+        val dependencies = Dependencies(true, *sources)
 
-        val file = codeGenerator.createNewFile(deps, "at.hannibal2.skyhanni.skyhannimodule", "LoadedModules")
+        val file = codeGenerator.createNewFile(dependencies, "at.hannibal2.skyhanni.skyhannimodule", "LoadedModules")
 
         OutputStreamWriter(file).use {
             it.write("package at.hannibal2.skyhanni.skyhannimodule\n\n")

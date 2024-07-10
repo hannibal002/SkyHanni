@@ -28,6 +28,8 @@ object MobData {
 
     val entityToMob = mutableMapOf<EntityLivingBase, Mob>()
 
+    internal val notSeenMobs = MobSet()
+
     internal val currentEntityLiving = mutableSetOf<EntityLivingBase>()
     internal val previousEntityLiving = mutableSetOf<EntityLivingBase>()
 
@@ -91,12 +93,19 @@ object MobData {
     fun onMobEventSpawn(event: MobEvent.Spawn) {
         entityToMob.putAll(event.mob.makeEntityToMobAssociation())
         currentMobs.add(event.mob)
+        notSeenMobs.add(event.mob)
     }
 
     @SubscribeEvent
     fun onMobEventDeSpawn(event: MobEvent.DeSpawn) {
         event.mob.fullEntityList().forEach { entityToMob.remove(it) }
         currentMobs.remove(event.mob)
+        notSeenMobs.remove(event.mob)
+    }
+
+    @SubscribeEvent
+    fun onMobFirstSeen(event: MobEvent.FirstSeen) {
+        notSeenMobs.remove(event.mob)
     }
 
     @SubscribeEvent
