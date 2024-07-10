@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -171,7 +169,7 @@ object ChocolateFactoryStrayTracker {
         if (!LorenzUtils.inSkyBlock) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (event.slot == null || event.slot.slotIndex == -999) return
-        if (!InventoryUtils.getItemsInOpenChest().any { it.slotNumber == event.slot.slotNumber}) return
+        if (!InventoryUtils.getItemsInOpenChest().any { it.slotNumber == event.slot.slotNumber }) return
         if (claimedStraysSlots.contains(event.slot.slotIndex)) return
         try {
             val clickedSlot = InventoryUtils.getItemsInOpenChest().first {
