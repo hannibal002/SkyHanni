@@ -327,7 +327,7 @@ object SkyBlockItemModifierUtils {
 
             fun getByName(name: String): GemstoneSlotType =
                 entries.firstOrNull { name.uppercase(Locale.ENGLISH).contains(it.name) }
-                    ?: error("Unknwon GemstoneSlotType: '$name'")
+                    ?: error("Unknown GemstoneSlotType: '$name'")
 
             fun getColorCode(name: String) = getByName(name).colorCode
         }

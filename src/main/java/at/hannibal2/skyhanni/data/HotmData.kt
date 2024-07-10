@@ -409,9 +409,13 @@ enum class HotmData(
             "Heart of the Mountain",
         )
 
+        /**
+         * REGEX-TEST: §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
+         * REGEX-TEST: §7Level 1§8/50
+         */
         private val levelPattern by patternGroup.pattern(
             "perk.level",
-            "§(?<color>.)Level (?<level>\\d+).*",
+            "(?:§.)*§(?<color>.)Level (?<level>\\d+).*",
         )
 
         private val notUnlockedPattern by patternGroup.pattern(
@@ -426,7 +430,7 @@ enum class HotmData(
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
             "§c§lDISABLED|§7§eClick to select!",
-        ) // unused for now since the assumption is when enabled isn't found it is disabled,
+        ) // unused for now since the assumption is when enabled isn't found, it is disabled,
         // but the value might be useful in the future or for debugging
 
         val perkCostPattern by patternGroup.pattern(
