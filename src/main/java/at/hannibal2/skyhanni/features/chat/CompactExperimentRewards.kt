@@ -34,9 +34,18 @@ object CompactExperimentRewards {
         "Superpairs (?:\\(.+\\)|Rewards)",
     )
 
+    /**
+     * REGEX-TEST: §8 +§r§3600k Enchanting Exp
+     * REGEX-TEST:  §r§8+§r§3132k Enchanting Exp
+     * REGEX-TEST:  §r§8+§r§aThunderlord V
+     * REGEX-TEST:  §r§8+§r§3143k Enchanting Exp
+     * REGEX-TEST:  §r§8+§r§aGrand Experience Bottle
+     * REGEX-TEST:  §r§8+§r§aCaster V
+     */
+
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",
-        "^ §r§8\\+(?<reward>.*)\$",
+        "^.[^+]+\\+(?<reward>.*)\$",
     )
 
     @SubscribeEvent
