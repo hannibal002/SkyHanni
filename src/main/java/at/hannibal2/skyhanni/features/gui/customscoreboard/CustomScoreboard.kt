@@ -355,5 +355,11 @@ object CustomScoreboard {
 
             newArray
         }
+        listOf("customTitle", "customFooter").forEach {
+            event.transform(53, "$displayPrefix.titleAndFooter.$it") { element ->
+                JsonPrimitive(element.asString.replace("&", "&&"))
+            }
+        }
+
     }
 }
