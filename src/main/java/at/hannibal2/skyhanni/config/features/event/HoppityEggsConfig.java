@@ -83,7 +83,7 @@ public class HoppityEggsConfig {
     public boolean warnUnclaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Click to Warp", desc = "Make the eggs ready chat message & unclaimed timers clickable to warp you to an island.")
+    @ConfigOption(name = "Click to Warp", desc = "Make the eggs ready chat message & unclaimed timer display clickable to warp you to an island.")
     @ConfigEditorBoolean
     public boolean warpUnclaimedEggs = false;
 
