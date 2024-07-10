@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class PersonOfInterestConfig {
 
@@ -17,7 +18,7 @@ public class PersonOfInterestConfig {
     @Expose
     @ConfigOption(name = "Players List", desc = "Players list you want to be notified for.\n§cCase sensitive, separated by comma.")
     @ConfigEditorText
-    public String playersList = "hypixel";
+    public Property<String> playersList = Property.of("hypixel");
 
     @Expose
     @ConfigOption(name = "Use Prefix", desc = "Should the [SkyHanni] prefix should be in the join/leave message ?")
@@ -25,12 +26,12 @@ public class PersonOfInterestConfig {
     public boolean usePrefix = true;
 
     @Expose
-    @ConfigOption(name = "Join Message", desc = "Configure the message when someone join.")
+    @ConfigOption(name = "Join Message", desc = "Configure the message when someone join.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
     @ConfigEditorText
-    public String joinMessage = "&b%s &ajoined your lobby.";
+    public String joinMessage = "&&b%s &&ajoined your lobby.";
 
     @Expose
-    @ConfigOption(name = "Left Message", desc = "Configure the message when someone leave.")
+    @ConfigOption(name = "Left Message", desc = "Configure the message when someone leave.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
     @ConfigEditorText
-    public String leftMessage = "&b%s &cleft your lobby.";
+    public String leftMessage = "&&b%s &&cleft your lobby.";
 }

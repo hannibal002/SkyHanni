@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -31,6 +33,7 @@ object PersonOfInterest {
 
     private val notifyList = mutableSetOf<String>()
     private val currentLobbyPlayers = mutableSetOf<String>()
+    private var personOfInterest = listOf<String>()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -43,7 +46,7 @@ object PersonOfInterest {
     fun onTablistUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
         if (!event.isWidget(TabWidget.PLAYER_LIST)) return
-        val poi = config.playersList.split(",")
+
         currentLobbyPlayers.clear()
 
         loop@ for (line in event.lines) {
@@ -54,12 +57,12 @@ object PersonOfInterest {
             }
         }
 
-        val playerJoined = currentLobbyPlayers.filter { it in poi && it !in notifyList }.toSet()
-        val playerLeft = poi.filter { it in notifyList && it !in currentLobbyPlayers }.toSet()
+        val playerJoined = currentLobbyPlayers.filter { it in personOfInterest && it !in notifyList }
+        val playerLeft = personOfInterest.filter { it in notifyList && it !in currentLobbyPlayers }
 
         if (playerJoined.isNotEmpty()) {
             ChatUtils.chat(
-                String.format(config.joinMessage.replace("§", "&"), playerJoined.joinToString(", ")),
+                String.format(config.joinMessage.replace("&&", "§"), playerJoined.joinToString(", ")),
                 config.usePrefix,
             )
             notifyList.addAll(playerJoined)
@@ -67,10 +70,17 @@ object PersonOfInterest {
 
         if (playerLeft.isNotEmpty()) {
             ChatUtils.chat(
-                String.format(config.leftMessage.replace("§", "&"), playerLeft.joinToString(", ")),
+                String.format(config.leftMessage.replace("&&", "§"), playerLeft.joinToString(", ")),
                 config.usePrefix,
             )
             notifyList.removeAll(playerLeft)
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.playersList) {
+            personOfInterest = config.playersList.get().split(",").map { it.trim() }
         }
     }
 
