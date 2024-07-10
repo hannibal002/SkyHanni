@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -20,6 +21,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ChocolateFactoryStrayTracker {
@@ -40,11 +42,12 @@ object ChocolateFactoryStrayTracker {
     )
 
     /**
-     * REGEX-TEST: §7You caught a stray §fCrush §7and §7gained §6+282,636 Chocolate§7!
+     * REGEX-TEST: §7You caught a stray §fMandy §7and §7gained §6+283,574 Chocolate§7!
+     * REGEX-TEST: §7You caught a stray §aSven §7and gained §7§6+397,004 Chocolate§7!'
      */
     private val strayLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.loreinfo",
-        "§7You caught a stray (?<rabbit>(?<name>§[^§]*)) .* §6\\+(?<amount>[\\d,]*) Chocolate§7!",
+        "§7You caught a stray (?<rabbit>(?<name>§[^§]*)) .* (?:§7)?§6\\+(?<amount>[\\d,]*) Chocolate§7!",
     )
 
     /**
@@ -61,6 +64,11 @@ object ChocolateFactoryStrayTracker {
     private val goldenStrayDoradoEscape by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.goldendoradoescape",
         "§7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, §7but he escaped and left behind §7§6\\+(?<amount>[\\d,]*) Chocolate§7!"
+    )
+
+    private val goldenStraySideDish by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.goldensidedish",
+        "§6§lGolden Rabbit §8- §aSide Dish"
     )
 
     //TODO: Verify pattern
@@ -96,8 +104,6 @@ object ChocolateFactoryStrayTracker {
         val profileStorage = profileStorage ?: return
         InventoryUtils.getItemsInOpenChest().filter {
             !claimedStraysSlots.contains(it.slotIndex)
-                && !ChocolateFactoryAPI.rabbitSlots.containsValue(it.slotIndex)
-                && !ChocolateFactoryAPI.otherUpgradeSlots.contains(it.slotIndex)
         }.forEach {
             strayCaughtPattern.matchMatcher(it.stack.name) {
                 if (it.stack.getLore().isEmpty()) return
@@ -161,19 +167,26 @@ object ChocolateFactoryStrayTracker {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        val profileStorage = profileStorage ?: return
         if (!LorenzUtils.inSkyBlock) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (event.slot == null || event.slot.slotIndex == -999) return
         if (!InventoryUtils.getItemsInOpenChest().any { it.slotNumber == event.slot.slotNumber}) return
+        if (claimedStraysSlots.contains(event.slot.slotIndex)) return
         try {
             val clickedSlot = InventoryUtils.getItemsInOpenChest().first {
                 it.hasStack && it.slotNumber == event.slot.slotNumber
             }
             val clickedStack = clickedSlot.stack
             val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
-            if (nameText == "§e§lCLICK ME!") return
-            val loreText = formLoreToSingleLine(clickedStack.getLore())
-            ChatUtils.chat("§a§lItemStack found in §b§lonSlotClick§7§l!\n§f§lName:\n${nameText.replace("§", "*")}\n§f§lLore:\n${loreText.replace("§", "*")}")
+            if (goldenStraySideDish.matches(nameText)) {
+                claimedStraysSlots.add(event.slot.slotIndex)
+                profileStorage.goldenTypesCaught["sidedish"] = profileStorage.goldenTypesCaught["sidedish"]?.plus(1) ?: 1
+                incrementRarity("legendary", 0)
+                DelayedRun.runDelayed(1.seconds) {
+                    claimedStraysSlots.remove(claimedStraysSlots.indexOf(event.slot.slotIndex))
+                }
+            }
         } catch (e: NoSuchElementException) {
             return
         }
@@ -233,40 +246,35 @@ object ChocolateFactoryStrayTracker {
         return if (rarityExtraChocMs == null) {
             Renderable.string(lineFormat)
         } else {
-            val tipList = listOf("§a+§b${extraChocFormat} §aof production§7")
-            if (rarity == "legendary") {
-                extractGoldenTypesCaught().forEach {
-                    tipList.addIfNotNull(it)
-                }
-            }
+            val productionTip = "§a+§b${extraChocFormat} §aof production§7" + if (rarity == "legendary") extractGoldenTypesCaught() else ""
             Renderable.hoverTips(
                 Renderable.string(lineFormat),
-                tips = tipList,
+                tips = productionTip.split("\n")
             )
         }
     }
 
-    private fun extractGoldenTypesCaught(): List<String> {
-        val tipList = mutableListOf<String>()
-        val profileStorage = profileStorage ?: return tipList
+    private fun extractGoldenTypesCaught(): String {
+        val profileStorage = profileStorage ?: return ""
+        val goldenList = mutableListOf<String>()
         profileStorage.goldenTypesCaught["sidedish"]?.let {
-            tipList.add("§b$it §6Side Dish" + if (it > 1) "es" else "")
+            goldenList.add("§b$it §6Side Dish" + if (it > 1) "es" else "")
         }
         profileStorage.goldenTypesCaught["jackpot"]?.let {
-            tipList.add("§b$it §6Chocolate Jackpot" + if ( it > 1) "s" else "")
+            goldenList.add("§b$it §6Chocolate Jackpot" + if (it > 1) "s" else "")
         }
         profileStorage.goldenTypesCaught["mountain"]?.let {
-            tipList.add("§b$it §6Chocolate Mountain" + if (it > 1) "s" else "")
+            goldenList.add("§b$it §6Chocolate Mountain" + if (it > 1) "s" else "")
         }
         profileStorage.goldenTypesCaught["dorado"]?.let {
-            tipList.add((if (it == 3) "§a" else "§b") + "$it§7/§a3 §6El Dorado §7Sighting" + if (it > 1) "s" else "")
+            goldenList.add((if (it == 3) "§a" else "§b") + "$it§7/§a3 §6El Dorado §7Sighting" + if (it > 1) "s" else "")
         }
         profileStorage.goldenTypesCaught["stampede"]?.let {
-            tipList.add("§b$it §6Stampede" + if (it > 1) "s" else "")
+            goldenList.add("§b$it §6Stampede" + if (it > 1) "s" else "")
         }
         profileStorage.goldenTypesCaught["goldenclick"]?.let {
-            tipList.add("§b$it §6Golden Click" + if (it > 1) "s" else "")
+            goldenList.add("§b$it §6Golden Click" + if (it > 1) "s" else "")
         }
-        return tipList
+        return if (goldenList.size == 0) "" else ("\n" + goldenList.joinToString("\n"))
     }
 }
