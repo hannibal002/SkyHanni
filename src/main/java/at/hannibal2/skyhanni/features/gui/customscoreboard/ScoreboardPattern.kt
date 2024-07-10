@@ -345,6 +345,10 @@ object ScoreboardPattern {
         "visiting",
         "\\s*§a✌ §7\\(§.\\d+(?:§.)?/\\d+(?:§.)?\\)",
     )
+    val flightDurationPattern by miscSb.pattern(
+        "flightduration",
+        "\\s*Flight Duration: §a[:\\d]+",
+    )
     val dojoChallengePattern by miscSb.pattern(
         "dojochallenge",
         "(?:§.)*Challenge: (?:§.)*(?<challenge>.+)",

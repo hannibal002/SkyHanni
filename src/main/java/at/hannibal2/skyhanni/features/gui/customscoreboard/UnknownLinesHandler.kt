@@ -135,6 +135,7 @@ object UnknownLinesHandler {
             SbPattern.redstonePattern,
             SbPattern.anniversaryPattern,
             SbPattern.visitingPattern,
+            SbPattern.flightDurationPattern,
             SbPattern.dojoChallengePattern,
             SbPattern.dojoDifficultyPattern,
             SbPattern.dojoPointsPattern,
