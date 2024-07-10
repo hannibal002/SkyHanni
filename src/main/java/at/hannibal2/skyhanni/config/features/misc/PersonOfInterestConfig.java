@@ -17,5 +17,5 @@ public class PersonOfInterestConfig {
     @Expose
     @ConfigOption(name = "Players List", desc = "Players list you want to be notified for.\n§cCase sensitive, separated by comma.")
     @ConfigEditorText
-    public String playersList = "BinRich";
+    public String playersList = "hypixel";
 }
