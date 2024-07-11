@@ -619,7 +619,7 @@ object Commands {
                 "§f&a = §aGreen            §f&b = §bAqua\n" +
                 "§f&c = §cRed               §f&d = §dLight Purple\n" +
                 "§f&e = §eYellow            §f&f = §fWhite\n" +
-                "§f&z = §zChroma §r(needs to enable chroma setting)\n" +
+                "§f&Z = §zChroma §r(needs to enable chroma setting)\n" +
                 "§c================= Formatting Codes ==================\n" +
                 "§f&k = Obfuscated (like this: §khellspawn§r)\n" +
                 "§f&l = §lBold           §r&m = §mStrikethrough \n" +
