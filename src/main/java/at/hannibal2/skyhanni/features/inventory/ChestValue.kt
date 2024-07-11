@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -42,12 +43,16 @@ object ChestValue {
     private var display = emptyList<List<Any>>()
     private val chestItems = mutableMapOf<String, Item>()
     private val inInventory get() = isValidStorage()
+    private var inOwnInventory = false
+    private var compactInventory = true
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (DungeonAPI.inDungeon() && !config.enableInDungeons) return
-        if (InventoryUtils.openInventoryName() == "") return
+        if (!inOwnInventory) {
+            if (InventoryUtils.openInventoryName() == "") return
+        }
 
         if (!config.showDuringEstimatedItemValue) {
             if (EstimatedItemValue.isCurrentlyShowing()) return
@@ -58,18 +63,21 @@ object ChestValue {
                 display,
                 extraSpace = -1,
                 itemScale = 0.7,
-                posLabel = "Estimated Chest Value"
+                posLabel = featureName(),
             )
         }
     }
 
+    fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
+        if (!event.isMod(5)) return
+        val inInv = Minecraft.getMinecraft().currentScreen is GuiInventory
+        inOwnInventory = inInv && config.enableInOwnInventory
         if (!inInventory) return
-        if (event.isMod(5)) {
-            update()
-        }
+        update()
     }
 
     @SubscribeEvent
@@ -108,7 +116,7 @@ object ChestValue {
         var rendered = 0
 
         val amountShowing = if (config.itemToShow > sortedList.size) sortedList.size else config.itemToShow
-        newDisplay.addAsSingletonList("§7Estimated Chest Value: §o(Showing $amountShowing of ${sortedList.size} items)")
+        newDisplay.addAsSingletonList("§7${featureName()}: §o(Showing $amountShowing of ${sortedList.size} items)")
         for ((index, amount, stack, total, tips) in sortedList) {
             totalPrice += total
             if (rendered >= config.itemToShow) continue
@@ -121,17 +129,19 @@ object ChestValue {
                 "$name $price"
             else
                 "${stack.itemName} §7x$amount: §6${total.formatPrice()}"
-            newDisplay.add(buildList {
-                val renderable = Renderable.hoverTips(
-                    text,
-                    tips,
-                    stack = stack,
-                    highlightsOnHoverSlots = if (config.enableHighlight) index else emptyList()
-                )
-                add(" §7- ")
-                if (config.showStacks) add(stack)
-                add(renderable)
-            })
+            newDisplay.add(
+                buildList {
+                    val renderable = Renderable.hoverTips(
+                        text,
+                        tips,
+                        stack = stack,
+                        highlightsOnHoverSlots = if (config.enableHighlight) index else emptyList(),
+                    )
+                    add(" §7- ")
+                    if (config.showStacks) add(stack)
+                    add(renderable)
+                },
+            )
             rendered++
         }
         newDisplay.addAsSingletonList("§aTotal value: §6${totalPrice.formatPrice()} coins")
@@ -144,59 +154,68 @@ object ChestValue {
     }
 
     private fun addButton(newDisplay: MutableList<List<Any>>) {
-        newDisplay.addButton("§7Sorted By: ",
+        newDisplay.addButton(
+            "§7Sorted By: ",
             getName = SortType.entries[config.sortingType.ordinal].longName, // todo avoid ordinal
             onChange = {
                 // todo avoid ordinals
                 config.sortingType = SortingTypeEntry.entries[(config.sortingType.ordinal + 1) % 2]
                 update()
-            })
+            },
+        )
 
-        newDisplay.addButton("§7Value format: ",
+        newDisplay.addButton(
+            "§7Value format: ",
             getName = FormatType.entries[config.formatType.ordinal].type, // todo avoid ordinal
             onChange = {
                 // todo avoid ordinal
                 config.formatType = NumberFormatEntry.entries[(config.formatType.ordinal + 1) % 2]
                 update()
-            })
+            },
+        )
 
-        newDisplay.addButton("§7Display Type: ",
+        newDisplay.addButton(
+            "§7Display Type: ",
             getName = DisplayType.entries[if (config.alignedDisplay) 1 else 0].type,
             onChange = {
                 config.alignedDisplay = !config.alignedDisplay
                 update()
-            })
+            },
+        )
     }
 
     private fun init() {
-        if (inInventory) {
+        if (!inInventory) return
+        val slots = if (inOwnInventory) {
+            InventoryUtils.getSlotsInOwnInventory()
+        } else {
             val isMinion = InventoryUtils.openInventoryName().contains(" Minion ")
-            val slots = InventoryUtils.getItemsInOpenChest().filter {
+            InventoryUtils.getItemsInOpenChest().filter {
                 it.hasStack && it.inventory != Minecraft.getMinecraft().thePlayer.inventory && (!isMinion || it.slotNumber % 9 != 1)
             }
-            val stacks = buildMap {
-                slots.forEach {
-                    put(it.slotIndex, it.stack)
-                }
+        }
+        val stacks = buildMap {
+            slots.forEach {
+                put(it.slotIndex, it.stack)
             }
-            chestItems.clear()
-            for ((i, stack) in stacks) {
-                val internalName = stack.getInternalNameOrNull() ?: continue
-                if (internalName.getItemStackOrNull() == null) continue
-                val list = mutableListOf<String>()
-                var total = EstimatedItemValueCalculator.calculate(stack, list).first
-                val key = "$internalName+$total"
-                if (stack.item == Items.enchanted_book)
-                    total /= 2
-                list.add("§aTotal: §6§l${total.formatPrice()} coins")
-                if (total == 0.0) continue
-                val item = chestItems.getOrPut(key) {
-                    Item(mutableListOf(), 0, stack, 0.0, list)
-                }
-                item.index.add(i)
-                item.amount += stack.stackSize
-                item.total += total * stack.stackSize
+        }
+        chestItems.clear()
+        for ((i, stack) in stacks) {
+            val internalName = stack.getInternalNameOrNull() ?: continue
+            if (internalName.getItemStackOrNull() == null) continue
+            val list = mutableListOf<String>()
+            var total = EstimatedItemValueCalculator.calculate(stack, list).first
+            val key = "$internalName+$total"
+            if (stack.item == Items.enchanted_book)
+                total /= 2
+            list.add("§aTotal: §6§l${total.formatPrice()} coins")
+            if (total == 0.0) continue
+            val item = chestItems.getOrPut(key) {
+                Item(mutableListOf(), 0, stack, 0.0, list)
             }
+            item.index.add(i)
+            item.amount += stack.stackSize
+            item.total += total * stack.stackSize
         }
     }
 
@@ -212,13 +231,13 @@ object ChestValue {
 
     enum class SortType(val shortName: String, val longName: String) {
         PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending")
+        PRICE_ASC("Price A", "Price Ascending"),
         ;
     }
 
     enum class FormatType(val type: String) {
         SHORT("Formatted"),
-        LONG("Unformatted")
+        LONG("Unformatted"),
         ;
     }
 
@@ -228,6 +247,7 @@ object ChestValue {
     }
 
     private fun isValidStorage(): Boolean {
+        if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
         if (Minecraft.getMinecraft().currentScreen !is GuiChest) return false
         if (BazaarApi.inBazaarInventory) return false
