@@ -38,7 +38,6 @@ object CompactExperimentRewards {
      * REGEX-TEST: §eYou claimed the §r§dUltrasequencer §r§erewards!
      * REGEX-TEST: §eYou claimed the §r§cUltrasequencer §r§erewards!
      */
-
     val claimMessagePattern by patternGroup.pattern(
         "message",
         "(?<message>§eYou claimed the §r§.\\S+ §r§erewards!)",
@@ -52,7 +51,6 @@ object CompactExperimentRewards {
      * REGEX-TEST:  §r§8+§r§aGrand Experience Bottle
      * REGEX-TEST:  §r§8+§r§aCaster V
      */
-
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",
         "^(?:§8 \\+| §r§8\\+)(?<reward>.*)\$",
