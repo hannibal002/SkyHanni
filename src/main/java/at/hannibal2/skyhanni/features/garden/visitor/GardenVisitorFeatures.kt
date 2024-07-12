@@ -268,7 +268,7 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$leftToCraft")
                         } else {
-                            HypixelCommands.viewRecipe(internalName.toString())
+                            HypixelCommands.viewRecipe(internalName.itemName)
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
