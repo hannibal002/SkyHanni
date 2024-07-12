@@ -258,7 +258,7 @@ object GardenVisitorFeatures {
                 break
             }
         }
-        if (hasIngredients) {
+        if (hasIngredients && (amount - amountInSacks) > 0) {
             val leftToCraft = amount - amountInSacks
             list.add(" §7(")
             list.add(
@@ -268,7 +268,7 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$leftToCraft")
                         } else {
-                            HypixelCommands.viewRecipe(internalName.itemName)
+                            HypixelCommands.viewRecipe(internalName.asString())
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
