@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -19,10 +18,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CompactExperimentRewards {
 
-    private val enabled get() = SkyHanniMod.feature.chat.compactEnchantingExp
+    private val enabled get() = SkyHanniMod.feature.chat.compactRewards
 
     private var gainedRewards = mutableListOf<String>()
     private var lastTimeTableOpened = SimpleTimeMark.farPast()
+    private var currentMessage = ""
 
     /**
      * REGEX-TEST: Superpairs (Metaphysical)
@@ -31,7 +31,17 @@ object CompactExperimentRewards {
     private val patternGroup = RepoPattern.group("chat.experiments.compact")
     val experimentInventoriesPattern by patternGroup.pattern(
         "inventories",
-        "Superpairs (?:\\(.+\\)|Rewards)",
+        "(?:Superpairs|Chronomatron|Ultrasequencer) (?:\\(.+\\)|➜ Stakes|Rewards)|Experimentation Table",
+    )
+
+    /**
+     * REGEX-TEST: §eYou claimed the §r§dUltrasequencer §r§erewards!
+     * REGEX-TEST: §eYou claimed the §r§cUltrasequencer §r§erewards!
+     */
+
+    val claimMessagePattern by patternGroup.pattern(
+        "message",
+        "(?<message>§eYou claimed the §r§.\\S+ §r§erewards!)",
     )
 
     /**
@@ -45,7 +55,7 @@ object CompactExperimentRewards {
 
     private val experimentsDropPattern by patternGroup.pattern(
         "drop",
-        "^.[^+]+\\+(?<reward>.*)\$",
+        "^(?:§8 \\+| §r§8\\+)(?<reward>.*)\$",
     )
 
     @SubscribeEvent
@@ -59,12 +69,12 @@ object CompactExperimentRewards {
     fun onChat(event: LorenzChatEvent) {
         if (!enabled || lastTimeTableOpened.passedSince() >= 3.seconds || event.blockedReason != "") return
 
-        if (event.message.removeColor() == "You claimed the Superpairs rewards!") {
-            event.blockedReason = "COMPACT_REWARDS"
-            return
-        }
-
         event.message.let { message ->
+            claimMessagePattern.matchMatcher(message) {
+                currentMessage = group("message")
+                event.blockedReason = "COMPACT_REWARDS"
+                return
+            }
             experimentsDropPattern.matchMatcher(message) {
                 val reward = group("reward")
 
@@ -72,8 +82,7 @@ object CompactExperimentRewards {
                 event.blockedReason = "COMPACT_REWARDS"
 
                 DelayedRun.runDelayed(100.milliseconds) {
-                    if (gainedRewards.last() == reward) {
-                        val chatMessage = "§eYou claimed the §dSuperpairs §erewards!"
+                    if (gainedRewards.last() == reward && currentMessage != "") {
 
                         val expList = mutableListOf<String>().apply {
                             gainedRewards.forEach {
@@ -81,8 +90,9 @@ object CompactExperimentRewards {
                             }
                         }
 
-                        ChatUtils.hoverableChat(chatMessage, expList, null, false)
+                        ChatUtils.hoverableChat(currentMessage, expList, null, false)
                         gainedRewards.clear()
+                        currentMessage = ""
                     }
                 }
             }
