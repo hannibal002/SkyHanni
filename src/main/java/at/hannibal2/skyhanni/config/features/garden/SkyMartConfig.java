@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.garden;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -26,24 +27,7 @@ public class SkyMartConfig {
     public Position copperPricePos = new Position(211, 132, false, true);
 
     @Expose
-    @ConfigOption(name = "Overlay Price", desc = "Toggle for Bazaar 'sell order' vs 'instant sell' price in copper price overlay.")
+    @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
-    public OverlayPriceTypeEntry overlayPriceType = OverlayPriceTypeEntry.INSTANT_SELL;
-
-    public enum OverlayPriceTypeEntry {
-        INSTANT_SELL("Instant Sell"),
-        SELL_ORDER("Sell Order"),
-        ;
-        private final String str;
-
-
-        OverlayPriceTypeEntry(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
+    public ItemPriceSource priceSource = ItemPriceSource.BAZAAR_INSTANT_SELL;
 }

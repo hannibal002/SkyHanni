@@ -1,13 +1,12 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -55,12 +54,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun addPriceFromButton(lists: MutableList<List<Any>>) {
         if (isInventoryOpen()) {
-            lists.addSelector<PriceSource>(
+            lists.addSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = PriceFromEntry.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update()
                 }
             )
