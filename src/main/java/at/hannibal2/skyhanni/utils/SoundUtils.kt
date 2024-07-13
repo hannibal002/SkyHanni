@@ -16,6 +16,7 @@ object SoundUtils {
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
     private val meowSound by lazy { createSound("mob.cat.meow", 1f) }
+    private val barkSound by lazy { createSound("mob.wolf.bark", 1f) }
     val plingSound by lazy { createSound("note.pling", 1f) }
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
@@ -76,6 +77,10 @@ object SoundUtils {
 
     fun playMeowSound() {
         meowSound.playSound()
+    }
+
+    fun playBarkSound() {
+        barkSound.playSound()
     }
 
     fun command(args: Array<String>) {

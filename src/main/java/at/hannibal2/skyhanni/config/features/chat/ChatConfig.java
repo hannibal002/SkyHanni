@@ -143,8 +143,9 @@ public class ChatConfig {
     @FeatureToggle
     public boolean petRarityDropMessage = true;
 
+
     @Expose
-    @ConfigOption(name = "Meow", desc = "Play a meow any time a meow appears in chat.")
-    @ConfigEditorBoolean
-    public boolean meow = false;
+    @ConfigOption(name = "Sound Responses", desc = "")
+    @Accordion
+    public SoundResponseConfig soundResponse = new SoundResponseConfig();
 }

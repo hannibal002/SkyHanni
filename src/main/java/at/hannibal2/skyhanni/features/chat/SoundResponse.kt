@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SoundResponse {
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.soundResponse
 
     private val repoGroup = RepoPattern.group("chat.sound.response")
 
@@ -23,11 +23,13 @@ object SoundResponse {
     REGEX-TEST: hello §ameow
      * */
     private val meow by repoGroup.pattern("meow", "(?:^|^.* )(?: |§.)*(?i)meow(?: |§.)*(?:\$| .*\$)")
+    private val bark by repoGroup.pattern("bark", "(?:^|^.* )(?: |§.)*(?i)(?:bark|arf|woof)(?: |§.)*(?:\$| .*\$)")
 
     @SubscribeEvent
     fun onLorenzChat(event: LorenzChatEvent) {
-        if (config.meow && meow.matches(event.message)) {
-            SoundUtils.playMeowSound()
+        when {
+            config.meow && meow.matches(event.message) -> SoundUtils.playMeowSound()
+            config.bark && bark.matches(event.message) -> SoundUtils.playBarkSound()
         }
     }
 }
