@@ -15,6 +15,7 @@ object SoundUtils {
     private val beepSound by lazy { createSound("random.orb", 1f) }
     private val clickSound by lazy { createSound("gui.button.press", 1f) }
     private val errorSound by lazy { createSound("mob.endermen.portal", 0f) }
+    private val meowSound by lazy { createSound("mob.cat.meow", 1f) }
     val plingSound by lazy { createSound("note.pling", 1f) }
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
@@ -38,7 +39,7 @@ object SoundUtils {
                 }
                 ErrorManager.logErrorWithData(
                     e, "Failed to play a sound",
-                    "soundLocation" to this.soundLocation
+                    "soundLocation" to this.soundLocation,
                 )
             } finally {
                 if (!SkyHanniMod.feature.misc.maintainGameVolume) {
@@ -71,6 +72,10 @@ object SoundUtils {
 
     fun playPlingSound() {
         plingSound.playSound()
+    }
+
+    fun playMeowSound() {
+        meowSound.playSound()
     }
 
     fun command(args: Array<String>) {
