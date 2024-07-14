@@ -7,10 +7,8 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
-import at.hannibal2.skyhanni.features.garden.pests.PestAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
@@ -69,7 +67,7 @@ object GardenCropMilestoneFix {
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
-                cropType.getCounter() + multiplier.second
+                cropType.getCounter() + primitiveStack.amount,
             )
             GardenCropMilestoneDisplay.update()
         }
@@ -77,12 +75,12 @@ object GardenCropMilestoneFix {
 
     @SubscribeEvent
     fun onPestKill(event: PestKillEvent) {
-        val multiplier = NEUItems.getMultiplier(event.item)
-        val rawName = multiplier.first.itemNameWithoutColor
+        val primitiveStack = NEUItems.getPrimitiveMultiplier(event.item)
+        val rawName = primitiveStack.internalName.itemNameWithoutColor
         val cropType = CropType.getByNameOrNull(rawName) ?: return
 
         cropType.setCounter(
-            cropType.getCounter() + (event.amount * multiplier.second)
+            cropType.getCounter() + (event.amount * primitiveStack.amount),
         )
         GardenCropMilestoneDisplay.update()
     }

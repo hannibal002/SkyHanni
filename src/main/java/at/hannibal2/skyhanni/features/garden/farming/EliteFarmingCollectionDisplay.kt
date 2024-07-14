@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteBotAPI
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingCollectionConfig.CropDisplay
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteCollectionGraphEntry
@@ -16,6 +15,7 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -28,7 +28,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -38,12 +39,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object EliteFarmingCollectionDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.eliteFarmingCollection
 
     private val eliteCollectionApiGson by lazy {
-        ConfigManager.createBaseGsonBuilder()
+        BaseGsonBuilder.gson()
             .registerTypeAdapter(CropType::class.java, object : TypeAdapter<CropType>() {
                 override fun write(out: JsonWriter, value: CropType) {}
 

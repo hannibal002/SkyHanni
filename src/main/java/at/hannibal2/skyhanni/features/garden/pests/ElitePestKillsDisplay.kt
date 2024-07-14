@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteBotAPI
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.garden.ElitePestKillsDisplayConfig.PestDisplay
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteLeaderboard
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteProfileMember
@@ -12,6 +11,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -24,7 +24,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.toDashlessUUID
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
@@ -33,12 +34,13 @@ import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object ElitePestKillsDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.elitePestKillsDisplayConfig
 
     private val elitePestApiGson by lazy {
-        ConfigManager.createBaseGsonBuilder()
+        BaseGsonBuilder.gson()
             .registerTypeAdapter(PestType::class.java, object : TypeAdapter<PestType>() {
                 override fun write(out: JsonWriter, value: PestType) {}
 
@@ -228,8 +230,8 @@ object ElitePestKillsDisplay {
     private fun getRanksForPest(pest: PestType) {
         if (EliteBotAPI.profileID == null) return
         val url =
-//             "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-            "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
+            "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
+//             "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {
