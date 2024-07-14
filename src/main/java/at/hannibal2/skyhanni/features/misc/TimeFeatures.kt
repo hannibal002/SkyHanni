@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -18,7 +19,8 @@ import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
-class TimeFeatures {
+@SkyHanniModule
+object TimeFeatures {
 
     private val config get() = SkyHanniMod.feature.gui
     private val winterConfig get() = SkyHanniMod.feature.event.winter

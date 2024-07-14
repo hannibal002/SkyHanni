@@ -4,10 +4,14 @@ import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
+import at.hannibal2.skyhanni.features.garden.pests.PestAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -19,7 +23,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class GardenCropMilestoneFix {
+@SkyHanniModule
+object GardenCropMilestoneFix {
     private val patternGroup = RepoPattern.group("garden.cropmilestone.fix")
 
     /**
@@ -59,8 +64,8 @@ class GardenCropMilestoneFix {
         pestRareDropPattern.matchMatcher(event.message) {
             val item = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            val multiplier = NEUItems.getMultiplier(item)
-            val rawName = multiplier.first.itemNameWithoutColor
+            val primitiveStack = NEUItems.getPrimitiveMultiplier(item)
+            val rawName = primitiveStack.internalName.itemNameWithoutColor
             val cropType = CropType.getByNameOrNull(rawName) ?: return
 
             cropType.setCounter(
@@ -83,8 +88,9 @@ class GardenCropMilestoneFix {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        event.tabList.matchFirst(tabListPattern) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
+        event.lines.matchFirst(tabListPattern) {
             val tier = group("tier").toInt()
             val percentage = group("percentage").toDouble()
             val cropName = group("crop")

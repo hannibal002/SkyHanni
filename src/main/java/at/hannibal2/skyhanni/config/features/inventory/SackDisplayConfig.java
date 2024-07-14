@@ -38,7 +38,7 @@ public class SackDisplayConfig {
     public NumberFormatEntry numberFormat = NumberFormatEntry.FORMATTED;
 
     @Expose
-    @ConfigOption(name = "Alignment", desc = "Channge the alignment for numbers and money.")
+    @ConfigOption(name = "Alignment", desc = "Change the alignment for numbers and money.")
     @ConfigEditorDropdown
     public RenderUtils.HorizontalAlignment alignment = RenderUtils.HorizontalAlignment.LEFT;
 

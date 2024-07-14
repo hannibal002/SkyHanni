@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
-import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson.ReputationQuest
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ReputationQuest
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.DojoQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.FetchQuest
@@ -36,22 +37,18 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
     }
 
     fun loadFromTabList() {
-        var i = -1
         dailyQuestHelper.greatSpook = false
-        for (line in TabListData.getTabList()) {
-            if (line.contains("Faction Quests:")) {
-                i = 0
-                continue
-            }
-            if (i == -1) continue
+        var found = 0
 
-            i++
+
+        for (line in TabWidget.FACTION_QUESTS.lines) {
             readQuest(line)
+            found++
             if (dailyQuestHelper.greatSpook) return
-            if (i == 5) {
-                break
-            }
         }
+
+        dailyQuestHelper.reputationHelper.tabListQuestsMissing = found == 0
+        dailyQuestHelper.update()
     }
 
     private fun readQuest(line: String) {
@@ -176,7 +173,7 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
         }
     }
 
-    // TODO remove this workaround once hypixel fixes the bug that amount is not in tab list for minibosses
+    // TODO remove this workaround once hypixel fixes the bug that amount is not in tab list for mini bosses
     private fun fixMinibossAmount(quest: Quest, stack: ItemStack) {
         if (quest !is MiniBossQuest) return
         val storedAmount = quest.needAmount
@@ -217,7 +214,8 @@ class QuestLoader(private val dailyQuestHelper: DailyQuestHelper) {
                     quest.haveAmount = haveAmount
                 } catch (e: IndexOutOfBoundsException) {
                     ErrorManager.logErrorWithData(
-                        e, "Error loading Crimson Isle Quests from config.",
+                        e,
+                        "Error loading Crimson Isle Quests from config.",
                         "text" to text,
                     )
                 }

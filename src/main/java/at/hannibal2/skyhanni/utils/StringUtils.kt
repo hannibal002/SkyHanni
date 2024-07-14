@@ -14,6 +14,7 @@ import net.minecraft.util.ChatStyle
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import java.util.Base64
+import java.util.NavigableMap
 import java.util.UUID
 import java.util.function.Predicate
 import java.util.regex.Matcher
@@ -42,6 +43,7 @@ object StringUtils {
     }
 
     private val formattingChars = "kmolnrKMOLNR".toSet()
+    private val colorChars = "abcdefABCDEF0123456789".toSet()
 
     /**
      * Removes color and optionally formatting codes from the given string, leaving plain text.
@@ -54,6 +56,9 @@ object StringUtils {
         // Formatting indicator: The '§' character indicating the beginning of a formatting sequence
         // Formatting code: The character following a formatting indicator which specifies what color or text style this sequence corresponds to
         // Formatting sequence: The combination of a formatting indicator and code that changes the color or format of a string
+
+        // Flag for whether there is a text style (non-color and non-reset formatting code) currently being applied
+        var isFormatted = false
 
         // Find the first formatting indicator
         var nextFormattingSequence = indexOf('§')
@@ -74,14 +79,27 @@ object StringUtils {
             // Write everything from the read index up to the next formatting indicator into our clean string
             cleanedString.append(this, readIndex, nextFormattingSequence)
 
+            // Get the formatting code (note: this may not be a valid formatting code)
+            val formattingCode = this.getOrNull(nextFormattingSequence + 1)
+
             // If the next formatting sequence's code indicates a non-color format and we should keep those
-            if (keepFormatting && nextFormattingSequence + 1 < length && this[nextFormattingSequence + 1] in formattingChars) {
+            if (keepFormatting && formattingCode in formattingChars) {
+                // Update formatted flag based on whether this is a reset or a style format code
+                isFormatted = formattingCode?.lowercaseChar() != 'r'
+
                 // Set the readIndex to the formatting indicator, so that the next loop will start writing from that paragraph symbol
                 readIndex = nextFormattingSequence
                 // Find the next § symbol after the formatting sequence
                 nextFormattingSequence = indexOf('§', startIndex = readIndex + 1)
             } else {
                 // If this formatting sequence should be skipped (either a color code, or !keepFormatting or an incomplete formatting sequence without a code)
+
+                // If being formatted and color code encountered, reset the current formatting code
+                if (isFormatted && formattingCode in colorChars) {
+                    cleanedString.append("§r")
+                    isFormatted = false
+                }
+
                 // Set the readIndex to after this formatting sequence, so that the next loop will skip over it before writing the string
                 readIndex = nextFormattingSequence + 2
                 // Find the next § symbol after the formatting sequence
@@ -96,6 +114,23 @@ object StringUtils {
 
         // And turn the string builder into a string
         return cleanedString.toString()
+    }
+
+    /**
+     * From https://stackoverflow.com/questions/10711494/get-values-in-treemap-whose-string-keys-start-with-a-pattern
+     */
+    fun <T> subMapOfStringsStartingWith(prefix: String, map: NavigableMap<String, T>): NavigableMap<String, T> {
+        if ("" == prefix) return map
+        val lastKey = nextLexicographicallyStringWithSameLength(prefix)
+        return map.subMap(prefix, true, lastKey, false)
+    }
+
+    fun nextLexicographicallyStringWithSameLength(input: String): String {
+        val lastCharPosition = input.length - 1
+        val inputWithoutLastChar = input.substring(0, lastCharPosition)
+        val lastChar = input[lastCharPosition]
+        val incrementedLastChar = (lastChar.code + 1).toChar()
+        return inputWithoutLastChar + incrementedLastChar
     }
 
     fun UUID.toDashlessUUID(): String = toString().replace("-", "")
@@ -171,6 +206,12 @@ object StringUtils {
         return default
     }
 
+    fun String.substringBeforeLastOrNull(needle: String): String? {
+        val index = this.lastIndexOf(needle)
+        if (index < 0) return null
+        return this.substring(0, index)
+    }
+
     fun encodeBase64(input: String) = Base64.getEncoder().encodeToString(input.toByteArray())
 
     fun decodeBase64(input: String) = Base64.getDecoder().decode(input).decodeToString()
@@ -189,19 +230,21 @@ object StringUtils {
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
-    fun String.splitLines(width: Int): String {
-        val fr = Minecraft.getMinecraft().fontRendererObj
-        return GuiUtilRenderComponents.splitText(
-            ChatComponentText(this), width, fr, false, false
-        ).joinToString("\n") {
-            val text = it.formattedText
-            val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
-            formatCode.matchAt(text, 0)?.let { matcher ->
-                val codes = matcher.value.replace("\\s".toRegex(), "")
-                codes + text.removeRange(matcher.range)
-            } ?: text
-        }
+    fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
+        ChatComponentText(this),
+        width,
+        Minecraft.getMinecraft().fontRendererObj,
+        false,
+        false,
+    ).joinToString("\n") {
+        val text = it.formattedText
+        val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
+        formatCode.matchAt(text, 0)?.let { matcher ->
+            val codes = matcher.value.replace("\\s".toRegex(), "")
+            codes + text.removeRange(matcher.range)
+        } ?: text
     }
+
 
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
@@ -339,6 +382,10 @@ object StringUtils {
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
+
+    fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
     fun replaceIfNeeded(
         original: ChatComponentText,

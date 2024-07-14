@@ -10,12 +10,14 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -31,40 +33,42 @@ import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BazaarApi {
+@SkyHanniModule
+object BazaarApi {
 
     private var loadedNpcPriceData = false
 
-    companion object {
+    val holder = BazaarDataHolder()
+    var inBazaarInventory = false
+    private var currentSearchedItem = ""
 
-        val holder = BazaarDataHolder()
-        var inBazaarInventory = false
-        private var currentSearchedItem = ""
+    var currentlyOpenedProduct: NEUInternalName? = null
 
-        var currentlyOpenedProduct: NEUInternalName? = null
+    fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
 
-        fun NEUInternalName.getBazaarData(): BazaarData? = HypixelBazaarFetcher.latestProductInformation[this]
+    fun NEUInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
+        ErrorManager.skyHanniError(
+            "Can not find bazaar data for $itemName",
+            "internal name" to this
+        )
+    }
 
-        fun NEUInternalName.getBazaarDataOrError(): BazaarData = getBazaarData() ?: run {
-            ErrorManager.skyHanniError(
-                "Can not find bazaar data for $itemName",
-                "internal name" to this
-            )
-        }
+    fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
 
-        fun isBazaarItem(stack: ItemStack): Boolean = stack.getInternalName().isBazaarItem()
+    fun NEUInternalName.isBazaarItem() = getBazaarData() != null
 
-        fun NEUInternalName.isBazaarItem() = getBazaarData() != null
+    fun searchForBazaarItem(internalName: NEUInternalName, amount: Int = -1) {
+        searchForBazaarItem(internalName.itemNameWithoutColor, amount)
+    }
 
-        fun searchForBazaarItem(displayName: String, amount: Int = -1) {
-            if (!LorenzUtils.inSkyBlock) return
-            if (NEUItems.neuHasFocus()) return
-            if (LorenzUtils.noTradeMode) return
-            if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
-            HypixelCommands.bazaar(displayName.removeColor())
-            if (amount != -1) OSUtils.copyToClipboard(amount.toString())
-            currentSearchedItem = displayName.removeColor()
-        }
+    fun searchForBazaarItem(displayName: String, amount: Int = -1) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (NEUItems.neuHasFocus()) return
+        if (LorenzUtils.noTradeMode) return
+        if (DungeonAPI.inDungeon() || LorenzUtils.inKuudraFight) return
+        HypixelCommands.bazaar(displayName.removeColor())
+        if (amount != -1) OSUtils.copyToClipboard(amount.toString())
+        currentSearchedItem = displayName.removeColor()
     }
 
     @SubscribeEvent

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -35,7 +36,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
-class ItemAbilityCooldown {
+@SkyHanniModule
+object ItemAbilityCooldown {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities
 
@@ -172,6 +174,10 @@ class ItemAbilityCooldown {
             // Royal Pigeon
             event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.ROYAL_PIGEON.sound()
+            }
+
+            event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
+                ItemAbility.WAND_OF_STRENGTH.sound()
             }
         }
     }

@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.boss.BossStatus
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object BossbarData {
     private var bossbar: String? = null
     private var previousServerBossbar = ""

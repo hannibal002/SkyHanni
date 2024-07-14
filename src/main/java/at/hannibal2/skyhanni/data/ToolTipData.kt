@@ -9,22 +9,13 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
-// Please use LorenzToolTipEvent over ItemTooltipEvent if no special EventPriority is necessary
+// Please use LorenzToolTipEvent over ItemHoverEvent, ItemHoverEvent is only used for special use cases (e.g. neu pv)
 object ToolTipData {
 
     @JvmStatic
-    fun getTooltip(stack: ItemStack, toolTip: MutableList<String>): List<String> {
-        onHover(stack, toolTip)
-        return onTooltip(toolTip)
-    }
-
-    private fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
-        ItemHoverEvent(stack, toolTip).postAndCatch()
-    }
-
-    fun onTooltip(toolTip: MutableList<String>): List<String> {
-        val slot = lastSlot ?: return toolTip
-        val itemStack = slot.stack ?: return toolTip
+    fun getTooltip(stack: ItemStack, toolTip: MutableList<String>) {
+        val slot = lastSlot ?: return
+        val itemStack = slot.stack ?: return
         try {
             if (LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()) {
                 toolTip.clear()
@@ -42,7 +33,11 @@ object ToolTipData {
                 "lore" to itemStack.getLore(),
             )
         }
-        return toolTip
+    }
+
+    @JvmStatic
+    fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
+        ItemHoverEvent(stack, toolTip).post()
     }
 
     var lastSlot: Slot? = null

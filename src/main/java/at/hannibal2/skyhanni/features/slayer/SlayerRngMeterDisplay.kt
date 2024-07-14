@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -34,7 +35,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.seconds
 
-class SlayerRngMeterDisplay {
+@SkyHanniModule
+object SlayerRngMeterDisplay {
 
     private val config get() = SkyHanniMod.feature.slayer.rngMeterDisplay
 
@@ -143,11 +145,11 @@ class SlayerRngMeterDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        readRngmeterInventory(event)
+        readRngMeterInventory(event)
         readSlayerInventory(event)
     }
 
-    private fun readRngmeterInventory(event: InventoryFullyOpenedEvent) {
+    private fun readRngMeterInventory(event: InventoryFullyOpenedEvent) {
         val name = inventoryNamePattern.matchMatcher(event.inventoryName) {
             group("name")
         } ?: return

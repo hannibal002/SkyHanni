@@ -30,10 +30,10 @@ object HotmAPI {
             }
         } == true
 
-    enum class Powder() {
-        MITHRIL,
-        GEMSTONE,
-        GLACITE,
+    enum class Powder(val displayName: String, val color: String) {
+        MITHRIL("Mithril", "§2"),
+        GEMSTONE("Gemstone", "§d"),
+        GLACITE("Glacite", "§b"),
 
         ;
 
@@ -94,7 +94,7 @@ object HotmAPI {
         EXTRA_POWDER("Gain §r§a\\+15% §r§fmore Powder while mining\\.", "Gain §a\\+15% §7more Powder while mining\\."),
         ABILITY_COOLDOWN("Reduce Pickaxe Ability cooldown by §r§a20%§r§f\\.", "Reduce Pickaxe Ability cooldown by"),
         GOBLIN_CHANCE("§r§a10x §r§fchance to find Golden and Diamond Goblins\\.", "§a10x §7chance to find Golden and"),
-        TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a\\+15% §7more Powder while mining\\.")
+        TITANIUM("Gain §r§a5x §r§9Titanium §r§fdrops", "Gain §a5x §9Titanium §7drops\\.")
         ;
 
         private val patternName = name.lowercase().replace("_", ".")

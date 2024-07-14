@@ -5,15 +5,17 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class EasterEggWaypoints {
+@SkyHanniModule
+object EasterEggWaypoints {
 
     private val config get() = SkyHanniMod.feature.event.lobbyWaypoints.easterEgg
     private var closest: EasterEgg? = null
@@ -37,13 +39,11 @@ class EasterEggWaypoints {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEnabled()) return
 
-        if (event.repeatSeconds(1)) {
-            isEgg = checkScoreboardEasterSpecific()
-        }
+        isEgg = checkScoreboardEasterSpecific()
 
         if (isEgg) {
             if (config.onlyClosest) {
@@ -70,7 +70,7 @@ class EasterEggWaypoints {
         }
 
         if (config.allEntranceWaypoints) {
-            for (eggEntrance in EggEntrances.entries) {
+            for (eggEntrance in EggEntrance.entries) {
                 if (!eggEntrance.easterEgg.any { it.shouldShow() }) continue
                 event.drawWaypointFilled(eggEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(eggEntrance.waypoint, "§e" + eggEntrance.eggEntranceName, 1.5)
