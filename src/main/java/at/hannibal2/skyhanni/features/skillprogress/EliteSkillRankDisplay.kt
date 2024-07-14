@@ -243,7 +243,6 @@ object EliteSkillRankDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/$skill/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-//         "https://api.elitebot.dev/Leaderboard/rank/$skill/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
 
         val response = APIUtil.getJSONResponseAsElement(url)
 
@@ -287,7 +286,6 @@ object EliteSkillRankDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/skills?days=1"
-//         "https://api.elitebot.dev/Graph/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30/skills?days=1"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {

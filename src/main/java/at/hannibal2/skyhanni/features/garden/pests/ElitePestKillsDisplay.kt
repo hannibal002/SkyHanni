@@ -231,7 +231,6 @@ object ElitePestKillsDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-//             "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {
@@ -274,7 +273,6 @@ object ElitePestKillsDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Profile/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/"
-//         "https://api.elitebot.dev/Profile/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30/"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {

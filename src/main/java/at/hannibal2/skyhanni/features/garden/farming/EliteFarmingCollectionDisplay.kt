@@ -262,7 +262,6 @@ object EliteFarmingCollectionDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-//             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30?includeUpcoming=true"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {
@@ -305,7 +304,6 @@ object EliteFarmingCollectionDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/crops?days=1"
-//         "https://api.elitebot.dev/Graph/5e22209be5864a088761aa6bde56a090/5825e8f071d04806b92687d79b733f30/crops?days=1"
         val response = APIUtil.getJSONResponseAsElement(url)
 
         try {
