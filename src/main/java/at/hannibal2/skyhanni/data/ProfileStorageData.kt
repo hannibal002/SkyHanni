@@ -57,11 +57,13 @@ object ProfileStorageData {
         val sackPlayers = sackPlayers
 
         if (playerSpecific == null) {
-            ErrorManager.logErrorStateWithData(
-                "failed to load your profile data a second time",
-                "workaround in 10 seconds did not work"
+            ErrorManager.skyHanniError(
+                "failed to load your profile data delayed ",
+                "onHypixel" to LorenzUtils.onHypixel,
+                "HypixelData.hypixelLive" to HypixelData.hypixelLive,
+                "HypixelData.hypixelAlpha" to HypixelData.hypixelAlpha,
+                "sidebarLinesFormatted" to ScoreboardData.sidebarLinesFormatted,
             )
-            ErrorManager.skyHanniError("playerSpecific is still null in ProfileJoinEvent!")
         }
         if (sackPlayers == null) {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")

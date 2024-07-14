@@ -48,6 +48,7 @@ enum class ItemAbility(
     FIRE_FURY_STAFF(20),
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
     ROYAL_PIGEON(5),
+    WAND_OF_STRENGTH(10),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 5, "Ender Bow"),

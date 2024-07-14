@@ -186,6 +186,16 @@ object ScoreboardPattern {
         "powder",
         "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?(?:§.)*:? (?:§.)*(?<amount>[\\d,.]*)"
     )
+
+    /**
+     * REGEX-TEST: §2᠅ §fMithril§f:§695
+     * REGEX-TEST: §d᠅ §fGemstone§f
+     * REGEX-TEST: §d᠅ §fGemstone§f§e(+1)
+     */
+    val powderGreedyPattern by miningSb.pattern(
+        "powdergreedy",
+        "(?:§.)*᠅ (?:§.)(?<type>Gemstone|Mithril|Glacite)(?: Powder)?.*$"
+    )
     val windCompassPattern by miningSb.pattern(
         "windcompass",
         "§9Wind Compass$"

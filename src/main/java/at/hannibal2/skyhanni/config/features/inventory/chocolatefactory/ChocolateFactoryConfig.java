@@ -172,6 +172,20 @@ public class ChocolateFactoryConfig {
     public boolean hoppityMenuShortcut = true;
 
     @Expose
+    @ConfigOption(name = "Highlight Requirement Rabbits", desc = "Highlight rabbits that have requirements.\n" +
+        "§cRed: Requirement not met.\n" +
+        "§aGreen: Requirement met.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightRabbitsWithRequirement = false;
+
+    @Expose
+    @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean onlyHighlightRequirementNotMet = true;
+
+    @Expose
     @ConfigOption(name = "Chocolate Shop Price", desc = "")
     @Accordion
     public ChocolateShopPriceConfig chocolateShopPrice = new ChocolateShopPriceConfig();
