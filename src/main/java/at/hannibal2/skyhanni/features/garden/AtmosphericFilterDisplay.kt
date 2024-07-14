@@ -4,12 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AtmosphericFilterDisplay {
+@SkyHanniModule
+object AtmosphericFilterDisplay {
 
     private val config get() = SkyHanniMod.feature.garden.atmosphericFilterDisplay
 

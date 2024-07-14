@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,7 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
-import at.hannibal2.skyhanni.utils.fromJson
+import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
@@ -29,7 +30,8 @@ import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class MiningEventTracker {
+@SkyHanniModule
+object MiningEventTracker {
     private val config get() = SkyHanniMod.feature.mining.miningEvent
 
     private val patternGroup = RepoPattern.group("mining.eventtracker")
@@ -59,11 +61,9 @@ class MiningEventTracker {
 
     private var canRequestAt = SimpleTimeMark.farPast()
 
-    companion object {
-        var apiErrorCount = 0
+    var apiErrorCount = 0
 
-        val apiError get() = apiErrorCount > 0
-    }
+    val apiError get() = apiErrorCount > 0
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -73,7 +73,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
-        if (!LorenzUtils.inAdvancedMiningIsland()) return
+        if (!isMiningIsland()) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
         if (!eventEndTime.isInPast()) {
             return
@@ -89,7 +89,7 @@ class MiningEventTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!LorenzUtils.inAdvancedMiningIsland()) return
+        if (!isMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {
             sendData(group("event"), null)
@@ -102,13 +102,15 @@ class MiningEventTracker {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
-        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !LorenzUtils.inAdvancedMiningIsland())) return
+        if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !isMiningIsland())) return
         if (!canRequestAt.isInPast()) return
 
         fetchData()
     }
 
     private fun sendData(eventName: String, time: String?) {
+        // we now ignore mineshaft events.
+        if (IslandType.MINESHAFT.isInIsland()) return
         // TODO fix this via regex
         if (eventName == "SLAYER QUEST") return
 
@@ -227,4 +229,7 @@ class MiningEventTracker {
             if (element.asString == "BOTH") JsonPrimitive("ALL") else element
         }
     }
+
+    // ignoring mineshaft here is intentional
+    fun isMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() || IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }

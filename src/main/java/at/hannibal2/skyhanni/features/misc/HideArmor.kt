@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.hasPotionEffect
@@ -16,7 +17,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HideArmor {
+@SkyHanniModule
+object HideArmor {
 
     private val config get() = SkyHanniMod.feature.misc.hideArmor2
     private var armor = mapOf<Int, ItemStack>()

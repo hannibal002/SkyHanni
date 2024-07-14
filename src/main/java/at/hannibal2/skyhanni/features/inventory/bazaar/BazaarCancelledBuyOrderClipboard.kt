@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -21,7 +22,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BazaarCancelledBuyOrderClipboard {
+@SkyHanniModule
+object BazaarCancelledBuyOrderClipboard {
 
     private val patternGroup = RepoPattern.group("bazaar.cancelledorder")
 
@@ -101,7 +103,7 @@ class BazaarCancelledBuyOrderClipboard {
         event.blockedReason = "bazaar cancelled buy order clipboard"
         val lastClicked = lastClickedItem ?: error("last clicked bz item is null")
 
-        val message = "Bazaar buy order cancelled. Click to recreate the buy order. " +
+        val message = "Bazaar buy order cancelled. Click to reorder. " +
             "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e)"
         ChatUtils.clickableChat(message, onClick = {
             BazaarApi.searchForBazaarItem(lastClicked, latestAmount)

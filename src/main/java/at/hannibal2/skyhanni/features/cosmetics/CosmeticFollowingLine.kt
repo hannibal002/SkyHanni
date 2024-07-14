@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -20,7 +21,8 @@ import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class CosmeticFollowingLine {
+@SkyHanniModule
+object CosmeticFollowingLine {
 
     private val config get() = SkyHanniMod.feature.gui.cosmetic.followingLine
 

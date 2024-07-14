@@ -16,13 +16,18 @@ public class CombatConfig {
     public DamageIndicatorConfig damageIndicator = new DamageIndicatorConfig();
 
     @Expose
-    @Category(name = "Ghost Counter", desc = "Ghost counter settings")
+    @Category(name = "Ghost Counter", desc = "Ghost Counter settings")
     public GhostCounterConfig ghostCounter = new GhostCounterConfig();
 
     @Expose
     @ConfigOption(name = "Quiver", desc = "")
     @Accordion
     public QuiverConfig quiverConfig = new QuiverConfig();
+
+    @Expose
+    @ConfigOption(name = "Armor Stack Display", desc = "")
+    @Accordion
+    public StackDisplayConfig stackDisplayConfig = new StackDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")

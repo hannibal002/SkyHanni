@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -23,8 +23,10 @@ import net.minecraft.util.MathHelper
 import org.lwjgl.input.Keyboard
 import org.lwjgl.input.Mouse
 import java.io.File
-import java.io.FileReader
+import java.io.FileInputStream
 import java.io.IOException
+import java.io.InputStreamReader
+import java.nio.charset.StandardCharsets
 
 open class VisualWordGui : GuiScreen() {
 
@@ -70,7 +72,7 @@ open class VisualWordGui : GuiScreen() {
                 displayName = "§§Up",
                 uuid = "7f68dd73-1ff6-4193-b246-820975d6fab1",
                 value = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1" +
-                    "cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0="
+                    "cmUvNzczMzRjZGRmYWI0NWQ3NWFkMjhlMWE0N2JmOGNmNTAxN2QyZjA5ODJmNjczN2RhMjJkNDk3Mjk1MjUxMDY2MSJ9fX0=",
             )
         }
 
@@ -78,8 +80,9 @@ open class VisualWordGui : GuiScreen() {
             ItemUtils.createSkull(
                 displayName = "§§Down",
                 uuid = "e4ace6de-0629-4719-aea3-3e113314dd3f",
-                value = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMz" +
-                    "RmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0="
+                value =
+                "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTc3NDIwMz" +
+                    "RmNTlkYjg5MGM4MDA0MTU2YjcyN2M3N2NhNjk1YzQzOTlkOGUwZGE1Y2U5MjI3Y2Y4MzZiYjhlMiJ9fX0=",
             )
         }
     }
@@ -125,7 +128,7 @@ open class VisualWordGui : GuiScreen() {
             drawUnmodifiedStringCentered(
                 "§7Modify Words. Replaces the top with the bottom",
                 (guiLeft + 180) * inverseScale,
-                (guiTop + 9) * inverseScale
+                (guiTop + 9) * inverseScale,
             )
             drawUnmodifiedString("§bPhrase", (guiLeft + 30) * inverseScale, (guiTop + 5) * inverseScale)
             drawUnmodifiedString("§bStatus", (guiLeft + 310) * inverseScale, (guiTop + 5) * inverseScale)
@@ -146,7 +149,7 @@ open class VisualWordGui : GuiScreen() {
                 drawUnmodifiedString(
                     "${index + 1}.",
                     (guiLeft + 5) * inverseScale,
-                    (adjustedY + 10 + 30 * index) * inverseScale
+                    (adjustedY + 10 + 30 * index) * inverseScale,
                 )
 
                 val top = adjustedY + 30 * index + 7
@@ -183,7 +186,7 @@ open class VisualWordGui : GuiScreen() {
                         guiLeft + sizeX,
                         adjustedY + 30 * index + 30,
                         colorB,
-                        inverseScale
+                        inverseScale,
                     )
                 }
 
@@ -210,23 +213,23 @@ open class VisualWordGui : GuiScreen() {
                     drawUnmodifiedString(
                         phrase.phrase,
                         (guiLeft + 15) * inverseScale,
-                        (adjustedY + 5 + 30 * index) * inverseScale
+                        (adjustedY + 5 + 30 * index) * inverseScale,
                     )
                     drawUnmodifiedString(
                         phrase.replacement,
                         (guiLeft + 15) * inverseScale,
-                        (adjustedY + 15 + 30 * index) * inverseScale
+                        (adjustedY + 15 + 30 * index) * inverseScale,
                     )
                 } else {
                     drawUnmodifiedString(
                         phrase.phrase.convertToFormatted(),
                         (guiLeft + 15) * inverseScale,
-                        (adjustedY + 5 + 30 * index) * inverseScale
+                        (adjustedY + 5 + 30 * index) * inverseScale,
                     )
                     drawUnmodifiedString(
                         phrase.replacement.convertToFormatted(),
                         (guiLeft + 15) * inverseScale,
-                        (adjustedY + 15 + 30 * index) * inverseScale
+                        (adjustedY + 15 + 30 * index) * inverseScale,
                     )
                 }
             }
@@ -293,41 +296,41 @@ open class VisualWordGui : GuiScreen() {
                 drawUnmodifiedString(
                     "§bThe top line of each section",
                     (guiLeft + 10) * inverseScale,
-                    (guiTop + 12) * inverseScale
+                    (guiTop + 12) * inverseScale,
                 )
                 drawUnmodifiedString(
                     "§bis the preview of the bottom text",
                     (guiLeft + 10) * inverseScale,
-                    (guiTop + 22) * inverseScale
+                    (guiTop + 22) * inverseScale,
                 )
 
                 drawUnmodifiedString(
                     "§bTo get the Minecraft",
                     (guiLeft + 220) * inverseScale,
-                    (guiTop + 12) * inverseScale
+                    (guiTop + 12) * inverseScale,
                 )
                 drawUnmodifiedString(
                     "§b formatting character use \"&&\"",
                     (guiLeft + 220) * inverseScale,
-                    (guiTop + 22) * inverseScale
+                    (guiTop + 22) * inverseScale,
                 )
 
                 drawUnmodifiedString(
                     currentPhrase.phrase.convertToFormatted(),
                     (guiLeft + 30) * inverseScale,
-                    (guiTop + 40) * inverseScale
+                    (guiTop + 40) * inverseScale,
                 )
                 drawUnmodifiedString(currentPhrase.phrase, (guiLeft + 30) * inverseScale, (guiTop + 55) * inverseScale)
 
                 drawUnmodifiedString(
                     currentPhrase.replacement.convertToFormatted(),
                     (guiLeft + 30) * inverseScale,
-                    (guiTop + 95) * inverseScale
+                    (guiTop + 95) * inverseScale,
                 )
                 drawUnmodifiedString(
                     currentPhrase.replacement,
                     (guiLeft + 30) * inverseScale,
-                    (guiTop + 110) * inverseScale
+                    (guiTop + 110) * inverseScale,
                 )
 
                 GlStateManager.scale(inverseScale, inverseScale, 1f)
@@ -563,7 +566,8 @@ open class VisualWordGui : GuiScreen() {
     private fun tryImportFromSBE() {
         if (!drawImport) return
         try {
-            val json = ConfigManager.gson.fromJson(FileReader(sbeConfigPath), JsonObject::class.java)
+            val reader = InputStreamReader(FileInputStream(sbeConfigPath), StandardCharsets.UTF_8)
+            val json = ConfigManager.gson.fromJson(reader, JsonObject::class.java)
             var importedWords = 0
             var skippedWords = 0
             val lists = json["custom"].asJsonObject["visualWords"].asJsonArray
@@ -584,7 +588,9 @@ open class VisualWordGui : GuiScreen() {
                 }
             }
             if (importedWords > 0 || skippedWords > 0) {
-                chat("§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !")
+                chat(
+                    "§aSuccessfully imported §e$importedWords §aand skipped §e$skippedWords §aVisualWords from SkyBlockExtras !"
+                )
                 SkyHanniMod.feature.storage.visualWordsImported = true
                 drawImport = false
             }

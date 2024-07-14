@@ -47,6 +47,11 @@ object LocationUtils {
         return noBlocks && notTooFar && inFov
     }
 
+    fun LorenzVec.canBeSeen(yOffsetRange: IntRange, radius: Double = 150.0): Boolean =
+        yOffsetRange.any { offset ->
+            this.add(y = offset).canBeSeen(radius)
+        }
+
     fun AxisAlignedBB.minBox() = LorenzVec(minX, minY, minZ)
 
     fun AxisAlignedBB.maxBox() = LorenzVec(maxX, maxY, maxZ)
@@ -57,9 +62,9 @@ object LocationUtils {
         val t1 = (this.minBox() - origin) * rayDirectionInverse
         val t2 = (this.maxBox() - origin) * rayDirectionInverse
 
-        val tmin = max(t1.minOfEachElement(t2).max(), Double.NEGATIVE_INFINITY)
-        val tmax = min(t1.maxOfEachElement(t2).min(), Double.POSITIVE_INFINITY)
-        return tmax >= tmin && tmax >= 0.0
+        val tMin = max(t1.minOfEachElement(t2).max(), Double.NEGATIVE_INFINITY)
+        val tMax = min(t1.maxOfEachElement(t2).min(), Double.POSITIVE_INFINITY)
+        return tMax >= tMin && tMax >= 0.0
     }
 
     fun AxisAlignedBB.union(aabbs: List<AxisAlignedBB>?): AxisAlignedBB? {
@@ -74,7 +79,7 @@ object LocationUtils {
         var maxY = this.maxY
         var maxZ = this.maxZ
 
-        aabbs.forEach { aabb ->
+        for (aabb in aabbs) {
             if (aabb.minX < minX) minX = aabb.minX
             if (aabb.minY < minY) minY = aabb.minY
             if (aabb.minZ < minZ) minZ = aabb.minZ

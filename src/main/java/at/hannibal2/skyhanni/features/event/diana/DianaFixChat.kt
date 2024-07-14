@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -15,7 +16,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class DianaFixChat {
+@SkyHanniModule
+object DianaFixChat {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
@@ -28,6 +30,7 @@ class DianaFixChat {
 
     private var lastSpadeUse = SimpleTimeMark.farPast()
     private var lastErrorTime = SimpleTimeMark.farPast()
+    private var lastGuessPoint = SimpleTimeMark.farPast()
     private var foundGuess = false
 
     @SubscribeEvent
@@ -117,13 +120,19 @@ class DianaFixChat {
         if (hasSetToggleMusic) {
             ChatUtils.chat("Toggling the hypixel music has worked, good job!")
         } else if (hasSetParticleQuality) {
-            ChatUtils.chat("Changing the particle qualilty has worked, good job!")
+            ChatUtils.chat("Changing the particle quality has worked, good job!")
         }
 
         hasSetParticleQuality = false
         hasSetToggleMusic = false
         errorCounter = 0
-        successfulCounter++
+
+        // This ensures we only count successes after new spade clicks, not the repeated moved guess locations
+        if (lastGuessPoint != lastSpadeUse) {
+            lastGuessPoint = lastSpadeUse
+            lastGuessPoint = SimpleTimeMark.now()
+            successfulCounter++
+        }
     }
 
     @SubscribeEvent
