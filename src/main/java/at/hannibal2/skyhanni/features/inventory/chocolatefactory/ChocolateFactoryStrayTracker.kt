@@ -64,21 +64,30 @@ object ChocolateFactoryStrayTracker {
         "§7You caught a stray §6§lGolden Rabbit§7! §7You caught a glimpse of §6El Dorado§7, §7but he escaped and left behind §7§6\\+(?<amount>[\\d,]*) Chocolate§7!"
     )
 
+    /**
+     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You gained §6+5 Chocolate §7until the end of the SkyBlock year!
+     */
+    private val goldenStrayClick by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.goldenclick",
+        "§7You caught a stray §6§lGolden Rabbit§7! §7You gained §6\\+5 Chocolate §7until the end of the SkyBlock year!"
+    )
+
     private val goldenStraySideDish by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.goldensidedish",
         "§6§lGolden Rabbit §8- §aSide Dish"
     )
 
-    //TODO: Verify pattern
     private val goldenStrayHoardPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.goldenhoard",
         "§7You caught a stray §6§lGolden Rabbit§7! §7A hoard of §aStray Rabbits §7has appeared!",
     )
 
-    //TODO: Verify pattern
+    /**
+     * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
+     */
     private val fishTheRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.fish",
-        "§7You caught a stray §9Fish the Rabbit§7!§7You have already found §9Fish the §9Rabbit§7, so you received .*§6\\+(?<amount>[\\d,]*) Chocolate§7!",
+        "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
     )
 
     private fun formLoreToSingleLine(lore: List<String>): String {
@@ -110,19 +119,14 @@ object ChocolateFactoryStrayTracker {
 
                 // "Base" strays - Common -> Epic, raw choc only reward.
                 strayLorePattern.matchMatcher(loreLine) {
-                    val rarity = group("rabbit").let { rab ->
-                        when {
-                            rab.startsWith("§f") -> "common"
-                            rab.startsWith("§a") -> "uncommon"
-                            rab.startsWith("§9") -> "rare"
-                            rab.startsWith("§5") -> "epic"
-                            // It's unclear if strays above Epic actually appear, but...
-                            rab.startsWith("§6") -> "legendary"
-                            rab.startsWith("§d") -> "mythic"
-                            rab.startsWith("§b") -> "divine"
-                            else -> return
-                        }
-                    }
+                    val rarity = extractRarity(group("rabbit"))
+                    val amount = group("amount").formatLong()
+                    incrementRarity(rarity, amount)
+                }
+
+                // Fish the Rabbit
+                fishTheRabbitPattern.matchMatcher(loreLine) {
+                    val rarity = extractRarity(group("color"))
                     val amount = group("amount").formatLong()
                     incrementRarity(rarity, amount)
                 }
@@ -145,6 +149,16 @@ object ChocolateFactoryStrayTracker {
                     val amount = group("amount").formatLong()
                     incrementRarity("legendary", amount)
                     profileStorage.goldenTypesCaught["dorado"] = profileStorage.goldenTypesCaught["dorado"]?.plus(1) ?: 1
+                }
+
+                // Golden Strays, "Golden Click"
+                goldenStrayClick.matchMatcher(loreLine) {
+                    profileStorage.goldenTypesCaught["goldenclick"] = profileStorage.goldenTypesCaught["goldenclick"]?.plus(1) ?: 1
+                }
+
+                // Golden Strays, hoard/stampede
+                goldenStrayHoardPattern.matchMatcher(loreLine) {
+                    profileStorage.goldenTypesCaught["stampede"] = profileStorage.goldenTypesCaught["stampede"]?.plus(1) ?: 1
                 }
 
                 //Asynchronously update to immediately reflect caught stray
@@ -211,6 +225,19 @@ object ChocolateFactoryStrayTracker {
         put("rare", "§9Rare§7: §r§9")
         put("epic", "§5Epic§7: §r§5")
         put("legendary", "§6Legendary§7: §r§6")
+    }
+
+    private fun extractRarity(rabbitName: String) : String {
+        return when {
+            rabbitName.startsWith("§f") -> "common"
+            rabbitName.startsWith("§a") -> "uncommon"
+            rabbitName.startsWith("§9") -> "rare"
+            rabbitName.startsWith("§5") -> "epic"
+            rabbitName.startsWith("§6") -> "legendary"
+            rabbitName.startsWith("§d") -> "mythic"
+            rabbitName.startsWith("§b") -> "divine"
+            else -> "common"
+        }
     }
 
     private fun updateStraysDisplay() {
