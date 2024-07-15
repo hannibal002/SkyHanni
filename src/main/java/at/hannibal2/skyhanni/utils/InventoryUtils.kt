@@ -6,6 +6,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
@@ -18,12 +19,16 @@ object InventoryUtils {
     var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
 
-    fun getItemsInOpenChest() = buildList<Slot> {
+    fun getItemsInOpenChest(): List<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
-        for (slot in guiChest.inventorySlots.inventorySlots) {
-            if (slot.inventory is InventoryPlayer) break
-            if (slot.stack != null) add(slot)
-        }
+        return guiChest.inventorySlots.inventorySlots
+            .filter { it.inventory !is InventoryPlayer && it.stack != null }
+    }
+
+    fun getSlotsInOwnInventory(): List<Slot> {
+        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory ?: return emptyList<Slot>()
+        return guiInventory.inventorySlots.inventorySlots
+            .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
 
     // TODO add cache that persists until the next gui/window open/close packet is sent/received
