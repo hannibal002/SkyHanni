@@ -460,7 +460,7 @@ object ChatFilter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         var blockReason = block(event.message)
-        if (blockReason == "") blockReason = powderMiningBlock(event)
+        if (blockReason == "" && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == "") return
 
         event.blockedReason = blockReason
@@ -511,8 +511,9 @@ object ChatFilter {
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
                 val reward = groupOrNull("reward") ?: ""
-                val amount = groupOrNull("amount")?.formatInt() ?: 1
-                val amountFormat = if (amount > 1) "§a+§b$amount§r" else "§a+§r"
+                val amountFormat = groupOrNull("amount")?.let {
+                    "§a+ §b$it§r"
+                } ?: "§a+§r"
                 event.chatComponent = ChatComponentText("$amountFormat $reward")
             }
             return ""

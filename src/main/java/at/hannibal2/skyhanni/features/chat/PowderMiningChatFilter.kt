@@ -98,7 +98,7 @@ object PowderMiningChatFilter {
      */
     val genericMiningRewardMessage by patternGroup.pattern(
         "reward.generic",
-        " {4}(?<reward>(?:§.*)?[a-f][^§]*)?(?: §r§8x(?<amount>[\\d,]+))?\$",
+        " {4}(?<reward>§.+?[^§]*)(?: §r§8x(?<amount>[\\d,]+))?\$",
     )
 
     /**
