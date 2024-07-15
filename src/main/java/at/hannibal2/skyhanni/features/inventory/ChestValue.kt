@@ -54,9 +54,7 @@ object ChestValue {
             if (InventoryUtils.openInventoryName() == "") return
         }
 
-        if (!config.showDuringEstimatedItemValue) {
-            if (EstimatedItemValue.isCurrentlyShowing()) return
-        }
+        if (!config.showDuringEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         if (inInventory) {
             config.position.renderStringsAndItems(
@@ -256,7 +254,7 @@ object ChestValue {
 
 
         if ((name.contains("Backpack") && name.contains("Slot #") || name.startsWith("Ender Chest (")) &&
-            !InventoryUtils.isNeuStorageEnabled.getValue()
+            !InventoryUtils.isNeuStorageEnabled
         ) {
             return true
         }
