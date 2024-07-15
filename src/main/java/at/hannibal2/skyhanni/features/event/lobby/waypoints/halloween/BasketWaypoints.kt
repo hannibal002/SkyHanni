@@ -71,7 +71,7 @@ object BasketWaypoints {
         }
 
         if (config.allEntranceWaypoints) {
-            for (basketEntrance in BasketEntrances.entries) {
+            for (basketEntrance in BasketEntrance.entries) {
                 if (!basketEntrance.basket.any { it.shouldShow() }) continue
                 event.drawWaypointFilled(basketEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(basketEntrance.waypoint, "§e" + basketEntrance.basketEntranceName, 1.5)

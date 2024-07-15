@@ -93,10 +93,16 @@ public class HoppityEggsConfig {
     public String warpDestination = "nucleus";
 
     @Expose
-    @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
+    @ConfigOption(name = "Show While Busy", desc = "Show while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showDuringContest = false;
+    public boolean showWhileBusy = false;
+
+    @Expose
+    @ConfigOption(name = "Warn While Busy", desc = "Warn while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnWhileBusy = false;
 
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show on Hypixel even when not playing SkyBlock.")
@@ -146,7 +152,7 @@ public class HoppityEggsConfig {
     @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
-        desc = "Warn when using the Egglocator without having a §d§lMythic Rabbit Pet §7selected. " +
+        desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
             "§eOnly enable this setting when you own a mythic Rabbit pet."
     )
     @ConfigEditorBoolean
