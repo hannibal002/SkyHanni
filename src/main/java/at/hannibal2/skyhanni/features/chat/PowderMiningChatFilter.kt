@@ -96,7 +96,7 @@ object PowderMiningChatFilter {
      * REGEX-TEST:    §r§aWishing Compass §r§8x3
      * REGEX-TEST:    §r§a⸕ Flawed Amber Gemstone §r§8x2
      */
-    public val genericMiningRewardMessage by patternGroup.pattern(
+    val genericMiningRewardMessage by patternGroup.pattern(
         "reward.generic",
         " {4}(?<reward>(?:§.*)?[a-f][^§]*)?(?: §r§8x(?<amount>[\\d,]+))?\$"
     )
