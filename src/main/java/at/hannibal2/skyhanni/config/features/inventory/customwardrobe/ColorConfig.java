@@ -10,7 +10,7 @@ public class ColorConfig {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetColor = CustomWardrobeReset::resetWardrobeColor;
+    public Runnable resetColor = CustomWardrobeReset::resetColor;
 
     @Expose
     @ConfigOption(name = "Background", desc = "Color of the GUI background.")

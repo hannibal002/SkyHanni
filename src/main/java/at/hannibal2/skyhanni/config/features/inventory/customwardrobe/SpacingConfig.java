@@ -11,7 +11,7 @@ public class SpacingConfig {
 
     @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe spacing settings to the default.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable resetSpacing = CustomWardrobeReset::resetWardrobeSpacing;
+    public Runnable resetSpacing = CustomWardrobeReset::resetSpacing;
 
     @Expose
     @ConfigOption(name = "Global Scale", desc = "Control the scale of the entirety of the wardrobe.")

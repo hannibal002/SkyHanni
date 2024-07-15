@@ -3,13 +3,11 @@ package at.hannibal2.skyhanni.features.inventory.wardrobe
 import at.hannibal2.skyhanni.SkyHanniMod
 
 object CustomWardrobeReset {
-
-    private val configSpacing get() = SkyHanniMod.feature.inventory.customWardrobe.spacing
-    private val configColor get() = SkyHanniMod.feature.inventory.customWardrobe.color
+    private val config get() = SkyHanniMod.feature.inventory.customWardrobe
 
     @JvmStatic
-    fun resetWardrobeSpacing() {
-        with(configSpacing) {
+    fun resetSpacing() {
+        with(config.spacing) {
             globalScale.set(100)
             outlineThickness.set(5)
             outlineBlur.set(0.5f)
@@ -29,8 +27,8 @@ object CustomWardrobeReset {
     }
 
     @JvmStatic
-    fun resetWardrobeColor() {
-        with(configColor) {
+    fun resetColor() {
+        with(config.color) {
             backgroundColor = "0:127:0:0:0"
             equippedColor = "0:127:85:255:85"
             favoriteColor = "0:127:255:85:85"
