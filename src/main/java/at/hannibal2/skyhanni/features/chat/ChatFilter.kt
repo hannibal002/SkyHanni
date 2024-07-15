@@ -508,7 +508,7 @@ object ChatFilter {
      */
     private fun powderMiningBlock(event: LorenzChatEvent): String {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
-        if(powderMiningMatchResult == "no_filter") {
+        if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
                 val reward = groupOrNull("reward") ?: ""
                 val amount = groupOrNull("amount")?.formatInt() ?: 1
