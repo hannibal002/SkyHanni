@@ -4,13 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -454,7 +459,8 @@ object ChatFilter {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val blockReason = block(event.message)
+        var blockReason = block(event.message)
+        if (blockReason == "") blockReason = powderMiningBlock(event)
         if (blockReason == "") return
 
         event.blockedReason = blockReason
@@ -479,7 +485,6 @@ object ChatFilter {
         config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.powderMiningFilter.enabled && isPowderMining(message) -> powderMiningMessage
         config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
@@ -494,23 +499,25 @@ object ChatFilter {
         else -> ""
     }
 
-    private var powderMiningMessage = ""
-
     /**
      * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
-     * Will store the resultant reason in powderMiningMessage for usage in the block function
-     * @param message The message to check
-     * @return True if the message is a blocked Powder Mining message
-     * @see powderMiningMessage
+     * Will modify un-filtered Mining rewards, or return a resultant blocking code
+     * @param event The event to check
+     * @return Block reason if applicable
      * @see block
      */
-    private fun isPowderMining(message: String): Boolean {
-        val powderMiningMatchResult = PowderMiningChatFilter.block(message)
-        if (powderMiningMatchResult == "no_match") return false
-        else {
-            powderMiningMessage = powderMiningMatchResult
-            return true
+    private fun powderMiningBlock(event: LorenzChatEvent): String {
+        val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
+        if(powderMiningMatchResult == "no_filter") {
+            genericMiningRewardMessage.matchMatcher(event.message) {
+                val reward = groupOrNull("reward") ?: ""
+                val amount = groupOrNull("amount")?.formatInt() ?: 1
+                val amountFormat = if (amount > 1) "§a+§b$amount§r" else "§a+§r"
+                event.chatComponent = ChatComponentText("$amountFormat $reward")
+            }
+            return ""
         }
+        return powderMiningMatchResult
     }
 
     private var othersMsg = ""

@@ -79,6 +79,29 @@ object PowderMiningChatFilter {
     )
 
     /**
+     * REGEX-TEST:    §r§a§r§aGreen Goblin Egg
+     * REGEX-TEST:    §r§9Goblin Egg
+     * REGEX-TEST:    §r§dDiamond Essence
+     * REGEX-TEST:    §r§dGold Essence
+     * REGEX-TEST:    §r§dGold Essence §r§8x3
+     * REGEX-TEST:    §r§dGemstone Powder §r§8x537
+     * REGEX-TEST:    §r§dDiamond Essence §r§8x2
+     * REGEX-TEST:    §r§2Mithril Powder §r§8x153
+     * REGEX-TEST:    §r§5Treasurite
+     * REGEX-TEST:    §r§f⸕ Rough Amber Gemstone §r§8x24
+     * REGEX-TEST:    §r§f❤ Rough Ruby Gemstone §r§8x24
+     * REGEX-TEST:    §r§f❈ Rough Amethyst Gemstone §r§8x24
+     * REGEX-TEST:    §r§9§r§eYellow Goblin Egg
+     * REGEX-TEST:    §r§a⸕ Flawed Amber Gemstone
+     * REGEX-TEST:    §r§aWishing Compass §r§8x3
+     * REGEX-TEST:    §r§a⸕ Flawed Amber Gemstone §r§8x2
+     */
+    public val genericMiningRewardMessage by patternGroup.pattern(
+        "reward.generic",
+        " {4}§r(?<reward>.*)( §r§8x(?<amount>[\\d,]+))?"
+    )
+
+    /**
      * REGEX-TEST: §r§2Mithril Powder §r§8x153
      * REGEX-TEST: §r§dGemstone Powder §r§8x537
      */
@@ -218,19 +241,19 @@ object PowderMiningChatFilter {
             return "reward_wrapper"
         }
 
-        if (!unclosedRewards) return "no_match"
+        if (!unclosedRewards) return ""
         if (lockPickedPattern.matches(message)) return "powder_chest_lockpicked"
         if (lootChestCollectedPattern.matches(message)) return "loot_chest_opened"
         if (rewardHeaderPattern.matches((message))) return "powder_reward_header"
 
         // All powder and loot chest rewards start with 4 spaces
         // To simplify regex statements, this check is done outside
-        if (!message.startsWith("    ")) return "no_match"
+        if (!message.startsWith("    ")) return ""
         val ssMessage = message.substring(4);
 
         //Powder
         powderRewardPattern.matchMatcher(ssMessage) {
-            if (config.powderFilterThreshold == 20000) return "powder_mining_powder"
+            if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
             val amountStr = groupOrNull("amount") ?: "1"
             if (amountStr.isNotEmpty() && config.powderFilterThreshold > 0) {
                 val amountParsed = amountStr.replace(",", "").toInt()
@@ -240,11 +263,12 @@ object PowderMiningChatFilter {
 
         //Essence
         essenceRewardPattern.matchMatcher(ssMessage) {
-            if (config.essenceFilterThreshold == 10) return "powder_mining_essence"
+            if (config.essenceFilterThreshold == 20) return "powder_mining_essence"
             val amountStr = groupOrNull("amount") ?: "1"
             if (amountStr.isNotEmpty() && config.essenceFilterThreshold > 0) {
                 val amountParsed = amountStr.toInt()
-                if (amountParsed < config.essenceFilterThreshold) return "powder_mining_essence"
+                return if (amountParsed < config.essenceFilterThreshold) "powder_mining_essence"
+                else "no_filter"
             }
         }
 
@@ -262,8 +286,9 @@ object PowderMiningChatFilter {
             treasuritePattern to TREASURITE to "powder_mining_treasurite"
         )
         for ((patternToReward, returnReason) in rewardPatterns) {
-            if (patternToReward.first.matches(ssMessage) && config.simplePowderMiningTypes.contains(patternToReward.second)) {
-                return returnReason
+            if (patternToReward.first.matches(ssMessage)) {
+                return if (config.simplePowderMiningTypes.contains(patternToReward.second)) returnReason
+                else "no_filter"
             }
         }
 
@@ -278,25 +303,25 @@ object PowderMiningChatFilter {
                     "" -> return "powder_mining_goblin_eggs"
                     "green" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
                         return "powder_mining_goblin_eggs"
-                    } else ""
+                    } else "no_filter"
                     "yellow" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.YELLOW_UP) {
                         "powder_mining_goblin_eggs"
-                    } else ""
+                    } else "no_filter"
                     "red" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.RED_UP) {
                         "powder_mining_goblin_eggs"
-                    } else ""
+                    } else "no_filter"
                     // BLUE_ONLY enum not explicitly used in comparison, as the only
                     // case that will block it is HIDE_ALL, which is covered above
-                    "blue" -> return ""
+                    "blue" -> return "no_filter"
                     else -> {
                         ChatUtils.chat(
                             "§cUnknown Goblin Egg color detected in Powder Mining Filter: " +
                                 "'${colorStr}' - please report this in the Discord!",
                         )
-                        return ""
+                        return "no_filter"
                     }
                 }
-            }
+            } else return "no_filter"
         }
 
         //Gemstones
@@ -315,7 +340,7 @@ object PowderMiningChatFilter {
                 "jade" -> gemstoneConfig.jadeGemstones
                 "topaz" -> gemstoneConfig.topazGemstones
                 //Failure case that should never be reached
-                else -> return ""
+                else -> return "no_filter"
             }
 
             if (gemSpecificConfig == GemstoneFilterEntry.HIDE_ALL) return "powder_mining_gemstones"
@@ -326,16 +351,16 @@ object PowderMiningChatFilter {
                 "rough" -> return "powder_mining_gemstones"
                 "flawed" -> return if (gemSpecificConfig > GemstoneFilterEntry.FLAWED_UP) {
                     "powder_mining_gemstones"
-                } else ""
+                } else "no_filter"
                 // FINE_ONLY enum not explicitly used in comparison, as the only
                 // case that will block it is HIDE_ALL, which is covered above
-                "fine" -> return ""
+                "fine" -> return "no_filter"
                 // This should not be reachable
-                else -> return ""
+                else -> return "no_filter"
             }
         }
 
         //Fallback default
-        return "no_match"
+        return ""
     }
 }
