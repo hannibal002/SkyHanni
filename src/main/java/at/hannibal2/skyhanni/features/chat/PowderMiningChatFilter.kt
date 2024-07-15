@@ -27,14 +27,14 @@ object PowderMiningChatFilter {
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
-    private var unclosedRewards = false;
+    private var unclosedRewards = false
 
     /**
      * REGEX-TEST: §aYou uncovered a treasure chest!
      */
     private val uncoverChestPattern by patternGroup.pattern(
         "warning.chestuncover",
-        "§aYou uncovered a treasure chest!"
+        "§aYou uncovered a treasure chest!",
     )
 
     /**
@@ -51,7 +51,7 @@ object PowderMiningChatFilter {
      */
     private val chestWrapperPattern by patternGroup.pattern(
         "powder.chestwrapper",
-        "^§[ed]§l▬{64}\$"
+        "^§[ed]§l▬{64}\$",
     )
 
     /**
@@ -59,7 +59,7 @@ object PowderMiningChatFilter {
      */
     private val lockPickedPattern by patternGroup.pattern(
         "powder.picked",
-        ".*§r§6§lCHEST LOCKPICKED.*"
+        ".*§r§6§lCHEST LOCKPICKED.*",
     )
 
     /**
@@ -67,7 +67,7 @@ object PowderMiningChatFilter {
      */
     private val lootChestCollectedPattern by patternGroup.pattern(
         "lootchest.collected",
-        ".*§r§5§lLOOT CHEST COLLECTED.*"
+        ".*§r§5§lLOOT CHEST COLLECTED.*",
     )
 
     /**
@@ -75,7 +75,7 @@ object PowderMiningChatFilter {
      */
     private val rewardHeaderPattern by patternGroup.pattern(
         "reward.header",
-        ".*§r§[af]§lREWARDS.*"
+        ".*§r§[af]§lREWARDS.*",
     )
 
     /**
@@ -98,7 +98,7 @@ object PowderMiningChatFilter {
      */
     val genericMiningRewardMessage by patternGroup.pattern(
         "reward.generic",
-        " {4}(?<reward>(?:§.*)?[a-f][^§]*)?(?: §r§8x(?<amount>[\\d,]+))?\$"
+        " {4}(?<reward>(?:§.*)?[a-f][^§]*)?(?: §r§8x(?<amount>[\\d,]+))?\$",
     )
 
     /**
@@ -249,7 +249,7 @@ object PowderMiningChatFilter {
         // All powder and loot chest rewards start with 4 spaces
         // To simplify regex statements, this check is done outside
         if (!message.startsWith("    ")) return ""
-        val ssMessage = message.substring(4);
+        val ssMessage = message.substring(4)
 
         //Powder
         powderRewardPattern.matchMatcher(ssMessage) {
@@ -284,7 +284,7 @@ object PowderMiningChatFilter {
             sludgeJuicePattern to SLUDGE_JUICE to "powder_mining_sludge_juice",
             yoggiePattern to YOGGIE to "powder_mining_yoggie",
             robotPartsPattern to ROBOT_PARTS to "powder_mining_robot_parts",
-            treasuritePattern to TREASURITE to "powder_mining_treasurite"
+            treasuritePattern to TREASURITE to "powder_mining_treasurite",
         )
         for ((patternToReward, returnReason) in rewardPatterns) {
             if (patternToReward.first.matches(ssMessage)) {
