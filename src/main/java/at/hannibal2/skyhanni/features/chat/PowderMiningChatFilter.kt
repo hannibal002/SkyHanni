@@ -98,7 +98,7 @@ object PowderMiningChatFilter {
      */
     public val genericMiningRewardMessage by patternGroup.pattern(
         "reward.generic",
-        " {4}§r(?<reward>.*)( §r§8x(?<amount>[\\d,]+))?"
+        " {4}(?<reward>(?:§.*)?[a-f][^§]*)?(?: §r§8x(?<amount>[\\d,]+))?\$"
     )
 
     /**
@@ -257,7 +257,8 @@ object PowderMiningChatFilter {
             val amountStr = groupOrNull("amount") ?: "1"
             if (amountStr.isNotEmpty() && config.powderFilterThreshold > 0) {
                 val amountParsed = amountStr.replace(",", "").toInt()
-                if (amountParsed < config.powderFilterThreshold) return "powder_mining_powder"
+                return if (amountParsed < config.powderFilterThreshold) "powder_mining_powder"
+                else "no_filter"
             }
         }
 
