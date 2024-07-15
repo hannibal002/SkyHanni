@@ -15,10 +15,11 @@ object PetAPI {
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
+     * REGEX-TEST: ⭐ [Lvl 100] Black Cat ✦
      */
     private val petItemName by patternGroup.pattern(
         "item.name",
-        "(?<favorite>§.⭐ )?(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)",
+        "(?<favorite>(?:§.)*⭐ )?(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)",
     )
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
