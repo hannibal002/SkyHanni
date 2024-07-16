@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
@@ -49,12 +48,13 @@ class RenderBackground {
                 val textureLocation = ResourceLocation("skyhanni", "scoreboard.png")
                 Minecraft.getMinecraft().textureManager.bindTexture(textureLocation)
 
-                Utils.drawTexturedRect(
-                    (x - border).toFloat(),
-                    (y - border).toFloat(),
-                    (elementWidth + border * 3).toFloat(),
-                    (elementHeight + border * 2).toFloat(),
-                    GL11.GL_NEAREST
+                RenderUtils.drawRoundTexturedRect(
+                    x - border,
+                    y - border,
+                    elementWidth + border * 3,
+                    elementHeight + border * 2,
+                    GL11.GL_NEAREST,
+                    backgroundConfig.roundedCornerSmoothness
                 )
             } else {
                 RenderUtils.drawRoundRect(
