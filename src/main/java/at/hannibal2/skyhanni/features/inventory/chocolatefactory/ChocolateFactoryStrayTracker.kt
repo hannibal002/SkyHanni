@@ -100,13 +100,13 @@ object ChocolateFactoryStrayTracker {
         "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
     )
 
-    private val rarityFormatMap = buildMap {
-        put("common", "§fCommon§7: §r§f")
-        put("uncommon", "§aUncommon§7: §r§a")
-        put("rare", "§9Rare§7: §r§9")
-        put("epic", "§5Epic§7: §r§5")
-        put("legendary", "§6Legendary§7: §r§6")
-    }
+    private val rarityFormatMap = mapOf(
+        "common" to "§f",
+        "uncommon" to "§a",
+        "rare" to "§9",
+        "epic" to "§5",
+        "legendary" to "§6",
+    )
 
     private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker })
     { drawDisplay(it) }
@@ -139,19 +139,6 @@ object ChocolateFactoryStrayTracker {
         tracker.modify { it.straysExtraChocMs.addOrPut(rarity, extraTime.inWholeMilliseconds) }
     }
 
-    private fun extractRarity(rabbitName: String): String {
-        return when {
-            rabbitName.startsWith("§f") -> "common"
-            rabbitName.startsWith("§a") -> "uncommon"
-            rabbitName.startsWith("§9") -> "rare"
-            rabbitName.startsWith("§5") -> "epic"
-            rabbitName.startsWith("§6") -> "legendary"
-            rabbitName.startsWith("§d") -> "mythic"
-            rabbitName.startsWith("§b") -> "divine"
-            else -> "common"
-        }
-    }
-
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         val extraChocMs = data.straysExtraChocMs.values.sum().milliseconds
         val formattedExtraTime = extraChocMs.let { if (it == 0.milliseconds) "0s" else it.format() }
@@ -177,7 +164,8 @@ object ChocolateFactoryStrayTracker {
         val rarityExtraChocMs = data.straysExtraChocMs[rarity]?.milliseconds
         val extraChocFormat = rarityExtraChocMs?.format() ?: ""
 
-        val lineHeader = rarityFormatMap[rarity] ?: ""
+        val colorCode = rarityFormatMap[rarity] ?: ""
+        val lineHeader = "$colorCode${rarity.substring(0, 1).uppercase()}${rarity.substring(1)}§7: §r$colorCode"
         val lineFormat = "${lineHeader}${caughtString}"
 
         return if (rarityExtraChocMs == null) Renderable.string(lineFormat)
@@ -227,7 +215,7 @@ object ChocolateFactoryStrayTracker {
                 // "Base" strays - Common -> Epic, raw choc only reward.
                 strayLorePattern.matchMatcher(loreLine) {
                     //Pretty sure base strays max at Epic, but...
-                    val rarity = extractRarity(group("rabbit"))
+                    val rarity = rarityFormatMap.entries.find { e -> e.value == group("rabbit").substring(0, 2) }?.key ?: "common"
                     val amount = groupOrNull("amount")?.formatLong() ?: return
                     incrementRarity(rarity, amount)
                 }
@@ -235,7 +223,7 @@ object ChocolateFactoryStrayTracker {
                 // Fish the Rabbit
                 fishTheRabbitPattern.matchMatcher(loreLine) {
                     //Also fairly sure that Fish maxes out at Rare, but...
-                    val rarity = extractRarity(group("color"))
+                    val rarity = rarityFormatMap.entries.find { e -> e.value == group("color").substring(0, 2) }?.key ?: "common"
                     val amount = groupOrNull("amount")?.formatLong() ?: return
                     incrementRarity(rarity, amount)
                 }
@@ -247,9 +235,9 @@ object ChocolateFactoryStrayTracker {
                     val cps = ChocolateFactoryAPI.chocolatePerSecond
                     val multiplier = amount / cps
                     if (multiplier in 479.0..481.0) { // If multiplier is close (+/- 1) from 480, this is a Jackpot
-                        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("jackpot", 1) }
+                        tracker.modify { t -> t.goldenTypesCaught.addOrPut("jackpot", 1) }
                     } else if (multiplier in 1499.0..1501.0) { //Otherwise, if (+/- 1) from 1500 it's a mountain
-                        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("mountain", 1) }
+                        tracker.modify { t -> t.goldenTypesCaught.addOrPut("mountain", 1) }
                     }
                 }
 
@@ -257,32 +245,32 @@ object ChocolateFactoryStrayTracker {
                 goldenStrayDoradoEscape.matchMatcher(loreLine) {
                     val amount = group("amount").formatLong()
                     incrementRarity("legendary", amount)
-                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("dorado", 1) }
+                    tracker.modify { t -> t.goldenTypesCaught.addOrPut("dorado", 1) }
                 }
 
                 // Golden Strays, El Dorado caught - 3/3
                 if (goldenStrayDoradoCaught.matches(loreLine)) {
                     incrementRarity("legendary", 1)
-                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught["dorado"] = 3 }
+                    tracker.modify { t -> t.goldenTypesCaught["dorado"] = 3 }
                 }
 
                 // Golden Strays, El Dorado (duplicate catch)
                 goldenStrayDoradoDuplicate.matchMatcher(loreLine) {
                     val amount = group("amount").formatLong()
                     incrementRarity("legendary", amount)
-                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t ->
+                    tracker.modify { t ->
                         t.goldenTypesCaught["dorado"] = t.goldenTypesCaught["dorado"]?.plus(1) ?: 4
                     }
                 }
 
                 // Golden Strays, "Golden Click"
                 goldenStrayClick.matchMatcher(loreLine) {
-                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("goldenclick", 1) }
+                    tracker.modify { t -> t.goldenTypesCaught.addOrPut("goldenclick", 1) }
                 }
 
                 // Golden Strays, hoard/stampede
                 if (loreLine == "§7You caught a stray §6§lGolden Rabbit§7! §7A hoard of §aStray Rabbits §7has appeared!") {
-                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("stampede", 1) }
+                    tracker.modify { t -> t.goldenTypesCaught.addOrPut("stampede", 1) }
                 }
 
                 //Asynchronously update to immediately reflect caught stray
@@ -314,7 +302,7 @@ object ChocolateFactoryStrayTracker {
             val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
             if (nameText.equals("§6§lGolden Rabbit §8- §aSide Dish")) {
                 claimedStraysSlots.add(event.slot.slotIndex)
-                tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { it.goldenTypesCaught.addOrPut("sidedish", 1) }
+                tracker.modify { it.goldenTypesCaught.addOrPut("sidedish", 1) }
                 incrementRarity("legendary", 0)
                 DelayedRun.runDelayed(1.seconds) {
                     claimedStraysSlots.remove(claimedStraysSlots.indexOf(event.slot.slotIndex))
