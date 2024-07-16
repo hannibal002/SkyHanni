@@ -136,11 +136,11 @@ enum class Mayor(
                 Perk.entries.firstOrNull { it.perkName == perk.renameIfFoxyExtraEventPerkFound() }
             }
 
-            mayor.setAssumeMayor(perks)
+            mayor.addPerks(perks)
             return mayor
         }
 
-        fun Mayor.setAssumeMayor(perks: List<Perk>) {
+        fun Mayor.addPerks(perks: List<Perk>) {
             perks.forEach { it.isActive = false }
             activePerks.clear()
             for (perk in perks.filter { perks.contains(it) }) {
