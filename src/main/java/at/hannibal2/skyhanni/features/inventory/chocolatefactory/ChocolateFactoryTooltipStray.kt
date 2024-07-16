@@ -19,7 +19,7 @@ object ChocolateFactoryTooltipStray {
      */
     private val chocolateGainedPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.stray",
-        "(?:§.)+(?:You )?(?:gained )?§6\\+(?<amount>[\\d,]+) Chocolate§7!"
+        "(?:§.)?+(?:Rabbit§7, so )?(?:[Yy]ou )?(?:gained |received )?§6\\+?(?<amount>[\\d,]+) (?:§6)?Chocolate§7!"
     )
 
     @SubscribeEvent(priority = EventPriority.HIGH)
