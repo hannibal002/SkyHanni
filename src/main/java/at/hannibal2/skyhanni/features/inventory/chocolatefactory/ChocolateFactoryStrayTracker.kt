@@ -72,7 +72,7 @@ object ChocolateFactoryStrayTracker {
      */
     private val goldenStrayDoradoCaught by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.goldendoradocaught",
-        "§7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!"
+        "§7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!",
     )
 
     /**
@@ -80,7 +80,7 @@ object ChocolateFactoryStrayTracker {
      */
     private val goldenStrayDoradoDuplicate by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.goldendoradoduplicate",
-        "§7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6\\+(?<amount>[\\d,]*) Chocolate§7."
+        "§7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6\\+(?<amount>[\\d,]*) Chocolate§7.",
     )
 
     /**
@@ -120,8 +120,10 @@ object ChocolateFactoryStrayTracker {
 
         @Expose
         var straysCaught: MutableMap<String, Int> = mutableMapOf()
+
         @Expose
         var straysExtraChocMs: MutableMap<String, Long> = mutableMapOf()
+
         @Expose
         var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf()
     }
@@ -160,9 +162,9 @@ object ChocolateFactoryStrayTracker {
                 tips = listOf("§a+§b${formattedExtraTime} §afrom strays§7"),
             ),
         )
-        for((rarity, _) in rarityFormatMap) {
+        for ((rarity, _) in rarityFormatMap) {
             val rarityDisplay = extractHoverableOfRarity(rarity, data)
-            if(rarityDisplay != null) {
+            if (rarityDisplay != null) {
                 addAsSingletonList(rarityDisplay)
             }
         }
@@ -213,7 +215,7 @@ object ChocolateFactoryStrayTracker {
 
     @SubscribeEvent
     fun onTick(event: SecondPassedEvent) {
-        if(!isEnabled()) return
+        if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
             !claimedStraysSlots.contains(it.slotIndex)
         }.forEach {
@@ -259,7 +261,7 @@ object ChocolateFactoryStrayTracker {
                 }
 
                 // Golden Strays, El Dorado caught - 3/3
-                if(goldenStrayDoradoCaught.matches(loreLine)){
+                if (goldenStrayDoradoCaught.matches(loreLine)) {
                     incrementRarity("legendary", 1)
                     tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught["dorado"] = 3 }
                 }
@@ -268,8 +270,8 @@ object ChocolateFactoryStrayTracker {
                 goldenStrayDoradoDuplicate.matchMatcher(loreLine) {
                     val amount = group("amount").formatLong()
                     incrementRarity("legendary", amount)
-                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) {
-                        t -> t.goldenTypesCaught["dorado"] = t.goldenTypesCaught["dorado"]?.plus(1) ?: 4
+                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t ->
+                        t.goldenTypesCaught["dorado"] = t.goldenTypesCaught["dorado"]?.plus(1) ?: 4
                     }
                 }
 
@@ -300,7 +302,7 @@ object ChocolateFactoryStrayTracker {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if(!isEnabled()) return
+        if (!isEnabled()) return
         if (event.slot == null || event.slot.slotIndex == -999) return
         if (!InventoryUtils.getItemsInOpenChest().any { it.slotNumber == event.slot.slotNumber }) return
         if (claimedStraysSlots.contains(event.slot.slotIndex)) return
@@ -325,7 +327,7 @@ object ChocolateFactoryStrayTracker {
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if(!isEnabled()) return
+        if (!isEnabled()) return
         tracker.renderDisplay(config.strayRabbitTrackerPosition)
     }
 
