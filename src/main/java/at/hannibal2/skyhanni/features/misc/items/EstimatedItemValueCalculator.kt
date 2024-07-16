@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
-import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -760,7 +759,6 @@ object EstimatedItemValueCalculator {
     private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: -1.0
 
     private fun NEUInternalName.getPriceOrNull(): Double? {
-        val useSellPrice = config.bazaarPriceSource.get() == EstimatedItemValueConfig.BazaarPriceSource.BUY_ORDER
-        return getPriceOrNull(useSellPrice)
+        return getPriceOrNull(config.priceSource.get())
     }
 }

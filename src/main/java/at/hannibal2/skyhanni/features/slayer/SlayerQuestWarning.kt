@@ -102,7 +102,7 @@ object SlayerQuestWarning {
         if (DianaAPI.isDoingDiana()) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
-      
+
         lastWarning = SimpleTimeMark.now()
         ChatUtils.chat(chatMessage)
 
@@ -124,7 +124,7 @@ object SlayerQuestWarning {
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
         val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
 
-        val activeSlayer = SlayerAPI.getActiveSlayer()
+        val activeSlayer = SlayerAPI.activeSlayer
 
         if (activeSlayer != null) {
             if (slayerType != activeSlayer) {

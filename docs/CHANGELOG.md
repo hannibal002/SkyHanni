@@ -170,6 +170,8 @@
 + Allow clicking on the Craftable! text in the shopping list to open the "view recipe" menu. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2075)
 + Rename Mushroom Tier to Mushroom Milestone in Mooshroom Cow Perk. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2159)
 + Add Fine Flour to the /ff menu. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2194)
++ Added a "Compact" option to the Rancher Boots Optimal Speed GUI. - Empa (https://github.com/hannibal002/SkyHanni/pull/2137)
++ The Rancher Boots Optimal Speed GUI now highlights the crop corresponding to the last held tool. - Empa (https://github.com/hannibal002/SkyHanni/pull/2137)
 
 #### Hoppity Event Improvements
 
@@ -239,6 +241,8 @@
     + Add Toxophilite.
     + Add option to choose whether to use Bazaar buy order or instant buy prices.
     + Calculating with tier 5 prices for Ferocious Mana, Hardened Mana, Mana Vampire and Strong Mana.
++ Added reset buttons for colors and spacing in the Custom Wardrobe config. - raven (https://github.com/hannibal002/SkyHanni/pull/2120)
++ Added an option for the Estimated Chest Value display to also work in your own inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2218)
 
 #### Fishing Improvements
 
@@ -280,6 +284,7 @@
 + Improved phrasing of config descriptions, enhanced overall readability, fixed typos, newlines, etc. - zapteryx (https://github.com/hannibal002/SkyHanni/pull/2067)
 + Add some OneConfig mods to the quick mod switcher. - nea (https://github.com/hannibal002/SkyHanni/pull/2155)
 + Add config option to maintain "current" sound settings levels while warning sounds are played. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2129)
++ Added a reset button in the config for the appearance and event priority of the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2141)
 
 ### Fixes
 
@@ -304,6 +309,7 @@
 + Fixed ore event sometimes getting stuck. - Empa (https://github.com/hannibal002/SkyHanni/pull/2115)
 + Fix incorrect powder costs and powder spent amounts being displayed for some HOTM perks. - Luna (https://github.com/hannibal002/SkyHanni/pull/2145)
 + Fix Powder Percentage Compatibility Issue with ColeWeight. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2186)
++ Fixed Powder detection from chat messages. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2207)
 
 #### Garden Fixes
 
@@ -322,6 +328,11 @@
 + Fix an issue where the farming overtake ETA was being displayed as 60 times longer than it actually was. - Evhan_ (https://github.com/hannibal002/SkyHanni/pull/2158)
 + Fix overflow level up message being sent upon reaching crop milestone 46. - Luna (https://github.com/hannibal002/SkyHanni/pull/2161)
 + Fix Craftable! text not opening the recipe. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2183)
++ Fixed an error in the Farming ETA Duration calculation. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2217)
++ Fixed a bug where the fragged Daedalus Axe was not being detected as a farming tool. - Luna (https://github.com/hannibal002/SkyHanni/pull/2212)
++ Fixed Fine Flour exportation not getting detected from chat messages for use in FF Guide. - Luna (https://github.com/hannibal002/SkyHanni/pull/2215)
++ Fixed "Craftable!" text not opening the recipe. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2219)
++ Fixed favorite pets not being detected by FF Guide. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2202)
 
 #### Chocolate Factory & Hoppity Hunt Fixes
 
@@ -348,6 +359,8 @@
 + Allow seeing the unclaimed eggs GUI while "Busy". - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2091)
     + In the Rift, Kuudra, Dungeons, etc.
 + Fix detection for supreme chocolate bar completion. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2194)
++ Fixed the detection of production time from Fish the Rabbit. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2225)
++ Fixed buying items sometimes triggering compact Hoppity messages. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/2201)
 
 #### Custom Scoreboard Fixes
 
@@ -418,6 +431,10 @@
 + Fix wrong item prices in Estimated Item Value when the craft price is higher than the NPC price and the item is soulbound. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2173)
     + E.g. for Gillsplash (fishing equipment).
 + Fix Custom Wardrobe Keybinds not working. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2198)
++ Fixed price calculation for Kuudra keys. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2205)
++ Page scrolling now works correctly in the museum. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2208)
++ Fixed detecting Hot Potato Books inside the Community Project as potatoes. - Empa (https://github.com/hannibal002/SkyHanni/pull/2214)
++ Fixed price source inconsistencies (Bazaar sell/buy and NPC prices). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2221)
 
 #### Combat Fixes
 
@@ -457,6 +474,7 @@
 + Fix "/worldedit right" setting the left position. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2179)
 + Fix a bug in the Hypixel detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2193)
 + Fix random Stack Overflow Errors. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2199)
++ Fixed a typo in /shcommands. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2223)
 
 ### Technical Details
 
@@ -560,6 +578,10 @@
 + Mob Detection now runs every tick instead of every other tick. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2096)
 + RepoPattern locale loading now works inversely for the development environment. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2069)
 + Move Hoppity Rabbit chat patterns to the eggs manager. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/2144)
++ Removed redundant `lowName` property from HotmAPI.Powder. - Luna (https://github.com/hannibal002/SkyHanni/pull/2128)
++ Made RecalculatingValue a ReadOnlyProperty. - Empa (https://github.com/hannibal002/SkyHanni/pull/2151)
++ Visitor rarities from the repository are now exposed to the code in a cleaner way. - Luna (https://github.com/hannibal002/SkyHanni/pull/2220)
++ Added automatic PR labeling for bug fixes. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2203)
 
 ### Removed Features
 

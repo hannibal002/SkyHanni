@@ -315,13 +315,8 @@ object LorenzUtils {
             this.cancel()
         }
     }
-
     // TODO move into mayor api
-    private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
-
-    // TODO move into mayor api
-    val isDerpy get() = recalculateDerpy.getValue()
+    val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
     // TODO move into mayor api
     fun Int.derpy() = if (isDerpy) this / 2 else this
