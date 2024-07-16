@@ -66,6 +66,14 @@ object ChocolateFactoryStrayTracker {
     )
 
     /**
+     * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!
+     */
+    private val goldenStrayDoradoCaught by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.goldendoradocaught",
+        "§7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!"
+    )
+
+    /**
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6+324,364,585 Chocolate§7.
      */
     private val goldenStrayDoradoDuplicate by ChocolateFactoryAPI.patternGroup.pattern(
@@ -176,7 +184,7 @@ object ChocolateFactoryStrayTracker {
             goldenList.add("§b$it §6Chocolate Mountain" + if (it > 1) "s" else "")
         }
         profileStorage.goldenTypesCaught["dorado"]?.let {
-            goldenList.add((if (it == 3) "§a" else "§b") + "$it§7/§a3 §6El Dorado §7Sighting" + if (it > 1) "s" else "")
+            goldenList.add((if (it >= 3) "§a" else "§b") + "$it§7/§a3 §6El Dorado §7Sighting" + if (it > 1) "s" else "")
         }
         profileStorage.goldenTypesCaught["stampede"]?.let {
             goldenList.add("§b$it §6Stampede" + if (it > 1) "s" else "")
@@ -235,6 +243,12 @@ object ChocolateFactoryStrayTracker {
                     val amount = group("amount").formatLong()
                     incrementRarity("legendary", amount)
                     profileStorage.goldenTypesCaught["dorado"] = profileStorage.goldenTypesCaught["dorado"]?.plus(1) ?: 1
+                }
+
+                // Golden Strays, El Dorado caught - 3/3
+                if(goldenStrayDoradoCaught.matches(loreLine)){
+                    incrementRarity("legendary", 1)
+                    profileStorage.goldenTypesCaught["dorado"] = 3
                 }
 
                 // Golden Strays, El Dorado (duplicate catch)
