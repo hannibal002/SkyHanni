@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -14,9 +16,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
+import at.hannibal2.skyhanni.utils.tracker.TrackerData
+import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
@@ -26,8 +30,6 @@ import kotlin.time.Duration.Companion.seconds
 object ChocolateFactoryStrayTracker {
 
     private val config get() = ChocolateFactoryAPI.config
-    private val profileStorage get() = ChocolateFactoryAPI.profileStorage
-    private var straysDisplay = listOf<Renderable>()
     private var claimedStraysSlots = mutableListOf<Int>()
 
     /**
@@ -106,17 +108,33 @@ object ChocolateFactoryStrayTracker {
         put("legendary", "§6Legendary§7: §r§6")
     }
 
+    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker })
+    { drawDisplay(it) }
+
+    class Data : TrackerData() {
+        override fun reset() {
+            straysCaught.clear()
+            straysExtraChocMs.clear()
+            goldenTypesCaught.clear()
+        }
+
+        @Expose
+        var straysCaught: MutableMap<String, Int> = mutableMapOf()
+        @Expose
+        var straysExtraChocMs: MutableMap<String, Long> = mutableMapOf()
+        @Expose
+        var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf()
+    }
+
     private fun formLoreToSingleLine(lore: List<String>): String {
         val notEmptyLines = lore.filter { it.isNotEmpty() }
         return notEmptyLines.joinToString(" ")
     }
 
     private fun incrementRarity(rarity: String, chocAmount: Long) {
-        val profileStorage = profileStorage ?: return
-        profileStorage.straysCaught[rarity] = profileStorage.straysCaught[rarity]?.plus(1) ?: 1
+        tracker.modify { it.straysCaught.addOrPut(rarity, 1) }
         val extraTime = ChocolateFactoryAPI.timeUntilNeed(chocAmount + 1)
-        profileStorage.straysExtraChocMs[rarity] = profileStorage.straysExtraChocMs[rarity]?.plus(extraTime.inWholeMilliseconds)
-            ?: extraTime.inWholeMilliseconds
+        tracker.modify { it.straysExtraChocMs.addOrPut(rarity, extraTime.inWholeMilliseconds) }
     }
 
     private fun extractRarity(rabbitName: String): String {
@@ -132,30 +150,29 @@ object ChocolateFactoryStrayTracker {
         }
     }
 
-    private fun updateStraysDisplay() {
-        val profileStorage = profileStorage ?: return
-        val extraChocMs = profileStorage.straysExtraChocMs.values.sum().milliseconds
+    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
+        val extraChocMs = data.straysExtraChocMs.values.sum().milliseconds
         val formattedExtraTime = extraChocMs.let { if (it == 0.milliseconds) "0s" else it.format() }
 
-        straysDisplay = listOfNotNull(
+        addAsSingletonList(
             Renderable.hoverTips(
                 "§6§lStray Tracker",
                 tips = listOf("§a+§b${formattedExtraTime} §afrom strays§7"),
             ),
-            extractHoverableOfRarity("common"),
-            extractHoverableOfRarity("uncommon"),
-            extractHoverableOfRarity("rare"),
-            extractHoverableOfRarity("epic"),
-            extractHoverableOfRarity("legendary"),
         )
+        for((rarity, _) in rarityFormatMap) {
+            val rarityDisplay = extractHoverableOfRarity(rarity, data)
+            if(rarityDisplay != null) {
+                addAsSingletonList(rarityDisplay)
+            }
+        }
     }
 
-    private fun extractHoverableOfRarity(rarity: String): Renderable? {
-        val profileStorage = profileStorage ?: return null
-        val caughtOfRarity = profileStorage.straysCaught[rarity]
+    private fun extractHoverableOfRarity(rarity: String, data: Data): Renderable? {
+        val caughtOfRarity = data.straysCaught[rarity]
         val caughtString = caughtOfRarity?.toString() ?: return null
 
-        val rarityExtraChocMs = profileStorage.straysExtraChocMs[rarity]?.milliseconds
+        val rarityExtraChocMs = data.straysExtraChocMs[rarity]?.milliseconds
         val extraChocFormat = rarityExtraChocMs?.format() ?: ""
 
         val lineHeader = rarityFormatMap[rarity] ?: ""
@@ -163,7 +180,7 @@ object ChocolateFactoryStrayTracker {
 
         return if (rarityExtraChocMs == null) Renderable.string(lineFormat)
         else {
-            val productionTip = "§a+§b${extraChocFormat} §aof production§7" + if (rarity == "legendary") extractGoldenTypesCaught() else ""
+            val productionTip = "§a+§b${extraChocFormat} §aof production§7" + if (rarity == "legendary") extractGoldenTypesCaught(data) else ""
             Renderable.hoverTips(
                 Renderable.string(lineFormat),
                 tips = productionTip.split("\n"),
@@ -171,25 +188,24 @@ object ChocolateFactoryStrayTracker {
         }
     }
 
-    private fun extractGoldenTypesCaught(): String {
-        val profileStorage = profileStorage ?: return ""
+    private fun extractGoldenTypesCaught(data: Data): String {
         val goldenList = mutableListOf<String>()
-        profileStorage.goldenTypesCaught["sidedish"]?.let {
+        data.goldenTypesCaught["sidedish"]?.let {
             goldenList.add("§b$it §6Side Dish" + if (it > 1) "es" else "")
         }
-        profileStorage.goldenTypesCaught["jackpot"]?.let {
+        data.goldenTypesCaught["jackpot"]?.let {
             goldenList.add("§b$it §6Chocolate Jackpot" + if (it > 1) "s" else "")
         }
-        profileStorage.goldenTypesCaught["mountain"]?.let {
+        data.goldenTypesCaught["mountain"]?.let {
             goldenList.add("§b$it §6Chocolate Mountain" + if (it > 1) "s" else "")
         }
-        profileStorage.goldenTypesCaught["dorado"]?.let {
+        data.goldenTypesCaught["dorado"]?.let {
             goldenList.add((if (it >= 3) "§a" else "§b") + "$it§7/§a3 §6El Dorado §7Sighting" + if (it > 1) "s" else "")
         }
-        profileStorage.goldenTypesCaught["stampede"]?.let {
+        data.goldenTypesCaught["stampede"]?.let {
             goldenList.add("§b$it §6Stampede" + if (it > 1) "s" else "")
         }
-        profileStorage.goldenTypesCaught["goldenclick"]?.let {
+        data.goldenTypesCaught["goldenclick"]?.let {
             goldenList.add("§b$it §6Golden Click" + if (it > 1) "s" else "")
         }
         return if (goldenList.size == 0) "" else ("\n" + goldenList.joinToString("\n"))
@@ -197,10 +213,7 @@ object ChocolateFactoryStrayTracker {
 
     @SubscribeEvent
     fun onTick(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.strayRabbitTracker) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
-        val profileStorage = profileStorage ?: return
+        if(!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
             !claimedStraysSlots.contains(it.slotIndex)
         }.forEach {
@@ -232,9 +245,9 @@ object ChocolateFactoryStrayTracker {
                     val cps = ChocolateFactoryAPI.chocolatePerSecond
                     val multiplier = amount / cps
                     if (multiplier in 479.0..481.0) { // If multiplier is close (+/- 1) from 480, this is a Jackpot
-                        profileStorage.goldenTypesCaught["jackpot"] = profileStorage.goldenTypesCaught["jackpot"]?.plus(1) ?: 1
+                        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("jackpot", 1) }
                     } else if (multiplier in 1499.0..1501.0) { //Otherwise, if (+/- 1) from 1500 it's a mountain
-                        profileStorage.goldenTypesCaught["mountain"] = profileStorage.goldenTypesCaught["mountain"]?.plus(1) ?: 1
+                        tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("mountain", 1) }
                     }
                 }
 
@@ -242,36 +255,37 @@ object ChocolateFactoryStrayTracker {
                 goldenStrayDoradoEscape.matchMatcher(loreLine) {
                     val amount = group("amount").formatLong()
                     incrementRarity("legendary", amount)
-                    profileStorage.goldenTypesCaught["dorado"] = profileStorage.goldenTypesCaught["dorado"]?.plus(1) ?: 1
+                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("dorado", 1) }
                 }
 
                 // Golden Strays, El Dorado caught - 3/3
                 if(goldenStrayDoradoCaught.matches(loreLine)){
                     incrementRarity("legendary", 1)
-                    profileStorage.goldenTypesCaught["dorado"] = 3
+                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught["dorado"] = 3 }
                 }
 
                 // Golden Strays, El Dorado (duplicate catch)
                 goldenStrayDoradoDuplicate.matchMatcher(loreLine) {
                     val amount = group("amount").formatLong()
                     incrementRarity("legendary", amount)
-                    profileStorage.goldenTypesCaught["dorado"] = profileStorage.goldenTypesCaught["dorado"]?.plus(1) ?: 4
+                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) {
+                        t -> t.goldenTypesCaught["dorado"] = t.goldenTypesCaught["dorado"]?.plus(1) ?: 4
+                    }
                 }
 
                 // Golden Strays, "Golden Click"
                 goldenStrayClick.matchMatcher(loreLine) {
-                    profileStorage.goldenTypesCaught["goldenclick"] = profileStorage.goldenTypesCaught["goldenclick"]?.plus(1) ?: 1
+                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("goldenclick", 1) }
                 }
 
                 // Golden Strays, hoard/stampede
                 if (loreLine == "§7You caught a stray §6§lGolden Rabbit§7! §7A hoard of §aStray Rabbits §7has appeared!") {
-                    profileStorage.goldenTypesCaught["stampede"] = profileStorage.goldenTypesCaught["stampede"]?.plus(1) ?: 1
+                    tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { t -> t.goldenTypesCaught.addOrPut("stampede", 1) }
                 }
 
                 //Asynchronously update to immediately reflect caught stray
-                updateStraysDisplay()
-                if (ChocolateFactoryAPI.inChocolateFactory) {
-                    config.strayRabbitTrackerPosition.renderRenderables(straysDisplay, posLabel = "Stray Tracker")
+                if (isEnabled()) {
+                    tracker.renderDisplay(config.strayRabbitTrackerPosition)
                 }
             }
         }
@@ -286,9 +300,7 @@ object ChocolateFactoryStrayTracker {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val profileStorage = profileStorage ?: return
-        if (!LorenzUtils.inSkyBlock) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if(!isEnabled()) return
         if (event.slot == null || event.slot.slotIndex == -999) return
         if (!InventoryUtils.getItemsInOpenChest().any { it.slotNumber == event.slot.slotNumber }) return
         if (claimedStraysSlots.contains(event.slot.slotIndex)) return
@@ -300,7 +312,7 @@ object ChocolateFactoryStrayTracker {
             val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
             if (nameText.equals("§6§lGolden Rabbit §8- §aSide Dish")) {
                 claimedStraysSlots.add(event.slot.slotIndex)
-                profileStorage.goldenTypesCaught["sidedish"] = profileStorage.goldenTypesCaught["sidedish"]?.plus(1) ?: 1
+                tracker.modify(SkyHanniTracker.DisplayMode.TOTAL) { it.goldenTypesCaught.addOrPut("sidedish", 1) }
                 incrementRarity("legendary", 0)
                 DelayedRun.runDelayed(1.seconds) {
                     claimedStraysSlots.remove(claimedStraysSlots.indexOf(event.slot.slotIndex))
@@ -312,17 +324,14 @@ object ChocolateFactoryStrayTracker {
     }
 
     @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
-        updateStraysDisplay()
-    }
-
-    @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!ChocolateFactoryAPI.inChocolateFactory) return
-        if (!config.strayRabbitTracker) return
-
-        config.strayRabbitTrackerPosition.renderRenderables(straysDisplay, posLabel = "Stray Tracker")
+        if(!isEnabled()) return
+        tracker.renderDisplay(config.strayRabbitTrackerPosition)
     }
+
+    fun resetCommand() {
+        tracker.resetCommand()
+    }
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.strayRabbitTracker && ChocolateFactoryAPI.inChocolateFactory
 }

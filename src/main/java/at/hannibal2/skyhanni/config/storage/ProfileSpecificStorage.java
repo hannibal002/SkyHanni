@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems;
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUpgrade;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
@@ -153,13 +154,7 @@ public class ProfileSpecificStorage {
         public Integer hoppityShopYearOpened = null;
 
         @Expose
-        public Map<String, Integer> straysCaught = new HashMap<>();
-
-        @Expose
-        public Map<String, Long> straysExtraChocMs = new HashMap<>();
-
-        @Expose
-        public Map<String, Integer> goldenTypesCaught = new HashMap<>();
+        public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
     }
 
     @Expose
