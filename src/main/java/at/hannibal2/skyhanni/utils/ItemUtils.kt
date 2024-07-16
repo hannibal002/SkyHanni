@@ -46,6 +46,8 @@ object ItemUtils {
         return list
     }
 
+    val ItemStack.extraAttributes : NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
+
     // TODO change else janni is sad
     fun ItemStack.isCoopSoulBound(): Boolean =
         getLore().any {
