@@ -104,32 +104,45 @@ object ChocolateFactoryStats {
                 } else {
                     "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
                         "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
-                }
+                },
 
-            )
+                )
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
                 ChocolateFactoryStat.RAW_PER_SECOND,
-                "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}"
+                "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}",
             )
             put(
                 ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
-                "§eChocolate To Prestige: $chocolateUntilPrestige"
+                if (!ChocolateFactoryAPI.isMaxPrestige()) {
+                    "§eChocolate To Prestige: $chocolateUntilPrestige"
+                } else {
+                    val amountUntilMaxMilestone = 700000000000L - ChocolateAmount.ALL_TIME.chocolate()
+                    "§eChocolate To Max Milestone: ${
+                        if (amountUntilMaxMilestone <= 0) {
+                            "§aMaxed!"
+                        } else {
+                            "§a$amountUntilMaxMilestone"
+                        }
+                    }"
+                },
             )
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
         }
         val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n") ?: listOf() }
 
-        display = listOf(Renderable.clickAndHover(
-            Renderable.verticalContainer(text.map(Renderable::string)),
-            tips = listOf("§bCopy to Clipboard!"),
-            onClick = {
-                val list = text.toMutableList()
-                list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
+        display = listOf(
+            Renderable.clickAndHover(
+                Renderable.verticalContainer(text.map(Renderable::string)),
+                tips = listOf("§bCopy to Clipboard!"),
+                onClick = {
+                    val list = text.toMutableList()
+                    list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
 
-                ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
-            }
-        ))
+                    ClipboardUtils.copyToClipboard(list.joinToString("\n") { it.removeColor() })
+                },
+            ),
+        )
     }
 
     @SubscribeEvent
@@ -167,13 +180,15 @@ object ChocolateFactoryStats {
         TIME_TOWER("§eTime Tower: §62/3 Charges", { ChocolateFactoryTimeTowerManager.currentCharges() != -1 }),
         TIME_TOWER_FULL(
             "§eTime Tower Full Charges: §b5h 13m 59s\n§bHappens at: Monday, May 13 5:32 AM",
-            { ChocolateFactoryTimeTowerManager.currentCharges() != -1 || ChocolateFactoryTimeTowerManager.timeTowerFull() }),
+            { ChocolateFactoryTimeTowerManager.currentCharges() != -1 || ChocolateFactoryTimeTowerManager.timeTowerFull() },
+        ),
         TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { !ChocolateFactoryAPI.isMaxPrestige() }),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
-        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851", { !ChocolateFactoryAPI.isMaxPrestige() }),
+        CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851"),
         TIME_TO_BEST_UPGRADE(
             "§eBest Upgrade: §b 59m 4s",
-            { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L }),
+            { ChocolateFactoryAPI.profileStorage?.bestUpgradeCost != 0L },
+        ),
         ;
 
         override fun toString(): String {
