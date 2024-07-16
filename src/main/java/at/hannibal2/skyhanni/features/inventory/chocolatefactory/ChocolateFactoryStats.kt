@@ -112,17 +112,33 @@ object ChocolateFactoryStats {
                 ChocolateFactoryStat.RAW_PER_SECOND,
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}",
             )
+
+            if (!ChocolateFactoryAPI.isMaxPrestige()) {
+                put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
+                put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Prestige: §6$chocolateUntilPrestige")
+
+            } else {
+                val chocolateUntilMaxMilestone = 700000000000L
+                val amountUntilMaxMilestone = chocolateUntilMaxMilestone - ChocolateAmount.ALL_TIME.chocolate()
+                val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(chocolateUntilMaxMilestone)
+
+                if (amountUntilMaxMilestone > 0) {
+                    put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Max Milestone: $maxMilestoneEstimate")
+                    put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Max Milestone: §6$amountUntilMaxMilestone")
+                }
+            }
+
             put(
                 ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
                 if (!ChocolateFactoryAPI.isMaxPrestige()) {
-                    "§eChocolate To Prestige: $chocolateUntilPrestige"
+                    "§eChocolate To Prestige: §6$chocolateUntilPrestige"
                 } else {
                     val amountUntilMaxMilestone = 700000000000L - ChocolateAmount.ALL_TIME.chocolate()
                     "§eChocolate To Max Milestone: ${
                         if (amountUntilMaxMilestone <= 0) {
                             "§aMaxed!"
                         } else {
-                            "§a$amountUntilMaxMilestone"
+                            "§6$amountUntilMaxMilestone"
                         }
                     }"
                 },
