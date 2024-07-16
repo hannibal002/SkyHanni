@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
@@ -22,21 +23,29 @@ object CrownOfAvariceCounter {
 
     private val internalName = "CROWN_OF_AVARICE".asInternalName()
 
+    private var render: Renderable? = null
+
     @SubscribeEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enable) return
+        render?.let { config.position.renderRenderable(it, posLabel = "Crown of Avarice Counter") }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        render = check()
+    }
+
+    fun check(): Renderable? {
+        if (!LorenzUtils.inSkyBlock) return null
+        if (!config.enable) return null
         val item = InventoryUtils.getHelmet()
-        if (item?.getInternalNameOrNull() != internalName) return
+        if (item?.getInternalNameOrNull() != internalName) return null
         val count = item.extraAttributes.getLong("collected_coins");
-        config.position.renderRenderable(
-            Renderable.horizontalContainer(
-                listOf(
-                    Renderable.itemStack(internalName.getItemStack()),
-                    Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
-                ),
+        return Renderable.horizontalContainer(
+            listOf(
+                Renderable.itemStack(internalName.getItemStack()),
+                Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
             ),
-            posLabel = "Crown of Avarice Counter",
         )
     }
 }
