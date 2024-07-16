@@ -294,11 +294,11 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
+    private val bookPattern = "(?<name>.* [IVX]+) Book".toPattern()
+
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
         // This workaround fixes 'Turbo Cacti I Book'
-        val input = (if (originalInput.endsWith(" Book")) {
-            originalInput.replace(" Book", "")
-        } else originalInput).removeResets()
+        val input = (bookPattern.matchMatcher(originalInput) { group("name") } ?: originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
