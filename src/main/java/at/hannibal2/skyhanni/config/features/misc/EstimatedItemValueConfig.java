@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.utils.ItemPriceSource;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -65,9 +66,9 @@ public class EstimatedItemValueConfig {
     public Property<Boolean> ignoreRunes = Property.of(false);
 
     @Expose
-    @ConfigOption(name = "Bazaar Price Source", desc = "Use Instant Buy or Buy Order.")
+    @ConfigOption(name = "Change Price Source", desc = "Change what price to use: Bazaar (Sell Offer or Buy Order) or NPC.")
     @ConfigEditorDropdown
-    public Property<BazaarPriceSource> bazaarPriceSource = Property.of(BazaarPriceSource.BUY_ORDER);
+    public Property<ItemPriceSource> priceSource = Property.of(ItemPriceSource.BAZAAR_INSTANT_SELL);
 
     public enum BazaarPriceSource {
         INSTANT_BUY("Instant Buy"),
