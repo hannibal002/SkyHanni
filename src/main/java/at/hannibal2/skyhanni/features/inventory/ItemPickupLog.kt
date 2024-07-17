@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.config.features.inventory
+package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
