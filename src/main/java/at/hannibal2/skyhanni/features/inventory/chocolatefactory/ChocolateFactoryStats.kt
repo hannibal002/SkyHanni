@@ -113,11 +113,7 @@ object ChocolateFactoryStats {
                 "§eRaw Per Second: §6${profileStorage.rawChocPerSecond.addSeparators()}",
             )
 
-            if (!ChocolateFactoryAPI.isMaxPrestige()) {
-                put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
-                put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Prestige: §6$chocolateUntilPrestige")
-
-            } else {
+            if (ChocolateFactoryAPI.isMaxPrestige()) {
                 val chocolateUntilMaxMilestone = 700000000000L
                 val amountUntilMaxMilestone = chocolateUntilMaxMilestone - ChocolateAmount.ALL_TIME.chocolate()
                 val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(chocolateUntilMaxMilestone)
@@ -126,6 +122,10 @@ object ChocolateFactoryStats {
                     put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Max Milestone: $maxMilestoneEstimate")
                     put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Max Milestone: §6$amountUntilMaxMilestone")
                 }
+                //this is horrible but it stops intellij throwing an error
+            } else if (true) {
+                put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
+                put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Prestige: §6$chocolateUntilPrestige")
             }
 
             put(
@@ -198,7 +198,7 @@ object ChocolateFactoryStats {
             "§eTime Tower Full Charges: §b5h 13m 59s\n§bHappens at: Monday, May 13 5:32 AM",
             { ChocolateFactoryTimeTowerManager.currentCharges() != -1 || ChocolateFactoryTimeTowerManager.timeTowerFull() },
         ),
-        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s", { !ChocolateFactoryAPI.isMaxPrestige() }),
+        TIME_TO_PRESTIGE("§eTime To Prestige: §b1d 13h 59m 4s"),
         RAW_PER_SECOND("§eRaw Per Second: §62,136"),
         CHOCOLATE_UNTIL_PRESTIGE("§eChocolate To Prestige: §65,851"),
         TIME_TO_BEST_UPGRADE(
