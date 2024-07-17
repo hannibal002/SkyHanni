@@ -18,7 +18,7 @@ object ThunderBottleNotification {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.message.endsWith("§e> Your bottle of thunder has fully charged!")) {
-            LorenzUtils.sendTitle("§eThunder Bottle Charged!", 5.seconds)
+            LorenzUtils.sendTitle("§eThunder Bottle Charged!", 3.seconds)
         }
     }
 

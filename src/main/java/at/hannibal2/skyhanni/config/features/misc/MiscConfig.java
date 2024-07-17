@@ -268,7 +268,7 @@ public class MiscConfig {
     public boolean replaceRomanNumerals = false;
 
     @Expose
-    @ConfigOption(name = "Thunder Bottle Notification", desc = "Show a notification when you charge a Thunder Bottle.")
+    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when you charge a Thunder Bottle.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean thunderBottleNotification = true;
