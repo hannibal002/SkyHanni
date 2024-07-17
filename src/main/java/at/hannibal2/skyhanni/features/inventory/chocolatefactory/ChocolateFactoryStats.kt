@@ -114,11 +114,11 @@ object ChocolateFactoryStats {
             )
 
             if (ChocolateFactoryAPI.isMaxPrestige()) {
-                val chocolateUntilMaxMilestone = 700000000000L
+                val chocolateUntilMaxMilestone = ChocolateFactoryAPI.maxMilestoneChocolate
                 val amountUntilMaxMilestone = chocolateUntilMaxMilestone - ChocolateAmount.ALL_TIME.chocolate()
                 val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(chocolateUntilMaxMilestone)
 
-                if (amountUntilMaxMilestone > 0) {
+                if (amountUntilMaxMilestone >= 0) {
                     put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Max Milestone: $maxMilestoneEstimate")
                     put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Max Milestone: §6$amountUntilMaxMilestone")
                 }
@@ -128,21 +128,6 @@ object ChocolateFactoryStats {
                 put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Prestige: §6$chocolateUntilPrestige")
             }
 
-            put(
-                ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
-                if (!ChocolateFactoryAPI.isMaxPrestige()) {
-                    "§eChocolate To Prestige: §6$chocolateUntilPrestige"
-                } else {
-                    val amountUntilMaxMilestone = 700000000000L - ChocolateAmount.ALL_TIME.chocolate()
-                    "§eChocolate To Max Milestone: ${
-                        if (amountUntilMaxMilestone <= 0) {
-                            "§aMaxed!"
-                        } else {
-                            "§6$amountUntilMaxMilestone"
-                        }
-                    }"
-                },
-            )
             put(ChocolateFactoryStat.TIME_TO_BEST_UPGRADE, "§eBest Upgrade: $upgradeAvailableAt")
         }
         val text = config.statsDisplayList.filter { it.shouldDisplay() }.flatMap { map[it]?.split("\n") ?: listOf() }
