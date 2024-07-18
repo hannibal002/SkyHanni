@@ -120,7 +120,10 @@ object ChocolateFactoryStats {
 
                 if (amountUntilMaxMilestone >= 0) {
                     put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Max Milestone: $maxMilestoneEstimate")
-                    put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Max Milestone: §6$amountUntilMaxMilestone")
+                    put(
+                        ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
+                        "§eChocolate To Max Milestone: §6${amountUntilMaxMilestone.addSeparators()}",
+                    )
                 }
                 //this is horrible but it stops intellij throwing an error
             } else if (true) {
