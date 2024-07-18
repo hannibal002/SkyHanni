@@ -61,48 +61,9 @@ object ItemPickupLog {
                         val currentTotalValue = item.value.amount - it.amount
 
                         if (currentTotalValue > 0) {
-                            if (config.showItemIcon) {
-                                newDisplay.add(
-                                    //TODO make this a function
-                                    Renderable.horizontalContainer(
-                                        buildList {
-                                            add(Renderable.string("§a+${currentTotalValue.addSeparators()}"))
-                                            ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
-                                                addItemStack(
-                                                    it1,
-                                                )
-                                            }
-                                            add(Renderable.string(item.value.name))
-                                        },
-                                    ),
-                                )
-                            } else {
-                                newDisplay.add(
-                                    Renderable.string("§a+${currentTotalValue.addSeparators()} ${item.value.name}"),
-                                )
-                            }
-
+                            newDisplay.add(renderList("§a+", currentTotalValue, item.value.name))
                         } else if (currentTotalValue < 0) {
-                            if (config.showItemIcon) {
-                                newDisplay.add(
-                                    Renderable.horizontalContainer(
-                                        buildList {
-                                            add(Renderable.string("§c${currentTotalValue.addSeparators()}"))
-                                            ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
-                                                addItemStack(
-                                                    it1,
-                                                )
-                                            }
-                                            add(Renderable.string(item.value.name))
-                                        },
-                                    ),
-                                )
-                            } else {
-                                newDisplay.add(
-                                    Renderable.string("§c${currentTotalValue.addSeparators()} ${item.value.name}"),
-                                )
-                            }
-
+                            newDisplay.add(renderList("§c", currentTotalValue, item.value.name))
                         } else {
                             itemsAddedToInventory.remove(item.key)
                             itemsRemovedFromInventory.remove(item.key)
@@ -111,90 +72,24 @@ object ItemPickupLog {
                         iterator.remove()
                     }
                 } else {
-                    if (config.showItemIcon) {
-                        newDisplay.add(
-                            Renderable.horizontalContainer(
-                                buildList {
-                                    add(Renderable.string("§a+${item.value.amount.addSeparators()}"))
-                                    ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
-                                        addItemStack(
-                                            it1,
-                                        )
-                                    }
-                                    add(Renderable.string(item.value.name))
-                                },
-                            ),
-                        )
-
-                    } else {
-                        newDisplay.add(
-                            Renderable.string("§a+${item.value.amount.addSeparators()} ${item.value.name}"),
-                        )
-                    }
-
+                    newDisplay.add(renderList("§a+", item.value.amount, item.value.name))
                 }
             }
         } else {
             for (item in addedItemsToNoLongerShow) {
-                if (config.showItemIcon) {
-                    newDisplay.add(
-                        Renderable.horizontalContainer(
-                            buildList {
-                                add(Renderable.string("§c${item.value.amount.addSeparators()}"))
-                                ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
-                                    addItemStack(
-                                        it1,
-                                    )
-                                }
-                                add(Renderable.string(item.value.name))
-                            },
-                        ),
-                    )
 
-                } else {
-                    newDisplay.add(
-                        Renderable.string("§a+${item.value.amount.addSeparators()} ${item.value.name}"),
-                    )
-                    removedItemsToNoLongerShow[item.key]?.let {
-                        newDisplay.add(
-                            Renderable.string("§c-${it.amount.addSeparators()} ${it.name}"),
-                        )
-                        removedItemsToNoLongerShow.remove(item.key)
-                    }
+                newDisplay.add(renderList("§a+", item.value.amount, item.value.name))
+                removedItemsToNoLongerShow[item.key]?.let {
+                    newDisplay.add(renderList("§c-", it.amount, it.name))
+                    removedItemsToNoLongerShow.remove(item.key)
                 }
-
             }
         }
-
         for (item in removedItemsToNoLongerShow) {
             newDisplay.add(renderList("§c-", item.value.amount, item.value.name))
-
-
-            if (config.showItemIcon) {
-                newDisplay.add(
-                    Renderable.horizontalContainer(
-                        buildList {
-                            add(Renderable.string("§c-${item.value.amount.addSeparators()}"))
-                            ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
-                                addItemStack(
-                                    it1,
-                                )
-                            }
-                            add(Renderable.string(item.value.name))
-                        },
-                    ),
-                )
-
-            } else {
-                newDisplay.add(
-                    Renderable.string("§c-${item.value.amount.addSeparators()} ${item.value.name}"),
-                )
-            }
         }
-
         config.pos.renderRenderables(newDisplay, posLabel = "Item Pickup Log Display")
     }
-
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -318,7 +213,7 @@ object ItemPickupLog {
         return if (config.showItemIcon) {
             Renderable.horizontalContainer(
                 buildList {
-                    add(Renderable.string("§c${amount.addSeparators()}"))
+                    add(Renderable.string("${prefix}${amount.addSeparators()}"))
                     ItemNameResolver.getInternalNameOrNull(name)?.let { it1 ->
                         addItemStack(
                             it1,
