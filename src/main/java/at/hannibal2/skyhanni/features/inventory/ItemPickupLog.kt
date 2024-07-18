@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemNameResolver
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,7 +36,7 @@ object ItemPickupLog {
     private val patternGroup = RepoPattern.group("itempickuplog")
     private val shopPattern by patternGroup.pattern(
         "shoppattern",
-        "^(?<itemName>.+?)(?: x\\d+)?\$"
+        "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
     @SubscribeEvent
@@ -45,29 +47,154 @@ object ItemPickupLog {
         itemsAddedToInventory.values.removeIf { it.isExpired() }
         itemsRemovedFromInventory.values.removeIf { it.isExpired() }
 
-        val removedToShow = itemsRemovedFromInventory.toMutableMap()
+        val removedItemsToNoLongerShow = itemsRemovedFromInventory.toMutableMap()
+        val addedItemsToNoLongerShow = itemsAddedToInventory.toMutableMap()
 
-        for (item in itemsAddedToInventory) {
-            newDisplay.add(
-                Renderable.string("§a+${item.value.amount.addSeparators()} ${item.value.name}")
-            )
+        if (config.compactLines) {
+            val iterator = addedItemsToNoLongerShow.iterator()
+            while (iterator.hasNext()) {
+                val item = iterator.next()
 
-            removedToShow[item.key]?.let {
-                newDisplay.add(
-                    Renderable.string("§c-${it.amount.addSeparators()} ${it.name}")
-                )
-                removedToShow.remove(item.key)
+                if (removedItemsToNoLongerShow.containsKey(item.key)) {
+                    val it = removedItemsToNoLongerShow[item.key]
+                    if (it != null) {
+                        val currentTotalValue = item.value.amount - it.amount
+
+                        if (currentTotalValue > 0) {
+                            if (config.showItemIcon) {
+                                newDisplay.add(
+                                    //TODO make this a function
+                                    Renderable.horizontalContainer(
+                                        buildList {
+                                            add(Renderable.string("§a+${currentTotalValue.addSeparators()}"))
+                                            ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
+                                                addItemStack(
+                                                    it1,
+                                                )
+                                            }
+                                            add(Renderable.string(item.value.name))
+                                        },
+                                    ),
+                                )
+                            } else {
+                                newDisplay.add(
+                                    Renderable.string("§a+${currentTotalValue.addSeparators()} ${item.value.name}"),
+                                )
+                            }
+
+                        } else if (currentTotalValue < 0) {
+                            if (config.showItemIcon) {
+                                newDisplay.add(
+                                    Renderable.horizontalContainer(
+                                        buildList {
+                                            add(Renderable.string("§c${currentTotalValue.addSeparators()}"))
+                                            ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
+                                                addItemStack(
+                                                    it1,
+                                                )
+                                            }
+                                            add(Renderable.string(item.value.name))
+                                        },
+                                    ),
+                                )
+                            } else {
+                                newDisplay.add(
+                                    Renderable.string("§c${currentTotalValue.addSeparators()} ${item.value.name}"),
+                                )
+                            }
+
+                        } else {
+                            itemsAddedToInventory.remove(item.key)
+                            itemsRemovedFromInventory.remove(item.key)
+                        }
+                        removedItemsToNoLongerShow.remove(item.key)
+                        iterator.remove()
+                    }
+                } else {
+                    if (config.showItemIcon) {
+                        newDisplay.add(
+                            Renderable.horizontalContainer(
+                                buildList {
+                                    add(Renderable.string("§a+${item.value.amount.addSeparators()}"))
+                                    ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
+                                        addItemStack(
+                                            it1,
+                                        )
+                                    }
+                                    add(Renderable.string(item.value.name))
+                                },
+                            ),
+                        )
+
+                    } else {
+                        newDisplay.add(
+                            Renderable.string("§a+${item.value.amount.addSeparators()} ${item.value.name}"),
+                        )
+                    }
+
+                }
+            }
+        } else {
+            for (item in addedItemsToNoLongerShow) {
+                if (config.showItemIcon) {
+                    newDisplay.add(
+                        Renderable.horizontalContainer(
+                            buildList {
+                                add(Renderable.string("§c${item.value.amount.addSeparators()}"))
+                                ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
+                                    addItemStack(
+                                        it1,
+                                    )
+                                }
+                                add(Renderable.string(item.value.name))
+                            },
+                        ),
+                    )
+
+                } else {
+                    newDisplay.add(
+                        Renderable.string("§a+${item.value.amount.addSeparators()} ${item.value.name}"),
+                    )
+                    removedItemsToNoLongerShow[item.key]?.let {
+                        newDisplay.add(
+                            Renderable.string("§c-${it.amount.addSeparators()} ${it.name}"),
+                        )
+                        removedItemsToNoLongerShow.remove(item.key)
+                    }
+                }
+
             }
         }
 
-        for (item in removedToShow) {
-            newDisplay.add(
-                Renderable.string("§c-${item.value.amount.addSeparators()} ${item.value.name}")
-            )
+        for (item in removedItemsToNoLongerShow) {
+            newDisplay.add(renderList("§c-", item.value.amount, item.value.name))
+
+
+            if (config.showItemIcon) {
+                newDisplay.add(
+                    Renderable.horizontalContainer(
+                        buildList {
+                            add(Renderable.string("§c-${item.value.amount.addSeparators()}"))
+                            ItemNameResolver.getInternalNameOrNull(item.value.name)?.let { it1 ->
+                                addItemStack(
+                                    it1,
+                                )
+                            }
+                            add(Renderable.string(item.value.name))
+                        },
+                    ),
+                )
+
+            } else {
+                newDisplay.add(
+                    Renderable.string("§c-${item.value.amount.addSeparators()} ${item.value.name}"),
+                )
+            }
         }
 
         config.pos.renderRenderables(newDisplay, posLabel = "Item Pickup Log Display")
     }
+
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -143,7 +270,7 @@ object ItemPickupLog {
         return Objects.hash(
             this.getInternalNameOrNull(),
             displayName.removeColor(),
-            this.getItemRarityOrNull()
+            this.getItemRarityOrNull(),
         )
     }
 
@@ -151,7 +278,7 @@ object ItemPickupLog {
     private val bannedItems = setOf(
         "SKYBLOCK_MENU".asInternalName(),
         "CANCEL_PARKOUR_ITEM".asInternalName(),
-        "CANCEL_RACE_ITEM".asInternalName()
+        "CANCEL_RACE_ITEM".asInternalName(),
     )
 
     private fun isBannedItem(item: ItemStack): Boolean {
@@ -185,5 +312,23 @@ object ItemPickupLog {
         }
 
         fun isExpired() = time.passedSince() > config.expireAfter.seconds
+    }
+
+    private fun renderList(prefix: String, amount: Int, name: String): Renderable {
+        return if (config.showItemIcon) {
+            Renderable.horizontalContainer(
+                buildList {
+                    add(Renderable.string("§c${amount.addSeparators()}"))
+                    ItemNameResolver.getInternalNameOrNull(name)?.let { it1 ->
+                        addItemStack(
+                            it1,
+                        )
+                    }
+                    add(Renderable.string(name))
+                },
+            )
+        } else {
+            Renderable.string("$prefix $amount $name")
+        }
     }
 }

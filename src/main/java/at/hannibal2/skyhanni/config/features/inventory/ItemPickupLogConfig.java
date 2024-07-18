@@ -17,6 +17,16 @@ public class ItemPickupLogConfig {
     public boolean on = true;
 
     @Expose
+    @ConfigOption(name = "Compact Lines", desc = "Combine the §a+ §7and §c- §7lines into a single line.")
+    @ConfigEditorBoolean
+    public boolean compactLines = true;
+
+    @Expose
+    @ConfigOption(name = "Show Item Icon", desc = "Show the item icon next to the item name")
+    @ConfigEditorBoolean
+    public boolean showItemIcon = true;
+
+    @Expose
     @ConfigOption(
         name = "Expire After",
         desc = "How long items show for after being picked up or dropped, in seconds."
