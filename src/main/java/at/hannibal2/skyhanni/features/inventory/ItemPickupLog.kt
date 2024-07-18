@@ -35,7 +35,7 @@ object ItemPickupLog {
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, UpdatedItem>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, UpdatedItem>()
-    val display = mutableListOf<Renderable>()
+    private val display = mutableListOf<Renderable>()
 
     private val patternGroup = RepoPattern.group("itempickuplog")
     private val shopPattern by patternGroup.pattern(
