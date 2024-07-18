@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
 import at.hannibal2.skyhanni.config.features.misc.PocketSackInASackConfig;
+import at.hannibal2.skyhanni.features.inventory.caketracker.CakeTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -112,6 +113,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Page Scrolling", desc = "")
     @Accordion
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
+
+    @Expose
+    @ConfigOption(name = "Cake Tracker", desc = "")
+    @Accordion
+    public CakeTrackerConfig cakeTracker = new CakeTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")

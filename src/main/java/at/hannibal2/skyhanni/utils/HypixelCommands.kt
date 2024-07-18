@@ -137,6 +137,10 @@ object HypixelCommands {
         send("chatprompt $prompt")
     }
 
+    fun ahs(query: String) {
+        send("ahs $query")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function
