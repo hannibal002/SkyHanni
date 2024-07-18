@@ -59,14 +59,13 @@ object ItemPickupLog {
 
     @SubscribeEvent
     fun onStackChange(event: SackChangeEvent) {
-        if (!isEnabled()) return
-        if (config.sack) {
-            event.sackChanges.forEach {
-                val itemStack = (it.internalName.getItemStack())
-                val item = UpdatedItem(itemStack.displayName, it.delta.absoluteValue)
+        if (!isEnabled() && !config.sack) return
 
-                updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
-            }
+        event.sackChanges.forEach {
+            val itemStack = (it.internalName.getItemStack())
+            val item = UpdatedItem(itemStack.displayName, it.delta.absoluteValue)
+
+            updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
         }
     }
 
