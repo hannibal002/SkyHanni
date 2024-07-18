@@ -38,6 +38,14 @@ object PowderMiningChatFilter {
     )
 
     /**
+     * REGEX-TEST: §6You have successfully picked the lock on this chest!
+     */
+    private val successfulPickPattern by patternGroup.pattern(
+        "warning.successpick",
+        "§6You have successfully picked the lock on this chest!",
+    )
+
+    /**
      * REGEX-TEST: §cYou need a tool with a §r§aBreaking Power §r§cof §r§66§r§c to mine Ruby Gemstone Block§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!
      */
     private val breakingPowerPattern by patternGroup.pattern(
@@ -233,6 +241,7 @@ object PowderMiningChatFilter {
 
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
+        if (successfulPickPattern.matches(message)) return "powder_mining_picked"
         // Breaking power warning
         if (breakingPowerPattern.matches(message) && gemstoneConfig.strongerToolMessages) return "stronger_tool"
         // Closing or opening a reward 'loop' with the spam of ▬
