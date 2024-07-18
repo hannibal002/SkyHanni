@@ -14,7 +14,7 @@ public class ItemPickupLogConfig {
     @ConfigOption(name = "Item Pickup Log", desc = "Show a log of what items you pick up/drop and their amounts.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean on = true;
+    public boolean enabled = true;
 
     @Expose
     @ConfigOption(name = "Compact Lines", desc = "Combine the §a+ §7and §c- §7lines into a single line.")
@@ -40,7 +40,7 @@ public class ItemPickupLogConfig {
     public int expireAfter = 10;
 
     @Expose
-    @ConfigLink(owner = ItemPickupLogConfig.class, field = "on")
+    @ConfigLink(owner = ItemPickupLogConfig.class, field = "enabled")
     public Position pos = new Position(100, 100, false, true);
 }
 

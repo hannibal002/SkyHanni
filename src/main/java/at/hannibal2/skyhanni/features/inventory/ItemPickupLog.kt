@@ -35,6 +35,7 @@ object ItemPickupLog {
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, UpdatedItem>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, UpdatedItem>()
+    val display = mutableListOf<Renderable>()
 
     private val patternGroup = RepoPattern.group("itempickuplog")
     private val shopPattern by patternGroup.pattern(
@@ -44,58 +45,13 @@ object ItemPickupLog {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        val newDisplay = mutableListOf<Renderable>()
-
-        itemsAddedToInventory.values.removeIf { it.isExpired() }
-        itemsRemovedFromInventory.values.removeIf { it.isExpired() }
-
-        val removedItemsToNoLongerShow = itemsRemovedFromInventory.toMutableMap()
-        val addedItemsToNoLongerShow = itemsAddedToInventory.toMutableMap()
-
-        if (config.compactLines) {
-            val iterator = addedItemsToNoLongerShow.iterator()
-            while (iterator.hasNext()) {
-                val item = iterator.next()
-
-                if (removedItemsToNoLongerShow.containsKey(item.key)) {
-                    val it = removedItemsToNoLongerShow[item.key]
-                    if (it != null) {
-                        val currentTotalValue = item.value.amount - it.amount
-
-                        if (currentTotalValue > 0) {
-                            newDisplay.add(renderList("§a+", currentTotalValue, item.value.name))
-                        } else if (currentTotalValue < 0) {
-                            newDisplay.add(renderList("§c", currentTotalValue, item.value.name))
-                        } else {
-                            itemsAddedToInventory.remove(item.key)
-                            itemsRemovedFromInventory.remove(item.key)
-                        }
-                        removedItemsToNoLongerShow.remove(item.key)
-                        iterator.remove()
-                    }
-                } else {
-                    newDisplay.add(renderList("§a+", item.value.amount, item.value.name))
-                }
-            }
-        } else {
-            for (item in addedItemsToNoLongerShow) {
-
-                newDisplay.add(renderList("§a+", item.value.amount, item.value.name))
-                removedItemsToNoLongerShow[item.key]?.let {
-                    newDisplay.add(renderList("§c-", it.amount, it.name))
-                    removedItemsToNoLongerShow.remove(item.key)
-                }
-            }
-        }
-        for (item in removedItemsToNoLongerShow) {
-            newDisplay.add(renderList("§c-", item.value.amount, item.value.name))
-        }
-        config.pos.renderRenderables(newDisplay, posLabel = "Item Pickup Log Display")
+        if (!isEnabled()) return
+        config.pos.renderRenderables(display, posLabel = "Item Pickup Log Display")
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        if (!isEnabled()) return
         itemList.clear()
         itemsAddedToInventory.clear()
         itemsRemovedFromInventory.clear()
@@ -103,6 +59,7 @@ object ItemPickupLog {
 
     @SubscribeEvent
     fun onStackChange(event: SackChangeEvent) {
+        if (!isEnabled()) return
         if (config.sack) {
             event.sackChanges.forEach {
                 val itemStack = (it.internalName.getItemStack())
@@ -115,7 +72,7 @@ object ItemPickupLog {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) return
+        if (!isEnabled()) return
 
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 
@@ -169,6 +126,7 @@ object ItemPickupLog {
                 updateItem(it.key, item, it.value.first, false)
             }
         }
+        updateDisplay()
     }
 
     private fun ItemStack.hash(): Int {
@@ -239,6 +197,8 @@ object ItemPickupLog {
         fun isExpired() = time.passedSince() > config.expireAfter.seconds
     }
 
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
     private fun renderList(prefix: String, amount: Int, name: String): Renderable {
         return if (config.showItemIcon) {
             Renderable.horizontalContainer(
@@ -254,6 +214,57 @@ object ItemPickupLog {
             )
         } else {
             Renderable.string("$prefix $amount $name")
+        }
+    }
+
+    private fun updateDisplay() {
+        if (!isEnabled()) return
+
+        display.clear()
+
+        itemsAddedToInventory.values.removeIf { it.isExpired() }
+        itemsRemovedFromInventory.values.removeIf { it.isExpired() }
+
+        val removedItemsToNoLongerShow = itemsRemovedFromInventory.toMutableMap()
+        val addedItemsToNoLongerShow = itemsAddedToInventory.toMutableMap()
+
+        if (config.compactLines) {
+            val iterator = addedItemsToNoLongerShow.iterator()
+            while (iterator.hasNext()) {
+                val item = iterator.next()
+
+                if (removedItemsToNoLongerShow.containsKey(item.key)) {
+                    val it = removedItemsToNoLongerShow[item.key]
+                    if (it != null) {
+                        val currentTotalValue = item.value.amount - it.amount
+
+                        if (currentTotalValue > 0) {
+                            display.add(renderList("§a+", currentTotalValue, item.value.name))
+                        } else if (currentTotalValue < 0) {
+                            display.add(renderList("§c", currentTotalValue, item.value.name))
+                        } else {
+                            itemsAddedToInventory.remove(item.key)
+                            itemsRemovedFromInventory.remove(item.key)
+                        }
+                        removedItemsToNoLongerShow.remove(item.key)
+                        iterator.remove()
+                    }
+                } else {
+                    display.add(renderList("§a+", item.value.amount, item.value.name))
+                }
+            }
+        } else {
+            for (item in addedItemsToNoLongerShow) {
+
+                display.add(renderList("§a+", item.value.amount, item.value.name))
+                removedItemsToNoLongerShow[item.key]?.let {
+                    display.add(renderList("§c-", it.amount, it.name))
+                    removedItemsToNoLongerShow.remove(item.key)
+                }
+            }
+        }
+        for (item in removedItemsToNoLongerShow) {
+            display.add(renderList("§c-", item.value.amount, item.value.name))
         }
     }
 }
