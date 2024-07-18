@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
-import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -50,8 +49,8 @@ public class TrackingConfig {
         PET("§aCurrent Pet", "Pet <:pets_icon:1263221331915182280>"),
         COOKIE_BUFF("§dCookie Buff", "Cookie <:booster_cookie:1263204080940220498>"),
         GOD_POTION("§cGod Potion", "God Potion <:god_potion:1263204732390871151>"),
-        JACOBS_CONTEST("§eJacob's Contest", "Contest <:jacobs_farming_contest:1263206591218585640>"),
-        ACTIVE_CROP("§aCrop", "Crop <:sugar:1263207586463748289>"),
+        JACOBS_CONTEST("§eJacob's Contest", "Contest <:hoe:1263206591218585640>"),
+        ACTIVE_CROP("§aCrop", "Crop <:hoe:1263206591218585640>"),
         ANITA_BUFF("§6Anita's Artifact", "Anita's Artifact <:anitas_artifact:1263212366330335376>"),
         BPS("§eBlocks/Second", "BPS <:bps_sugar:1263285905083465729>")
         ;
@@ -120,22 +119,23 @@ public class TrackingConfig {
     }
 
     public enum Crop {
-        WHEAT("Wheat <:wheat:1263207588296790048>"),
-        POTATO("Potato <:potato:1263207583502569522>"),
-        CARROT("Carrot <:carrot:1263207574472359956>"),
-        CARVED_PUMPKIN("Carved Pumpkin <:pumpkin:1263207585004257321>"),
-        MELON_SLICE("Melon Slice <:melon:1263207577920213083>"),
-        SUGAR_CANE("Sugar Cane <:sugar:1263207586463748289>"),
-        RED_MUSHROOM("Red Mushroom <:mushroom:1263207580268888096>"), //TODO NEW EMOJI
-        BROWN_MUSHROOM("Brown Mushroom <:mushroom:1263207580268888096>"), //TODO NEW EMOJI
-        CACTUS("Cactus <:cactus:1263207572962414724>"),
-        COCOA_BEANS("Cocoa Beans <:cocoa_beans:1263207576330567795>"),
-        NETHER_WART("Nether Wart <:nether_wart:1263207581770579970>");
+        WHEAT("Wheat", "<:wheat:1263207588296790048>"),
+        POTATO("Potato", "<:potato:1263207583502569522>"),
+        CARROT("Carrot", "<:carrot:1263207574472359956>"),
+        PUMPKIN("Pumpkin", "<:pumpkin:1263207585004257321>"),
+        MELON("Melon", "<:melon:1263207577920213083>"),
+        SUGAR_CANE("Sugar Cane", "<:sugar:1263207586463748289>"),
+        MUSHROOM("Mushroom", "<:mushroom:1263207580268888096>"), //TODO NEW EMOJI
+        CACTUS("Cactus", "<:cactus:1263207572962414724>"),
+        COCOA_BEANS("Cocoa Beans", "<:cocoa_beans:1263207576330567795>"),
+        NETHER_WART("Nether Wart", "<:nether_wart:1263207581770579970>"),;
 
         public final String name;
+        public final String emoji;
 
-        Crop(String name) {
+        Crop(String name, String emoji) {
             this.name = name;
+            this.emoji = emoji;
         }
 
         @Override

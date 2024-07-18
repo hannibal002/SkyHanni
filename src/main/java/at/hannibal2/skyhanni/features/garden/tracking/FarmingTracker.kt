@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.tracking
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Crop
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.InformationType
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.BRONZE_MEDAL
@@ -47,6 +48,7 @@ object FarmingTracker {
     var cookieBuffTimer = ""
     var godPotionTimer = ""
     var activeAnitaBuff = ""
+    var currentCrop: Crop? = null
     var currentPlacement = 0.0
     val farmingTrackerURL = "https://cdn.discordapp.com/attachments/1263194220630638714/1263216589898252359/FT.png?" +
         "ex=66996da0&is=66981c20&hm=b50b1993a4aa9485b2b161b61830668451ffdb84002ee2a0d7886d8e6e7f5cc7&"
@@ -101,14 +103,33 @@ object FarmingTracker {
                     InformationType.PET -> PetAPI.currentPet
                     InformationType.COOKIE_BUFF -> cookieBuffTimer
                     InformationType.GOD_POTION -> godPotionTimer
-                    InformationType.JACOBS_CONTEST -> if (FarmingContestAPI.inContest) "$currentPlacement% ${convertPlacement(currentPlacement)?.emoji}" else ""
-                    InformationType.ACTIVE_CROP -> GardenAPI.getCurrentlyFarmedCrop()?.cropName
+                    InformationType.JACOBS_CONTEST -> if (FarmingContestAPI.inContest) "$currentPlacement% ${
+                        convertPlacement(
+                            currentPlacement,
+                        )?.emoji
+                    }" else ""
+
+                    InformationType.ACTIVE_CROP -> {
+                        currentCrop = GardenAPI.getCurrentlyFarmedCrop()?.niceName?.let { niceName ->
+                            Crop.entries.find { it.name.lowercase() == niceName }
+                        }
+                        currentCrop?.name + currentCrop?.emoji
+                    }
+
                     InformationType.ANITA_BUFF -> activeAnitaBuff
                     InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond
                     else -> ""
                 }?.toString().takeIf { !it.isNullOrBlank() }
 
-                value?.let { Field(type.fieldName, it, true) }
+                val fieldName = if (type == InformationType.JACOBS_CONTEST) {
+                    GardenAPI.getCurrentlyFarmedCrop()?.niceName?.let { niceName ->
+                        Crop.entries.find { it.name.lowercase() == niceName }?.run { "$name Contest $emoji" }
+                    } ?: type.fieldName
+                } else {
+                    type.fieldName
+                }
+
+                value?.let { Field(fieldName, it, true) }
             }
 
         val embed = Embed(
@@ -117,7 +138,7 @@ object FarmingTracker {
             fields = fields,
             timestamp = SimpleTimeMark.now().formattedDate("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"),
             thumbnail = Thumbnail(playerFaceURL),
-            footer = Footer("Automatic Status Report")
+            footer = Footer("Automatic Status Report"),
         )
 
         val embeds = listOf(embed)
@@ -131,6 +152,7 @@ object FarmingTracker {
                     farmingTrackerURL,
                 )
             }
+
             EDITED_MESSAGE -> {
                 WebhookUtils.editMessageEmbeds(
                     config.webhook.url,
@@ -139,6 +161,7 @@ object FarmingTracker {
                     farmingTrackerURL,
                 )
             }
+
             else -> {
                 WebhookUtils.sendEmbedsToWebhook(
                     config.webhook.url,
@@ -194,7 +217,7 @@ object FarmingTracker {
                 SILVER_MEDAL.requiredNormal,
                 GOLD_MEDAL.requiredNormal,
                 PLATINUM_MEDAL.requiredNormal,
-                DIAMOND_MEDAL.requiredNormal
+                DIAMOND_MEDAL.requiredNormal,
             )
         } else {
             listOf(
@@ -202,7 +225,7 @@ object FarmingTracker {
                 SILVER_MEDAL.requiredFinnegan,
                 GOLD_MEDAL.requiredFinnegan,
                 PLATINUM_MEDAL.requiredFinnegan,
-                DIAMOND_MEDAL.requiredFinnegan
+                DIAMOND_MEDAL.requiredFinnegan,
             )
         }
 
