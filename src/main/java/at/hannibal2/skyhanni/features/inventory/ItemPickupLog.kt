@@ -136,22 +136,22 @@ object ItemPickupLog {
         oldItemList.forEach {
             if (!itemList.containsKey(it.key)) {
                 val item = UpdatedItem(it.value.first.displayName, it.value.second)
-                itemsRemovedFromInventory.updateItem(it.key, item, it.value.first)
+                updateItem(it.key, item, it.value.first, true)
             } else if (it.value.second > itemList[it.key]!!.second) {
                 val amount = (it.value.second - itemList[it.key]?.second!!)
                 val item = UpdatedItem(it.value.first.displayName, amount)
-                itemsRemovedFromInventory.updateItem(it.key, item, it.value.first)
+                updateItem(it.key, item, it.value.first, true)
             }
         }
 
         itemList.forEach {
             if (!oldItemList.containsKey(it.key)) {
                 val item = UpdatedItem(it.value.first.displayName, it.value.second)
-                itemsAddedToInventory.updateItem(it.key, item, it.value.first)
+                updateItem(it.key, item, it.value.first, false)
             } else if (it.value.second > oldItemList[it.key]!!.second) {
                 val amount = (it.value.second - oldItemList[it.key]?.second!!)
                 val item = UpdatedItem(it.value.first.displayName, amount)
-                itemsAddedToInventory.updateItem(it.key, item, it.value.first)
+                updateItem(it.key, item, it.value.first, false)
             }
         }
     }
@@ -189,13 +189,28 @@ object ItemPickupLog {
         return false
     }
 
-    private fun MutableMap<Int, UpdatedItem>.updateItem(hash: Int, itemInfo: UpdatedItem, item: ItemStack) {
-        this[hash]?.let {
-            it.updateAmount(itemInfo.amount)
-            return
+    private fun updateItem(hash: Int, itemInfo: UpdatedItem, item: ItemStack, removed: Boolean) {
+        if (removed) {
+            itemsAddedToInventory[hash]?.let { added ->
+                added.time = SimpleTimeMark.now()
+            }
+            itemsRemovedFromInventory[hash]?.let {
+                it.updateAmount(itemInfo.amount)
+                return
+            }
+            if (isBannedItem(item)) return
+            itemsRemovedFromInventory[hash] = itemInfo
+        } else {
+            itemsRemovedFromInventory[hash]?.let { added ->
+                added.time = SimpleTimeMark.now()
+            }
+            itemsAddedToInventory[hash]?.let {
+                it.updateAmount(itemInfo.amount)
+                return
+            }
+            if (isBannedItem(item)) return
+            itemsAddedToInventory[hash] = itemInfo
         }
-        if (isBannedItem(item)) return
-        this[hash] = itemInfo
     }
 
     private data class UpdatedItem(val name: String, var amount: Int) {
@@ -214,9 +229,9 @@ object ItemPickupLog {
             Renderable.horizontalContainer(
                 buildList {
                     add(Renderable.string("${prefix}${amount.addSeparators()}"))
-                    ItemNameResolver.getInternalNameOrNull(name)?.let { it1 ->
+                    ItemNameResolver.getInternalNameOrNull(name)?.let {
                         addItemStack(
-                            it1,
+                            it,
                         )
                     }
                     add(Renderable.string(name))
