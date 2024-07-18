@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -23,6 +25,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Objects
+import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -99,6 +102,18 @@ object ItemPickupLog {
     }
 
     @SubscribeEvent
+    fun onStackChange(event: SackChangeEvent) {
+        if (config.sack) {
+            event.sackChanges.forEach {
+                val itemStack = (it.internalName.getItemStack())
+                val item = UpdatedItem(itemStack.displayName, it.delta.absoluteValue)
+
+                updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -131,7 +146,7 @@ object ItemPickupLog {
             }
         }
 
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds) return
 
         oldItemList.forEach {
             if (!itemList.containsKey(it.key)) {

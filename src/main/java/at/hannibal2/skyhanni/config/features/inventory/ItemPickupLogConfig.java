@@ -27,12 +27,17 @@ public class ItemPickupLogConfig {
     public boolean showItemIcon = true;
 
     @Expose
+    @ConfigOption(name = "Sacks", desc = "Also show items added and removed from stacks")
+    @ConfigEditorBoolean
+    public boolean sack = true;
+
+    @Expose
     @ConfigOption(
         name = "Expire After",
         desc = "How long items show for after being picked up or dropped, in seconds."
     )
     @ConfigEditorSlider(minValue = 1, maxValue = 20, minStep = 1)
-    public int expireAfter = 5;
+    public int expireAfter = 10;
 
     @Expose
     @ConfigLink(owner = ItemPickupLogConfig.class, field = "on")
