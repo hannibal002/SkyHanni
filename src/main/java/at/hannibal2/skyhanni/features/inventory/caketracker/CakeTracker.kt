@@ -42,9 +42,11 @@ object CakeTracker {
 
     private var inCakeBag = false
     private var inCakeInventory = false
+    private var timeOpenedCakeInventory: Long = 0
     private var inAuctionHouse = false
     private var unobtainedCakesDisplayed = false
     private var searchingForCakes = false
+    private var knownCakesInCurrentInventory = mutableListOf<Int>()
 
     /**
      * REGEX-TEST: §cNew Year Cake (Year 360)
@@ -129,7 +131,7 @@ object CakeTracker {
     private fun isEnabled(): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
         if (!config.enabled) return false
-        return true;
+        return true
     }
 
     @SubscribeEvent
@@ -138,10 +140,12 @@ object CakeTracker {
         if (inCakeBag || (inAuctionHouse && (unobtainedCakesDisplayed || searchingForCakes))) {
             tracker.renderDisplay(config.cakeTrackerPosition)
         }
+        if (inCakeInventory) checkInventoryCakes()
     }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiContainerEvent.BackgroundDrawnEvent) {
+        if (!isEnabled()) return
         if (inAuctionHouse) {
             unobtainedCakesDisplayed = getCakeTrackerData()?.let { data ->
                 InventoryUtils.getItemsInOpenChest().filter {
@@ -155,6 +159,7 @@ object CakeTracker {
                 }.isNotEmpty()
             } ?: false
         }
+        if (inCakeInventory) checkInventoryCakes()
     }
 
     @SubscribeEvent
@@ -163,13 +168,20 @@ object CakeTracker {
         val inventoryName = event.inventoryName
         if(cakeContainerPattern.matches(inventoryName)) {
             if(cakeBagPattern.matches(inventoryName)) inCakeBag = true
-            val items = event.inventoryItems.values.filter { cakeNamePattern.matches(it.displayName) }
+            val items = event.inventoryItems.filter { cakeNamePattern.matches(it.value.displayName) }
+            knownCakesInCurrentInventory = items.values.mapNotNull { item ->
+                cakeNamePattern.matchMatcher(item.displayName) {
+                    group("year")?.toInt()
+                }
+            }.toMutableList()
             for(item in items) {
-                cakeNamePattern.matchMatcher(item.displayName){
+                cakeNamePattern.matchMatcher(item.value.displayName){
                     val cakeYearInt = group("year").toInt()
                     addCake(cakeYearInt)
                 }
             }
+            inCakeInventory = true
+            timeOpenedCakeInventory = System.currentTimeMillis()
             tracker.firstUpdate()
         }
         if(auctionBrowserPattern.matches(inventoryName)) {
@@ -182,6 +194,7 @@ object CakeTracker {
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCakeBag = false
         inCakeInventory = false
+        knownCakesInCurrentInventory.clear()
         inAuctionHouse = false
         unobtainedCakesDisplayed = false
         searchingForCakes = false
@@ -190,13 +203,29 @@ object CakeTracker {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if(!isEnabled()) return
-        checkYear()
-    }
-
-    private fun checkYear() {
         if(currentYear == SkyBlockTime.now().year) return
         currentYear = SkyBlockTime.now().year
         recalculateMissingCakes()
+    }
+
+    private fun checkInventoryCakes() {
+        if (System.currentTimeMillis() - timeOpenedCakeInventory >= 500) {
+            val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
+                cakeNamePattern.matchMatcher(item.stack.displayName) {
+                    group("year")?.toInt()
+                }
+            }
+
+            val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }
+            val removedYears = knownCakesInCurrentInventory.filter { it !in currentYears }
+
+            addedYears.forEach(::addCake)
+            removedYears.forEach(::removeCake)
+
+            if (addedYears.isNotEmpty() || removedYears.isNotEmpty()) {
+                knownCakesInCurrentInventory = currentYears.toMutableList()
+            }
+        }
     }
 
     private fun recalculateMissingCakes() {
@@ -250,14 +279,48 @@ object CakeTracker {
         return displayToggleRenderables
     }
 
+    private fun setDisplayOrderType(type: CakeTrackerDisplayOrderType) {
+        val cakeTrackerData = getCakeTrackerData() ?: return
+        config.displayOrderType = type
+        drawDisplay(cakeTrackerData)
+        tracker.update()
+    }
+
+    private fun getDisplayOrderTypeToggle(): List<Renderable> {
+        val displayOrderToggleRenderables = mutableListOf<Renderable>()
+        val newestString =
+            if(config.displayOrderType == CakeTrackerDisplayOrderType.NEWEST_FIRST) "§7§l[§r §a§nNewest First§r §7§l]"
+            else "§aNewest First"
+        val oldestString =
+            if(config.displayOrderType == CakeTrackerDisplayOrderType.OLDEST_FIRST) "§7§l[§r §c§nOldest First§r §7§l]"
+            else "§cOldest First"
+
+        displayOrderToggleRenderables.add(
+            Renderable.optionalLink(
+                newestString,
+                { setDisplayOrderType(CakeTrackerDisplayOrderType.NEWEST_FIRST) }
+            ) { config.displayOrderType != CakeTrackerDisplayOrderType.NEWEST_FIRST }
+        )
+        displayOrderToggleRenderables.add(Renderable.string(" §7§l- §r"))
+        displayOrderToggleRenderables.add(
+            Renderable.optionalLink(
+                oldestString,
+                { setDisplayOrderType(CakeTrackerDisplayOrderType.OLDEST_FIRST) }
+            ) { config.displayOrderType != CakeTrackerDisplayOrderType.OLDEST_FIRST }
+        )
+
+        return displayOrderToggleRenderables
+    }
+
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList(
             Renderable.hoverTips(
-                "§f§lYear §c§lCake §f§lTracker",
+                "§c§lNew §f§lYear §c§lCake §f§lTracker",
                 tips = listOf("§aHave§7: §a${data.cakesOwned.count()}§7, §cMissing§7: §c${data.cakesMissing.count()}")
             ),
         )
         add(getDisplayTypeToggle())
+        add(getDisplayOrderTypeToggle())
 
         val cakeList = when (config.displayType) {
             CakeTrackerDisplayType.OWNED_CAKES -> data.cakesOwned
@@ -282,8 +345,10 @@ object CakeTracker {
             var end = start
 
             for (i in 1 until sortedCakes.size) {
-                if (sortedCakes[i] == end + 1) end = sortedCakes[i]
-                else {
+                if ((config.displayOrderType == CakeTrackerDisplayOrderType.OLDEST_FIRST && sortedCakes[i] == end + 1) ||
+                    (config.displayOrderType == CakeTrackerDisplayOrderType.NEWEST_FIRST && sortedCakes[i] == end - 1)) {
+                    end = sortedCakes[i]
+                } else {
                     if (start != end) cakeRanges.add(CakeRange(start, end))
                     else cakeRanges.add(CakeRange(start))
                     start = sortedCakes[i]
