@@ -61,7 +61,7 @@ public class ItemPickupLogConfig {
 
     @Expose
     @ConfigLink(owner = ItemPickupLogConfig.class, field = "enabled")
-    public Position pos = new Position(100, 100, false, true);
+    public Position pos = new Position(-256, 140, false, true);
 }
 
 

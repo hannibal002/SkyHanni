@@ -670,6 +670,24 @@ interface Renderable {
             }
         }
 
+        fun fixedSizeBox(
+            content: Renderable,
+            height: Int,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+            override fun render(posX: Int, posY: Int) {
+                render.renderXYAligned(posX, posY, height, width)
+            }
+        }
+
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,

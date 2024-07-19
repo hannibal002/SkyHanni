@@ -18,13 +18,11 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -285,16 +283,19 @@ object ItemPickupLog {
             display.add(renderList("§c-", item.value.amount, item.value.name, item.value.neuInternalName))
         }
         val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
-        this.display = object : Renderable {
-            override val width: Int = renderable.width
-            override val height: Int = renderable.height
-            override val horizontalAlign: RenderUtils.HorizontalAlignment = renderable.horizontalAlign
-            override val verticalAlign: RenderUtils.VerticalAlignment = renderable.verticalAlign
 
-            override fun render(posX: Int, posY: Int) {
-                renderable.renderXYAligned(posX, posY, 0, 0)
-            }
+        this.display = Renderable.fixedSizeBox(renderable, 30, 75)
 
-        }
+//         this.display = object : Renderable {
+//             override val width: Int = renderable.width
+//             override val height: Int = renderable.height
+//             override val horizontalAlign: RenderUtils.HorizontalAlignment = renderable.horizontalAlign
+//             override val verticalAlign: RenderUtils.VerticalAlignment = renderable.verticalAlign
+//
+//             override fun render(posX: Int, posY: Int) {
+//                 renderable.renderXYAligned(posX, posY, 0, 0)
+//             }
+//
+//         }
     }
 }
