@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -20,18 +21,41 @@ public class CakeTrackerConfig {
     public Position cakeTrackerPosition = new Position(300, 300, false, true);
 
     @Expose
-    @ConfigOption(name = "Display Mode", desc = "How the tracker should display")
-    public CakeTrackerDisplayType displayType = CakeTrackerDisplayType.OLDEST_FIRST;
+    @ConfigOption(name = "Display Mode", desc = "Which cakes the tracker should display.")
+    @ConfigEditorDropdown
+    public CakeTrackerDisplayType displayType = CakeTrackerDisplayType.MISSING_CAKES;
 
     public enum CakeTrackerDisplayType {
-
-        OLDEST_FIRST("§cOldest Missing First"),
-        NEWEST_FIRST("§dNewest Missing First")
+        MISSING_CAKES("§cMissing Cakes"),
+        OWNED_CAKES("§aOwned Cakes")
         ;
 
         private final String name;
 
         CakeTrackerDisplayType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    @Expose
+    @ConfigOption(name = "Display Order", desc = "What order the tracker should display cakes in.")
+    @ConfigEditorDropdown
+    public CakeTrackerDisplayOrderType displayOrderType = CakeTrackerDisplayOrderType.OLDEST_FIRST;
+
+    public enum CakeTrackerDisplayOrderType {
+
+        OLDEST_FIRST("§cOldest Cakes First"),
+        NEWEST_FIRST("§dNewest Cakes First")
+        ;
+
+        private final String name;
+
+        CakeTrackerDisplayOrderType(String name) {
             this.name = name;
         }
 

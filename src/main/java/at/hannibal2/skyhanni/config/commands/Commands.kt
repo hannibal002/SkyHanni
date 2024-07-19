@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -272,6 +273,10 @@ object Commands {
             "shresetseacreaturetracker",
             "Resets the Sea Creature Tracker",
         ) { SeaCreatureTracker.resetCommand() }
+        registerCommand(
+            "shresetcaketracker",
+            "Resets the New Year Cake Tracker",
+        ) { CakeTracker.resetCommand() }
         registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
