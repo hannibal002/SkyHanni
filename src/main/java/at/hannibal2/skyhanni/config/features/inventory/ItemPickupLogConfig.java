@@ -36,7 +36,7 @@ public class ItemPickupLogConfig {
     @Expose
     @ConfigOption(name = "Sacks", desc = "Show items added and removed from stacks.")
     @ConfigEditorBoolean
-    public boolean sack = true;
+    public boolean sack = false;
 
     @Expose
     @ConfigOption(name = "Coins", desc = "Show coins added and removed from purse.")
