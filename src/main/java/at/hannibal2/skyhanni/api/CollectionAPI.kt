@@ -89,7 +89,7 @@ object CollectionAPI {
     @SubscribeEvent
     fun onItemAdd(event: ItemAddEvent) {
         val internalName = event.internalName
-        val (_, amount) = NEUItems.getMultiplier(internalName)
+        val amount = NEUItems.getPrimitiveMultiplier(internalName).amount
         if (amount > 1) return
 
         // TODO add support for replenish (higher collection than actual items in inv)

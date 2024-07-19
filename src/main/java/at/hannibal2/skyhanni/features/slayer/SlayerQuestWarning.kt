@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -42,9 +42,9 @@ object SlayerQuestWarning {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        val slayerType = event.newList.nextAfter("Slayer Quest")
-        val slayerProgress = event.newList.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        val slayerType = event.scoreboard.nextAfter("Slayer Quest")
+        val slayerProgress = event.scoreboard.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
@@ -102,7 +102,7 @@ object SlayerQuestWarning {
         if (DianaAPI.isDoingDiana()) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
-      
+
         lastWarning = SimpleTimeMark.now()
         ChatUtils.chat(chatMessage)
 
@@ -124,7 +124,7 @@ object SlayerQuestWarning {
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
         val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
 
-        val activeSlayer = SlayerAPI.getActiveSlayer()
+        val activeSlayer = SlayerAPI.activeSlayer
 
         if (activeSlayer != null) {
             if (slayerType != activeSlayer) {

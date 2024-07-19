@@ -34,7 +34,7 @@ object TeleportPadCompactName {
         val name = entity.name
 
         noNamePattern.matchMatcher(name) {
-            event.isCanceled = true
+            event.cancel()
         }
 
         namePattern.matchMatcher(name) {

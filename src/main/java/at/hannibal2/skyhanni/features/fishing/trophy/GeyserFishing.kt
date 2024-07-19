@@ -72,7 +72,7 @@ object GeyserFishing {
         val geyser = geyser ?: return
 
         if (bobber.distanceTo(event.location) < 3 && bobber.distanceTo(geyser) < 3) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

@@ -83,7 +83,7 @@ object CorpseLocator {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (sharedWaypoints.isNotEmpty()) sharedWaypoints.clear()
+        sharedWaypoints.clear()
     }
 
     @SubscribeEvent

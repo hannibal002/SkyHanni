@@ -1,20 +1,19 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.test.PriceSource
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.seconds
@@ -37,7 +36,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun addItem(internalName: NEUInternalName, amount: Int) {
         modify {
-            it.additem(internalName, amount)
+            it.addItem(internalName, amount)
         }
         getSharedTracker()?.let {
             val hidden = it.get(DisplayMode.TOTAL).items[internalName]!!.hidden
@@ -55,12 +54,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun addPriceFromButton(lists: MutableList<List<Any>>) {
         if (isInventoryOpen()) {
-            lists.addSelector<PriceSource>(
+            lists.addSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = PriceFromEntry.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update()
                 }
             )
@@ -106,7 +105,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 internalName.itemName
             }
 
-            val priceFormat = NumberUtil.format(price)
+            val priceFormat = price.shortFormat()
             val hidden = itemProfit.hidden
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
@@ -127,7 +126,8 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
 
             val lore = buildLore(data, itemProfit, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(displayName, lore,
+            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(
+                displayName, lore,
                 onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.items.remove(internalName)
@@ -183,7 +183,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         val tips = if (totalAmount > 0) {
             val profitPerCatch = profit / totalAmount
-            val profitPerCatchFormat = NumberUtil.format(profitPerCatch)
+            val profitPerCatchFormat = profitPerCatch.shortFormat()
             listOf("§7Profit per $action: $profitPrefix$profitPerCatchFormat")
         } else emptyList()
 

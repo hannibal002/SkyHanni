@@ -18,9 +18,8 @@ object GardenVisitorColorNames {
         visitorColours.clear()
         visitorItems.clear()
         for ((visitor, visitorData) in data.visitors) {
-            val rarity = visitorData.new_rarity ?: visitorData.rarity
-            visitorColours[visitor] = rarity.color.getChatColor()
-            visitorItems[visitor] = visitorData.need_items
+            visitorColours[visitor] = visitorData.rarity.color.getChatColor()
+            visitorItems[visitor] = visitorData.needItems
         }
     }
 
