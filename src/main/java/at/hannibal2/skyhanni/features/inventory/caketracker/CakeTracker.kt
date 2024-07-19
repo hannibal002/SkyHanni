@@ -38,7 +38,7 @@ object CakeTracker {
 
     private fun getCakeTrackerData() = ProfileStorageData.profileSpecific?.cakeTracker
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
-    private var currentYear = SkyBlockTime.now().year
+    private var currentYear = 0
 
     private var inCakeBag = false
     private var inCakeInventory = false
@@ -204,8 +204,10 @@ object CakeTracker {
     fun onSecondPassed(event: SecondPassedEvent) {
         if(!isEnabled()) return
         if(currentYear == SkyBlockTime.now().year) return
-        currentYear = SkyBlockTime.now().year
-        recalculateMissingCakes()
+        if(SkyBlockTime.now().monthName == "Late Winter" && SkyBlockTime.now().day >= 29) {
+            currentYear = SkyBlockTime.now().year
+            recalculateMissingCakes()
+        } else currentYear = SkyBlockTime.now().year - 1
     }
 
     private fun checkInventoryCakes() {
