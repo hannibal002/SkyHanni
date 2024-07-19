@@ -639,7 +639,7 @@ object RenderUtils {
             renderable.render(0, 0)
         }
         GlStateManager.popMatrix()
-        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, 0)
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
     }
 
     /**

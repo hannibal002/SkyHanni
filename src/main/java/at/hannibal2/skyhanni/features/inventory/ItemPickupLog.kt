@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
@@ -12,14 +13,18 @@ import at.hannibal2.skyhanni.utils.ItemNameResolver
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
@@ -32,10 +37,12 @@ import kotlin.time.Duration.Companion.seconds
 object ItemPickupLog {
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
 
+    private val coinIcon = "COIN_TALISMAN".asInternalName()
+
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, UpdatedItem>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, UpdatedItem>()
-    private val display = mutableListOf<Renderable>()
+    private var display: Renderable = Renderable.string("")
 
     private val patternGroup = RepoPattern.group("itempickuplog")
     private val shopPattern by patternGroup.pattern(
@@ -46,7 +53,7 @@ object ItemPickupLog {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        config.pos.renderRenderables(display, posLabel = "Item Pickup Log Display")
+        config.pos.renderRenderable(display, posLabel = "Item Pickup Log Display")
     }
 
     @SubscribeEvent
@@ -58,15 +65,22 @@ object ItemPickupLog {
     }
 
     @SubscribeEvent
-    fun onStackChange(event: SackChangeEvent) {
-        if (!isEnabled() && !config.sack) return
+    fun onSackChange(event: SackChangeEvent) {
+        if (!isEnabled() || !config.sack) return
 
         event.sackChanges.forEach {
             val itemStack = (it.internalName.getItemStack())
-            val item = UpdatedItem(itemStack.displayName, it.delta.absoluteValue)
+            val item = UpdatedItem(itemStack.displayName, it.delta.absoluteValue.toLong(), it.internalName)
 
             updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
         }
+    }
+
+    @SubscribeEvent
+    fun onPurseChange(event: PurseChangeEvent) {
+        if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
+
+        updateItem(0, UpdatedItem("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
     }
 
     @SubscribeEvent
@@ -102,26 +116,26 @@ object ItemPickupLog {
             }
         }
 
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 2.seconds) return
+        if (!worldChangeCooldown()) return
 
         oldItemList.forEach {
             if (!itemList.containsKey(it.key)) {
-                val item = UpdatedItem(it.value.first.displayName, it.value.second)
+                val item = UpdatedItem(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, true)
             } else if (it.value.second > itemList[it.key]!!.second) {
                 val amount = (it.value.second - itemList[it.key]?.second!!)
-                val item = UpdatedItem(it.value.first.displayName, amount)
+                val item = UpdatedItem(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, true)
             }
         }
 
         itemList.forEach {
             if (!oldItemList.containsKey(it.key)) {
-                val item = UpdatedItem(it.value.first.displayName, it.value.second)
+                val item = UpdatedItem(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, false)
             } else if (it.value.second > oldItemList[it.key]!!.second) {
                 val amount = (it.value.second - oldItemList[it.key]?.second!!)
-                val item = UpdatedItem(it.value.first.displayName, amount)
+                val item = UpdatedItem(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, false)
             }
         }
@@ -185,10 +199,10 @@ object ItemPickupLog {
         }
     }
 
-    private data class UpdatedItem(val name: String, var amount: Int) {
+    private data class UpdatedItem(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
         var time = SimpleTimeMark.now()
 
-        fun updateAmount(change: Int) {
+        fun updateAmount(change: Long) {
             amount += change
             time = SimpleTimeMark.now()
         }
@@ -198,15 +212,16 @@ object ItemPickupLog {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    private fun renderList(prefix: String, amount: Int, name: String): Renderable {
+    private fun renderList(prefix: String, amount: Long, name: String, itemIcon: NEUInternalName?): Renderable {
         return if (config.showItemIcon) {
             Renderable.horizontalContainer(
                 buildList {
-                    add(Renderable.string("${prefix}${amount.addSeparators()}"))
-                    ItemNameResolver.getInternalNameOrNull(name)?.let {
-                        addItemStack(
-                            it,
-                        )
+                    val formattedAmount = if (config.shorten) amount.shortFormat() else amount.addSeparators()
+                    add(Renderable.string("${prefix}${formattedAmount}"))
+                    if (itemIcon != null) {
+                        addItemStack(itemIcon)
+                    } else {
+                        ItemNameResolver.getInternalNameOrNull(name)?.let { addItemStack(it) }
                     }
                     add(Renderable.string(name))
                 },
@@ -216,10 +231,14 @@ object ItemPickupLog {
         }
     }
 
+    private fun worldChangeCooldown(): Boolean {
+        return LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
+    }
+
     private fun updateDisplay() {
         if (!isEnabled()) return
 
-        display.clear()
+        val display = mutableListOf<Renderable>()
 
         itemsAddedToInventory.values.removeIf { it.isExpired() }
         itemsRemovedFromInventory.values.removeIf { it.isExpired() }
@@ -238,9 +257,9 @@ object ItemPickupLog {
                         val currentTotalValue = item.value.amount - it.amount
 
                         if (currentTotalValue > 0) {
-                            display.add(renderList("§a+", currentTotalValue, item.value.name))
+                            display.add(renderList("§a+", currentTotalValue, item.value.name, item.value.neuInternalName))
                         } else if (currentTotalValue < 0) {
-                            display.add(renderList("§c", currentTotalValue, item.value.name))
+                            display.add(renderList("§c", currentTotalValue, item.value.name, item.value.neuInternalName))
                         } else {
                             itemsAddedToInventory.remove(item.key)
                             itemsRemovedFromInventory.remove(item.key)
@@ -249,21 +268,33 @@ object ItemPickupLog {
                         iterator.remove()
                     }
                 } else {
-                    display.add(renderList("§a+", item.value.amount, item.value.name))
+                    display.add(renderList("§a+", item.value.amount, item.value.name, item.value.neuInternalName))
                 }
             }
         } else {
             for (item in addedItemsToNoLongerShow) {
 
-                display.add(renderList("§a+", item.value.amount, item.value.name))
+                display.add(renderList("§a+", item.value.amount, item.value.name, item.value.neuInternalName))
                 removedItemsToNoLongerShow[item.key]?.let {
-                    display.add(renderList("§c-", it.amount, it.name))
+                    display.add(renderList("§c-", it.amount, it.name, it.neuInternalName))
                     removedItemsToNoLongerShow.remove(item.key)
                 }
             }
         }
         for (item in removedItemsToNoLongerShow) {
-            display.add(renderList("§c-", item.value.amount, item.value.name))
+            display.add(renderList("§c-", item.value.amount, item.value.name, item.value.neuInternalName))
+        }
+        val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
+        this.display = object : Renderable {
+            override val width: Int = renderable.width
+            override val height: Int = renderable.height
+            override val horizontalAlign: RenderUtils.HorizontalAlignment = renderable.horizontalAlign
+            override val verticalAlign: RenderUtils.VerticalAlignment = renderable.verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                renderable.renderXYAligned(posX, posY, 0, 0)
+            }
+
         }
     }
 }
