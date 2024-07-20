@@ -48,6 +48,16 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
+    //these used to have .asInternalName() at the end
+    private val bannedItemsPattern by patternGroup.list(
+        "banneditems",
+        "SKYBLOCK_MENU",
+        "CANCEL_PARKOUR_ITEM",
+        "CANCEL_RACE_ITEM",
+    )
+
+    private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
@@ -153,20 +163,15 @@ object ItemPickupLog {
         )
     }
 
-    //TODO convert to repo patterns once that pr is merged
-    private val bannedItems = setOf(
-        "SKYBLOCK_MENU".asInternalName(),
-        "CANCEL_PARKOUR_ITEM".asInternalName(),
-        "CANCEL_RACE_ITEM".asInternalName(),
-    )
-
     private fun isBannedItem(item: ItemStack): Boolean {
         if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
             return true
         }
-        if (bannedItems.contains(item.getInternalNameOrNull())) {
+
+        if (bannedItemsConverted.contains(item.getInternalNameOrNull())) {
             return true
         }
+
         if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
             return true
         }
