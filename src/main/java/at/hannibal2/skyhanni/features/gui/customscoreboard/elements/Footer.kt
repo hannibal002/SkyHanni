@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Compan
 object Footer : ScoreboardElement() {
     override fun getDisplay() = listOf(
         displayConfig.titleAndFooter.customFooter
-            .replace("&", "§")
+            .replace("&&", "§")
             .split("\\n")
             .map { it align displayConfig.titleAndFooter.alignTitleAndFooter },
     ).flatten()

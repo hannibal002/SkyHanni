@@ -16,10 +16,10 @@ public class TitleAndFooterConfig {
 
     @Expose
     @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard." +
-        "\nUse & for colors." +
+        "\nUse && for colors." +
         "\nUse \"\\n\" for new line.")
     @ConfigEditorText
-    public String customTitle = "&6&lSKYBLOCK";
+    public String customTitle = "&&6&&lSKYBLOCK";
 
     @Expose
     @ConfigOption(name = "Use Custom Title", desc = "Use a custom title instead of the default Hypixel title.")
@@ -33,8 +33,8 @@ public class TitleAndFooterConfig {
 
     @Expose
     @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard." +
-        "\nUse & for colors." +
+        "\nUse && for colors." +
         "\nUse \"\\n\" for new line.")
     @ConfigEditorText
-    public String customFooter = "&ewww.hypixel.net";
+    public String customFooter = "&&ewww.hypixel.net";
 }

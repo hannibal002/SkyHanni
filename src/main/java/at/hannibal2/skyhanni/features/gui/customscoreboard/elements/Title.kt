@@ -21,7 +21,7 @@ object Title : ScoreboardElement() {
 
         return listOf(
             displayConfig.titleAndFooter.customTitle
-                .replace("&", "§")
+                .replace("&&", "§")
                 .split("\\n")
                 .map { it align alignment },
         ).flatten()
