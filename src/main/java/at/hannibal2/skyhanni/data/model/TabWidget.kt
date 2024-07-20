@@ -207,7 +207,7 @@ enum class TabWidget(
     ),
     DRAGON(
         // language=RegExp
-        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)])\\)",
+        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)]*)\\)",
     ),
     VOLCANO(
         // language=RegExp

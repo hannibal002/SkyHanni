@@ -75,23 +75,23 @@ class TextInput {
                 }
                 return
             }
-            val tcarriage = carriage
+            val carriage = carriage
 
             if (Keyboard.KEY_LEFT.isKeyClicked()) {
-                carriage = tcarriage?.moveCarriageLeft() ?: (textBox.length - 1)
+                this.carriage = carriage?.moveCarriageLeft() ?: (textBox.length - 1)
                 return
             }
             if (Keyboard.KEY_RIGHT.isKeyClicked()) {
-                carriage = when {
-                    tcarriage == null -> null
-                    (tcarriage >= textBox.length - 1) -> null
-                    else -> moveCarriageRight(tcarriage)
+                this.carriage = when {
+                    carriage == null -> null
+                    (carriage >= textBox.length - 1) -> null
+                    else -> moveCarriageRight(carriage)
                 }
                 return
             }
             if (Keyboard.KEY_DELETE.isKeyClicked()) { // Does not work for some reason
-                if (tcarriage != null) {
-                    textBox.removeRange(tcarriage, tcarriage + 1)
+                if (carriage != null) {
+                    textBox.removeRange(carriage, carriage + 1)
                 } else {
                     textBox.dropLast(1)
                 }
@@ -103,27 +103,27 @@ class TextInput {
             val char = Keyboard.getEventCharacter()
             textBox = when (char) {
                 Char(0) -> return
-                '\b' -> if (tcarriage != null) {
-                    if (tcarriage == 0) {
+                '\b' -> if (carriage != null) {
+                    if (carriage == 0) {
                         textBox.substring(1)
                     } else {
-                        carriage = tcarriage.minus(1)
-                        textBox.removeRange(tcarriage - 1, tcarriage)
+                        this.carriage = carriage.minus(1)
+                        textBox.removeRange(carriage - 1, carriage)
                     }
                 } else {
                     textBox.dropLast(1)
                 }
 
-                else -> if (tcarriage != null) {
-                    carriage = tcarriage + 1
-                    textBox.insert(tcarriage, char)
+                else -> if (carriage != null) {
+                    this.carriage = carriage + 1
+                    textBox.insert(carriage, char)
                 } else {
                     textBox + char
                 }
             }
         }
 
-        private fun moveCarriageRight(tcarriage: Int) = tcarriage + 1
+        private fun moveCarriageRight(carriage: Int) = carriage + 1
 
         private fun Int.moveCarriageLeft(): Int = when {
             this > 0 -> this - 1

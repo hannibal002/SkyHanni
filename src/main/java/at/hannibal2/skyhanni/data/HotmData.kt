@@ -409,9 +409,13 @@ enum class HotmData(
             "Heart of the Mountain",
         )
 
+        /**
+         * REGEX-TEST: §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
+         * REGEX-TEST: §7Level 1§8/50
+         */
         private val levelPattern by patternGroup.pattern(
             "perk.level",
-            "§(?<color>.)Level (?<level>\\d+).*",
+            "(?:§.)*§(?<color>.)Level (?<level>\\d+).*",
         )
 
         private val notUnlockedPattern by patternGroup.pattern(
@@ -426,7 +430,7 @@ enum class HotmData(
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
             "§c§lDISABLED|§7§eClick to select!",
-        ) // unused for now since the assumption is when enabled isn't found it is disabled,
+        ) // unused for now since the assumption is when enabled isn't found, it is disabled,
         // but the value might be useful in the future or for debugging
 
         val perkCostPattern by patternGroup.pattern(
@@ -647,13 +651,13 @@ enum class HotmData(
             if (!LorenzUtils.inSkyBlock) return
 
             event.scoreboard.matchFirst(ScoreboardPattern.powderPattern) {
-                val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
+                val type = HotmAPI.Powder.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
 
                 if (difference > 0) {
                     type.gain(difference)
-                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.lowName} Powder")
+                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.displayName} Powder")
                 }
             }
         }
@@ -741,7 +745,7 @@ enum class HotmData(
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 HotmAPI.Powder.entries.forEach {
-                    add("${it.lowName} Powder: ${it.getCurrent()}/${it.getTotal()}")
+                    add("${it.displayName} Powder: ${it.getCurrent()}/${it.getTotal()}")
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")

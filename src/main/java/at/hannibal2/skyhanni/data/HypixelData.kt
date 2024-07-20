@@ -86,7 +86,7 @@ object HypixelData {
         "solo.profile.amount",
         "^\\s*(?:§.)*Island\\s*$",
     )
-    private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+    private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
         "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
     )
@@ -201,7 +201,7 @@ object HypixelData {
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
-        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
+        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmountPattern) {
             return group("maxamount").toInt()
         }
 
@@ -394,7 +394,7 @@ object HypixelData {
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.getCurrentServerData().serverIP) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -453,7 +453,7 @@ object HypixelData {
             newIsland = getIslandType(foundIsland, guesting)
         }
 
-        // TODO dont send events when one of the arguments is none, at least when not on sb anymore
+        // TODO don't send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != newIsland) {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland

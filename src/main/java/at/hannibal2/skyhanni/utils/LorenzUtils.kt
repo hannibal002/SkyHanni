@@ -127,7 +127,7 @@ object LorenzUtils {
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
-    // TODO create extenstion function
+    // TODO create extension function
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
@@ -316,13 +316,8 @@ object LorenzUtils {
             this.cancel()
         }
     }
-
     // TODO move into mayor api
-    private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
-
-    // TODO move into mayor api
-    val isDerpy get() = recalculateDerpy.getValue()
+    val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
     // TODO move into mayor api
     fun Int.derpy() = if (isDerpy) this / 2 else this

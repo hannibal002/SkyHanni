@@ -49,7 +49,7 @@ object HoppityEggsShared {
 
     fun shareNearbyEggLocation(playerLocation: LorenzVec, meal: HoppityEggType, note: String) {
         if (!isEnabled()) return
-        val islandEggsLocations = HoppityEggLocations.islandLocations ?: return
+        val islandEggsLocations = HoppityEggLocations.islandLocations
         val closestEgg = islandEggsLocations.minByOrNull { it.distance(playerLocation) } ?: return
 
         val x = closestEgg.x.toInt()

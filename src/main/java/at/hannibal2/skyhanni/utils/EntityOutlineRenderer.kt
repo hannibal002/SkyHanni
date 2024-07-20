@@ -37,7 +37,7 @@ import java.lang.reflect.Method
 object EntityOutlineRenderer {
 
     private val entityRenderCache: CachedInfo = CachedInfo(null, null, null)
-    private var stopLookingForOptifine = false
+    private var stopLookingForOptiFine = false
     private var isMissingMixin = false
     private var isFastRender: Method? = null
     private var isShaders: Method? = null
@@ -56,13 +56,13 @@ object EntityOutlineRenderer {
      */
     private fun initSwapBuffer(): Framebuffer {
         val main = mc.framebuffer
-        val framebuffer = Framebuffer(main.framebufferTextureWidth, main.framebufferTextureHeight, true)
-        framebuffer.setFramebufferFilter(GL11.GL_NEAREST)
-        framebuffer.setFramebufferColor(0.0f, 0.0f, 0.0f, 0.0f)
-        return framebuffer
+        val frameBuffer = Framebuffer(main.framebufferTextureWidth, main.framebufferTextureHeight, true)
+        frameBuffer.setFramebufferFilter(GL11.GL_NEAREST)
+        frameBuffer.setFramebufferColor(0.0f, 0.0f, 0.0f, 0.0f)
+        return frameBuffer
     }
 
-    private fun updateFramebufferSize() {
+    private fun updateFrameBufferSize() {
         val width = mc.displayWidth
         val height = mc.displayHeight
         if (swapBuffer.framebufferWidth != width || swapBuffer.framebufferHeight != height) {
@@ -94,7 +94,7 @@ object EntityOutlineRenderer {
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
         val renderManager = mc.renderManager
         mc.theWorld.theProfiler.endStartSection("entityOutlines")
-        updateFramebufferSize()
+        updateFrameBufferSize()
 
         // Clear and bind the outline framebuffer
         renderGlobal.frameBuffer.framebufferClear()
@@ -216,7 +216,7 @@ object EntityOutlineRenderer {
     }
 
     /**
-     * Caches optifine settings and determines whether outlines should be rendered
+     * Caches OptiFine settings and determines whether outlines should be rendered
      *
      * @return `true` iff outlines should be rendered
      */
@@ -232,8 +232,8 @@ object EntityOutlineRenderer {
         val renderGlobal = mc.renderGlobal as CustomRenderGlobal
         if (renderGlobal.frameBuffer == null || renderGlobal.shader == null || mc.thePlayer == null) return false
 
-        // Optifine Conditions
-        if (!stopLookingForOptifine && isFastRender == null) {
+        // OptiFine Conditions
+        if (!stopLookingForOptiFine && isFastRender == null) {
             try {
                 val config = Class.forName("Config")
                 try {
@@ -241,12 +241,12 @@ object EntityOutlineRenderer {
                     isShaders = config.getMethod("isShaders")
                     isAntialiasing = config.getMethod("isAntialiasing")
                 } catch (ex: Exception) {
-                    logger.log("Couldn't find Optifine methods for entity outlines.")
-                    stopLookingForOptifine = true
+                    logger.log("Couldn't find OptiFine methods for entity outlines.")
+                    stopLookingForOptiFine = true
                 }
             } catch (ex: Exception) {
-                logger.log("Couldn't find Optifine for entity outlines.")
-                stopLookingForOptifine = true
+                logger.log("Couldn't find OptiFine for entity outlines.")
+                stopLookingForOptiFine = true
             }
         }
         var isFastRenderValue = false
@@ -258,9 +258,9 @@ object EntityOutlineRenderer {
                 isShadersValue = isShaders!!.invoke(null) as Boolean
                 isAntialiasingValue = isAntialiasing!!.invoke(null) as Boolean
             } catch (ex: IllegalAccessException) {
-                logger.log("An error occurred while calling Optifine methods for entity outlines... $ex")
+                logger.log("An error occurred while calling OptiFine methods for entity outlines... $ex")
             } catch (ex: InvocationTargetException) {
-                logger.log("An error occurred while calling Optifine methods for entity outlines... $ex")
+                logger.log("An error occurred while calling OptiFine methods for entity outlines... $ex")
             }
         }
         return !isFastRenderValue && !isShadersValue && !isAntialiasingValue
@@ -373,15 +373,15 @@ object EntityOutlineRenderer {
             val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
             xrayOutlineEvent.postAndCatch()
             // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
-            val noxrayOutlineEvent = RenderEntityOutlineEvent(
+            val noXrayOutlineEvent = RenderEntityOutlineEvent(
                 RenderEntityOutlineEvent.Type.NO_XRAY,
                 xrayOutlineEvent.entitiesToChooseFrom
             )
-            noxrayOutlineEvent.postAndCatch()
+            noXrayOutlineEvent.postAndCatch()
             // Cache the entities for future use
             entityRenderCache.xrayCache = xrayOutlineEvent.entitiesToOutline
-            entityRenderCache.noXrayCache = noxrayOutlineEvent.entitiesToOutline
-            entityRenderCache.noOutlineCache = noxrayOutlineEvent.entitiesToChooseFrom
+            entityRenderCache.noXrayCache = noXrayOutlineEvent.entitiesToOutline
+            entityRenderCache.noOutlineCache = noXrayOutlineEvent.entitiesToChooseFrom
             emptyLastTick = if (isCacheEmpty()) {
                 if (!emptyLastTick) {
                     renderGlobal.frameBuffer.framebufferClear()
