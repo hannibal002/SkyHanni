@@ -137,7 +137,6 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
     @ConfigEditorBoolean
-    @FeatureToggle
     public boolean crashOnDeath = false;
 
     // TODO move into scoreboard accordion
