@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
-import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -45,11 +44,7 @@ object FarmingContestAPI {
     private val contests = mutableMapOf<Long, FarmingContest>()
     private var internalContest = false
     val inContest
-        get() = internalContest && LorenzUtils.skyBlockIsland.isAnyOf(
-            IslandType.GARDEN,
-            IslandType.HUB,
-            IslandType.THE_FARMING_ISLANDS
-        )
+        get() = internalContest && IslandTypeTags.CONTESTS_SHOWN.inAny()
     var contestCrop: CropType? = null
     private var startTime = SimpleTimeMark.farPast()
     var inInventory = false
