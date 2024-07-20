@@ -91,31 +91,31 @@ object IslandTypeTags {
         IslandType.SPIDER_DEN,
     )
 
-    // Scoreboard
+    // Custom Scoreboard
     val SB_BITS_NOT_SHOWN = IslandTypeTag(
-        "scoreboard_bits_not_shown",
+        "custom_scoreboard_bits_not_shown",
         IslandType.CATACOMBS,
         IslandType.KUUDRA_ARENA,
     )
     val SB_GEMS_NOT_SHOWN = IslandTypeTag(
-        "scoreboard_gems_not_shown",
+        "custom_scoreboard_gems_not_shown",
         SB_BITS_NOT_SHOWN,
         IslandType.THE_RIFT,
     )
     val SB_MOTES_SHOWN = IslandTypeTag(
-        "scoreboard_motes_shown",
+        "custom_scoreboard_motes_shown",
         IslandType.THE_RIFT,
     )
     val SB_COINS_NOT_SHOWN = IslandTypeTag(
-        "scoreboard_coins_not_shown",
+        "custom_scoreboard_coins_not_shown",
         SB_MOTES_SHOWN
     )
     val SB_COPPER_SHOWN = IslandTypeTag(
-        "scoreboard_copper_shown",
+        "custom_scoreboard_copper_shown",
         IslandType.GARDEN,
     )
     val SB_PARTY_SHOWN = IslandTypeTag(
-        "scoreboard_party_shown",
+        "custom_scoreboard_party_shown",
         IslandType.DUNGEON_HUB,
         IslandType.KUUDRA_ARENA,
         IslandType.CRIMSON_ISLE,
