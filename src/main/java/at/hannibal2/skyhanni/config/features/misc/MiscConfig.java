@@ -134,6 +134,12 @@ public class MiscConfig {
     @FeatureToggle
     public boolean brewingStandOverlay = true;
 
+    @Expose
+    @ConfigOption(name = "Crash On Death", desc = "Crash every time you die in Skyblock")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean crashOnDeath = false;
+
     // TODO move into scoreboard accordion
     @Expose
     @ConfigOption(name = "Red Scoreboard Numbers", desc = "Hide the red scoreboard numbers on the right side of the screen.")
