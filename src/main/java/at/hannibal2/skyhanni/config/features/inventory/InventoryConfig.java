@@ -120,7 +120,8 @@ public class InventoryConfig {
         NEW_YEAR_CAKE,
         RANCHERS_BOOTS_SPEED,
         LARVA_HOOK,
-        VACUUM_GARDEN));
+        VACUUM_GARDEN
+    ));
 
     public enum ItemNumberEntry implements HasLegacyId {
         MASTER_STAR_TIER("§bMaster Star Tier", 0),
@@ -208,16 +209,14 @@ public class InventoryConfig {
 
     @Expose
     @ConfigOption(name = "Missing Tasks", desc = "Highlight missing tasks in the SkyBlock Level Guide inventory.")
-    // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide",
-    // "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
+    // TODO move( , "inventory.highlightMissingSkyBlockLevelGuide", "inventory.skyblockGuideConfig.highlightMissingSkyBlockLevelGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightMissingSkyBlockLevelGuide = true;
 
     @Expose
     @ConfigOption(name = "Power Stone Guide", desc = "Highlight missing power stones, show their total bazaar price, and allows to open the bazaar when clicking on the items in the Power Stone Guide.")
-    // TODO move( , "inventory.powerStoneGuide",
-    // "inventory.skyblockGuideConfig.powerStoneGuide")
+    // TODO move( , "inventory.powerStoneGuide", "inventory.skyblockGuideConfig.powerStoneGuide")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean powerStoneGuide = true;
