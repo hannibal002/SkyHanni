@@ -30,7 +30,7 @@ object MagicalPowerDisplay {
 
     private val accBagPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """^(Accessory Bag \(\d+/\d+\)|Auctions Browser)\$"""
+        """(Accessory Bag \(\d+/\d+\)|Auctions Browser)"""
     )
     private val accessoryLorePattern by RepoPattern.pattern(
         "accessory.lore",
@@ -43,6 +43,14 @@ object MagicalPowerDisplay {
         if (!accBagPattern.matches(InventoryUtils.openInventoryName().stripControlCodes())) return
         val item = event.stack
         val rarity = item.isSkyblockAccessory() ?: return
+        if (item.displayName.stripControlCodes() == "Hegemony Artifact") {
+            event.stackTip = "${if (colored) rarity else "§7"}${2* MPMap[rarity]!!}"
+            return
+        }
+        if (item.displayName.stripControlCodes() == "Rift Prism") {
+            event.stackTip = "${if (colored) rarity else "§7"}${11}"
+            return
+        }
         event.stackTip = "${if (colored) rarity else "§7"}${MPMap[rarity]}"
     }
 
