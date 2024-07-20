@@ -28,7 +28,7 @@ object MagicalPowerDisplay {
         AccessoryRarity.MYTHIC to 22
     )
 
-    private val accBagPattern by RepoPattern.pattern(
+    private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
         """(Accessory Bag \(\d+/\d+\)|Auctions Browser)"""
     )
@@ -40,18 +40,18 @@ object MagicalPowerDisplay {
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
-        if (!accBagPattern.matches(InventoryUtils.openInventoryName().stripControlCodes())) return
+        if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().stripControlCodes())) return
         val item = event.stack
         val rarity = item.isSkyblockAccessory() ?: return
-        if (item.displayName.stripControlCodes() == "Hegemony Artifact") {
-            event.stackTip = "${if (colored) rarity else "§7"}${2* MPMap[rarity]!!}"
-            return
+        val itemName = item.displayName.stripControlCodes()
+        var endMP = MPMap[rarity]!!
+        if (itemName == "Hegemony Artifact") {
+            endMP = 2 * MPMap[rarity]!!
         }
-        if (item.displayName.stripControlCodes() == "Rift Prism") {
-            event.stackTip = "${if (colored) rarity else "§7"}${11}"
-            return
+        if (itemName == "Rift Prism") {
+            endMP = 11
         }
-        event.stackTip = "${if (colored) rarity else "§7"}${MPMap[rarity]}"
+        event.stackTip = "${if (colored) rarity else "§7"}${endMP}"
     }
 
     private fun ItemStack.isSkyblockAccessory(): AccessoryRarity? {
