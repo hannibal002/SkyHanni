@@ -16,7 +16,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object CrashOnDeath {
     private val config get() = SkyHanniMod.feature.misc
 
-    //
     private val pattern by RepoPattern.pattern(
         "ownplayer.death.chat",
         "§c ☠ §r§7You (?<reason>.+)",
