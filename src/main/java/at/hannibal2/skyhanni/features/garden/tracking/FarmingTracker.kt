@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.PLATINU
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.SILVER_MEDAL
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType.EDITED_MESSAGE
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType.NEW_MESSAGE
+import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Pet
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Field
 import at.hannibal2.skyhanni.data.Footer
@@ -27,9 +28,11 @@ import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.WebhookUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -42,6 +45,7 @@ object FarmingTracker {
     val config get() = SkyHanniMod.feature.garden.tracking
 
     var lastNotification = SimpleTimeMark.farPast()
+    var farmingSince = SimpleTimeMark.farFuture()
     var playerFaceURL = ""
     var stats = mutableMapOf<String, Int>()
     var lastTablist = listOf<String>()
@@ -50,14 +54,13 @@ object FarmingTracker {
     var activeAnitaBuff = ""
     var currentCrop: Crop? = null
     var currentPlacement = 0.0
-    val farmingTrackerURL = "https://cdn.discordapp.com/attachments/1263194220630638714/1263216589898252359/FT.png?" +
-        "ex=66996da0&is=66981c20&hm=b50b1993a4aa9485b2b161b61830668451ffdb84002ee2a0d7886d8e6e7f5cc7&"
+    const val SKYHANNI_URL = "https://cdn.discordapp.com/attachments/1094190239532208228/1175194612550344784/bbfwfK0.png?" +
+        "ex=669cdd05&is=669b8b85&hm=f338a9e8536ab9679f91dd1322d2d3d11549c33fb702c2b08d14132a20d860ad&"
 
-
-    private val patternGroup = RepoPattern.group("garden.tracking")
-    private val webhookPattern by patternGroup.pattern(
+    private val patternGroup = RepoPattern.group("utils.webhook")
+    val webhookPattern by patternGroup.pattern(
         "webhook",
-        "https://discord\\.com/api/webhooks/(?<id>\\d+)/(?<token>\\S+)",
+        "https:\\/\\/discord\\.com\\/api\\/webhooks\\/\\d+\\/\\S+(?:\\?wait=true)?",
     )
 
     private val tablistStatsPattern by patternGroup.pattern(
@@ -75,9 +78,18 @@ object FarmingTracker {
         "^ (?<boost>[☘○]) (?<crop>.+) ◆ Top (?<placement>\\S+)%\$",
     )
 
+    /**
+     * REGEX-TEST:  Cookie Buff: 28h
+     * REGEX-TEST:  God Potion: 6m
+     */
     private val tablistEffectsPattern by patternGroup.pattern(
         "tablist.effects",
         "^ (?<type>Cookie Buff|God Potion): (?<duration>.+)\$",
+    )
+
+    private val tablistFooterGodPotionPattern by patternGroup.pattern(
+        "tablist.footer.godpotion",
+        "You have a God Potion active! (?<length>.+)",
     )
 
     @SubscribeEvent
@@ -88,49 +100,62 @@ object FarmingTracker {
         if (playerFaceURL.isBlank()) playerFaceURL = "https://api.mineatar.io/face/${LorenzUtils.getPlayerUuid()}?scale=12"
 
         val status = if (GardenAPI.isCurrentlyFarming()) "Farming" else "Idle"
+        farmingSince = if (status == "Farming") SimpleTimeMark.now() else SimpleTimeMark.farFuture()
 
-        val color = 16777045
-        val fields = config.information
-            .filter { it.isSelected() }
-            .mapNotNull { type ->
+        val color = toIntColor(config.color.toConfigColour())
 
-                val value = when (type) {
-                    InformationType.FARMING_FORTUNE -> stats["Farming Fortune"]
-                    InformationType.FARMING_WISDOM -> stats["Farming Wisdom"]
-                    InformationType.BONUS_PEST_CHANCE -> stats["Bonus Pest Chance"]
-                    InformationType.SPEED -> stats["Speed"]
-                    InformationType.STRENGTH -> stats["Strength"]
-                    InformationType.PET -> PetAPI.currentPet
-                    InformationType.COOKIE_BUFF -> cookieBuffTimer
-                    InformationType.GOD_POTION -> godPotionTimer
-                    InformationType.JACOBS_CONTEST -> if (FarmingContestAPI.inContest) "$currentPlacement% ${
-                        convertPlacement(
-                            currentPlacement,
-                        )?.emoji
-                    }" else ""
+        val fields = mutableListOf<Field>()
 
-                    InformationType.ACTIVE_CROP -> {
-                        currentCrop = GardenAPI.getCurrentlyFarmedCrop()?.niceName?.let { niceName ->
-                            Crop.entries.find { it.name.lowercase() == niceName }
-                        }
-                        currentCrop?.name + currentCrop?.emoji
-                    }
+        for (type in config.information) {
+            if (!type.isSelected()) continue
 
-                    InformationType.ANITA_BUFF -> activeAnitaBuff
-                    InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond
-                    else -> ""
-                }?.toString().takeIf { !it.isNullOrBlank() }
+            val value = when (type) {
+                InformationType.FARMING_FORTUNE -> stats["Farming Fortune"] ?: ""
+                InformationType.FARMING_WISDOM -> stats["Farming Wisdom"] ?: ""
+                InformationType.BONUS_PEST_CHANCE -> stats["Bonus Pest Chance"] ?: ""
+                InformationType.SPEED -> stats["Speed"] ?: ""
+                InformationType.STRENGTH -> stats["Strength"] ?: ""
+                InformationType.PET -> PetAPI.currentPet?.let { pet ->
+                    Pet.entries.find { it.toString() == pet.removeColor() }?.petName ?: ""
+                } ?: ""
 
-                val fieldName = if (type == InformationType.JACOBS_CONTEST) {
-                    GardenAPI.getCurrentlyFarmedCrop()?.niceName?.let { niceName ->
-                        Crop.entries.find { it.name.lowercase() == niceName }?.run { "$name Contest $emoji" }
-                    } ?: type.fieldName
-                } else {
-                    type.fieldName
+                InformationType.COOKIE_BUFF -> cookieBuffTimer.ifBlank { "<:no:1263210393723998278>" }
+                InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
+                InformationType.JACOBS_CONTEST -> {
+                    if (!FarmingContestAPI.inContest) ""
+                    else convertPlacement(currentPlacement)?.let { medal ->
+                        "$currentPlacement% ${medal.emoji}"
+                    } ?: ""
                 }
 
-                value?.let { Field(fieldName, it, true) }
-            }
+                InformationType.ACTIVE_CROP -> {
+                    GardenAPI.getCurrentlyFarmedCrop()?.let { farmedCrop ->
+                        getCropEnum(farmedCrop.cropName)?.let { cropEnum ->
+                            currentCrop = cropEnum
+                            cropEnum.name + cropEnum.emoji
+                        } ?: ""
+                    } ?: ""
+                }
+
+                InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
+                InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.round(2)
+                else -> ""
+            }.toString()
+
+            val fieldName =
+                if (type != InformationType.JACOBS_CONTEST) type.fieldName
+                else currentCrop?.let {
+                    "${it.name} Contest ${it.emoji}"
+                } ?: type.fieldName
+
+            if (value != "") fields.add(
+                Field(
+                    name = fieldName,
+                    value = value,
+                    inline = true,
+                ),
+            )
+        }
 
         val embed = Embed(
             title = "Status - $status",
@@ -143,13 +168,15 @@ object FarmingTracker {
 
         val embeds = listOf(embed)
 
+        val username = "[FARMING TRACKER] ${LorenzUtils.getPlayerName()}"
+
         when (config.messageType) {
             NEW_MESSAGE -> {
                 WebhookUtils.sendEmbedsToWebhook(
                     config.webhook.url,
                     embeds,
-                    "[FARMING TRACKER] ${LorenzUtils.getPlayerName()}",
-                    farmingTrackerURL,
+                    username,
+                    SKYHANNI_URL,
                 )
             }
 
@@ -157,8 +184,8 @@ object FarmingTracker {
                 WebhookUtils.editMessageEmbeds(
                     config.webhook.url,
                     embeds,
-                    "[FARMING TRACKER] ${LorenzUtils.getPlayerName()}",
-                    farmingTrackerURL,
+                    username,
+                    SKYHANNI_URL,
                 )
             }
 
@@ -166,8 +193,8 @@ object FarmingTracker {
                 WebhookUtils.sendEmbedsToWebhook(
                     config.webhook.url,
                     embeds,
-                    "[FARMING TRACKER] ${LorenzUtils.getPlayerName()}",
-                    farmingTrackerURL,
+                    username,
+                    SKYHANNI_URL,
                 )
             }
         }
@@ -191,8 +218,12 @@ object FarmingTracker {
         }
 
         widgetLines(TabWidget.JACOB_CONTEST).apply {
-            if (firstOrNull()?.contains("Starts In:") == true) {
-                matchAll(tablistUpcomingContestPattern) { activeAnitaBuff = group("crop") }
+            if (this[1].contains("Starts In:")) {
+                matchAll(tablistUpcomingContestPattern) {
+                    getCropEnum(group("crop"))?.let { cropEnum ->
+                        activeAnitaBuff = cropEnum.name + cropEnum.emoji
+                    }
+                }
             } else {
                 matchAll(tablistActiveContestPattern) {
                     currentPlacement = group("placement").toDouble()
@@ -202,11 +233,38 @@ object FarmingTracker {
         }
 
         widgetLines(TabWidget.ACTIVE_EFFECTS).matchAll(tablistEffectsPattern) {
+            println(group("type"))
+            println(group("duration"))
+            println(cookieBuffTimer to godPotionTimer)
             when (group("type")) {
                 "Cookie Buff" -> cookieBuffTimer = group("duration")
                 "God Potion" -> godPotionTimer = group("duration")
             }
         }
+
+        val footerLines = TabListData.getFooter().removeColor().lines()
+
+        val cookieBuffIndex = footerLines.indexOfFirst { it.contains("Cookie Buff") } + 1
+        if (cookieBuffIndex <= footerLines.lastIndex) cookieBuffTimer = footerLines[cookieBuffIndex]
+
+        if (footerLines.any { it.contains("No effects active.") }) {
+            godPotionTimer = "INACTIVE"
+        } else footerLines.matchAll(tablistFooterGodPotionPattern) {
+            godPotionTimer = group("length")
+        }
+    }
+
+    private fun getCropEnum(cropName: String): Crop? =
+        Crop.entries.find { it.name == cropName }
+
+    private fun toIntColor(configString: String): Int {
+        val parts = configString.split(':')
+
+        val red = parts[2].toInt()
+        val green = parts[3].toInt()
+        val blue = parts[4].toInt()
+
+        return (red shl 16) or (green shl 8) or blue
     }
 
     private fun convertPlacement(placement: Double): Medal? {

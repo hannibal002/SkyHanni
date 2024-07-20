@@ -2,22 +2,50 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Payload
+import at.hannibal2.skyhanni.features.garden.tracking.FarmingTracker.webhookPattern
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import com.google.gson.Gson
 
 object WebhookUtils {
 
-    var lastMessageID: Long? = 0L
+    private var lastMessageID: Long? = null
+
+    private fun checkIfWebhookValid(webhookUrl: String): MutableList<String>? {
+        return mutableListOf<String>().apply {
+            if (webhookUrl.isEmpty()) add("Missing webhook url.")
+            if (!webhookPattern.matches(webhookUrl)) add("Webhook url is invalid.")
+        }.takeIf { it.isNotEmpty() }
+    }
+
+    private fun checkForEmptyEmbeds(embeds: List<Embed>): Boolean =
+        if (embeds.any { embed ->
+                embed.fields.filter { it.value.isEmpty() }
+                    .also { emptyFields ->
+                        emptyFields.forEach { field ->
+                            LorenzDebug.log("Field ${field.name} has empty value ${field.value}")
+                        }
+                    }
+                    .isNotEmpty()
+            }) {
+            true
+        } else false
 
     fun postPayload(payload: Payload, url: String) =
         APIUtil.postJSON(url, Gson().toJson(payload)).data.asJsonObject
+
+    fun patchPayload(payload: Payload, url: String) =
+        APIUtil.patchJSON(url, Gson().toJson(payload)).data.asJsonObject
 
     fun sendMessageToWebhook(
         webhookUrl: String,
         message: String = "",
         username: String? = null,
         avatarUrl: String? = null,
+        wait: Boolean = true,
     ) {
-        if (webhookUrl.isEmpty()) return LorenzDebug.log("Missing webhook url.")
+        val finalUrl = if (wait) "$webhookUrl?wait=true" else webhookUrl
+
+        checkIfWebhookValid(finalUrl)?.forEach { LorenzDebug.log(it) }
         if (message.isEmpty()) return LorenzDebug.log("Missing message.")
 
         val messagePayload = Payload(
@@ -26,8 +54,10 @@ object WebhookUtils {
             avatar_url = avatarUrl,
         )
 
-        lastMessageID = postPayload(messagePayload, webhookUrl).get("id").asLong
-        return ChatUtils.debug("Message sent to webhook.")
+        val response = postPayload(messagePayload, finalUrl)
+        if (response.has("id")) lastMessageID = response.get("id").asLong
+
+        ChatUtils.debug("Message sent to webhook.")
     }
 
     fun sendEmbedsToWebhook(
@@ -35,9 +65,13 @@ object WebhookUtils {
         embeds: List<Embed>,
         username: String? = null,
         avatarUrl: String? = null,
+        wait: Boolean = true,
     ) {
-        if (webhookUrl.isEmpty()) return LorenzDebug.log("Missing webhook url.")
+        val finalUrl = if (wait) "$webhookUrl?wait=true" else webhookUrl
+
+        checkIfWebhookValid(finalUrl)?.forEach { LorenzDebug.log(it) }
         if (embeds.isEmpty()) return LorenzDebug.log("Missing embeds.")
+        if (checkForEmptyEmbeds(embeds)) return LorenzDebug.log("Some fields are empty.")
 
         val embedPayload = Payload(
             embeds = embeds,
@@ -45,8 +79,10 @@ object WebhookUtils {
             avatar_url = avatarUrl,
         )
 
-        lastMessageID = postPayload(embedPayload, webhookUrl).get("id").asLong
-        return ChatUtils.debug("Embeds sent to webhook.")
+        val response = postPayload(embedPayload, finalUrl)
+        lastMessageID = if (response.has("id")) response.get("id").asLong else null
+
+        ChatUtils.debug("Embeds sent to webhook.")
     }
 
     fun editMessageEmbeds(
@@ -54,22 +90,23 @@ object WebhookUtils {
         embeds: List<Embed>,
         username: String? = null,
         avatarUrl: String? = null,
+        wait: Boolean = true,
     ) {
-        if (webhookUrl.isEmpty()) return LorenzDebug.log("Missing webhook url.")
-        if (embeds.isEmpty()) return LorenzDebug.log("Missing message.")
+        var finalUrl = if (lastMessageID != null) "$webhookUrl/messages/$lastMessageID" else webhookUrl
+        if (wait) finalUrl += "?wait=true"
 
-        val messagePayload = Payload(
+        checkIfWebhookValid(finalUrl)?.forEach { LorenzDebug.log(it) }
+        if (embeds.isEmpty()) return LorenzDebug.log("Missing message.")
+        if (checkForEmptyEmbeds(embeds)) return LorenzDebug.log("Some fields are empty.")
+
+        val embedPayload = Payload(
             embeds = embeds,
             username = username,
             avatar_url = avatarUrl,
         )
 
-        lastMessageID = if (lastMessageID == null) {
-            postPayload(messagePayload, webhookUrl).get("id").asLong
-        } else {
-            postPayload(messagePayload, "$webhookUrl/messages/$lastMessageID").get("id").asLong
-        }
-
-        ChatUtils.debug("Embeds edited.")
+        val response = if (lastMessageID != null) patchPayload(embedPayload, finalUrl) else postPayload(embedPayload, finalUrl)
+        lastMessageID = if (response.has("id")) response.get("id").asLong else null
+        if (lastMessageID != null) ChatUtils.debug("Embeds edited.") else ChatUtils.debug("Embeds sent to webhook.")
     }
 }

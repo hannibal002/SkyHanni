@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
+import at.hannibal2.skyhanni.utils.LorenzColor;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -52,8 +53,8 @@ public class TrackingConfig {
         JACOBS_CONTEST("§eJacob's Contest", "Contest <:hoe:1263206591218585640>"),
         ACTIVE_CROP("§aCrop", "Crop <:hoe:1263206591218585640>"),
         ANITA_BUFF("§6Anita's Artifact", "Anita's Artifact <:anitas_artifact:1263212366330335376>"),
-        BPS("§eBlocks/Second", "BPS <:bps_sugar:1263285905083465729>")
-        ;
+        BPS("§eBlocks/Second", "BPS <:bps_sugar:1263285905083465729>"),
+        FARMING_SINCE("§fFarming Since", "Farming For uhr");
 
         public final String name;
         public final String fieldName;
@@ -70,14 +71,18 @@ public class TrackingConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Embed Colour", desc = "Which color the sidebar of the embed should be (Chroma displays as black).")
+    @ConfigEditorDropdown
+    public LorenzColor color = LorenzColor.YELLOW;
+
+    @Expose
     @ConfigOption(name = "Message Type", desc = "Shows which way the status will be sent.")
     @ConfigEditorDropdown
     public MessageType messageType = MessageType.NEW_MESSAGE;
 
     public enum MessageType {
         NEW_MESSAGE("New Message"),
-        EDITED_MESSAGE("Edited Message")
-        ;
+        EDITED_MESSAGE("Edited Message");
 
         private final String str;
 
@@ -106,15 +111,18 @@ public class TrackingConfig {
         SLUG("Slug <:slug:1263201140086931511>"),
         ;
 
-        public final String name;
+        public final String petName;
 
-        Pet(String name) {
-            this.name = name;
+        Pet(String petName) {
+            this.petName = petName;
         }
 
         @Override
         public String toString() {
-            return name;
+            String cleanName = name().replace("_", " ").toLowerCase();
+            cleanName = cleanName.substring(0, 1).toUpperCase() + cleanName.substring(1);
+            if (cleanName.equals("mooshroom cow")) cleanName = "Mooshroom Cow";
+            return cleanName;
         }
     }
 
@@ -128,7 +136,8 @@ public class TrackingConfig {
         MUSHROOM("Mushroom", "<:mushroom:1263207580268888096>"), //TODO NEW EMOJI
         CACTUS("Cactus", "<:cactus:1263207572962414724>"),
         COCOA_BEANS("Cocoa Beans", "<:cocoa_beans:1263207576330567795>"),
-        NETHER_WART("Nether Wart", "<:nether_wart:1263207581770579970>"),;
+        NETHER_WART("Nether Wart", "<:nether_wart:1263207581770579970>"),
+        ;
 
         public final String name;
         public final String emoji;
