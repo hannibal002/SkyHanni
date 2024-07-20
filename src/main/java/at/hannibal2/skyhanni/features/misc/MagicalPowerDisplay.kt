@@ -41,16 +41,19 @@ object MagicalPowerDisplay {
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().stripControlCodes())) return
+
         val item = event.stack
         val rarity = item.isSkyblockAccessory() ?: return
         val itemName = item.displayName.stripControlCodes()
+
         var endMP = MPMap[rarity]!!
         if (itemName == "Hegemony Artifact") {
-            endMP = 2 * MPMap[rarity]!!
+            endMP *= 2
         }
         if (itemName == "Rift Prism") {
             endMP = 11
         }
+
         event.stackTip = "${if (colored) rarity else "§7"}${endMP}"
     }
 
