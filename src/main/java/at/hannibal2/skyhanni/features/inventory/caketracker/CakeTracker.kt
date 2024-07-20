@@ -12,9 +12,9 @@ import at.hannibal2.skyhanni.features.inventory.caketracker.CakeTrackerConfig.Ca
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -28,13 +28,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CakeTracker {
-
-    /**
-     * TODO:
-     * - Check for Cake leaving inventory, if not `inCakeInventory`, remove from tracker
-     * - When items are placed into inventories, if `inCakeInventory`, do another inventory check
-     * - Fix drawDisplay() so that year grouping works for both Display Order Types
-     */
 
     private fun getCakeTrackerData() = ProfileStorageData.profileSpecific?.cakeTracker
     private val config get() = SkyHanniMod.feature.inventory.cakeTracker
@@ -140,7 +133,6 @@ object CakeTracker {
         if (inCakeBag || (inAuctionHouse && (unobtainedCakesDisplayed || searchingForCakes))) {
             tracker.renderDisplay(config.cakeTrackerPosition)
         }
-        if (inCakeInventory) checkInventoryCakes()
     }
 
     @SubscribeEvent
@@ -153,7 +145,7 @@ object CakeTracker {
                 }.onEach { cakeItem ->
                     cakeNamePattern.matchMatcher(cakeItem.stack.displayName) {
                         group("year").toInt().takeIf { it !in data.cakesOwned }?.let {
-                            cakeItem highlight LorenzColor.RED
+                            cakeItem highlight config.auctionHighlightColor.toChromaColor()
                         }
                     }
                 }.isNotEmpty()
@@ -165,6 +157,7 @@ object CakeTracker {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if(!isEnabled()) return
+        knownCakesInCurrentInventory.clear()
         val inventoryName = event.inventoryName
         if(cakeContainerPattern.matches(inventoryName)) {
             if(cakeBagPattern.matches(inventoryName)) inCakeBag = true
