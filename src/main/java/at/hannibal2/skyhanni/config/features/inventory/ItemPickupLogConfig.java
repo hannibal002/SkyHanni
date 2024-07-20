@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.mining.MiningNotifications;
+import at.hannibal2.skyhanni.features.inventory.ItemPickupLog;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -35,11 +35,6 @@ public class ItemPickupLogConfig {
     public boolean shorten = false;
 
     @Expose
-    @ConfigOption(name = "Show Item Icon", desc = "Show the item icon next to the item name.")
-    @ConfigEditorBoolean
-    public boolean showItemIcon = true;
-
-    @Expose
     @ConfigOption(name = "Sacks", desc = "Show items added and removed from stacks.")
     @ConfigEditorBoolean
     public boolean sack = false;
@@ -60,15 +55,13 @@ public class ItemPickupLogConfig {
     @Expose
     @ConfigOption(
         name = "Layout",
-        desc = "Drag text to change the layout used."
+        desc = "Drag text to change the layout. List will be rendered horizontally"
     )
-    @ConfigEditorDraggableList
-    public List<MiningNotifications.MiningNotificationList> notifications = new ArrayList<>(Arrays.asList(
-        MiningNotifications.MiningNotificationList.MINESHAFT_SPAWN,
-        MiningNotifications.MiningNotificationList.SCRAP,
-        MiningNotifications.MiningNotificationList.COLD,
-        MiningNotifications.MiningNotificationList.GOLDEN_GOBLIN,
-        MiningNotifications.MiningNotificationList.DIAMOND_GOBLIN
+    @ConfigEditorDraggableList(requireNonEmpty = true)
+    public List<ItemPickupLog.DisplayLayout> displayLayout = new ArrayList<>(Arrays.asList(
+        ItemPickupLog.DisplayLayout.CHANGE_AMOUNT,
+        ItemPickupLog.DisplayLayout.ICON,
+        ItemPickupLog.DisplayLayout.ITEM_NAME
     ));
 
     @Expose

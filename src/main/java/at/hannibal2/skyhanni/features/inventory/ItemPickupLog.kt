@@ -33,10 +33,18 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ItemPickupLog {
+
+    enum class DisplayLayout(private val display: String) {
+        ICON("§e✎"),
+        ITEM_NAME("§d[Cute] Skirtwearer's Cake Soul"),
+        CHANGE_AMOUNT("§a+256"),
+        ;
+
+        override fun toString() = display
+    }
+
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
-
     private val coinIcon = "COIN_TALISMAN".asInternalName()
-
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, UpdatedItem>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, UpdatedItem>()
@@ -48,15 +56,14 @@ object ItemPickupLog {
         "^(?<itemName>.+?)(?: x\\d+)?\$",
     )
 
-    //these used to have .asInternalName() at the end
     private val bannedItemsPattern by patternGroup.list(
         "banneditems",
         "SKYBLOCK_MENU",
         "CANCEL_PARKOUR_ITEM",
         "CANCEL_RACE_ITEM",
     )
-
     private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
+
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -216,23 +223,36 @@ object ItemPickupLog {
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     private fun renderList(prefix: String, amount: Long, name: String, itemIcon: NEUInternalName?): Renderable {
-        return if (config.showItemIcon) {
-            Renderable.horizontalContainer(
-                buildList {
-                    val formattedAmount = if (config.shorten) amount.shortFormat() else amount.addSeparators()
-                    add(Renderable.string("${prefix}${formattedAmount}"))
-                    if (itemIcon != null) {
-                        addItemStack(itemIcon)
-                    } else {
-                        ItemNameResolver.getInternalNameOrNull(name)?.let { addItemStack(it) }
+
+
+        return Renderable.horizontalContainer(
+            buildList {
+                for (item in config.displayLayout) {
+                    when (item) {
+                        DisplayLayout.ICON -> {
+                            if (itemIcon != null) {
+                                addItemStack(itemIcon)
+                            } else {
+                                ItemNameResolver.getInternalNameOrNull(name)?.let { addItemStack(it) }
+                            }
+                        }
+
+                        DisplayLayout.CHANGE_AMOUNT -> {
+                            val formattedAmount = if (config.shorten) amount.shortFormat() else amount.addSeparators()
+                            add(Renderable.string("${prefix}${formattedAmount}"))
+                        }
+
+                        DisplayLayout.ITEM_NAME -> {
+                            add(Renderable.string(name))
+                        }
+
+                        null -> {}
                     }
-                    add(Renderable.string(name))
-                },
-            )
-        } else {
-            Renderable.string("$prefix $amount $name")
-        }
+                }
+            },
+        )
     }
+
 
     private fun worldChangeCooldown(): Boolean {
         return LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
@@ -290,17 +310,5 @@ object ItemPickupLog {
         val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
 
         this.display = Renderable.fixedSizeBox(renderable, 30, 75)
-
-//         this.display = object : Renderable {
-//             override val width: Int = renderable.width
-//             override val height: Int = renderable.height
-//             override val horizontalAlign: RenderUtils.HorizontalAlignment = renderable.horizontalAlign
-//             override val verticalAlign: RenderUtils.VerticalAlignment = renderable.verticalAlign
-//
-//             override fun render(posX: Int, posY: Int) {
-//                 renderable.renderXYAligned(posX, posY, 0, 0)
-//             }
-//
-//         }
     }
 }
