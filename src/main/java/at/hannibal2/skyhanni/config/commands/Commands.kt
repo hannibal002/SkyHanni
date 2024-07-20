@@ -170,6 +170,7 @@ object Commands {
             DefaultConfigFeatures::onComplete,
         )
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
+        registerCommand("shcustomlines", "Opens the config list for modifying custom lines") { openCustomLines() }
     }
 
 
@@ -572,7 +573,6 @@ object Commands {
 
     private fun internalCommands() {
         registerCommand("shaction", "") { ChatClickActionManager.onCommand(it) }
-        registerCommand("shcustomlines", "Opens the config list for modifying custom lines") { openCustomLines() }
     }
 
     private fun shortenedCommands() {
