@@ -66,23 +66,23 @@ object ItemDisplayOverlayFeatures {
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
     private val masterSkullPattern by patternGroup.pattern(
         "masterskull",
-        "(.*)Master Skull - Tier ."
+        "(.*)Master Skull - Tier .",
     )
     private val gardenVacuumPatterm by patternGroup.pattern(
         "vacuum",
-        "§7Vacuum Bag: §6(?<amount>\\d*) Pests?"
+        "§7Vacuum Bag: §6(?<amount>\\d*) Pests?",
     )
     private val harvestPattern by patternGroup.pattern(
         "harvest",
-        "§7§7You may harvest §6(?<amount>.).*"
+        "§7§7You may harvest §6(?<amount>.).*",
     )
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
-        "Dungeon (?<level>.*) Potion"
+        "Dungeon (?<level>.*) Potion",
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
-        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to",
     )
 
     /**
@@ -91,7 +91,7 @@ object ItemDisplayOverlayFeatures {
      */
     private val skyblockLevelPattern by patternGroup.pattern(
         "skyblocklevel",
-        "§7Your SkyBlock Level: §8\\[(?<level>§.\\d+)§8]"
+        "§7Your SkyBlock Level: §8\\[(?<level>§.\\d+)§8]",
     )
 
     @SubscribeEvent
