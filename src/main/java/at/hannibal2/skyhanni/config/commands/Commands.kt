@@ -326,10 +326,6 @@ object Commands {
             "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!",
         ) { LimboTimeTracker.printStats() }
         registerCommand(
-            "shlimbo",
-            "Warps you to Limbo.",
-        ) { MiscFeatures.goToLimbo() }
-        registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden",
         ) { FarmingLaneCreator.commandLaneDetection() }
