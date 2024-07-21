@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.utils.APIUtil.SkinBodyPart;
 import at.hannibal2.skyhanni.utils.LorenzColor;
 import com.google.gson.annotations.Expose;
@@ -120,6 +121,7 @@ public class TrackingConfig {
     @Expose
     @ConfigOption(name = "Tracking", desc = "Send an embed with the options you selected above to your specified webhook.")
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean tracking = true;
 
     public enum Pet {
