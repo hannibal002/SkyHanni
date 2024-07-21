@@ -72,14 +72,14 @@ object HoppityEggDisplayManager {
 
     private fun updateDisplay(): List<Renderable> {
         if (!HoppityEggsManager.isActive()) return emptyList()
-        if (!HoppityEggsManager.config.showClaimedEggs) return emptyList()
-        if (ReminderUtils.isBusy() && !HoppityEggsManager.config.showWhileBusy) return emptyList()
+        if (!config.showClaimedEggs) return emptyList()
+        if (ReminderUtils.isBusy() && !config.showWhileBusy) return emptyList()
 
         val displayList =
             HoppityEggType.entries.map { "§7 - ${it.formattedName} ${it.timeUntil().format()}" }.toMutableList()
         displayList.add(0, "§bUnclaimed Eggs:")
 
-        if (HoppityEggsManager.config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
+        if (config.showCollectedLocationCount && LorenzUtils.inSkyBlock) {
             val totalEggs = HoppityEggLocations.islandLocations.size
             if (totalEggs > 0) {
                 val collectedEggs = HoppityEggLocations.islandCollectedLocations.size
@@ -89,12 +89,13 @@ object HoppityEggDisplayManager {
         }
         if (displayList.size == 1) return emptyList()
 
+        val container = Renderable.verticalContainer(displayList.map(Renderable::string))
         return listOf(
             if (config.warpUnclaimedEggs) Renderable.clickAndHover(
-                Renderable.verticalContainer(displayList.map(Renderable::string)),
-                tips = listOf("§eClick to ${"/warp ${HoppityEggsManager.config.warpDestination}".trim()}!"),
-                onClick = { HypixelCommands.warp(HoppityEggsManager.config.warpDestination) },
-            ) else Renderable.verticalContainer(displayList.map(Renderable::string))
+                container,
+                tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
+                onClick = { HypixelCommands.warp(config.warpDestination) },
+            ) else container
         )
     }
 
@@ -102,7 +103,7 @@ object HoppityEggDisplayManager {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!HoppityEggsManager.isActive()) return
-        HoppityEggsManager.config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
+        config.position.renderRenderables(display, posLabel = "Hoppity Eggs")
     }
 
     private fun formatEggsCollected(collectedEggs: Int): String =
