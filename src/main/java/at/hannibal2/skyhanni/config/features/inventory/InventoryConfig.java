@@ -142,6 +142,7 @@ public class InventoryConfig {
         DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
+        SKYBLOCK_LEVEL("§bSkyblock Level")
         ;
 
         private final String str;
