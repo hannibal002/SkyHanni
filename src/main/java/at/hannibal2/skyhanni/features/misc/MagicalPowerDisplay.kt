@@ -28,13 +28,29 @@ object MagicalPowerDisplay {
         AccessoryRarity.MYTHIC to 22
     )
 
+    /*
+    * REGEX-TEST: Accessory Bag
+    * REGEX-TEST: Accessory Bag (1/75)
+    * REGEX-TEST: Accessory Bag (909/394294)
+    * REGEX-TEST: Auctions Browser
+    * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """(Accessory Bag \(\d+/\d+\)|Auctions Browser)"""
+        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser)$"""
     )
+
+    /*
+    * REGEX-TEST: LEGENDARY ACCESSORY
+    * REGEX-TEST: a UNCOMMON ACCESSORY a
+    * REGEX-TEST: a RARE ACCESSORY a
+    * REGEX-TEST: RARE DUNGEON ACCESSORY
+    * REGEX-TEST: RARE ACCESSORY
+    * REGEX-TEST: COMMON ACCESSORY
+    * REGEX-TEST: a EPIC DUNGEON ACCESSORY a
+    * */
     private val accessoryLorePattern by RepoPattern.pattern(
         "accessory.lore",
-        """a?\s*(COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC)\s*(DUNGEON\s*)?ACCESSORY\s*a?"""
+        """^a?\s*(COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC)\s*(?:DUNGEON\s*)?ACCESSORY\s*a?$"""
     )
 
     @SubscribeEvent
