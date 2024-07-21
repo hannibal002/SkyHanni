@@ -22,15 +22,12 @@ object RegexUtils {
     }
 
     @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
-    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        pattern.firstMatcher(this, consumer)
+    inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.firstMatcher(this, consumer)
 
-    inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? =
-        firstMatcher(list.asSequence(), consumer)
+    inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
 
     @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer() }"))
-    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        pattern.matchAll(this, consumer)
+    inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.matchAll(this, consumer)
 
     inline fun <T> Pattern.matchAll(list: List<String>, consumer: Matcher.() -> T): T? {
         for (line in list) {
@@ -50,6 +47,7 @@ object RegexUtils {
 
     fun List<Pattern>.allMatches(list: List<String>): List<String> = list.filter { line -> any { it.matches(line) } }
     fun List<Pattern>.anyMatches(list: List<String>?): Boolean = list?.any { line -> any { it.matches(line) } } ?: false
+    fun List<Pattern>.anyMatches(string: String): Boolean = any { it.matches(string) }
 
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
