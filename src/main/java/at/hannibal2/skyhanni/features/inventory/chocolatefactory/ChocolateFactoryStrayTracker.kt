@@ -264,11 +264,6 @@ object ChocolateFactoryStrayTracker {
                         t.goldenTypesCaught["dorado"] = t.goldenTypesCaught["dorado"]?.plus(1) ?: 4
                     }
                 }
-
-                //Asynchronously update to immediately reflect caught stray
-                if (isEnabled()) {
-                    tracker.renderDisplay(config.strayRabbitTrackerPosition)
-                }
             }
         }
         InventoryUtils.getItemsInOpenChest().filter {
