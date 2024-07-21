@@ -5,9 +5,10 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -23,7 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class SlayerQuestWarning {
+@SkyHanniModule
+object SlayerQuestWarning {
 
     private val config get() = SkyHanniMod.feature.slayer
 
@@ -40,9 +42,9 @@ class SlayerQuestWarning {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        val slayerType = event.newList.nextAfter("Slayer Quest")
-        val slayerProgress = event.newList.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        val slayerType = event.scoreboard.nextAfter("Slayer Quest")
+        val slayerProgress = event.scoreboard.nextAfter("Slayer Quest", skip = 2) ?: "no slayer"
         val new = slayerProgress.removeColor()
         val slayerData = getSlayerData()
 
@@ -59,20 +61,21 @@ class SlayerQuestWarning {
 
     private fun getSlayerData() = if (RiftAPI.inRift()) outsideRiftData else insideRiftData
 
+    private fun String.inCombat() = contains("Combat") || contains("Kills")
+    private fun String.inBoss() = this == "Slay the boss!"
+    private fun String?.bossSlain() = this == "Boss slain!"
+    private fun String.noSlayer() = this == "no slayer"
+
     private fun change(old: String, new: String) {
-        if (new.contains("Combat")) {
-            if (!old.contains("Combat")) {
-                needSlayerQuest = false
-            }
+        if (!old.inCombat() && new.inCombat()) {
+            needSlayerQuest = false
         }
-        if (new == "no slayer") {
-            if (old == "Slay the boss!") {
-                needNewQuest("The old slayer quest has failed!")
-            }
+        if (old.inBoss() && new.noSlayer()) {
+            needNewQuest("The old slayer quest has failed!")
         }
-        if (new == "Boss slain!") {
+        if (new.bossSlain()) {
             DelayedRun.runDelayed(2.seconds) {
-                if (getSlayerData().currentSlayerState == "Boss slain!") {
+                if (getSlayerData().currentSlayerState.bossSlain()) {
                     needNewQuest("You have no Auto-Slayer active!")
                 }
             }
@@ -100,7 +103,7 @@ class SlayerQuestWarning {
         if (DianaAPI.isDoingDiana()) return
         // prevent warnings when mobs are hit by other players
         if (lastWeaponUse.passedSince() > 500.milliseconds) return
-      
+
         lastWarning = SimpleTimeMark.now()
         ChatUtils.chat(chatMessage)
 
@@ -122,7 +125,7 @@ class SlayerQuestWarning {
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
         val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
 
-        val activeSlayer = SlayerAPI.getActiveSlayer()
+        val activeSlayer = SlayerAPI.activeSlayer
 
         if (activeSlayer != null) {
             if (slayerType != activeSlayer) {
@@ -131,7 +134,7 @@ class SlayerQuestWarning {
                 SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
-                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
+                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!",
                 )
             }
         }

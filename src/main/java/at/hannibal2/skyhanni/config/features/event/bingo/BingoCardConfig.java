@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class BingoCardConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Displays the Bingo Card.")
+    @ConfigOption(name = "Enable", desc = "Display the Bingo Card.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -35,7 +35,7 @@ public class BingoCardConfig {
     @ConfigOption(
         name = "Show Guide",
         desc = "Show tips and difficulty for bingo goals inside the Bingo Card inventory.\n" +
-            "These tips are made from inspirations and guides from the community,\n" +
+            "These tips are made from inspirations and guides from the community, " +
             "aiming to help you to complete the bingo card."
     )
     @ConfigEditorBoolean

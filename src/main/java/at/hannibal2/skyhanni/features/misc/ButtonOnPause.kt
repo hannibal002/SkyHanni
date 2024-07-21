@@ -3,13 +3,15 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.gui.GuiButton
 import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ButtonOnPause {
+@SkyHanniModule
+object ButtonOnPause {
 
     private val config get() = SkyHanniMod.feature.gui
     private val buttonId = System.nanoTime().toInt()

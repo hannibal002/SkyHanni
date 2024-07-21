@@ -81,7 +81,7 @@ enum class LorenzColor(val chatColorCode: Char, private val color: Color, privat
 
         fun EnumDyeColor.toLorenzColor() = when (this) {
             EnumDyeColor.WHITE -> WHITE
-            EnumDyeColor.MAGENTA -> AQUA
+            EnumDyeColor.MAGENTA -> LIGHT_PURPLE
             EnumDyeColor.PINK -> LIGHT_PURPLE
             EnumDyeColor.RED -> RED
             EnumDyeColor.SILVER -> GRAY

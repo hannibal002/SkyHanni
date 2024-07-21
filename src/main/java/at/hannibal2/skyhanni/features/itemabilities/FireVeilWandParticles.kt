@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -20,7 +21,8 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class FireVeilWandParticles {
+@SkyHanniModule
+object FireVeilWandParticles {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities.fireVeilWands
     private val item by lazy { "FIRE_VEIL_WAND".asInternalName() }
@@ -33,7 +35,7 @@ class FireVeilWandParticles {
         if (config.display == DisplayEntry.PARTICLES) return
         if (lastClick.passedSince() > 5.5.seconds) return
         if (event.type == EnumParticleTypes.FLAME && event.speed == 0.55f) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

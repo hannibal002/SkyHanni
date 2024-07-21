@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay.getAbilityFortune
 import at.hannibal2.skyhanni.features.garden.GardenAPI.getCropType
 import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -19,15 +20,17 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 
-class ToolTooltipTweaks {
+@SkyHanniModule
+object ToolTooltipTweaks {
 
     private val config get() = GardenAPI.config.tooltipTweak
+
     private val tooltipFortunePattern =
         "^§5§o§7Farming Fortune: §a\\+([\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(\\d+)\\))?$".toRegex()
     private val counterStartLine = setOf("§5§o§6Logarithmic Counter", "§5§o§6Collection Analysis")
     private val reforgeEndLine = setOf("§5§o", "§5§o§7chance for multiple crops.")
-    private val abilityDescriptionStart = "§5§o§7These boots gain §a+2❈ Defense"
-    private val abilityDescriptionEnd = "§5§o§7Skill level."
+    private const val ABILITY_DESCRIPTION_START = "§5§o§7These boots gain §a+2❈ Defense"
+    private const val ABILITY_DESCRIPTION_END = "§5§o§7Skill level."
 
     private val statFormatter = DecimalFormat("0.##")
 
@@ -132,12 +135,12 @@ class ToolTooltipTweaks {
                         iterator.remove()
                     }
 
-                    if (line == abilityDescriptionStart) {
+                    if (line == ABILITY_DESCRIPTION_START) {
                         removingAbilityDescription = true
                     }
                     if (removingAbilityDescription) {
                         iterator.remove()
-                        if (line == abilityDescriptionEnd) {
+                        if (line == ABILITY_DESCRIPTION_END) {
                             removingAbilityDescription = false
                         }
                     }

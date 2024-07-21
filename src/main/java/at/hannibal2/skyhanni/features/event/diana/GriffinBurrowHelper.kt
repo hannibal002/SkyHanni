@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.BlockUtils.isInLoadedChunk
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -43,6 +44,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
@@ -378,8 +380,8 @@ object GriffinBurrowHelper {
 
         val text = "§bWarp to " + warp.displayName
         val keybindSuffix = if (config.keyBindWarp != Keyboard.KEY_NONE) {
-            val keyname = KeyboardManager.getKeyName(config.keyBindWarp)
-            " §7(§ePress $keyname§7)"
+            val keyName = KeyboardManager.getKeyName(config.keyBindWarp)
+            " §7(§ePress $keyName§7)"
         } else ""
         if (lastTitleSentTime.passedSince() > 2.seconds) {
             lastTitleSentTime = SimpleTimeMark.now()
