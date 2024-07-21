@@ -21,15 +21,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
 
-    private val MPMap = mapOf(
-        LorenzRarity.COMMON to 3, LorenzRarity.SPECIAL to 3,
-        LorenzRarity.UNCOMMON to 5, LorenzRarity.VERY_SPECIAL to 5,
-        LorenzRarity.RARE to 8,
-        LorenzRarity.EPIC to 12,
-        LorenzRarity.LEGENDARY to 16,
-        LorenzRarity.MYTHIC to 22
-    )
-
     /*
     * REGEX-TEST: Accessory Bag
     * REGEX-TEST: Accessory Bag (1/75)
@@ -51,6 +42,18 @@ object MagicalPowerDisplay {
         """a?\s*(COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC)\s*(?:DUNGEON\s*)?ACCESSORY\s*a?"""
     )
 
+    fun LorenzRarity.toMP(): Int? {
+        return when (this) {
+            LorenzRarity.COMMON, LorenzRarity.SPECIAL -> 3
+            LorenzRarity.UNCOMMON, LorenzRarity.VERY_SPECIAL -> 5
+            LorenzRarity.RARE -> 8
+            LorenzRarity.EPIC -> 12
+            LorenzRarity.LEGENDARY -> 16
+            LorenzRarity.MYTHIC -> 22
+            else -> null
+        }
+    }
+
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
@@ -60,7 +63,7 @@ object MagicalPowerDisplay {
         val rarity = item.isAccessory() ?: return
         val itemID = item.getInternalNameOrNull() ?: return
 
-        var endMP = MPMap[rarity] ?: run {
+        var endMP = rarity.toMP() ?: run {
             ErrorManager.skyHanniError(
                 "Unknown rarity '$rarity' for item '${item.displayName}§7'"
             )
