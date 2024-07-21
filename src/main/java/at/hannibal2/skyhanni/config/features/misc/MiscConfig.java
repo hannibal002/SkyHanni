@@ -284,8 +284,5 @@ public class MiscConfig {
     @FeatureToggle
     public boolean maintainGameVolume = false;
 
-    @Expose
-    @ConfigOption(name = "Magical Power Display", desc = "")
-    @Accordion
-    public MPDisplayConfig mpDisplay = new MPDisplayConfig();
+
 }

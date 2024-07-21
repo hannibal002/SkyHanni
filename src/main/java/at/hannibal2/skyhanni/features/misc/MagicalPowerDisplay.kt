@@ -15,9 +15,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MagicalPowerDisplay {
-    private val config get() = SkyHanniMod.feature.misc.mpDisplay.enabled
-    private val colored get() = SkyHanniMod.feature.misc.mpDisplay.colored
-    private fun isEnabled() = config && LorenzUtils.inSkyBlock
+    private val config get() = SkyHanniMod.feature.inventory.magicalPower
+    private val colored get() = config.colored
+    private fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
 
     private val MPMap = mapOf(
         AccessoryRarity.COMMON to 3, AccessoryRarity.SPECIAL to 3,
