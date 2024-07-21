@@ -42,18 +42,6 @@ object MagicalPowerDisplay {
         """a?\s*(COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC)\s*(?:DUNGEON\s*)?ACCESSORY\s*a?"""
     )
 
-    fun LorenzRarity.toMP(): Int? {
-        return when (this) {
-            LorenzRarity.COMMON, LorenzRarity.SPECIAL -> 3
-            LorenzRarity.UNCOMMON, LorenzRarity.VERY_SPECIAL -> 5
-            LorenzRarity.RARE -> 8
-            LorenzRarity.EPIC -> 12
-            LorenzRarity.LEGENDARY -> 16
-            LorenzRarity.MYTHIC -> 22
-            else -> null
-        }
-    }
-
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
@@ -73,6 +61,18 @@ object MagicalPowerDisplay {
         if (itemID == "RIFT_PRISM".asInternalName())
             endMP = 11
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}${endMP}"
+    }
+
+    private fun LorenzRarity.toMP(): Int? {
+        return when (this) {
+            LorenzRarity.COMMON, LorenzRarity.SPECIAL -> 3
+            LorenzRarity.UNCOMMON, LorenzRarity.VERY_SPECIAL -> 5
+            LorenzRarity.RARE -> 8
+            LorenzRarity.EPIC -> 12
+            LorenzRarity.LEGENDARY -> 16
+            LorenzRarity.MYTHIC -> 22
+            else -> null
+        }
     }
 
     private fun ItemStack.isAccessory(): LorenzRarity? {
