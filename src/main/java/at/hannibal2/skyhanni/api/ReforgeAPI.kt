@@ -83,13 +83,14 @@ object ReforgeAPI {
             ReforgeType.BOW -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
             ReforgeType.ARMOR -> setOf(
                 ItemCategory.HELMET,
+                ItemCategory.CARNIVAL_MASK,
                 ItemCategory.CHESTPLATE,
                 ItemCategory.LEGGINGS,
                 ItemCategory.BOOTS,
             ).contains(itemCategory)
 
             ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
-            ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
+            ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET || itemCategory == ItemCategory.CARNIVAL_MASK
             ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
             ReforgeType.AXE -> itemCategory == ItemCategory.AXE
             ReforgeType.HOE -> itemCategory == ItemCategory.HOE
