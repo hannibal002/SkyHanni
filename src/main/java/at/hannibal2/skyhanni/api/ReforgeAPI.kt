@@ -90,7 +90,7 @@ object ReforgeAPI {
             ).contains(itemCategory)
 
             ReforgeType.CHESTPLATE -> itemCategory == ItemCategory.CHESTPLATE
-            ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET || itemCategory == ItemCategory.CARNIVAL_MASK
+            ReforgeType.HELMET -> itemCategory == ItemCategory.HELMET
             ReforgeType.CLOAK -> itemCategory == ItemCategory.CLOAK
             ReforgeType.AXE -> itemCategory == ItemCategory.AXE
             ReforgeType.HOE -> itemCategory == ItemCategory.HOE
