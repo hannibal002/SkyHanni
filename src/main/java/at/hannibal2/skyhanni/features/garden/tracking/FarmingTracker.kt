@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -54,25 +55,32 @@ object FarmingTracker {
     var activeAnitaBuff = ""
     var currentCrop: Crop? = null
     var currentPlacement = 0.0
-    const val SKYHANNI_URL = "https://cdn.discordapp.com/attachments/1094190239532208228/1175194612550344784/bbfwfK0.png?" +
-        "ex=669cdd05&is=669b8b85&hm=f338a9e8536ab9679f91dd1322d2d3d11549c33fb702c2b08d14132a20d860ad&"
+    const val SKYHANNI_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png"
 
-    private val patternGroup = RepoPattern.group("utils.webhook")
-    val webhookPattern by patternGroup.pattern(
-        "webhook",
-        "https:\\/\\/discord\\.com\\/api\\/webhooks\\/\\d+\\/\\S+(?:\\?wait=true)?",
-    )
+    private val patternGroup = RepoPattern.group("garden.tracking")
 
+    /**
+     * REGEX-TEST:  Speed: ✦328
+     * REGEX-TEST:  Farming Fortune: ☘135
+     */
     private val tablistStatsPattern by patternGroup.pattern(
         "tablist.stats",
         "^ (?<stat>[^:]+): .?(?<amount>\\d+)\$",
     )
 
+    /**
+     * REGEX-TEST:  ☘ Cocoa Beans
+     * REGEX-TEST:  ☘ Mushroom
+     */
     private val tablistUpcomingContestPattern by patternGroup.pattern(
         "tablist.contest.upcoming",
         "^ ☘ (?<crop>.+)\$",
     )
 
+    /**
+     * REGEX-TEST:  ☘ Wheat ◆ Top 0.2%
+     * REGEX-TEST:  ○ Wheat ◆ Top 0.2%
+     */
     private val tablistActiveContestPattern by patternGroup.pattern(
         "tablist.contest.active",
         "^ (?<boost>[☘○]) (?<crop>.+) ◆ Top (?<placement>\\S+)%\$",
@@ -87,6 +95,9 @@ object FarmingTracker {
         "^ (?<type>Cookie Buff|God Potion): (?<duration>.+)\$",
     )
 
+    /**
+     * REGEX-TEST: You have a God Potion active! 32 Minutes
+     */
     private val tablistFooterGodPotionPattern by patternGroup.pattern(
         "tablist.footer.godpotion",
         "You have a God Potion active! (?<length>.+)",
@@ -247,7 +258,12 @@ object FarmingTracker {
         val cookieBuffIndex = footerLines.indexOfFirst { it.contains("Cookie Buff") } + 1
         if (cookieBuffIndex <= footerLines.lastIndex) cookieBuffTimer = footerLines[cookieBuffIndex]
 
-        if (footerLines.any { it.contains("No effects active.") }) {
+        if (
+            footerLines.any {
+                it.contains("No effects active.")
+            } ||
+            footerLines.none { tablistFooterGodPotionPattern.matches(it) }
+        ) {
             godPotionTimer = "INACTIVE"
         } else footerLines.matchAll(tablistFooterGodPotionPattern) {
             godPotionTimer = group("length")

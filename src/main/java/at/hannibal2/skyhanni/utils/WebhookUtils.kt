@@ -2,13 +2,28 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.Embed
 import at.hannibal2.skyhanni.data.Payload
-import at.hannibal2.skyhanni.features.garden.tracking.FarmingTracker.webhookPattern
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 
+@SkyHanniModule
 object WebhookUtils {
 
     private var lastMessageID: Long? = null
+
+    private val patternGroup = RepoPattern.group("utils.webhook")
+
+    /**
+     * REGEX-TEST: https://discord.com/api/webhooks/1263107706752073801/EIjM9xNoZJmZ3zn4QcIIpGTlrg6xDH8BgHxYRyjR5VbFv8_6ql1UEijyBs7SDFlv8SCB
+     * REGEX-TEST: https://discord.com/api/webhooks/1263107706752073801/EIjM9xNoZJmZ3zn4QcIIpGTlrg6xDH8BgHxYRyjR5VbFv8_6ql1UEijyBs7SDFlv8SCB?wait=true
+     * REGEX-TEST: https://discord.com/api/webhooks/1263107706752073801/EIjM9xNoZJmZ3zn4QcIIpGTlrg6xDH8BgHxYRyjR5VbFv8_6ql1UEijyBs7SDFlv8SCB/messages/1264323904462389385
+     * REGEX-TEST: https://discord.com/api/webhooks/1263107706752073801/EIjM9xNoZJmZ3zn4QcIIpGTlrg6xDH8BgHxYRyjR5VbFv8_6ql1UEijyBs7SDFlv8SCB/messages/1264323904462389385?wait=true
+     */
+    private val webhookPattern by patternGroup.pattern(
+        "webhook",
+        "^https:\\/\\/discord\\.com\\/api\\/webhooks\\/\\d+\\/[^\\/?\\s]+(?:\\/messages\\/\\d+)?(?:\\?wait=true)?\$",
+    )
 
     private fun checkIfWebhookValid(webhookUrl: String): MutableList<String>? {
         return mutableListOf<String>().apply {
