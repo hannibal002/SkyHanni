@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.utils.CollectionUtils.addNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
-import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 // scoreboard
 // scoreboard update event
@@ -16,8 +16,10 @@ object Objective : ScoreboardElement() {
         add(objective)
         addNotNull(ScoreboardData.sidebarLinesFormatted.nextAfter(objective))
 
-        if (ScoreboardPattern.thirdObjectiveLinePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)) {
-            addNotNull(ScoreboardData.sidebarLinesFormatted.nextAfter(objective, 2))
+        var index = 2
+        while (ScoreboardPattern.thirdObjectiveLinePattern.matches(ScoreboardData.sidebarLinesFormatted.nextAfter(objective, index))) {
+            addNotNull(ScoreboardData.sidebarLinesFormatted.nextAfter(objective, index))
+            index++
         }
     }
 
