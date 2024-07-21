@@ -66,6 +66,7 @@ internal enum class FFInfos(
             FarmingItems.ELEPHANT -> 150
             FarmingItems.MOOSHROOM_COW -> 158
             FarmingItems.BEE -> 30
+            FarmingItems.SLUG -> 100
             else -> 0
         }
     }),
