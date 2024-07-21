@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
@@ -29,6 +30,19 @@ object APIUtil {
     private var showApiErrors = false
 
     data class ApiResponse(val success: Boolean, val message: String?, val data: JsonObject)
+
+    enum class SkinBodyPart(val path: String) {
+        FRONT("body/front"),
+        LEFT("body/left"),
+        BACK("body/back"),
+        RIGHT("body/right"),
+        FACE("face"),
+        HEAD("head");
+
+        override fun toString(): String {
+            return "§9${name.lowercase().firstLetterUppercase()}"
+        }
+    }
 
     private val builder: HttpClientBuilder =
         HttpClients.custom().setUserAgent("SkyHanni/${SkyHanniMod.version}")
@@ -221,6 +235,9 @@ object APIUtil {
             client.close()
         }
     }
+
+    fun getPlayerSkin(part: SkinBodyPart, scale: Int) =
+        "https://api.mineatar.io/${part.path}/${LorenzUtils.getPlayerUuid()}?scale=$scale"
 
     fun readFile(file: File): BufferedReader {
         return BufferedReader(InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8))

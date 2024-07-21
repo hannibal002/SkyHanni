@@ -2,13 +2,7 @@ package at.hannibal2.skyhanni.features.garden.tracking
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Crop
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.InformationType
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.BRONZE_MEDAL
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.DIAMOND_MEDAL
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.GOLD_MEDAL
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.PLATINUM_MEDAL
-import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Medal.SILVER_MEDAL
+import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.EmbedConfig.InformationType
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType.EDITED_MESSAGE
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.MessageType.NEW_MESSAGE
 import at.hannibal2.skyhanni.config.features.garden.TrackingConfig.Pet
@@ -22,18 +16,26 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.Thumbnail
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.contest.ContestBracket
+import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.BRONZE
+import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.DIAMOND
+import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.GOLD
+import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.PLATINUM
+import at.hannibal2.skyhanni.features.garden.contest.ContestBracket.SILVER
 import at.hannibal2.skyhanni.features.garden.contest.FarmingContestAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.APIUtil.getPlayerSkin
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.WebhookUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -55,7 +57,6 @@ object FarmingTracker {
     var activeAnitaBuff = ""
     var currentCrop: Crop? = null
     var currentPlacement = 0.0
-    const val SKYHANNI_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png"
 
     private val patternGroup = RepoPattern.group("garden.tracking")
 
@@ -108,16 +109,17 @@ object FarmingTracker {
         if (!isEnabled()) return
         if (lastNotification.passedSince() < config.webhook.interval.minutes) return
 
-        if (playerFaceURL.isBlank()) playerFaceURL = "https://api.mineatar.io/face/${LorenzUtils.getPlayerUuid()}?scale=12"
+        if (playerFaceURL.isBlank()) playerFaceURL = getPlayerSkin(config.embed.bodyPart, 12)
 
         val status = if (GardenAPI.isCurrentlyFarming()) "Farming" else "Idle"
-        farmingSince = if (status == "Farming") SimpleTimeMark.now() else SimpleTimeMark.farFuture()
+        if (status == "Idle") farmingSince = SimpleTimeMark.farFuture()
+        else if (farmingSince.isInFuture()) farmingSince = SimpleTimeMark.now()
 
-        val color = toIntColor(config.color.toConfigColour())
+        val color = toIntColor(config.embed.color.toConfigColour())
 
         val fields = mutableListOf<Field>()
 
-        for (type in config.information) {
+        for (type in config.embed.information) {
             if (!type.isSelected()) continue
 
             val value = when (type) {
@@ -134,8 +136,8 @@ object FarmingTracker {
                 InformationType.GOD_POTION -> godPotionTimer.ifBlank { "<:no:1263210393723998278>" }
                 InformationType.JACOBS_CONTEST -> {
                     if (!FarmingContestAPI.inContest) ""
-                    else convertPlacement(currentPlacement)?.let { medal ->
-                        "$currentPlacement% ${medal.emoji}"
+                    else convertPlacement(currentPlacement)?.let { bracket ->
+                        "$currentPlacement% ${bracket.emoji}"
                     } ?: ""
                 }
 
@@ -143,13 +145,17 @@ object FarmingTracker {
                     GardenAPI.getCurrentlyFarmedCrop()?.let { farmedCrop ->
                         getCropEnum(farmedCrop.cropName)?.let { cropEnum ->
                             currentCrop = cropEnum
-                            cropEnum.name + cropEnum.emoji
+                            "${cropEnum.name} ${cropEnum.emoji}"
                         } ?: ""
                     } ?: ""
                 }
 
                 InformationType.ANITA_BUFF -> activeAnitaBuff.ifBlank { "<:no:1263210393723998278>" }
                 InformationType.BPS -> GardenCropSpeed.averageBlocksPerSecond.round(2)
+                InformationType.FARMING_SINCE -> {
+                    if (farmingSince.isInFuture()) ""
+                    else farmingSince.passedSince().toString()
+                }
                 else -> ""
             }.toString()
 
@@ -168,6 +174,14 @@ object FarmingTracker {
             )
         }
 
+        if(fields.isEmpty()) {
+            lastNotification = SimpleTimeMark.now()
+            return ChatUtils.chatAndOpenConfig(
+                "No information could be displayed! Do you have them activated? Click to open Config.",
+                config.embed::information
+                )
+        }
+
         val embed = Embed(
             title = "Status - $status",
             color = color,
@@ -180,14 +194,15 @@ object FarmingTracker {
         val embeds = listOf(embed)
 
         val username = "[FARMING TRACKER] ${LorenzUtils.getPlayerName()}"
+        val threadID = config.threadId.ifBlank { null }
 
         when (config.messageType) {
             NEW_MESSAGE -> {
                 WebhookUtils.sendEmbedsToWebhook(
                     config.webhook.url,
                     embeds,
-                    username,
-                    SKYHANNI_URL,
+                    threadID = threadID,
+                    username = username,
                 )
             }
 
@@ -195,8 +210,8 @@ object FarmingTracker {
                 WebhookUtils.editMessageEmbeds(
                     config.webhook.url,
                     embeds,
-                    username,
-                    SKYHANNI_URL,
+                    threadID = threadID,
+                    username = username,
                 )
             }
 
@@ -204,8 +219,8 @@ object FarmingTracker {
                 WebhookUtils.sendEmbedsToWebhook(
                     config.webhook.url,
                     embeds,
-                    username,
-                    SKYHANNI_URL,
+                    threadID = threadID,
+                    username = username,
                 )
             }
         }
@@ -214,46 +229,49 @@ object FarmingTracker {
     }
 
     @SubscribeEvent
-    fun onTablistUpdated(event: TabListUpdateEvent) {
+    fun onWidgetUpdated(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
 
-        val tabList = event.tabList.map { it.removeColor() }
-        val changedLines = tabList.filter { !lastTablist.contains(it) }
-        lastTablist = tabList
-        val widgets = TabWidget.entries.filter { it.isActive }
+        val widget = event.widget
+        val widgetLines = event.widget.lines.map { it.removeColor() }
+        if (widgetLines.isEmpty()) return
 
-        val widgetLines = { widget: TabWidget -> widgets.find { it == widget }?.lines?.map { it.removeColor() } ?: changedLines }
+        when (widget) {
+            TabWidget.STATS -> widgetLines.matchAll(tablistStatsPattern) {
+                stats[group("stat")] = group("amount").toInt()
+            }
 
-        widgetLines(TabWidget.STATS).matchAll(tablistStatsPattern) {
-            stats[group("stat")] = group("amount").toInt()
-        }
-
-        widgetLines(TabWidget.JACOB_CONTEST).apply {
-            if (this[1].contains("Starts In:")) {
-                matchAll(tablistUpcomingContestPattern) {
-                    getCropEnum(group("crop"))?.let { cropEnum ->
-                        activeAnitaBuff = cropEnum.name + cropEnum.emoji
+            TabWidget.JACOB_CONTEST -> {
+                if (widgetLines[1].contains("Starts In:")) {
+                    widgetLines.matchAll(tablistUpcomingContestPattern) {
+                        getCropEnum(group("crop"))?.let { cropEnum ->
+                            activeAnitaBuff = cropEnum.name + cropEnum.emoji
+                        }
+                    }
+                } else {
+                    widgetLines.matchAll(tablistActiveContestPattern) {
+                        currentPlacement = group("placement").toDouble()
+                        if (group("boost") == "☘") activeAnitaBuff = group("crop")
                     }
                 }
-            } else {
-                matchAll(tablistActiveContestPattern) {
-                    currentPlacement = group("placement").toDouble()
-                    if (group("boost") == "☘") activeAnitaBuff = group("crop")
+            }
+
+            TabWidget.ACTIVE_EFFECTS -> widgetLines.matchAll(tablistEffectsPattern) {
+                when (group("type")) {
+                    "Cookie Buff" -> cookieBuffTimer = group("duration")
+                    "God Potion" -> godPotionTimer = group("duration")
                 }
             }
-        }
 
-        widgetLines(TabWidget.ACTIVE_EFFECTS).matchAll(tablistEffectsPattern) {
-            println(group("type"))
-            println(group("duration"))
-            println(cookieBuffTimer to godPotionTimer)
-            when (group("type")) {
-                "Cookie Buff" -> cookieBuffTimer = group("duration")
-                "God Potion" -> godPotionTimer = group("duration")
-            }
+            else -> {}
         }
+    }
 
-        val footerLines = TabListData.getFooter().removeColor().lines()
+    @SubscribeEvent
+    fun onFooterUpdated(event: TablistFooterUpdateEvent) {
+        if (!isEnabled()) return
+
+        val footerLines = event.footer.removeColor().lines()
 
         val cookieBuffIndex = footerLines.indexOfFirst { it.contains("Cookie Buff") } + 1
         if (cookieBuffIndex <= footerLines.lastIndex) cookieBuffTimer = footerLines[cookieBuffIndex]
@@ -283,37 +301,24 @@ object FarmingTracker {
         return (red shl 16) or (green shl 8) or blue
     }
 
-    private fun convertPlacement(placement: Double): Medal? {
+    private fun convertPlacement(placement: Double): ContestBracket? {
         val isFinnegan = MayorAPI.currentMayor == Mayor.FINNEGAN
-        val (requiredBronze, requiredSilver, requiredGold, requiredPlatinum, requiredDiamond) = if (isFinnegan) {
-            listOf(
-                BRONZE_MEDAL.requiredNormal,
-                SILVER_MEDAL.requiredNormal,
-                GOLD_MEDAL.requiredNormal,
-                PLATINUM_MEDAL.requiredNormal,
-                DIAMOND_MEDAL.requiredNormal,
-            )
-        } else {
-            listOf(
-                BRONZE_MEDAL.requiredFinnegan,
-                SILVER_MEDAL.requiredFinnegan,
-                GOLD_MEDAL.requiredFinnegan,
-                PLATINUM_MEDAL.requiredFinnegan,
-                DIAMOND_MEDAL.requiredFinnegan,
-            )
-        }
+        val (requiredBronze, requiredSilver, requiredGold, requiredPlatinum, requiredDiamond) = ContestBracket.entries
+            .map {
+                if (isFinnegan) it.requiredNormal else it.requiredFinnegan
+            }
 
         return when {
             placement >= requiredBronze -> null
-            placement in requiredSilver..requiredBronze -> BRONZE_MEDAL
-            placement in requiredGold..requiredSilver -> SILVER_MEDAL
-            placement in requiredPlatinum..requiredGold -> GOLD_MEDAL
-            placement in requiredDiamond..requiredPlatinum -> PLATINUM_MEDAL
-            else -> DIAMOND_MEDAL
+            placement in requiredSilver..requiredBronze -> BRONZE
+            placement in requiredGold..requiredSilver -> SILVER
+            placement in requiredPlatinum..requiredGold -> GOLD
+            placement in requiredDiamond..requiredPlatinum -> PLATINUM
+            else -> DIAMOND
         }
     }
 
-    fun InformationType.isSelected() = config.information.contains(this)
+    fun InformationType.isSelected() = config.embed.information.contains(this)
 
     fun isEnabled() = config.tracking && LorenzUtils.inSkyBlock && GardenAPI.inGarden()
 }

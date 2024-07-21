@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.garden;
 
+import at.hannibal2.skyhanni.utils.APIUtil.SkinBodyPart;
 import at.hannibal2.skyhanni.utils.LorenzColor;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -37,43 +38,63 @@ public class TrackingConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Information Displayed", desc = "Change which stats are enabled, and the order they will be displayed in.")
-    @ConfigEditorDraggableList
-    public List<InformationType> information = new ArrayList<>();
+    @ConfigOption(name = "Embed Settings", desc = "")
+    @Accordion
+    public EmbedConfig embed = new EmbedConfig();
 
-    public enum InformationType {
-        FARMING_FORTUNE("§6Farming Fortune ☘", "FF <:farming_fortune:1263201171317854369>"),
-        FARMING_WISDOM("§3Farming Wisdom ☯", "FW <:farming_wisdom:1263201172513099788>"),
-        BONUS_PEST_CHANCE("§2Bonus Pest Chance ൠ", "Pest Chance <:bonus_pest_chance:1263201675724984370>"),
-        SPEED("§fSpeed ✦", "Speed <:speed:1263211269134225488>"),
-        STRENGTH("§cStrength ❁", "Strength <:strength:1263293916258631781>"),
-        PET("§aCurrent Pet", "Pet <:pets_icon:1263221331915182280>"),
-        COOKIE_BUFF("§dCookie Buff", "Cookie <:booster_cookie:1263204080940220498>"),
-        GOD_POTION("§cGod Potion", "God Potion <:god_potion:1263204732390871151>"),
-        JACOBS_CONTEST("§eJacob's Contest", "Contest <:hoe:1263206591218585640>"),
-        ACTIVE_CROP("§aCrop", "Crop <:hoe:1263206591218585640>"),
-        ANITA_BUFF("§6Anita's Artifact", "Anita's Artifact <:anitas_artifact:1263212366330335376>"),
-        BPS("§eBlocks/Second", "BPS <:bps_sugar:1263285905083465729>"),
-        FARMING_SINCE("§fFarming Since", "Farming For uhr");
+    public static class EmbedConfig {
+        @Expose
+        @ConfigOption(name = "Information Displayed", desc = "Change which stats are enabled, and the order they will be displayed in.")
+        @ConfigEditorDraggableList
+        public List<InformationType> information = new ArrayList<>();
 
-        public final String name;
-        public final String fieldName;
+        public enum InformationType {
+            FARMING_FORTUNE("§6Farming Fortune ☘", "FF <:farming_fortune:1263201171317854369>"),
+            FARMING_WISDOM("§3Farming Wisdom ☯", "FW <:farming_wisdom:1263201172513099788>"),
+            BONUS_PEST_CHANCE("§2Bonus Pest Chance ൠ", "Pest Chance <:bonus_pest_chance:1263201675724984370>"),
+            SPEED("§fSpeed ✦", "Speed <:speed:1263211269134225488>"),
+            STRENGTH("§cStrength ❁", "Strength <:strength:1263293916258631781>"),
+            PET("§aCurrent Pet", "Pet <:pets_icon:1263221331915182280>"),
+            COOKIE_BUFF("§dCookie Buff", "Cookie <:booster_cookie:1263204080940220498>"),
+            GOD_POTION("§cGod Potion", "God Potion <:god_potion:1263204732390871151>"),
+            JACOBS_CONTEST("§eJacob's Contest", "Contest <:hoe:1263206591218585640>"),
+            ACTIVE_CROP("§aCrop", "Crop <:hoe:1263206591218585640>"),
+            ANITA_BUFF("§6Anita's Artifact", "Anita's Artifact <:anitas_artifact:1263212366330335376>"),
+            BPS("§eBlocks/Second", "BPS <:bps_sugar:1263285905083465729>"),
+            FARMING_SINCE("§fFarming Since", "Farming For <:minecraftclock:1264539139911716866>");
 
-        InformationType(String name, String fieldName) {
-            this.name = name;
-            this.fieldName = fieldName;
+            public final String name;
+            public final String fieldName;
+
+            InformationType(String name, String fieldName) {
+                this.name = name;
+                this.fieldName = fieldName;
+            }
+
+            @Override
+            public String toString() {
+                return name;
+            }
         }
 
-        @Override
-        public String toString() {
-            return name;
-        }
+        @Expose
+        @ConfigOption(name = "Skin Part", desc = "Skin Part to be displayed in the top right of the embed.")
+        @ConfigEditorDropdown
+        public SkinBodyPart bodyPart = SkinBodyPart.HEAD;
+
+        @Expose
+        @ConfigOption(name = "Embed Colour", desc = "Which color the sidebar of the embed should be (Chroma displays as black).")
+        @ConfigEditorDropdown
+        public LorenzColor color = LorenzColor.YELLOW;
     }
 
     @Expose
-    @ConfigOption(name = "Embed Colour", desc = "Which color the sidebar of the embed should be (Chroma displays as black).")
-    @ConfigEditorDropdown
-    public LorenzColor color = LorenzColor.YELLOW;
+    @ConfigOption(
+        name = "Thread ID",
+        desc = "If you want the message to be sent to a thread in the webhook channel put it's id here, otherwise leave blank."
+    )
+    @ConfigEditorText
+    public String threadId = "";
 
     @Expose
     @ConfigOption(name = "Message Type", desc = "Shows which way the status will be sent.")
@@ -121,7 +142,7 @@ public class TrackingConfig {
         public String toString() {
             String cleanName = name().replace("_", " ").toLowerCase();
             cleanName = cleanName.substring(0, 1).toUpperCase() + cleanName.substring(1);
-            if (cleanName.equals("mooshroom cow")) cleanName = "Mooshroom Cow";
+            if (cleanName.equals("Mooshroom cow")) cleanName = "Mooshroom Cow";
             return cleanName;
         }
     }
@@ -150,30 +171,6 @@ public class TrackingConfig {
         @Override
         public String toString() {
             return name;
-        }
-    }
-
-    public enum Medal {
-        BRONZE_MEDAL("<:bronze_medal:1263205786876776541>", 60.0, 70.0),
-        SILVER_MEDAL("<:silver_medal:1263205793424085053>", 30.0, 40.0),
-        GOLD_MEDAL("<:gold_medal:1263205790362239036>", 10.0, 20.0),
-        PLATINUM_MEDAL("<:platinum_medal:1263205791825920091>", 5.0, 10.0),
-        DIAMOND_MEDAL("<:diamond_medal:1263205788675997717>", 2.0, 5.0),
-        ;
-
-        public final String emoji;
-        public final Double requiredNormal;
-        public final Double requiredFinnegan;
-
-        Medal(String emoji, Double requiredNormal, Double requiredFinnegan) {
-            this.emoji = emoji;
-            this.requiredNormal = requiredNormal;
-            this.requiredFinnegan = requiredFinnegan;
-        }
-
-        @Override
-        public String toString() {
-            return emoji;
         }
     }
 }
