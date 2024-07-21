@@ -496,10 +496,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §fCarnival Tokens: §e129
+     * REGEX-TEST: §fCarnival Tokens: §e1,031
      */
     val carnivalTokensPattern by carnivalSb.pattern(
         "tokens",
-        "(?:§f)*Carnival Tokens: §e\\d+",
+        "(?:§f)*Carnival Tokens: §e[\\d,]+",
     )
 
     /**
