@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.github.moulberry.notenoughupdates.util.stripControlCodes
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -39,6 +40,17 @@ object MagicalPowerDisplay {
         "inv.acceptable",
         """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser)$"""
     )
+    /*
+    * REGEX-TEST: a RARE ACCESSORY a
+    * REGEX-TEST: RARE ACCESSORY
+    * REGEX-TEST: EPIC DUNGEON ACCESSORY
+    * REGEX-TEST: a LEGENDARY ACCESSORY a
+    * */
+    private val accessoryLorePattern by RepoPattern.pattern(
+        "accessory.lore",
+        """a?\s*(COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC)\s*(?:DUNGEON\s*)?ACCESSORY\s*a?"""
+    )
+
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -46,17 +58,9 @@ object MagicalPowerDisplay {
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().stripControlCodes())) return
 
         val item = event.stack
-        val rarity = item.getItemRarityOrNull() ?: return
+        val rarity = item.isAccessory() ?: return
         val itemID = item.getInternalNameOrNull() ?: return
-        var isAccessory = false
 
-        for (line in item.getLore()) {
-            val plain = line.stripControlCodes()
-            if (plain.contains("ACCESSORY") || line.contains("HATCESSORY")) isAccessory = true
-            break
-        }
-
-        println("$itemID -> ${if (isAccessory) "acc" else "not acc"}")
 
         var endMP = MPMap[rarity] ?: run {
             ErrorManager.skyHanniError(
@@ -68,8 +72,25 @@ object MagicalPowerDisplay {
             endMP *= 2
         if (itemID == "RIFT_PRISM".asInternalName())
             endMP = 11
-        if (isAccessory)
-            event.stackTip = "${if (config.colored) rarity else "§7"}${endMP}"
+        event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}${endMP}"
+    }
+
+    private fun ItemStack.isAccessory(): LorenzRarity? {
+        val lore = this.getLore()
+        for (line in lore) {
+            val stripped = line.stripControlCodes()
+
+            if (stripped == "SPECIAL HATCESSORY") {
+                return LorenzRarity.SPECIAL
+            } else if (stripped == "a VERY SPECIAL HATCESSORY a") {
+                return LorenzRarity.VERY_SPECIAL
+            }
+
+            if (accessoryLorePattern.matches(stripped)) {
+                return this.getItemRarityOrNull()
+            }
+        }
+        return null
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
