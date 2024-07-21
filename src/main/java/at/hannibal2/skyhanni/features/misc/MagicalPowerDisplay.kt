@@ -51,7 +51,6 @@ object MagicalPowerDisplay {
         """a?\s*(COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC)\s*(?:DUNGEON\s*)?ACCESSORY\s*a?"""
     )
 
-
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
@@ -61,13 +60,11 @@ object MagicalPowerDisplay {
         val rarity = item.isAccessory() ?: return
         val itemID = item.getInternalNameOrNull() ?: return
 
-
         var endMP = MPMap[rarity] ?: run {
             ErrorManager.skyHanniError(
                 "Unknown rarity '$rarity' for item '${item.displayName}§7'"
             )
         }
-
         if (itemID == "HEGEMONY_ARTIFACT".asInternalName())
             endMP *= 2
         if (itemID == "RIFT_PRISM".asInternalName())
