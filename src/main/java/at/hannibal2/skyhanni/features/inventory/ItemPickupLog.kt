@@ -47,10 +47,8 @@ object ItemPickupLog {
     private val coinIcon = "COIN_TALISMAN".asInternalName()
 
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
-
-    //     private var itemList = mutableMapOf<Int, PrimitiveItemStack>()
-    private var itemsAddedToInventory = mutableMapOf<Int, UpdatedItem>()
-    private var itemsRemovedFromInventory = mutableMapOf<Int, UpdatedItem>()
+    private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
+    private var itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable = Renderable.string("")
 
     private val patternGroup = RepoPattern.group("itempickuplog")
@@ -88,7 +86,7 @@ object ItemPickupLog {
 
         event.sackChanges.forEach {
             val itemStack = (it.internalName.getItemStack())
-            val item = UpdatedItem(itemStack.displayName, it.delta.absoluteValue.toLong(), it.internalName)
+            val item = PickupEntry(itemStack.displayName, it.delta.absoluteValue.toLong(), it.internalName)
 
             updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
         }
@@ -98,7 +96,7 @@ object ItemPickupLog {
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled() || !config.coins || !worldChangeCooldown()) return
 
-        updateItem(0, UpdatedItem("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
+        updateItem(0, PickupEntry("§6Coins", event.coins.absoluteValue.toLong(), coinIcon), coinIcon.getItemStack(), event.coins < 0)
     }
 
     @SubscribeEvent
@@ -109,9 +107,6 @@ object ItemPickupLog {
 
 
         oldItemList.putAll(itemList)
-//         itemList.forEach {
-//             oldItemList[it.key] = it.value
-//         }
 
         itemList.clear()
 
@@ -140,22 +135,22 @@ object ItemPickupLog {
 
         oldItemList.forEach {
             if (!itemList.containsKey(it.key)) {
-                val item = UpdatedItem(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
+                val item = PickupEntry(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, true)
             } else if (it.value.second > itemList[it.key]!!.second) {
                 val amount = (it.value.second - itemList[it.key]?.second!!)
-                val item = UpdatedItem(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
+                val item = PickupEntry(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, true)
             }
         }
 
         itemList.forEach {
             if (!oldItemList.containsKey(it.key)) {
-                val item = UpdatedItem(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
+                val item = PickupEntry(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, false)
             } else if (it.value.second > oldItemList[it.key]!!.second) {
                 val amount = (it.value.second - oldItemList[it.key]?.second!!)
-                val item = UpdatedItem(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
+                val item = PickupEntry(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
                 updateItem(it.key, item, it.value.first, false)
             }
         }
@@ -190,7 +185,7 @@ object ItemPickupLog {
         return false
     }
 
-    private fun updateItem(hash: Int, itemInfo: UpdatedItem, item: ItemStack, removed: Boolean) {
+    private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
         if (isBannedItem(item)) return
         if (removed) {
             itemsAddedToInventory[hash]?.let { added ->
@@ -213,7 +208,7 @@ object ItemPickupLog {
         }
     }
 
-    private data class UpdatedItem(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
+    private data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
         var timeUntilExpiry = SimpleTimeMark.now()
 
         fun updateAmount(change: Long) {
@@ -226,34 +221,32 @@ object ItemPickupLog {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    private fun renderList(prefix: String, amount: Long, name: String, itemIcon: NEUInternalName?): Renderable {
-        return Renderable.horizontalContainer(
-            buildList {
-                for (item in config.displayLayout) {
-                    when (item) {
-                        DisplayLayout.ICON -> {
-                            if (itemIcon != null) {
-                                addItemStack(itemIcon)
-                            } else {
-                                ItemNameResolver.getInternalNameOrNull(name)?.let { addItemStack(it) }
-                            }
+    private fun renderList(prefix: String, amount: Long, name: String, itemIcon: NEUInternalName?) = Renderable.horizontalContainer(
+        buildList {
+            for (item in config.displayLayout) {
+                when (item) {
+                    DisplayLayout.ICON -> {
+                        if (itemIcon != null) {
+                            addItemStack(itemIcon)
+                        } else {
+                            ItemNameResolver.getInternalNameOrNull(name)?.let { addItemStack(it) }
                         }
-
-                        DisplayLayout.CHANGE_AMOUNT -> {
-                            val formattedAmount = if (config.shorten) amount.shortFormat() else amount.addSeparators()
-                            add(Renderable.string("${prefix}${formattedAmount}"))
-                        }
-
-                        DisplayLayout.ITEM_NAME -> {
-                            add(Renderable.string(name))
-                        }
-
-                        null -> {}
                     }
+
+                    DisplayLayout.CHANGE_AMOUNT -> {
+                        val formattedAmount = if (config.shorten) amount.shortFormat() else amount.addSeparators()
+                        add(Renderable.string("${prefix}${formattedAmount}"))
+                    }
+
+                    DisplayLayout.ITEM_NAME -> {
+                        add(Renderable.string(name))
+                    }
+
+                    null -> {}
                 }
-            },
-        )
-    }
+            }
+        },
+    )
 
 
     private fun worldChangeCooldown(): Boolean {
@@ -311,7 +304,6 @@ object ItemPickupLog {
         }
         val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
 
-//         this.display = Renderable.fixedSizeBox(renderable, 30, 75)
-        this.display = Renderable.fixedSizeColumn(renderable, 30)
+        this.display = Renderable.fixedSizeBox(renderable, 30, 75)
     }
 }
