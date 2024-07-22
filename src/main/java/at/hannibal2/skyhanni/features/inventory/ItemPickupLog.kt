@@ -35,9 +35,9 @@ import kotlin.time.Duration.Companion.seconds
 object ItemPickupLog {
 
     enum class DisplayLayout(private val display: String) {
+        CHANGE_AMOUNT("§a+256"),
         ICON("§e✎"),
         ITEM_NAME("§d[Cute] Skirtwearer's Cake Soul"),
-        CHANGE_AMOUNT("§a+256"),
         ;
 
         override fun toString() = display
@@ -133,25 +133,25 @@ object ItemPickupLog {
 
         if (!worldChangeCooldown()) return
 
-        oldItemList.forEach {
-            if (!itemList.containsKey(it.key)) {
-                val item = PickupEntry(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
-                updateItem(it.key, item, it.value.first, true)
-            } else if (it.value.second > itemList[it.key]!!.second) {
-                val amount = (it.value.second - itemList[it.key]?.second!!)
-                val item = PickupEntry(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
-                updateItem(it.key, item, it.value.first, true)
+        for ((key, value) in oldItemList) {
+            if (!itemList.containsKey(key)) {
+                val item = PickupEntry(value.first.displayName, value.second.toLong(), value.first.getInternalNameOrNull())
+                updateItem(key, item, value.first, true)
+            } else if (value.second > itemList[key]!!.second) {
+                val amount = (value.second - itemList[key]?.second!!)
+                val item = PickupEntry(value.first.displayName, amount.toLong(), value.first.getInternalNameOrNull())
+                updateItem(key, item, value.first, true)
             }
         }
 
-        itemList.forEach {
-            if (!oldItemList.containsKey(it.key)) {
-                val item = PickupEntry(it.value.first.displayName, it.value.second.toLong(), it.value.first.getInternalNameOrNull())
-                updateItem(it.key, item, it.value.first, false)
-            } else if (it.value.second > oldItemList[it.key]!!.second) {
-                val amount = (it.value.second - oldItemList[it.key]?.second!!)
-                val item = PickupEntry(it.value.first.displayName, amount.toLong(), it.value.first.getInternalNameOrNull())
-                updateItem(it.key, item, it.value.first, false)
+        for ((key, value) in itemList) {
+            if (!oldItemList.containsKey(key)) {
+                val item = PickupEntry(value.first.displayName, value.second.toLong(), value.first.getInternalNameOrNull())
+                updateItem(key, item, value.first, false)
+            } else if (value.second > oldItemList[key]!!.second) {
+                val amount = (value.second - oldItemList[key]?.second!!)
+                val item = PickupEntry(value.first.displayName, amount.toLong(), value.first.getInternalNameOrNull())
+                updateItem(key, item, value.first, false)
             }
         }
         updateDisplay()
@@ -218,7 +218,8 @@ object ItemPickupLog {
 
     private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontalContainer(
         buildList {
-            for (item in config.displayLayout) {
+            val displayLayout: List<DisplayLayout> = config.displayLayout
+            for (item in displayLayout) {
                 when (item) {
                     DisplayLayout.ICON -> {
                         val itemIcon = entry.neuInternalName?.getItemStack()
@@ -237,8 +238,6 @@ object ItemPickupLog {
                     DisplayLayout.ITEM_NAME -> {
                         add(Renderable.string(entry.name))
                     }
-
-                    null -> {}
                 }
             }
         },
