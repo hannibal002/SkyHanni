@@ -9,9 +9,13 @@ import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -86,7 +90,7 @@ object ItemPickupLog {
 
         event.sackChanges.forEach {
             val itemStack = (it.internalName.getItemStack())
-            val item = PickupEntry(itemStack.displayName, it.delta.absoluteValue.toLong(), it.internalName)
+            val item = PickupEntry(itemStack.dynamicName(), it.delta.absoluteValue.toLong(), it.internalName)
 
             updateItem(itemStack.hash(), item, itemStack, it.delta < 0)
         }
@@ -134,28 +138,42 @@ object ItemPickupLog {
         if (!worldChangeCooldown()) return
 
         for ((key, value) in oldItemList) {
+            val stack = value.first
+            val oldAmount = value.second
             if (!itemList.containsKey(key)) {
-                val item = PickupEntry(value.first.displayName, value.second.toLong(), value.first.getInternalNameOrNull())
-                updateItem(key, item, value.first, true)
-            } else if (value.second > itemList[key]!!.second) {
-                val amount = (value.second - itemList[key]?.second!!)
-                val item = PickupEntry(value.first.displayName, amount.toLong(), value.first.getInternalNameOrNull())
-                updateItem(key, item, value.first, true)
+                val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, true)
+            } else if (oldAmount > itemList[key]!!.second) {
+                val amount = (oldAmount - itemList[key]?.second!!)
+                val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, true)
             }
         }
 
         for ((key, value) in itemList) {
+            val stack = value.first
+            val oldAmount = value.second
             if (!oldItemList.containsKey(key)) {
-                val item = PickupEntry(value.first.displayName, value.second.toLong(), value.first.getInternalNameOrNull())
-                updateItem(key, item, value.first, false)
-            } else if (value.second > oldItemList[key]!!.second) {
-                val amount = (value.second - oldItemList[key]?.second!!)
-                val item = PickupEntry(value.first.displayName, amount.toLong(), value.first.getInternalNameOrNull())
-                updateItem(key, item, value.first, false)
+                val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, false)
+            } else if (oldAmount > oldItemList[key]!!.second) {
+                val amount = (oldAmount - oldItemList[key]?.second!!)
+                val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, false)
             }
         }
         updateDisplay()
     }
+
+    private fun ItemStack.dynamicName(): String {
+        val compact = when (getItemCategoryOrNull()) {
+            ItemCategory.ENCHANTED_BOOK -> true
+            ItemCategory.PET -> true
+            else -> false
+        }
+        return if (compact) getInternalName().itemName else displayName
+    }
+
 
     private fun ItemStack.hash(): Int {
         var displayName = this.displayName.removeColor()
@@ -244,9 +262,7 @@ object ItemPickupLog {
     )
 
 
-    private fun worldChangeCooldown(): Boolean {
-        return LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
-    }
+    private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
 
     private fun updateDisplay() {
         if (!isEnabled()) return
