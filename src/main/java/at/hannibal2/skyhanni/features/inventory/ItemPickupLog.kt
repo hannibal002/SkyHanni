@@ -49,7 +49,7 @@ object ItemPickupLog {
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
     private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
-    private var display: Renderable = Renderable.string("")
+    private var display: Renderable? = null
 
     private val patternGroup = RepoPattern.group("itempickuplog")
     private val shopPattern by patternGroup.pattern(
@@ -69,7 +69,7 @@ object ItemPickupLog {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        config.pos.renderRenderable(display, posLabel = "Item Pickup Log Display")
+        display?.let { config.pos.renderRenderable(it, posLabel = "Item Pickup Log Display") }
     }
 
     @SubscribeEvent
@@ -297,8 +297,12 @@ object ItemPickupLog {
         for (item in removedItemsToNoLongerShow) {
             display.add(renderList("§c-", item.value.amount, item.value.name, item.value.neuInternalName))
         }
+        if (display.isEmpty()) {
+            this.display = null
+            return
+        }
         val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
 
-        this.display = Renderable.fixedSizeBox(renderable, 30, 75)
+        this.display = Renderable.fixedSizeColumn(renderable, 30)
     }
 }
