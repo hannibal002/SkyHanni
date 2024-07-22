@@ -216,25 +216,26 @@ object ItemPickupLog {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    private fun renderList(prefix: String, amount: Long, name: String, itemIcon: NEUInternalName?) = Renderable.horizontalContainer(
+    private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontalContainer(
         buildList {
             for (item in config.displayLayout) {
                 when (item) {
                     DisplayLayout.ICON -> {
+                        val itemIcon = entry.neuInternalName?.getItemStack()
                         if (itemIcon != null) {
                             addItemStack(itemIcon)
                         } else {
-                            ItemNameResolver.getInternalNameOrNull(name)?.let { addItemStack(it) }
+                            ItemNameResolver.getInternalNameOrNull(entry.name)?.let { addItemStack(it) }
                         }
                     }
 
                     DisplayLayout.CHANGE_AMOUNT -> {
-                        val formattedAmount = if (config.shorten) amount.shortFormat() else amount.addSeparators()
+                        val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
                         add(Renderable.string("${prefix}${formattedAmount}"))
                     }
 
                     DisplayLayout.ITEM_NAME -> {
-                        add(Renderable.string(name))
+                        add(Renderable.string(entry.name))
                     }
 
                     null -> {}
@@ -268,11 +269,12 @@ object ItemPickupLog {
                     val it = removedItemsToNoLongerShow[item.key]
                     if (it != null) {
                         val currentTotalValue = item.value.amount - it.amount
+                        val entry = PickupEntry(item.value.name, currentTotalValue, item.value.neuInternalName)
 
                         if (currentTotalValue > 0) {
-                            display.add(renderList("§a+", currentTotalValue, item.value.name, item.value.neuInternalName))
+                            display.add(renderList("§a+", entry))
                         } else if (currentTotalValue < 0) {
-                            display.add(renderList("§c", currentTotalValue, item.value.name, item.value.neuInternalName))
+                            display.add(renderList("§c", entry))
                         } else {
                             itemsAddedToInventory.remove(item.key)
                             itemsRemovedFromInventory.remove(item.key)
@@ -281,21 +283,21 @@ object ItemPickupLog {
                         iterator.remove()
                     }
                 } else {
-                    display.add(renderList("§a+", item.value.amount, item.value.name, item.value.neuInternalName))
+                    display.add(renderList("§a+", item.value))
                 }
             }
         } else {
             for (item in addedItemsToNoLongerShow) {
 
-                display.add(renderList("§a+", item.value.amount, item.value.name, item.value.neuInternalName))
+                display.add(renderList("§a+", item.value))
                 removedItemsToNoLongerShow[item.key]?.let {
-                    display.add(renderList("§c-", it.amount, it.name, it.neuInternalName))
+                    display.add(renderList("§c-", it))
                     removedItemsToNoLongerShow.remove(item.key)
                 }
             }
         }
         for (item in removedItemsToNoLongerShow) {
-            display.add(renderList("§c-", item.value.amount, item.value.name, item.value.neuInternalName))
+            display.add(renderList("§c-", item.value))
         }
         if (display.isEmpty()) {
             this.display = null
