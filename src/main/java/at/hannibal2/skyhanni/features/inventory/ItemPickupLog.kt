@@ -45,7 +45,10 @@ object ItemPickupLog {
 
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
     private val coinIcon = "COIN_TALISMAN".asInternalName()
+
     private var itemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
+
+    //     private var itemList = mutableMapOf<Int, PrimitiveItemStack>()
     private var itemsAddedToInventory = mutableMapOf<Int, UpdatedItem>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, UpdatedItem>()
     private var display: Renderable = Renderable.string("")
@@ -104,9 +107,11 @@ object ItemPickupLog {
 
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 
-        itemList.forEach {
-            oldItemList[it.key] = it.value
-        }
+
+        oldItemList.putAll(itemList)
+//         itemList.forEach {
+//             oldItemList[it.key] = it.value
+//         }
 
         itemList.clear()
 
@@ -186,45 +191,42 @@ object ItemPickupLog {
     }
 
     private fun updateItem(hash: Int, itemInfo: UpdatedItem, item: ItemStack, removed: Boolean) {
+        if (isBannedItem(item)) return
         if (removed) {
             itemsAddedToInventory[hash]?.let { added ->
-                added.time = SimpleTimeMark.now()
+                added.timeUntilExpiry = SimpleTimeMark.now()
             }
             itemsRemovedFromInventory[hash]?.let {
                 it.updateAmount(itemInfo.amount)
                 return
             }
-            if (isBannedItem(item)) return
             itemsRemovedFromInventory[hash] = itemInfo
         } else {
             itemsRemovedFromInventory[hash]?.let { added ->
-                added.time = SimpleTimeMark.now()
+                added.timeUntilExpiry = SimpleTimeMark.now()
             }
             itemsAddedToInventory[hash]?.let {
                 it.updateAmount(itemInfo.amount)
                 return
             }
-            if (isBannedItem(item)) return
             itemsAddedToInventory[hash] = itemInfo
         }
     }
 
     private data class UpdatedItem(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
-        var time = SimpleTimeMark.now()
+        var timeUntilExpiry = SimpleTimeMark.now()
 
         fun updateAmount(change: Long) {
             amount += change
-            time = SimpleTimeMark.now()
+            timeUntilExpiry = SimpleTimeMark.now()
         }
 
-        fun isExpired() = time.passedSince() > config.expireAfter.seconds
+        fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     private fun renderList(prefix: String, amount: Long, name: String, itemIcon: NEUInternalName?): Renderable {
-
-
         return Renderable.horizontalContainer(
             buildList {
                 for (item in config.displayLayout) {
@@ -309,6 +311,7 @@ object ItemPickupLog {
         }
         val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
 
-        this.display = Renderable.fixedSizeBox(renderable, 30, 75)
+//         this.display = Renderable.fixedSizeBox(renderable, 30, 75)
+        this.display = Renderable.fixedSizeColumn(renderable, 30)
     }
 }
