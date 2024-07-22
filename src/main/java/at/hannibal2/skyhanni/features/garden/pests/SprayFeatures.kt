@@ -32,6 +32,15 @@ object SprayFeatures {
         "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!"
     )
 
+    private fun SprayType.getSprayEffect(): String {
+        return this.getPests().takeIf { it.isNotEmpty() }?.let { pests ->
+            pests.joinToString("§7, §6") { it.displayName }
+        } ?: when (this) {
+            SprayType.FINE_FLOUR -> "§a+§620☘ Farming Fortune"
+            else -> "§cUnknown Effect"
+        }
+    }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
@@ -48,8 +57,8 @@ object SprayFeatures {
             }
         } ?: return
 
-        val pests = type.getPests().joinToString("§7, §6") { it.displayName }
-        display = "§a${type.displayName} §7(§6$pests§7)"
+        val sprayEffect = type.getSprayEffect()
+        display = "§a${type.displayName} §7(§6$sprayEffect§7)"
 
         lastChangeTime = SimpleTimeMark.now()
     }
