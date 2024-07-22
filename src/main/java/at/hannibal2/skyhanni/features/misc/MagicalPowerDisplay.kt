@@ -1,9 +1,12 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -20,16 +23,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
+    private var contactAmount: Int
+        get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount ?: -1
+        private set(value) { ProfileStorageData.profileSpecific?.abiphoneContactAmount = value }
 
     /*
     * REGEX-TEST: Accessory Bag
     * REGEX-TEST: Accessory Bag (1/75)
     * REGEX-TEST: Accessory Bag (909/394294)
     * REGEX-TEST: Auctions Browser
+    * REGEX-TEST: Auctions: "ligma"
+    * REGEX-TEST: Auctions: ""sugoma""
     * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser)$"""
+        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Auctions: .*)$"""
     )
     /*
     * REGEX-TEST: a RARE ACCESSORY a
@@ -60,7 +68,30 @@ object MagicalPowerDisplay {
             endMP *= 2
         if (itemID == "RIFT_PRISM".asInternalName())
             endMP = 11
+        if (item.isAbicase())
+            endMP += contactAmount / 2
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}${endMP}"
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpened(event: InventoryOpenEvent) {
+        if (!isEnabled()) return
+        if (event.inventoryName.startsWith("Abiphone")) {
+            val theBookLore = event.inventoryItems[51]?.getLore() ?: return
+            ChatUtils.debug("Checking Abiphone for contacts")
+            for (line in theBookLore) {
+                val stripped = line.stripControlCodes()
+                if (stripped.startsWith("Your contacts: ")) {
+                    contactAmount = stripped.split(" ")[2].split("/")[0].toInt()
+                    return
+                }
+            }
+        }
+    }
+
+    private fun ItemStack.isAbicase(): Boolean {
+        val id = this.getInternalNameOrNull() ?: return false
+        return id.startsWith("ABICASE_")
     }
 
     private fun LorenzRarity.toMP(): Int? {
