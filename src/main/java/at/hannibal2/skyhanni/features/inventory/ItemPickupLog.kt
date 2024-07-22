@@ -187,25 +187,20 @@ object ItemPickupLog {
 
     private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
         if (isBannedItem(item)) return
-        if (removed) {
-            itemsAddedToInventory[hash]?.let { added ->
-                added.timeUntilExpiry = SimpleTimeMark.now()
-            }
-            itemsRemovedFromInventory[hash]?.let {
-                it.updateAmount(itemInfo.amount)
-                return
-            }
-            itemsRemovedFromInventory[hash] = itemInfo
-        } else {
-            itemsRemovedFromInventory[hash]?.let { added ->
-                added.timeUntilExpiry = SimpleTimeMark.now()
-            }
-            itemsAddedToInventory[hash]?.let {
-                it.updateAmount(itemInfo.amount)
-                return
-            }
-            itemsAddedToInventory[hash] = itemInfo
+
+        val targetInventory = if (removed) itemsRemovedFromInventory else itemsAddedToInventory
+        val oppositeInventory = if (removed) itemsAddedToInventory else itemsRemovedFromInventory
+
+        oppositeInventory[hash]?.let { existingItem ->
+            existingItem.timeUntilExpiry = SimpleTimeMark.now()
         }
+
+        targetInventory[hash]?.let { existingItem ->
+            existingItem.updateAmount(itemInfo.amount)
+            return
+        }
+
+        targetInventory[hash] = itemInfo
     }
 
     private data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
