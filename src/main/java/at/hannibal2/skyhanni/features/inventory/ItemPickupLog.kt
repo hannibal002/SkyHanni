@@ -246,16 +246,13 @@ object ItemPickupLog {
             val stack = value.first
             val oldAmount = value.second
 
-            fun addItem(amount: Int) {
-                val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, add)
-            }
-
             if (!listToCheckAgainst.containsKey(key)) {
-                addItem(oldAmount)
+                val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, add)
             } else if (oldAmount > listToCheckAgainst[key]!!.second) {
                 val amount = (oldAmount - listToCheckAgainst[key]?.second!!)
-                addItem(amount)
+                val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, add)
             }
         }
     }
