@@ -124,7 +124,6 @@ object PowderTracker {
                 }
             }
         } else {
-            doublePowder = powderBossBarPattern.matcher(BossbarData.getBossbar()).find()
             powderBossBarPattern.matchMatcher(BossbarData.getBossbar()) {
                 val duration = group("time")
                 powderTimer = TimeUtils.getDuration(duration)
