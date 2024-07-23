@@ -37,7 +37,6 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ItemPickupLog {
-
     enum class DisplayLayout(private val display: String) {
         CHANGE_AMOUNT("§a+256"),
         ICON("§e✎"),
@@ -68,7 +67,6 @@ object ItemPickupLog {
         "CANCEL_RACE_ITEM",
     )
     private val bannedItemsConverted = bannedItemsPattern.map { it.toString().asInternalName() }
-
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -150,7 +148,6 @@ object ItemPickupLog {
         }
         return if (compact) getInternalName().itemName else displayName
     }
-
 
     private fun ItemStack.hash(): Int {
         var displayName = this.displayName.removeColor()
@@ -238,7 +235,6 @@ object ItemPickupLog {
         },
     )
 
-
     private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
 
     private fun checkForDuplicateItems(
@@ -319,7 +315,6 @@ object ItemPickupLog {
             return
         }
         val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
-
         this.display = Renderable.fixedSizeColumn(renderable, 30)
     }
 }
