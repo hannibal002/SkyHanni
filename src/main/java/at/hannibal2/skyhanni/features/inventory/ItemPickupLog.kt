@@ -46,6 +46,17 @@ object ItemPickupLog {
         override fun toString() = display
     }
 
+    private data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
+        var timeUntilExpiry = SimpleTimeMark.now()
+
+        fun updateAmount(change: Long) {
+            amount += change
+            timeUntilExpiry = SimpleTimeMark.now()
+        }
+
+        fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
+    }
+
     private val config get() = SkyHanniMod.feature.inventory.itemPickupLogConfig
     private val coinIcon = "COIN_TALISMAN".asInternalName()
 
@@ -140,43 +151,6 @@ object ItemPickupLog {
         updateDisplay()
     }
 
-    private fun ItemStack.dynamicName(): String {
-        val compact = when (getItemCategoryOrNull()) {
-            ItemCategory.ENCHANTED_BOOK -> true
-            ItemCategory.PET -> true
-            else -> false
-        }
-        return if (compact) getInternalName().itemName else displayName
-    }
-
-    private fun ItemStack.hash(): Int {
-        var displayName = this.displayName.removeColor()
-        val matcher = shopPattern.matcher(displayName)
-        if (matcher.matches()) {
-            displayName = matcher.group("itemName")
-        }
-        return Objects.hash(
-            this.getInternalNameOrNull(),
-            displayName.removeColor(),
-            this.getItemRarityOrNull(),
-        )
-    }
-
-    private fun isBannedItem(item: ItemStack): Boolean {
-        if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
-            return true
-        }
-
-        if (bannedItemsConverted.contains(item.getInternalNameOrNull())) {
-            return true
-        }
-
-        if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
-            return true
-        }
-        return false
-    }
-
     private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
         if (isBannedItem(item)) return
 
@@ -194,19 +168,6 @@ object ItemPickupLog {
 
         targetInventory[hash] = itemInfo
     }
-
-    private data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
-        var timeUntilExpiry = SimpleTimeMark.now()
-
-        fun updateAmount(change: Long) {
-            amount += change
-            timeUntilExpiry = SimpleTimeMark.now()
-        }
-
-        fun isExpired() = timeUntilExpiry.passedSince() > config.expireAfter.seconds
-    }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontalContainer(
         buildList {
@@ -235,8 +196,6 @@ object ItemPickupLog {
         },
     )
 
-    private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
-
     private fun checkForDuplicateItems(
         list: MutableMap<Int, Pair<ItemStack, Int>>,
         listToCheckAgainst: MutableMap<Int, Pair<ItemStack, Int>>,
@@ -257,6 +216,43 @@ object ItemPickupLog {
         }
     }
 
+    private fun isBannedItem(item: ItemStack): Boolean {
+        if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
+            return true
+        }
+
+        if (bannedItemsConverted.contains(item.getInternalNameOrNull())) {
+            return true
+        }
+
+        if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
+            return true
+        }
+        return false
+    }
+
+    private fun ItemStack.dynamicName(): String {
+        val compact = when (getItemCategoryOrNull()) {
+            ItemCategory.ENCHANTED_BOOK -> true
+            ItemCategory.PET -> true
+            else -> false
+        }
+        return if (compact) getInternalName().itemName else displayName
+    }
+
+    private fun ItemStack.hash(): Int {
+        var displayName = this.displayName.removeColor()
+        val matcher = shopPattern.matcher(displayName)
+        if (matcher.matches()) {
+            displayName = matcher.group("itemName")
+        }
+        return Objects.hash(
+            this.getInternalNameOrNull(),
+            displayName.removeColor(),
+            this.getItemRarityOrNull(),
+        )
+    }
+
     private fun updateDisplay() {
         if (!isEnabled()) return
 
@@ -269,49 +265,77 @@ object ItemPickupLog {
         val addedItemsToNoLongerShow = itemsAddedToInventory.toMutableMap()
 
         if (config.compactLines) {
-            val iterator = addedItemsToNoLongerShow.iterator()
-            while (iterator.hasNext()) {
-                val item = iterator.next()
-
-                if (removedItemsToNoLongerShow.containsKey(item.key)) {
-                    val it = removedItemsToNoLongerShow[item.key]
-                    if (it != null) {
-                        val currentTotalValue = item.value.amount - it.amount
-                        val entry = PickupEntry(item.value.name, currentTotalValue, item.value.neuInternalName)
-
-                        if (currentTotalValue > 0) {
-                            display.add(renderList("§a+", entry))
-                        } else if (currentTotalValue < 0) {
-                            display.add(renderList("§c", entry))
-                        } else {
-                            itemsAddedToInventory.remove(item.key)
-                            itemsRemovedFromInventory.remove(item.key)
-                        }
-                        removedItemsToNoLongerShow.remove(item.key)
-                        iterator.remove()
-                    }
-                } else {
-                    display.add(renderList("§a+", item.value))
-                }
-            }
+            handleCompactLines(display, addedItemsToNoLongerShow, removedItemsToNoLongerShow)
         } else {
-            for (item in addedItemsToNoLongerShow) {
+            handleNormalLines(display, addedItemsToNoLongerShow, removedItemsToNoLongerShow)
+        }
 
-                display.add(renderList("§a+", item.value))
-                removedItemsToNoLongerShow[item.key]?.let {
-                    display.add(renderList("§c-", it))
-                    removedItemsToNoLongerShow.remove(item.key)
-                }
-            }
-        }
-        for (item in removedItemsToNoLongerShow) {
-            display.add(renderList("§c-", item.value))
-        }
+        addRemainingRemovedItems(display, removedItemsToNoLongerShow)
+
         if (display.isEmpty()) {
             this.display = null
-            return
+        } else {
+            val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
+            this.display = Renderable.fixedSizeColumn(renderable, 30)
         }
-        val renderable = Renderable.verticalContainer(display, verticalAlign = config.alignment)
-        this.display = Renderable.fixedSizeColumn(renderable, 30)
     }
+
+    private fun handleCompactLines(
+        display: MutableList<Renderable>,
+        addedItems: MutableMap<Int, PickupEntry>,
+        removedItems: MutableMap<Int, PickupEntry>,
+    ) {
+        val iterator = addedItems.iterator()
+        while (iterator.hasNext()) {
+            val item = iterator.next()
+
+            if (removedItems.containsKey(item.key)) {
+                val it = removedItems[item.key]
+                if (it != null) {
+                    val currentTotalValue = item.value.amount - it.amount
+                    val entry = PickupEntry(item.value.name, currentTotalValue, item.value.neuInternalName)
+
+                    if (currentTotalValue > 0) {
+                        display.add(renderList("§a+", entry))
+                    } else if (currentTotalValue < 0) {
+                        display.add(renderList("§c", entry))
+                    } else {
+                        itemsAddedToInventory.remove(item.key)
+                        itemsRemovedFromInventory.remove(item.key)
+                    }
+                    removedItems.remove(item.key)
+                    iterator.remove()
+                }
+            } else {
+                display.add(renderList("§a+", item.value))
+            }
+        }
+    }
+
+    private fun handleNormalLines(
+        display: MutableList<Renderable>,
+        addedItems: MutableMap<Int, PickupEntry>,
+        removedItems: MutableMap<Int, PickupEntry>,
+    ) {
+        for (item in addedItems) {
+            display.add(renderList("§a+", item.value))
+            removedItems[item.key]?.let {
+                display.add(renderList("§c-", it))
+                removedItems.remove(item.key)
+            }
+        }
+    }
+
+    private fun addRemainingRemovedItems(
+        display: MutableList<Renderable>,
+        removedItems: MutableMap<Int, PickupEntry>,
+    ) {
+        for (item in removedItems) {
+            display.add(renderList("§c-", item.value))
+        }
+    }
+
+    private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
+
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
