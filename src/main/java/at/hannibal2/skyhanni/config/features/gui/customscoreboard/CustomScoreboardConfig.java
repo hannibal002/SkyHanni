@@ -35,9 +35,7 @@ public class CustomScoreboardConfig {
 
     @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
-    public Runnable reset = () -> {
-        scoreboardEntries = ScoreboardElement.defaultOption;
-    };
+    public Runnable reset = () -> scoreboardEntries = Property.of(ScoreboardEntry.defaultOption);
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")
