@@ -109,7 +109,6 @@ object ItemPickupLog {
 
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 
-
         oldItemList.putAll(itemList)
 
         itemList.clear()
@@ -137,31 +136,9 @@ object ItemPickupLog {
 
         if (!worldChangeCooldown()) return
 
-        for ((key, value) in oldItemList) {
-            val stack = value.first
-            val oldAmount = value.second
-            if (!itemList.containsKey(key)) {
-                val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, true)
-            } else if (oldAmount > itemList[key]!!.second) {
-                val amount = (oldAmount - itemList[key]?.second!!)
-                val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, true)
-            }
-        }
+        checkForDuplicateItems(itemList, oldItemList, false)
+        checkForDuplicateItems(oldItemList, itemList, true)
 
-        for ((key, value) in itemList) {
-            val stack = value.first
-            val oldAmount = value.second
-            if (!oldItemList.containsKey(key)) {
-                val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, false)
-            } else if (oldAmount > oldItemList[key]!!.second) {
-                val amount = (oldAmount - oldItemList[key]?.second!!)
-                val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
-                updateItem(key, item, stack, false)
-            }
-        }
         updateDisplay()
     }
 
@@ -263,6 +240,25 @@ object ItemPickupLog {
 
 
     private fun worldChangeCooldown(): Boolean = LorenzUtils.lastWorldSwitch.passedSince() > 2.seconds
+
+    private fun checkForDuplicateItems(
+        list: MutableMap<Int, Pair<ItemStack, Int>>,
+        listToCheckAgainst: MutableMap<Int, Pair<ItemStack, Int>>,
+        add: Boolean,
+    ) {
+        for ((key, value) in list) {
+            val stack = value.first
+            val oldAmount = value.second
+            if (!listToCheckAgainst.containsKey(key)) {
+                val item = PickupEntry(stack.dynamicName(), oldAmount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, add)
+            } else if (oldAmount > listToCheckAgainst[key]!!.second) {
+                val amount = (oldAmount - listToCheckAgainst[key]?.second!!)
+                val item = PickupEntry(stack.dynamicName(), amount.toLong(), stack.getInternalNameOrNull())
+                updateItem(key, item, stack, add)
+            }
+        }
+    }
 
     private fun updateDisplay() {
         if (!isEnabled()) return
