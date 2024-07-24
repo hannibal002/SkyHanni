@@ -8,7 +8,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -38,16 +40,6 @@ object MagicalPowerDisplay {
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
         """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$"""
-    )
-    /*
-    * REGEX-TEST: a RARE ACCESSORY a
-    * REGEX-TEST: RARE ACCESSORY
-    * REGEX-TEST: EPIC DUNGEON ACCESSORY
-    * REGEX-TEST: a LEGENDARY ACCESSORY a
-    * */
-    private val accessoryLorePattern by RepoPattern.pattern(
-        "accessory.lore",
-        """a?\s*(COMMON|UNCOMMON|RARE|EPIC|LEGENDARY|MYTHIC)\s*(?:DUNGEON\s*)?ACCESSORY\s*a?"""
     )
 
     @SubscribeEvent
@@ -107,21 +99,9 @@ object MagicalPowerDisplay {
     }
 
     private fun ItemStack.isAccessory(): LorenzRarity? {
-        val lore = this.getLore()
-        for (line in lore) {
-            val stripped = line.stripControlCodes()
-
-            if (stripped == "SPECIAL HATCESSORY") {
-                return LorenzRarity.SPECIAL
-            } else if (stripped == "a VERY SPECIAL HATCESSORY a") {
-                return LorenzRarity.VERY_SPECIAL
-            }
-
-            if (accessoryLorePattern.matches(stripped)) {
-                return this.getItemRarityOrNull()
-            }
-        }
-        return null
+        val category = this.getItemCategoryOrNull() ?: return null
+        if (category != ItemCategory.ACCESSORY && category != ItemCategory.HATCESSORY) return null
+        return this.getItemRarityOrNull()
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
