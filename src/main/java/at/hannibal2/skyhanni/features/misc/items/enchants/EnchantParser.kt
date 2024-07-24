@@ -115,6 +115,8 @@ object EnchantParser {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
 
+        currentItem = null
+
         val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
 
         // Check for any vanilla gray enchants at the top of the tooltip
@@ -291,7 +293,7 @@ object EnchantParser {
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
             val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
-            builder.append(orderedEnchant.getFormattedString())
+            builder.append(orderedEnchant.getFormattedString(currentItem))
             if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1) {
                 builder.append(comma)
             } else {
@@ -314,7 +316,7 @@ object EnchantParser {
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
             val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
-            builder.append(orderedEnchant.getFormattedString())
+            builder.append(orderedEnchant.getFormattedString(currentItem))
             if (i % 3 != 2) {
                 builder.append(comma)
             } else {
@@ -329,12 +331,12 @@ object EnchantParser {
     private fun stackedFormatting(insertEnchants: MutableList<String>) {
         if (!config.hideEnchantDescriptions.get() || itemIsBook()) {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getFormattedString())
+                insertEnchants.add(enchant.getFormattedString(currentItem))
                 insertEnchants.addAll(enchant.getLore())
             }
         } else {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getFormattedString())
+                insertEnchants.add(enchant.getFormattedString(currentItem))
             }
         }
     }

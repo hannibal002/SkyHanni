@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.items.enchants
 
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
+import net.minecraft.item.ItemStack
 
 class FormattedEnchant(
     private val enchant: Enchant,
@@ -17,9 +18,9 @@ class FormattedEnchant(
 
     override fun compareTo(other: FormattedEnchant) = this.enchant.compareTo(other.enchant)
 
-    fun getFormattedString(): String {
+    fun getFormattedString(itemStack: ItemStack?): String {
         val builder = StringBuilder()
-        builder.append(enchant.getFormattedName(level)).append(" ").append(level.toRoman())
+        builder.append(enchant.getFormattedName(level, itemStack)).append(" ").append(level.toRoman())
 
         return if (!stacking.contains("empty")) builder.append(stacking).toString() else builder.toString()
     }
