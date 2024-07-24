@@ -148,12 +148,12 @@ object ItemPickupLog {
         checkForDuplicateItems(itemList, oldItemList, false)
         checkForDuplicateItems(oldItemList, itemList, true)
 
-        if (itemsRemovedFromInventory.values.removeIf { it.isExpired() } || itemsAddedToInventory.values.removeIf { it.isExpired() }) {
-            updateDisplay()
-        } else if (itemList != oldItemList) {
+        val itemsRemovedUpdated = itemsRemovedFromInventory.values.removeIf { it.isExpired() }
+        val itemsAddedUpdated = itemsAddedToInventory.values.removeIf { it.isExpired() }
+
+        if (itemsRemovedUpdated || itemsAddedUpdated || itemList != oldItemList) {
             updateDisplay()
         }
-
     }
 
     private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
@@ -262,9 +262,6 @@ object ItemPickupLog {
         if (!isEnabled()) return
 
         val display = mutableListOf<Renderable>()
-
-        itemsAddedToInventory.values.removeIf { it.isExpired() }
-        itemsRemovedFromInventory.values.removeIf { it.isExpired() }
 
         val removedItemsToNoLongerShow = itemsRemovedFromInventory.toMutableMap()
         val addedItemsToNoLongerShow = itemsAddedToInventory.toMutableMap()
