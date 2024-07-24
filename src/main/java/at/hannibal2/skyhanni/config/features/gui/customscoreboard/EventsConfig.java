@@ -20,10 +20,11 @@ public class EventsConfig {
     @ConfigEditorDraggableList()
     public List<ScoreboardEvent> eventEntries = new ArrayList<>(ScoreboardEvent.defaultOption);
 
-    @ConfigOption(name = "Reset Events Priority", desc = "Reset the priority of all events.\n§cYou will need to restart your game to apply the changes.")
+    @ConfigOption(name = "Reset Events Priority", desc = "Reset the priority of all events.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable reset = () -> {
-        eventEntries = ScoreboardEvent.defaultOption;
+        eventEntries.clear();
+        eventEntries.addAll(ScoreboardEvent.defaultOption);
     };
 
     @Expose

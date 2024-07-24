@@ -33,10 +33,11 @@ public class CustomScoreboardConfig {
     @ConfigEditorDraggableList()
     public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.defaultOption);
 
-    @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.\n§cYou will need to restart your game to apply the changes.")
+    @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable reset = () -> {
-        scoreboardEntries = ScoreboardElement.defaultOption;
+        scoreboardEntries.clear();
+        scoreboardEntries.addAll(ScoreboardElement.defaultOption);
     };
 
     @Expose
