@@ -153,10 +153,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: Submerges In: §e01m 00s
+     * REGEX-TEST: Submerges In: §e???
      */
     val submergesPattern by kuudraSb.pattern(
         "submerges",
-        "(?:§.)*Submerges In: (?:§.)*[\\w\\s]+",
+        "(?:§.)*Submerges In: (?:§.)*[\\w\\s?]+",
     )
 
     // farming
@@ -392,7 +393,10 @@ object ScoreboardPattern {
         "§d\\d+(?:st|nd|rd|th) Anniversary§f (?:\\d|:)+",
     )
 
-    // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
+    // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
+    /**
+     * REGEX-TEST: §eProtect Elle §7(§a98%§7)
+     */
     val thirdObjectiveLinePattern by miscSb.pattern(
         "thirdobjectiveline",
         "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)",
@@ -496,10 +500,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §fCarnival Tokens: §e129
+     * REGEX-TEST: §fCarnival Tokens: §e1,031
      */
     val carnivalTokensPattern by carnivalSb.pattern(
         "tokens",
-        "(?:§f)*Carnival Tokens: §e\\d+",
+        "(?:§f)*Carnival Tokens: §e[\\d,]+",
     )
 
     /**
