@@ -28,5 +28,5 @@ object ThunderBottleNotification {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.thunderBottleNotification
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.thunderBottleNotification
 }
