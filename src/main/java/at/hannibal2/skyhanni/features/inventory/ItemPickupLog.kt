@@ -290,22 +290,19 @@ object ItemPickupLog {
             val item = iterator.next()
 
             if (removedItems.containsKey(item.key)) {
-                val it = removedItems[item.key]
-                if (it != null) {
-                    val currentTotalValue = item.value.amount - it.amount
-                    val entry = PickupEntry(item.value.name, currentTotalValue, item.value.neuInternalName)
+                val currentTotalValue = item.value.amount - (removedItems[item.key]?.amount ?: 0)
+                val entry = PickupEntry(item.value.name, currentTotalValue, item.value.neuInternalName)
 
-                    if (currentTotalValue > 0) {
-                        display.add(renderList("§a+", entry))
-                    } else if (currentTotalValue < 0) {
-                        display.add(renderList("§c", entry))
-                    } else {
-                        itemsAddedToInventory.remove(item.key)
-                        itemsRemovedFromInventory.remove(item.key)
-                    }
-                    removedItems.remove(item.key)
-                    iterator.remove()
+                if (currentTotalValue > 0) {
+                    display.add(renderList("§a+", entry))
+                } else if (currentTotalValue < 0) {
+                    display.add(renderList("§c", entry))
+                } else {
+                    itemsAddedToInventory.remove(item.key)
+                    itemsRemovedFromInventory.remove(item.key)
                 }
+                removedItems.remove(item.key)
+                iterator.remove()
             } else {
                 display.add(renderList("§a+", item.value))
             }
