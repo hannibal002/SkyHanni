@@ -15,7 +15,7 @@ object ThunderBottleNotification {
     private val config get() = SkyHanniMod.feature.misc
 
     private val thunderBottleChargedPattern by RepoPattern.pattern(
-        "bottle.charged",
+        "thunderbottle.charged",
         "§e> Your bottle of thunder has fully charged!"
     )
 
