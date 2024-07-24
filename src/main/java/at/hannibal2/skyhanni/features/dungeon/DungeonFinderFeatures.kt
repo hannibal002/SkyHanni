@@ -253,6 +253,13 @@ object DungeonFinderFeatures {
                 }
             }
 
+            val markedClass = memberClasses.any { it == config.markClass.toString() }
+            if (markedClass) {
+                map[slot] = LorenzColor.WHITE
+                continue
+            }
+
+
             if (config.markMissingClass && memberClasses.none { it == selectedClass }) {
                 map[slot] = LorenzColor.GREEN
             }
