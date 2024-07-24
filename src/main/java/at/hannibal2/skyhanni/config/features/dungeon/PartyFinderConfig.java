@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.config.features.dungeon;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -12,6 +14,42 @@ public class PartyFinderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean coloredClassLevel = true;
+
+    @Expose
+    @ConfigOption(name = "Colored Class", desc = "Color selected class in Party Finder.")
+    @ConfigEditorDropdown
+    public ClassEntry markClass = ClassEntry.TANK;
+
+    public enum ClassEntry implements HasLegacyId {
+        TANK("Tank", 0),
+        HEALER("Healer", 1),
+        MAGE("Mage", 2),
+        ARCHER("Archer", 3),
+        BERSERK("Berserk", 4),
+        ;
+        private final String str;
+        private final int legacyId;
+
+        ClassEntry(String str, int legacyId) {
+            this.str = str;
+            this.legacyId = legacyId;
+        }
+
+        // Constructor if new enum elements are added post-migration
+        ClassEntry(String str) {
+            this(str, -1);
+        }
+
+        @Override
+        public int getLegacyId() {
+            return legacyId;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Floor Stack Size", desc = "Display the party finder floor as the item stack size.")
