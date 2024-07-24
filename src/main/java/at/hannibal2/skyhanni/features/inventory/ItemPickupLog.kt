@@ -148,7 +148,12 @@ object ItemPickupLog {
         checkForDuplicateItems(itemList, oldItemList, false)
         checkForDuplicateItems(oldItemList, itemList, true)
 
-        updateDisplay()
+        if (itemsRemovedFromInventory.values.removeIf { it.isExpired() } || itemsAddedToInventory.values.removeIf { it.isExpired() }) {
+            updateDisplay()
+        } else if (itemList != oldItemList) {
+            updateDisplay()
+        }
+
     }
 
     private fun updateItem(hash: Int, itemInfo: PickupEntry, item: ItemStack, removed: Boolean) {
