@@ -24,10 +24,10 @@ enum class SkyblockStat(
     @Language("RegExp") menuPatternS: String,
 ) {
     DAMAGE("§c❁", "", ""),  // Weapon only
-    HEALTH("§c❤", " Health: §r§c❤(?<value>.*)", " §c❤ Health §f(?<value>.*)"),
-    DEFENSE("§a❈", " Defense: §r§a❈(?<value>.*)", " §a❈ Defense §f(?<value>.*)"),
+    HEALTH("§c❤", " Health: §r§c❤(?<value>.*)", " §c❤ Health §f(?<value>.*)"), // TODO get from action bar
+    DEFENSE("§a❈", " Defense: §r§a❈(?<value>.*)", " §a❈ Defense §f(?<value>.*)"), // TODO get from action bar
     STRENGTH("§c❁", " Strength: §r§c❁(?<value>.*)", " §c❁ Strength §f(?<value>.*)"),
-    INTELLIGENCE("§b✎", " Intelligence: §r§b✎(?<value>.*)", " §b✎ Intelligence §f(?<value>.*)"),
+    INTELLIGENCE("§b✎", " Intelligence: §r§b✎(?<value>.*)", " §b✎ Intelligence §f(?<value>.*)"), // TODO get from action bar
     CRIT_DAMAGE("§9☠", " Crit Damage: §r§9☠(?<value>.*)", " §9☠ Crit Damage §f(?<value>.*)"),
     CRIT_CHANCE("§9☣", " Crit Chance: §r§9☣(?<value>.*)", " §9☣ Crit Chance §f(?<value>.*)"),
     FEROCITY("§c⫽", " Ferocity: §r§c⫽(?<value>.*)", " §c⫽ Ferocity §f(?<value>.*)"),
@@ -38,7 +38,7 @@ enum class SkyblockStat(
     MENDING("§a☄", " Mending: §r§a☄(?<value>.*)", " §a☄ Mending §f(?<value>.*)"),
     TRUE_DEFENCE("§7❂", " True Defense: §r§f❂(?<value>.*)", " §f❂ True Defense §f(?<value>.*)"),
     SWING_RANGE("§eⓈ", " Swing Range: §r§eⓈ(?<value>.*)", " §eⓈ Swing Range §f(?<value>.*)"),
-    SPEED("§f✦", " Speed: §r§f✦(?<value>.*)", " §f✦ Speed §f(?<value>.*)"),
+    SPEED("§f✦", " Speed: §r§f✦(?<value>.*)", " §f✦ Speed §f(?<value>.*)"), // TODO add the way sba did get it (be careful with 500+ Speed)
     SEA_CREATURE_CHANCE("§3α", " Sea Creature Chance: §r§3α(?<value>.*)", " §3α Sea Creature Chance §f(?<value>.*)"),
     MAGIC_FIND("§b✯", " Magic Find: §r§b✯(?<value>.*)", " §b✯ Magic Find §f(?<value>.*)"),
     PET_LUCK("§d♣", " Pet Luck: §r§d♣(?<value>.*)", " §d♣ Pet Luck §f(?<value>.*)"),
@@ -73,9 +73,10 @@ enum class SkyblockStat(
     CACTUS_FORTUNE("§7☘", "", " §7(?:§m)☘ Cactus Fortune (?<value>.*)"),
     NETHER_WART_FORTUNE("§7☘", "", " §7(?:§m)☘ Nether Wart Fortune (?<value>.*)"),
     COCOA_BEANS_FORTUNE("§7☘", "", " §7(?:§m)☘ Cocoa Beans Fortune (?<value>.*)"),
+    SUGAR_CANE_FORTUNE("§7☘", "", " §7(?:§m)☘ Sugar Cane Fortune (?<value>.*)"),
     ;
 
-    var lastKnowValue: Double
+    var lastKnownValue: Double
         get() = ProfileStorageData.profileSpecific?.stats?.get(this) ?: 0.0
         set(value) {
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
@@ -89,7 +90,7 @@ enum class SkyblockStat(
 
     val keyName = name.lowercase().replace('_', '.')
 
-    val displayValue get() = icon + lastKnowValue.roundToInt()
+    val displayValue get() = icon + lastKnownValue.roundToInt()
 
     val tablistPattern by RepoPattern.pattern("stats.tablist.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)
@@ -150,7 +151,7 @@ enum class SkyblockStat(
                 val matchResult = pattern(entry).matchMatcher(line) {
                     groupOrNull("value")?.replace("[,%]".toRegex(), "")?.toDouble()
                 } ?: continue
-                entry.lastKnowValue = matchResult
+                entry.lastKnownValue = matchResult
                 entry.lastSource = type
                 break // Exit the inner loop once a match is found
             }
