@@ -40,7 +40,7 @@ object ItemPickupLog {
     enum class DisplayLayout(private val display: String) {
         CHANGE_AMOUNT("§a+256"),
         ICON("§e✎"),
-        ITEM_NAME("§d[Cute] Skirtwearer's Cake Soul"),
+        ITEM_NAME("§d[:3] TransRights's Cake Soul"),
         ;
 
         override fun toString() = display
