@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -70,7 +69,6 @@ object MagicalPowerDisplay {
         if (!isEnabled()) return
         if (event.inventoryName.startsWith("Abiphone")) {
             val theBookLore = event.inventoryItems[51]?.getLore() ?: return
-            ChatUtils.debug("Checking Abiphone for contacts")
             for (line in theBookLore) {
                 val stripped = line.stripControlCodes()
                 if (stripped.startsWith("Your contacts: ")) {
