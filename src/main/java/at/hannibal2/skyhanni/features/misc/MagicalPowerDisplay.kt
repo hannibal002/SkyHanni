@@ -37,7 +37,7 @@ object MagicalPowerDisplay {
     * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Auctions: .*)$"""
+        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$"""
     )
     /*
     * REGEX-TEST: a RARE ACCESSORY a
