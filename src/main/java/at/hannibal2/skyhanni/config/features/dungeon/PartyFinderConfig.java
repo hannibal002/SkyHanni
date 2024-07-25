@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config.features.dungeon;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.HasLegacyId;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -14,43 +13,6 @@ public class PartyFinderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean coloredClassLevel = true;
-
-    @Expose
-    @ConfigOption(name = "Colored Class", desc = "Color selected class in Party Finder.")
-    @ConfigEditorDropdown
-    public ClassEntry markClass = ClassEntry.NONE;
-
-    public enum ClassEntry implements HasLegacyId {
-        NONE("None", 0),
-        TANK("Tank", 1),
-        HEALER("Healer", 2),
-        MAGE("Mage", 3),
-        ARCHER("Archer", 4),
-        BERSERK("Berserk", 5),
-        ;
-        private final String str;
-        private final int legacyId;
-
-        ClassEntry(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        ClassEntry(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
 
     @Expose
     @ConfigOption(name = "Floor Stack Size", desc = "Display the party finder floor as the item stack size.")
@@ -80,6 +42,31 @@ public class PartyFinderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean markIneligibleGroups = true;
+
+    @Expose
+    @ConfigOption(name = "Mark Selected Class", desc = "Highlight groups that has selected class.")
+    @ConfigEditorDropdown
+    public ClassEntry markClass = ClassEntry.NONE;
+
+    public enum ClassEntry {
+        NONE("None"),
+        TANK("Tank"),
+        HEALER("Healer"),
+        MAGE("Mage"),
+        ARCHER("Archer"),
+        BERSERK("Berserk"),
+        ;
+        private final String str;
+
+        ClassEntry(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Mark Missing Class", desc = "Highlight groups that don't currently have any members of your selected dungeon class.")
