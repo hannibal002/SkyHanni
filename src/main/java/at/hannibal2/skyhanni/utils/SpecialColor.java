@@ -5,7 +5,7 @@ import java.awt.Color;
 /**
  * Taken from NotEnoughUpdates
  */
-public class SpecialColour {
+public class SpecialColor {
 
     private static final int RADIX = 10;
 
