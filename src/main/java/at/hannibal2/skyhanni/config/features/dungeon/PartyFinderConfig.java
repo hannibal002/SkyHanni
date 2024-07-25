@@ -18,14 +18,15 @@ public class PartyFinderConfig {
     @Expose
     @ConfigOption(name = "Colored Class", desc = "Color selected class in Party Finder.")
     @ConfigEditorDropdown
-    public ClassEntry markClass = ClassEntry.TANK;
+    public ClassEntry markClass = ClassEntry.NONE;
 
     public enum ClassEntry implements HasLegacyId {
-        TANK("Tank", 0),
-        HEALER("Healer", 1),
-        MAGE("Mage", 2),
-        ARCHER("Archer", 3),
-        BERSERK("Berserk", 4),
+        NONE("None", 0),
+        TANK("Tank", 1),
+        HEALER("Healer", 2),
+        MAGE("Mage", 3),
+        ARCHER("Archer", 4),
+        BERSERK("Berserk", 5),
         ;
         private final String str;
         private final int legacyId;
