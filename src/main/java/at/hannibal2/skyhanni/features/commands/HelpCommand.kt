@@ -75,7 +75,7 @@ object HelpCommand {
 
         if (filtered.isEmpty()) {
             text.add(Text.EMPTY)
-            text.add("§cNo reminders found.".asComponent().center())
+            text.add("§cNo commands found.".asComponent().center())
             text.add(Text.EMPTY)
         } else {
             val start = (page - 1) * COMMANDS_PER_PAGE

@@ -31,40 +31,19 @@ object ShaderManager {
         DARKEN(DarkenShader.INSTANCE)
         ;
 
-        fun enableShader() = ShaderManager.enableShader(name.lowercase())
-
-        companion object {
-
-            fun getShaderInstance(shaderName: String): Shader? = when (shaderName) {
-                "standard_chroma" -> STANDARD_CHROMA.shader
-                "textured_chroma" -> TEXTURED_CHROMA.shader
-                "rounded_rect" -> ROUNDED_RECTANGLE.shader
-                "rounded_rect_outline" -> ROUNDED_RECT_OUTLINE.shader
-                "darken" -> DARKEN.shader
-                else -> {
-                    null
-                }
-            }
-        }
+        fun enableShader() = enableShader(this)
     }
 
-    private val shaders: MutableMap<String, Shader> = mutableMapOf()
     private var activeShader: Shader? = null
 
-    fun enableShader(shaderName: String) {
-        var shader = shaders[shaderName]
+    fun enableShader(shader: Shaders) {
+        val shaderInstance = shader.shader
 
-        if (shader == null) {
-            shader = Shaders.getShaderInstance(shaderName)
-            if (shader == null) return
-            shaders[shaderName] = shader
-        }
+        if (!shaderInstance.created) return
 
-        if (!shader.created) return
-
-        activeShader = shader
-        shader.enable()
-        shader.updateUniforms()
+        activeShader = shaderInstance
+        shaderInstance.enable()
+        shaderInstance.updateUniforms()
     }
 
     fun attachShader(shaderProgram: Int, shaderID: Int) {
@@ -92,7 +71,7 @@ object ShaderManager {
         ShaderHelper.glShaderSource(shaderID, source.toString())
         ShaderHelper.glCompileShader(shaderID)
 
-        if (ShaderHelper.glGetShaderi(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
+        if (ShaderHelper.glGetShaderInt(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
             val errorMessage = "Failed to compile shader $fileName${type.extension}. Features that utilise this " +
                 "shader will not work correctly, if at all"
             val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))
@@ -101,7 +80,7 @@ object ShaderManager {
                 ErrorManager.logErrorWithData(
                     OpenGLException("Shader compilation error."),
                     errorMessage,
-                    "GLSL Compilation Error:\n" to errorLog
+                    "GLSL Compilation Error:\n" to errorLog,
                 )
             } else {
                 LorenzUtils.consoleLog("$errorMessage $errorLog")
