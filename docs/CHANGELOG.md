@@ -3901,7 +3901,7 @@
 + Fixed max kills from Ghost Counter using old bestiary data when resetting the config. - HiZe
 + Fixed part of Zealot Hideout area showing as The End. - Cad
 + Fixed many typos in the config. - schlaumeyer, oofy, CalMWolfs & hannibal2
-+ Fixed a missing bracket in the reforge apply cost display from Estimated Item Value. - jaNI
++ Fixed a missing bracket in the reforge apply cost display from Estimated Item Value. - jani
 + Fixed a rare crash while doing enderman slayer. - hannibal2
 + Fixed pet exp tooltip doesn't show in pet inventory or Hypixel profile viewer (right-click a player). - hannibal2
 + Fixed turbo books price not getting detected in visitor rewards. - hannibal2
