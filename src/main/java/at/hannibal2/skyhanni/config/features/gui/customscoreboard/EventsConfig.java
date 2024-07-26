@@ -24,6 +24,9 @@ public class EventsConfig {
     @ConfigOption(name = "Reset Events Priority", desc = "Reset the priority of all events.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable reset = () -> {
+        eventEntries.get().clear();
+        eventEntries.get().addAll(ScoreboardEventEntry.defaultOption);
+        eventEntries.notifyObservers();
     };
 
     @Expose
