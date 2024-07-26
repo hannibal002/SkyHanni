@@ -28,17 +28,17 @@ object SprayFeatures {
 
     private val changeMaterialPattern by RepoPattern.pattern(
         "garden.spray.material",
-        "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!"
+        "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!",
     )
 
-    private fun SprayType?.getSprayEffect(): String {
-        return this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
+    private fun SprayType?.getSprayEffect(): String =
+        this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
             pests.joinToString("§7, §6") { it.displayName }
         } ?: when (this) {
             SprayType.FINE_FLOUR -> "§6+20☘ Farming Fortune"
             else -> "§cUnknown Effect"
         }
-    }
+
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
