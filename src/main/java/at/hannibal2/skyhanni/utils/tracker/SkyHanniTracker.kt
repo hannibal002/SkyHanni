@@ -22,6 +22,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
+    // TODO change to renderable
     private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
 
