@@ -215,6 +215,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show a list of all possible reforges for the item, with stats.
     + The reforge list can be sorted by a specific stat.
     + Optionally show the different stat values compared to the current reforge.
++ Show Bestiary Level as Stack Size. - saga (https://github.com/hannibal002/SkyHanni/pull/1945)
+    + Can be enabled/disabled on the Item Number list.
 
 </details>
 <details open><summary>
@@ -1266,6 +1268,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to include vanilla items.
 + Add Armor Stack Display. - Xupie (https://github.com/hannibal002/SkyHanni/pull/1811)
     + Display the number of stacks on armor pieces like Crimson, Terror etc.
++ Added Option to crash your game when you die, for extra suffering. - Stella (https://github.com/hannibal002/SkyHanni/pull/2238)
+    + Also punishes players who don't read patch notes.
++ Added Crown of Avarice counter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2229)
 
 </details>
 <details open><summary>
