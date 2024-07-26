@@ -169,6 +169,7 @@ object FishingTimer {
             1 + it.key.extraEntities.size
         }
         startTime = mobDespawnTime.maxByOrNull { it.value.passedSince() }?.value ?: SimpleTimeMark.farPast()
+        display = createDisplay()
     }
 
     private fun updateLocation() {
