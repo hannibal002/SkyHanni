@@ -194,7 +194,7 @@ object BitsAPI {
         }
 
         boosterCookieAte.matchMatcher(message) {
-            bitsAvailable += (defaultCookieBits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
+            bitsAvailable += bitsPerCookie()
             val cookieTime = cookieBuffTime
             cookieBuffTime = if (cookieTime == null) SimpleTimeMark.now() + 4.days else cookieTime + 4.days
             sendBitsAvailableGainedEvent()
@@ -202,6 +202,8 @@ object BitsAPI {
             return
         }
     }
+
+    fun bitsPerCookie() : Int = (defaultCookieBits * (currentFameRank?.bitsMultiplier ?: 1.0)).toInt()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
