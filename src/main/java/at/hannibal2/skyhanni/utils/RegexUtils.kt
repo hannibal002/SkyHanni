@@ -83,4 +83,16 @@ object RegexUtils {
         return this.any { it.matches(string) }
     }
 
+    /**
+     * Returns a sequence of all occurrences of a regular expression within the [input] string.
+     */
+    fun Pattern.findAll(input: String): List<String> {
+        val matcher = this.matcher(input)
+
+        return buildList {
+            while (matcher.find()) {
+                add(matcher.group())
+            }
+        }
+    }
 }
