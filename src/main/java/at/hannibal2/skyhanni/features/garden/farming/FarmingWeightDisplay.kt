@@ -387,7 +387,7 @@ object FarmingWeightDisplay {
     private fun updateWeightPerSecond(crop: CropType, before: Double, after: Double, diff: Int) {
         val speed = crop.getSpeed() ?: return
         val weightDiff = (after - before) * 1000
-        weightPerSecond = ((weightDiff / diff) * (speed / 1000))
+        weightPerSecond = (((weightDiff / diff) * speed) / 1000)
     }
 
     private fun getExactWeight(): Double {

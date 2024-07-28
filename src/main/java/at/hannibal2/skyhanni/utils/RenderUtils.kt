@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
@@ -75,7 +76,7 @@ object RenderUtils {
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    private val colourBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
 
     infix fun Slot.highlight(color: LorenzColor) {
@@ -640,14 +641,46 @@ object RenderUtils {
             renderable.render(0, 0)
         }
         GlStateManager.popMatrix()
-        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, 0)
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, renderable.width, renderable.height)
+    }
+
+    /** This function is discouraged to be used. Please use renderRenderables with List<Renderable> instead with horizontal container.*/
+    fun Position.renderRenderablesDouble(
+        renderables: List<List<Renderable>>,
+        extraSpace: Int = 0,
+        posLabel: String,
+        addToGuiManager: Boolean = true,
+    ) {
+        if (renderables.isEmpty()) return
+        var longestY = 0
+        var longestX = 0
+        GlStateManager.pushMatrix()
+        val (x, y) = transform()
+        Renderable.withMousePosition(x, y) {
+            for (line in renderables) {
+                GlStateManager.pushMatrix()
+                GlStateManager.translate(0f, longestY.toFloat(), 0F)
+                val lineY = line.maxOf { it.height }
+                var lineX = 0
+                for (element in line) {
+                    element.renderYAligned(lineX, longestY, lineY)
+                    GlStateManager.translate(element.width.toFloat(), 0f, 0f)
+                    lineX += element.width
+                }
+                longestY += lineY + extraSpace + 2
+                longestX = max(longestX, lineX)
+                GlStateManager.popMatrix()
+            }
+        }
+        GlStateManager.popMatrix()
+        if (addToGuiManager) GuiEditManager.add(this, posLabel, longestX, longestY)
     }
 
     /**
      * Accepts a list of lines to print.
      * Each line is a list of things to print. Can print String or ItemStack objects.
      */
-    @Deprecated("use List<Renderable>", ReplaceWith(""))
+    @Deprecated("use List<List<Renderable>>", ReplaceWith("this.renderRenderablesDouble(list,extraSpace,posLabel)"))
     fun Position.renderStringsAndItems(
         list: List<List<Any?>>,
         extraSpace: Int = 0,
@@ -656,24 +689,10 @@ object RenderUtils {
     ) {
         if (list.isEmpty()) return
 
-        var offsetY = 0
-        var longestX = 0
-        try {
-            for (line in list) {
-                val x = renderLine(line, offsetY, itemScale)
-                if (x > longestX) {
-                    longestX = x
-                }
-                offsetY += 10 + extraSpace + 2
-            }
-        } catch (e: NullPointerException) {
-            ErrorManager.logErrorWithData(
-                e,
-                "Failed to render an element",
-                "list" to list,
-            )
-        }
-        GuiEditManager.add(this, posLabel, longestX, offsetY)
+        val render =
+            list.map { it.map { Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it") } }
+
+        this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
     /**
@@ -686,11 +705,9 @@ object RenderUtils {
         posLabel: String,
     ) {
         if (list.isEmpty()) return
-        renderRenderables(
-            listOf(
-                Renderable.horizontalContainer(
-                    list.mapNotNull { Renderable.fromAny(it) },
-                ),
+        renderRenderable(
+            Renderable.horizontalContainer(
+                list.mapNotNull { Renderable.fromAny(it) },
             ),
             posLabel = posLabel,
         )
@@ -993,12 +1010,12 @@ object RenderUtils {
         y: Float,
         shadow: Boolean,
         len: Int,
-        colour: Int,
+        color: Int,
     ) {
         val strLen = fr.getStringWidth(str)
         var factor = len / strLen.toFloat()
         factor = 1f.coerceAtMost(factor)
-        TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, colour, factor)
+        TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, color, factor)
     }
 
     fun LorenzRenderWorldEvent.drawDynamicText(
@@ -1592,14 +1609,14 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.outlineTopFace(
         boundingBox: AxisAlignedBB,
         lineWidth: Int,
-        colour: Color,
+        color: Color,
         depth: Boolean,
     ) {
         val (cornerOne, cornerTwo, cornerThree, cornerFour) = boundingBox.getCorners(boundingBox.maxY)
-        this.draw3DLine(cornerOne, cornerTwo, colour, lineWidth, depth)
-        this.draw3DLine(cornerTwo, cornerThree, colour, lineWidth, depth)
-        this.draw3DLine(cornerThree, cornerFour, colour, lineWidth, depth)
-        this.draw3DLine(cornerFour, cornerOne, colour, lineWidth, depth)
+        this.draw3DLine(cornerOne, cornerTwo, color, lineWidth, depth)
+        this.draw3DLine(cornerTwo, cornerThree, color, lineWidth, depth)
+        this.draw3DLine(cornerThree, cornerFour, color, lineWidth, depth)
+        this.draw3DLine(cornerFour, cornerOne, color, lineWidth, depth)
     }
 
     // TODO nea please merge with 'draw3DLine'
@@ -1887,9 +1904,9 @@ object RenderUtils {
     }
 
     fun getAlpha(): Float {
-        colourBuffer.clear()
-        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colourBuffer)
-        if (colourBuffer.limit() < 4) return 1f
-        return colourBuffer.get(3)
+        colorBuffer.clear()
+        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)
+        if (colorBuffer.limit() < 4) return 1f
+        return colorBuffer.get(3)
     }
 }

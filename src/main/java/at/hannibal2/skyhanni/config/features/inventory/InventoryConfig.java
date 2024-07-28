@@ -59,6 +59,11 @@ public class InventoryConfig {
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @Expose
+    @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
+    @Accordion
+    public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
+
+    @Expose
     @Category(name = "Craftable Item List", desc = "")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
@@ -142,6 +147,8 @@ public class InventoryConfig {
         DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
+        SKYBLOCK_LEVEL("§bSkyblock Level"),
+        BESTIARY_LEVEL("§bBestiary Level")
         ;
 
         private final String str;
