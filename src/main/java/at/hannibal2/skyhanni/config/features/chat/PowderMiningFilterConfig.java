@@ -44,11 +44,6 @@ public class PowderMiningFilterConfig {
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int essenceFilterThreshold = 5;
 
-    @Expose
-    @ConfigOption(name = "Gemstones", desc = "")
-    @Accordion
-    public PowderMiningGemstoneFilterConfig gemstoneFilterConfig = new PowderMiningGemstoneFilterConfig();
-
     public enum SimplePowderMiningRewardTypes {
 
         ASCENSION_ROPE("§9Ascension Rope"),
@@ -96,21 +91,26 @@ public class PowderMiningFilterConfig {
     public enum GoblinEggFilterEntry {
         SHOW_ALL("Show all"),
         HIDE_ALL("Hide all"),
-        GREEN_UP("Show §aGreen§7+"),
-        YELLOW_UP("Show §eYellow§7+"),
-        RED_UP("Show §cRed§7+"),
+        GREEN_UP("Show §aGreen §7and up"),
+        YELLOW_UP("Show §eYellow §7and up"),
+        RED_UP("Show §cRed §7and up"),
         BLUE_ONLY("Show §3Blue §7only");
 
-        private final String str;
+        private final String name;
 
-        GoblinEggFilterEntry(String str) {
-            this.str = str;
+        GoblinEggFilterEntry(String name) {
+            this.name = name;
         }
 
         @Override
         public String toString() {
-            return str;
+            return name;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "Gemstones", desc = "")
+    @Accordion
+    public PowderMiningGemstoneFilterConfig gemstoneFilterConfig = new PowderMiningGemstoneFilterConfig();
 
 }
