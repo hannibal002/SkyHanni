@@ -55,7 +55,7 @@ object PatcherSendCoordinates {
                 split.first().toFloat()
             } else end.toFloat()
             patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
-            logger.log("got patcher coords and username")
+            logger.log("got Patcher coords and username")
         }
     }
 
@@ -76,10 +76,10 @@ object PatcherSendCoordinates {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()
-        // removed patcher beacon!
+        // removed Patcher beacon!
         patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + 5 && location.distanceIgnoreY(it.location) < 5 }
 
-        // removed patcher beacon after time!
+        // removed Patcher beacon after time!
         patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + config.duration }
     }
 

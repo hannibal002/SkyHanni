@@ -46,9 +46,8 @@ object ChocolateFactoryUpgradeWarning {
         if (ChocolateFactoryAPI.inChocolateFactory) return
         ChatUtils.clickableChat(
             "You have a Chocolate factory upgrade available to purchase!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            }
+            onClick = { HypixelCommands.chocolateFactory() },
+            "§eClick to run /cf!"
         )
     }
 

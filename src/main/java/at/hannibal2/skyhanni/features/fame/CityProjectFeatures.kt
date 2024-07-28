@@ -81,9 +81,8 @@ object CityProjectFeatures {
 
         ChatUtils.clickableChat(
             "Daily City Project Reminder! (Click here to disable this reminder)",
-            onClick = {
-                disable()
-            },
+            onClick = { disable() },
+            "§eClick to disable!",
             oneTimeClick = true
         )
     }
@@ -171,7 +170,7 @@ object CityProjectFeatures {
                 ) { inInventory && !NEUItems.neuHasFocus() }
             )
 
-            val price = internalName.getPrice(false) * amount
+            val price = internalName.getPrice() * amount
             val format = price.shortFormat()
             list.add(" §7(§6$format§7)")
             add(list)
