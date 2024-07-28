@@ -567,7 +567,7 @@ enum class HotmData(
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
 
-            if (entry == SKY_MALL) handelSkyMall(lore)
+            if (entry == SKY_MALL) handleSkyMall(lore)
         }
 
         private fun Slot.handlePowder(): Boolean {
@@ -620,10 +620,10 @@ enum class HotmData(
             "§aYour Current Effect",
         )
 
-        private fun handelSkyMall(lore: List<String>) {
+        private fun handleSkyMall(lore: List<String>) {
             if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
             else {
-                val index = lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                val index = skyMallCurrentEffect.indexOfFirstMatch(lore) ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Could not read the skymall effect from the hotm tree",
                         "skyMallCurrentEffect didn't match",
@@ -651,13 +651,13 @@ enum class HotmData(
             if (!LorenzUtils.inSkyBlock) return
 
             event.scoreboard.matchFirst(ScoreboardPattern.powderPattern) {
-                val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
+                val type = HotmAPI.Powder.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
 
                 if (difference > 0) {
                     type.gain(difference)
-                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.lowName} Powder")
+                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.displayName} Powder")
                 }
             }
         }
@@ -745,7 +745,7 @@ enum class HotmData(
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 HotmAPI.Powder.entries.forEach {
-                    add("${it.lowName} Powder: ${it.getCurrent()}/${it.getTotal()}")
+                    add("${it.displayName} Powder: ${it.getCurrent()}/${it.getTotal()}")
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")

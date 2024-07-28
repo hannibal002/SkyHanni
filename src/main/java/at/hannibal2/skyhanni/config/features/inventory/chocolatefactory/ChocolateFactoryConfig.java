@@ -62,7 +62,7 @@ public class ChocolateFactoryConfig {
 
     @Expose
     @ConfigOption(name = "Highlight Upgrades", desc = "Highlight any upgrades that you can afford.\n" +
-        "The upgrade with a golden border is the most optimal and the lightest colour of green is the most optimal you can afford.")
+        "The upgrade with a golden border is the most optimal and the lightest color of green is the most optimal you can afford.")
     @ConfigEditorBoolean
     public boolean highlightUpgrades = true;
 

@@ -160,8 +160,10 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-    fun NEUInternalName.getPrice(useSellPrice: Boolean = false, pastRecipes: List<NeuRecipe> = emptyList()) =
-        getPriceOrNull(useSellPrice, pastRecipes) ?: -1.0
+    fun NEUInternalName.getPrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ) = getPriceOrNull(priceSource, pastRecipes) ?: -1.0
 
     fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
 
@@ -175,20 +177,28 @@ object NEUItems {
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
-    fun NEUInternalName.getPriceOrNull(useSellPrice: Boolean = false, pastRecipes: List<NeuRecipe> = emptyList()): Double? {
-        if (this == NEUInternalName.WISP_POTION) {
-            return 20_000.0
+    fun NEUInternalName.getPriceOrNull(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ): Double? {
+        when (this) {
+            NEUInternalName.JASPER_CRYSTAL -> return 0.0
+            NEUInternalName.RUBY_CRYSTAL -> return 0.0
+            NEUInternalName.SKYBLOCK_COIN -> return 1.0
+            NEUInternalName.WISP_POTION -> return 20_000.0
         }
 
-        getBazaarData()?.let {
-            return if (useSellPrice) it.sellOfferPrice else it.instantBuyPrice
-        }
+        if (priceSource != ItemPriceSource.NPC_SELL) {
+            getBazaarData()?.let {
+                return if (priceSource == ItemPriceSource.BAZAAR_INSTANT_BUY) it.sellOfferPrice else it.instantBuyPrice
+            }
 
-        val result = manager.auctionManager.getLowestBin(asString())
-        if (result != -1L) return result.toDouble()
+            val result = manager.auctionManager.getLowestBin(asString())
+            if (result != -1L) return result.toDouble()
 
-        if (equals("JACK_O_LANTERN")) {
-            return "PUMPKIN".asInternalName().getPrice(useSellPrice) + 1
+            if (equals("JACK_O_LANTERN")) {
+                return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
+            }
         }
         if (equals("GOLDEN_CARROT")) {
             // 6.8 for some players
@@ -202,7 +212,9 @@ object NEUItems {
     fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
         manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
             getRecipes(this).filter { it !in pastRecipes }
-                .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }.minOrNull()
+                .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }
+                .filter { it >= 0 }
+                .minOrNull()
         }
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
@@ -372,7 +384,7 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled.getValue()) return true
+        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
         if (NEUOverlay.searchBarHasFocus) return true
 
         return false
