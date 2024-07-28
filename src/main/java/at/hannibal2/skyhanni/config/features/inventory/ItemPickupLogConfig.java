@@ -35,7 +35,7 @@ public class ItemPickupLogConfig {
     public boolean shorten = false;
 
     @Expose
-    @ConfigOption(name = "Sacks", desc = "Show items added and removed from stacks.")
+    @ConfigOption(name = "Sacks", desc = "Show items added and removed from sacks.")
     @ConfigEditorBoolean
     public boolean sack = false;
 
