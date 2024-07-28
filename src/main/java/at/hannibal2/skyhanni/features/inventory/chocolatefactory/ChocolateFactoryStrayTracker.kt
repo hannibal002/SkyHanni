@@ -2,12 +2,11 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfAllNotNull
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -15,7 +14,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -279,13 +277,9 @@ object ChocolateFactoryStrayTracker {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot == null || event.slot.slotIndex == -999) return
-        if (!InventoryUtils.getItemsInOpenChest().any { it.slotNumber == event.slot.slotNumber }) return
         if (claimedStraysSlots.contains(event.slot.slotIndex)) return
-        try {
-            val clickedSlot = InventoryUtils.getItemsInOpenChest().first {
-                it.hasStack && it.slotNumber == event.slot.slotNumber
-            }
-            val clickedStack = clickedSlot.stack
+        InventoryUtils.getItemsInOpenChest().find { it.slotNumber == event.slot.slotNumber && it.hasStack }?.let {
+            val clickedStack = it.stack
             val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
             if (nameText.equals("§6§lGolden Rabbit §8- §aSide Dish")) {
                 claimedStraysSlots.add(event.slot.slotIndex)
@@ -295,16 +289,19 @@ object ChocolateFactoryStrayTracker {
                     claimedStraysSlots.remove(claimedStraysSlots.indexOf(event.slot.slotIndex))
                 }
             }
-        } catch (e: NoSuchElementException) {
-            return
-        }
+        } ?: return
     }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        tracker.firstUpdate()
         tracker.renderDisplay(config.strayRabbitTrackerPosition)
+    }
+
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!isEnabled()) return
+        tracker.firstUpdate()
     }
 
     fun resetCommand() {
