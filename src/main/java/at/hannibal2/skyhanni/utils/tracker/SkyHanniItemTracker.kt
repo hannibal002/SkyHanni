@@ -56,7 +56,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         if (isInventoryOpen()) {
             lists.addSelector<ItemPriceSource>(
                 "",
-                getName = { type -> type.displayName },
+                getName = { type -> type.sellName },
                 isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
                     config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
