@@ -20,7 +20,7 @@ public class ChocolateFactoryCustomReminderConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Always Custom Reminder", desc = "Always show the display always, even outside the chocolate factory.")
+    @ConfigOption(name = "Always Custom Reminder", desc = "Always show the display, even outside the chocolate factory.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean always = false;

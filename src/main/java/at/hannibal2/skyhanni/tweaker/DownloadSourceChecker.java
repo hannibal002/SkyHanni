@@ -121,7 +121,7 @@ public class DownloadSourceChecker {
             URI host = getHost(file);
             if (host == null) return null;
 
-            if (host.getHost().equals("objects.githubusercontent.com") && host.getPath().contains(GITHUB_REPO_TEXT)) {
+            if (host.getHost().equals("objects.githubusercontent.com") && host.getQuery().contains(GITHUB_REPO_TEXT)) {
                 return null;
             } else if (host.getHost().equals("cdn.modrinth.com") && host.getPath().startsWith(MODRINTH_URL)) {
                 return null;

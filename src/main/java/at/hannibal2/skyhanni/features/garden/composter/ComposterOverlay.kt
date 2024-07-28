@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
-import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -503,9 +502,8 @@ object ComposterOverlay {
             val sackType = if (isDwarvenMineable) "Mining §eor §9Dwarven" else "Enchanted Agronomy"
             ChatUtils.clickableChat(
                 "Sacks could not be loaded. Click here and open your §9$sackType Sack §eto update the data!",
-                onClick = {
-                    HypixelCommands.sacks()
-                }
+                onClick = { HypixelCommands.sacks() },
+                "§eClick to run /sax!",
             )
             return
         }
@@ -528,17 +526,15 @@ object ComposterOverlay {
             } else {
                 ChatUtils.clickableChat( // TODO Add this as a separate feature, and then don't send any msg if the feature is disabled
                     "You're out of $itemName §ein your sacks! Click here to buy more on the Bazaar!",
-                    onClick = {
-                        HypixelCommands.bazaar(itemName.removeColor())
-                    }
+                    onClick = { HypixelCommands.bazaar(itemName.removeColor()) },
+                    "§eClick find on the bazaar!",
                 )
             }
         }
     }
 
     private fun getPrice(internalName: NEUInternalName): Double {
-        val useSellPrice = config.overlayPriceType == ComposterConfig.OverlayPriceTypeEntry.BUY_ORDER
-        val price = internalName.getPrice(useSellPrice)
+        val price = internalName.getPrice(config.priceSource)
         if (internalName.equals("BIOFUEL") && price > 20_000) return 20_000.0
 
         return price
@@ -624,9 +620,6 @@ object ComposterOverlay {
         event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
         event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
         event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
-        event.transform(15, "garden.composters.overlayPriceType") { element ->
-            ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
-        }
         event.transform(15, "garden.composters.retrieveFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
         }
