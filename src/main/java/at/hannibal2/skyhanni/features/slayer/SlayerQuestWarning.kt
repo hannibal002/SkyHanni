@@ -61,20 +61,21 @@ object SlayerQuestWarning {
 
     private fun getSlayerData() = if (RiftAPI.inRift()) outsideRiftData else insideRiftData
 
+    private fun String.inCombat() = contains("Combat") || contains("Kills")
+    private fun String.inBoss() = this == "Slay the boss!"
+    private fun String?.bossSlain() = this == "Boss slain!"
+    private fun String.noSlayer() = this == "no slayer"
+
     private fun change(old: String, new: String) {
-        if (new.contains("Combat")) {
-            if (!old.contains("Combat")) {
-                needSlayerQuest = false
-            }
+        if (!old.inCombat() && new.inCombat()) {
+            needSlayerQuest = false
         }
-        if (new == "no slayer") {
-            if (old == "Slay the boss!") {
-                needNewQuest("The old slayer quest has failed!")
-            }
+        if (old.inBoss() && new.noSlayer()) {
+            needNewQuest("The old slayer quest has failed!")
         }
-        if (new == "Boss slain!") {
+        if (new.bossSlain()) {
             DelayedRun.runDelayed(2.seconds) {
-                if (getSlayerData().currentSlayerState == "Boss slain!") {
+                if (getSlayerData().currentSlayerState.bossSlain()) {
                     needNewQuest("You have no Auto-Slayer active!")
                 }
             }
@@ -133,7 +134,7 @@ object SlayerQuestWarning {
                 SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
-                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
+                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!",
                 )
             }
         }
