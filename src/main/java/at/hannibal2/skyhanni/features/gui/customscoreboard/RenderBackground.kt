@@ -54,7 +54,7 @@ class RenderBackground {
                     elementWidth + border * 3,
                     elementHeight + border * 2,
                     GL11.GL_NEAREST,
-                    backgroundConfig.roundedCornerSmoothness
+                    backgroundConfig.roundedCornerSmoothness,
                 )
             } else {
                 RenderUtils.drawRoundRect(
@@ -63,7 +63,7 @@ class RenderBackground {
                     elementWidth + border * 3,
                     elementHeight + border * 2,
                     backgroundConfig.color.toChromaColor().rgb,
-                    backgroundConfig.roundedCornerSmoothness
+                    backgroundConfig.roundedCornerSmoothness,
                 )
             }
             if (outlineConfig.enabled) {
@@ -76,7 +76,7 @@ class RenderBackground {
                     outlineConfig.colorBottom.toChromaColor().rgb,
                     outlineConfig.thickness,
                     backgroundConfig.roundedCornerSmoothness,
-                    outlineConfig.blur
+                    outlineConfig.blur,
                 )
             }
         }
@@ -133,7 +133,7 @@ class RenderBackground {
             newX,
             newY,
             position.getScale(),
-            position.isCenter
+            position.isCenter,
         )
     }
 }
