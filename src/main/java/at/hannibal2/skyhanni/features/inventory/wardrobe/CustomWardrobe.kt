@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -41,7 +42,6 @@ import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO add support for estimated item value
 @SkyHanniModule
 object CustomWardrobe {
 
@@ -58,7 +58,7 @@ object CustomWardrobe {
     private var guiName = "Custom Wardrobe"
 
     @SubscribeEvent
-    fun onGuiRender(event: GuiContainerEvent.BeforeDraw) {
+    fun onGuiRender(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled() || editMode) return
         val renderable = displayRenderable ?: run {
             update()
@@ -89,9 +89,16 @@ object CustomWardrobe {
             loadingPos.renderRenderable(loadingRenderable, posLabel = guiName, addToGuiManager = false)
         }
 
+        GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
+
         pos.renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
-        GlStateManager.translate(0f, 0f, -100f)
+
+        if (EstimatedItemValue.config.enabled) {
+            GlStateManager.translate(0f, 0f, 400f)
+            EstimatedItemValue.tryRendering()
+        }
+        GlStateManager.popMatrix()
         event.cancel()
     }
 
@@ -111,8 +118,7 @@ object CustomWardrobe {
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
-        if (!isEnabled()) return
-        DelayedRun.runDelayed(250.milliseconds) {
+        DelayedRun.runDelayed(300.milliseconds) {
             if (!WardrobeAPI.inWardrobe()) {
                 reset()
             }
@@ -211,8 +217,12 @@ object CustomWardrobe {
                     renderable = Renderable.hoverTips(
                         renderable,
                         tips = toolTip,
+                        stack = stack,
                         condition = {
                             !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
+                        },
+                        onHover = {
+                            if (EstimatedItemValue.config.enabled) EstimatedItemValue.updateItem(stack)
                         },
                     )
                 }
@@ -587,7 +597,7 @@ object CustomWardrobe {
         }
     }
 
-    private fun WardrobeSlot.clickSlot() {
+    fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
         val wardrobePage = WardrobeAPI.currentPage ?: return

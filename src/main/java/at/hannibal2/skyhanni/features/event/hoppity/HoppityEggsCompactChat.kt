@@ -87,8 +87,10 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            rabbitBought = true
-            compactChat(event)
+            if (group("rabbitname").equals(lastName)) {
+                rabbitBought = true
+                compactChat(event)
+            }
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
@@ -107,9 +109,14 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
+            newRabbit = true
+            groupOrNull("other")?.let {
+                lastProfit = it
+                compactChat(event)
+                return
+            }
             val chocolate = groupOrNull("chocolate")
             val perSecond = group("perSecond")
-            newRabbit = true
             lastProfit = chocolate?.let {
                 "§6+$it §7and §6+${perSecond}x c/s!"
             } ?: "§6+${perSecond}x c/s!"

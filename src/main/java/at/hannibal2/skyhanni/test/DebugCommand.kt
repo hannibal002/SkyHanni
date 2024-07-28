@@ -114,6 +114,16 @@ object DebugCommand {
             event.addData("Unknown SkyBlock island!")
             return
         }
+
+        if (LorenzUtils.skyBlockIsland != HypixelData.skyBlockIsland) {
+            event.addData {
+                add("using a test island!")
+                add("test island: ${SkyBlockIslandTest.testIsland}")
+                add("real island: ${HypixelData.skyBlockIsland}")
+            }
+            return
+        }
+
         event.addIrrelevant {
             add("on Hypixel SkyBlock")
             add("skyBlockIsland: ${LorenzUtils.skyBlockIsland}")

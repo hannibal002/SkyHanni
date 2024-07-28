@@ -3,8 +3,9 @@ package at.hannibal2.skyhanni.features.garden.composter
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -53,10 +54,11 @@ object ComposterDisplay {
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!(config.displayEnabled && GardenAPI.inGarden())) return
+        if (!event.isWidget(TabWidget.COMPOSTER)) return
 
-        readData(event.tabList)
+        readData(event.lines)
 
         if (tabListData.isNotEmpty()) {
             composterEmptyTime = ComposterAPI.estimateEmptyTimeFromTab()
@@ -137,8 +139,7 @@ object ComposterDisplay {
             storage.informedAboutLowMatter = 5.0.minutes.fromNow()
         }
 
-        if (ComposterAPI.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()
-        ) {
+        if (ComposterAPI.getFuel() <= config.notifyLow.fuel && storage.informedAboutLowFuel.isInPast()) {
             if (config.notifyLow.title) {
                 LorenzUtils.sendTitle("§cYour Fuel is low", 4.seconds)
             }
@@ -193,9 +194,13 @@ object ComposterDisplay {
         if (IslandType.GARDEN.isInIsland()) {
             ChatUtils.chat(warningMessage)
         } else {
-            ChatUtils.clickableChat(warningMessage, onClick = {
-                HypixelCommands.warp("garden")
-            })
+            ChatUtils.clickableChat(
+                warningMessage,
+                onClick = {
+                    HypixelCommands.warp("garden")
+                },
+                "§eClick to warp to the garden!",
+            )
         }
         LorenzUtils.sendTitle("§eComposter Warning!", 3.seconds)
     }
