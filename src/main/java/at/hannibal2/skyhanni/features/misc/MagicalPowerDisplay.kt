@@ -32,17 +32,16 @@ object MagicalPowerDisplay {
     private val hegemonyArtifact = "HEGEMONY_ARTIFACT".asInternalName()
     private val riftPrism = "RIFT_PRISM".asInternalName()
 
-    /*
-    * REGEX-TEST: Accessory Bag
-    * REGEX-TEST: Accessory Bag (1/75)
-    * REGEX-TEST: Accessory Bag (909/394294)
-    * REGEX-TEST: Auctions Browser
-    * REGEX-TEST: Auctions: "ligma"
-    * REGEX-TEST: Auctions: ""sugoma""
-    * */
+    /** REGEX-TEST: Accessory Bag
+     *  REGEX-TEST: Accessory Bag (1/75)
+     *  REGEX-TEST: Accessory Bag (909/394294)
+     *  REGEX-TEST: Auctions Browser
+     *  REGEX-TEST: Auctions: "ligma"
+     *  REGEX-TEST: Auctions: ""sugoma""
+     *  */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$"""
+        """^(Accessory Bag(?: \(\d+\/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$"""
     )
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
