@@ -49,7 +49,7 @@ object HoppityEggsManager {
      */
     val eggBoughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.bought",
-        "§aYou bought §r§.(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!",
+        "§aYou bought §r(?<rabbitname>.*?) §r§afor §r§6((\\d|,)*) Coins§r§a!",
     )
 
     /**
@@ -122,9 +122,9 @@ object HoppityEggsManager {
             return
         }
 
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
-
         HoppityEggsCompactChat.handleChat(event)
+
+        if (!ChocolateFactoryAPI.isHoppityEvent()) return
 
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocations.saveNearestEgg()

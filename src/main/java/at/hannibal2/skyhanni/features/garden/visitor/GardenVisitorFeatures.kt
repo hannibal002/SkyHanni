@@ -234,8 +234,8 @@ object GardenVisitorFeatures {
         var amountInSacks = 0
         internalName.getAmountInSacksOrNull()?.let {
             amountInSacks = it
-            val textColour = if (it >= amount) "a" else "e"
-            list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+            val textColor = if (it >= amount) "a" else "e"
+            list.add(" §7(§${textColor}x${it.addSeparators()} §7in sacks)")
         }
 
         val ingredients = NEUItems.getRecipes(internalName)
@@ -258,7 +258,7 @@ object GardenVisitorFeatures {
                 break
             }
         }
-        if (hasIngredients) {
+        if (hasIngredients && (amount - amountInSacks) > 0) {
             val leftToCraft = amount - amountInSacks
             list.add(" §7(")
             list.add(
@@ -268,7 +268,7 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$leftToCraft")
                         } else {
-                            HypixelCommands.viewRecipe(internalName.toString())
+                            HypixelCommands.viewRecipe(internalName.asString())
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },

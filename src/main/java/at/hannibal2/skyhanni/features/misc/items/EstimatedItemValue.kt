@@ -123,7 +123,7 @@ object EstimatedItemValue {
                 ignoreHelmetSkins,
                 ignoreArmorDyes,
                 ignoreRunes,
-                bazaarPriceSource,
+                priceSource,
                 useAttributeComposite,
             ) {
                 cache.clear()
