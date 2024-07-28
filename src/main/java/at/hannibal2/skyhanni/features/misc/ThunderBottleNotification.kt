@@ -16,7 +16,7 @@ object ThunderBottleNotification {
 
     private val thunderBottleChargedPattern by RepoPattern.pattern(
         "thunderbottle.charged",
-        "§e> Your bottle of thunder has fully charged!"
+        "§e> Your bottle of thunder has fully charged!",
     )
 
     @SubscribeEvent
