@@ -122,6 +122,7 @@ public class MiscConfig {
     @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to hideTemporaryArmorStands
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
@@ -132,6 +133,11 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean brewingStandOverlay = true;
+
+    @Expose
+    @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
+    @ConfigEditorBoolean
+    public boolean crashOnDeath = false;
 
     // TODO move into scoreboard accordion
     @Expose

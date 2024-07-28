@@ -87,8 +87,10 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            rabbitBought = true
-            compactChat(event)
+            if (group("rabbitname").equals(lastName)) {
+                rabbitBought = true
+                compactChat(event)
+            }
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
