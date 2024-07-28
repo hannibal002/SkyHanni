@@ -73,7 +73,7 @@ object ChocolateFactoryStats {
 
         val upgradeAvailableAt = ChocolateAmount.CURRENT.formattedTimeUntilGoal(profileStorage.bestUpgradeCost)
 
-        val map = buildMap {
+        val map = buildMap<ChocolateFactoryStat, String> {
             put(ChocolateFactoryStat.HEADER, "§6§lChocolate Factory ${ChocolateFactoryAPI.currentPrestige.toRoman()}")
 
             put(ChocolateFactoryStat.CURRENT, "§eCurrent Chocolate: §6${ChocolateAmount.CURRENT.formatted}")
@@ -105,8 +105,7 @@ object ChocolateFactoryStats {
                     "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
                         "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
                 },
-
-                )
+            )
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
             put(
                 ChocolateFactoryStat.RAW_PER_SECOND,
@@ -125,8 +124,7 @@ object ChocolateFactoryStats {
                         "§eChocolate To Max Milestone: §6${amountUntilMaxMilestone.addSeparators()}",
                     )
                 }
-                //this is horrible but it stops intellij throwing an error
-            } else if (true) {
+            } else {
                 put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
                 put(ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE, "§eChocolate To Prestige: §6$chocolateUntilPrestige")
             }
