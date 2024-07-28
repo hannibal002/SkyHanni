@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class FilterTypesConfig {
+
+    @Expose
+    @ConfigOption(name = "Powder Mining", desc = "")
+    @Accordion
+    public PowderMiningFilterConfig powderMiningFilter = new PowderMiningFilterConfig();
 
     @Expose
     @ConfigOption(name = "Hypixel Lobbies", desc = "Hide announcements in Hypixel lobbies " +
@@ -51,11 +55,6 @@ public class FilterTypesConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean winterGift = false;
-
-    @Expose
-    @ConfigOption(name = "Powder Mining", desc = "")
-    @Accordion
-    public PowderMiningFilterConfig powderMiningFilter = new PowderMiningFilterConfig();
 
     @Expose
     @ConfigOption(name = "Kill Combo", desc = "Hide messages about your Kill Combo from the Grandma Wolf pet.")

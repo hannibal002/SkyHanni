@@ -1,19 +1,20 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.OIL_BARREL
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PICKONIMBUS
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PREHISTORIC_EGG
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ROBOT_PARTS
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.SLUDGE_JUICE
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.TREASURITE
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
-import at.hannibal2.skyhanni.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE
-import at.hannibal2.skyhanni.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ASCENSION_ROPE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.JUNGLE_HEART
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.OIL_BARREL
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PICKONIMBUS
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.PREHISTORIC_EGG
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.ROBOT_PARTS
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.SLUDGE_JUICE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.TREASURITE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE
+import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -238,7 +239,6 @@ object PowderMiningChatFilter {
     )
 
     fun block(message: String): String {
-
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
         if (successfulPickPattern.matches(message)) return "powder_mining_picked"
@@ -282,7 +282,15 @@ object PowderMiningChatFilter {
             }
         }
 
-        //All the 'simple' boolean rewards
+        blockSimpleRewards(ssMessage).takeIf { it.isNotEmpty() }?.let { return it }
+        blockGoblinEggs(ssMessage).takeIf { it.isNotEmpty() }?.let { return it }
+        blockGemstones(ssMessage).takeIf { it.isNotEmpty() }?.let { return it }
+
+        //Fallback default
+        return ""
+    }
+
+    private fun blockSimpleRewards(ssMessage: String): String {
         val rewardPatterns = mapOf(
             ascensionRopeRewardPattern to ASCENSION_ROPE to "powder_mining_ascension_rope",
             wishingCompassRewardPattern to WISHING_COMPASS to "powder_mining_wishing_compass",
@@ -301,40 +309,43 @@ object PowderMiningChatFilter {
                 else "no_filter"
             }
         }
+        return ""
+    }
 
-        //Goblin Eggs
+    private fun blockGoblinEggs(ssMessage: String): String {
         goblinEggPattern.matchMatcher(ssMessage) {
-            if (config.goblinEggs != PowderMiningFilterConfig.GoblinEggFilterEntry.SHOW_ALL) {
-                if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
+            if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.SHOW_ALL) return "no_filter"
+            if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
-                val colorStr = groupOrNull("color")?.lowercase() ?: ""
-                when (colorStr) {
-                    //'Colorless', base goblin eggs will never be shown in this code path
-                    "" -> return "powder_mining_goblin_eggs"
-                    "green" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
-                        return "powder_mining_goblin_eggs"
-                    } else "no_filter"
-                    "yellow" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.YELLOW_UP) {
-                        "powder_mining_goblin_eggs"
-                    } else "no_filter"
-                    "red" -> return if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.RED_UP) {
-                        "powder_mining_goblin_eggs"
-                    } else "no_filter"
-                    // BLUE_ONLY enum not explicitly used in comparison, as the only
-                    // case that will block it is HIDE_ALL, which is covered above
-                    "blue" -> return "no_filter"
-                    else -> {
-                        ChatUtils.chat(
-                            "§cUnknown Goblin Egg color detected in Powder Mining Filter: " +
-                                "'${colorStr}' - please report this in the Discord!",
-                        )
-                        return "no_filter"
-                    }
+            val colorStr = groupOrNull("color")?.lowercase() ?: ""
+            return when (colorStr) {
+                //'Colorless', base goblin eggs will never be shown in this code path
+                "" -> "powder_mining_goblin_eggs"
+                "green" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
+                    "powder_mining_goblin_eggs"
+                } else "no_filter"
+                "yellow" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.YELLOW_UP) {
+                    "powder_mining_goblin_eggs"
+                } else "no_filter"
+                "red" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.RED_UP) {
+                    "powder_mining_goblin_eggs"
+                } else "no_filter"
+                // BLUE_ONLY enum not explicitly used in comparison, as the only
+                // case that will block it is HIDE_ALL, which is covered above
+                "blue" -> "no_filter"
+                else -> {
+                    ErrorManager.logErrorWithData(
+                        NoSuchElementException(),
+                        "Unknown Goblin Egg color detected in Powder Mining Filter: '${colorStr}' - please report this in the Discord!",
+                        noStackTrace = true
+                    )
+                    "no_filter"
                 }
-            } else return "no_filter"
-        }
+            }
+        } ?: return ""
+    }
 
-        //Gemstones
+    private fun blockGemstones(ssMessage: String): String {
         gemstonePattern.matchMatcher(ssMessage) {
             val gemStr = groupOrNull("gem")?.lowercase() ?: ""
             val tierStr = groupOrNull("tier")?.lowercase() ?: ""
@@ -342,7 +353,7 @@ object PowderMiningChatFilter {
             //Theoretically impossible but ?
             if (gemStr.isEmpty() || tierStr.isEmpty()) return ""
 
-            val gemSpecificConfig = when (gemStr) {
+            val gemSpecificFilterEntry = when (gemStr) {
                 "ruby" -> gemstoneConfig.rubyGemstones
                 "sapphire" -> gemstoneConfig.sapphireGemstones
                 "amber" -> gemstoneConfig.amberGemstones
@@ -353,24 +364,21 @@ object PowderMiningChatFilter {
                 else -> return "no_filter"
             }
 
-            if (gemSpecificConfig == GemstoneFilterEntry.HIDE_ALL) return "powder_mining_gemstones"
+            if (gemSpecificFilterEntry == GemstoneFilterEntry.HIDE_ALL) return "powder_mining_gemstones"
 
-            when (tierStr) {
+            return when (tierStr) {
                 // Never allowed through, except for in SHOW_ALL,
                 // which is handled above
-                "rough" -> return "powder_mining_gemstones"
-                "flawed" -> return if (gemSpecificConfig > GemstoneFilterEntry.FLAWED_UP) {
+                "rough" -> "powder_mining_gemstones"
+                "flawed" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FLAWED_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
                 // FINE_ONLY enum not explicitly used in comparison, as the only
                 // case that will block it is HIDE_ALL, which is covered above
-                "fine" -> return "no_filter"
+                "fine" -> "no_filter"
                 // This should not be reachable
-                else -> return "no_filter"
+                else -> "no_filter"
             }
-        }
-
-        //Fallback default
-        return ""
+        } ?: return ""
     }
 }

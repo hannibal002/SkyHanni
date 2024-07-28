@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat;
+package at.hannibal2.skyhanni.config.features.chat;
 
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -45,7 +45,7 @@ public class PowderMiningGemstoneFilterConfig {
     public enum GemstoneFilterEntry {
         SHOW_ALL("Show All"),
         HIDE_ALL("Hide all"),
-        FLAWED_UP("Show §aFlawed§7+"),
+        FLAWED_UP("Show §aFlawed §7or higher"),
         FINE_ONLY("Show §9Fine §7only");
 
         private final String str;
