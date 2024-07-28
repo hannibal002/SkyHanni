@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -25,6 +26,11 @@ public class HoppityEggsConfig {
     )
     @ConfigEditorBoolean
     public boolean waypointsImmediately = false;
+
+    @Expose
+    @ConfigOption(name = "Color", desc = "Color of the waypoint.")
+    @ConfigEditorColour
+    public String waypointColor = "0:53:46:224:73";
 
     @Expose
     @ConfigOption(name = "Show Line", desc = "Show a line to the waypoint.")

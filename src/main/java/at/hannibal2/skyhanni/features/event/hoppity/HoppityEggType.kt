@@ -6,7 +6,7 @@ import kotlin.time.Duration
 
 enum class HoppityEggType(
     val mealName: String,
-    private val mealColour: String,
+    private val mealColor: String,
     val resetsAt: Int,
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
@@ -34,8 +34,8 @@ enum class HoppityEggType(
     }
 
     fun isClaimed() = claimed
-    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColour}$mealName:$mealColour"
-    val coloredName get() = "$mealColour$mealName"
+    val formattedName get() = "${if (isClaimed()) "§7§m" else mealColor}$mealName:$mealColor"
+    val coloredName get() = "$mealColor$mealName"
 
     companion object {
         fun allFound() = entries.forEach { it.markClaimed() }

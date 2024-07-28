@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
@@ -14,7 +15,7 @@ object RenderBackground {
 
     private val textureLocation by lazy { ResourceLocation("skyhanni", "scoreboard.png") }
 
-    fun addBackground(renderable: Renderable): Renderable {
+    internal fun addBackground(renderable: Renderable): Renderable {
         val backgroundConfig = CustomScoreboard.backgroundConfig
         val outlineConfig = backgroundConfig.outline
         val padding = backgroundConfig.borderSize
@@ -27,8 +28,9 @@ object RenderBackground {
                 textureLocation,
                 (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
                 padding,
-                RenderUtils.HorizontalAlignment.CENTER,
-                RenderUtils.VerticalAlignment.CENTER,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                radius = backgroundConfig.roundedCornerSmoothness,
             )
         } else {
             Renderable.drawInsideRoundedRect(
@@ -37,8 +39,8 @@ object RenderBackground {
                 padding,
                 backgroundConfig.roundedCornerSmoothness,
                 1,
-                RenderUtils.HorizontalAlignment.CENTER,
-                RenderUtils.VerticalAlignment.CENTER,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
         }
 
@@ -52,13 +54,13 @@ object RenderBackground {
                 outlineConfig.colorBottom.toChromaColor().rgb,
                 outlineConfig.thickness,
                 outlineConfig.blur,
-                RenderUtils.HorizontalAlignment.CENTER,
-                RenderUtils.VerticalAlignment.CENTER,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
         } else backgroundRenderable
     }
 
-    fun updatePosition(renderable: Renderable) {
+    internal fun updatePosition(renderable: Renderable) {
         if (GuiEditManager.isInGui()) return
         val alignmentConfig = CustomScoreboard.alignmentConfig
 
