@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
+import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -1717,6 +1718,48 @@ object RenderUtils {
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
+    }
+
+
+    /**
+     * Method to draw a rounded textured rect.
+     *
+     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
+     * is called **BEFORE** [GlStateManager.scale], otherwise the textured rect will not be rendered correctly
+     *
+     * @param filter the texture filter to use
+     * @param radius the radius of the corners (default 10), NOTE: If you pass less than 1 it will just draw as a normal textured rect
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     */
+    fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
+        // if radius is 0 then just draw a normal textured rect
+        if (radius <= 0) {
+            Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+            return
+        }
+
+        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
+        val widthIn = width * scaledRes.scaleFactor
+        val heightIn = height * scaledRes.scaleFactor
+        val xIn = x * scaledRes.scaleFactor
+        val yIn = y * scaledRes.scaleFactor
+
+        RoundedTextureShader.scaleFactor = scaledRes.scaleFactor.toFloat()
+        RoundedTextureShader.radius = radius.toFloat()
+        RoundedTextureShader.smoothness = smoothness.toFloat()
+        RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
+        GlStateManager.pushMatrix()
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
+
+        Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+
+        ShaderManager.disableShader()
+        GlStateManager.popMatrix()
     }
 
     /**
