@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
@@ -28,7 +29,8 @@ object RenderBackground {
                 (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
                 padding,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                radius = backgroundConfig.roundedCornerSmoothness,
             )
         } else {
             Renderable.drawInsideRoundedRect(
@@ -38,7 +40,7 @@ object RenderBackground {
                 backgroundConfig.roundedCornerSmoothness,
                 1,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
         }
 
@@ -53,7 +55,7 @@ object RenderBackground {
                 outlineConfig.thickness,
                 outlineConfig.blur,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
         } else backgroundRenderable
     }
@@ -92,12 +94,5 @@ object RenderBackground {
             }
             CustomScoreboard.config.position.moveTo(x, y)
         }
-
-        return Position(
-            newX,
-            newY,
-            position.getScale(),
-            position.isCenter,
-        )
     }
 }
