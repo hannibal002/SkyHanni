@@ -56,6 +56,7 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
+    var maxMilestoneChocolate = 700_000_000_000L
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -117,6 +118,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        maxMilestoneChocolate = data.maxMilestoneChocolate
         specialRabbitTextures = data.specialRabbits
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
@@ -156,14 +158,14 @@ object ChocolateFactoryAPI {
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     // TODO add debug toggle
-    fun isHoppityEvent() = SkyblockSeason.getCurrentSeason() == SkyblockSeason.SPRING
+    fun isHoppityEvent() = SkyblockSeason.currentSeason == SkyblockSeason.SPRING
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 
     fun timeTowerChargeDuration() =
         if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
 
-    private fun timeTowerMultiplier(): Double {
+    fun timeTowerMultiplier(): Double {
         var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1
         if (HoppityCollectionStats.hasFoundRabbit("Mu")) multiplier += 0.7
         return multiplier
