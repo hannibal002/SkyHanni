@@ -59,6 +59,11 @@ public class InventoryConfig {
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @Expose
+    @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
+    @Accordion
+    public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
+
+    @Expose
     @Category(name = "Craftable Item List", desc = "")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
