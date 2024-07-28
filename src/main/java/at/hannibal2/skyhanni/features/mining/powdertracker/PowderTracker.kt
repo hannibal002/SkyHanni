@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -193,9 +194,22 @@ object PowderTracker {
 
         for (reward in PowderChestReward.entries) {
             reward.chatPattern.matchMatcher(msg) {
+                val amountName = groupOrNull("amount")
+                // TODO remove workaround check once we know this chat message
+                //  formatLong failed for '2 §r§awith your §r§cMetal Detector§r§a!'
+                if (amountName?.contains("Metal Detector") ?: false) {
+                    ErrorManager.skyHanniError(
+                        "Powder tracker pattern contains invalid amount",
+                        "msg" to msg,
+                        "amountName" to amountName,
+                        "reward" to reward.name,
+                    )
+                }
+
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
-                    var amount = groupOrNull("amount")?.formatLong() ?: 1
+                    var amount = amountName?.formatLong() ?: 1
+
                     if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder) {
                         amount *= 2
                     }
