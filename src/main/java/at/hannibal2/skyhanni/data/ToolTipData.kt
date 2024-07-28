@@ -37,7 +37,7 @@ object ToolTipData {
 
     @JvmStatic
     fun onHover(stack: ItemStack, toolTip: MutableList<String>) {
-        ItemHoverEvent(stack, toolTip).postAndCatch()
+        ItemHoverEvent(stack, toolTip).post()
     }
 
     var lastSlot: Slot? = null

@@ -81,7 +81,7 @@ object MythologicalCreatureTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        MythologicalCreatureType.entries.forEach { creatureType ->
+        for (creatureType in MythologicalCreatureType.entries) {
             if (creatureType.pattern.matches(event.message)) {
                 BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
                 tracker.modify {
@@ -102,8 +102,7 @@ object MythologicalCreatureTracker {
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
-        data.count.entries.sortedByDescending { it.value }.forEach { (creatureType, amount) ->
-
+        for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
                 val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
                 " §7$percentage"

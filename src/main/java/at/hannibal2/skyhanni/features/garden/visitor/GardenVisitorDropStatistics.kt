@@ -19,9 +19,9 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -224,7 +224,7 @@ object GardenVisitorDropStatistics {
 
     fun format(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
-        if (amount is Long) return NumberUtil.format(amount)
+        if (amount is Long) return amount.shortFormat()
         return "$amount"
     }
 
@@ -247,22 +247,26 @@ object GardenVisitorDropStatistics {
 
     fun resetCommand() {
         val storage = GardenAPI.storage?.visitorDrops ?: return
-        ChatUtils.clickableChat("Click here to reset Visitor Drops Statistics.", onClick = {
-            acceptedVisitors = 0
-            deniedVisitors = 0
-            totalVisitors = 0
-            coinsSpent = 0
-            storage.copper = 0
-            storage.bits = 0
-            storage.farmingExp = 0
-            storage.gardenExp = 0
-            storage.gemstonePowder = 0
-            storage.mithrilPowder = 0
-            storage.visitorRarities = arrayListOf(0, 0, 0, 0, 0)
-            storage.rewardsCount = mapOf<VisitorReward, Int>()
-            ChatUtils.chat("Visitor Drop Statistics reset!")
-            saveAndUpdate()
-        })
+        ChatUtils.clickableChat(
+            "Click here to reset Visitor Drops Statistics.",
+            onClick = {
+                acceptedVisitors = 0
+                deniedVisitors = 0
+                totalVisitors = 0
+                coinsSpent = 0
+                storage.copper = 0
+                storage.bits = 0
+                storage.farmingExp = 0
+                storage.gardenExp = 0
+                storage.gemstonePowder = 0
+                storage.mithrilPowder = 0
+                storage.visitorRarities = arrayListOf(0, 0, 0, 0, 0)
+                storage.rewardsCount = mapOf<VisitorReward, Int>()
+                ChatUtils.chat("Visitor Drop Statistics reset!")
+                saveAndUpdate()
+            },
+            "§eClick to reset!",
+        )
     }
 
     @SubscribeEvent

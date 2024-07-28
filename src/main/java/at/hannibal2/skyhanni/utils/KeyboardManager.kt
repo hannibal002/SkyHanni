@@ -88,7 +88,7 @@ object KeyboardManager {
             lastClickedMouseButton = -1
         }
 
-        // I don't know when this is needed
+        // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
         if (Keyboard.getEventKey() == 0) {
             LorenzKeyPressEvent(Keyboard.getEventCharacter().code + 256).postAndCatch()
         }
@@ -112,8 +112,11 @@ object KeyboardManager {
         if (this == 0) return false
         return if (this < 0) {
             Mouse.isButtonDown(this + 100)
+        } else if (this >= Keyboard.KEYBOARD_SIZE) {
+            val pressedKey = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
+            Keyboard.getEventKeyState() && this == pressedKey
         } else {
-            KeybindHelper.isKeyDown(this)
+            Keyboard.isKeyDown(this)
         }
     }
 
@@ -133,4 +136,43 @@ object KeyboardManager {
     }
 
     fun getKeyName(keyCode: Int): String = KeybindHelper.getKeyName(keyCode)
+
+    object WasdInputMatrix : Iterable<KeyBinding> {
+        operator fun contains(keyBinding: KeyBinding) = when (keyBinding) {
+            w, a, s, d, up, down -> true
+            else -> false
+        }
+
+        val w get() = Minecraft.getMinecraft().gameSettings.keyBindForward!!
+        val a get() = Minecraft.getMinecraft().gameSettings.keyBindLeft!!
+        val s get() = Minecraft.getMinecraft().gameSettings.keyBindBack!!
+        val d get() = Minecraft.getMinecraft().gameSettings.keyBindRight!!
+
+        val up get() = Minecraft.getMinecraft().gameSettings.keyBindJump!!
+        val down get() = Minecraft.getMinecraft().gameSettings.keyBindSneak!!
+
+        override fun iterator(): Iterator<KeyBinding> =
+            object : Iterator<KeyBinding> {
+
+                var current = w
+
+                override fun hasNext(): Boolean =
+                    current != down
+
+                override fun next(): KeyBinding {
+                    return current.also {
+                        current = when (it) {
+                            w -> a
+                            a -> s
+                            s -> d
+                            d -> up
+                            up -> down
+                            else -> throw java.lang.IndexOutOfBoundsException()
+                        }
+                    }
+                }
+
+            }
+
+    }
 }

@@ -41,9 +41,9 @@ object ArrowTrail {
         listAllArrow.removeIf { it.deathTime.isInPast() }
         listYourArrow.removeIf { it.deathTime.isInPast() }
 
-        EntityUtils.getEntities<EntityArrow>().forEach {
-            val line = Line(it.getPrevLorenzVec(), it.getLorenzVec(), deathTime)
-            if (it.shootingEntity == Minecraft.getMinecraft().thePlayer) {
+        for (arrow in EntityUtils.getEntities<EntityArrow>()) {
+            val line = Line(arrow.getPrevLorenzVec(), arrow.getLorenzVec(), deathTime)
+            if (arrow.shootingEntity == Minecraft.getMinecraft().thePlayer) {
                 listYourArrow.add(line)
             } else {
                 listAllArrow.add(line)

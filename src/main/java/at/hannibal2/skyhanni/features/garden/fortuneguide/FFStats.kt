@@ -23,7 +23,11 @@ object FFStats {
 
     private val farmingBoots = arrayListOf("RANCHERS_BOOTS", "FARMER_BOOTS")
 
-    var cakeExpireTime = SimpleTimeMark.farPast()
+    var cakeExpireTime
+        get() = GardenAPI.storage?.fortune?.cakeExpiring ?: SimpleTimeMark.farPast()
+        set(value) {
+            GardenAPI.storage?.fortune?.cakeExpiring = value
+        }
 
     var equipmentTotalFF = mapOf<FFTypes, Double>()
 
@@ -37,9 +41,6 @@ object FFStats {
     var totalBaseFF = mapOf<FFTypes, Double>()
 
     fun loadFFData() {
-        cakeExpireTime = SimpleTimeMark(GardenAPI.storage?.fortune?.cakeExpiring ?: -1L)
-
-        FarmingItems.resetFFData()
 
         equipmentTotalFF = FarmingItems.equip.getFFData()
 
@@ -144,12 +145,12 @@ object FFStats {
 
     private fun getGenericFF(): Map<FFTypes, Double> = buildMap {
         val storage = GardenAPI.storage?.fortune ?: return emptyMap()
-        this[FFTypes.BASE_FF] = 100.0
         this[FFTypes.FARMING_LVL] = storage.farmingLevel.toDouble() * 4
-        this[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
+        this[FFTypes.BESTIARY] = storage.bestiary
         this[FFTypes.PLOTS] = storage.plotsUnlocked.toDouble() * 3
         this[FFTypes.ANITA] = storage.anitaUpgrade.toDouble() * 4
-        if (cakeExpireTime.isInPast() || cakeExpireTime.isFarPast()) {
+        this[FFTypes.COMMUNITY_SHOP] = (ProfileStorageData.playerSpecific?.gardenCommunityUpgrade ?: -1).toDouble() * 4
+        if (cakeExpireTime.isInFuture() || cakeExpireTime.isFarPast()) {
             this[FFTypes.CAKE] = 5.0
         } else {
             this[FFTypes.CAKE] = 0.0

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson.SalvageFilter
+import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getInventoryName
@@ -26,7 +26,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.isCoopSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.isSoulBound
 import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -68,7 +70,7 @@ object HideNotClickableItems {
 
     private val seedsPattern by RepoPattern.pattern(
         "inventory.hidenotclickable.seeds",
-        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3"
+        "SEEDS|CARROT_ITEM|POTATO_ITEM|PUMPKIN_SEEDS|SUGAR_CANE|MELON_SEEDS|CACTUS|INK_SACK-3",
     )
 
     private val netherWart by lazy { "NETHER_STALK".asInternalName() }
@@ -76,10 +78,10 @@ object HideNotClickableItems {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
-        hideNpcSellFilter.load(hideNotClickable.hide_npc_sell)
-        hideInStorageFilter.load(hideNotClickable.hide_in_storage)
-        hidePlayerTradeFilter.load(hideNotClickable.hide_player_trade)
-        notAuctionableFilter.load(hideNotClickable.not_auctionable)
+        hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
+        hideInStorageFilter.load(hideNotClickable.hideInStorage)
+        hidePlayerTradeFilter.load(hideNotClickable.hidePlayerTrade)
+        notAuctionableFilter.load(hideNotClickable.notAuctionable)
         updateSalvageList(hideNotClickable.salvage)
     }
 
@@ -134,7 +136,7 @@ object HideNotClickableItems {
             event.toolTip.add("")
             if (hideReason == "") {
                 event.toolTip.add("§4No hide reason!")
-                ChatUtils.error("No hide reason for not clickable item!")
+                ErrorManager.skyHanniError("No hide reason for not clickable item!")
             } else {
                 event.toolTip.add("§c$hideReason")
                 if (config.itemsBypass && !hideReason.contains("SkyBlock Menu")) {
@@ -160,7 +162,7 @@ object HideNotClickableItems {
         val stack = slot.stack
 
         if (hide(chestName, stack)) {
-            event.isCanceled = true
+            event.cancel()
 
             if (lastClickTime.passedSince() > 5.seconds) {
                 lastClickTime = SimpleTimeMark.now()
@@ -304,7 +306,7 @@ object HideNotClickableItems {
             "CLOAK",
             "BELT",
             "GLOVES",
-            "BRACELET"
+            "BRACELET",
         )
         for (type in list) {
             if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
@@ -338,7 +340,7 @@ object HideNotClickableItems {
 
         // TODO make check if player is on private island
 
-        if (!ItemUtils.isSoulBound(stack)) return false
+        if (!stack.isSoulBound()) return false
 
         hideReason = "This item cannot be stored into a chest!"
         return true
@@ -445,7 +447,7 @@ object HideNotClickableItems {
     private fun hidePlayerTrade(chestName: String, stack: ItemStack): Boolean {
         if (!chestName.startsWith("You    ")) return false
 
-        if (ItemUtils.isCoopSoulBound(stack)) {
+        if (stack.isCoopSoulBound()) {
             hideReason = "Soulbound items cannot be traded!"
             return true
         }
@@ -582,7 +584,7 @@ object HideNotClickableItems {
     }
 
     private fun isNotAuctionable(stack: ItemStack): Boolean {
-        if (ItemUtils.isCoopSoulBound(stack)) {
+        if (stack.isCoopSoulBound()) {
             hideReason = "Soulbound items cannot be auctioned!"
             return true
         }

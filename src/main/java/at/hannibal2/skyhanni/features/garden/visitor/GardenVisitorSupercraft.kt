@@ -107,7 +107,7 @@ object GardenVisitorSupercraft {
         if (!hasIngredients) return
 
         if (event.slotId != 31) return
-        event.isCanceled = true
+        event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
             HypixelCommands.recipe(lastSuperCraftMaterial)
             lastClick = SimpleTimeMark.now()

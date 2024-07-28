@@ -148,15 +148,15 @@ object LimboPlaytime {
         val firstList = mutableListOf<String>()
         val lastList = mutableListOf<String>()
         var hasPassed = false
-        toolTip.forEach {
-            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && !hasPassed) {
-                firstList.add(it)
+        for (line in toolTip) {
+            if (!(hoursPattern.matches(line) || minutesPattern.matches(line)) && !hasPassed) {
+                firstList.add(line)
             } else hasPassed = true
         }
         hasPassed = false
-        toolTip.forEach {
-            if (!(hoursPattern.matches(it) || minutesPattern.matches(it)) && hasPassed) {
-                lastList.add(it)
+        for (line in toolTip) {
+            if (!(hoursPattern.matches(line) || minutesPattern.matches(line)) && hasPassed) {
+                lastList.add(line)
             } else hasPassed = true
         }
         toolTip.clear()

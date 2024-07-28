@@ -106,20 +106,20 @@ object DungeonCleanEnd {
             return
         }
 
-        event.isCanceled = true
+        event.cancel()
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (shouldBlock()) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("note.")) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
