@@ -27,7 +27,9 @@ object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
     private var contactAmount: Int
         get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount ?: -1
-        private set(value) { ProfileStorageData.profileSpecific?.abiphoneContactAmount = value }
+        private set(value) {
+            ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
+        }
 
     private val hegemonyArtifact = "HEGEMONY_ARTIFACT".asInternalName()
     private val riftPrism = "RIFT_PRISM".asInternalName()
@@ -41,11 +43,10 @@ object MagicalPowerDisplay {
      *  */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """^(Accessory Bag(?: \(\d+\/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$"""
+        """^(Accessory Bag(?: \(\d+\/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$""",
     )
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
-
 
 
     @SubscribeEvent
@@ -58,7 +59,7 @@ object MagicalPowerDisplay {
         val itemID = item.getInternalNameOrNull() ?: return
 
         var endMP = rarity.toMP() ?: ErrorManager.skyHanniError(
-            "Unknown rarity '$rarity' for item '${item.displayName}§7'"
+            "Unknown rarity '$rarity' for item '${item.displayName}§7'",
         )
 
         when (itemID) {
