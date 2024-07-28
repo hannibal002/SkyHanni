@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.garden.composter
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig
-import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.OverlayPriceTypeEntry
 import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig.RetrieveFromEntry
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
@@ -535,8 +534,7 @@ object ComposterOverlay {
     }
 
     private fun getPrice(internalName: NEUInternalName): Double {
-        val useSellPrice = config.overlayPriceType == ComposterConfig.OverlayPriceTypeEntry.BUY_ORDER
-        val price = internalName.getPrice(useSellPrice)
+        val price = internalName.getPrice(config.priceSource)
         if (internalName.equals("BIOFUEL") && price > 20_000) return 20_000.0
 
         return price
@@ -622,9 +620,6 @@ object ComposterOverlay {
         event.move(3, "garden.composterOverlayOrganicMatterPos", "garden.composters.overlayOrganicMatterPos")
         event.move(3, "garden.composterOverlayFuelExtrasPos", "garden.composters.overlayFuelExtrasPos")
         event.move(3, "garden.composterRoundDown", "garden.composters.roundDown")
-        event.transform(15, "garden.composters.overlayPriceType") { element ->
-            ConfigUtils.migrateIntToEnum(element, OverlayPriceTypeEntry::class.java)
-        }
         event.transform(15, "garden.composters.retrieveFrom") { element ->
             ConfigUtils.migrateIntToEnum(element, RetrieveFromEntry::class.java)
         }

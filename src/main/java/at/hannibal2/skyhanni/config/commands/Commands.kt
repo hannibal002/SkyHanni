@@ -321,10 +321,6 @@ object Commands {
             "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!",
         ) { LimboTimeTracker.printStats() }
         registerCommand(
-            "shlimbo",
-            "Warps you to Limbo.",
-        ) { MiscFeatures.goToLimbo() }
-        registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden",
         ) { FarmingLaneCreator.commandLaneDetection() }
@@ -382,7 +378,7 @@ object Commands {
         ) { SkyHanniDebugsAndTests.toggleRender() }
         registerCommand(
             "shcarrolyn",
-            "Toggels if the specified crops effect is active from carrolyn",
+            "Toggles if the specified crops effect is active from carrolyn",
         ) {
             CaptureFarmingGear.handelCarrolyn(it)
         }
@@ -392,11 +388,11 @@ object Commands {
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
             "shclearkismet",
-            "Cleares the saved values of the applied kismet feathers in Croesus",
+            "Clears the saved values of the applied kismet feathers in Croesus",
         ) { CroesusChestTracker.resetChest() }
         registerCommand(
             "shkingfix",
-            "Reseting the local King Talisman Helper offset.",
+            "Resets the local King Talisman Helper offset.",
         ) { KingTalismanHelper.kingFix() }
         registerCommand(
             "shupdate",
@@ -544,7 +540,7 @@ object Commands {
                 "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
-            "readcropmilestonefromclipboard",
+            "shreadcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data",
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
         registerCommand(

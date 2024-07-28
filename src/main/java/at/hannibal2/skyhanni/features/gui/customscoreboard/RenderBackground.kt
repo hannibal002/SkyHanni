@@ -92,5 +92,12 @@ object RenderBackground {
             }
             CustomScoreboard.config.position.moveTo(x, y)
         }
+
+        return Position(
+            newX,
+            newY,
+            position.getScale(),
+            position.isCenter,
+        )
     }
 }

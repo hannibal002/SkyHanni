@@ -60,7 +60,7 @@ value class Graph(
             { reader ->
                 reader.beginObject()
                 val list = mutableListOf<GraphNode>()
-                val neigbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
+                val neighbourMap = mutableMapOf<GraphNode, List<Pair<Int, Double>>>()
                 while (reader.hasNext()) {
                     val id = reader.nextName().toInt()
                     reader.beginObject()
@@ -93,10 +93,10 @@ value class Graph(
                     }
                     val node = GraphNode(id, position!!, name)
                     list.add(node)
-                    neigbourMap[node] = neighbors
+                    neighbourMap[node] = neighbors
                     reader.endObject()
                 }
-                neigbourMap.forEach { (node, edge) ->
+                neighbourMap.forEach { (node, edge) ->
                     node.neighbours = edge.associate { (id, distance) ->
                         list.first { it.id == id } to distance
                     }

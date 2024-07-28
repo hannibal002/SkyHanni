@@ -86,7 +86,7 @@ interface Renderable {
         }
 
         fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable =
-            link(string(text), onClick, bypassChecks = bypassChecks) { true }
+            link(string(text), onClick, bypassChecks = bypassChecks)
 
         fun optionalLink(
             text: String,
@@ -103,10 +103,11 @@ interface Renderable {
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
+            underlineColor: Color = Color.WHITE,
         ): Renderable {
             return clickable(
                 hoverable(
-                    underlined(renderable), renderable, bypassChecks,
+                    underlined(renderable, underlineColor), renderable, bypassChecks,
                     condition = condition,
                     highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
@@ -252,10 +253,16 @@ interface Renderable {
             val openGui = guiScreen?.javaClass?.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NEUItems.neuHasFocus()
-            val isInSkyTilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
+            val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
 
-            val result = isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen &&
-                !isInNeuPv && !isInSkyTilsPv && !neuFocus
+            val result = isGuiScreen &&
+                isGuiPositionEditor &&
+                inMenu &&
+                isNotInSignAndOnSlot &&
+                isConfigScreen &&
+                !isInNeuPv &&
+                !isInSkytilsPv &&
+                !neuFocus
 
             if (debug) {
                 if (!result) {
@@ -268,7 +275,7 @@ interface Renderable {
                     if (!isConfigScreen) logger.log("isConfigScreen")
                     if (isInNeuPv) logger.log("isInNeuPv")
                     if (neuFocus) logger.log("neuFocus")
-                    if (isInSkyTilsPv) logger.log("isInSkyTilsPv")
+                    if (isInSkytilsPv) logger.log("isInSkytilsPv")
                     logger.log("")
                 } else {
                     logger.log("allowed click")
@@ -278,15 +285,16 @@ interface Renderable {
             return result
         }
 
-        fun underlined(renderable: Renderable) = object : Renderable {
+        fun underlined(renderable: Renderable, color: Color = Color.WHITE) = object : Renderable {
             override val width: Int
                 get() = renderable.width
-            override val height = 10
+            override val height: Int
+                get() = renderable.height + 1
             override val horizontalAlign = renderable.horizontalAlign
             override val verticalAlign = renderable.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 10, width, 11, 0xFFFFFFFF.toInt())
+                Gui.drawRect(0, height, width, 11, color.rgb)
                 GlStateManager.color(1F, 1F, 1F, 1F)
                 renderable.render(posX, posY)
             }
@@ -394,7 +402,7 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 DarkenShader.darknessLevel = amount
-                ShaderManager.enableShader("darken")
+                ShaderManager.enableShader(ShaderManager.Shaders.DARKEN)
                 this@darken.render(posX, posY)
                 ShaderManager.disableShader()
             }
@@ -649,7 +657,7 @@ interface Renderable {
             }
         }
 
-        fun fixedSizeCollum(
+        fun fixedSizeColumn(
             content: Renderable,
             height: Int,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -663,6 +671,24 @@ interface Renderable {
             override val verticalAlign = verticalAlign
             override fun render(posX: Int, posY: Int) {
                 render.renderYAligned(posX, posY, height)
+            }
+        }
+
+        fun fixedSizeBox(
+            content: Renderable,
+            height: Int,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+            override fun render(posX: Int, posY: Int) {
+                render.renderXYAligned(posX, posY, height, width)
             }
         }
 

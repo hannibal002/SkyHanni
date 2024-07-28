@@ -20,7 +20,7 @@ public class CompactTabListConfig {
     @ConfigOption(
         name = "Toggle Tab",
         desc = "Use the tab key to toggle the tab list, not show tab list while the key is pressed. " +
-            "Similar to patcher's feature."
+            "Similar to Patcher's feature."
     )
     @ConfigEditorBoolean
     public boolean toggleTab = false;

@@ -39,9 +39,9 @@ object AdvancedPlayerList {
         ".*\\[(?<level>.*)] §r(?<name>.*)"
     )
 
-    private var playerDatas = mutableMapOf<String, PlayerData>()
+    private var playerData = mutableMapOf<String, PlayerData>()
 
-    fun createTabLine(text: String, type: TabStringType) = playerDatas[text]?.let {
+    fun createTabLine(text: String, type: TabStringType) = playerData[text]?.let {
         TabLine(text, type, createCustomName(it))
     } ?: TabLine(text, type)
 
@@ -90,7 +90,7 @@ object AdvancedPlayerList {
                 currentData[line] = it
             }
         }
-        playerDatas = currentData
+        playerData = currentData
         val prepare = currentData.entries
 
         val sorted = when (config.playerSortOrder) {
@@ -127,7 +127,7 @@ object AdvancedPlayerList {
         }
         newList.addAll(newPlayerList)
 
-        val rest = original.drop(playerDatas.size + extraTitles + 1)
+        val rest = original.drop(playerData.size + extraTitles + 1)
         newList.addAll(rest)
         return newList
     }
