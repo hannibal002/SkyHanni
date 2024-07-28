@@ -195,7 +195,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 + AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
     + Highlight auctions based on the difference between their estimated value and the value they are listed for.
-    + Options to change the colours
+    + Options to change the colors
 + Highlight options in /tab. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1175)
     + Green for enabled
     + Red for disabled

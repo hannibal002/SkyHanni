@@ -25,7 +25,7 @@ object StringUtils {
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
-    private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val stringColorPattern = "§[0123456789abcdef].*".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
@@ -194,7 +194,7 @@ object StringUtils {
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
-        val matcher = stringColourPattern.matcher(string)
+        val matcher = stringColorPattern.matcher(string)
         if (matcher.matches()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
             return if (darker) {
