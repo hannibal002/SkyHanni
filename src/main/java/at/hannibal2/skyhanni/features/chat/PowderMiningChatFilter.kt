@@ -257,8 +257,7 @@ object PowderMiningChatFilter {
 
         // All powder and loot chest rewards start with 4 spaces
         // To simplify regex statements, this check is done outside
-        if (!message.startsWith("    ")) return ""
-        val ssMessage = message.substring(4)
+        val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return ""
 
         //Powder
         powderRewardPattern.matchMatcher(ssMessage) {
@@ -342,7 +341,8 @@ object PowderMiningChatFilter {
                     "no_filter"
                 }
             }
-        } ?: return ""
+        }
+        return ""
     }
 
     private fun blockGemstones(ssMessage: String): String {
@@ -379,6 +379,7 @@ object PowderMiningChatFilter {
                 // This should not be reachable
                 else -> "no_filter"
             }
-        } ?: return ""
+        }
+        return ""
     }
 }
