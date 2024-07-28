@@ -96,10 +96,11 @@ enum class FarmingItems(
 
         val content = Renderable.clickable(
             Renderable.itemStackWithTip(
-                getItem(), 1.0, 0, 0, false
+                getItem(), 1.0, 0, 0, false,
             ),
             onClick = onClick(),
-            condition = { clickEnabled })
+            condition = { clickEnabled },
+        )
 
         override val width = content.width
         override val height = content.height
@@ -112,7 +113,7 @@ enum class FarmingItems(
                 0,
                 width,
                 height,
-                if (this@FarmingItems.selectedState) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt()
+                if (selectedState) 0xFFB3FFB3.toInt() else 0xFF43464B.toInt(),
             )
             content.render(posX, posY)
         }
