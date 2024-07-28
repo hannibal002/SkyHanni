@@ -217,7 +217,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.TOTAL_PET.bar(
                 "§2Total Pet Fortune",
                 "§7§2The total fortune from your pet and its item",
-                71
+                72
             )
         )
 
@@ -225,7 +225,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.PET_BASE.bar(
                 "§2Base Pet Fortune",
                 "§7§2The base fortune from your pet",
-                71
+                72
             )
         )
 
@@ -238,7 +238,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
                     "MINOS_RELIC" -> "§cGreen Bandana is better for fortune than minos relic!"
                     else -> "No fortune boosting pet item"
                 },
-                71
+                72
             )
         )
 

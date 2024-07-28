@@ -49,7 +49,7 @@ internal enum class FFInfos(
     ENCHANT_ARMOR(
         sumTo = TOTAL_ARMOR,
         from = { FarmingItems.currentArmor?.getFFData() ?: FFStats.armorTotalFF },
-        what = FFTypes.PESTERMINATOR,
+        what = FFTypes.ENCHANT,
         x4 = { FarmingItems.currentArmor == null },
         max = 5
     ),
@@ -66,6 +66,7 @@ internal enum class FFInfos(
             FarmingItems.ELEPHANT -> 150
             FarmingItems.MOOSHROOM_COW -> 158
             FarmingItems.BEE -> 30
+            FarmingItems.SLUG -> 100
             else -> 0
         }
     }),
@@ -99,7 +100,7 @@ internal enum class FFInfos(
     ENCHANT_EQUIP(
         sumTo = TOTAL_EQUIP,
         from = { FarmingItems.currentEquip?.getFFData() ?: FFStats.equipmentTotalFF },
-        what = FFTypes.GREEN_THUMB,
+        what = FFTypes.ENCHANT,
         x4 = { FarmingItems.currentEquip == null },
         max = { at.hannibal2.skyhanni.features.garden.GardenAPI.totalAmountVisitorsExisting.toDouble() / 4.0 }
     ),

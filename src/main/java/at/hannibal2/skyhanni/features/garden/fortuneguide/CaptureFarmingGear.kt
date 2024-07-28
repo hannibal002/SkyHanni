@@ -277,6 +277,7 @@ object CaptureFarmingGear {
         var highestMooshroomRarity = (FarmingItems.MOOSHROOM_COW.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestRabbitRarity = (FarmingItems.RABBIT.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
         var highestBeeRarity = (FarmingItems.BEE.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
+        var highestSlugRarity = (FarmingItems.SLUG.getItemOrNull()?.getItemRarityOrNull()?.id ?: -1) - 1
 
         for ((_, item) in items) {
             if (item.getItemCategoryOrNull() != ItemCategory.PET) continue
@@ -300,6 +301,11 @@ object CaptureFarmingGear {
                 FarmingItems.BEE.setItem(item)
                 outdatedItems[FarmingItems.BEE] = false
                 highestBeeRarity = rarity.toInt()
+            }
+            if (name == "SLUG" && rarity.toInt() > highestSlugRarity) {
+                FarmingItems.SLUG.setItem(item)
+                outdatedItems[FarmingItems.SLUG] = false
+                highestSlugRarity = rarity.toInt()
             }
         }
     }
