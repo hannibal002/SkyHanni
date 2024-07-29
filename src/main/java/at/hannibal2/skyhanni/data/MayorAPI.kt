@@ -195,7 +195,10 @@ object MayorAPI {
     }
 
     private fun checkHypixelAPI(forceReload: Boolean = false) {
-        if (!forceReload && (lastUpdate.passedSince() < 20.minutes || (currentMayor == Mayor.UNKNOWN && lastUpdate.passedSince() < 1.minutes))) return
+        if (
+            !forceReload
+            && (lastUpdate.passedSince() < 20.minutes || (currentMayor == Mayor.UNKNOWN && lastUpdate.passedSince() < 1.minutes))
+        ) return
         lastUpdate = SimpleTimeMark.now()
 
         SkyHanniMod.coroutineScope.launch {
