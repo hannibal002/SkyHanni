@@ -21,6 +21,15 @@ import kotlin.math.sin
 object HoppityCallWarning {
 
     /**
+     * REGEX-TEST: §e✆ §r§bHoppity§r§e ✆
+     * REGEX-TEST: §e✆ §r§aHoppity§r§e ✆
+     */
+    private val initHoppityCallPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "hoppity.call.init",
+        "§e✆ §r(?:§a|§b)Hoppity§r§e ✆"
+    )
+
+    /**
      * REGEX-TEST: §e[NPC] §aHoppity§f: §b✆ §f§rWhat's up, §boBlazin§f?
      */
     private val pickupHoppityCallPattern by ChocolateFactoryAPI.patternGroup.pattern(
@@ -50,7 +59,7 @@ object HoppityCallWarning {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
         val message = event.message
-        if (message == "§e✆ §r§aHoppity§r§e ✆") startWarningUser()
+        if (initHoppityCallPattern.matches(message)) startWarningUser()
         if (pickupHoppityCallPattern.matches(message)) stopWarningUser()
     }
 
