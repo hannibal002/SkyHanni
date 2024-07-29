@@ -1,14 +1,16 @@
-package at.hannibal2.skyhanni.config.features.event;
+package at.hannibal2.skyhanni.config.features.event.hoppity;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class HoppityEggsConfig {
 
@@ -164,4 +166,9 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Hoppity Call Warning", desc = "")
+    @Accordion
+    public HoppityCallWarningConfig hoppityCallWarning = new HoppityCallWarningConfig();
 }
