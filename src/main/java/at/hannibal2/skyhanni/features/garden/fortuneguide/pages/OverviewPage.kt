@@ -137,7 +137,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.REFORGE_ARMOR.bar(
                 "§2$wordArmor Reforge",
                 if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's reforge\n$moreInfo"
-                else "§7§2Reforge fortune from your\n$armorName}",
+                else "§7§2Reforge fortune from your\n$armorName",
             ),
         )
 
@@ -146,7 +146,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.ENCHANT_ARMOR.bar(
                 "§2$wordArmor Enchantment",
                 if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's enchantments\n$moreInfo"
-                else "§7§2Enchantment fortune from your\n$armorName}",
+                else "§7§2Enchantment fortune from your\n$armorName",
             ),
         )
 
@@ -155,7 +155,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
             FFInfos.GEMSTONE_ARMOR.bar(
                 "§2$wordArmor Gemstones",
                 if (FarmingItems.currentArmor == null) "§7§2The fortune from your armor's gemstones\n$moreInfo"
-                else "§7§2Gemstone fortune from your\n$armorName}",
+                else "§7§2Gemstone fortune from your\n$armorName",
             ),
         )
 
