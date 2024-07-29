@@ -35,7 +35,7 @@ public class ItemPickupLogConfig {
     public boolean shorten = false;
 
     @Expose
-    @ConfigOption(name = "Sacks", desc = "Show items added and removed from stacks.")
+    @ConfigOption(name = "Sacks", desc = "Show items added and removed from sacks.")
     @ConfigEditorBoolean
     public boolean sack = false;
 
@@ -47,7 +47,7 @@ public class ItemPickupLogConfig {
     @Expose
     @ConfigOption(
         name = "Alignment",
-        desc = "How the item pickup log should be aligned. §d:3"
+        desc = "How the item pickup log should be aligned."
     )
     @ConfigEditorDropdown
     public RenderUtils.VerticalAlignment alignment = RenderUtils.VerticalAlignment.TOP;

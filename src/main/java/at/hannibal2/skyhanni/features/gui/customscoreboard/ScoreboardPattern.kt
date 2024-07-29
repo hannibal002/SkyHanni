@@ -432,9 +432,14 @@ object ScoreboardPattern {
         "wintereventwave",
         "(?:§.)*Wave \\d+",
     )
+
+    /**
+     * REGEX-TEST: Magma Cubes Left: §c-4
+     * REGEX-TEST: Magma Cubes Left: §c3
+     */
     val winterMagmaLeftPattern by eventsSb.pattern(
         "wintereventmagmaleft",
-        "(?:§.)*Magma Cubes Left: §.\\d+",
+        "(?:§.)*Magma Cubes Left: §.-?\\d+",
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
