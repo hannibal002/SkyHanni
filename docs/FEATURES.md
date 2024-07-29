@@ -195,7 +195,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 + AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
     + Highlight auctions based on the difference between their estimated value and the value they are listed for.
-    + Options to change the colours
+    + Options to change the colors
 + Highlight options in /tab. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1175)
     + Green for enabled
     + Red for disabled
@@ -215,6 +215,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show a list of all possible reforges for the item, with stats.
     + The reforge list can be sorted by a specific stat.
     + Optionally show the different stat values compared to the current reforge.
++ Show Bestiary Level as Stack Size. - saga (https://github.com/hannibal002/SkyHanni/pull/1945)
+    + Can be enabled/disabled on the Item Number list.
++ Added Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
 
 </details>
 <details open><summary>
@@ -401,6 +404,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show a line to the beacon. - hannibal2
     + Warning when enderman slayer beacon spawns - dragon99z
 + Highlight enderman slayer Nukekubi (Skulls) - dragon99z
++ Add a line to Nukekebi Skull. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2148)
 + Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged,
   corrupted, runic or semi rare.
 + Cooldown when the Fire Pillar from the Blaze Slayer will kill you.
@@ -1263,6 +1267,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Click on an item to open /recipe.
     + Option to include items from inside sacks.
     + Option to include vanilla items.
++ Add Armor Stack Display. - Xupie (https://github.com/hannibal002/SkyHanni/pull/1811)
+    + Display the number of stacks on armor pieces like Crimson, Terror etc.
++ Added Option to crash your game when you die, for extra suffering. - Stella (https://github.com/hannibal002/SkyHanni/pull/2238)
+    + Also punishes players who don't read patch notes.
++ Added Crown of Avarice counter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2229)
++ Added a title notification for when the Thunder Bottle is fully charged. - raven (https://github.com/hannibal002/SkyHanni/pull/2234)
 
 </details>
 <details open><summary>

@@ -17,10 +17,13 @@ data class GardenJson(
 )
 
 data class GardenVisitor(
-    @Expose val rarity: LorenzRarity,
-    @Expose @SerializedName("new_rarity") val newRarity: LorenzRarity?,
+    @Expose @SerializedName("rarity") private val _rarity: LorenzRarity,
+    @Expose @SerializedName("new_rarity") private val _newRarity: LorenzRarity?,
     @Expose val position: LorenzVec?,
     @Expose var skinOrType: String?,
     @Expose val mode: String,
     @Expose @SerializedName("need_items") val needItems: List<String>,
-)
+) {
+    val rarity: LorenzRarity
+        get() = _newRarity ?: _rarity
+}

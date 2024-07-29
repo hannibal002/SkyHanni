@@ -46,6 +46,8 @@ object ItemUtils {
         return list
     }
 
+    val ItemStack.extraAttributes: NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
+
     // TODO change else janni is sad
     fun ItemStack.isCoopSoulBound(): Boolean =
         getLore().any {
@@ -77,20 +79,16 @@ object ItemUtils {
     }
 
     fun hasAttributes(stack: ItemStack): Boolean {
-        if (stack.hasTagCompound()) {
-            val tagCompound = stack.tagCompound
-            if (tagCompound.hasKey("ExtraAttributes")) {
-                val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-                try {
-                    val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
-                    if (json.has("attributes")) {
-                        return true
-                    }
-                } catch (_: Exception) {
-                }
-            }
+        if (!stack.hasTagCompound()) return false
+        val tagCompound = stack.tagCompound
+        if (!tagCompound.hasKey("ExtraAttributes")) return false
+        val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
+        try {
+            val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
+            return json.has("attributes")
+        } catch (_: Exception) {
+            return false
         }
-        return false
     }
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
@@ -294,11 +292,11 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
+    private val bookPattern = "(?<name>.* [IVX]+) Book".toPattern()
+
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
         // This workaround fixes 'Turbo Cacti I Book'
-        val input = (if (originalInput.endsWith(" Book")) {
-            originalInput.replace(" Book", "")
-        } else originalInput).removeResets()
+        val input = (bookPattern.matchMatcher(originalInput) { group("name") } ?: originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
@@ -423,9 +421,9 @@ object ItemUtils {
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe): Double =
+    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
         neededItems(recipe).map {
-            it.key.getPrice() * it.value
+            it.key.getPrice(pastRecipes = pastRecipes) * it.value
         }.sum()
 
 }

@@ -372,6 +372,9 @@ object FarmingWeightDisplay {
     private fun isEtaEnabled() = config.overtakeETA
 
     fun addCrop(crop: CropType, addedCounter: Int) {
+        //Prevent div-by-0 errors
+        if (addedCounter == 0) return;
+
         val before = getExactWeight()
         localCounter[crop] = crop.getLocalCounter() + addedCounter
         val after = getExactWeight()
@@ -384,7 +387,7 @@ object FarmingWeightDisplay {
     private fun updateWeightPerSecond(crop: CropType, before: Double, after: Double, diff: Int) {
         val speed = crop.getSpeed() ?: return
         val weightDiff = (after - before) * 1000
-        weightPerSecond = weightDiff / diff * speed / 1000
+        weightPerSecond = (((weightDiff / diff) * speed) / 1000)
     }
 
     private fun getExactWeight(): Double {

@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
@@ -148,6 +150,18 @@ object ChocolateFactoryDataLoader {
         ConditionalUtils.onToggle(soundProperty) {
             ChocolateFactoryAPI.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
         }
+
+        config.chocolateUpgradeWarnings.upgradeWarningTimeTower.whenChanged { _, _ ->
+            ChocolateFactoryAPI.factoryUpgrades.takeIf { it.isNotEmpty() }?.let {
+                findBestUpgrades(it)
+            } ?: run {
+                ChatUtils.clickableChat(
+                    "Could not determine your current statistics to get next upgrade. Open CF to fix this!",
+                    onClick = { HypixelCommands.chocolateFactory() },
+                    "§eClick to run /cf!"
+                )
+            }
+        }
     }
 
     private fun clearData() {
@@ -265,7 +279,7 @@ object ChocolateFactoryDataLoader {
         item.getLore().matchFirst(barnAmountPattern) {
             profileStorage.currentRabbits = group("rabbits").formatInt()
             profileStorage.maxRabbits = group("max").formatInt()
-            ChocolateFactoryBarnManager.trySendBarnFullMessage()
+            ChocolateFactoryBarnManager.trySendBarnFullMessage(inventory = true)
         }
     }
 
@@ -427,9 +441,12 @@ object ChocolateFactoryDataLoader {
     private fun findBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
         val profileStorage = profileStorage ?: return
 
-        // removing time tower here as people like to determine when to buy it themselves
-        val notMaxed = list.filter {
-            !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null
+        val ttFiltered = list.filter {
+            config.chocolateUpgradeWarnings.upgradeWarningTimeTower.get() || it.slotIndex != ChocolateFactoryAPI.timeTowerIndex
+        }
+
+        val notMaxed = ttFiltered.filter {
+            !it.isMaxed && it.effectiveCost != null
         }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }
