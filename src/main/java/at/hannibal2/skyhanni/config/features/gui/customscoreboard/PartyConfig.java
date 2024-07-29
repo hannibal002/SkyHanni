@@ -4,7 +4,6 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class PartyConfig {
     @Expose
@@ -14,7 +13,7 @@ public class PartyConfig {
         maxValue = 25, // why do I even set it so high
         minStep = 1
     )
-    public Property<Integer> maxPartyList = Property.of(4);
+    public Integer maxPartyList = 4;
 
     @Expose
     @ConfigOption(name = "Show Party Everywhere", desc = "Show the party list everywhere.\n" +

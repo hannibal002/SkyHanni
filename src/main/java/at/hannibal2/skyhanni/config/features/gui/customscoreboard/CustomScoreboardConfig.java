@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEntry;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -28,16 +28,17 @@ public class CustomScoreboardConfig {
     @Expose
     @ConfigOption(
         name = "Appearance",
-        desc = "Drag text to change the appearance of the advanced scoreboard." // supporting both custom & advanced search
+        desc = "Drag text to change the appearance of the advanced scoreboard."
     )
     @ConfigEditorDraggableList()
-    public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.defaultOption);
+    public Property<List<ScoreboardEntry>> scoreboardEntries = Property.of(new ArrayList<>(ScoreboardEntry.defaultOption));
 
     @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable reset = () -> {
-        scoreboardEntries.clear();
-        scoreboardEntries.addAll(ScoreboardElement.defaultOption);
+        scoreboardEntries.get().clear();
+        scoreboardEntries.get().addAll(ScoreboardEntry.defaultOption);
+        scoreboardEntries.notifyObservers();
     };
 
     @Expose
@@ -56,7 +57,7 @@ public class CustomScoreboardConfig {
     public InformationFilteringConfig informationFiltering = new InformationFilteringConfig();
 
     @Expose
-    @ConfigOption(name = "Unknown Lines warning", desc = "Give a chat warning when unknown lines are found in the scoreboard.")
+    @ConfigOption(name = "Unknown Lines warning", desc = "Give a chat warning when unknown lines are found in the scoreboard.\n§cReporting these in the Discord Server are very important, so we can know what lines are missing.")
     @ConfigEditorBoolean
     public boolean unknownLinesWarning = true;
 

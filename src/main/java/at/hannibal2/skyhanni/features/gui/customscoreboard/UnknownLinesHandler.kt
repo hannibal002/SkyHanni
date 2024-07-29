@@ -1,16 +1,59 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SizeLimitedSet
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import com.google.common.cache.RemovalCause
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
+
+internal var confirmedLinesCache = SizeLimitedSet<String>(100)
+
+internal var confirmedUnknownLines = listOf<String>()
+internal var unconfirmedUnknownLines = listOf<String>()
+
+internal var pastUnknownLines = SizeLimitedSet<String>(100)
+
+internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { line, cause -> if (cause == RemovalCause.EXPIRED) onRemoval(line) }
+
+private fun onRemoval(line: String) {
+    if (!LorenzUtils.inSkyBlock) return
+    if (line !in unconfirmedUnknownLines) return
+    unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
+    confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
+    if (!config.unknownLinesWarning) return
+    val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
+    val message = "CustomScoreboard detected $pluralize"
+    ErrorManager.logErrorWithData(
+        UndetectedScoreboardLines(message),
+        message,
+        "Unknown Lines" to confirmedUnknownLines,
+        "Island" to LorenzUtils.skyBlockIsland,
+        "Area" to HypixelData.skyBlockArea,
+        "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+        "Previous Unknown Lines" to pastUnknownLines.toSet(),
+        noStackTrace = true,
+        betaOnly = true,
+    )
+}
+
+private class UndetectedScoreboardLines(message: String) : Exception(message)
 
 object UnknownLinesHandler {
 
@@ -115,7 +158,7 @@ object UnknownLinesHandler {
             SbPattern.wtfAreThoseLinesPattern,
             SbPattern.timeLeftPattern,
             SbPattern.darkAuctionCurrentItemPattern,
-            SbPattern.coldPattern,
+            MiningAPI.coldPattern,
             SbPattern.riftHotdogTitlePattern,
             SbPattern.riftHotdogEatenPattern,
             SbPattern.mineshaftNotStartedPattern,
@@ -138,7 +181,10 @@ object UnknownLinesHandler {
         )
 
         unknownLines = unknownLines.filterNot { line ->
-            patternsToExclude.any { pattern -> pattern.matches(line) }
+            if (line in confirmedLinesCache) return@filterNot true
+            val matches = patternsToExclude.any { pattern -> pattern.matches(line) }
+            if (matches) confirmedLinesCache += line
+            matches
         }
 
         /**
@@ -209,6 +255,7 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter { it !in unknownLinesSet }
 
         unknownLines.forEach {
+            pastUnknownLines += it
             ChatUtils.debug("Unknown Scoreboard line: '$it'")
             unknownLinesSet.add(it)
         }

@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -318,17 +318,18 @@ object SkillAPI {
         }
 
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
+        val gained = matcher.group("gained")
         tablistLevel?.let { level ->
             if (isPercentPatternFound) {
                 val levelXp = calculateLevelXp(existingLevel.level - 1)
                 val nextLevelDiff = levelArray.getOrNull(level)?.toDouble() ?: 7_600_000.0
                 val nextLevelProgress = nextLevelDiff * xpPercentage / 100
                 val totalXp = levelXp + nextLevelProgress
-                updateSkillInfo(existingLevel, level, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong(), matcher.group("gained"))
+                updateSkillInfo(existingLevel, level, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong(), gained)
             } else {
                 val exactLevel = getLevelExact(needed)
                 val levelXp = calculateLevelXp(existingLevel.level - 1).toLong() + current
-                updateSkillInfo(existingLevel, exactLevel, current, needed, levelXp, matcher.group("gained"))
+                updateSkillInfo(existingLevel, exactLevel, current, needed, levelXp, gained)
             }
             storage?.set(skillType, existingLevel)
         }

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEntry
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -135,13 +135,14 @@ object MaxwellAPI {
 
         chatPowerPattern.tryReadPower(message)
         chatPowerUnlockedPattern.tryReadPower(message)
-        tuningAutoAssignedPattern.matchMatcher(event.message) {
+        if (tuningAutoAssignedPattern.matches(event.message)) {
             if (tunings.isNullOrEmpty()) return
-            val tuningsInScoreboard = ScoreboardElement.TUNING in CustomScoreboard.config.scoreboardEntries
-            if (tuningsInScoreboard) {
-                ChatUtils.chat(
-                    "Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.",
-                )
+            with(CustomScoreboard.config) {
+                if (enabled.get() && ScoreboardEntry.TUNING in scoreboardEntries.get()) {
+                    ChatUtils.chat(
+                        "Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.",
+                    )
+                }
             }
         }
     }
