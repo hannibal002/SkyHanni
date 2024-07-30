@@ -170,7 +170,8 @@ object ChocolateFactoryStrayTracker {
         val lineFormat = "${lineHeader}${caughtString}"
 
         return rarityExtraChocMs?.let {
-            val tip = "§a+§b$extraChocFormat §afrom $colorCode$rarity strays§7${if (rarity == "legendary") extractGoldenTypesCaught(data) else ""}"
+            val tip =
+                "§a+§b$extraChocFormat §afrom $colorCode$rarity strays§7${if (rarity == "legendary") extractGoldenTypesCaught(data) else ""}"
             Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.split("\n"))
         } ?: Renderable.string(lineFormat)
     }
@@ -276,20 +277,22 @@ object ChocolateFactoryStrayTracker {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
-        if (event.slot == null || event.slot.slotIndex == -999) return
-        if (claimedStraysSlots.contains(event.slot.slotIndex)) return
-        InventoryUtils.getItemsInOpenChest().find { it.slotNumber == event.slot.slotNumber && it.hasStack }?.let {
-            val clickedStack = it.stack
-            val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
-            if (nameText.equals("§6§lGolden Rabbit §8- §aSide Dish")) {
-                claimedStraysSlots.add(event.slot.slotIndex)
-                incrementGoldenType("sidedish")
-                incrementRarity("legendary", 0)
-                DelayedRun.runDelayed(1.seconds) {
-                    claimedStraysSlots.remove(claimedStraysSlots.indexOf(event.slot.slotIndex))
-                }
-            }
-        } ?: return
+        val index = event.slot?.slotIndex ?: return
+        if (index == -999) return
+        if (claimedStraysSlots.contains(index)) return
+
+        val clickedStack = InventoryUtils.getItemsInOpenChest()
+            .find { it.slotNumber == event.slot.slotNumber && it.hasStack }
+            ?.stack ?: return
+        val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
+        if (!nameText.equals("§6§lGolden Rabbit §8- §aSide Dish")) return
+
+        claimedStraysSlots.add(index)
+        incrementGoldenType("sidedish")
+        incrementRarity("legendary", 0)
+        DelayedRun.runDelayed(1.seconds) {
+            claimedStraysSlots.remove(claimedStraysSlots.indexOf(index))
+        }
     }
 
     @SubscribeEvent
