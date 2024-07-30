@@ -239,9 +239,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             }
         }
         if (autoReturn == "") { // if we didn't find any useful information, display the fallback
-            val statusNoAuto = DiscordStatus.entries.toMutableList()
-            statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[DiscordRPCManager.config.auto.get().ordinal].getDisplayString()
+            val fallbackID = DiscordRPCManager.config.auto.get().ordinal
+            if (fallbackID == 10) autoReturn = NONE.getDisplayString() // 10 is this (DiscordStatus.AUTO); prevents an infinite loop
+            else autoReturn = DiscordStatus.entries[DiscordRPCManager.config.auto.get().ordinal].getDisplayString()
         }
         autoReturn
     }),
