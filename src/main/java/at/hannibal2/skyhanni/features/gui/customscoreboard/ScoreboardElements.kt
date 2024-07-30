@@ -632,17 +632,21 @@ private fun getCookieShowWhen(): Boolean {
 }
 
 private fun getObjectiveDisplayPair() = buildList {
-    val objective =
-        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.objectivePattern.matches(it) }
+    val formattedLines = ScoreboardData.sidebarLinesFormatted
+    val objective = formattedLines.firstOrNull { ScoreboardPattern.objectivePattern.matches(it) }
+    if (objective != null) {
+        add(objective to HorizontalAlignment.LEFT)
 
-    add(objective to HorizontalAlignment.LEFT)
-    add((ScoreboardData.sidebarLinesFormatted.nextAfter(objective) ?: "<hidden>") to HorizontalAlignment.LEFT)
+        val secondLine = formattedLines.nextAfter(objective) ?: "<hidden>"
+        add(secondLine to HorizontalAlignment.LEFT)
 
-    if (ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.thirdObjectiveLinePattern.matches(it) }) {
-        add(
-            (ScoreboardData.sidebarLinesFormatted.nextAfter(objective, 2)
-                ?: "Second objective here") to HorizontalAlignment.LEFT,
-        )
+        formattedLines.nextAfter(objective, 2)?.let {
+            if (ScoreboardPattern.thirdObjectiveLinePattern.matches(it)) add(it to HorizontalAlignment.LEFT)
+        }
+
+        formattedLines.nextAfter(objective, 3)?.let {
+            if (ScoreboardPattern.thirdObjectiveLinePattern.matches(it)) add(it to HorizontalAlignment.LEFT)
+        }
     }
 }
 

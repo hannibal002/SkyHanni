@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
@@ -278,6 +279,10 @@ object Commands {
             "Resets the Sea Creature Tracker",
         ) { SeaCreatureTracker.resetCommand() }
         registerCommand(
+            "shresetstrayrabbittracker",
+            "Resets the Stray Rabbit Tracker",
+        ) { ChocolateFactoryStrayTracker.resetCommand() }
+        registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
         ) { WikiManager.otherWikiCommands(it, true) }
@@ -325,10 +330,6 @@ object Commands {
             "shlimbostats",
             "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!",
         ) { LimboTimeTracker.printStats() }
-        registerCommand(
-            "shlimbo",
-            "Warps you to Limbo.",
-        ) { MiscFeatures.goToLimbo() }
         registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden",
