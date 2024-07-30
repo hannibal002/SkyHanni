@@ -32,9 +32,7 @@ object CustomLines {
         Time,
     )
 
-    internal fun String.handleCustomLine(): List<String> {
-        return this.replace("&&", "§").replaceWithReplacements()
-    }
+    internal fun String.handleCustomLine(): List<String> = this.replace("&&", "§").replaceWithReplacements()
 
     private fun String.replaceWithReplacements(): List<String> {
         var modifiedString = this
@@ -43,16 +41,5 @@ object CustomLines {
         }
         return modifiedString.split("\\n")
     }
-
-    private fun normalizeYaw(yaw: Float): Float {
-        var result = yaw % 360
-        if (result > 180) {
-            result -= 360
-        } else if (result <= -180) {
-            result += 360
-        }
-        return result
-    }
-
 
 }
