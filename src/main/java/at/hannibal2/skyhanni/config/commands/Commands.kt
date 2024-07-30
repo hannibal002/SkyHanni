@@ -278,6 +278,7 @@ object Commands {
             "shresetcaketracker",
             "Resets the New Year Cake Tracker",
         ) { CakeTracker.resetCommand() }
+        registerCommand(
             "shresetstrayrabbittracker",
             "Resets the Stray Rabbit Tracker",
         ) { ChocolateFactoryStrayTracker.resetCommand() }

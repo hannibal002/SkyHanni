@@ -70,5 +70,5 @@ public class CakeTrackerConfig {
     @Expose
     @ConfigOption(name = "Auction Highlight Color", desc = "The color that should be used to highlight unobtained cakes in the auction house.")
     @ConfigEditorColour
-    public String auctionHighlightColor = LorenzColor.RED.toConfigColour();
+    public String auctionHighlightColor = LorenzColor.RED.toConfigColor();
 }
