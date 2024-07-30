@@ -122,9 +122,9 @@ object HoppityEggsManager {
             return
         }
 
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
-
         HoppityEggsCompactChat.handleChat(event)
+
+        if (!ChocolateFactoryAPI.isHoppityEvent()) return
 
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocations.saveNearestEgg()

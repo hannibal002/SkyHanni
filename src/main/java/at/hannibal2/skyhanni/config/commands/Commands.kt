@@ -52,6 +52,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -277,6 +278,9 @@ object Commands {
             "shresetcaketracker",
             "Resets the New Year Cake Tracker",
         ) { CakeTracker.resetCommand() }
+            "shresetstrayrabbittracker",
+            "Resets the Stray Rabbit Tracker",
+        ) { ChocolateFactoryStrayTracker.resetCommand() }
         registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",

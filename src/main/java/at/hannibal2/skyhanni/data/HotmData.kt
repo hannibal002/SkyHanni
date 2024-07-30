@@ -36,7 +36,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.math.pow
 
-
 private fun calculatePeakOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
     for (i in 1..level) {
         when (i) {
@@ -51,7 +50,6 @@ private fun calculatePeakOfTheMountainLoot(level: Int): Map<HotmReward, Double> 
         }
     }
 }
-
 
 enum class HotmData(
     val guiName: String,
@@ -359,17 +357,22 @@ enum class HotmData(
 
     val printName = name.allLettersFirstUppercase()
 
+    /** Level which are actually paid with powder (does exclude [blueEgg]*/
     val rawLevel: Int
         get() = storage?.perks?.get(this.name)?.level ?: 0
 
+    /** Level for which the effect that is present (considers [enabled] and [blueEgg])*/
     var activeLevel: Int
-        get() = if (enabled) storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0 else 0
+        get() = if (enabled) effectivLevel else 0
         private set(value) {
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value.minus(blueEgg())
         }
 
+    /** Level that considering [blueEgg]*/
+    val effectivLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
+
     val isMaxLevel: Boolean
-        get() = activeLevel >= maxLevel // >= to account for +1 from Blue Cheese
+        get() = effectivLevel >= maxLevel // >= to account for +1 from Blue Cheese
 
     private fun blueEgg() = if (this != PEAK_OF_THE_MOUNTAIN && maxLevel != 1 && HotmAPI.isBlueEggActive) 1 else 0
 
@@ -567,7 +570,7 @@ enum class HotmData(
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
 
-            if (entry == SKY_MALL) handelSkyMall(lore)
+            if (entry == SKY_MALL) handleSkyMall(lore)
         }
 
         private fun Slot.handlePowder(): Boolean {
@@ -620,10 +623,10 @@ enum class HotmData(
             "§aYour Current Effect",
         )
 
-        private fun handelSkyMall(lore: List<String>) {
+        private fun handleSkyMall(lore: List<String>) {
             if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
             else {
-                val index = lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                val index = skyMallCurrentEffect.indexOfFirstMatch(lore) ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Could not read the skymall effect from the hotm tree",
                         "skyMallCurrentEffect didn't match",
@@ -674,6 +677,7 @@ enum class HotmData(
         fun onInventoryFullyOpen(event: InventoryFullyOpenedEvent) {
             if (!LorenzUtils.inSkyBlock) return
             inInventory = inventoryPattern.matches(event.inventoryName)
+            if (!inInventory) return
             DelayedRun.runNextTick {
                 InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
                 abilities.filter { it.isUnlocked }.forEach {
