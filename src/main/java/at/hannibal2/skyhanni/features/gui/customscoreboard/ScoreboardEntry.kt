@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Cold
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Cookie
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Copper
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.CustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Date
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.EmptyLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Events
@@ -78,6 +79,7 @@ enum class ScoreboardEntry(val element: ScoreboardElement) {
     EMPTY_LINE8(EmptyLine),
     EMPTY_LINE9(EmptyLine),
     EMPTY_LINE10(EmptyLine),
+    CUSTOM_LINE1(CustomLine),
     ;
 
     override fun toString() = element.configLine

@@ -1,45 +1,45 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBits
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getBitsAvailable
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
-import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import net.minecraft.client.Minecraft
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Area
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Bits
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.BitsAvailable
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Date
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Island
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Pitch
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Purse
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Time
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.XCoord
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.YCoord
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Yaw
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Year
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ZCoord
 
 object CustomLines {
 
     internal val replacements = listOf(
-        Triple("%x%", { Minecraft.getMinecraft().thePlayer.posX.round(2) }, "X-Coordinate"),
-        Triple("%y%", { Minecraft.getMinecraft().thePlayer.posY.round(2) }, "Y-Coordinate"),
-        Triple("%z%", { Minecraft.getMinecraft().thePlayer.posZ.round(2) }, "Z-Coordinate"),
-        Triple("%yaw%", { normalizeYaw(Minecraft.getMinecraft().thePlayer.rotationYaw).round(2) }, "Direction"),
-        Triple("%pitch%", { Minecraft.getMinecraft().thePlayer.rotationPitch.round(2) }, "Pitch"),
-        Triple("%purse%", { PurseAPI.getPurse().formatNum() }, "Purse"),
-        Triple("%bits%", { getBits() }, "Bits"),
-        Triple("%bits_available%", { getBitsAvailable() }, "Bits Available"),
-        Triple("%island%", { HypixelData.skyBlockIsland.displayName }, "Island"),
-        Triple("%area%", { HypixelData.skyBlockArea }, "Area"),
-        Triple("%date%", { SkyBlockTime.now().formatted(hoursAndMinutesElement = false, yearElement = false) }, "Date"),
-        Triple(
-            "%year%",
-            { SkyBlockTime.now().formatted(dayAndMonthElement = false, hoursAndMinutesElement = false) },
-            "Year",
-        ),
-        Triple("%time%", { SkyBlockTime.now().formatted(dayAndMonthElement = false, yearElement = false) }, "Time"),
+        XCoord,
+        YCoord,
+        ZCoord,
+        Yaw,
+        Pitch,
+        Purse,
+        Bits,
+        BitsAvailable,
+        Island,
+        Area,
+        Date,
+        Year,
+        Time,
     )
 
     internal fun String.handleCustomLine(): List<String> {
-        return this.replace("&", "§").replaceWithReplacements()
+        return this.replace("&&", "§").replaceWithReplacements()
     }
 
     private fun String.replaceWithReplacements(): List<String> {
         var modifiedString = this
-        replacements.forEach { (placeholder, replacement) ->
-            modifiedString = modifiedString.replace(placeholder, replacement.invoke().toString())
+        replacements.forEach {
+            modifiedString = modifiedString.replace(it.trigger, it.replacement())
         }
         return modifiedString.split("\\n")
     }

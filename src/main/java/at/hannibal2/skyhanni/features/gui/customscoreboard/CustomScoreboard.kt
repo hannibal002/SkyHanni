@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.AlignmentConfi
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ChunkedStatsConfig
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomLinesConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.EventsConfig
@@ -126,6 +127,7 @@ object CustomScoreboard {
     val alignmentConfig: AlignmentConfig get() = displayConfig.alignment
     val arrowConfig: ArrowConfig get() = displayConfig.arrow
     val chunkedConfig: ChunkedStatsConfig get() = displayConfig.chunkedStats
+    val customLineConfig: CustomLinesConfig get() = displayConfig.customLines
     val eventsConfig: EventsConfig get() = displayConfig.events
     val mayorConfig: MayorConfig get() = displayConfig.mayor
     val partyConfig: PartyConfig get() = displayConfig.party
