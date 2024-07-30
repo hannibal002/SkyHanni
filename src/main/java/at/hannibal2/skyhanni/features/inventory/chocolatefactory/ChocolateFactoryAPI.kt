@@ -12,8 +12,13 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockSeason
@@ -21,6 +26,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -40,6 +46,25 @@ object ChocolateFactoryAPI {
     private val chocolateFactoryInventoryNamePattern by patternGroup.pattern(
         "inventory.name",
         "Hoppity|Chocolate Factory Milestones",
+    )
+
+    /**
+     * REGEX-TEST: §a§lPROMOTE §8➜ §7[208§7] §dExecutive
+     * REGEX-TEST: §a§lUPGRADE §8➜ §aRabbit Barn CCXXI
+     */
+    private val upgradeLorePattern by patternGroup.pattern(
+        "item.lore.upgrade",
+        "§a§l(?:UPGRADE|PROMOTE) §8➜ (?:§7\\[(?<nextlevel>\\d+)§7] )?(?<upgradename>.*?) ?(?<nextlevelalt>[IVXLCDM]*)\$"
+    )
+
+    /**
+     * REGEX-TEST: §bRabbit Bro§8 - §7[220§7] §bBoard Member
+     * REGEX-TEST: §6Rabbit Dog§8 - §7[190§7] §6Director
+     * REGEX-TEST: §dRabbit Daddy§8 - §7[201§7] §dExecutive
+     */
+    private val employeeNamePattern by patternGroup.pattern(
+        "item.name.employee",
+        "(?<employee>(?:§.+)+Rabbit .*)§8 - §7\\[\\d*§7] .*"
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -152,6 +177,17 @@ object ChocolateFactoryAPI {
         val nextLine = lore.nextAfter({ UtilsPatterns.costLinePattern.matches(it) }) ?: return null
         return chocolateAmountPattern.matchMatcher(nextLine.removeColor()) {
             group("amount").formatLong()
+        }
+    }
+
+    fun getNextLevelName(stack: ItemStack): String? {
+        return upgradeLorePattern.firstMatcher(stack.getLore()) {
+            val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
+                groupOrNull("employee")
+            } else groupOrNull("upgradename")
+            val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
+            if(upgradeName == null || nextLevel == null) null
+            else "$upgradeName $nextLevel"
         }
     }
 
