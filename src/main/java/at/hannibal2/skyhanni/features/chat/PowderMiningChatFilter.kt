@@ -238,7 +238,7 @@ object PowderMiningChatFilter {
         "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
     )
 
-    fun block(message: String): String {
+    fun block(message: String): String? {
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
         if (successfulPickPattern.matches(message)) return "powder_mining_picked"
@@ -250,14 +250,14 @@ object PowderMiningChatFilter {
             return "reward_wrapper"
         }
 
-        if (!unclosedRewards) return ""
+        if (!unclosedRewards) return null
         if (lockPickedPattern.matches(message)) return "powder_chest_lockpicked"
         if (lootChestCollectedPattern.matches(message)) return "loot_chest_opened"
         if (rewardHeaderPattern.matches((message))) return "powder_reward_header"
 
         // All powder and loot chest rewards start with 4 spaces
         // To simplify regex statements, this check is done outside
-        val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return ""
+        val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return null
 
         //Powder
         powderRewardPattern.matchMatcher(ssMessage) {
@@ -281,15 +281,15 @@ object PowderMiningChatFilter {
             }
         }
 
-        blockSimpleRewards(ssMessage).takeIf { it.isNotEmpty() }?.let { return it }
-        blockGoblinEggs(ssMessage).takeIf { it.isNotEmpty() }?.let { return it }
-        blockGemstones(ssMessage).takeIf { it.isNotEmpty() }?.let { return it }
+        blockSimpleRewards(ssMessage)?.let { return it }
+        blockGoblinEggs(ssMessage)?.let { return it }
+        blockGemstones(ssMessage)?.let { return it }
 
         //Fallback default
-        return ""
+        return null
     }
 
-    private fun blockSimpleRewards(ssMessage: String): String {
+    private fun blockSimpleRewards(ssMessage: String): String? {
         val rewardPatterns = mapOf(
             ascensionRopeRewardPattern to ASCENSION_ROPE to "powder_mining_ascension_rope",
             wishingCompassRewardPattern to WISHING_COMPASS to "powder_mining_wishing_compass",
@@ -308,24 +308,26 @@ object PowderMiningChatFilter {
                 else "no_filter"
             }
         }
-        return ""
+        return null
     }
 
-    private fun blockGoblinEggs(ssMessage: String): String {
+    private fun blockGoblinEggs(ssMessage: String): String? {
         goblinEggPattern.matchMatcher(ssMessage) {
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.SHOW_ALL) return "no_filter"
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
-            val colorStr = groupOrNull("color")?.lowercase() ?: ""
+            val colorStr = groupOrNull("color")?.lowercase()
             return when (colorStr) {
                 //'Colorless', base goblin eggs will never be shown in this code path
-                "" -> "powder_mining_goblin_eggs"
+                null -> "powder_mining_goblin_eggs"
                 "green" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
+
                 "yellow" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.YELLOW_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
+
                 "red" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.RED_UP) {
                     "powder_mining_goblin_eggs"
                 } else "no_filter"
@@ -336,22 +338,19 @@ object PowderMiningChatFilter {
                     ErrorManager.logErrorWithData(
                         NoSuchElementException(),
                         "Unknown Goblin Egg color detected in Powder Mining Filter: '${colorStr}' - please report this in the Discord!",
-                        noStackTrace = true
+                        noStackTrace = true,
                     )
                     "no_filter"
                 }
             }
         }
-        return ""
+        return null
     }
 
-    private fun blockGemstones(ssMessage: String): String {
+    private fun blockGemstones(ssMessage: String): String? {
         gemstonePattern.matchMatcher(ssMessage) {
-            val gemStr = groupOrNull("gem")?.lowercase() ?: ""
-            val tierStr = groupOrNull("tier")?.lowercase() ?: ""
-
-            //Theoretically impossible but ?
-            if (gemStr.isEmpty() || tierStr.isEmpty()) return ""
+            val gemStr = groupOrNull("gem")?.lowercase() ?: return null
+            val tierStr = groupOrNull("tier")?.lowercase() ?: return null
 
             val gemSpecificFilterEntry = when (gemStr) {
                 "ruby" -> gemstoneConfig.rubyGemstones
@@ -380,6 +379,6 @@ object PowderMiningChatFilter {
                 else -> "no_filter"
             }
         }
-        return ""
+        return null
     }
 }

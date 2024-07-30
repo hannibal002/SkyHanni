@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -460,10 +459,9 @@ object ChatFilter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         var blockReason = block(event.message)
-        if (blockReason == "" && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
-        if (blockReason == "") return
+        if (blockReason == null && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
 
-        event.blockedReason = blockReason
+        event.blockedReason = blockReason ?: return
     }
 
     /**
@@ -471,7 +469,7 @@ object ChatFilter {
      * @param message The message to check
      * @return The reason why the message was blocked, empty if not blocked
      */
-    private fun block(message: String): String = when {
+    private fun block(message: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"
         config.warping && message.isPresent("warping") -> "warping"
@@ -496,7 +494,7 @@ object ChatFilter {
         dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
 
-        else -> ""
+        else -> null
     }
 
     /**
@@ -506,7 +504,7 @@ object ChatFilter {
      * @return Block reason if applicable
      * @see block
      */
-    private fun powderMiningBlock(event: LorenzChatEvent): String {
+    private fun powderMiningBlock(event: LorenzChatEvent): String? {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
@@ -516,12 +514,12 @@ object ChatFilter {
                 } ?: "§a+§r"
                 event.chatComponent = ChatComponentText("$amountFormat $reward")
             }
-            return ""
+            return null
         }
         return powderMiningMatchResult
     }
 
-    private var othersMsg = ""
+    private var othersMsg: String? = null
 
     /**
      * Checks if the message is an "other" message.
@@ -544,9 +542,9 @@ object ChatFilter {
             message.isPresent("winter_island") -> "winter_island"
             message.isPresent("useless_warning") -> "useless_warning"
             message.isPresent("annoying_spam") -> "annoying_spam"
-            else -> ""
+            else -> null
         }
-        return othersMsg != ""
+        return othersMsg != null
     }
 
     /**
