@@ -956,6 +956,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added an option to block Chocolate Factory access without a mythic rabbit pet. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2124)
 + Add reminder that the Time Tower is expired and has extra charges available. - appable (https://github.com/hannibal002/SkyHanni/pull/2133)
     + Replaces the previous Time Tower Reminder feature.
++ Added a tracker for stray rabbits caught in the Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2210)
 
 </details>
 <details open><summary>
