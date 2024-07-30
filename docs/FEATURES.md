@@ -195,7 +195,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 + AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
     + Highlight auctions based on the difference between their estimated value and the value they are listed for.
-    + Options to change the colours
+    + Options to change the colors
 + Highlight options in /tab. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1175)
     + Green for enabled
     + Red for disabled
@@ -217,6 +217,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optionally show the different stat values compared to the current reforge.
 + Show Bestiary Level as Stack Size. - saga (https://github.com/hannibal002/SkyHanni/pull/1945)
     + Can be enabled/disabled on the Item Number list.
++ Added Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
 
 </details>
 <details open><summary>
@@ -1271,6 +1272,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Option to crash your game when you die, for extra suffering. - Stella (https://github.com/hannibal002/SkyHanni/pull/2238)
     + Also punishes players who don't read patch notes.
 + Added Crown of Avarice counter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2229)
++ Added a title notification for when the Thunder Bottle is fully charged. - raven (https://github.com/hannibal002/SkyHanni/pull/2234)
 
 </details>
 <details open><summary>
