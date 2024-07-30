@@ -4,13 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
@@ -324,20 +329,6 @@ object ChatFilter {
         "§cThis gift is for §r.*§r§c, sorry!".toPattern(),
     )
 
-    // Powder Mining
-    private val powderMiningPatterns = listOf(
-        "§cYou need a stronger tool to mine (Amethyst|Ruby|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c.".toPattern(),
-        "§aYou received §r§f\\d* §r§f[❤❈☘⸕✎✧] Rough (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-        "§aYou received §r§f\\d §r§a[❤❈☘⸕✎✧] Flawed (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone§r§a\\.".toPattern(),
-
-        // Jungle
-        "§aYou received §r§f\\d* §r§aSludge Juice§r§a\\.".toPattern(),
-
-        // Useful, maybe in another chat
-        "§aYou received §r§b\\+\\d{1,3} §r§a(Mithril|Gemstone) Powder.".toPattern(),
-        "§aYou received §r(§6|§b)\\+[1-2] (Diamond|Gold) Essence§r§a.".toPattern(),
-    )
-
     private val fireSalePattern by RepoPattern.pattern(
         "chat.firesale",
         "§6§k§lA§r §c§lFIRE SALE §r§6§k§lA(?:\\n|.)*",
@@ -428,7 +419,6 @@ object ChatFilter {
         "winter_island" to winterIslandPatterns,
         "annoying_spam" to annoyingSpamPatterns,
         "winter_gift" to winterGiftPatterns,
-        "powder_mining" to powderMiningPatterns,
         "fire_sale" to fireSalePatterns,
         "event" to eventPatterns,
         "factory_upgrade" to factoryUpgradePatterns,
@@ -469,7 +459,8 @@ object ChatFilter {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        val blockReason = block(event.message)
+        var blockReason = block(event.message)
+        if (blockReason == "" && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
         if (blockReason == "") return
 
         event.blockedReason = blockReason
@@ -494,7 +485,6 @@ object ChatFilter {
         config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.powderMining && message.isPresent("powder_mining") -> "powder_mining"
         config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
@@ -507,6 +497,28 @@ object ChatFilter {
         dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
 
         else -> ""
+    }
+
+    /**
+     * Checks if the message is a blocked powder mining message, as defined in PowderMiningChatFilter.
+     * Will modify un-filtered Mining rewards, or return a resultant blocking code
+     * @param event The event to check
+     * @return Block reason if applicable
+     * @see block
+     */
+    private fun powderMiningBlock(event: LorenzChatEvent): String {
+        val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
+        if (powderMiningMatchResult == "no_filter") {
+            genericMiningRewardMessage.matchMatcher(event.message) {
+                val reward = groupOrNull("reward") ?: ""
+                val amountFormat = groupOrNull("amount")?.let {
+                    "§a+ §b$it§r"
+                } ?: "§a+§r"
+                event.chatComponent = ChatComponentText("$amountFormat $reward")
+            }
+            return ""
+        }
+        return powderMiningMatchResult
     }
 
     private var othersMsg = ""
@@ -565,5 +577,6 @@ object ChatFilter {
         event.move(3, "chat.killCombo", "chat.filterType.killCombo")
         event.move(3, "chat.profileJoin", "chat.filterType.profileJoin")
         event.move(3, "chat.others", "chat.filterType.others")
+        event.move(52, "chat.filterType.powderMining", "chat.filterType.powderMiningFilter.enabled")
     }
 }
