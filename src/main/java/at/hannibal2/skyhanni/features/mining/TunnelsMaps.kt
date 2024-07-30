@@ -488,6 +488,7 @@ object TunnelsMaps {
         closedNote = null
         clearPath()
         cooldowns.clear()
+        goalReached = false
     }
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
