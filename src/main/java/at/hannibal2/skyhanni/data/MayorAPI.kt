@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.Mayor.Companion.addPerks
 import at.hannibal2.skyhanni.data.Mayor.Companion.getMayorFromPerk
-import at.hannibal2.skyhanni.data.Mayor.Companion.setAssumeMayor
 import at.hannibal2.skyhanni.data.Mayor.Companion.setAssumeMayorJson
 import at.hannibal2.skyhanni.data.Perk.Companion.getPerkFromName
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
@@ -105,13 +105,13 @@ object MayorAPI {
 
     /**
      * @param input: The name of the mayor
-     * @return: The neu color of the mayor; If no mayor was found, it will return "§c"
+     * @return: The NotEnoughUpdates color of the mayor; If no mayor was found, it will return "§c"
      */
     fun mayorNameToColorCode(input: String): String = Mayor.getMayorFromName(input)?.color ?: "§c"
 
     /**
      * @param input: The name of the mayor
-     * @return: The neu color of the mayor + the name of the mayor; If no mayor was found, it will return "§c[input]"
+     * @return: The NotEnoughUpdates color of the mayor + the name of the mayor; If no mayor was found, it will return "§c[input]"
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
@@ -159,15 +159,14 @@ object MayorAPI {
 
         if (!calendarGuiPattern.matches(event.inventoryName)) return
 
-        val stack: ItemStack =
-            event.inventoryItems.values.firstOrNull { jerryHeadPattern.matches(it.displayName) } ?: return
+        val stack: ItemStack = event.inventoryItems.values.firstOrNull { jerryHeadPattern.matches(it.displayName) } ?: return
 
         val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }) ?: return
-        // This is one Perk of the Perkpocalypse Mayor
+        // This is the first Perk of the Perkpocalypse Mayor
         val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
         val lastMayorTimestamp = nextMayorTimestamp - SKYBLOCK_YEAR_MILLIS.milliseconds
-          
+
         val expireTime = (1..21)
             .map { lastMayorTimestamp + (6.hours * it) }
             .firstOrNull { it.isInFuture() }
@@ -195,20 +194,11 @@ object MayorAPI {
         nextMayorTimestamp = calculateNextMayorTime()
     }
 
-    private fun checkCurrentMayor() {
-        val nextMayorTime = calculateNextMayorTime()
-
-        // Check if it is still the mayor from the old SkyBlock year
-        currentMayor = candidates[nextMayorTime.toSkyBlockTime().year - 1]?.let {
-            if (it.name == lastMayor?.name) return
-
-            // TODO: Once Jerry is active, add the sub mayor perks in here
-            setAssumeMayorJson(it.name, it.perks)
+    private fun checkHypixelAPI(forceReload: Boolean = false) {
+        if (!forceReload) {
+            if (lastUpdate.passedSince() < 20.minutes) return
+            if (currentMayor == Mayor.UNKNOWN && lastUpdate.passedSince() < 1.minutes) return
         }
-    }
-
-    private fun checkHypixelAPI() {
-        if (lastUpdate.passedSince() < 20.minutes || (currentMayor == Mayor.UNKNOWN && lastUpdate.passedSince() < 1.minutes)) return
         lastUpdate = SimpleTimeMark.now()
 
         SkyHanniMod.coroutineScope.launch {
@@ -222,7 +212,11 @@ object MayorAPI {
                 map put data.current.getPairs()
             }
             candidates = map
-            checkCurrentMayor()
+
+            val currentMayorName = data.mayor.name
+            if (lastMayor?.name != currentMayorName) {
+                currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
+            }
         }
     }
 
@@ -236,9 +230,9 @@ object MayorAPI {
             val mayor = SkyHanniMod.feature.dev.debug.assumeMayor.get()
 
             if (mayor == Mayor.DISABLED) {
-                checkCurrentMayor()
+                checkHypixelAPI(forceReload = true)
             } else {
-                mayor.setAssumeMayor(mayor.perks.toList())
+                mayor.addPerks(mayor.perks.toList())
                 currentMayor = mayor
             }
         }
