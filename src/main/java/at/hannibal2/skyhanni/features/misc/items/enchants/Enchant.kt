@@ -67,9 +67,10 @@ open class Enchant : Comparable<Enchant> {
         val itemName = itemStack?.itemNameWithoutColor
 
         if (this.nbtName == "efficiency") {
-            // If the item is a Stonk, or a non-mining tool with Efficiency 5, color the enchant as max
+            // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
+            // color the enchant as max
             if (itemName == "Stonk" ||
-                (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5)) {
+                (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")) {
                 return config.perfectEnchantColor
             }
         }
