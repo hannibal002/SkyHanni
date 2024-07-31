@@ -1,58 +1,57 @@
-import org.apache.commons.lang3.SystemUtils
+import at.skyhanni.sharedvariables.MinecraftVersion
+import at.skyhanni.sharedvariables.ProjectTarget
+import at.skyhanni.sharedvariables.SHVersionInfo
+import at.skyhanni.sharedvariables.versionString
+import com.google.devtools.ksp.gradle.KspTaskJvm
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import java.io.ByteArrayOutputStream
 
 plugins {
     idea
     java
-    id("gg.essential.loom") version "0.10.0.+"
-    id("dev.architectury.architectury-pack200") version "0.1.3"
     id("com.github.johnrengelman.shadow") version "7.1.2"
-    kotlin("jvm") version "1.9.0"
+    id("com.replaymod.preprocess")
+    id("gg.essential.loom")
+    kotlin("jvm")
+    id("com.google.devtools.ksp")
     id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
     `maven-publish`
-    id("com.google.devtools.ksp") version "1.9.0-1.0.13"
     id("moe.nea.shot") version "1.0.0"
 }
 
-group = "at.hannibal2.skyhanni"
-version = "0.26.Beta.20"
-
-val gitHash by lazy {
-    val baos = ByteArrayOutputStream()
-    exec {
-        standardOutput = baos
-        commandLine("git", "rev-parse", "--short", "HEAD")
-        isIgnoreExitValue = true
-    }
-    baos.toByteArray().decodeToString().trim()
-}
+val target = ProjectTarget.values().find { it.projectPath == project.path }!!
 
 // Toolchains:
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(8))
+    toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
+}
+
+// Minecraft configuration:
+loom {
+    forge {
+        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
+        mixinConfig("mixins.skyhanni.json")
+    }
+//     mixin.defaultRefmapName.set("mixins.skyhanni.refmap.json")
+    runs {
+        named("client") {
+            property("mixin.debug", "true")
+            if (System.getenv("repo_action") != "true") {
+                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
+            }
+            vmArgs("-Xmx4G")
+            programArgs("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
+            programArgs("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
+        }
+        removeIf { it.name == "server" }
+    }
 }
 
 sourceSets.main {
     output.setResourcesDir(sourceSets.main.flatMap { it.java.classesDirectory })
     java.srcDir(layout.projectDirectory.dir("src/main/kotlin"))
     kotlin.destinationDirectory.set(java.destinationDirectory)
-}
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-    maven("https://repo.spongepowered.org/maven/") // mixin
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
-        content {
-            includeGroupByRegex("com\\.github\\..*")
-        }
-    }
-    maven("https://repo.nea.moe/releases") // libautoupdate
-    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
-    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
-    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
+    println(java.destinationDirectory.get().asFile)
+    println(kotlin.destinationDirectory.get().asFile)
 }
 
 val shadowImpl: Configuration by configurations.creating {
@@ -73,11 +72,11 @@ val headlessLwjgl by configurations.creating {
     isVisible = false
 }
 
-val shot = shots.shot("minecraft", project.file("shots.txt"))
+val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
     minecraft("com.mojang:minecraft:1.8.9")
-    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9")
+    mappings("de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip")
     forge("net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9")
 
     // Discord RPC client
@@ -93,10 +92,14 @@ dependencies {
 
     compileOnly(ksp(project(":annotation-processors"))!!)
 
-    shadowImpl("org.spongepowered:mixin:0.7.11-SNAPSHOT") {
-        isTransitive = false
+    val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
+
+    if (!target.isFabric) {
+        shadowImpl("org.spongepowered:mixin:$mixinVersion") {
+            isTransitive = false
+        }
     }
-    annotationProcessor("org.spongepowered:mixin:0.8.4-SNAPSHOT")
+//     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
     implementation(kotlin("stdlib-jdk8"))
     shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
@@ -133,8 +136,8 @@ dependencies {
     implementation("net.hypixel:mod-api:0.3.1")
 }
 
-configurations.getByName("minecraftNamed").dependencies.forEach {
-    shot.applyTo(it as HasConfigurableAttributes<*>)
+loom.runs.named("client") {
+    programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
 }
 
 tasks.withType(Test::class) {
@@ -151,46 +154,6 @@ kotlin {
             enableLanguageFeature("BreakContinueInInlineLambdas")
         }
     }
-    sourceSets.main {
-        kotlin.srcDir("build/generated/ksp/main/kotlin")
-    }
-    sourceSets.test {
-        kotlin.srcDir("build/generated/ksp/test/kotlin")
-    }
-}
-
-// Minecraft configuration:
-loom {
-    launchConfigs {
-        "client" {
-            property("mixin.debug", "true")
-            if (System.getenv("repo_action") != "true") {
-                property("devauth.configDir", rootProject.file(".devauth").absolutePath)
-            }
-            arg("--tweakClass", "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker")
-            arg("--tweakClass", "io.github.notenoughupdates.moulconfig.tweaker.DevelopmentResourceTweaker")
-            arg("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
-        }
-    }
-    forge {
-        pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
-        mixinConfig("mixins.skyhanni.json")
-    }
-    @Suppress("UnstableApiUsage")
-    mixin {
-        defaultRefmapName.set("mixins.skyhanni.refmap.json")
-    }
-    runConfigs {
-        "client" {
-            if (SystemUtils.IS_OS_MAC_OSX) {
-                vmArgs.remove("-XstartOnFirstThread")
-            }
-            vmArgs.add("-Xmx4G")
-        }
-        "server" {
-            isIdeConfigGenerated = false
-        }
-    }
 }
 
 // Tasks:
@@ -199,24 +162,29 @@ tasks.processResources {
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
     }
+    if (target.isFabric) {
+        exclude("mcmod.info")
+    } // else do NOT exclude fabric.mod.json. We use fabric.mod.json in order to show a logo in prism launcher.
 }
 
-val generateRepoPatterns by tasks.creating(JavaExec::class) {
-    javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-    mainClass.set("net.fabricmc.devlaunchinjector.Main")
-    workingDir(project.file("run"))
-    classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
-    jvmArgs(
-        "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
-        "-Dfabric.dli.env=client",
-        "-Dfabric.dli.main=net.minecraft.launchwrapper.Launch",
-        "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
-        "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
-        "-javaagent:${headlessLwjgl.singleFile.absolutePath}"
-    )
-    val outputFile = project.file("build/regexes/constants.json")
-    environment("SKYHANNI_DUMP_REGEXES", "${gitHash}:${outputFile.absolutePath}")
-    environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
+if (target == ProjectTarget.MAIN) {
+    val generateRepoPatterns by tasks.creating(JavaExec::class) {
+        javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
+        mainClass.set("net.fabricmc.devlaunchinjector.Main")
+        workingDir(project.file("run"))
+        classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
+        jvmArgs(
+            "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
+            "-Dfabric.dli.env=client",
+            "-Dfabric.dli.main=net.minecraft.launchwrapper.Launch",
+            "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
+            "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
+            "-javaagent:${headlessLwjgl.singleFile.absolutePath}",
+        )
+        val outputFile = project.file("build/regexes/constants.json")
+        environment("SKYHANNI_DUMP_REGEXES", "${SHVersionInfo.gitHash}:${outputFile.absolutePath}")
+        environment("SKYHANNI_DUMP_REGEXES_EXIT", "true")
+    }
 }
 
 tasks.compileJava {
@@ -229,21 +197,22 @@ tasks.withType(JavaCompile::class) {
 
 tasks.withType(Jar::class) {
     archiveBaseName.set("SkyHanni")
-    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
-        this["FMLCorePluginContainsFMLMod"] = "true"
-        this["ForceLoadAsMod"] = "true"
         this["Main-Class"] = "SkyHanniInstallerFrame"
-
-        this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
-        this["MixinConfigs"] = "mixins.skyhanni.json"
+        if (target == ProjectTarget.MAIN) {
+            this["FMLCorePluginContainsFMLMod"] = "true"
+            this["ForceLoadAsMod"] = "true"
+            this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
+            this["MixinConfigs"] = "mixins.skyhanni.json"
+        }
     }
 }
 
 val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
-    from(tasks.shadowJar)
-    input.set(tasks.shadowJar.get().archiveFile)
+    dependsOn(tasks.shadowJar)
+    inputFile.set(tasks.shadowJar.get().archiveFile)
 }
 
 tasks.shadowJar {
@@ -267,14 +236,10 @@ tasks.jar {
 }
 tasks.assemble.get().dependsOn(tasks.remapJar)
 
-val compileKotlin: KotlinCompile by tasks
-compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+tasks.withType(KotlinCompile::class) {
+    kotlinOptions.jvmTarget = target.minecraftVersion.javaLanguageVersion.versionString()
 }
-val compileTestKotlin: KotlinCompile by tasks
-compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
-}
+
 val sourcesJar by tasks.creating(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
