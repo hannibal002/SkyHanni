@@ -372,7 +372,7 @@ object PowderMiningChatFilter {
                 "flawed" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FLAWED_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
-                "fine" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FINE_ONLY) {
+                "fine" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FINE_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
                 // FLAWLESS_ONLY enum not explicitly used in comparison, as the only

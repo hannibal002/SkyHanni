@@ -15,38 +15,38 @@ public class PowderMiningGemstoneFilterConfig {
     @Expose
     @ConfigOption(name = "Ruby", desc = "Hide Ruby gemstones under a certain quality.")
     @ConfigEditorDropdown
-    public GemstoneFilterEntry rubyGemstones = GemstoneFilterEntry.FINE_ONLY;
+    public GemstoneFilterEntry rubyGemstones = GemstoneFilterEntry.FINE_UP;
 
     @Expose
     @ConfigOption(name = "Sapphire", desc = "Hide Sapphire gemstones under a certain quality.")
     @ConfigEditorDropdown
-    public GemstoneFilterEntry sapphireGemstones = GemstoneFilterEntry.FINE_ONLY;
+    public GemstoneFilterEntry sapphireGemstones = GemstoneFilterEntry.FINE_UP;
 
     @Expose
     @ConfigOption(name = "Amber", desc = "Hide Amber gemstones under a certain quality.")
     @ConfigEditorDropdown
-    public GemstoneFilterEntry amberGemstones = GemstoneFilterEntry.FINE_ONLY;
+    public GemstoneFilterEntry amberGemstones = GemstoneFilterEntry.FINE_UP;
 
     @Expose
     @ConfigOption(name = "Amethyst", desc = "Hide Amethyst gemstones under a certain quality.")
     @ConfigEditorDropdown
-    public GemstoneFilterEntry amethystGemstones = GemstoneFilterEntry.FINE_ONLY;
+    public GemstoneFilterEntry amethystGemstones = GemstoneFilterEntry.FINE_UP;
 
     @Expose
     @ConfigOption(name = "Jade", desc = "Hide Jade gemstones under a certain quality.")
     @ConfigEditorDropdown
-    public GemstoneFilterEntry jadeGemstones = GemstoneFilterEntry.FINE_ONLY;
+    public GemstoneFilterEntry jadeGemstones = GemstoneFilterEntry.FINE_UP;
 
     @Expose
     @ConfigOption(name = "Topaz", desc = "Hide Topaz gemstones under a certain quality.")
     @ConfigEditorDropdown
-    public GemstoneFilterEntry topazGemstones = GemstoneFilterEntry.FINE_ONLY;
+    public GemstoneFilterEntry topazGemstones = GemstoneFilterEntry.FINE_UP;
 
     public enum GemstoneFilterEntry {
         SHOW_ALL("Show All"),
         HIDE_ALL("Hide all"),
         FLAWED_UP("Show §aFlawed §7or higher"),
-        FINE_ONLY("Show §9Fine §7or higher"),
+        FINE_UP("Show §9Fine §7or higher"),
         FLAWLESS_ONLY("Show §5Flawless §7only");
 
         private final String str;
