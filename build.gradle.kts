@@ -32,7 +32,7 @@ repositories {
     maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
     maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
         content {
-            includeGroupByRegex("com\\.github\\..*")
+            includeGroupByRegex("(com|io)\\.github\\..*")
         }
     }
     maven("https://repo.nea.moe/releases") // libautoupdate
@@ -90,7 +90,11 @@ val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
     minecraft("com.mojang:minecraft:${target.minecraftVersion.versionName}")
-    mappings(target.mappingDependency)
+    if (target.mappingDependency == "official") {
+        mappings(loom.officialMojangMappings())
+    } else {
+        mappings(target.mappingDependency)
+    }
     if (target.forgeDep != null)
         "forge"(target.forgeDep!!)
 

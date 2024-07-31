@@ -16,20 +16,28 @@ enum class ProjectTarget(
         "de.oceanlabs.mcp:mcp_stable:22-1.8.9@zip",
         MappingStyle.SEARGE,
         "net.minecraftforge:forge:1.8.9-11.15.1.2318-1.8.9",
-        "BRIDGE_FORGE",
+        "BRIDGE112",
     ),
-    BRIDGE_FORGE(
-        "1.14.4-forge",
-        MinecraftVersion.MC1144,
-        "de.oceanlabs.mcp:mcp_stable:58-1.14.4@zip",
+    BRIDGE112(
+        "1.12.2",
+        MinecraftVersion.MC11202,
+        "de.oceanlabs.mcp:mcp_stable:39-1.12@zip",
         MappingStyle.SEARGE,
-        "net.minecraftforge:forge:1.14.4-28.1.113",
-        "BRIDGE_FABRIC",
+        "net.minecraftforge:forge:1.12.2-14.23.5.2847",
+        "BRIDGE116FORGE",
     ),
-    BRIDGE_FABRIC(
-        "1.14.4",
-        MinecraftVersion.MC1144,
-        yarn("1.14.4+build.1"),
+    BRIDGE116FORGE(
+        "1.16.5-forge",
+        MinecraftVersion.MC11605,
+        "official",
+        MappingStyle.SEARGE,
+        "net.minecraftforge:forge:1.16.5-36.2.39",
+        "BRIDGE116FABRIC",
+    ),
+    BRIDGE116FABRIC(
+        "1.16.5",
+        MinecraftVersion.MC11605,
+        yarn("1.16.5+build.10"),
         MappingStyle.YARN,
         null,
         "MODERN",
@@ -44,7 +52,7 @@ enum class ProjectTarget(
     )
     ;
 
-    val isBridge get() = this == BRIDGE_FABRIC || this == BRIDGE_FORGE
+    val isBridge get() = name.contains("bridge")
 
     val linkTo by lazy {
         if (linkTo == null) null

@@ -2,7 +2,7 @@ import at.skyhanni.sharedvariables.ProjectTarget
 import com.replaymod.gradle.preprocess.Node
 
 plugins {
-    id("dev.deftu.gradle.preprocess") version "0.6.0"
+    id("dev.deftu.gradle.preprocess") version "0.6.1"
     id("gg.essential.loom") version "1.6.+" apply false
     kotlin("jvm") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false

@@ -15,7 +15,7 @@ pluginManagement {
         maven("https://maven.deftu.xyz/releases")
         maven("https://jitpack.io") {
             content {
-                includeGroupByRegex("com\\.github\\..*")
+                includeGroupByRegex("(com|io)\\.github\\..*")
             }
         }
     }

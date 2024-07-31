@@ -28,6 +28,8 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
+import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -41,7 +43,7 @@ class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
     private val oldScreen: GuiContainer? = null
-) : GuiScreen() {
+) : SkyhanniBaseScreen() {
 
     private var grabbedX = 0
     private var grabbedY = 0
@@ -154,15 +156,15 @@ class GuiPositionEditor(
         return hoveredPos
     }
 
-    private fun getScaledHeight() = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
-    private fun getScaledWidth() = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+    private fun getScaledHeight() = GuiScreenUtils.scaledWindowHeight
+    private fun getScaledWidth() = GuiScreenUtils.scaledWindowHeight
 
     @Throws(IOException::class)
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
         super.mouseClicked(originalX, priginalY, mouseButton)
 
-        val mouseX = Mouse.getX() * width / Minecraft.getMinecraft().displayWidth
-        val mouseY = height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
+        val mouseX = GuiScreenUtils.mouseX
+        val mouseY = GuiScreenUtils.mouseY
         for (i in positions.indices.reversed()) {
             val position = positions[i]
             val elementWidth = position.getDummySize().x

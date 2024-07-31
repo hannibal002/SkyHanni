@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.compat.getArmorOrFullInventory
+import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
 import at.hannibal2.skyhanni.utils.compat.getNameAsString
-import at.hannibal2.skyhanni.utils.compat.getPlayers
 import at.hannibal2.skyhanni.utils.compat.isOnMainThread
 import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import net.minecraft.block.state.IBlockState
@@ -31,11 +31,12 @@ import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.AxisAlignedBB
-//#if FORGE
 import net.minecraftforge.client.event.RenderLivingEvent
+
+//#if FORGE
 import net.minecraftforge.fml.common.eventhandler.Event
-//#endif
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+//#endif
 
 @SkyHanniModule
 object EntityUtils {
@@ -52,7 +53,7 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld?.getPlayers() ?: emptyList()) {
+        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers() ?: emptyList()) {
             if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
@@ -156,7 +157,7 @@ object EntityUtils {
     fun EntityLivingBase.hasPotionEffect(
         potion:
         //#if MC <1.21
-        Potion
+        Potion,
         //#else
         //$$ net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>
         //#endif
@@ -173,10 +174,10 @@ object EntityUtils {
 //#if MC < 1.14
         loadedEntityList
 //#else
-//$$    allEntities
+//$$    entitiesForRendering()
 //#endif
 
-    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.getAllEntities()?.let {
+    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
         if (Minecraft.getMinecraft()
                 .isOnMainThread()
         ) it else it.toMutableList() // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization, but *does* make crashes because of it rarer.
@@ -217,14 +218,11 @@ object EntityUtils {
         SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
+//#if MC < 11400
     @SubscribeEvent
     fun onEntityRenderSpecialsPre(
         event:
-        //#if MC < 11400
         RenderLivingEvent.Specials.Pre<*>,
-        //#else
-        //$$ RenderLivingEvent.Specials.Pre<*,*>
-        //#endif
     ) {
         val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
@@ -235,14 +233,11 @@ object EntityUtils {
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(
         event:
-        //#if MC < 11400
         RenderLivingEvent.Specials.Post<*>,
-        //#else
-        //$$ RenderLivingEvent.Specials.Post<*,*>
-        //#endif
     ) {
         SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
+//#endif
 
 //#endif
 
@@ -269,7 +264,7 @@ object EntityUtils {
                 override fun getNameTagVisibility() = EnumVisible.NEVER
             }
 
-            override fun isWearing(part: EnumPlayerModelParts?): Boolean =
+            override fun isWearing(part: EnumPlayerModelParts): Boolean =
                 player.isWearing(part) && part != EnumPlayerModelParts.CAPE
         }
     }
