@@ -232,10 +232,11 @@ object PowderMiningChatFilter {
      * REGEX-TEST: §r§f❈ Rough Amethyst Gemstone §r§8x24
      * REGEX-TEST: §r§a❈ Flawed Amethyst Gemstone §r§8x4
      * REGEX-TEST: §r§9⸕ Fine Amber Gemstone
+     * REGEX-TEST: §r§5⸕ Flawless Amber Gemstone
      */
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
     )
 
     fun block(message: String): String? {
@@ -316,8 +317,7 @@ object PowderMiningChatFilter {
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.SHOW_ALL) return "no_filter"
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
-            val colorStr = groupOrNull("color")?.lowercase()
-            return when (colorStr) {
+            return when (val colorStr = groupOrNull("color")?.lowercase()) {
                 //'Colorless', base goblin eggs will never be shown in this code path
                 null -> "powder_mining_goblin_eggs"
                 "green" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
