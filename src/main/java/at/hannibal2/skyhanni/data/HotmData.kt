@@ -565,7 +565,7 @@ enum class HotmData(
             }
 
             if (entry == PEAK_OF_THE_MOUNTAIN) {
-                entry.enabled = entry.activeLevel != 0
+                entry.enabled = entry.rawLevel != 0
                 return
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }

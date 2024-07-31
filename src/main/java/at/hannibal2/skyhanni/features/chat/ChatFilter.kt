@@ -576,5 +576,12 @@ object ChatFilter {
         event.move(3, "chat.profileJoin", "chat.filterType.profileJoin")
         event.move(3, "chat.others", "chat.filterType.others")
         event.move(52, "chat.filterType.powderMining", "chat.filterType.powderMiningFilter.enabled")
+        event.transform(53, "chat.filterType.powderMiningFilter.gemstoneFilterConfig") { element ->
+            element.asJsonObject.apply {
+                entrySet().forEach { (key, value) ->
+                    if (value.asString == "FINE_ONLY") addProperty(key, "FINE_UP")
+                }
+            }
+        }
     }
 }
