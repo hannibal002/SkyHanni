@@ -64,4 +64,8 @@ enum class ProjectTarget(
     val isFabric get() = forgeDep == null
 
     val projectPath get() = ":$projectName"
+
+    companion object {
+        fun activeVersions() = values().filter { MultiVersionStage.activeState.shouldCreateProject(it) }
+    }
 }

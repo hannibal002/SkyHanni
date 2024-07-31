@@ -1,4 +1,5 @@
 import at.skyhanni.sharedvariables.MinecraftVersion
+import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
@@ -13,7 +14,7 @@ plugins {
     id("dev.deftu.gradle.preprocess")
     kotlin("jvm")
     id("com.google.devtools.ksp")
-    id("com.bnorm.power.kotlin-power-assert") version "0.13.0"
+    kotlin("plugin.power-assert")
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
 }
@@ -56,6 +57,7 @@ loom {
 //     mixin.defaultRefmapName.set("mixins.skyhanni.refmap.json")
     runs {
         named("client") {
+            this.runDir(rootProject.file("run").relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
@@ -85,7 +87,11 @@ val headlessLwjgl by configurations.creating {
     isTransitive = false
     isVisible = false
 }
-
+tasks.runClient {
+    this.javaLauncher.set(javaToolchains.launcherFor {
+        languageVersion.set(target.minecraftVersion.javaLanguageVersion)
+    })
+}
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
@@ -157,7 +163,7 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file("run")).path })
+        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file(runDir)).path })
     }
 }
 
@@ -263,7 +269,7 @@ tasks.withType(KotlinCompile::class) {
     }
 }
 
-if (target.isBridge || (target != ProjectTarget.MAIN && rootProject.property("skyhanni.buildmodern") != "true")) {
+if (!MultiVersionStage.activeState.shouldCompile(target)) {
     tasks.withType<JavaCompile> {
         onlyIf { false }
     }

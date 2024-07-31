@@ -8,7 +8,7 @@ net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.
 net.minecraft.world.entity.player.Inventory armor armorInventory
 
 net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
-net.minecraft.world.entity.monster.EnderMan getCarriedBlock()  getHeldBlockState()
+net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
 net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
 net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()

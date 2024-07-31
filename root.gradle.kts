@@ -5,6 +5,7 @@ plugins {
     id("dev.deftu.gradle.preprocess") version "0.6.1"
     id("gg.essential.loom") version "1.6.+" apply false
     kotlin("jvm") version "2.0.0" apply false
+    kotlin("plugin.power-assert") version "2.0.0" apply false
     id("com.google.devtools.ksp") version "2.0.0-1.0.24" apply false
     id("dev.architectury.architectury-pack200") version "0.1.3"
 }
@@ -16,20 +17,25 @@ allprojects {
 
 preprocess {
     val nodes = mutableMapOf<ProjectTarget, Node>()
-    ProjectTarget.values().forEach { target ->
+    ProjectTarget.activeVersions().forEach { target ->
         nodes[target] = createNode(target.projectName, target.minecraftVersion.versionNumber, target.mappingStyle.identifier)
         val p = project(target.projectPath)
         if (target.isForge)
             p.extra.set("loom.platform", "forge")
     }
-    ProjectTarget.values().forEach { child ->
+    ProjectTarget.activeVersions().forEach { child ->
         val parent = child.linkTo ?: return@forEach
+        val pNode = nodes[parent]
+        if (pNode == null) {
+            println("Parent target to ${child.projectName} not available in this multi version stage. Not setting parent.")
+            return@forEach
+        }
         val mappingFile = file("versions/mapping-${parent.projectName}-${child.projectName}.txt")
         if (mappingFile.exists()) {
-            nodes[parent]!!.link(nodes[child]!!, mappingFile)
+            pNode.link(nodes[child]!!, mappingFile)
             println("Loading mappings from $mappingFile")
         } else {
-            nodes[parent]!!.link(nodes[child]!!)
+            pNode.link(nodes[child]!!)
             println("Skipped loading mappings from $mappingFile")
         }
     }

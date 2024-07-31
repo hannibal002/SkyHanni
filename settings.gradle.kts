@@ -1,3 +1,4 @@
+import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 
 pluginManagement {
@@ -33,11 +34,13 @@ plugins {
     id("at.skyhanni.shared-variables")
 }
 
+MultiVersionStage.initFrom(file(".gradle/private.properties"))
+
 include("annotation-processors")
 rootProject.name = "SkyHanni"
 rootProject.buildFileName = "root.gradle.kts"
 
-ProjectTarget.values().forEach { target ->
+ProjectTarget.activeVersions().forEach { target ->
     include(target.projectPath)
     val p = project(target.projectPath)
     p.projectDir = file("versions/${target.projectName}")
