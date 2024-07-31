@@ -13,12 +13,16 @@ import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.Simpl
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
 @SkyHanniModule
 object PowderMiningChatFilter {
@@ -289,8 +293,11 @@ object PowderMiningChatFilter {
         return null
     }
 
-    private fun blockSimpleRewards(ssMessage: String): String? {
-        val rewardPatterns = mapOf(
+    var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        rewardPatterns = mapOf(
             ascensionRopeRewardPattern to ASCENSION_ROPE to "powder_mining_ascension_rope",
             wishingCompassRewardPattern to WISHING_COMPASS to "powder_mining_wishing_compass",
             oilBarrelRewardPattern to OIL_BARREL to "powder_mining_oil_barrel",
@@ -302,6 +309,9 @@ object PowderMiningChatFilter {
             robotPartsPattern to ROBOT_PARTS to "powder_mining_robot_parts",
             treasuritePattern to TREASURITE to "powder_mining_treasurite",
         )
+    }
+
+    private fun blockSimpleRewards(ssMessage: String): String? {
         for ((patternToReward, returnReason) in rewardPatterns) {
             if (patternToReward.first.matches(ssMessage)) {
                 return if (config.simplePowderMiningTypes.contains(patternToReward.second)) returnReason
