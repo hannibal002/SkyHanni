@@ -46,7 +46,8 @@ public class PowderMiningGemstoneFilterConfig {
         SHOW_ALL("Show All"),
         HIDE_ALL("Hide all"),
         FLAWED_UP("Show §aFlawed §7or higher"),
-        FINE_ONLY("Show §9Fine §7only");
+        FINE_ONLY("Show §9Fine §7or higher"),
+        FLAWLESS_ONLY("Show §5Flawless §7only");
 
         private final String str;
 
