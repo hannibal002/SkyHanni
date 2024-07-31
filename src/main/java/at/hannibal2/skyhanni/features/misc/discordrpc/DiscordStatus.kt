@@ -226,25 +226,30 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         DiscordRPCManager.config.customText.get() // custom field in the config
     }),
 
-    AUTO({
-        var autoReturn = ""
-        for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
-            // TODO, change functionality to use enum rather than ordinals
-            val autoStatus = AutoStatus.entries[statusID.ordinal]
-            val result =
-                autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
-            if (result != autoStatus.placeholderText) { // if that value is useful, display it
-                autoReturn = result
-                break
+    AUTO(
+        {
+            var autoReturn = ""
+            for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
+                // TODO, change functionality to use enum rather than ordinals
+                val autoStatus = AutoStatus.entries[statusID.ordinal]
+                val result =
+                    autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
+                if (result != autoStatus.placeholderText) { // if that value is useful, display it
+                    autoReturn = result
+                    break
+                }
             }
-        }
-        if (autoReturn == "") { // if we didn't find any useful information, display the fallback
-            val fallbackID = DiscordRPCManager.config.auto.get().ordinal
-            if (fallbackID == 10) autoReturn = NONE.getDisplayString() // 10 is this (DiscordStatus.AUTO); prevents an infinite loop
-            else autoReturn = DiscordStatus.entries[DiscordRPCManager.config.auto.get().ordinal].getDisplayString()
-        }
-        autoReturn
-    }),
+            if (autoReturn == "") { // if we didn't find any useful information, display the fallback
+                val fallbackID = DiscordRPCManager.config.auto.get().ordinal
+                autoReturn = if (fallbackID == 10) {
+                    NONE.getDisplayString() // 10 is this (DiscordStatus.AUTO); prevents an infinite loop
+                } else {
+                    DiscordStatus.entries[fallbackID].getDisplayString()
+                }
+            }
+            autoReturn
+        },
+    ),
 
     CROP_MILESTONES({ getCropMilestoneDisplay() }),
 
