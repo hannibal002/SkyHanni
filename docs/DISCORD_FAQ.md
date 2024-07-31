@@ -24,8 +24,8 @@ _Frequently Asked Questions_
 > **7: My Jacob Contest Display crops are wrong, how do I fix this?**
 > Run the command `/shclearcontestdata` to clear the Jacob contest data.
 
-> **8: How can I get bigger crop hitboxes?**
-> Use Patcher or PolyPatcher to have 1.12 hitboxes in 1.8.9.
+> **8: How can I get bigger crop hit boxes?**
+> Use Patcher or PolyPatcher to have 1.12 hit boxes in 1.8.9.
 > - [Sk1erLLC's Patcher](<https://sk1er.club/mods/patcher>)
 > - [Polyfrost's PolyPatcher](<https://modrinth.com/mod/patcher>) (a fork of Patcher with OneConfig, slightly different features, and bug fixes)
 

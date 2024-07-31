@@ -36,7 +36,6 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.ceil
 import kotlin.math.pow
 
-
 private fun calculatePeakOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
     for (i in 1..level) {
         when (i) {
@@ -51,7 +50,6 @@ private fun calculatePeakOfTheMountainLoot(level: Int): Map<HotmReward, Double> 
         }
     }
 }
-
 
 enum class HotmData(
     val guiName: String,
@@ -359,17 +357,22 @@ enum class HotmData(
 
     val printName = name.allLettersFirstUppercase()
 
+    /** Level which are actually paid with powder (does exclude [blueEgg]*/
     val rawLevel: Int
         get() = storage?.perks?.get(this.name)?.level ?: 0
 
+    /** Level for which the effect that is present (considers [enabled] and [blueEgg])*/
     var activeLevel: Int
-        get() = if (enabled) storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0 else 0
+        get() = if (enabled) effectivLevel else 0
         private set(value) {
             storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value.minus(blueEgg())
         }
 
+    /** Level that considering [blueEgg]*/
+    val effectivLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
+
     val isMaxLevel: Boolean
-        get() = activeLevel >= maxLevel // >= to account for +1 from Blue Cheese
+        get() = effectivLevel >= maxLevel // >= to account for +1 from Blue Cheese
 
     private fun blueEgg() = if (this != PEAK_OF_THE_MOUNTAIN && maxLevel != 1 && HotmAPI.isBlueEggActive) 1 else 0
 
@@ -409,9 +412,13 @@ enum class HotmData(
             "Heart of the Mountain",
         )
 
+        /**
+         * REGEX-TEST: §5§o§7Level 1§8/50 §7(§b0 §l0%§7):skull:
+         * REGEX-TEST: §7Level 1§8/50
+         */
         private val levelPattern by patternGroup.pattern(
             "perk.level",
-            "§(?<color>.)Level (?<level>\\d+).*",
+            "(?:§.)*§(?<color>.)Level (?<level>\\d+).*",
         )
 
         private val notUnlockedPattern by patternGroup.pattern(
@@ -426,7 +433,7 @@ enum class HotmData(
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
             "§c§lDISABLED|§7§eClick to select!",
-        ) // unused for now since the assumption is when enabled isn't found it is disabled,
+        ) // unused for now since the assumption is when enabled isn't found, it is disabled,
         // but the value might be useful in the future or for debugging
 
         val perkCostPattern by patternGroup.pattern(
@@ -563,7 +570,7 @@ enum class HotmData(
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
 
-            if (entry == SKY_MALL) handelSkyMall(lore)
+            if (entry == SKY_MALL) handleSkyMall(lore)
         }
 
         private fun Slot.handlePowder(): Boolean {
@@ -616,10 +623,10 @@ enum class HotmData(
             "§aYour Current Effect",
         )
 
-        private fun handelSkyMall(lore: List<String>) {
+        private fun handleSkyMall(lore: List<String>) {
             if (!SKY_MALL.enabled || !SKY_MALL.isUnlocked) HotmAPI.skymall = null
             else {
-                val index = lore.indexOfFirstMatch(skyMallCurrentEffect) ?: run {
+                val index = skyMallCurrentEffect.indexOfFirstMatch(lore) ?: run {
                     ErrorManager.logErrorStateWithData(
                         "Could not read the skymall effect from the hotm tree",
                         "skyMallCurrentEffect didn't match",
@@ -647,13 +654,13 @@ enum class HotmData(
             if (!LorenzUtils.inSkyBlock) return
 
             event.scoreboard.matchFirst(ScoreboardPattern.powderPattern) {
-                val type = HotmAPI.Powder.entries.firstOrNull { it.lowName == group("type") } ?: return
+                val type = HotmAPI.Powder.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
 
                 if (difference > 0) {
                     type.gain(difference)
-                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.lowName} Powder")
+                    ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.displayName} Powder")
                 }
             }
         }
@@ -670,6 +677,7 @@ enum class HotmData(
         fun onInventoryFullyOpen(event: InventoryFullyOpenedEvent) {
             if (!LorenzUtils.inSkyBlock) return
             inInventory = inventoryPattern.matches(event.inventoryName)
+            if (!inInventory) return
             DelayedRun.runNextTick {
                 InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
                 abilities.filter { it.isUnlocked }.forEach {
@@ -741,7 +749,7 @@ enum class HotmData(
             event.addIrrelevant {
                 add("Tokens : $availableTokens/$tokens")
                 HotmAPI.Powder.entries.forEach {
-                    add("${it.lowName} Powder: ${it.getCurrent()}/${it.getTotal()}")
+                    add("${it.displayName} Powder: ${it.getCurrent()}/${it.getTotal()}")
                 }
                 add("Ability: ${HotmAPI.activeMiningAbility?.printName}")
                 add("Blue Egg: ${HotmAPI.isBlueEggActive}")

@@ -58,7 +58,7 @@ object RepoPatternManager {
      */
     private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
-    private var wasPreinitialized = false
+    private var wasPreInitialized = false
     private val isInDevEnv = try {
         Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
     } catch (_: Exception) {
@@ -78,7 +78,7 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+    val localLoading: Boolean get() = config.forceLocal.get() xor (!insideTest && PlatformUtils.isDevEnvironment)
 
     private val logger = LogManager.getLogger("SkyHanni")
 
@@ -261,7 +261,7 @@ object RepoPatternManager {
 
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
-        wasPreinitialized = true
+        wasPreInitialized = true
         val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
         if (dumpDirective.isNullOrBlank()) return
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
@@ -274,7 +274,7 @@ object RepoPatternManager {
 
     fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {
         verifyKeyShape(key)
-        if (wasPreinitialized && !config.tolerateLateRegistration) {
+        if (wasPreInitialized && !config.tolerateLateRegistration) {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
         }
         if (key in usedKeys) {
@@ -289,7 +289,7 @@ object RepoPatternManager {
         parentKeyHolder: RepoPatternKeyOwner? = null,
     ): RepoPatternList {
         verifyKeyShape(key)
-        if (wasPreinitialized && !config.tolerateLateRegistration) {
+        if (wasPreInitialized && !config.tolerateLateRegistration) {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
         }
         if (key in usedKeys) {
@@ -309,7 +309,7 @@ object RepoPatternManager {
      * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
      * */
     internal fun getUnusedPatterns(prefix: String): List<Pattern> {
-        if (config.forceLocal.get()) return emptyList()
+        if (localLoading) return emptyList()
         try {
             verifyKeyShape(prefix)
         } catch (e: IllegalArgumentException) {

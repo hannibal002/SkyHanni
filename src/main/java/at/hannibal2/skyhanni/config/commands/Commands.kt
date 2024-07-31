@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -273,6 +274,10 @@ object Commands {
             "Resets the Sea Creature Tracker",
         ) { SeaCreatureTracker.resetCommand() }
         registerCommand(
+            "shresetstrayrabbittracker",
+            "Resets the Stray Rabbit Tracker",
+        ) { ChocolateFactoryStrayTracker.resetCommand() }
+        registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
         ) { WikiManager.otherWikiCommands(it, true) }
@@ -320,10 +325,6 @@ object Commands {
             "shlimbostats",
             "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!",
         ) { LimboTimeTracker.printStats() }
-        registerCommand(
-            "shlimbo",
-            "Warps you to Limbo.",
-        ) { MiscFeatures.goToLimbo() }
         registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden",
@@ -382,7 +383,7 @@ object Commands {
         ) { SkyHanniDebugsAndTests.toggleRender() }
         registerCommand(
             "shcarrolyn",
-            "Toggels if the specified crops effect is active from carrolyn",
+            "Toggles if the specified crops effect is active from carrolyn",
         ) {
             CaptureFarmingGear.handelCarrolyn(it)
         }
@@ -392,11 +393,11 @@ object Commands {
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
             "shclearkismet",
-            "Cleares the saved values of the applied kismet feathers in Croesus",
+            "Clears the saved values of the applied kismet feathers in Croesus",
         ) { CroesusChestTracker.resetChest() }
         registerCommand(
             "shkingfix",
-            "Reseting the local King Talisman Helper offset.",
+            "Resets the local King Talisman Helper offset.",
         ) { KingTalismanHelper.kingFix() }
         registerCommand(
             "shupdate",
@@ -544,7 +545,7 @@ object Commands {
                 "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
-            "readcropmilestonefromclipboard",
+            "shreadcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data",
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
         registerCommand(
