@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockSeason
@@ -54,7 +53,7 @@ object ChocolateFactoryAPI {
      */
     private val upgradeLorePattern by patternGroup.pattern(
         "item.lore.upgrade",
-        "§a§l(?:UPGRADE|PROMOTE) §8➜ (?:§7\\[(?<nextlevel>\\d+)§7] )?(?<upgradename>.*?) ?(?<nextlevelalt>[IVXLCDM]*)\$"
+        "§a§l(?:UPGRADE|PROMOTE) §8➜ (?:§7\\[(?<nextlevel>\\d+)§7] )?(?<upgradename>.*?) ?(?<nextlevelalt>[IVXLCDM]*)\$",
     )
 
     /**
@@ -64,7 +63,7 @@ object ChocolateFactoryAPI {
      */
     private val employeeNamePattern by patternGroup.pattern(
         "item.name.employee",
-        "(?<employee>(?:§.+)+Rabbit .*)§8 - §7\\[\\d*§7] .*"
+        "(?<employee>(?:§.+)+Rabbit .*)§8 - §7\\[\\d*§7] .*",
     )
 
     var rabbitSlots = mapOf<Int, Int>()
@@ -180,16 +179,16 @@ object ChocolateFactoryAPI {
         }
     }
 
-    fun getNextLevelName(stack: ItemStack): String? {
-        return upgradeLorePattern.firstMatcher(stack.getLore()) {
+    fun getNextLevelName(stack: ItemStack): String? =
+        upgradeLorePattern.firstMatcher(stack.getLore()) {
             val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
                 groupOrNull("employee")
             } else groupOrNull("upgradename")
             val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
-            if(upgradeName == null || nextLevel == null) null
+            if (upgradeName == null || nextLevel == null) null
             else "$upgradeName $nextLevel"
         }
-    }
+
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
