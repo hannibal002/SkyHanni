@@ -1,0 +1,9 @@
+
+# When switching to fabric we will just replace all forge event uses with skyhanni events
+# This will not work because most events fail to be posted on that event bus
+# But it will reduce compilation failures in the short term
+# Later on we can delete the LorenzEvent class (using preprocessor ifs) and go from there
+at.hannibal2.skyhanni.api.event.HandleEvent net.minecraftforge.eventbus.api.SubscribeEvent
+
+
+net.minecraft.entity.Entity getScoreboardTeam getTeam
