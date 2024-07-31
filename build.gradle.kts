@@ -198,7 +198,7 @@ if (target == ProjectTarget.MAIN) {
     val generateRepoPatterns by tasks.creating(JavaExec::class) {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         mainClass.set("net.fabricmc.devlaunchinjector.Main")
-        workingDir(project.file("run"))
+        workingDir(project.file(loom.runs.getAt("client").runDir))
         classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
         jvmArgs(
             "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
