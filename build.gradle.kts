@@ -54,7 +54,10 @@ loom {
             pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
             mixinConfig("mixins.skyhanni.json")
         }
-//     mixin.defaultRefmapName.set("mixins.skyhanni.refmap.json")
+    mixin {
+        useLegacyMixinAp.set(true)
+        defaultRefmapName.set("mixins.skyhanni.refmap.json")
+    }
     runs {
         named("client") {
             this.runDir(rootProject.file("run").relativeTo(projectDir).toString())
@@ -123,8 +126,10 @@ dependencies {
         shadowImpl("org.spongepowered:mixin:$mixinVersion") {
             isTransitive = false
         }
+        annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
+        annotationProcessor("com.google.code.gson:gson:2.10.1")
+        annotationProcessor("com.google.guava:guava:17.0")
     }
-//     annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
 
     implementation(kotlin("stdlib-jdk8"))
     shadowImpl("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3") {
@@ -170,7 +175,7 @@ afterEvaluate {
 tasks.withType(Test::class) {
     useJUnitPlatform()
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-    workingDir(file("run"))
+    workingDir(file(loom.runs.getAt("client").runDir))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
 }
 
