@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
-import java.util.TreeSet
 import net.minecraft.item.ItemStack
+import java.util.TreeSet
 
 open class Enchant : Comparable<Enchant> {
     @Expose
@@ -34,7 +34,7 @@ open class Enchant : Comparable<Enchant> {
         val config = SkyHanniMod.feature.inventory.enchantParsing
 
         // TODO change color to string (support for bold)
-        var colour = when {
+        var color = when {
             level >= maxLevel -> config.perfectEnchantColor
             level > goodLevel -> config.greatEnchantColor
             level == goodLevel -> config.goodEnchantColor
@@ -42,11 +42,11 @@ open class Enchant : Comparable<Enchant> {
         }
 
         // Exceptions
-        colour = checkExceptions(colour, level, itemStack)
+        color = checkExceptions(color, level, itemStack)
 
         // TODO when chroma is disabled maybe use the neu chroma style instead of gold
-        if (colour.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
-        return colour.get().getChatColor()
+        if (color.get() == LorenzColor.CHROMA && !(ChromaManager.config.enabled.get() || EnchantParser.isSbaLoaded)) return "§6§l"
+        return color.get().getChatColor()
     }
 
     /**
@@ -56,11 +56,11 @@ open class Enchant : Comparable<Enchant> {
      * a corresponding enchantment conditional, unless the exception is not specific to a certain enchant. i.e.
      * Efficiency exceptions should be within the `if (this.nbtName == "efficiency")` conditional)*
      *
-     * @param colour The original coloring based on default behaviour, for when no exception is met
+     * @param color The original coloring based on default behaviour, for when no exception is met
      * @param level The level of the enchant currently being parsed
      * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
-    private fun checkExceptions(colour: Property<LorenzColor>, level: Int, itemStack: ItemStack?) : Property<LorenzColor> {
+    private fun checkExceptions(color: Property<LorenzColor>, level: Int, itemStack: ItemStack?) : Property<LorenzColor> {
         val config = SkyHanniMod.feature.inventory.enchantParsing
 
         val itemCategory = itemStack?.getItemCategoryOrNull()
@@ -75,7 +75,7 @@ open class Enchant : Comparable<Enchant> {
             }
         }
 
-        return colour
+        return color
     }
 
     override fun toString() = "$nbtName $goodLevel $maxLevel\n"

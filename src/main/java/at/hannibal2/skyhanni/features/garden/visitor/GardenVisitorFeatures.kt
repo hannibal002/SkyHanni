@@ -234,8 +234,8 @@ object GardenVisitorFeatures {
         var amountInSacks = 0
         internalName.getAmountInSacksOrNull()?.let {
             amountInSacks = it
-            val textColour = if (it >= amount) "a" else "e"
-            list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+            val textColor = if (it >= amount) "a" else "e"
+            list.add(" §7(§${textColor}x${it.addSeparators()} §7in sacks)")
         }
 
         val ingredients = NEUItems.getRecipes(internalName)
