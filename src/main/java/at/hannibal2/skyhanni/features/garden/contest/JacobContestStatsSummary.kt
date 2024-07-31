@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.FarmingContestEvent
@@ -15,7 +16,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object JacobContestStatsSummary {
 
-    private val config get() = GardenAPI.config
+    private val config get() = GardenAPI.config.contestSummaryConfig
     private var blocksBroken = 0
     private var startTime = SimpleTimeMark.farPast()
 
@@ -46,7 +47,7 @@ object JacobContestStatsSummary {
                 ChatUtils.chat("Stats for $cropName Contest:")
                 val time = duration.format()
                 ChatUtils.chat("§7Blocks Broken in total: §e${blocksBroken.addSeparators()}")
-                val color = getBlocksPerSecondColor(blocksPerSecond)
+                val color = getBlocksPerSecondColor(blocksPerSecond).getChatColor()
                 ChatUtils.chat("§7Average Blocks Per Second: $color$blocksPerSecond")
                 ChatUtils.chat("§7Participated for §b$time")
             }
@@ -59,7 +60,16 @@ object JacobContestStatsSummary {
         blocksBroken = 0
     }
 
-    private fun getBlocksPerSecondColor(blocksPerSecond: Double) = if (blocksPerSecond > 19) "§c" else "§a"
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(52, "garden.config", "garden.config.contestSummaryConfig")
+    }
+
+    private fun getBlocksPerSecondColor(blocksPerSecond: Double) = when {
+        blocksPerSecond >= config.good.threshold -> config.good.color
+        blocksPerSecond >= config.okay.threshold -> config.okay.color
+        else -> config.bad.color
+    }
 
     fun isEnabled() = GardenAPI.inGarden() && config.jacobContestSummary
 }
