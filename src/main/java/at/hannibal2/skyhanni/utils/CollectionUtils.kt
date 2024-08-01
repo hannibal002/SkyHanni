@@ -429,4 +429,14 @@ object CollectionUtils {
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
         return filterKeys { it != null } as Map<K, V>
     }
+
+    /**
+     * Inserts the element at the index or appends it to the end if out of bounds of the list.
+     *
+     * @param index index to insert at, or append if >= size
+     * @param element element to insert or add
+     */
+    fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
+        if (index < size) add(index, element) else add(element)
+    }
 }
