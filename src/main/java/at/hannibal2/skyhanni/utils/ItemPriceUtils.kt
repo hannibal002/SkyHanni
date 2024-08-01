@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
-import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 
@@ -58,7 +57,7 @@ object ItemPriceUtils {
 
     // If NEU fails to calculate the craft costs, we calculate it ourself.
     fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
-        manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
+        NEUItems.manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
             getRecipes(this).filter { it !in pastRecipes }
                 .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }
                 .filter { it >= 0 }
