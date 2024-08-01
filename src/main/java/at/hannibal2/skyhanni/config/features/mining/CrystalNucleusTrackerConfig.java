@@ -1,18 +1,29 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class CrystalNucleusTrackerConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the Powder Tracker overlay for mining.")
+    @ConfigOption(name = "Enabled", desc = "Enable the Crystal Nucleus Tracker overlay for mining.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigLink(owner = CrystalNucleusTrackerConfig.class, field = "enabled")
+    public Position position = new Position(20, 20, false, true);
+
+    @Expose
+    @ConfigOption(name = "Show Outside of Nucleus", desc = "Show the tracker anywhere in the Crystal Hollows.")
+    @ConfigEditorBoolean
+    public boolean showEverywhere = false;
 
     @Expose
     @ConfigOption(name = "Profit Per", desc = "Show profit summary message for the completed nucleus run.")

@@ -92,4 +92,9 @@ object CrystalNucleusAPI {
         }
         loot.add(pair)
     }
+
+    //Todo: Actual logic
+    fun isInNucleus(): Boolean {
+        return true
+    }
 }

@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUpgrade;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
@@ -560,6 +561,9 @@ public class ProfileSpecificStorage {
             @Expose
             public List<MineshaftPityDisplay.PityData> blocksBroken = new ArrayList<>();
         }
+
+        @Expose
+        public CrystalNucleusTracker.Data crystalNucleusTracker = new CrystalNucleusTracker.Data();
     }
 
     @Expose
