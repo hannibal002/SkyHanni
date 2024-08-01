@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -181,7 +182,7 @@ object ItemPickupLog {
             for (item in displayLayout) {
                 when (item) {
                     DisplayLayout.ICON -> {
-                        val itemIcon = entry.neuInternalName?.getItemStack()
+                        val itemIcon = entry.neuInternalName?.getItemStackOrNull()
                         if (itemIcon != null) {
                             addItemStack(itemIcon)
                         } else {
