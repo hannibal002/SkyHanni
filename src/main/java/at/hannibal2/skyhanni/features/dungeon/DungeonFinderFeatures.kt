@@ -297,7 +297,7 @@ object DungeonFinderFeatures {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        val toolTip = toolTipMap[event.slot.slotIndex]
+        val toolTip = toolTipMap[event.slot.slotNumber]
         if (toolTip.isNullOrEmpty()) return
         // TODO @Thunderblade73 fix that to "event.toolTip = toolTip"
         val oldToolTip = event.toolTip
