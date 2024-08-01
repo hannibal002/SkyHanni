@@ -23,7 +23,8 @@ class CrystalNucleusProfitPer {
         var totalProfit = 0.0
         val map = mutableMapOf<String, Double>()
         for ((name, amount) in loot) {
-            if (name == "§bGlacite Powder") continue
+            // Gemstone and Mithril Powder
+            if (name.contains(" Powder")) continue
             NEUInternalName.fromItemNameOrNull(name)?.let {
                 val pricePer = it.getPrice()
                 if (pricePer == -1.0) continue
