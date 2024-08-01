@@ -46,7 +46,8 @@ repositories {
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
 }
-
+val runDirectory = rootProject.file("run")
+runDirectory.mkdirs()
 // Minecraft configuration:
 loom {
     if (this.isForgeLike)
@@ -60,7 +61,7 @@ loom {
     }
     runs {
         named("client") {
-            this.runDir(rootProject.file("run").relativeTo(projectDir).toString())
+            this.runDir(runDirectory.relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
                 property("devauth.configDir", rootProject.file(".devauth").absolutePath)
@@ -168,14 +169,14 @@ dependencies {
 
 afterEvaluate {
     loom.runs.named("client") {
-        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(file(runDir)).path })
+        programArgs("--mods", devenvMod.resolve().joinToString(",") { it.relativeTo(runDirectory).path })
     }
 }
 
 tasks.withType(Test::class) {
     useJUnitPlatform()
     javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-    workingDir(file(loom.runs.getAt("client").runDir))
+    workingDir(file(runDirectory))
     systemProperty("junit.jupiter.extensions.autodetection.enabled", "true")
 }
 
@@ -203,7 +204,7 @@ if (target == ProjectTarget.MAIN) {
     val generateRepoPatterns by tasks.creating(JavaExec::class) {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         mainClass.set("net.fabricmc.devlaunchinjector.Main")
-        workingDir(project.file(loom.runs.getAt("client").runDir))
+        workingDir(project.file(runDirectory))
         classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
         jvmArgs(
             "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
