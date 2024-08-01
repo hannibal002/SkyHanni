@@ -205,7 +205,6 @@ object GardenVisitorFeatures {
                             if (internalName.isBazaarItem()) {
                                 BazaarApi.searchForBazaarItem(name, amount)
                             } else {
-                                println("es hat funktionoiert")
                                 HypixelCommands.auctionSearch(name.removeColor())
                             }
                         }
