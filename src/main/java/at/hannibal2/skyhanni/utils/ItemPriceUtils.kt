@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getLowestBinOrNull
@@ -19,17 +20,21 @@ object ItemPriceUtils {
             return
         }
 
+
+        val defaultPrice = internalName.getPrice().addSeparators()
+        ChatUtils.chat("${internalName.itemName}§f: §6$defaultPrice")
+
         println("")
         println(" Debug Item Price for $internalName ")
+        println("defaultPrice: $defaultPrice")
 
-        val defaultPrice = internalName.getPrice()
-        println("defaultPrice: ${defaultPrice.addSeparators()}")
         println(" #")
         for (source in ItemPriceSource.values()) {
             val price = internalName.getPrice(source)
             println("${source.displayName} price: ${price.addSeparators()}")
         }
         println(" #")
+
         println(" ")
         println("getLowestBinOrNull: ${internalName.getLowestBinOrNull()?.addSeparators()}")
 
@@ -37,6 +42,7 @@ object ItemPriceUtils {
             println("getBazaarData sellOfferPrice: ${it?.sellOfferPrice?.addSeparators()}")
             println("getBazaarData instantBuyPrice: ${it?.instantBuyPrice?.addSeparators()}")
         }
+
         println("getNpcPriceOrNull: ${internalName.getNpcPriceOrNull()?.addSeparators()}")
         println("getRawCraftCostOrNull: ${internalName.getRawCraftCostOrNull()?.addSeparators()}")
         println(" ")
