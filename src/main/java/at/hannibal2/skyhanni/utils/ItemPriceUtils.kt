@@ -1,17 +1,78 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getLowestBinOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NEUItems.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getRecipes
+import at.hannibal2.skyhanni.utils.NEUItems.manager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 
 object ItemPriceUtils {
+
+    fun NEUInternalName.getPrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ) = getPriceOrNull(priceSource, pastRecipes) ?: -1.0
+
+    fun NEUInternalName.getPriceOrNull(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ): Double? {
+        when (this) {
+            NEUInternalName.JASPER_CRYSTAL -> return 0.0
+            NEUInternalName.RUBY_CRYSTAL -> return 0.0
+            NEUInternalName.SKYBLOCK_COIN -> return 1.0
+            NEUInternalName.WISP_POTION -> return 20_000.0
+        }
+
+        if (priceSource != ItemPriceSource.NPC_SELL) {
+            getBazaarData()?.let {
+                return if (priceSource == ItemPriceSource.BAZAAR_INSTANT_BUY) it.sellOfferPrice else it.instantBuyPrice
+            }
+
+            getLowestBinOrNull()?.let {
+                return it
+            }
+
+            if (equals("JACK_O_LANTERN")) {
+                return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
+            }
+        }
+        if (equals("GOLDEN_CARROT")) {
+            // 6.8 for some players
+            return 7.0 // NPC price
+        }
+
+        return getNpcPriceOrNull() ?: getRawCraftCostOrNull(pastRecipes)
+    }
+
+    private fun NEUInternalName.getLowestBinOrNull(): Double? {
+        val result = NEUItems.manager.auctionManager.getLowestBin(asString())
+        if (result == -1L) return null
+        return result.toDouble()
+    }
+
+    // If NEU fails to calculate the craft costs, we calculate it ourself.
+    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
+        manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
+            getRecipes(this).filter { it !in pastRecipes }
+                .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }
+                .filter { it >= 0 }
+                .minOrNull()
+        }
+
+    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceOrNull() ?: -1.0
+
+    fun NEUInternalName.getNpcPriceOrNull(): Double? {
+        if (this == NEUInternalName.WISP_POTION) {
+            return 20_000.0
+        }
+        return BazaarDataHolder.getNpcPrice(this)
+    }
 
     fun debugItemPrice(args: Array<String>) {
         val internalName = getItemOrFromHand(args)
@@ -60,7 +121,6 @@ object ItemPriceUtils {
             } else {
                 NEUInternalName.fromItemNameOrNull(name)
             }
-
         }
     }
 }
