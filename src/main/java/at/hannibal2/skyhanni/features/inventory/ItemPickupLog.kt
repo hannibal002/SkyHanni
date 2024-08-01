@@ -64,6 +64,7 @@ object ItemPickupLog {
     private var itemsAddedToInventory = mutableMapOf<Int, PickupEntry>()
     private var itemsRemovedFromInventory = mutableMapOf<Int, PickupEntry>()
     private var display: Renderable? = null
+    private var dirty = false
 
     private val patternGroup = RepoPattern.group("itempickuplog")
     private val shopPattern by patternGroup.pattern(
@@ -151,7 +152,8 @@ object ItemPickupLog {
         val itemsRemovedUpdated = itemsRemovedFromInventory.values.removeIf { it.isExpired() }
         val itemsAddedUpdated = itemsAddedToInventory.values.removeIf { it.isExpired() }
 
-        if (itemsRemovedUpdated || itemsAddedUpdated || itemList != oldItemList) {
+        if (itemsRemovedUpdated || itemsAddedUpdated || itemList != oldItemList || dirty) {
+            dirty = false
             updateDisplay()
         }
     }
@@ -173,6 +175,7 @@ object ItemPickupLog {
         }
 
         targetInventory[hash] = itemInfo
+        dirty = true
     }
 
     private fun renderList(prefix: String, entry: PickupEntry) = Renderable.horizontalContainer(
