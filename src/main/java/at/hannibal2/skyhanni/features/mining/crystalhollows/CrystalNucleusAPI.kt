@@ -21,7 +21,7 @@ object CrystalNucleusAPI {
      */
     private val startPattern by patternGroup.pattern(
         "loot.start",
-        " {2}§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE"
+        " {2}§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE",
     )
 
     /**
@@ -29,7 +29,7 @@ object CrystalNucleusAPI {
      */
     private val endPattern by patternGroup.pattern(
         "loot.end",
-        "§3§l▬{64}"
+        "§3§l▬{64}",
     )
 
     /**
@@ -72,7 +72,7 @@ object CrystalNucleusAPI {
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
-            CrystalNucleusLootEvent(loot).postAndCatch()
+            CrystalNucleusLootEvent(loot).post()
             loot.clear()
             inLoot = false
             return

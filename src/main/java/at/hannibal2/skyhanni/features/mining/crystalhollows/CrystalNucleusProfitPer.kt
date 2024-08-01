@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -9,13 +11,12 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-class CrystalNucleusProfitPer {
+object CrystalNucleusProfitPer {
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
 
-    @SubscribeEvent
+    @HandleEvent(priority = HIGH)
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
         if (!config.profitPer) return
         val loot = event.loot
