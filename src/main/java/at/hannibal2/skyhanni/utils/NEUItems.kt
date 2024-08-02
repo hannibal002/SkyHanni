@@ -193,8 +193,9 @@ object NEUItems {
                 return if (priceSource == ItemPriceSource.BAZAAR_INSTANT_BUY) it.sellOfferPrice else it.instantBuyPrice
             }
 
-            val result = manager.auctionManager.getLowestBin(asString())
-            if (result != -1L) return result.toDouble()
+            getLowestBinOrNull()?.let {
+                return it
+            }
 
             if (equals("JACK_O_LANTERN")) {
                 return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
@@ -206,6 +207,12 @@ object NEUItems {
         }
 
         return getNpcPriceOrNull() ?: getRawCraftCostOrNull(pastRecipes)
+    }
+
+    fun NEUInternalName.getLowestBinOrNull(): Double? {
+        val result = manager.auctionManager.getLowestBin(asString())
+        if (result == -1L) return null
+        return result.toDouble()
     }
 
     // If NEU fails to calculate the craft costs, we calculate it ourself.

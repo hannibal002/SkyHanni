@@ -60,7 +60,6 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -88,6 +87,7 @@ import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
+import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -454,6 +454,7 @@ object Commands {
             "shtestisland",
             "Sets the current skyblock island for testing purposes.",
         ) { SkyBlockIslandTest.onCommand(it) }
+        registerCommand("shdebugprice", "Debug different price sources for an item.") { ItemPriceUtils.debugItemPrice(it) }
     }
 
     private fun developersCodingHelp() {
