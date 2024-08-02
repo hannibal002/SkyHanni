@@ -47,12 +47,12 @@ object CrystalNucleusProfitPer {
         }
 
         val jungleKeyPrice = "JUNGLE_KEY".asInternalName().getPrice()
-        map["§9Used §5Jungle Key§7: §c-${jungleKeyPrice.shortFormat()}"] = -jungleKeyPrice
+        map["§cUsed §5Jungle Key§7: §c-${jungleKeyPrice.shortFormat()}"] = -jungleKeyPrice
         totalProfit -= jungleKeyPrice
 
         var robotPartsPrice = 0.0
         robotParts.forEach { robotPartsPrice += it.asInternalName().getPrice() }
-        map["§9Used §9Robot Parts§7: §c-${robotPartsPrice.shortFormat()}"] = -robotPartsPrice
+        map["§cUsed §9Robot Parts§7: §c-${robotPartsPrice.shortFormat()}"] = -robotPartsPrice
         totalProfit -= robotPartsPrice
 
         val hover = map.sortedDesc().filter { it.value >= config.profitPerMinimum || it.value < 0 }.keys.toMutableList()

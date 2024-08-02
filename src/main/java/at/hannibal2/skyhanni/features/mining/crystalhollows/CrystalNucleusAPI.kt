@@ -25,11 +25,11 @@ object CrystalNucleusAPI {
     )
 
     /**
-     * REGEX-TEST: §7Pick it up near the §r§5Nucleus Vault§r§7!
+     * REGEX-TEST: §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
      */
     private val endPattern by patternGroup.pattern(
         "loot.end",
-        "§7Pick it up near the §r§5Nucleus Vault§r§7!.*",
+        "§3§l▬{64}",
     )
 
     /**
