@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 object CrystalNucleusProfitPer {
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
 
-    private val robotParts = listOf(
+    val robotParts = listOf(
         "CONTROL_SWITCH",
         "ELECTRON_TRANSMITTER",
         "FTX_3070",
