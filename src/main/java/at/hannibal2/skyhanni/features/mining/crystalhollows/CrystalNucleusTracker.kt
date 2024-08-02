@@ -87,7 +87,7 @@ object CrystalNucleusTracker {
             addAsSingletonList(
                 Renderable.hoverTips(
                     " §c${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
-                    listOf("§7You paid §c$jungleKeyCostFormat §7in total", "§7for §5 Jungle Keys§7.")
+                    listOf("§7You lost §c$jungleKeyCostFormat §7of total profit", "due to §5Jungle Keys§7.")
                 )
             )
 
@@ -95,11 +95,11 @@ object CrystalNucleusTracker {
             robotParts.forEach { robotPartsCost += it.asInternalName().getPrice() }
             robotPartsCost *= runsCompleted
             profit -= robotPartsCost
-            val robotPartsCostFormat = jungleKeyCost.shortFormat()
+            val robotPartsCostFormat = robotPartsCost.shortFormat()
             addAsSingletonList(
                 Renderable.hoverTips(
                     " §c${runsCompleted * 6}x §9Robot Parts§7: §c-$robotPartsCostFormat",
-                    listOf("§7You lost §c$robotPartsCostFormat §7in total", "§7for §9Robot Parts§7.")
+                    listOf("§7You lost §c$robotPartsCostFormat §7of total profit", "due to §9Robot Parts§7.")
                 )
             )
 
