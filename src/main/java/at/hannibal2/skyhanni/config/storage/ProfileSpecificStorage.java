@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
+import at.hannibal2.skyhanni.features.misc.datahistory.DataPoint;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
@@ -663,4 +664,13 @@ public class ProfileSpecificStorage {
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
+
+    @Expose
+    public HistoryDataStorage historyData = new HistoryDataStorage();
+
+    public static class HistoryDataStorage {
+
+        @Expose
+        public List<DataPoint> purse = new ArrayList<>();
+    }
 }

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import ChartScreen
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
@@ -243,7 +244,7 @@ interface Renderable {
             }
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
-            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
+            val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*> && guiScreen !is ChartScreen) {
                 ToolTipData.lastSlot == null || GuiData.preDrawEventCancelled
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
@@ -252,6 +253,7 @@ interface Renderable {
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NEUItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
+            val isChartScreen = guiScreen is ChartScreen
 
             val result = isGuiScreen &&
                 isGuiPositionEditor &&
@@ -260,7 +262,8 @@ interface Renderable {
                 isConfigScreen &&
                 !isInNeuPv &&
                 !isInSkytilsPv &&
-                !neuFocus
+                !neuFocus &&
+                !isChartScreen
 
             if (debug) {
                 if (!result) {
@@ -274,6 +277,7 @@ interface Renderable {
                     if (isInNeuPv) logger.log("isInNeuPv")
                     if (neuFocus) logger.log("neuFocus")
                     if (isInSkytilsPv) logger.log("isInSkytilsPv")
+                    if (isChartScreen) logger.log("isChartScreen")
                     logger.log("")
                 } else {
                     logger.log("allowed click")

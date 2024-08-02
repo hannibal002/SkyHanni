@@ -41,6 +41,10 @@ public class MiscConfig {
     @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
+    @Expose
+    @Category(name = "Data History", desc = "Save various data for local history view.")
+    public DataHistoryConfig dataHistory = new DataHistoryConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose

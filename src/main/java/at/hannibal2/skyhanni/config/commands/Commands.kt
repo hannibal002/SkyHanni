@@ -60,6 +60,7 @@ import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.MiscFeatures
+import at.hannibal2.skyhanni.features.misc.datahistory.purse.PurseHistory
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -337,6 +338,10 @@ object Commands {
             "shtpinfested",
             "Teleports you to the nearest infested plot",
         ) { PestFinder.teleportNearestInfestedPlot() }
+        registerCommand(
+            "shpursehistory",
+            "Shows the history of your purse over time",
+        ) { PurseHistory.onCommand(it) }
     }
 
     private fun usersBugFix() {
