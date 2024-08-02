@@ -36,7 +36,8 @@ object CrystalNucleusProfitPer {
             }
         }
 
-        val hover = map.sortedDesc().keys.toMutableList()
+        val hover = map.sortedDesc().filter{ it.value >= config.profitPerMinimum }.keys.toMutableList()
+        if(hover.size != map.size) hover.add("§7${map.size - hover.size} cheap items are hidden.")
         val totalMessage = "Profit for Crystal Nucleus Run§e: §6${totalProfit.shortFormat()}"
         hover.add("")
         hover.add("§e$totalMessage")

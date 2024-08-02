@@ -104,5 +104,5 @@ object CrystalNucleusTracker {
         tracker.resetCommand()
     }
 
-    fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled && (CrystalNucleusAPI.isInNucleus() || config.showEverywhere)
+    fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && (config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus")
 }

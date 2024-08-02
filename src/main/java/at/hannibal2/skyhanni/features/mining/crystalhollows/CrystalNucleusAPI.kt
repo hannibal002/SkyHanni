@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -91,10 +92,5 @@ object CrystalNucleusAPI {
             pair = "§9Fortune IV" to pair.second
         }
         loot.add(pair)
-    }
-
-    //Todo: Actual logic
-    fun isInNucleus(): Boolean {
-        return true
     }
 }
