@@ -13,19 +13,19 @@ import java.util.List;
 public class CrystalNucleusConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Modify or hide messages relating to Crystal Nucleus runs in the Crystal Hollows.")
+    @ConfigOption(name = "Enabled", desc = "Hide or compact messages relating to Crystal Nucleus runs in the Crystal Hollows.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     public enum CrystalNucleusMessageTypes {
-        RUN_COMPLETED("§5Run Completed"),
+        RUN_COMPLETED("§5Run Completed Summary"),
         CRYSTAL_COLLECTED("§aC§6r§dy§bs§et§aa§6l §7Collected"),
-        CRYSTAL_PLACED("§aC§6r§dy§bs§et§aa§6l §fPlaced"),
-        NPC_KEEPER("§e[NPC] §6Keeper"),
+        CRYSTAL_PLACED("§aC§6r§dy§bs§et§aa§6l §7Placed"),
+        NPC_DIVAN_KEEPERS("§e[NPC] §6Keepers §7(§2Mines of Divan§7)"),
         NPC_PROF_ROBOT("§e[NPC] Professor Robot"),
         NPC_KING_YOLKAR("§e[NPC] §6King Yolkar"),
-        NON_TOOL_SCAVENGE("§7Non-Tool §cMetal Detector")
+        NON_TOOL_SCAVENGE("§7Non-Tool §cMetal Detector §7loot")
         ;
 
         private final String name;
@@ -41,18 +41,15 @@ public class CrystalNucleusConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hidden Messages", desc = "Messages that should be completely hidden.")
+    @ConfigOption(name = "Modified Messages", desc = "Messages that should be hidden or compacted.\n§cImportant information will still appear§7.")
     @ConfigEditorDraggableList
-    public List<CrystalNucleusMessageTypes> hiddenMessages = new ArrayList<>(Arrays.asList(
+    public List<CrystalNucleusMessageTypes> modifiedMessages = new ArrayList<>(Arrays.asList(
+        CrystalNucleusMessageTypes.CRYSTAL_COLLECTED,
         CrystalNucleusMessageTypes.CRYSTAL_PLACED,
+        CrystalNucleusMessageTypes.RUN_COMPLETED,
+        CrystalNucleusMessageTypes.NPC_DIVAN_KEEPERS,
+        CrystalNucleusMessageTypes.NPC_PROF_ROBOT,
+        CrystalNucleusMessageTypes.NPC_KING_YOLKAR,
         CrystalNucleusMessageTypes.NON_TOOL_SCAVENGE
-    ));
-
-    @Expose
-    @ConfigOption(name = "Compacted Messages", desc = "Messages that should be compacted (where possible).")
-    @ConfigEditorDraggableList
-    public List<CrystalNucleusMessageTypes> compactedMessages = new ArrayList<>(Arrays.asList(
-       CrystalNucleusMessageTypes.CRYSTAL_COLLECTED,
-       CrystalNucleusMessageTypes.RUN_COMPLETED
     ));
 }

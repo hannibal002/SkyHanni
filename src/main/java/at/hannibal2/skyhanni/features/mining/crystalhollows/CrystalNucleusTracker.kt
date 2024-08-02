@@ -27,7 +27,8 @@ object CrystalNucleusTracker {
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
         { Data() },
-        { it.mining.crystalNucleusTracker }) { drawDisplay(it)}
+        { it.mining.crystalNucleusTracker },
+    ) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -39,7 +40,7 @@ object CrystalNucleusTracker {
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop rate: §c$dropRate."
+                "§7Your drop rate: §c$dropRate.",
             )
         }
 
@@ -77,8 +78,8 @@ object CrystalNucleusTracker {
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Runs completed: §e${runsCompleted.addSeparators()}",
-                listOf("§7You completed §e${runsCompleted.addSeparators()} §7Crystal Nucleus Runs.")
-            )
+                listOf("§7You completed §e${runsCompleted.addSeparators()} §7Crystal Nucleus Runs."),
+            ),
         )
         addAsSingletonList(tracker.addTotalProfit(profit, data.runsCompleted, "run"))
 
@@ -88,7 +89,7 @@ object CrystalNucleusTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if(config.hideInCf && ChocolateFactoryAPI.inChocolateFactory) return
+        if (config.hideInCf && ChocolateFactoryAPI.inChocolateFactory) return
 
         tracker.renderDisplay(config.position)
     }
@@ -104,5 +105,6 @@ object CrystalNucleusTracker {
         tracker.resetCommand()
     }
 
-    fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && (config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus")
+    fun isEnabled() =
+        config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && (config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus")
 }
