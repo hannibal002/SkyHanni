@@ -459,7 +459,7 @@ object ChatFilter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         var blockReason = block(event.message)
-        if (blockReason == null && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
+        if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
 
         event.blockedReason = blockReason ?: return
     }

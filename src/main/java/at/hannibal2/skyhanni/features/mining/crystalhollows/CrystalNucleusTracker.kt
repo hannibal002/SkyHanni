@@ -7,10 +7,12 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
@@ -51,7 +53,14 @@ object CrystalNucleusTracker {
 
     @HandleEvent(priority = HIGH)
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
-        //Todo: Add items to tracker
+        addCompletedRun()
+        for ((itemName, amount) in event.loot) {
+            // Gemstone and Mithril Powder
+            if (itemName.contains(" Powder")) continue
+            NEUInternalName.fromItemNameOrNull(itemName)?.let {
+                tracker.addItem(it, amount)
+            }
+        }
     }
 
     private fun addCompletedRun() {
@@ -61,7 +70,7 @@ object CrystalNucleusTracker {
     }
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lPest Profit Tracker")
+        addAsSingletonList("§e§lCrystal Nucleus Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
         val runsCompleted = data.runsCompleted
@@ -79,6 +88,7 @@ object CrystalNucleusTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
+        if(config.hideInCf && ChocolateFactoryAPI.inChocolateFactory) return
 
         tracker.renderDisplay(config.position)
     }

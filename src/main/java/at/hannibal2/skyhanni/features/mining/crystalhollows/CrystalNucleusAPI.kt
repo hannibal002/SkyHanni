@@ -21,15 +21,15 @@ object CrystalNucleusAPI {
      */
     private val startPattern by patternGroup.pattern(
         "loot.start",
-        " {2}§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE",
+        " {2}§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE.*",
     )
 
     /**
-     * REGEX-TEST: §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
+     * REGEX-TEST: §7Pick it up near the §r§5Nucleus Vault§r§7!
      */
     private val endPattern by patternGroup.pattern(
         "loot.end",
-        "§3§l▬{64}",
+        "§7Pick it up near the §r§5Nucleus Vault§r§7!.*",
     )
 
     /**
