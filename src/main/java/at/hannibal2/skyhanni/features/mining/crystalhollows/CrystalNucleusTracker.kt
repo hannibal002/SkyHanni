@@ -87,7 +87,7 @@ object CrystalNucleusTracker {
             addAsSingletonList(
                 Renderable.hoverTips(
                     " §c${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
-                    listOf("§7You lost §c$jungleKeyCostFormat §7of total profit", "due to §5Jungle Keys§7.")
+                    listOf("§7You lost §c$jungleKeyCostFormat §7of total profit", "§7due to §5Jungle Keys§7.")
                 )
             )
 
@@ -99,7 +99,7 @@ object CrystalNucleusTracker {
             addAsSingletonList(
                 Renderable.hoverTips(
                     " §c${runsCompleted * 6}x §9Robot Parts§7: §c-$robotPartsCostFormat",
-                    listOf("§7You lost §c$robotPartsCostFormat §7of total profit", "due to §9Robot Parts§7.")
+                    listOf("§7You lost §c$robotPartsCostFormat §7of total profit", "§7due to §9Robot Parts§7.")
                 )
             )
 
