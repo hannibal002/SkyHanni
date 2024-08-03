@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
@@ -10,24 +9,27 @@ import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object SackDisplay {
 
     private var display = emptyList<Renderable>()
@@ -110,13 +112,13 @@ object SackDisplay {
                     NumberFormatEntry.DEFAULT -> {
                         addAlignedNumber("$colorCode${stored.addSeparators()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.shortFormat()}")
                     }
 
                     NumberFormatEntry.FORMATTED -> {
-                        addAlignedNumber("$colorCode${NumberUtil.format(stored)}")
+                        addAlignedNumber("$colorCode${stored.shortFormat()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.shortFormat()}")
                     }
 
                     NumberFormatEntry.UNFORMATTED -> {
@@ -172,7 +174,7 @@ object SackDisplay {
             else -> sackItems.sortedByDescending { it.second.stored }
         }.toMap().toMutableMap()
 
-        sortedPairs.toList().forEach { (k, v) ->
+        for ((k, v) in sortedPairs.toList()) {
             if (v.stored == 0 && !config.showEmpty) {
                 sortedPairs.remove(k)
             }
@@ -204,11 +206,11 @@ object SackDisplay {
         )
 
         if (config.showPrice) {
-            list.addSelector<PriceFrom>(" ",
-                getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
+            list.addSelector<ItemPriceSource>(" ",
+                getName = { type -> type.sellName },
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = SackDisplayConfig.PriceFrom.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update(false)
                 })
             list.addButton(
@@ -283,7 +285,7 @@ object SackDisplay {
     }
 
     private fun format(price: Long) = if (config.priceFormat == PriceFormatEntry.FORMATTED) {
-        NumberUtil.format(price)
+        price.shortFormat()
     } else {
         price.addSeparators()
     }
@@ -295,12 +297,6 @@ object SackDisplay {
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
         PRICE_ASC("Price A", "Price Ascending"),
-        ;
-    }
-
-    enum class PriceFrom(val displayName: String) {
-        BAZAAR("Bazaar Price"),
-        NPC("NPC Price"),
         ;
     }
 
@@ -324,9 +320,6 @@ object SackDisplay {
         }
         event.transform(15, "inventory.sackDisplay.priceFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
-        }
-        event.transform(15, "inventory.sackDisplay.priceFrom") { element ->
-            ConfigUtils.migrateIntToEnum(element, SackDisplayConfig.PriceFrom::class.java)
         }
         event.transform(15, "inventory.sackDisplay.sortingType") { element ->
             ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)

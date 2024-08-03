@@ -6,6 +6,7 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
@@ -18,12 +19,16 @@ object InventoryUtils {
     var recentItemsInHand = mutableMapOf<Long, NEUInternalName>()
     var latestItemInHand: ItemStack? = null
 
-    fun getItemsInOpenChest() = buildList<Slot> {
+    fun getItemsInOpenChest(): List<Slot> {
         val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
-        for (slot in guiChest.inventorySlots.inventorySlots) {
-            if (slot.inventory is InventoryPlayer) break
-            if (slot.stack != null) add(slot)
-        }
+        return guiChest.inventorySlots.inventorySlots
+            .filter { it.inventory !is InventoryPlayer && it.stack != null }
+    }
+
+    fun getSlotsInOwnInventory(): List<Slot> {
+        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory ?: return emptyList<Slot>()
+        return guiInventory.inventorySlots.inventorySlots
+            .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
 
     // TODO add cache that persists until the next gui/window open/close packet is sent/received
@@ -34,7 +39,11 @@ object InventoryUtils {
         } else ""
     }
 
+    fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
+
+    fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 
     fun getItemsInOwnInventory() =
         getItemsInOwnInventoryWithNull()?.filterNotNull() ?: emptyList()
@@ -62,7 +71,7 @@ object InventoryUtils {
     fun getLeggings(): ItemStack? = getArmor()[1]
     fun getBoots(): ItemStack? = getArmor()[0]
 
-    val isNeuStorageEnabled = RecalculatingValue(10.seconds) {
+    val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
         try {
             val config = NotEnoughUpdates.INSTANCE.config
 
@@ -72,7 +81,7 @@ object InventoryUtils {
             val booleanField = storage.javaClass.getDeclaredField("enableStorageGUI3")
             booleanField.get(storage) as Boolean
         } catch (e: Throwable) {
-            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is emabled.")
+            ErrorManager.logErrorWithData(e, "Could not read NEU config to determine if the neu storage is enabled.")
             false
         }
     }
@@ -107,9 +116,15 @@ object InventoryUtils {
         }
     }
 
-    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? {
-        return getItemsInOpenChest().find { it.slotIndex == slotIndex }?.stack
-    }
+    fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
+
+    fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NEUInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }
+
+    fun clickSlot(slot: Int) {
+        val windowId = getWindowId() ?: return
+        val controller = Minecraft.getMinecraft().playerController
+        controller.windowClick(windowId, slot, 0, 0, Minecraft.getMinecraft().thePlayer)
+    }
 }

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -24,6 +25,7 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
+@SkyHanniModule
 object CorpseLocator {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseLocator
 
@@ -46,7 +48,7 @@ object CorpseLocator {
                 entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
             }
             .forEach { entity ->
-                val helmetName = entity.getCurrentArmor(3).getInternalName()
+                val helmetName = entity.getCurrentArmor(3)?.getInternalName() ?: return
                 val corpseType = MineshaftWaypointType.getByHelmetOrNull(helmetName) ?: return
 
                 val canSee = entity.getLorenzVec().canBeSeen(-1..3)
@@ -81,7 +83,7 @@ object CorpseLocator {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (sharedWaypoints.isNotEmpty()) sharedWaypoints.clear()
+        sharedWaypoints.clear()
     }
 
     @SubscribeEvent

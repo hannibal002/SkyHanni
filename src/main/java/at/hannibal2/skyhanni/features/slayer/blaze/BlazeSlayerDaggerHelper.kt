@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -26,7 +27,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class BlazeSlayerDaggerHelper {
+@SkyHanniModule
+object BlazeSlayerDaggerHelper {
 
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
 
@@ -184,12 +186,12 @@ class BlazeSlayerDaggerHelper {
 
         for (shield in HellionShield.entries) {
             if (shield.formattedName + "§r" == event.title) {
-                Dagger.entries.filter { shield in it.shields }.forEach {
-                    it.shields.forEach { shield -> shield.active = false }
-                    it.updated = true
+                for (dagger in Dagger.entries.filter { shield in it.shields }) {
+                    dagger.shields.forEach { it.active = false }
+                    dagger.updated = true
                 }
                 shield.active = true
-                event.isCanceled = true
+                event.cancel()
                 clientSideClicked = false
                 return
             }

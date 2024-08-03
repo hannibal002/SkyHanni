@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -22,6 +23,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
 
+@SkyHanniModule
 object DicerRngDropTracker {
 
     private val itemDrops = mutableListOf<ItemDrop>()
@@ -42,37 +44,37 @@ object DicerRngDropTracker {
     private val melonPatternGroup = RepoPattern.group("garden.dicer.melon")
     private val melonUncommonDropPattern by melonPatternGroup.pattern(
         "uncommon",
-        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!"
+        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!",
     )
     private val melonRareDropPattern by melonPatternGroup.pattern(
         "rare",
-        "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!"
+        "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Melon§r§e!",
     )
     private val melonCrazyRareDropPattern by melonPatternGroup.pattern(
         "crazyrare",
-        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§[a|9]Enchanted Melon(?: Block)?§r§e!"
+        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§[a|9]Enchanted Melon(?: Block)?§r§e!",
     )
     private val melonRngesusDropPattern by melonPatternGroup.pattern(
         "rngesus",
-        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9(\\d+)x §r§9Enchanted Melon Block§r§e!"
+        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§9(\\d+)x §r§9Enchanted Melon Block§r§e!",
     )
 
     private val pumpkinPatternGroup = RepoPattern.group("garden.dicer.pumpkin")
     private val pumpkinUncommonDropPattern by pumpkinPatternGroup.pattern(
         "uncommon",
-        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!"
+        "§a§lUNCOMMON DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!",
     )
     private val pumpkinRareDropPattern by pumpkinPatternGroup.pattern(
         "rare",
-        "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!"
+        "§9§lRARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!",
     )
     private val pumpkinCrazyRareDropPattern by pumpkinPatternGroup.pattern(
         "crazyrare",
-        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!"
+        "§d§lCRAZY RARE DROP! §r§eDicer dropped §r§a(\\d+)x §r§aEnchanted Pumpkin§r§e!",
     )
     private val pumpkinRngesusDropPattern by pumpkinPatternGroup.pattern(
         "rngesus",
-        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§(aEnchanted|9Polished) Pumpkin§r§e!"
+        "§5§lPRAY TO RNGESUS DROP! §r§eDicer dropped §r§[a|9](\\d+)x §r§(aEnchanted|9Polished) Pumpkin§r§e!",
     )
 
     init {
@@ -120,20 +122,19 @@ object DicerRngDropTracker {
 
     private fun drawDisplay(data: Data) = buildList {
         val cropInHand = cropInHand ?: return@buildList
-        val items = data.drops.getOrPut(cropInHand) { mutableMapOf() }
-        val list = mutableListOf<Renderable>()
-        val topLine = mutableListOf<Renderable>()
 
+        val topLine = mutableListOf<Renderable>()
         topLine.add(Renderable.itemStack(cropInHand.icon))
         topLine.add(Renderable.string("§7Dicer Tracker:"))
         add(listOf(Renderable.horizontalContainer(topLine)))
-        if (config.compact.get()) {
 
+        val items = data.drops[cropInHand] ?: return@buildList
+        val list = mutableListOf<Renderable>()
+        if (config.compact.get()) {
             val compactLine = items.sortedDesc().map { (rarity, amount) ->
                 "§${rarity.colorCode}${amount.addSeparators()}"
             }.joinToString("§7/")
             list.add(Renderable.string(compactLine))
-            add(listOf(Renderable.verticalContainer(list)))
 
         } else {
             for ((rarity, amount) in items.sortedDesc()) {
@@ -141,9 +142,8 @@ object DicerRngDropTracker {
                 val displayName = rarity.displayName
                 list.add(Renderable.string(" §7- §e${amount.addSeparators()}x §$colorCode$displayName"))
             }
-            add(listOf(Renderable.verticalContainer(list)))
         }
-
+        add(listOf(Renderable.verticalContainer(list)))
     }
 
     private var cropInHand: CropType? = null

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -17,8 +18,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object HoppityNpc {
 
     private val config get() = HoppityEggsManager.config
@@ -49,7 +51,7 @@ object HoppityNpc {
         if (ReminderUtils.isBusy()) return
         if (hoppityYearOpened == SkyBlockTime.now().year) return
         if (!ChocolateFactoryAPI.isHoppityEvent()) return
-        if (lastReminderSent.passedSince() <= 30.seconds) return
+        if (lastReminderSent.passedSince() <= 2.minutes) return
 
         ChatUtils.clickableChat(
             "New rabbits are available at §aHoppity's Shop§e! §c(Click to disable this reminder)",
