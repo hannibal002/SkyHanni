@@ -31,6 +31,7 @@ object FontRendererHook {
     private var chromaPreviewText: String
 
     var cameFromChat = false
+
     init {
         // Get the description text from the ConfigOption annotation from the chromaPreview field to check against
         val fields = config::class.java.declaredFields
