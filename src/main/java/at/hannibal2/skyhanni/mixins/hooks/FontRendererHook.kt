@@ -3,11 +3,8 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getPropertiesWithType
 import at.hannibal2.skyhanni.utils.RenderUtils
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
-import jdk.nashorn.internal.runtime.regexp.joni.Config
-import kotlin.reflect.KAnnotatedElement
 import net.minecraft.client.renderer.GlStateManager
 
 /**
