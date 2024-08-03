@@ -44,5 +44,5 @@ object GFSPiggyBank {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.gfsPiggyBank
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.misc.gfsPiggyBank
 }
