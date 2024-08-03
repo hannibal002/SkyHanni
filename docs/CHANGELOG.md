@@ -66,6 +66,7 @@
     + Warns when using the Egglocator without having a Mythic Rabbit Pet selected.
 + Flash your screen when a special stray rabbit appears. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2040)
     + Option to also flash on normal stray rabbits.
++ Added a tracker for stray rabbits caught in the Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2210)
 
 #### Mining Features
 
@@ -218,6 +219,7 @@
     + The configuration option to manually specify this has been removed.
 + Added different display options for mining powder in the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1442)
 + Added Left Click on Royal Pigeon for next spot in Tunnel Maps. - Empa (https://github.com/hannibal002/SkyHanni/pull/2181)
++ Overhauled the Powder Mining chat filter to be much more customizable. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2152)
 
 #### Commands Improvements
 
@@ -304,6 +306,7 @@
 + Added a reset button in the config for the appearance and event priority of the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2141)
 + Reverted item source names to shorter format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2233)
 + Rounded corner smoothness now applies to custom Scoreboard textures. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2228)
++ Reduced the frequency of "tab list not found" error messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2266)
 
 ### Fixes
 
@@ -335,6 +338,9 @@
 + Fixed total powder amounts resetting when opening the SkyBlock Menu on a mining island. - Luna (https://github.com/hannibal002/SkyHanni/pull/2263)
 + Fixed detection of 2x Powder Event for Powder Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2157)
     + Now uses the Tab Widget.
++ Fixed TunnelMaps not resetting on lobby swap. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2275)
++ Fixed a rare error when detecting corpses in the Mineshaft. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2268)
++ Fixed incorrect maximum Powder value on HotM perks when disabled. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2269)
 
 #### Garden Fixes
 
@@ -362,6 +368,7 @@
 + Fixed Jacob's Contest FF needed display not showing. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2262)
 + Fixed Dicer Tracker Reset Button misalignment. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2248)
 + Fixed errors when selecting Fine Flour with the Sprayonator. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2251)
++ Fixed typos in the FF guide. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2273)
 
 #### Chocolate Factory & Hoppity Hunt Fixes
 
@@ -411,6 +418,7 @@
 + Fixed Custom Scoreboard Error during Carnival. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2245)
 + Fixed 2 Custom Scoreboard Errors while in Kuudra. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2236)
 + Fixed Scoreboard Reset not updating the draggable list. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2252)
++ Fixed a scoreboard error message when a Hypixel bug shows a negative number of magma cubes remaining in the scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2267)
 
 #### Dungeon Fixes
 
@@ -471,6 +479,7 @@
 + Fixed detecting Hot Potato Books inside the Community Project as potatoes. - Empa (https://github.com/hannibal002/SkyHanni/pull/2214)
 + Fixed price source inconsistencies (Bazaar sell/buy and NPC prices). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2221)
 + Fixed Carnival Masks not being detected by Reforge Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2244)
++ Fixed a typo in the Item Pickup Log config. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2271)
 
 #### Combat Fixes
 
@@ -626,6 +635,7 @@
 + Changed "colour" to "color" internally, everywhere. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2258)
 + Added renderRenderableDouble. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2260)
     + A direct replacement for renderStringsAndItems.
++ Changed detecting active mayor to no longer use the number of votes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2227)
 
 ### Removed Features
 

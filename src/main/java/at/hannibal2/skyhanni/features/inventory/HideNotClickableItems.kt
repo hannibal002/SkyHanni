@@ -298,6 +298,7 @@ object HideNotClickableItems {
 
         val list = listOf(
             "HELMET",
+            "CARNIVAL MASK",
             "CHESTPLATE",
             "LEGGINGS",
             "BOOTS",
