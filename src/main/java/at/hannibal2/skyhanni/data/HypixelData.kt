@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
@@ -59,10 +58,6 @@ object HypixelData {
         "serverid.scoreboard",
         "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
     )
-    private val serverIdTablistPattern by patternGroup.pattern(
-        "serverid.tablist",
-        " Server: §r§8(?<serverid>\\S+)",
-    )
     private val lobbyTypePattern by patternGroup.pattern(
         "lobbytype",
         "(?<lobbyType>.*lobby)\\d+",
@@ -91,7 +86,7 @@ object HypixelData {
         "solo.profile.amount",
         "^\\s*(?:§.)*Island\\s*$",
     )
-    private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+    private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
         "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
     )
@@ -161,14 +156,14 @@ object HypixelData {
         if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
         if (!TabListData.fullyLoaded) return
 
-        ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
-            val serverType = if (group("servertype") == "M") "mega" else "mini"
-            serverId = "$serverType${group("serverid")}"
+        TabWidget.SERVER.matchMatcherFirstLine {
+            serverId = group("serverid")
             return
         }
 
-        TabListData.getTabList().matchFirst(serverIdTablistPattern) {
-            serverId = group("serverid")
+        ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
+            val serverType = if (group("servertype") == "M") "mega" else "mini"
+            serverId = "$serverType${group("serverid")}"
             return
         }
 
@@ -206,7 +201,7 @@ object HypixelData {
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
-        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
+        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmountPattern) {
             return group("maxamount").toInt()
         }
 
@@ -298,14 +293,13 @@ object HypixelData {
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
+            ProfileStorageData.profileJoinMessage()
         }
     }
 
-    @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
-        event.tabList.matchFirst(UtilsPatterns.tabListProfilePattern) {
+    private fun checkProfile() {
+        TabWidget.PROFILE.matchMatcherFirstLine {
             var newProfile = group("profile").lowercase()
-
             // Hypixel shows the profile name reversed while in the Rift
             if (RiftAPI.inRift()) newProfile = newProfile.reversed()
             if (profileName == newProfile) return
@@ -374,6 +368,7 @@ object HypixelData {
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
+            TabWidget.PROFILE -> checkProfile()
             else -> Unit
         }
     }
@@ -400,7 +395,7 @@ object HypixelData {
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.getCurrentServerData().serverIP) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -459,6 +454,7 @@ object HypixelData {
             islandType = getIslandType(foundIsland, guesting)
         }
 
+        // TODO don't send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {

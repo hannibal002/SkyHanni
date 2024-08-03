@@ -67,13 +67,14 @@ object ChocolateFactoryCustomReminder {
         // TODO add support for prestige and for Chocolate Milestone
         val cost = ChocolateFactoryAPI.getChocolateBuyCost(item.getLore()) ?: return
         val duration = ChocolateAmount.CURRENT.timeUntilGoal(cost)
+        val nextLevelName = ChocolateFactoryAPI.getNextLevelName(item) ?: return
 
         // the user has enough chocolate, and just bought something
         if (duration.isNegative()) {
             reset()
             return
         }
-        setReminder(cost, item.name)
+        setReminder(cost, nextLevelName)
     }
 
     @SubscribeEvent

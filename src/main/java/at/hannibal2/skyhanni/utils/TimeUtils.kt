@@ -16,7 +16,7 @@ object TimeUtils {
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = false,
+        showMilliSeconds: Boolean = this in -1.seconds..1.seconds,
         longName: Boolean = false,
         maxUnits: Int = -1,
     ): String {

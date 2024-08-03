@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.style
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
+import kotlin.math.ceil
 
 object HelpCommand {
 
@@ -50,7 +51,7 @@ object HelpCommand {
         val filtered = commands.filter {
             it.name.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
         }
-        val maxPage = filtered.size / COMMANDS_PER_PAGE + 1
+        val maxPage = ceil(filtered.size.toDouble() / COMMANDS_PER_PAGE).toInt()
         val page = page.coerceIn(1, maxPage)
         val title = if (search.isEmpty()) "§6SkyHanni Commands" else "§6SkyHanni Commands matching '$search'"
 
@@ -75,7 +76,7 @@ object HelpCommand {
 
         if (filtered.isEmpty()) {
             text.add(Text.EMPTY)
-            text.add("§cNo reminders found.".asComponent().center())
+            text.add("§cNo commands found.".asComponent().center())
             text.add(Text.EMPTY)
         } else {
             val start = (page - 1) * COMMANDS_PER_PAGE
