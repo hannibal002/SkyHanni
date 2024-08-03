@@ -3,7 +3,11 @@ package at.hannibal2.skyhanni.mixins.hooks
 import at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getPropertiesWithType
 import at.hannibal2.skyhanni.utils.RenderUtils
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import jdk.nashorn.internal.runtime.regexp.joni.Config
+import kotlin.reflect.KAnnotatedElement
 import net.minecraft.client.renderer.GlStateManager
 
 /**
@@ -27,8 +31,15 @@ object FontRendererHook {
 
     private var currentDrawState: ChromaFontRenderer? = null
     private var previewChroma = false
+    private var chromaPreviewText: String
 
     var cameFromChat = false
+    init {
+        // Get the description text from the ConfigOption annotation from the chromaPreview field to check against
+        val fields = config::class.java.declaredFields
+        val previewField = fields.first { it.name == "chromaPreview" } // Pls no one change the config field name
+        chromaPreviewText = previewField.getAnnotation(ConfigOption::class.java).desc
+    }
 
     /**
      * Setups the [ChromaFontRenderer][at.hannibal2.skyhanni.features.chroma.ChromaFontRenderer] for rendering text
@@ -71,7 +82,7 @@ object FontRendererHook {
             return
         }
 
-        if (text == "§fPlease star the mod on GitHub!") {
+        if (text == chromaPreviewText) {
             previewChroma = true
             setupChromaFont()
         }
