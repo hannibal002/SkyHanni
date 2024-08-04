@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.mineshaft
+package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent

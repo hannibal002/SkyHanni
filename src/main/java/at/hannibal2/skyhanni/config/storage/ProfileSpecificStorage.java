@@ -567,7 +567,7 @@ public class ProfileSpecificStorage {
             public List<MineshaftPityDisplay.PityData> blocksBroken = new ArrayList<>();
 
             @Expose
-            public CorpseTracker.Data corpseProfitTracker = new CorpseTracker.Data();
+            public CorpseTracker.BucketData corpseProfitTracker = new CorpseTracker.BucketData();
         }
     }
 

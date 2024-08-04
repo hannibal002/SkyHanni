@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
-import at.hannibal2.skyhanni.features.mining.mineshaft.CorpseType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
@@ -30,13 +29,13 @@ import java.util.EnumMap
 object CorpseTracker {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
-    private val tracker = SkyHanniBucketedItemTracker<CorpseType, Data>(
+    private val tracker = SkyHanniBucketedItemTracker<CorpseType, BucketData>(
         "Corpse Tracker",
-        { Data() },
+        { BucketData() },
         { it.mining.mineshaft.corpseProfitTracker },
     ) { drawDisplay(it) }
 
-    class Data: BucketedItemTrackerData<CorpseType>() {
+    class BucketData: BucketedItemTrackerData<CorpseType>() {
         override fun resetItems() {
             corpsesLooted = EnumMap(CorpseType::class.java)
         }
@@ -75,12 +74,14 @@ object CorpseTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
+    private fun drawDisplay(bucketData: BucketData): List<List<Any>> = buildList {
         addAsSingletonList("§b§lGlacite Corpse Profit Tracker")
-        var profit = tracker.drawItems(data, { true }, this)
+        addAll(tracker.addBucketSelectors(bucketData))
 
-        if (data.corpseCount > 0) {
-            val applicableKeys: List<CorpseType> = data.selectedBucket?.let { listOf(it) } ?: CorpseType.entries
+        var profit = tracker.drawItems(bucketData, { true }, this)
+
+        if (bucketData.corpseCount > 0) {
+            val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let { listOf(it) } ?: CorpseType.entries
             val keyCostStrings: List<String> = mutableListOf()
             var totalKeyCost = 0.0
             var totalKeyCount = 0
@@ -88,7 +89,7 @@ object CorpseTracker {
                 it.key?.let { key ->
                     val keyName = key.itemName
                     val price = key.getPrice()
-                    val count = (data.corpsesLooted[it] ?: 0)
+                    val count = (bucketData.corpsesLooted[it] ?: 0)
                     val totalPrice = (price * count)
                     if (totalPrice > 0) {
                         keyCostStrings.addIfNotNull("§7${count}x $keyName§7: §c-${totalPrice.shortFormat()}")
@@ -98,16 +99,18 @@ object CorpseTracker {
                     }
                 }
             }
-            val keyFormat = "§7${totalKeyCount}x ${if (applicableKeys.count() == 1) applicableKeys.first() else "§eCorpse Keys"}§7: §c-${totalKeyCost.shortFormat()}"
-            addAsSingletonList(
-                if (applicableKeys.count() == 1) Renderable.string(keyFormat)
-                else Renderable.hoverTips(
-                    keyFormat,
-                    keyCostStrings
+            if (totalKeyCount > 0) {
+                val keyFormat = "§7${totalKeyCount}x ${if (applicableKeys.count() == 1) applicableKeys.first() else "§eCorpse Keys"}§7: §c-${totalKeyCost.shortFormat()}"
+                addAsSingletonList(
+                    if (applicableKeys.count() == 1) Renderable.string(keyFormat)
+                    else Renderable.hoverTips(
+                        keyFormat,
+                        keyCostStrings
+                    )
                 )
-            )
+            }
 
-            addAsSingletonList(tracker.addTotalProfit(profit, data.corpseCount, "loot"))
+            addAsSingletonList(tracker.addTotalProfit(profit, bucketData.corpseCount, "loot"))
         }
 
         tracker.addPriceFromButton(this)
@@ -121,7 +124,7 @@ object CorpseTracker {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland == IslandType.MINESHAFT) {
+        if (event.newIsland == IslandType.MINESHAFT || event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
         }
     }
@@ -131,5 +134,5 @@ object CorpseTracker {
     }
 
     fun isEnabled() =
-        config.enabled && IslandType.MINESHAFT.isInIsland() && (!config.onlyInMineshaft || LorenzUtils.skyBlockArea == "Glacite Mineshafts")
+        config.enabled && IslandType.DWARVEN_MINES.isInIsland() && (!config.onlyInMineshaft || IslandType.MINESHAFT.isInIsland())
 }

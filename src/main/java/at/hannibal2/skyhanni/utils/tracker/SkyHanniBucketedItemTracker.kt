@@ -38,8 +38,8 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
             it.addItem(bucket, internalName, amount)
         }
         getSharedTracker()?.let {
-            val hidden = it.get(DisplayMode.TOTAL).getItems(bucket)[internalName]!!.hidden
-            it.get(DisplayMode.SESSION).getItems(bucket)[internalName]!!.hidden = hidden
+            val hidden = it.get(DisplayMode.TOTAL).getItemsProp()[internalName]!!.hidden
+            it.get(DisplayMode.SESSION).getItemsProp()[internalName]!!.hidden = hidden
         }
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
@@ -66,20 +66,25 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
     }
 
     fun addBucketSelectors(data: Data) = buildList {
-        val bucket = data.selectedBucket
-        addAsSingletonList(
-            Renderable.optionalLink(
-                if (bucket == null) "§7§l[§r §n§aAll§r §7§l]" else "§aAll",
-                { data.selectedBucket = null; update() }
-            ) { bucket != null }
-        )
-        data.getPoppedBuckets().chunked(3).forEach { bucketChunk ->
-            add(bucketChunk.map {
-                Renderable.optionalLink(
-                    if (bucket == it) "§7§l[§r §n$it§r §7§l]" else it.toString(),
-                    { data.selectedBucket = it; update() }
-                ) { bucket != it }
-            })
+        if (isInventoryOpen()) {
+            val bucket = data.selectedBucket
+            add(
+                listOf(
+                    Renderable.string("§7Loot source: "),
+                    Renderable.optionalLink(
+                        if (bucket == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
+                        { data.selectBucket(null); update() }
+                    ) { bucket != null && isInventoryOpen() },
+                )
+            )
+            data.getPoppedBuckets().chunked(3).forEach { bucketChunk ->
+                add(bucketChunk.map {
+                    Renderable.optionalLink(
+                        if (bucket == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
+                        { data.selectBucket(it); update() }
+                    ) { bucket != it }
+                })
+            }
         }
     }
 
@@ -88,10 +93,10 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
         filter: (NEUInternalName) -> Boolean,
         lists: MutableList<List<Any>>,
     ): Double {
-        val bucket = data.selectedBucket
         var profit = 0.0
+        val dataItems = data.getItemsProp()
         val items = mutableMapOf<NEUInternalName, Long>()
-        for ((internalName, itemProfit) in data.getItems(bucket)) {
+        for ((internalName, itemProfit) in dataItems) {
             if (!filter(internalName)) continue
 
             val amount = itemProfit.totalAmount
@@ -112,7 +117,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
         var pos = 0
         val hiddenItemTexts = mutableListOf<String>()
         for ((internalName, price) in items.sortedDesc()) {
-            val itemProfit = data.getItems(bucket)[internalName] ?: error("Item not found for $internalName")
+            val itemProfit = data.getItemsProp()[internalName] ?: error("Item not found for $internalName")
 
             val amount = itemProfit.totalAmount
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
@@ -148,11 +153,11 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
                 displayName, lore,
                 onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
-                        data.removeItem(bucket, internalName)
-                        ChatUtils.chat("Removed $cleanName §efrom $name${if (bucket != null) "($bucket)" else ""}.")
+                        data.removeItem(data.selectedBucket, internalName)
+                        ChatUtils.chat("Removed $cleanName §efrom $name${if (data.selectedBucket != null) " (${data.selectedBucket})" else ""}")
                     } else {
                         modify {
-                            it.toggleItemHide(bucket, internalName)
+                            it.toggleItemHide(data.selectedBucket, internalName)
                         }
                     }
                     update()

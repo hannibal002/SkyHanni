@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.mining.mineshaft
+package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 

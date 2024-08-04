@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import com.google.gson.annotations.Expose
 
 abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
@@ -13,20 +14,21 @@ abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
 
     abstract fun getDescription(bucket: E?, timesGained: Long): List<String>
 
-    abstract fun getCoinName(item: ItemTrackerData.TrackedItem): String
+    abstract fun getCoinName(item: TrackedItem): String
 
-    abstract fun getCoinDescription(item: ItemTrackerData.TrackedItem): List<String>
+    abstract fun getCoinDescription(item: TrackedItem): List<String>
 
     open fun getCustomPricePer(internalName: NEUInternalName) = SkyHanniTracker.getPricePer(internalName)
 
     override fun reset() {
         bucketedItems.clear()
+        selectedBucket = null
         resetItems()
     }
 
     fun addItem(bucket: E, internalName: NEUInternalName, stackSize: Int) {
         val bucketMap = bucketedItems.getOrPut(bucket) { HashMap() }
-        val item = bucketMap.getOrPut(internalName) { ItemTrackerData.TrackedItem() }
+        val item = bucketMap.getOrPut(internalName) { TrackedItem() }
 
         item.timesGained++
         item.totalAmount += stackSize
@@ -49,25 +51,33 @@ abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
         }
     }
 
-    fun getItems(bucket: E? = null): MutableMap<NEUInternalName, ItemTrackerData.TrackedItem> = bucket?.let { return bucketedItems[bucket] ?: HashMap() } ?: items
     fun getPoppedBuckets(): MutableList<E> = bucketedItems.filter { it.value.isNotEmpty() }.keys.toMutableList()
+    fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = selectedBucket?.let {
+        return bucketedItems[selectedBucket] ?: HashMap()
+    } ?: flattenBuckets()
 
     @Expose
     var selectedBucket: E? = null
+    fun selectBucket(type: E?) { selectedBucket = type }
 
     @Expose
-    var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, ItemTrackerData.TrackedItem>> = HashMap()
+    var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
-    @Expose
-    var items: MutableMap<NEUInternalName, ItemTrackerData.TrackedItem> =
-        bucketedItems.values.flatMap { it.entries }.groupBy({ it.key }, { it.value })
-        .mapValues { (_, valueList) ->
-            ItemTrackerData.TrackedItem().apply {
-                timesGained = valueList.filterNot { it.hidden }.sumOf { it.timesGained }
-                totalAmount = valueList.filterNot { it.hidden }.sumOf { it.totalAmount }
-                hidden = false
-                lastTimeUpdated = valueList.filterNot { it.hidden }.maxByOrNull { it.lastTimeUpdated } ?.lastTimeUpdated
-                    ?: SimpleTimeMark.farPast()
+    private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {
+        val flatMap: MutableMap<NEUInternalName, TrackedItem> = HashMap()
+        getPoppedBuckets().forEach { bucket ->
+            val entryMap: MutableMap<NEUInternalName, TrackedItem> = bucketedItems[bucket] ?: HashMap()
+            entryMap.forEach { (key, value) ->
+                flatMap.merge(key, value) { existing, new ->
+                    existing.apply {
+                        hidden = false
+                        totalAmount += new.totalAmount
+                        timesGained += new.timesGained
+                        lastTimeUpdated = maxOf(lastTimeUpdated, new.lastTimeUpdated)
+                    }
+                }
             }
-        }.filter { it.value.timesGained > 0 && it.value.totalAmount > 0 } .toMutableMap()
+        }
+        return flatMap
+    }
 }
