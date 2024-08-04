@@ -10,4 +10,6 @@ enum class CorpseType(val displayName: String, private val keyName: String? = nu
     ;
 
     val key by lazy { keyName?.asInternalName() }
+
+    override fun toString(): String = displayName
 }

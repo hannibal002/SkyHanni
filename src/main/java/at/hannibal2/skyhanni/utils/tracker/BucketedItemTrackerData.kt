@@ -11,7 +11,7 @@ abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
 
     abstract fun resetItems()
 
-    abstract fun getDescription(timesGained: Long): List<String>
+    abstract fun getDescription(bucket: E?, timesGained: Long): List<String>
 
     abstract fun getCoinName(item: ItemTrackerData.TrackedItem): String
 

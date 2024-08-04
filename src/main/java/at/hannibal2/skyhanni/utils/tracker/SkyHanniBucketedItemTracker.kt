@@ -85,10 +85,10 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
 
     fun drawItems(
         data: Data,
-        bucket: E?,
         filter: (NEUInternalName) -> Boolean,
         lists: MutableList<List<Any>>,
     ): Double {
+        val bucket = data.selectedBucket
         var profit = 0.0
         val items = mutableMapOf<NEUInternalName, Long>()
         for ((internalName, itemProfit) in data.getItems(bucket)) {
@@ -180,7 +180,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
         if (internalName == SKYBLOCK_COIN) {
             addAll(data.getCoinDescription(item))
         } else {
-            addAll(data.getDescription(item.timesGained))
+            addAll(data.getDescription(data.selectedBucket, item.timesGained))
         }
         add("")
         if (newDrop) {
