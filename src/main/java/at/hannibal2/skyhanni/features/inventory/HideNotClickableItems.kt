@@ -330,7 +330,7 @@ object HideNotClickableItems {
 
         showGreenLine = true
 
-        if (ItemUtils.hasAttributes(stack)) return false
+        if (stack.hasAttributes()) return false
 
         hideReason = "This item has no attributes!"
         return true

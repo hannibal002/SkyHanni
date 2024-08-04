@@ -151,6 +151,8 @@ object SkyBlockItemModifierUtils {
             }.sortedBy { it.first }
         }
 
+    fun ItemStack.hasAttributes() = getAttributes() != null
+
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
