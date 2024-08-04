@@ -50,14 +50,24 @@ abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
     }
 
     fun getItems(bucket: E? = null): MutableMap<NEUInternalName, ItemTrackerData.TrackedItem> = bucket?.let { return bucketedItems[bucket] ?: HashMap() } ?: items
-    fun getBucketItems(bucket: E) = bucketedItems[bucket] ?: HashMap()
     fun getPoppedBuckets(): MutableList<E> = bucketedItems.filter { it.value.isNotEmpty() }.keys.toMutableList()
 
-    abstract var selectedBucket: E?
+    @Expose
+    var selectedBucket: E? = null
 
     @Expose
     var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, ItemTrackerData.TrackedItem>> = HashMap()
 
     @Expose
-    var items: MutableMap<NEUInternalName, ItemTrackerData.TrackedItem> = bucketedItems.flatMap { it.value.entries }.associate { it.toPair() }.toMutableMap()
+    var items: MutableMap<NEUInternalName, ItemTrackerData.TrackedItem> =
+        bucketedItems.values.flatMap { it.entries }.groupBy({ it.key }, { it.value })
+        .mapValues { (_, valueList) ->
+            ItemTrackerData.TrackedItem().apply {
+                timesGained = valueList.filterNot { it.hidden }.sumOf { it.timesGained }
+                totalAmount = valueList.filterNot { it.hidden }.sumOf { it.totalAmount }
+                hidden = false
+                lastTimeUpdated = valueList.filterNot { it.hidden }.maxByOrNull { it.lastTimeUpdated } ?.lastTimeUpdated
+                    ?: SimpleTimeMark.farPast()
+            }
+        }.filter { it.value.timesGained > 0 && it.value.totalAmount > 0 } .toMutableMap()
 }

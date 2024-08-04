@@ -70,14 +70,14 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
         addAsSingletonList(
             Renderable.optionalLink(
                 if (bucket == null) "§7§l[§r §n§aAll§r §7§l]" else "§aAll",
-                { data.selectedBucket = null }
+                { data.selectedBucket = null; update() }
             ) { bucket != null }
         )
         data.getPoppedBuckets().chunked(3).forEach { bucketChunk ->
             add(bucketChunk.map {
                 Renderable.optionalLink(
                     if (bucket == it) "§7§l[§r §n$it§r §7§l]" else it.toString(),
-                    { data.selectedBucket = it }
+                    { data.selectedBucket = it; update() }
                 ) { bucket != it }
             })
         }
