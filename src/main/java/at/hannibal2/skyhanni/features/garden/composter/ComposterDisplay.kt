@@ -55,7 +55,7 @@ object ComposterDisplay {
 
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
-        if (!(config.displayEnabled && GardenAPI.inGarden())) return
+        if (!GardenAPI.inGarden()) return
         if (!event.isWidget(TabWidget.COMPOSTER)) return
 
         readData(event.lines)
@@ -68,6 +68,7 @@ object ComposterDisplay {
     }
 
     private fun updateDisplay() {
+        if (!config.displayEnabled) return
         val newDisplay = mutableListOf<List<Any>>()
         newDisplay.addAsSingletonList("§bComposter")
 
