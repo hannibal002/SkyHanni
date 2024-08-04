@@ -66,7 +66,7 @@ object MiningAPI {
 
     private var lastSkyblockArea: String? = null
 
-    private val recentlyClicked = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
+    private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
     private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
     private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
@@ -115,7 +115,7 @@ object MiningAPI {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
-        recentlyClicked += event.position to SimpleTimeMark.now()
+        recentClickedBlocks += event.position to SimpleTimeMark.now()
     }
 
     @SubscribeEvent
@@ -142,7 +142,7 @@ object MiningAPI {
         if (waitingForInitSound) {
             if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
-                if (recentlyClicked.none { it.first == pos }) return
+                if (recentClickedBlocks.none { it.first == pos }) return
                 waitingForInitSound = false
                 waitingForInitBlock = true
                 waitingForInitBlockPos = event.location.roundLocationToBlock()
@@ -197,7 +197,7 @@ object MiningAPI {
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 20 seconds to mine a single block, congrats
-        recentlyClicked.removeIf { it.second.passedSince() >= 20.seconds }
+        recentClickedBlocks.removeIf { it.second.passedSince() >= 20.seconds }
         surroundingMinedBlocks.removeIf { it.first.time.passedSince() >= 20.seconds }
 
         if (waitingForInitSound) return
@@ -209,7 +209,7 @@ object MiningAPI {
 
         val originalBlock = surroundingMinedBlocks.firstOrNull { it.first.confirmed }?.first ?: run {
             surroundingMinedBlocks.clear()
-            recentlyClicked.clear()
+            recentClickedBlocks.clear()
             return
         }
 
@@ -218,14 +218,14 @@ object MiningAPI {
         OreMinedEvent(originalBlock.ore, extraBlocks).post()
 
         surroundingMinedBlocks.clear()
-        recentlyClicked.removeIf { it.second.passedSince() >= originalBlock.time.passedSince() }
+        recentClickedBlocks.removeIf { it.second.passedSince() >= originalBlock.time.passedSince() }
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
-        recentlyClicked.clear()
+        recentClickedBlocks.clear()
         surroundingMinedBlocks.clear()
         currentAreaOreBlocks = setOf()
         resetOreEvent()
@@ -259,7 +259,7 @@ object MiningAPI {
             add("waitingForInitBlockPos: $waitingForInitBlockPos")
             add("waitingForEffMinerSound: $waitingForEffMinerSound")
             add("waitingForEffMinerBlock: $waitingForEffMinerBlock")
-            add("recentlyClickedBlocks: ${recentlyClicked.joinToString { "(${it.first.toCleanString()}" }}")
+            add("recentlyClickedBlocks: ${recentClickedBlocks.joinToString { "(${it.first.toCleanString()}" }}")
         }
     }
 
