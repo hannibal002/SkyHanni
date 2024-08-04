@@ -81,7 +81,7 @@ object CorpseTracker {
         var profit = tracker.drawItems(bucketData, { true }, this)
 
         if (bucketData.corpseCount > 0) {
-            val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let { listOf(it) } ?: CorpseType.entries
+            val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let { listOf(it) } ?: enumValues<CorpseType>().toList()
             val keyCostStrings: List<String> = mutableListOf()
             var totalKeyCost = 0.0
             var totalKeyCount = 0

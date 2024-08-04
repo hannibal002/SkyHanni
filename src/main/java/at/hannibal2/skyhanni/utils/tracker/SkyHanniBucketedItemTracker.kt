@@ -73,15 +73,15 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
                     Renderable.string("§7Loot source: "),
                     Renderable.optionalLink(
                         if (bucket == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
-                        { data.selectBucket(null); update() }
-                    ) { bucket != null && isInventoryOpen() },
+                        { data.selectBucket(null); update(); }
+                    ) { bucket != null },
                 )
             )
             data.getPoppedBuckets().chunked(3).forEach { bucketChunk ->
                 add(bucketChunk.map {
                     Renderable.optionalLink(
                         if (bucket == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
-                        { data.selectBucket(it); update() }
+                        { data.selectBucket(it) }
                     ) { bucket != it }
                 })
             }
