@@ -18,12 +18,12 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.seconds
 
-class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>(
+class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
     name: String,
-    createNewSession: () -> Data,
-    getStorage: (ProfileSpecificStorage) -> Data,
-    drawDisplay: (Data) -> List<List<Any>>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
+    createNewSession: () -> BucketedData,
+    getStorage: (ProfileSpecificStorage) -> BucketedData,
+    drawDisplay: (BucketedData) -> List<List<Any>>,
+) : SkyHanniTracker<BucketedData>(name, createNewSession, getStorage, drawDisplay) {
 
     companion object {
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
@@ -65,7 +65,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
         }
     }
 
-    fun addBucketSelectors(data: Data) = buildList {
+    fun addBucketSelectors(data: BucketedData) = buildList {
         if (isInventoryOpen()) {
             val bucket = data.selectedBucket
             add(
@@ -81,7 +81,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
                 add(bucketChunk.map {
                     Renderable.optionalLink(
                         if (bucket == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
-                        { data.selectBucket(it) }
+                        { data.selectBucket(it); update(); }
                     ) { bucket != it }
                 })
             }
@@ -89,7 +89,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
     }
 
     fun drawItems(
-        data: Data,
+        data: BucketedData,
         filter: (NEUInternalName) -> Boolean,
         lists: MutableList<List<Any>>,
     ): Double {
@@ -176,7 +176,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, Data : BucketedItemTrackerData<E>>
     }
 
     private fun buildLore(
-        data: Data,
+        data: BucketedData,
         item: ItemTrackerData.TrackedItem,
         hidden: Boolean,
         newDrop: Boolean,

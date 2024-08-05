@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -56,8 +57,7 @@ object CorpseTracker {
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = EnumMap(CorpseType::class.java)
 
-        @Expose
-        var corpseCount: Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.sumAllValues().toLong()
+        fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }
 
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
@@ -80,25 +80,28 @@ object CorpseTracker {
 
         var profit = tracker.drawItems(bucketData, { true }, this)
 
-        if (bucketData.corpseCount > 0) {
-            val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let { listOf(it) } ?: enumValues<CorpseType>().toList()
-            val keyCostStrings: List<String> = mutableListOf()
+        if (bucketData.getCorpseCount() > 0) {
+            val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let { listOf(it) }
+                ?: enumValues<CorpseType>().toList().filter { bucketData.corpsesLooted[it] != null }
             var totalKeyCost = 0.0
             var totalKeyCount = 0
-            applicableKeys.forEach {
-                it.key?.let { key ->
-                    val keyName = key.itemName
-                    val price = key.getPrice()
-                    val count = (bucketData.corpsesLooted[it] ?: 0)
-                    val totalPrice = (price * count)
-                    if (totalPrice > 0) {
-                        keyCostStrings.addIfNotNull("§7${count}x $keyName§7: §c-${totalPrice.shortFormat()}")
-                        profit -= totalPrice
-                        totalKeyCost += totalPrice
-                        totalKeyCount += count.toInt()
+            val keyCostStrings = buildList {
+                applicableKeys.forEach { keyData ->
+                    keyData.key?.let { key ->
+                        val keyName = key.itemName
+                        val price = key.getPrice()
+                        val count = bucketData.corpsesLooted[keyData] ?: 0
+                        val totalPrice = price * count
+                        if (totalPrice > 0) {
+                            profit -= totalPrice
+                            totalKeyCost += totalPrice
+                            totalKeyCount += count.toInt()
+                            add("§7${count}x $keyName§7: §c-${totalPrice.shortFormat()}")
+                        }
                     }
                 }
             }
+
             if (totalKeyCount > 0) {
                 val keyFormat = "§7${totalKeyCount}x ${if (applicableKeys.count() == 1) applicableKeys.first() else "§eCorpse Keys"}§7: §c-${totalKeyCost.shortFormat()}"
                 addAsSingletonList(
@@ -110,7 +113,7 @@ object CorpseTracker {
                 )
             }
 
-            addAsSingletonList(tracker.addTotalProfit(profit, bucketData.corpseCount, "loot"))
+            addAsSingletonList(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
         }
 
         tracker.addPriceFromButton(this)
