@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import kotlin.time.Duration.Companion.seconds
 
-class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
+class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
     name: String,
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
@@ -60,7 +60,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTracker
                 onChange = {
                     config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update()
-                }
+                },
             )
         }
     }
@@ -72,17 +72,19 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTracker
                     Renderable.string("§7Loot source: "),
                     Renderable.optionalLink(
                         if (data.getSelectedBucket() == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
-                        { data.selectBucket(null); update(); }
+                        { data.selectBucket(null); update(); },
                     ) { data.getSelectedBucket() != null },
-                )
+                ),
             )
             data.getPoppedBuckets().chunked(3).forEach { bucketChunk ->
-                add(bucketChunk.map {
-                    Renderable.optionalLink(
-                        if (data.getSelectedBucket() == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
-                        { data.selectBucket(it); update(); }
-                    ) { data.getSelectedBucket() != it }
-                })
+                add(
+                    bucketChunk.map {
+                        Renderable.optionalLink(
+                            if (data.getSelectedBucket() == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
+                            { data.selectBucket(it); update(); },
+                        ) { data.getSelectedBucket() != it }
+                    },
+                )
             }
         }
     }
@@ -161,7 +163,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTracker
                     }
                     update()
 
-                }
+                },
             ) else Renderable.string(displayName)
 
             lists.addAsSingletonList(renderable)

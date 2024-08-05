@@ -57,7 +57,7 @@ abstract class ItemTrackerData : TrackerData() {
             timesGained: Long = this.timesGained,
             totalAmount: Long = this.totalAmount,
             hidden: Boolean = this.hidden,
-            lastTimeUpdated: SimpleTimeMark = this.lastTimeUpdated
+            lastTimeUpdated: SimpleTimeMark = this.lastTimeUpdated,
         ): TrackedItem {
             val copy = TrackedItem()
             copy.timesGained = timesGained

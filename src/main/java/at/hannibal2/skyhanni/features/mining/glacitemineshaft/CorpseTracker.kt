@@ -34,14 +34,14 @@ object CorpseTracker {
         { it.mining.mineshaft.corpseProfitTracker },
     ) { drawDisplay(it) }
 
-    class BucketData: BucketedItemTrackerData<CorpseType>() {
+    class BucketData : BucketedItemTrackerData<CorpseType>() {
         override fun resetItems() {
             corpsesLooted = EnumMap(CorpseType::class.java)
         }
 
         override fun getDescription(timesGained: Long): List<String> {
             val divisor = 1.coerceAtLeast(getSelectedBucket()?.let { corpsesLooted[it]?.toInt() } ?: corpsesLooted.sumAllValues().toInt())
-            val percentage = timesGained.toDouble() /  divisor
+            val percentage = timesGained.toDouble() / divisor
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
@@ -107,8 +107,8 @@ object CorpseTracker {
                     if (applicableKeys.count() == 1) Renderable.string(keyFormat)
                     else Renderable.hoverTips(
                         keyFormat,
-                        keyCostStrings
-                    )
+                        keyCostStrings,
+                    ),
                 )
             }
 

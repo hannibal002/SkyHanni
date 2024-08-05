@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 
-abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
+abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
 
     private val config get() = SkyHanniMod.feature.misc.tracker
 
@@ -57,7 +57,8 @@ abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
     fun getPoppedBuckets(): MutableList<E> = (bucketedItems.toMutableMap().filter { it.value.isNotEmpty() }.keys).toMutableList()
     fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let { getBucket(it) } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
-    fun selectBucket(type: E?) { selectedBucket = type; }
+    fun selectBucket(type: E?) {
+        selectedBucket = type; }
 
     private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {
         val flatMap: MutableMap<NEUInternalName, TrackedItem> = HashMap()
@@ -68,7 +69,7 @@ abstract class BucketedItemTrackerData<E: Enum<E>> : TrackerData() {
                         hidden = false,
                         totalAmount = existing.totalAmount + new.totalAmount,
                         timesGained = existing.timesGained + new.timesGained,
-                        lastTimeUpdated = maxOf(existing.lastTimeUpdated, new.lastTimeUpdated)
+                        lastTimeUpdated = maxOf(existing.lastTimeUpdated, new.lastTimeUpdated),
                     )
                 }
             }
