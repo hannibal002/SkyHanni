@@ -43,7 +43,7 @@ object CorpseAPI {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        //if (!IslandType.MINESHAFT.isInIsland()) return
+        if (!IslandType.MINESHAFT.isInIsland()) return
 
         val message = event.message
 
