@@ -65,11 +65,11 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         }
     }
 
-    fun addBucketSelectors(data: BucketedData) = buildList {
+    fun addBucketSelectors(data: BucketedData, sourceString: String = "") = buildList {
         if (isInventoryOpen()) {
             add(
                 listOf(
-                    Renderable.string("§7Loot source: "),
+                    Renderable.string("§7${if (sourceString != "") sourceString else "Item source"}: "),
                     Renderable.optionalLink(
                         if (data.getSelectedBucket() == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
                         { data.selectBucket(null); update(); },
