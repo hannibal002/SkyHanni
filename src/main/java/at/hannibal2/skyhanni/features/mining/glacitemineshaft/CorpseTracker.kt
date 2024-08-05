@@ -7,9 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -41,8 +39,8 @@ object CorpseTracker {
             corpsesLooted = EnumMap(CorpseType::class.java)
         }
 
-        override fun getDescription(bucket: CorpseType?, timesGained: Long): List<String> {
-            val divisor = 1.coerceAtLeast(bucket?.let { corpsesLooted[bucket]?.toInt() } ?: corpsesLooted.sumAllValues().toInt())
+        override fun getDescription(timesGained: Long): List<String> {
+            val divisor = 1.coerceAtLeast(getSelectedBucket()?.let { corpsesLooted[it]?.toInt() } ?: corpsesLooted.sumAllValues().toInt())
             val percentage = timesGained.toDouble() /  divisor
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
@@ -57,7 +55,7 @@ object CorpseTracker {
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = EnumMap(CorpseType::class.java)
 
-        fun getCorpseCount(): Long = selectedBucket?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
+        fun getCorpseCount(): Long = getSelectedBucket()?.let { corpsesLooted[it] } ?: corpsesLooted.values.sum()
     }
 
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
@@ -81,7 +79,7 @@ object CorpseTracker {
         var profit = tracker.drawItems(bucketData, { true }, this)
 
         if (bucketData.getCorpseCount() > 0) {
-            val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let { listOf(it) }
+            val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) }
                 ?: enumValues<CorpseType>().toList().filter { bucketData.corpsesLooted[it] != null }
             var totalKeyCost = 0.0
             var totalKeyCount = 0

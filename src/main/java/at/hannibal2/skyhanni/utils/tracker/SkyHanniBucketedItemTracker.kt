@@ -67,22 +67,21 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTracker
 
     fun addBucketSelectors(data: BucketedData) = buildList {
         if (isInventoryOpen()) {
-            val bucket = data.selectedBucket
             add(
                 listOf(
                     Renderable.string("§7Loot source: "),
                     Renderable.optionalLink(
-                        if (bucket == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
+                        if (data.getSelectedBucket() == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
                         { data.selectBucket(null); update(); }
-                    ) { bucket != null },
+                    ) { data.getSelectedBucket() != null },
                 )
             )
             data.getPoppedBuckets().chunked(3).forEach { bucketChunk ->
                 add(bucketChunk.map {
                     Renderable.optionalLink(
-                        if (bucket == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
+                        if (data.getSelectedBucket() == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
                         { data.selectBucket(it); update(); }
-                    ) { bucket != it }
+                    ) { data.getSelectedBucket() != it }
                 })
             }
         }
@@ -153,11 +152,11 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTracker
                 displayName, lore,
                 onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
-                        data.removeItem(data.selectedBucket, internalName)
-                        ChatUtils.chat("Removed $cleanName §efrom $name${if (data.selectedBucket != null) " (${data.selectedBucket})" else ""}")
+                        data.removeItem(data.getSelectedBucket(), internalName)
+                        ChatUtils.chat("Removed $cleanName §efrom $name${if (data.getSelectedBucket() != null) " (${data.getSelectedBucket()})" else ""}")
                     } else {
                         modify {
-                            it.toggleItemHide(data.selectedBucket, internalName)
+                            it.toggleItemHide(data.getSelectedBucket(), internalName)
                         }
                     }
                     update()
@@ -185,7 +184,7 @@ class SkyHanniBucketedItemTracker<E: Enum<E>, BucketedData : BucketedItemTracker
         if (internalName == SKYBLOCK_COIN) {
             addAll(data.getCoinDescription(item))
         } else {
-            addAll(data.getDescription(data.selectedBucket, item.timesGained))
+            addAll(data.getDescription(item.timesGained))
         }
         add("")
         if (newDrop) {
