@@ -103,7 +103,8 @@ object CorpseTracker {
             }
 
             if (totalKeyCount > 0) {
-                val keyFormat = "§7${totalKeyCount}x ${if (applicableKeys.count() == 1) applicableKeys.first() else "§eCorpse Keys"}§7: §c-${totalKeyCost.shortFormat()}"
+                val specificKeyFormat = if (applicableKeys.count() == 1) "${applicableKeys.first()} §eKey" else "§eCorpse Keys"
+                val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
                 addAsSingletonList(
                     if (applicableKeys.count() == 1) Renderable.string(keyFormat)
                     else Renderable.hoverTips(
