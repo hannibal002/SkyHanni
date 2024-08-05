@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
-import scala.tools.nsc.backend.jvm.BCodeTypes.Tracked
 
 abstract class ItemTrackerData : TrackerData() {
 
