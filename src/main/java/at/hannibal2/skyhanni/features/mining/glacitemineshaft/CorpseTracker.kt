@@ -74,7 +74,7 @@ object CorpseTracker {
 
     private fun drawDisplay(bucketData: BucketData): List<List<Any>> = buildList {
         addAsSingletonList("§b§lGlacite Corpse Profit Tracker")
-        addAll(tracker.addBucketSelectors(bucketData, "Corpse type"))
+        addAll(tracker.addBucketSelectors(bucketData, "Corpse Type"))
 
         var profit = tracker.drawItems(bucketData, { true }, this)
 

@@ -69,7 +69,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         if (isInventoryOpen()) {
             add(
                 listOf(
-                    Renderable.string("§7${if (sourceString != "") sourceString else "Item source"}: "),
+                    Renderable.string("§7${if (sourceString != "") sourceString else "Item Source"}: "),
                     Renderable.optionalLink(
                         if (data.getSelectedBucket() == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
                         { data.selectBucket(null); update(); },
