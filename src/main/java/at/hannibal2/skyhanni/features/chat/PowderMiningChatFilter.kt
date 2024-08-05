@@ -19,6 +19,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -48,6 +50,14 @@ object PowderMiningChatFilter {
     private val successfulPickPattern by patternGroup.pattern(
         "warning.successpick",
         "§6You have successfully picked the lock on this chest!",
+    )
+
+    /**
+     * REGEX-TEST: §cThis chest has already been looted.
+     */
+    private val alreadyLootedPattern by patternGroup.pattern(
+        "warning.alreadylooted",
+        "§cThis chest has already been looted."
     )
 
     /**
@@ -247,6 +257,7 @@ object PowderMiningChatFilter {
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
         if (successfulPickPattern.matches(message)) return "powder_mining_picked"
+        if (alreadyLootedPattern.matches(message)) return "powder_mining_dupe"
         // Breaking power warning
         if (breakingPowerPattern.matches(message) && gemstoneConfig.strongerToolMessages) return "stronger_tool"
         // Closing or opening a reward 'loop' with the spam of ▬
@@ -256,6 +267,7 @@ object PowderMiningChatFilter {
         }
 
         if (!unclosedRewards) return null
+        if (message.removeColor().trim() == "") return "powder_mining_empty"
         if (lockPickedPattern.matches(message)) return "powder_chest_lockpicked"
         if (lootChestCollectedPattern.matches(message)) return "loot_chest_opened"
         if (rewardHeaderPattern.matches((message))) return "powder_reward_header"
@@ -263,7 +275,6 @@ object PowderMiningChatFilter {
         // All powder and loot chest rewards start with 4 spaces
         // To simplify regex statements, this check is done outside
         val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return null
-
         //Powder
         powderRewardPattern.matchMatcher(ssMessage) {
             if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
