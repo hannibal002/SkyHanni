@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.isTrackableMeal
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -37,10 +38,11 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!
      */
     val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "egg.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!",
+        "egg.foundblehhhhhhhh",
+        "§d§lHOPPITY'S HUNT §r§dYou found a §r(?:§.)*(?:Chocolate )?(?<meal>[\\w ]+) (?:§.)*Egg §r§d(?<note>.*)§r§d!",
     )
 
     /**
@@ -123,13 +125,15 @@ object HoppityEggsManager {
         }
 
         HoppityEggsCompactChat.handleChat(event)
+        HoppityAPI.handleChat(event)
 
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+        if (!HoppityAPI.isHoppityEvent()) return
 
         eggFoundPattern.matchMatcher(event.message) {
+            val meal = getEggType(event)
+            if (!isTrackableMeal(meal)) return
             HoppityEggLocations.saveNearestEgg()
             HoppityEggLocator.eggFound()
-            val meal = getEggType(event)
             val note = group("note").removeColor()
             meal.markClaimed()
             lastMeal = meal
@@ -141,7 +145,7 @@ object HoppityEggsManager {
             HoppityEggType.allFound()
 
             if (config.timeInChat) {
-                val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
+                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
                 ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
@@ -151,7 +155,7 @@ object HoppityEggsManager {
         eggAlreadyCollectedPattern.matchMatcher(event.message) {
             getEggType(event).markClaimed()
             if (config.timeInChat) {
-                val nextEgg = HoppityEggType.entries.minByOrNull { it.timeUntil() } ?: return
+                val nextEgg = HoppityEggType.resettingEntries.minByOrNull { it.timeUntil() } ?: return
                 ChatUtils.chat("§eNext egg available in §b${nextEgg.timeUntil().format()}§e.")
                 event.blockedReason = "hoppity_egg"
             }
@@ -222,7 +226,7 @@ object HoppityEggsManager {
         if (lastWarnTime.passedSince() < 1.minutes) return
 
         lastWarnTime = now()
-        val amount = HoppityEggType.entries.size
+        val amount = HoppityEggType.resettingEntries.size
         val message = "All $amount Hoppity Eggs are ready to be found!"
         if (config.warpUnclaimedEggs) {
             if (LorenzUtils.inSkyBlock) {
@@ -255,5 +259,5 @@ object HoppityEggsManager {
     }
 
     fun isActive() = (LorenzUtils.inSkyBlock || (LorenzUtils.onHypixel && config.showOutsideSkyblock)) &&
-        ChocolateFactoryAPI.isHoppityEvent()
+        HoppityAPI.isHoppityEvent()
 }

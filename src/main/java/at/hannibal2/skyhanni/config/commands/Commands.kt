@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -337,6 +338,10 @@ object Commands {
             "shtpinfested",
             "Teleports you to the nearest infested plot",
         ) { PestFinder.teleportNearestInfestedPlot() }
+        registerCommand(
+            "shhoppityprogress",
+            "Check your progress in the current Hoppity's Hunt event."
+        ) { HoppityEventSummary.sendProgressMessage() }
     }
 
     private fun usersBugFix() {
@@ -415,6 +420,10 @@ object Commands {
             "shresetpunchcard",
             "Resets the Rift Punchcard Artifact player list.",
         ) { PunchcardHighlight.clearList() }
+        registerCommand(
+            "shendhoppity",
+            "Simulates ending the current hoppity's event to send the event summary."
+        ) { HoppityEventSummary.forceEventEnd() }
     }
 
     private fun developersDebugFeatures() {

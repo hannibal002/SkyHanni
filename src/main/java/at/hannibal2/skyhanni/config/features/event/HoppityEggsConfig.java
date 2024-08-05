@@ -164,4 +164,11 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Event Summary", desc = "Show a summary of your event stats once it is over.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean eventSummary = true;
+
 }

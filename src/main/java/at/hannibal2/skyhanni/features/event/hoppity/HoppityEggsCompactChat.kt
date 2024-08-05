@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -24,6 +25,7 @@ object HoppityEggsCompactChat {
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
     private var rabbitBought = false
+    private var sideDishEgg = false
     private val config get() = ChocolateFactoryAPI.config
 
     fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
@@ -60,11 +62,14 @@ object HoppityEggsCompactChat {
         this.lastChatMeal = null
         this.lastDuplicateAmount = null
         this.rabbitBought = false
+        this.sideDishEgg = false
     }
 
     private fun createCompactMessage(): String {
         val mealName = lastChatMeal?.coloredName ?: ""
-        val mealNameFormatted = if (rabbitBought) "§aBought Rabbit" else "$mealName Egg"
+        val mealNameFormatted = if (rabbitBought) "§aBought Rabbit"
+            else if (sideDishEgg) "§6§lSide Dish §r§6Egg"
+            else "$mealName Egg"
 
         return if (duplicate) {
             val format = lastDuplicateAmount?.shortFormat() ?: "?"
@@ -83,6 +88,7 @@ object HoppityEggsCompactChat {
         HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
             resetCompactData()
             lastChatMeal = getEggType(event)
+            if (lastChatMeal == HoppityEggType.SIDE_DISH) sideDishEgg = true
             compactChat(event)
         }
 
@@ -94,12 +100,13 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
-            // The only case where "You found ..." will come in with more than 1 message,
-            // or empty for hoppityEggChat, is where the rabbit was purchased from hoppity
-            // in this case, we want to reset variables to a clean state during this capture,
+            // The only cases where "You found ..." will come in with more than 1 message,
+            // or empty for hoppityEggChat, is where the rabbit was purchased from hoppity,
+            // or when a Side Dish golden stray was found in the Chocolate Factory.
+            // In the case of buying, we want to reset variables to a clean state during this capture,
             // as the important capture for the purchased message is the final message in
             // the chain; "You found [rabbit]" -> "Dupe/New Rabbit" -> "You bought [rabbit]"
-            if (hoppityEggChat.isEmpty() || hoppityEggChat.size > 1) {
+            if ((hoppityEggChat.isEmpty() || hoppityEggChat.size > 1) && !sideDishEgg) {
                 resetCompactData()
             }
 
@@ -124,7 +131,7 @@ object HoppityEggsCompactChat {
         }
     }
 
-    fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.isNotEmpty()) {
+    fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.isNotEmpty() && !rabbitBought && !sideDishEgg) {
         val hover = hoppityEggChat.joinToString("\n") + " \n§eClick here to share the location of this chocolate egg with the server!"
         hoppityEggChat.clear()
         ChatUtils.clickableChat(

@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitRarity;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
@@ -29,7 +31,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker;
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUpgrade;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
@@ -43,6 +44,7 @@ import at.hannibal2.skyhanni.utils.GenericWrapper;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
+import at.hannibal2.skyhanni.utils.SkyBlockTime;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -663,4 +665,24 @@ public class ProfileSpecificStorage {
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
+
+    @Expose
+    public HoppityEventStatsStorage hoppityEventStats = new HoppityEventStatsStorage();
+
+    public static class HoppityEventStatsStorage {
+        @Expose
+        public int currentYear = 0;
+
+        @Expose
+        public Map<HoppityEggType, Integer> mealTypeMap = new HashMap<>();
+
+        @Expose
+        public Map<HoppityRabbitRarity, Integer> newRarityMap = new HashMap<>();
+
+        @Expose
+        public Map<HoppityRabbitRarity, Integer> dupeRarityMap = new HashMap<>();
+
+        @Expose
+        public long chocolateGained = 0;
+    }
 }
