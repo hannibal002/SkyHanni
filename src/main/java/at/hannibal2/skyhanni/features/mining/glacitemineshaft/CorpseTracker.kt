@@ -103,7 +103,7 @@ object CorpseTracker {
             }
 
             if (totalKeyCount > 0) {
-                val specificKeyFormat = if (applicableKeys.count() == 1) "${applicableKeys.first()} §eKey" else "§eCorpse Keys"
+                val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.itemName else "§eCorpse Keys"
                 val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
                 addAsSingletonList(
                     if (applicableKeys.count() == 1) Renderable.string(keyFormat)
