@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeSFormattingCode
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -275,6 +274,7 @@ object PowderMiningChatFilter {
         // All powder and loot chest rewards start with 4 spaces
         // To simplify regex statements, this check is done outside
         val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return null
+
         //Powder
         powderRewardPattern.matchMatcher(ssMessage) {
             if (config.powderFilterThreshold == 60000) return "powder_mining_powder"
