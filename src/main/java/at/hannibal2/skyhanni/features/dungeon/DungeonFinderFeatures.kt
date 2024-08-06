@@ -58,7 +58,6 @@ object DungeonFinderFeatures {
         "§7§7Note: §f(?<note>.*)"
     )
     /* 
-    REGEX-TESTS:
     * REGEX-TEST: The Catacombs
     * REGEX-TEST: Master Mode The Catacombs
     */
@@ -95,7 +94,6 @@ object DungeonFinderFeatures {
         "(Any)"
     )
     /* 
-    REGEX-TESTS:
     * REGEX-TEST: Master Mode The Catacombs
     * REGEX-TEST: The Catacombs
     */
