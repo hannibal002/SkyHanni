@@ -23,10 +23,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+    /*
+    * §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
+    * §f                        §r§cThe Catacombs §r§8- §r§eFloor VI
+    * §f                §r§cMaster Mode Catacombs §r§8- §r§eFloor II
+    */
     private val catacombsPattern by RepoPattern.pattern(
         "dungeon.end.chests.spawned",
-        "(?:§f)?( *)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
-    )
+        "(?:§f)?( *)§r§c(Master Mode )?The Catacombs §r§8- §r§eFloor (.*)"
+    ) 
 
     private var bossDone = false
     private var chestsSpawned = false
