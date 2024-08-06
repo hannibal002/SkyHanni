@@ -99,6 +99,7 @@ object DungeonFinderFeatures {
     REGEX-TESTS:
     * REGEX-TEST: Master Mode The Catacombs
     * REGEX-TEST: MM Catacombs
+    * REGEX-TEST: The Catacombs
     */
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
