@@ -59,7 +59,7 @@ object DungeonFinderFeatures {
     )
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM Catacombs).*"
+        "(The Catacombs).*|.*(Master Mode The Catacombs).*"
     )
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
@@ -91,7 +91,7 @@ object DungeonFinderFeatures {
     )
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
-        "(MM )|(.*Master Mode Catacombs)"
+        "(MM )|(.*Master Mode The Catacombs)"
     )
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
