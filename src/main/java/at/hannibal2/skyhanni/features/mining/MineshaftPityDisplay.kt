@@ -218,7 +218,8 @@ object MineshaftPityDisplay {
                 Renderable.string(
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
-            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e$sessionMineshafts")
+            MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.string("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}")
         )
 
         display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
@@ -268,7 +269,8 @@ object MineshaftPityDisplay {
         NEEDED_TO_PITY("§3Needed to pity:\n§7   <blocks>"),
         TIME_SINCE_MINESHAFT("§3Last Mineshaft: §e21m 5s", { !lastMineshaftSpawn.isFarPast() }),
         AVERAGE_BLOCKS_MINESHAFT("§3Average Blocks/Mineshaft: §e361.5", { mineshaftTotalCount != 0 }),
-        MINESHAFTS_SESSION("§3Mineshafts this session: §e3", { sessionMineshafts != 0 })
+        MINESHAFTS_TOTAL("§3Mineshafts total: §e23", { mineshaftTotalCount != 0 }),
+        MINESHAFTS_SESSION("§3Mineshafts this session: §e3", { sessionMineshafts != 0 }),
         ;
 
         override fun toString() = display
