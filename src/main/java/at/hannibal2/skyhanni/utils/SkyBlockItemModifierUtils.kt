@@ -168,6 +168,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.hasWoodSingularity() = getAttributeBoolean("wood_singularity_count")
 
+    fun ItemStack.hasDivanPowderCoating() = getAttributeBoolean("divan_powder_coating")
+
     fun ItemStack.hasArtOfWar() = getAttributeBoolean("art_of_war_count")
 
     // TODO untested
