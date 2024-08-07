@@ -16,22 +16,13 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object SplatterHearts {
-
-    private const val MAX_HEARTS = 4
-    private var currentMax = 0
-
-    // TODO: add OwnMaxHealthUpdateEvent
-    // use that to detect when the thing happens
-
     private var lastHearts = SimpleTimeMark.farPast()
     private var lastSpawn = SimpleTimeMark.farPast()
 
     private var spawning = false
-    private var spawned = 0
-
     private var currentIndex = 0
 
-    private data class SplatterHeart(val location: LorenzVec, var index: Int)
+    private data class SplatterHeart(var location: LorenzVec, var index: Int, val time: SimpleTimeMark = SimpleTimeMark.now())
 
     private val hearts = TimeLimitedSet<SplatterHeart>(1500.milliseconds)
 
@@ -45,10 +36,10 @@ object SplatterHearts {
             println("spawning: true")
             spawning = true
             currentIndex = 0
-            spawned = 0
             lastSpawn = SimpleTimeMark.now()
         }
-        if (spawning && (spawned >= MAX_HEARTS || lastSpawn.passedSince() > 1.seconds)) {
+
+        if (spawning && lastSpawn.passedSince() > 100.milliseconds) {
             spawning = false
             println("spawning: false [${lastSpawn.passedSince()}]")
         }
@@ -57,20 +48,24 @@ object SplatterHearts {
         lastHearts = SimpleTimeMark.now()
         val pos = event.location
 
-        if (spawning) {
-            ++spawned
-            hearts += SplatterHeart(pos, spawned)
-            println("added heart at $pos ($spawned) [${lastSpawn.passedSince()}]")
+        if (spawning && hearts.none { it.time.passedSince() > 2.seconds && it.location.distance(pos) < 0.5 }) {
+            hearts += SplatterHeart(pos, currentIndex)
+            println("added heart at ${pos.toCleanString()} ($currentIndex) [${lastSpawn.passedSince()}]")
         } else {
             val heart = hearts.apply { if (lastSpawn.passedSince() > 2.seconds) filter { it.location.distance(pos) < 0.2 } }
                 .minByOrNull { it.index }
                 ?: run {
-                    println("no heart found at $pos [${lastSpawn.passedSince()}]")
+                    println("no heart found at ${pos.toCleanString()} [${lastSpawn.passedSince()}]")
+                    println("        ${hearts.joinToString { "([${it.location.toCleanString()}], ${it.index}, ${it.time.passedSince()})" }}")
                     return
                 }
-            hearts -= heart
-            hearts += SplatterHeart(pos, currentIndex)
-            println("updated heart (${heart.location} -> $pos) (${heart.index} -> $currentIndex) [${lastSpawn.passedSince()}]")
+            val prevIndex = heart.index
+            with(heart) {
+                location = pos
+                index = currentIndex
+            }
+            hearts.update(heart)
+            println("updated heart (${heart.location.toCleanString()} -> $pos) (${prevIndex} -> $currentIndex) [${lastSpawn.passedSince()}]")
         }
     }
 
