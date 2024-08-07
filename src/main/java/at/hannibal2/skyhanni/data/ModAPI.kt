@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.events.modapi.HypixelHelloEvent
+import at.hannibal2.skyhanni.events.modapi.HypixelLocationChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.hypixel.modapi.HypixelModAPI
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
@@ -17,7 +18,14 @@ object ModAPI {
         }
 
         api.createHandler(ClientboundLocationPacket::class.java) { packet ->
-            packet.mode.getOrNull()
+            val newLocation = HypixelLocation(
+                packet.serverName,
+                packet.serverType.getOrNull(),
+                packet.lobbyName.getOrNull(),
+                packet.mode.getOrNull(),
+                packet.map.getOrNull()
+            )
+            HypixelLocationChangeEvent(newLocation).post()
         }
     }
 }

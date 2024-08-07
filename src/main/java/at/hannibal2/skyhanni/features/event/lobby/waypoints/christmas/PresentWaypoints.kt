@@ -91,7 +91,7 @@ object PresentWaypoints {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled() && config.onlyClosest && HypixelData.locrawData != null && closest == null) return
+        if (!isEnabled() && config.onlyClosest && closest == null) return
         val notFoundPresents = presentSet?.filterNot { it.isFound }
         if (notFoundPresents?.isEmpty() == true) return
         closest = notFoundPresents?.minByOrNull { it.position.distanceSqToPlayer() } ?: return

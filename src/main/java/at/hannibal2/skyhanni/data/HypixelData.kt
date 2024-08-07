@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.modapi.HypixelHelloEvent
+import at.hannibal2.skyhanni.events.modapi.HypixelLocationChangeEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -114,6 +115,7 @@ object HypixelData {
     private var hasScoreboardUpdated = false
 
     var hypixelEnvironment: Environment? = null
+    var hypixelLocation: HypixelLocation? = null
     val hypixelAlpha get() = hypixelEnvironment == Environment.BETA
     val hypixelLive get() = hypixelEnvironment == Environment.PRODUCTION
 
@@ -136,25 +138,15 @@ object HypixelData {
     var skyBlockArea: String? = null
     var skyBlockAreaWithSymbol: String? = null
 
-    // Data from locraw
-    var locrawData: JsonObject? = null
-    private var locraw: MutableMap<String, String> = listOf(
-        "server",
-        "gametype",
-        "lobbyname",
-        "lobbytype",
-        "mode",
-        "map",
-    ).associateWith { "" }.toMutableMap()
+    val server get() = hypixelLocation?.serverName ?: ""
+    val lobbyType get() = hypixelLocation?.lobbyName?.let {
+        lobbyTypePattern.matchMatcher(it) { group("lobbyType") }
+    } ?: ""
+    val mode get() = hypixelLocation?.mode ?: ""
+    val map get() = hypixelLocation?.map ?: ""
 
-    val server get() = locraw["server"] ?: ""
-    val gameType get() = locraw["gametype"] ?: ""
-    val lobbyName get() = locraw["lobbyname"] ?: ""
-    val lobbyType get() = locraw["lobbytype"] ?: ""
-    val mode get() = locraw["mode"] ?: ""
-    val map get() = locraw["map"] ?: ""
-
-    fun checkCurrentServerId() {
+    // TODO: replace with parsing the HypixelLocation server property
+    private fun checkCurrentServerId() {
         if (!LorenzUtils.inSkyBlock) return
         if (serverId != null) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
@@ -221,42 +213,13 @@ object HypixelData {
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
     private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-    //todo convert to proper json object
-    fun checkForLocraw(message: String) {
-        jsonBracketPattern.matchMatcher(message.removeColor()) {
-            try {
-                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
-                if (obj.has("server")) {
-                    locrawData = obj
-                    for (key in locraw.keys) {
-                        locraw[key] = obj[key]?.asString ?: ""
-                    }
-                    inLimbo = locraw["server"] == "limbo"
-                    inLobby = locraw["lobbyname"] != ""
-
-                    if (inLobby) {
-                        locraw["lobbyname"]?.let {
-                            lobbyTypePattern.matchMatcher(it) {
-                                locraw["lobbytype"] = group("lobbyType")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
-            }
-        }
-    }
-
     private var loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        locrawData = null
         skyBlock = false
         inLimbo = false
         inLobby = false
-        locraw.forEach { locraw[it.key] = "" }
         joinedWorld = SimpleTimeMark.now()
         serverId = null
         skyBlockArea = null
@@ -266,10 +229,9 @@ object HypixelData {
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         hypixelEnvironment = null
+        hypixelLocation = null
         skyBlock = false
         inLobby = false
-        locraw.forEach { locraw[it.key] = "" }
-        locrawData = null
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
         hasScoreboardUpdated = false
@@ -314,9 +276,6 @@ object HypixelData {
     // TODO rewrite everything in here
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) {
-            checkNEULocraw()
-        }
 
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
@@ -345,21 +304,6 @@ object HypixelData {
         skyBlock = inSkyBlock
     }
 
-    // Modified from NEU.
-    // NEU does not send locraw when not in SkyBlock.
-    // So, as requested by Hannibal, use locraw from
-    // NEU and have NEU send it.
-    // Remove this when NEU dependency is removed
-    private fun checkNEULocraw() {
-        if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
-            lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
-            }
-        }
-    }
-
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
@@ -383,6 +327,11 @@ object HypixelData {
         hypixelEnvironment = event.environment
         HypixelJoinEvent().postAndCatch()
         SkyHanniMod.repo.displayRepoStatus(true)
+    }
+
+    @HandleEvent
+    fun onHypixelLocationChange(event: HypixelLocationChangeEvent) {
+        hypixelLocation = event.location
     }
 
     private fun checkSidebar() {
