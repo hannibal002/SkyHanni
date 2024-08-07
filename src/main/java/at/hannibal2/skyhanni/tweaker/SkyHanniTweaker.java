@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.tweaker;
 
+import net.hypixel.modapi.HypixelModAPI;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -19,6 +20,7 @@ public class SkyHanniTweaker implements ITweaker {
     @SuppressWarnings("unchecked")
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
         List<String> tweakClasses = (List<String>) Launch.blackboard.get("TweakClasses");
+        tweakClasses.add("at.hannibal2.skyhanni.deps.modapi.HypixelModAPITweaker");
         tweakClasses.add(MixinTweaker.class.getName());
         tweakClasses.add(ModLoadingTweaker.class.getName());
     }

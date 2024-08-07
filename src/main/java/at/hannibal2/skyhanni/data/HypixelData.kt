@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.modapi.HypixelHelloEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -31,6 +32,7 @@ import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import net.hypixel.data.region.Environment
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.thread
@@ -111,8 +113,10 @@ object HypixelData {
     private var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
 
-    var hypixelLive = false
-    var hypixelAlpha = false
+    var hypixelEnvironment: Environment? = null
+    val hypixelAlpha get() = hypixelEnvironment == Environment.BETA
+    val hypixelLive get() = hypixelEnvironment == Environment.PRODUCTION
+
     var inLobby = false
     var inLimbo = false
     var skyBlock = false
@@ -261,8 +265,7 @@ object HypixelData {
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
-        hypixelLive = false
-        hypixelAlpha = false
+        hypixelEnvironment = null
         skyBlock = false
         inLobby = false
         locraw.forEach { locraw[it.key] = "" }
@@ -328,13 +331,6 @@ object HypixelData {
             checkProfileName()
         }
 
-        if (!LorenzUtils.onHypixel) {
-            checkHypixel()
-            if (LorenzUtils.onHypixel) {
-                HypixelJoinEvent().postAndCatch()
-                SkyHanniMod.repo.displayRepoStatus(true)
-            }
-        }
         if (!LorenzUtils.onHypixel) return
 
         if (!event.isMod(5)) return
@@ -382,36 +378,11 @@ object HypixelData {
         }
     }
 
-    private fun checkHypixel() {
-        if (!hasScoreboardUpdated) return
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer ?: return
-
-        var hypixel = false
-
-        player.clientBrand?.let {
-            if (it.contains("hypixel", ignoreCase = true)) {
-                hypixel = true
-            }
-        }
-
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
-            hypixel = true
-            if (group("prefix") == "alpha.") {
-                hypixelAlpha = true
-            }
-        }
-
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            serverNameScoreboardPattern.matchMatcher(line) {
-                hypixel = true
-                if (group("prefix") == "alpha.") {
-                    hypixelAlpha = true
-                }
-            }
-        }
-
-        hypixelLive = hypixel && !hypixelAlpha
+    @HandleEvent
+    fun onHypixelHello(event: HypixelHelloEvent) {
+        hypixelEnvironment = event.environment
+        HypixelJoinEvent().postAndCatch()
+        SkyHanniMod.repo.displayRepoStatus(true)
     }
 
     private fun checkSidebar() {
