@@ -8,7 +8,7 @@ enum class IslandType(val displayName: String, val mode: String? = null) {
     KUUDRA_ARENA("Kuudra", "instanced"),
     CRIMSON_ISLE("Crimson Isle", "crimson_isle"),
     DWARVEN_MINES("Dwarven Mines", "mining_3"),
-    DUNGEON_HUB("Dungeon Hub", "dungeon)hub"),
+    DUNGEON_HUB("Dungeon Hub", "dungeon_hub"),
     CATACOMBS("Catacombs", "dungeon"),
 
     HUB("Hub", "hub"),
