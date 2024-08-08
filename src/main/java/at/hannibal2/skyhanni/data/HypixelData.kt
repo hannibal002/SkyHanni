@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -31,12 +30,9 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.hypixel.data.region.Environment
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -290,6 +286,12 @@ object HypixelData {
             checkProfileName()
         }
 
+        if (!LorenzUtils.onHypixel) {
+            val environment = getHypixelEnvironment()
+            if (environment != null) {
+                onJoinHypixel(environment)
+            }
+        }
         if (!LorenzUtils.onHypixel) return
 
         if (!event.isMod(5)) return
@@ -324,7 +326,11 @@ object HypixelData {
 
     @HandleEvent
     fun onHypixelHello(event: HypixelHelloEvent) {
-        hypixelEnvironment = event.environment
+        onJoinHypixel(event.environment)
+    }
+
+    private fun onJoinHypixel(environment: Environment) {
+        hypixelEnvironment = environment
         HypixelJoinEvent().postAndCatch()
         SkyHanniMod.repo.displayRepoStatus(true)
     }
@@ -407,5 +413,43 @@ object HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
+    }
+
+    // Backup to mod API checks
+    private fun getHypixelEnvironment(): Environment? {
+        if (!hasScoreboardUpdated) return null
+        val mc = Minecraft.getMinecraft()
+        val player = mc.thePlayer ?: return null
+
+        var hypixel = false
+        var hypixelAlpha = false
+
+        player.clientBrand?.let {
+            if (it.contains("hypixel", ignoreCase = true)) {
+                hypixel = true
+            }
+        }
+
+        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
+            hypixel = true
+            if (group("prefix") == "alpha.") {
+                hypixelAlpha = true
+            }
+        }
+
+        for (line in ScoreboardData.sidebarLinesFormatted) {
+            serverNameScoreboardPattern.matchMatcher(line) {
+                hypixel = true
+                if (group("prefix") == "alpha.") {
+                    hypixelAlpha = true
+                }
+            }
+        }
+
+        return when {
+            hypixel && hypixelAlpha -> Environment.BETA
+            hypixel -> Environment.PRODUCTION
+            else -> null
+        }
     }
 }
