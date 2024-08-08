@@ -13,16 +13,20 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
-object ColourHexInDyeMenu {
+object ColorHexInLore {
 
     private val patternGroup = RepoPattern.group("hex")
+
     /**
      * REGEX-TEST: §5§o§7to §4#960018§7!
+     * REGEX-TEST: §8Hex #F56FA1
+     * REGEX-TEST: Color: #1793C4
      */
     private val hexPattern by patternGroup.pattern(
         "code",
-        ".*(?<hex>#[0-9a-fA-F]{6}).*",
+        ".*(?:Color:|Hex|to) (?:§.)?(?<hex>#[0-9a-fA-F]{1,6}).*",
     )
+
     /**
      * REGEX-TEST: §5§o§7between §9#034150§7 and §9#009295§7!
      */
@@ -32,22 +36,13 @@ object ColourHexInDyeMenu {
     )
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun tooltip(event: ItemHoverEvent) {
-        if (!SkyHanniMod.feature.inventory.dyeHexDisplay) return
-        if (InventoryUtils.openInventoryName().startsWith("Dye")) {
-            event.toolTip = event.toolTip.map {
-                if (it.contains("Hex ")) {
-                    it.split("Hex ").let { list ->
-                        val s = list[1]
-                        "Hex " + ExtendedChatColor(ColorUtils.getColorFromHex(s), false).toString() + s
-                    }
-                } else {
-                    it
-                }
-            }.toMutableList()
-        }
+    fun onTooltip(event: ItemHoverEvent) {
+        if (!SkyHanniMod.feature.inventory.hexDisplay) return
         val itemCategory = event.itemStack.getItemCategoryOrNull()
-        if (itemCategory != ItemCategory.DYE) return
+        if (itemCategory != ItemCategory.DYE &&
+            itemCategory !in ItemCategory.armor &&
+            !InventoryUtils.openInventoryName().startsWith("Dye")) return
+
         event.toolTip = event.toolTip.map {
             doubleHexPattern.matchMatcher(it) {
                 val group1 = group("hexfirst")

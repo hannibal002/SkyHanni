@@ -38,14 +38,5 @@ object ColorUtils {
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
 
-    fun getColorFromHex(hex: String): Int {
-        var color: Color? = null
-        try {
-            val decode = Integer.decode(hex)
-            color = Color(decode)
-        } catch (_: NumberFormatException) {
-        } catch (_: NullPointerException) {
-        }
-        return color?.rgb ?: 0
-    }
+    fun getColorFromHex(hex: String): Int = runCatching { Color(Integer.decode(hex)) }.getOrNull()?.rgb ?: 0
 }
