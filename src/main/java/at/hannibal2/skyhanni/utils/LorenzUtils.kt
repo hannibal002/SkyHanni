@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.hypixel.location.NetworkData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
@@ -42,15 +43,15 @@ import kotlin.time.Duration.Companion.seconds
 
 object LorenzUtils {
 
-    val connectedToHypixel get() = HypixelData.hypixelLive || HypixelData.hypixelAlpha
+    val connectedToHypixel get() = NetworkData.onHypixel()
 
     val onHypixel get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
 
-    val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
+    val isOnAlphaServer get() = onHypixel && NetworkData.onAlpha()
 
     val inSkyBlock get() = onHypixel && HypixelData.skyBlock
 
-    val inHypixelLobby get() = onHypixel && HypixelData.inLobby
+    val inHypixelLobby get() = onHypixel && HypixelData.location?.isLobby() == true
 
     @Deprecated("Use DungeonAPI.inDungeon() instead", ReplaceWith("DungeonAPI.inDungeon()"))
     val inDungeons get() = DungeonAPI.inDungeon()

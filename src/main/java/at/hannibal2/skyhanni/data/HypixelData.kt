@@ -101,8 +101,6 @@ object HypixelData {
     val hypixelAlpha get() = NetworkData.onAlpha()
     val hypixelLive get() = NetworkData.onLive()
 
-    var inLobby = false
-    var inLimbo = false
     var skyBlock = false
     var skyBlockIsland = IslandType.UNKNOWN
     var serverId: String? = null
@@ -192,8 +190,6 @@ object HypixelData {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         skyBlock = false
-        inLimbo = false
-        inLobby = false
         joinedWorld = SimpleTimeMark.now()
         serverId = null
         skyBlockArea = null
@@ -203,7 +199,6 @@ object HypixelData {
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         skyBlock = false
-        inLobby = false
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
         hasScoreboardUpdated = false
