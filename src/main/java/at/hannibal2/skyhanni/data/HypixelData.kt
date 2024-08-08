@@ -282,7 +282,7 @@ object HypixelData {
         if (!LorenzUtils.inSkyBlock) {
             checkNEULocraw()
         }
-        
+
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
@@ -297,7 +297,7 @@ object HypixelData {
         }
 
         if (!LorenzUtils.onHypixel) {
-            val environment = getHypixelEnvironment()
+            val environment = readEnvironmentFromWorld()
             if (environment != null) {
                 onJoinHypixel(environment)
             }
@@ -428,7 +428,7 @@ object HypixelData {
     /* Backup logic - mod API should do all the below generally */
 
     // Backup to hypixel hello event
-    private fun getHypixelEnvironment(): Environment? {
+    private fun readEnvironmentFromWorld(): Environment? {
         if (!hasScoreboardUpdated) return null
         val mc = Minecraft.getMinecraft()
         val player = mc.thePlayer ?: return null
