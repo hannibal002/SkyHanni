@@ -31,8 +31,9 @@ object PresentWaypoints {
     private var presentEntranceLocations = mapOf<String, MutableSet<EventWaypoint>>()
     private var closest: EventWaypoint? = null
 
-    private val presentSet get() = presentLocations[HypixelData.lobbyType]
-    private val presentEntranceSet get() = presentEntranceLocations[HypixelData.lobbyType]
+    private val lobbyTypeKey get() = HypixelData.location?.lobbyType ?: ""
+    private val presentSet get() = presentLocations[lobbyTypeKey]
+    private val presentEntranceSet get() = presentEntranceLocations[lobbyTypeKey]
 
     private val patternGroup = RepoPattern.group("event.lobby.waypoint.presents")
     private val presentAlreadyFoundPattern by patternGroup.pattern(

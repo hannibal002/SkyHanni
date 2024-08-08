@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.data.hypixel.location.HypixelLocation
 import at.hannibal2.skyhanni.events.modapi.HypixelHelloEvent
 import at.hannibal2.skyhanni.events.modapi.HypixelLocationChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule

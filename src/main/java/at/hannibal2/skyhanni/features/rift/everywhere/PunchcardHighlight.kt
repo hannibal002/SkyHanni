@@ -132,9 +132,10 @@ object PunchcardHighlight {
             if (playerList.isEmpty()) return@runDelayed
             if (event.newIsland != IslandType.THE_RIFT) return@runDelayed
 
-            if (HypixelData.server.isNotEmpty() && lastRiftServer != HypixelData.server) {
+            val currentServer = HypixelData.location?.serverName
+            if (currentServer != null && lastRiftServer != currentServer) {
                 reloadColors()
-                lastRiftServer = HypixelData.server
+                lastRiftServer = currentServer
                 playerList.clear()
             }
             display = drawDisplay()
