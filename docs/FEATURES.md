@@ -217,7 +217,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optionally show the different stat values compared to the current reforge.
 + Show Bestiary Level as Stack Size. - saga (https://github.com/hannibal002/SkyHanni/pull/1945)
     + Can be enabled/disabled on the Item Number list.
-+ Added Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
++ Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
++ Display the price per Stonk when taking the minimum bid in the Stonks Auction (Richard Menu). - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2195)
 
 </details>
 <details open><summary>
@@ -234,6 +235,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Lesser Orb of Healing Hider. - jani
 + Wand of Strength cooldown is now displayed. - saga (https://github.com/hannibal002/SkyHanni/pull/1948)
     + The cooldown displayed is for the buff, not the item usage.
++ Added Tactical Insertion Ability Cooldown feature. - DungeonHub (https://github.com/hannibal002/SkyHanni/pull/2278)
 
 </details>
 <details open><summary>
