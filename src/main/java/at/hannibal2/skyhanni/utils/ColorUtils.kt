@@ -37,4 +37,15 @@ object ColorUtils {
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (this.rgb and 0x00ffffff)
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
+
+    fun getColorFromHex(hex: String): Int {
+        var color: Color? = null
+        try {
+            val decode = Integer.decode(hex)
+            color = Color(decode)
+        } catch (_: NumberFormatException) {
+        } catch (_: NullPointerException) {
+        }
+        return color?.rgb ?: 0
+    }
 }

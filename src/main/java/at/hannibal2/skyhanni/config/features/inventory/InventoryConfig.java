@@ -263,4 +263,10 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean stonkOfStonkPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Show dye hex as actual color", desc = "Changes the color of a dye's hex code to the actual color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean dyeHexDisplay = true;
 }
