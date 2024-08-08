@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -30,9 +31,14 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.JsonObject
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.hypixel.data.region.Environment
+import net.hypixel.data.type.ServerType
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.concurrent.thread
+import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -135,9 +141,10 @@ object HypixelData {
     var skyBlockAreaWithSymbol: String? = null
 
     val server get() = hypixelLocation?.serverName ?: ""
-    val lobbyType get() = hypixelLocation?.lobbyName?.let {
-        lobbyTypePattern.matchMatcher(it) { group("lobbyType") }
-    } ?: ""
+    val lobbyType
+        get() = hypixelLocation?.lobbyName?.let {
+            lobbyTypePattern.matchMatcher(it) { group("lobbyType") }
+        } ?: ""
     val mode get() = hypixelLocation?.mode ?: ""
     val map get() = hypixelLocation?.map ?: ""
 
@@ -272,7 +279,10 @@ object HypixelData {
     // TODO rewrite everything in here
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-
+        if (!LorenzUtils.inSkyBlock) {
+            checkNEULocraw()
+        }
+        
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
@@ -415,7 +425,9 @@ object HypixelData {
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
 
-    // Backup to mod API checks
+    /* Backup logic - mod API should do all the below generally */
+
+    // Backup to hypixel hello event
     private fun getHypixelEnvironment(): Environment? {
         if (!hasScoreboardUpdated) return null
         val mc = Minecraft.getMinecraft()
@@ -452,4 +464,50 @@ object HypixelData {
             else -> null
         }
     }
+
+    // Modified from NEU.
+    // NEU does not send locraw when not in SkyBlock.
+    // So, as requested by Hannibal, use locraw from
+    // NEU and have NEU send it.
+    // Remove this when NEU dependency is removed
+    private fun checkNEULocraw() {
+        if (LorenzUtils.onHypixel && hypixelLocation == null && lastLocRaw.passedSince() > 15.seconds) {
+            lastLocRaw = SimpleTimeMark.now()
+            thread(start = true) {
+                Thread.sleep(1000)
+                NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
+            }
+        }
+    }
+
+    // Backup to hypixel location event
+    fun checkForLocraw(message: String) {
+        jsonBracketPattern.matchMatcher(message.removeColor()) {
+            try {
+                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
+                if (obj.has("server")) {
+
+                    val server = obj["server"].asString
+
+                    // note: lobbyType was removed from locraw some point;
+                    // it just returns the server type but still calls it gametype
+                    val gameType = obj["gametype"]?.asString
+                    val lobbyName = obj["lobbyname"]?.asString
+                    val mode = obj["mode"]?.asString
+                    val map = obj["map"]?.asString
+
+                    hypixelLocation = HypixelLocation(
+                        server,
+                        ServerType.valueOf(gameType).getOrNull(),
+                        lobbyName,
+                        mode,
+                        map
+                    )
+                }
+            } catch (e: Exception) {
+                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
+            }
+        }
+    }
 }
+
