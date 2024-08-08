@@ -95,11 +95,9 @@ object HypixelData {
         "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
-    private var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
 
     val location: HypixelLocation? get() = ServerData.hypixelLocation
-
     val hypixelAlpha get() = NetworkData.onAlpha()
     val hypixelLive get() = NetworkData.onLive()
 

@@ -5,12 +5,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.hypixel.data.type.ServerType
 
-private val lobbyTypePattern by RepoPattern.pattern(
-    "data.hypixel.location.lobbytype",
-    "(?<lobbyType>.*lobby)\\d+",
-)
-
-
 class HypixelLocation(
     val serverName: String,
     val serverType: ServerType?,
@@ -24,5 +18,12 @@ class HypixelLocation(
 
     val lobbyType get() = lobbyName?.let {
         lobbyTypePattern.matchMatcher(it) { group("lobbyType") }
+    }
+
+    companion object {
+        private val lobbyTypePattern by RepoPattern.pattern(
+            "data.hypixel.location.lobbytype",
+            "(?<lobbyType>.*lobby)\\d+",
+        )
     }
 }
