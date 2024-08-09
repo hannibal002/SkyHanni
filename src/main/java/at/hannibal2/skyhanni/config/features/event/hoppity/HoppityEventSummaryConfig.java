@@ -37,7 +37,7 @@ public class HoppityEventSummaryConfig {
     public enum HoppityStat {
         MEAL_EGGS_FOUND("§7You found §b45§7/§a47 §6Chocolate Meal Eggs§7."),
         HOPPITY_RABBITS_BOUGHT("§7You bought §b7 §fRabbits §7from §aHoppity§7."),
-        SIDE_DISH_EGGS("§7You found §b4 §6§lSide Dish §r§6Eggs §7in the §dChocolate Factory§7."),
+        SIDE_DISH_EGGS("§7You found §b4 §6§lSide Dish §r§6Eggs §7in the §6Chocolate Factory§7."),
         EMPTY(""),
         NEW_RABBITS("§7Unique Rabbits: §b7\n §f1 §7- §a1 §7- §91 §7- §51 §7- §61 §7- §d1 §7- §b1"),
         EMPTY_2(""),

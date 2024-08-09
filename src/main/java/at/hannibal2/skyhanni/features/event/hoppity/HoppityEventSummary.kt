@@ -192,20 +192,20 @@ object HoppityEventSummary {
                 }
 
                 put(HoppityStat.NEW_RABBITS) {
-                    getRabbitsFormat(stats.newRabbits, "Unique", "§b").forEach {
+                    getRabbitsFormat(stats.newRabbits, "Unique").forEach {
                         newRabbitLine -> it.appendHeadedLine(newRabbitLine)
                     }
                 }
 
                 put(HoppityStat.DUPLICATE_RABBITS) {
-                    getRabbitsFormat(stats.dupeRabbits, "Duplicate", "§c").forEach {
+                    getRabbitsFormat(stats.dupeRabbits, "Duplicate").forEach {
                         dupeRabbitLine -> it.appendHeadedLine(dupeRabbitLine)
                     }
                     it.addExtraChocFormatLine(stats.chocolateGained)
                 }
 
                 put(HoppityStat.STRAY_RABBITS) {
-                    getRabbitsFormat(stats.strayRabbits, "Stray", "§f").forEach {
+                    getRabbitsFormat(stats.strayRabbits, "Stray").forEach {
                         strayRabbitLine -> it.appendHeadedLine(strayRabbitLine)
                     }
                     it.addExtraChocFormatLine(stats.strayChocolateGained)
@@ -215,16 +215,19 @@ object HoppityEventSummary {
                     val initialPosition = stats.initLbPos ?: return@put
                     val updatedPosition = stats.finalLbPos.takeIf { lb -> lb != null } ?: ChocolateFactoryAPI.leaderboardPosition ?: return@put
                     val leaderboardChange = initialPosition - updatedPosition
-                    val changeFormat = "${if (leaderboardChange < 0) "§c-" else "§a+"}$leaderboardChange"
-                    it.appendHeadedLine(
-                        "§7Leaderboard Change: §b#${stats.initLbPos} §c-> ${stats.finalLbPos}"
-                            + if (leaderboardChange != 0) "§7($changeFormat spots§7)" else ""
-                    )
+                    if (leaderboardChange == 0) {
+                        it.appendHeadedLine("§7Leaderboard Change: §7§oNo change in position§r§7.")
+                    } else {
+                        val changeFormat = "${if (leaderboardChange < 0) "§c-" else "§a+"}$leaderboardChange"
+                        it.appendHeadedLine(
+                            "§7Leaderboard Change: §b#$initialPosition §c-> $updatedPosition §7($changeFormat spots§7)"
+                        )
+                    }
                 }
 
                 put(HoppityStat.TIME_IN_CF) {
                     val timeFormat = stats.millisInCf.milliseconds.format(maxUnits = 2)
-                    it.appendHeadedLine("§7You spent §b$timeFormat §7 in the §6Chocolate Factory§7.")
+                    it.appendHeadedLine("§7You spent §b$timeFormat §7in the §6Chocolate Factory§7.")
                 }
 
                 put(HoppityStat.EMPTY) { it.appendLine() }
@@ -240,7 +243,7 @@ object HoppityEventSummary {
         summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")
 
         // Header
-        summaryBuilder.appendLine("${" ".repeat(20)}§d§lHoppity's Hunt #${getHoppityEventNumber(stats.currentYear)} $type")
+        summaryBuilder.appendLine("${" ".repeat(26)}§d§lHoppity's Hunt #${getHoppityEventNumber(stats.currentYear)} $type")
         summaryBuilder.appendLine()
 
         // Various stats from config
@@ -261,7 +264,7 @@ object HoppityEventSummary {
             eggsFoundFormatList.add("§7You found §b$foundMealEggs§7/§a$spawnedEggs §6Chocolate Meal ${StringUtils.pluralize(foundMealEggs, "Egg")}§7.")
         }
         mealsFound[HoppityEggType.SIDE_DISH]?.let {
-            eggsFoundFormatList.add("§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 §7in the §dChocolate Factory§7.")
+            eggsFoundFormatList.add("§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 §7in the §6Chocolate Factory§7.")
         }
         mealsFound[HoppityEggType.BOUGHT]?.let {
             eggsFoundFormatList.add("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7.")
@@ -293,13 +296,13 @@ object HoppityEventSummary {
         return spawnedMealsEggs
     }
 
-    private fun getRabbitsFormat(rarityMap: Map<HoppityRabbitRarity, Int>, name: String, colorCode: String): List<String> {
+    private fun getRabbitsFormat(rarityMap: Map<HoppityRabbitRarity, Int>, name: String): List<String> {
         val formats = mutableListOf<String>()
         val rabbitsFound = rarityMap.toMutableMap()
         val rabbitsSum = rabbitsFound.sumAllValues().toInt()
         if (rabbitsSum == 0) return formats
 
-        formats.add("§7$name Rabbits: $colorCode$rabbitsSum")
+        formats.add("§7$name Rabbits: §f$rabbitsSum")
 
         var addSeparator = false
         val uniqueBuilder = StringBuilder()
