@@ -76,16 +76,17 @@ object ServerData {
 
                     val server = obj["server"].asString
 
-                    // note: lobbyType was removed from locraw some point;
+                    // note: lobbyType was removed from locraw at some point;
                     // it just returns the server type but still calls it gametype
                     val gameType = obj["gametype"]?.asString
                     val lobbyName = obj["lobbyname"]?.asString
                     val mode = obj["mode"]?.asString
                     val map = obj["map"]?.asString
+                    val serverType = gameType?.let { ServerType.valueOf(gameType).getOrNull() }
 
                     hypixelLocation = HypixelLocation(
                         server,
-                        ServerType.valueOf(gameType).getOrNull(),
+                        serverType,
                         lobbyName,
                         mode,
                         map
