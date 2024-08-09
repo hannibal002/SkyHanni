@@ -1,8 +1,9 @@
-package at.hannibal2.skyhanni.config.features.event;
+package at.hannibal2.skyhanni.config.features.event.hoppity;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
@@ -11,6 +12,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class HoppityEggsConfig {
+
+    @Expose
+    @ConfigOption(name = "Event Summary", desc = "")
+    @Accordion
+    public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();
 
     @Expose
     @ConfigOption(name = "Hoppity Waypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
@@ -164,11 +170,5 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
-
-    @Expose
-    @ConfigOption(name = "Event Summary", desc = "Show a summary of your event stats once it is over.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean eventSummary = true;
 
 }

@@ -668,26 +668,40 @@ public class ProfileSpecificStorage {
     @Expose
     public HoppityEventStatsStorage hoppityEventStats = new HoppityEventStatsStorage();
 
+    @Expose
+    public Map<Integer, HoppityEventStatsStorage> pastHoppityEventStats = new HashMap<>();
+
     public static class HoppityEventStatsStorage {
         @Expose
         public int currentYear = 0;
 
         @Expose
-        public Map<HoppityEggType, Integer> mealTypeMap = new HashMap<>();
+        public Map<HoppityEggType, Integer> mealType = new HashMap<>();
 
         @Expose
-        public Map<HoppityRabbitRarity, Integer> newRarityMap = new HashMap<>();
+        public Map<HoppityRabbitRarity, Integer> newRabbits = new HashMap<>();
 
         @Expose
-        public Map<HoppityRabbitRarity, Integer> dupeRarityMap = new HashMap<>();
+        public Map<HoppityRabbitRarity, Integer> dupeRabbits = new HashMap<>();
 
         @Expose
         public long chocolateGained = 0;
 
         @Expose
-        public Map<HoppityRabbitRarity, Integer> strayRarityMap = new HashMap<>();
+        public Map<HoppityRabbitRarity, Integer> strayRabbits = new HashMap<>();
 
         @Expose
         public long strayChocolateGained = 0;
+
+        @Expose
+        public long millisInCf = 0;
+
+        @Expose
+        @Nullable
+        public Integer initLbPos = null;
+
+        @Expose
+        @Nullable
+        public Integer finalLbPos = null;
     }
 }
