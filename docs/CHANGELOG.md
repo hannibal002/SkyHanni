@@ -113,6 +113,8 @@
 + Show Bestiary Level as Stack Size. - saga (https://github.com/hannibal002/SkyHanni/pull/1945)
     + Can be enabled/disabled on the Item Number list.
 + Added Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
++ Added Tactical Insertion Ability Cooldown feature. - DungeonHub (https://github.com/hannibal002/SkyHanni/pull/2278)
++ Display the price per Stonk when taking the minimum bid in the Stonks Auction (Richard Menu). - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2195)
 
 #### Fishing Features
 
@@ -307,6 +309,7 @@
 + Reverted item source names to shorter format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2233)
 + Rounded corner smoothness now applies to custom Scoreboard textures. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2228)
 + Reduced the frequency of "tab list not found" error messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2266)
++ Hide Beacon Power display while on a Bingo profile. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2286)
 
 ### Fixes
 
@@ -341,6 +344,10 @@
 + Fixed TunnelMaps not resetting on lobby swap. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2275)
 + Fixed a rare error when detecting corpses in the Mineshaft. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2268)
 + Fixed incorrect maximum Powder value on HotM perks when disabled. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2269)
++ Fixed HOTM levels being saved incorrectly if the menu was opened with a Blue Egg Cheese Drill in hand. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2295)
++ Fixed Flawless Gemstones not being formatted correctly when the Powder Mining filter is enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2281)
++ Fixed Peak of the Mountain always being disabled. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2282)
++ Fixed an issue where TunnelMaps could stop functioning. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2277)
 
 #### Garden Fixes
 
@@ -369,6 +376,10 @@
 + Fixed Dicer Tracker Reset Button misalignment. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2248)
 + Fixed errors when selecting Fine Flour with the Sprayonator. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2251)
 + Fixed typos in the FF guide. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2273)
++ Fixed command sent in chat for Farming Weight Display. - not-a-cow (https://github.com/hannibal002/SkyHanni/pull/2303)
++ Fixed visitor shopping list with AH items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2297)
++ Fixed Zorro's Cape not working with Green Thumb in the FF stats breakdown in item lore. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2299)
++ Fixed Composter Overlay calculating incorrectly while Composter Display is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2294)
 
 #### Chocolate Factory & Hoppity Hunt Fixes
 
@@ -399,6 +410,7 @@
 + Fixed buying items sometimes triggering compact Hoppity messages. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/2201)
 + Fixed Hoppity Chat Compact not working outside of Hoppity's event for Abiphone users who have Hoppity as a contact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2250)
 + Fixed stray rabbit production time tooltip display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2239)
++ Fixed Hoppity custom goals being off by one level. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2280)
 
 #### Custom Scoreboard Fixes
 
@@ -419,6 +431,7 @@
 + Fixed 2 Custom Scoreboard Errors while in Kuudra. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2236)
 + Fixed Scoreboard Reset not updating the draggable list. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2252)
 + Fixed a scoreboard error message when a Hypixel bug shows a negative number of magma cubes remaining in the scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2267)
++ Fixed Custom Scoreboard Error when having more than 1000 medals. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2319)
 
 #### Dungeon Fixes
 
@@ -428,12 +441,14 @@
 + Fixed Dungeons in DiscordRPC not showing the elapsed time. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2089)
 + Fixed multiple empty lines appearing in Custom Scoreboard while in Dungeons. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2082)
 + Fixed Livid Finder not working with Magenta Livid. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2086)
++ Fixed the dungeon finder item lore displaying on other items in the inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2298)
 
 #### Commands Fixes
 
 + Fixed typo in /shclearkismet command. - fahr-plan (https://github.com/hannibal002/SkyHanni/pull/1912)
 + Fixed 'viewrecipe' lowercase not working. - Obsidian + hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1939)
 + Fixed rare cases where queued /gfs didn't work. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1999)
++ Fixed an additional empty /shcommands page from appearing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2287)
 
 #### Fishing Fixes
 
@@ -480,6 +495,10 @@
 + Fixed price source inconsistencies (Bazaar sell/buy and NPC prices). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2221)
 + Fixed Carnival Masks not being detected by Reforge Helper. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2244)
 + Fixed a typo in the Item Pickup Log config. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2271)
++ Fixed a bug in SkyHanni's Time Held in Lore with Coca Truffle when using Odin. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2300)
++ Fixed sack changes appearing with a delay in the Item Pickup Log. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2292)
++ Fixed Item Pickup Log error with Wisp Potion. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2291)
++ Fixed Carnival Masks not being clickable in `/equipment`. - Luna (https://github.com/hannibal002/SkyHanni/pull/2293)
 
 #### Combat Fixes
 
@@ -492,6 +511,11 @@
 
 + Fixed stash getting detected as a private message. - sayomaki (https://github.com/hannibal002/SkyHanni/pull/2060)
 + Fix Guild Rank formatting having an extra space. - Empa (https://github.com/hannibal002/SkyHanni/pull/2191)
+
+#### Crimson Fixes
+
++ Fixed Pablo Helper not functioning when called via Abiphone. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2288)
++ Fixed reputation helper keybind activating while inside GUIs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2284)
 
 #### Misc Fixes
 
@@ -523,6 +547,10 @@
 + Fixed a typo in /shcommands. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2223)
 + Fixed multiple features not showing a duration when it was less than one second. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2261)
 + Fixed some incorrect boxes in the GUI editor. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2260)
++ Fixed chroma preview always being white. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2302)
++ Fixed Contributor name tag flickering when using Patcher. - nea (https://github.com/hannibal002/SkyHanni/pull/2296)
++ Fixed Discord Rich Presence dynamic fallback. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/2279)
+    + Placeholder messages that should not be visible will no longer appear.
 
 ### Technical Details
 
@@ -636,6 +664,10 @@
 + Added renderRenderableDouble. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2260)
     + A direct replacement for renderStringsAndItems.
 + Changed detecting active mayor to no longer use the number of votes. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2227)
++ Fixed wrong color for Jasper gemstone in OreBlock API. - Luna (https://github.com/hannibal002/SkyHanni/pull/2257)
++ Added DYE to Item Category. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2315)
++ Added /shdebugprice command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2289)
++ Cache rewardPatterns in the powder chat filter. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2276)
 
 ### Removed Features
 
