@@ -676,7 +676,7 @@ public class ProfileSpecificStorage {
         public int currentYear = 0;
 
         @Expose
-        public Map<HoppityEggType, Integer> mealType = new HashMap<>();
+        public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
 
         @Expose
         public Map<HoppityRabbitRarity, Integer> newRabbits = new HashMap<>();

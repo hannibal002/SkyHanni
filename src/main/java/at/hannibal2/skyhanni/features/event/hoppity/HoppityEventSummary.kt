@@ -45,7 +45,7 @@ object HoppityEventSummary {
         if (!HoppityAPI.isHoppityEvent()) return
         val stats = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
 
-        stats.mealType.addOrPut(event.eggType, 1)
+        stats.mealsFound.addOrPut(event.eggType, 1)
         val rarity = HoppityRabbitRarity.getByRabbit(event.rabbitName) ?: return
         if (event.duplicate) stats.dupeRabbits.addOrPut(rarity, 1)
         else stats.newRabbits.addOrPut(rarity, 1)
@@ -255,15 +255,15 @@ object HoppityEventSummary {
 
     private fun HoppityEventStatsStorage.getEggsFoundFormat(): List<String> {
         val eggsFoundFormatList = mutableListOf<String>()
-        val foundMealEggs = mealType.filterKeys { HoppityEggType.resettingEntries.contains(it) }.sumAllValues().toInt()
+        val foundMealEggs = mealsFound.filterKeys { HoppityEggType.resettingEntries.contains(it) }.sumAllValues().toInt()
         if (foundMealEggs > 0) {
             val spawnedEggs = getMealEggsSinceStart()
             eggsFoundFormatList.add("§7You found §b$foundMealEggs§7/§a$spawnedEggs §6Chocolate Meal ${StringUtils.pluralize(foundMealEggs, "Egg")}§7.")
         }
-        mealType[HoppityEggType.SIDE_DISH]?.let {
+        mealsFound[HoppityEggType.SIDE_DISH]?.let {
             eggsFoundFormatList.add("§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 §7in the §dChocolate Factory§7.")
         }
-        mealType[HoppityEggType.BOUGHT]?.let {
+        mealsFound[HoppityEggType.BOUGHT]?.let {
             eggsFoundFormatList.add("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7.")
         }
 
