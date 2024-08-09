@@ -44,7 +44,6 @@ import at.hannibal2.skyhanni.utils.GenericWrapper;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
-import at.hannibal2.skyhanni.utils.SkyBlockTime;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -684,5 +683,11 @@ public class ProfileSpecificStorage {
 
         @Expose
         public long chocolateGained = 0;
+
+        @Expose
+        public Map<HoppityRabbitRarity, Integer> strayRarityMap = new HashMap<>();
+
+        @Expose
+        public long strayChocolateGained = 0;
     }
 }

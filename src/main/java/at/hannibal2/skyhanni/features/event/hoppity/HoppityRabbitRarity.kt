@@ -12,6 +12,7 @@ enum class HoppityRabbitRarity(val displayName: String, val colorCode: String) {
 
     companion object {
         fun getByRabbit(rabbitName: String): HoppityRabbitRarity? = entries.firstOrNull { it.colorCode == rabbitName.substring(0, 2) }
+        fun getByKey(rarityKey: String): HoppityRabbitRarity? = entries.firstOrNull { it.displayName.lowercase() == rarityKey }
     }
 
 }
