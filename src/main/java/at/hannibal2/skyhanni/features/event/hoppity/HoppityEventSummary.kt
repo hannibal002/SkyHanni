@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
+import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -134,7 +136,8 @@ object HoppityEventSummary {
         val eggsFoundFormatList = mutableListOf<String>()
         val foundMealEggs = mealTypeMap.filterKeys { HoppityEggType.resettingEntries.contains(it) }.sumAllValues().toInt()
         if (foundMealEggs > 0) {
-            eggsFoundFormatList.add("§7You found §b$foundMealEggs §6Chocolate Egg${if(foundMealEggs > 1) "s" else ""}§7.")
+            val spawnedEggs = getMealEggsSinceStart()
+            eggsFoundFormatList.add("§7You found §b$foundMealEggs§7/§a$spawnedEggs §6Chocolate Meal Egg${if(foundMealEggs > 1) "s" else ""}§7.")
         }
         mealTypeMap[HoppityEggType.SIDE_DISH]?.let {
             eggsFoundFormatList.add("§7You found §b$it §6§lSide Dish §r§6Egg${if(it > 1) "s" else ""}§7 §7in the §dChocolate Factory§7.")
@@ -147,6 +150,26 @@ object HoppityEventSummary {
             eggsFoundFormatList.add("§cNo Chocolate Eggs or Rabbits found during this event§7.")
         }
         return eggsFoundFormatList
+    }
+
+    private fun getMealEggsSinceStart(): Int {
+        if (!HoppityAPI.isHoppityEvent()) return 0
+
+        val sbTimeNow = SkyBlockTime.now()
+        val milliDifference = sbTimeNow.toMillis() - SkyBlockTime.fromSbYear(sbTimeNow.year).toMillis()
+
+        // Calculate total eggs from complete days and incomplete day periods
+        var spawnedMealsEggs = (milliDifference / SKYBLOCK_DAY_MILLIS ).toInt() * 3
+
+        // Add eggs for the current day based on time of day
+        spawnedMealsEggs += when {
+            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 21 -> 3 // Dinner egg, 9 PM
+            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 14 -> 2 // Lunch egg, 2 PM
+            milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 7 -> 1 // Breakfast egg, 7 AM
+            else -> 0
+        }
+
+        return spawnedMealsEggs
     }
 
     private fun getRabbitsFormat(rarityMap: Map<HoppityRabbitRarity, Int>, name: String, colorCode: String): List<String> {
