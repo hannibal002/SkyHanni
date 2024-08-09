@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -105,33 +104,32 @@ object HoppityEventSummary {
     }
 
     private fun sendSummaryMessage(type: SummaryType, stats: HoppityEventStatsStorage) {
-        val headerMessage = "§d§lHoppity's Hunt #${getHoppityEventNumber(stats.currentYear)} $type"
-        val headerLength = headerMessage.removeColor().length
-        val wrapperLength = ((headerLength + 8) * 1.5).toInt()
-        val summaryWrapper = "§d§l${"▬".repeat(wrapperLength + 4)}"
-
         val summaryBuilder: StringBuilder = StringBuilder()
-        summaryBuilder.appendLine(summaryWrapper)
+        summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")
 
         // Header
-        summaryBuilder.appendLine("${" ".repeat(((summaryWrapper.length - 4) / 2) - 8)}$headerMessage")
+        summaryBuilder.appendLine("${" ".repeat(20)}§d§lHoppity's Hunt #${getHoppityEventNumber(stats.currentYear)} $type")
         summaryBuilder.appendLine()
+
         // Eggs found
         stats.getEggsFoundFormat().forEach { summaryBuilder.appendHeadedLine(it) }
         summaryBuilder.appendLine()
+
         // New rabbits
         getRabbitsFormat(stats.newRarityMap, "Unique", "§b").forEach { summaryBuilder.appendHeadedLine(it) }
         if (stats.newRarityMap.any()) summaryBuilder.appendLine()
+
         // Dupe rabbits
         getRabbitsFormat(stats.dupeRarityMap, "Duplicate", "§c").forEach { summaryBuilder.appendHeadedLine(it) }
         summaryBuilder.addExtraChocFormatLine(stats.chocolateGained)
         if (stats.dupeRarityMap.any()) summaryBuilder.appendLine()
+
         // Stray rabbits
         getRabbitsFormat(stats.strayRarityMap, "Stray", "§f").forEach { summaryBuilder.appendHeadedLine(it) }
         summaryBuilder.addExtraChocFormatLine(stats.strayChocolateGained)
         if (stats.strayRarityMap.any()) summaryBuilder.appendLine()
 
-        summaryBuilder.appendLine(summaryWrapper)
+        summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")
 
         ChatUtils.chat(summaryBuilder.toString(), prefix = false)
     }

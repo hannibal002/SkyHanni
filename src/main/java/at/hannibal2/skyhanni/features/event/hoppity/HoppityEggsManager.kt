@@ -41,7 +41,7 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!
      */
     val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "egg.foundblehhhhhhhh",
+        "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r(?:§.)*(?:Chocolate )?(?<meal>[\\w ]+) (?:§.)*Egg §r§d(?<note>.*)§r§d!",
     )
 
