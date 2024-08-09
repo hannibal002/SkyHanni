@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.hypixel.location.ServerData
+import at.hannibal2.skyhanni.data.hypixel.location.HypixelLocationData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -122,7 +122,7 @@ object ChatManager {
         val original = event.message
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
         if (message.startsWith("§f{\"server\":\"")) {
-            ServerData.parseLocraw(message)
+            HypixelLocationData.parseLocraw(message)
             return
         }
         val key = IdentityCharacteristics(original)

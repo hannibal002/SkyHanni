@@ -15,36 +15,45 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.hypixel.data.type.ServerType
+import net.minecraftforge.event.world.WorldEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.thread
 import kotlin.jvm.optionals.getOrNull
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object ServerData {
-    var hypixelLocation: HypixelLocation? = null
-        private set
-
+object HypixelLocationData {
     private var lastLocRaw = SimpleTimeMark.farPast()
+    private var previousLocation: HypixelLocation? = null
 
-    @HandleEvent
-    fun onHypixelLocationChange(event: HypixelLocationChangeEvent) {
-        hypixelLocation = event.location
-    }
+    var location: HypixelLocation? = null
+        private set
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
-        hypixelLocation = null
+        location = null
+        previousLocation = null
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        hypixelLocation = null
+        if (location != null) {
+            previousLocation = location
+            location = null
+            lastLocRaw = SimpleTimeMark.farPast()
+        }
     }
+
+    fun update(newLocation: HypixelLocation) {
+        HypixelLocationChangeEvent(newLocation, previousLocation).post()
+        location = newLocation
+    }
+
+    /* backup logic - neu locraw */
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (NetworkData.onHypixel() && hypixelLocation == null) {
+        if (LorenzUtils.onHypixel && location == null && lastLocRaw.passedSince() > 15.seconds) {
             sendNEULocraw()
         }
     }
@@ -55,20 +64,18 @@ object ServerData {
     // NEU and have NEU send it.
     // Remove this when NEU dependency is removed
     private fun sendNEULocraw() {
-        if (LorenzUtils.onHypixel && hypixelLocation == null && lastLocRaw.passedSince() > 15.seconds) {
-            lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
-            }
+        lastLocRaw = SimpleTimeMark.now()
+        thread(start = true) {
+            Thread.sleep(1000)
+            NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
         }
     }
-
 
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
     private val jsonBracketPattern = "^\\{.+}".toPattern()
 
     fun parseLocraw(message: String) {
+        if (location != null) return
         jsonBracketPattern.matchMatcher(message.removeColor()) {
             try {
                 val obj: JsonObject = ConfigManager.gson.fromJson(group(), JsonObject::class.java)
@@ -84,13 +91,13 @@ object ServerData {
                     val map = obj["map"]?.asString
                     val serverType = gameType?.let { ServerType.valueOf(gameType).getOrNull() }
 
-                    hypixelLocation = HypixelLocation(
+                    update(HypixelLocation(
                         server,
                         serverType,
                         lobbyName,
                         mode,
                         map
-                    )
+                    ))
                 }
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to parse locraw data")

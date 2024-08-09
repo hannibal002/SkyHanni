@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.location.HypixelLocation
 import at.hannibal2.skyhanni.data.hypixel.location.NetworkData
-import at.hannibal2.skyhanni.data.hypixel.location.ServerData
+import at.hannibal2.skyhanni.data.hypixel.location.HypixelLocationData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -97,7 +97,7 @@ object HypixelData {
 
     private var hasScoreboardUpdated = false
 
-    val location: HypixelLocation? get() = ServerData.hypixelLocation
+    val location: HypixelLocation? get() = HypixelLocationData.location
     val hypixelAlpha get() = NetworkData.onAlpha()
     val hypixelLive get() = NetworkData.onLive()
 

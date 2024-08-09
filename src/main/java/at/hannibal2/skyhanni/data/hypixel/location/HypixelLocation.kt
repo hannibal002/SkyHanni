@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.hypixel.data.type.ServerType
 
-class HypixelLocation(
+data class HypixelLocation(
     val serverName: String,
     val serverType: ServerType?,
     val lobbyName: String?,
