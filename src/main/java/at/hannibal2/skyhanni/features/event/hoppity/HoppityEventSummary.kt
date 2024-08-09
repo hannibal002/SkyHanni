@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
@@ -40,6 +41,7 @@ object HoppityEventSummary {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         checkEnded()
     }
 
@@ -66,7 +68,7 @@ object HoppityEventSummary {
             return
         }
 
-        val ended = stats.currentYear <= currentYear || (stats.currentYear == currentYear && currentSeason != SkyblockSeason.SPRING)
+        val ended = stats.currentYear < currentYear || (stats.currentYear == currentYear && currentSeason != SkyblockSeason.SPRING)
         if (ended) {
             sendSummaryMessage(SummaryType.CONCLUDED, stats)
             ProfileStorageData.profileSpecific?.hoppityEventStats = HoppityEventStatsStorage()
@@ -116,7 +118,7 @@ object HoppityEventSummary {
             summaryBuilder.appendLine("$lineHeader$it")
         }
         if (stats.chocolateGained > 0) {
-            var extraChocFormat = "§6+${stats.chocolateGained.addSeparators()} Chocolate";
+            var extraChocFormat = " §6+${stats.chocolateGained.addSeparators()} Chocolate";
             if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
                 val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(stats.chocolateGained).format(maxUnits = 2)
                 extraChocFormat += " §7(§a+§b${timeFormatted}§7)"
