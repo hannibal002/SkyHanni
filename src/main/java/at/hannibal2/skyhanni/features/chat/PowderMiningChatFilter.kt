@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -56,7 +56,7 @@ object PowderMiningChatFilter {
      */
     private val alreadyLootedPattern by patternGroup.pattern(
         "warning.alreadylooted",
-        "§cThis chest has already been looted."
+        "§cThis chest has already been looted\\.",
     )
 
     /**
@@ -266,7 +266,7 @@ object PowderMiningChatFilter {
         }
 
         if (!unclosedRewards) return null
-        if (message.removeColor().trim() == "") return "powder_mining_empty"
+        if (StringUtils.isEmpty(message)) return "powder_mining_empty"
         if (lockPickedPattern.matches(message)) return "powder_chest_lockpicked"
         if (lootChestCollectedPattern.matches(message)) return "loot_chest_opened"
         if (rewardHeaderPattern.matches((message))) return "powder_reward_header"
@@ -393,6 +393,7 @@ object PowderMiningChatFilter {
                 "flawed" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FLAWED_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
+
                 "fine" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FINE_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
