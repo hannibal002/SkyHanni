@@ -45,7 +45,7 @@ object LorenzUtils {
 
     private val connectedToHypixel get() = NetworkData.onHypixel()
 
-    val onHypixel get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
+    val onHypixel: Boolean get() = connectedToHypixel && Minecraft.getMinecraft().thePlayer != null
 
     val isOnAlphaServer get() = onHypixel && NetworkData.onAlpha()
 
