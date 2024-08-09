@@ -12,4 +12,10 @@ public class ColosseumConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightBlobbercysts = true;
+
+    @Expose
+    @ConfigOption(name = "Tentacle Waypoints", desc = "Show waypoints for tentacles with their hits in Bacte fight.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean tentacleWaypoints = true;
 }
