@@ -1,15 +1,23 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import net.minecraft.util.ChatComponentText
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -45,6 +53,59 @@ object HoppityAPI {
         this.lastDuplicateAmount = null
         this.rabbitBought = false
         this.sideDishEgg = false
+    }
+
+    /**
+     * REGEX-TEST: §f1st Chocolate Milestone
+     * REGEX-TEST: §915th Chocolate Milestone
+     * REGEX-TEST: §622nd Chocolate Milestone
+     */
+    private val milestoneNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.milestone",
+        "(?:§.)*?(?<milestone>\\d{1,2})[a-z]{1,2} Chocolate Milestone"
+    )
+
+    /**
+     * REGEX-TEST: §7Reach §6300B Chocolate §7all-time to
+     * REGEX-TEST: §7Reach §61k Chocolate §7all-time to unlock
+     */
+    private val allTimeLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "milestone.alltime",
+        "§7Reach §6(?<amount>[\\d.MBk]*) Chocolate §7all-time.*"
+    )
+
+    /**
+     * REGEX-TEST: §7Spend §6150B Chocolate §7in the
+     * REGEX-TEST: §7Spend §62M Chocolate §7in the §6Chocolate
+     */
+    private val shopLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "milestone.shop",
+        "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*"
+    )
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        val index = event.slot?.slotIndex ?: return
+        if (index == -999) return
+
+        val clickedStack = InventoryUtils.getItemsInOpenChest()
+            .find { it.slotNumber == event.slot.slotNumber && it.hasStack }
+            ?.stack ?: return
+        val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
+
+        milestoneNamePattern.matchMatcher(nameText) {
+            val itemLore = clickedStack.getLore()
+            if (!itemLore.any { it == "§eClick to claim!"}) return
+
+            // Will never match both all time and shop patterns together
+            allTimeLorePattern.firstMatcher(clickedStack.getLore()) {
+                LorenzChatEvent("§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!", ChatComponentText("")).postAndCatch()
+            }
+
+            shopLorePattern.firstMatcher(clickedStack.getLore()) {
+                LorenzChatEvent("§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!", ChatComponentText("")).postAndCatch()
+            }
+        }
     }
 
     // Dumbed down version of the Compact Chat for Hoppity's,

@@ -46,6 +46,15 @@ object HoppityEggsManager {
     )
 
     /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!
+     */
+    val milestoneRabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "milestone.customclaimed",
+        "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§l(?<meal>[\\w ]+) Rabbit §r§din the Chocolate Factory§r§d!"
+    )
+
+    /**
      * REGEX-TEST: §aYou bought §r§9Casanova §r§afor §r§6970,000 Coins§r§a!
      * REGEX-TEST: §aYou bought §r§fHeidie §r§afor §r§6194,000 Coins§r§a!
      */

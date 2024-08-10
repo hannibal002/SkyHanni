@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -9,7 +11,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -69,6 +70,7 @@ object HoppityEggsCompactChat {
         val mealName = lastChatMeal?.coloredName ?: ""
         val mealNameFormatted = if (rabbitBought) "§aBought Rabbit"
             else if (sideDishEgg) "§6§lSide Dish §r§6Egg"
+            else if (lastChatMeal == CHOCOLATE_SHOP_MILESTONE || lastChatMeal == CHOCOLATE_FACTORY_MILESTONE) "§6§lMilestone Rabbit"
             else "$mealName Egg"
 
         return if (duplicate) {
@@ -89,6 +91,12 @@ object HoppityEggsCompactChat {
             resetCompactData()
             lastChatMeal = getEggType(event)
             if (lastChatMeal == HoppityEggType.SIDE_DISH) sideDishEgg = true
+            compactChat(event)
+        }
+
+        HoppityEggsManager.milestoneRabbitFoundPattern.matchMatcher(event.message) {
+            resetCompactData()
+            lastChatMeal = getEggType(event)
             compactChat(event)
         }
 
