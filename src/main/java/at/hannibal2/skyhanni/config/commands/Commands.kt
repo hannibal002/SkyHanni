@@ -341,7 +341,11 @@ object Commands {
         registerCommand(
             "shhoppityprogress",
             "Check your progress in the current Hoppity's Hunt event."
-        ) { HoppityEventSummary.sendProgressMessage() }
+        ) { HoppityEventSummary.sendStatsMessage() }
+        registerCommand(
+            "shhoppitystats",
+            "Look up stats for a Hoppity's Event (by SkyBlock year).\nLeave blank for year list."
+        ) { HoppityEventSummary.sendStatsMessage(it) }
     }
 
     private fun usersBugFix() {
