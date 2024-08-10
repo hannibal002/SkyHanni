@@ -212,6 +212,7 @@ if (target == ProjectTarget.MAIN) {
     val generateRepoPatterns by tasks.creating(JavaExec::class) {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
         mainClass.set("net.fabricmc.devlaunchinjector.Main")
+        dependsOn(tasks.configureLaunch)
         workingDir(project.file(runDirectory))
         classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
         jvmArgs(
