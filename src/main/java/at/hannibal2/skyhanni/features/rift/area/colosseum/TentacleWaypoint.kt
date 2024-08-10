@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -22,31 +23,27 @@ import kotlin.math.ceil
 object TentacleWaypoint {
 
     private val config get() = SkyHanniMod.feature.rift.area.colosseum
-    private var tentacles: MutableMap<EntityLivingBase, Int> = mutableMapOf()
+    private var tentacles = mutableMapOf<EntityLivingBase, Int>()
 
     @SubscribeEvent
-    fun onMobSpawn(event: EntityMaxHealthUpdateEvent) {
+    fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isEnabled()) return
-        if (event.entity !is EntitySlime) return
-        if (!event.entity.isSkyBlockMob()) return
-        if (event.entity.displayName.formattedText != "Slime§r") return
+        val entity = event.entity as? EntitySlime ?: return
+        if (!entity.isSkyBlockMob()) return
+        if (entity.displayName.formattedText != "Slime§r") return
         // Only get the tentacle on the ground
-        if (ceil(event.entity.posY).toInt() != 68) return
+        if (ceil(entity.posY).toInt() != 68) return
         // Only get the tentacle with size 4 to 8
-        if (event.entity.slimeSize !in 4..8) return
-        if (tentacles.containsKey(event.entity)) return
+        if (entity.slimeSize !in 4..8) return
+        if (entity in tentacles) return
 
         tentacles += event.entity to 0
     }
 
-    @HandleEvent
-    fun onEntityDamage(event: EntityHurtEvent) {
+    @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.THE_RIFT)
+    fun onEntityDamage(event: EntityHurtEvent<EntitySlime>) {
         if (!isEnabled()) return
-        if (event.entity !is EntitySlime) return
-        if (event.entity !in tentacles) return
-
-        val tentacle = tentacles[event.entity] ?: return
-        tentacles[event.entity] = tentacle + 1
+        tentacles[event.entity]?.let { tentacles[event.entity] = it + 1 }
     }
 
     @SubscribeEvent
@@ -54,16 +51,16 @@ object TentacleWaypoint {
         if (!isEnabled()) return
         tentacles = tentacles.filterNot { it.key.isDead || it.key.health == 0f }.toMutableMap()
 
-        for (tentacle in tentacles) {
+        for ((tentacle, hits) in tentacles) {
             event.drawWaypointFilled(
-                tentacle.key.getLorenzVec().add(-0.5, 0.0, -0.5),
+                tentacle.getLorenzVec().add(-0.5, 0.0, -0.5),
                 Color.RED,
                 seeThroughBlocks = true,
                 beacon = true,
             )
             event.drawDynamicText(
-                tentacle.key.getLorenzVec().up(1.0),
-                "§a${pluralize(tentacle.value, "Hit", withNumber = true)}",
+                tentacle.getLorenzVec().up(1.0),
+                "§a${pluralize(hits, "Hit", withNumber = true)}",
                 1.0,
             )
         }
