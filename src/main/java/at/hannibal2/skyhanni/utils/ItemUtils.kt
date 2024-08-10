@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -76,19 +74,6 @@ object ItemUtils {
             list.add(player.inventory.itemStack)
         }
         return list
-    }
-
-    fun hasAttributes(stack: ItemStack): Boolean {
-        if (!stack.hasTagCompound()) return false
-        val tagCompound = stack.tagCompound
-        if (!tagCompound.hasKey("ExtraAttributes")) return false
-        val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-        try {
-            val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
-            return json.has("attributes")
-        } catch (_: Exception) {
-            return false
-        }
     }
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE

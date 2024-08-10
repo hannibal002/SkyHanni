@@ -4,10 +4,7 @@ import at.hannibal2.skyhanni.utils.shader.Shader
 import at.hannibal2.skyhanni.utils.shader.Uniform
 import net.minecraft.client.Minecraft
 
-object RoundedRectangleShader : Shader("rounded_rect", "rounded_rect") {
-
-    val INSTANCE: RoundedRectangleShader
-        get() = this
+abstract class RoundedShader(vertex: String, fragment: String) : Shader(vertex, fragment) {
 
     var scaleFactor: Float = 0f
     var radius: Float = 0f
@@ -25,4 +22,16 @@ object RoundedRectangleShader : Shader("rounded_rect", "rounded_rect") {
         registerUniform(Uniform.UniformType.VEC2, "halfSize") { halfSize }
         registerUniform(Uniform.UniformType.VEC2, "centerPos") { centerPos }
     }
+}
+
+object RoundedRectangleShader : RoundedShader("rounded_rect", "rounded_rect") {
+
+    val INSTANCE: RoundedRectangleShader
+        get() = this
+}
+
+object RoundedTextureShader : RoundedShader("rounded_texture", "rounded_texture") {
+
+    val INSTANCE: RoundedTextureShader
+        get() = this
 }

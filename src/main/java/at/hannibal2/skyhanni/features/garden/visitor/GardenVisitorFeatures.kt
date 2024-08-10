@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -201,7 +202,11 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
-                            BazaarApi.searchForBazaarItem(name, amount)
+                            if (internalName.isBazaarItem()) {
+                                BazaarApi.searchForBazaarItem(name, amount)
+                            } else {
+                                HypixelCommands.auctionSearch(name.removeColor())
+                            }
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },

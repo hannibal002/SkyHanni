@@ -12,6 +12,10 @@ object HypixelCommands {
         send("bz $searchTerm")
     }
 
+    fun auctionSearch(searchTerm: String) {
+        send("ahs $searchTerm")
+    }
+
     fun playtime() {
         send("playtime")
     }

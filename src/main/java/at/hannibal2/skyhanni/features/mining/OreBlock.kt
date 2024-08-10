@@ -176,7 +176,7 @@ enum class OreBlock(
         checkArea = { inCrystalHollows || inGlacite },
     ),
     JASPER(
-        checkBlock = { it.isGemstoneWithColor(EnumDyeColor.PINK) },
+        checkBlock = { it.isGemstoneWithColor(EnumDyeColor.MAGENTA) },
         checkArea = { inCrystalHollows || inGlacite },
     ),
     OPAL(
