@@ -53,8 +53,8 @@ object ItemStars {
         val data = event.getConstant<ItemsJson>("Items")
         armorNames.clear()
         tiers.clear()
-        armorNames.addAll(data.crimson_armors)
-        for (tier in data.crimson_tiers) {
+        armorNames.addAll(data.crimsonArmors)
+        for (tier in data.crimsonTiers) {
             tiers[tier.key] = tier.value
         }
     }

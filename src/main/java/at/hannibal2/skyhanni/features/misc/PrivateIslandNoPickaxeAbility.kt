@@ -23,7 +23,7 @@ object PrivateIslandNoPickaxeAbility {
 
         when (event.itemInHand?.getItemCategoryOrNull()) {
             ItemCategory.GAUNTLET, ItemCategory.PICKAXE, ItemCategory.DRILL -> {
-                event.isCanceled = true
+                event.cancel()
             }
 
             else -> {}

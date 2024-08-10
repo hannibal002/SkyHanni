@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -46,7 +46,7 @@ object SlayerAPI {
             val maxPrice = npcPrice.coerceAtLeast(price)
             val totalPrice = maxPrice * amount
 
-            val format = NumberUtil.format(totalPrice)
+            val format = totalPrice.shortFormat()
             val priceFormat = " §7(§6$format coins§7)"
 
             "$amountFormat$displayName$priceFormat" to totalPrice
@@ -62,7 +62,7 @@ object SlayerAPI {
         }
 
         event.addData {
-            add("activeSlayer: ${getActiveSlayer()}")
+            add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: $latestSlayerProgress")
@@ -82,9 +82,7 @@ object SlayerAPI {
         }
     }
 
-    fun getActiveSlayer() = activeSlayer.getValue()
-
-    private val activeSlayer = RecalculatingValue(1.seconds) {
+    val activeSlayer by RecalculatingValue(1.seconds) {
         grabActiveSlayer()
     }
 
@@ -125,7 +123,7 @@ object SlayerAPI {
             } else {
                 val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
                 isInAnyArea = slayerTypeForCurrentArea != null
-                slayerTypeForCurrentArea == getActiveSlayer() && slayerTypeForCurrentArea != null
+                slayerTypeForCurrentArea == activeSlayer && slayerTypeForCurrentArea != null
             }
         }
     }

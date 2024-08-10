@@ -48,7 +48,7 @@ object CorpseLocator {
                 entity.showArms && entity.hasNoBasePlate() && !entity.isInvisible
             }
             .forEach { entity ->
-                val helmetName = entity.getCurrentArmor(3).getInternalName()
+                val helmetName = entity.getCurrentArmor(3)?.getInternalName() ?: return
                 val corpseType = MineshaftWaypointType.getByHelmetOrNull(helmetName) ?: return
 
                 val canSee = entity.getLorenzVec().canBeSeen(-1..3)
@@ -83,7 +83,7 @@ object CorpseLocator {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        if (sharedWaypoints.isNotEmpty()) sharedWaypoints.clear()
+        sharedWaypoints.clear()
     }
 
     @SubscribeEvent
