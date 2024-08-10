@@ -102,9 +102,7 @@ object CroesusChestTracker {
             pageSetup(event)
 
             if (croesusEmpty) {
-                croesusChests?.forEach {
-                    it.setValuesNull()
-                }
+                croesusChests?.forEach { it.setValuesNull() }
                 return
             }
 
@@ -149,7 +147,7 @@ object CroesusChestTracker {
                 unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
                 else -> ErrorManager.logErrorStateWithData(
                     "Croesus Chest couldn't be read correctly.",
-                    "Openstate check failed for chest.",
+                    "Open state check failed for chest.",
                     "run" to run,
                     "lore" to lore
                 ).run { null }

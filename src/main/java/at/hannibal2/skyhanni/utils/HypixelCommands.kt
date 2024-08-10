@@ -12,6 +12,10 @@ object HypixelCommands {
         send("bz $searchTerm")
     }
 
+    fun auctionSearch(searchTerm: String) {
+        send("ahs $searchTerm")
+    }
+
     fun playtime() {
         send("playtime")
     }
@@ -41,7 +45,7 @@ object HypixelCommands {
     }
 
     fun teleportToPlot(plotName: String) {
-        send("tptoplot $plotName")
+        send("plottp $plotName")
     }
 
     fun gardenLevels() {

@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -11,10 +12,10 @@ import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getClassInstance
-import at.hannibal2.skyhanni.utils.ReflectionUtils.getModContainer
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text.send
+import at.hannibal2.skyhanni.utils.system.PlatformUtils.getModInstance
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ChatLine
 import net.minecraft.client.gui.GuiNewChat
@@ -76,17 +77,17 @@ object ChatManager {
         val hoverExtraInfo: List<String> = listOf(),
     )
 
-    @SubscribeEvent
-    fun onSendMessageToServerPacket(event: PacketEvent.SendEvent) {
+    @HandleEvent
+    fun onSendMessageToServerPacket(event: PacketSentEvent) {
         val packet = event.packet as? C01PacketChatMessage ?: return
 
         val message = packet.message
         val component = ChatComponentText(message)
         val originatingModCall = event.findOriginatingModCall()
-        val originatingModContainer = originatingModCall?.getClassInstance()?.getModContainer()
+        val originatingModContainer = originatingModCall?.getClassInstance()?.getModInstance()
         val hoverInfo = listOf(
             "§7Message created by §a${originatingModCall?.toString() ?: "§cprobably minecraft"}",
-            "§7Mod id: §a${originatingModContainer?.modId}",
+            "§7Mod id: §a${originatingModContainer?.id}",
             "§7Mod name: §a${originatingModContainer?.name}"
         )
         val stackTrace =

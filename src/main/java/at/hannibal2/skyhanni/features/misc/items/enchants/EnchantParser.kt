@@ -39,7 +39,7 @@ object EnchantParser {
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
-        "enchants", "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z -]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)"
+        "enchants", "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)"
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
@@ -321,11 +321,18 @@ object EnchantParser {
             val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
             builder.append(orderedEnchant.getFormattedString())
-            if (i % 3 != 2) {
-                builder.append(comma)
-            } else {
+
+            if (itemIsBook() && maxEnchantsPerLine == 1) {
                 insertEnchants.add(builder.toString())
+                insertEnchants.addAll(orderedEnchant.getLore())
                 builder = StringBuilder()
+            } else {
+                if (i % 3 != 2) {
+                    builder.append(comma)
+                } else {
+                    insertEnchants.add(builder.toString())
+                    builder = StringBuilder()
+                }
             }
         }
 

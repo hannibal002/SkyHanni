@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFrom
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -22,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -49,15 +47,15 @@ object SackAPI {
     private val patternGroup = RepoPattern.group("data.sacks")
     private val sackPattern by patternGroup.pattern(
         "sack",
-        "^(.* Sack|Enchanted .* Sack)\$"
+        "^(.* Sack|Enchanted .* Sack)\$",
     )
     private val numPattern by patternGroup.pattern(
         "number",
-        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)"
+        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
-        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?"
+        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
     )
 
     private var isRuneSack = false
@@ -114,21 +112,14 @@ object SackAPI {
         SackDisplay.update(isNewInventory)
     }
 
-    private fun String.getTrophyRarity(): TrophyRarity? {
-        return if (this.startsWith("Bronze"))
-            TrophyRarity.BRONZE
-        else
-            if (this.startsWith("Silver"))
-                TrophyRarity.SILVER
-            else null
+    private fun String.getTrophyRarity(): TrophyRarity? = when {
+        this.startsWith("Bronze") -> TrophyRarity.BRONZE
+        this.startsWith("Silver") -> TrophyRarity.SILVER
+        else -> null
     }
 
     private fun NEUInternalName.sackPrice(stored: Int): Long {
-        return when (sackDisplayConfig.priceFrom) {
-            PriceFrom.BAZAAR -> (getPrice() * stored).toLong().coerceAtLeast(0)
-            PriceFrom.NPC -> (getNpcPriceOrNull() ?: 0.0).toLong() * stored
-            else -> 0L
-        }
+        return getPrice(sackDisplayConfig.priceSource).toLong() * stored
     }
 
     fun getSacksData(savingSacks: Boolean) {
@@ -275,11 +266,7 @@ object SackAPI {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NEUInternalName>()
 
-        sacksData.values.forEach { sackInfo ->
-            sackInfo.contents.forEach { content ->
-                uniqueSackItems.add(content)
-            }
-        }
+        sacksData.values.flatMap { it.contents }.forEach { uniqueSackItems.add(it) }
 
         sackListInternalNames = uniqueSackItems.map { it.asString() }.toSet()
         sackListNames = uniqueSackItems.map { it.itemNameWithoutColor.removeNonAscii().trim().uppercase() }.toSet()
