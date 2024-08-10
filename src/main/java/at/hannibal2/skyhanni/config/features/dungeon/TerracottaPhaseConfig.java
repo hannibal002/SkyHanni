@@ -14,7 +14,7 @@ public class TerracottaPhaseConfig {
     public boolean hideParticles = false;
 
     @Expose
-    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes during the terracotta phase.")
+    @ConfigOption(name = "Hide Damage Splash", desc = "Hide damage splashes during the terracotta currentPhase.")
     @ConfigEditorBoolean
     public boolean hideDamageSplash = false;
 }

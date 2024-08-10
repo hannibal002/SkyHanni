@@ -58,9 +58,21 @@ object TentacleWaypoint {
                 seeThroughBlocks = true,
                 beacon = true,
             )
+
+            val text = if (BactePhase.currentPhase == BactePhase.BactePhase.PHASE_5) {
+                "§a${pluralize(hits, "Hit", withNumber = true)}"
+            } else {
+                val maxHp = when (BactePhase.currentPhase) {
+                    BactePhase.BactePhase.PHASE_4 -> 3
+                    else -> 4
+                }
+                val hpColor = if (hits > 0) "§c" else "§a"
+                "$hpColor${maxHp - hits}§a/${maxHp}§c❤"
+            }
+
             event.drawDynamicText(
                 tentacle.getLorenzVec().up(1.0),
-                "§a${pluralize(hits, "Hit", withNumber = true)}",
+                text,
                 1.0,
             )
         }

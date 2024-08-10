@@ -9,7 +9,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     LorenzEvent() {
 
     /**
-     * The phase of the event (see [Type]
+     * The currentPhase of the event (see [Type]
      */
     var type: Type? = null
 
@@ -105,7 +105,7 @@ class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity
     }
 
     /**
-     * The phase of the event.
+     * The currentPhase of the event.
      * [.XRAY] means that this directly precedes entities whose outlines are rendered through walls (Vanilla 1.9+)
      * [.NO_XRAY] means that this directly precedes entities whose outlines are rendered only when visible to the client
      */

@@ -14,8 +14,14 @@ public class ColosseumConfig {
     public boolean highlightBlobbercysts = true;
 
     @Expose
-    @ConfigOption(name = "Tentacle Waypoints", desc = "Show waypoints for tentacles with their hits in Bacte fight.")
+    @ConfigOption(name = "Tentacle Waypoints", desc = "Show waypoints for tentacles with their HP in Bacte fight.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean tentacleWaypoints = true;
+
+    @Expose
+    @ConfigOption(name = "Show Bacte Phase", desc = "Show the current currentPhase of Bacte.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showBactePhase = true;
 }
