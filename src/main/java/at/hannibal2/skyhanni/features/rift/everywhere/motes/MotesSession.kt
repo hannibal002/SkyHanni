@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object MotesSession {
 
-    private val config get() = SkyHanniMod.feature.rift.motes.showSession
+    private val config get() = SkyHanniMod.feature.rift.motes.motesPerSession
 
     private var initialMotes: Long? = null
     private var currentMotes: Long? = null
