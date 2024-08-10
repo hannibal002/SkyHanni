@@ -60,6 +60,9 @@ enum class ProjectTarget(
             ProjectTarget.values().find { it.name == linkTo }!!
         }
     }
+    val parent by lazy {
+        values().find { it.linkTo == this }
+    }
     val isForge get() = forgeDep != null
     val isFabric get() = forgeDep == null
 

@@ -61,6 +61,8 @@ loom {
     }
     runs {
         named("client") {
+            if (target == ProjectTarget.MAIN)
+                isIdeConfigGenerated = true
             this.runDir(runDirectory.relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
@@ -73,6 +75,12 @@ loom {
         removeIf { it.name == "server" }
     }
 }
+
+if (target == ProjectTarget.MAIN)
+    sourceSets.main {
+        resources.destinationDirectory.set(kotlin.destinationDirectory)
+        output.setResourcesDir(kotlin.destinationDirectory)
+    }
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
@@ -220,8 +228,19 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-tasks.compileJava {
-    dependsOn(tasks.processResources)
+if (target == ProjectTarget.MAIN)
+    tasks.compileJava {
+        dependsOn(tasks.processResources)
+    }
+
+if (target.parent == ProjectTarget.MAIN) {
+    val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
+    tasks.named("processResources") {
+        dependsOn(mainRes)
+    }
+    tasks.named("preprocessCode") {
+        dependsOn(mainRes)
+    }
 }
 
 tasks.withType(JavaCompile::class) {
