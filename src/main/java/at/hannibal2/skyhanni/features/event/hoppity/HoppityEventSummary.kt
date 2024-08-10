@@ -36,10 +36,9 @@ object HoppityEventSummary {
     private var firstInCf = 0L
     private var inCfNow = false
 
-    private var needInitLeaderboard = false
     private var lastLeaderboardInitWarning: SimpleTimeMark = SimpleTimeMark.farPast()
-    private var needFinalLeaderboard = false
     private var lastLeaderboardFinWarning: SimpleTimeMark = SimpleTimeMark.farPast()
+    private var needLeaderboardFinalization = false
 
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
@@ -58,6 +57,7 @@ object HoppityEventSummary {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         checkEnded()
+        if (!HoppityAPI.isHoppityEvent()) return
         checkLeaderboardInit()
         checkAddCfTime()
     }
@@ -70,79 +70,80 @@ object HoppityEventSummary {
 
     private fun checkInit() {
         val storage = ProfileStorageData.profileSpecific?.hoppityEvent ?: return
-        if (storage.currentYear == null) {
-            if (SkyblockSeason.currentSeason != SkyblockSeason.SPRING) storage.currentYear = SkyBlockTime.now().year + 1
-            else storage.currentYear = SkyBlockTime.now().year
+        val currentYear = SkyBlockTime.now().year
+        storage.eventYear = storage.eventYear ?: run {
+            if (SkyblockSeason.currentSeason == SkyblockSeason.SPRING) currentYear else currentYear + 1
         }
     }
 
     private fun checkLeaderboardInit() {
         if (!HoppityAPI.isHoppityEvent()) return
-        if (!config.eventSummary.statDisplayList.contains(HoppityStat.TIME_IN_CF)) return
+        if (!config.eventSummary.statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE)) return
         val stats = ProfileStorageData.profileSpecific?.hoppityEvent?.stats ?: return
-        if (stats.initLbPos == null) {
-            needInitLeaderboard = true
-            if (lastLeaderboardInitWarning.passedSince() >= 60.seconds) {
-                ChatUtils.chat("Open chocolate factory to set your initial Leaderboard position for Hoppity Event!")
-                lastLeaderboardInitWarning = SimpleTimeMark.now()
-            }
-        } else needInitLeaderboard = false
+        if (stats.initLbPos == null && lastLeaderboardInitWarning.passedSince() >= 60.seconds) {
+            ChatUtils.chat("Open chocolate factory to set your initial Leaderboard position for Hoppity Event!")
+            lastLeaderboardInitWarning = SimpleTimeMark.now()
+        }
     }
 
     private fun updateCurrentLeaderboardPosition(position: Int?) {
-        if (!HoppityAPI.isHoppityEvent()) return
-        if (position == null) return
+        if (!HoppityAPI.isHoppityEvent() || position == null) return
         val stats = ProfileStorageData.profileSpecific?.hoppityEvent?.stats ?: return
-        if (needInitLeaderboard) {
-            stats.initLbPos = position
-        } else if (needFinalLeaderboard) {
-            stats.finalLbPos = position
+
+        when {
+            stats.initLbPos == null -> stats.initLbPos = position
+            stats.finalLbPos == null && needLeaderboardFinalization -> {
+                stats.finalLbPos = position
+                needLeaderboardFinalization = false
+            }
         }
     }
 
     private fun checkAddCfTime() {
-        if (ChocolateFactoryAPI.inChocolateFactory && !inCfNow) {
+        if (ChocolateFactoryAPI.inChocolateFactory && !this.inCfNow) {
             updateCurrentLeaderboardPosition(ChocolateFactoryAPI.leaderboardPosition)
-            inCfNow = true
+            this.inCfNow = true
             firstInCf = SkyBlockTime.now().toMillis()
-        } else if (!ChocolateFactoryAPI.inChocolateFactory && inCfNow) {
+        } else if (!ChocolateFactoryAPI.inChocolateFactory && this.inCfNow) {
             val stats = ProfileStorageData.profileSpecific?.hoppityEvent?.stats ?: return
             stats.millisInCf += (SkyBlockTime.now().toMillis() - firstInCf)
-            inCfNow = false
+            this.inCfNow = false
             firstInCf = 0
         }
     }
 
     private fun checkEnded() {
-        if (!config.eventSummary.enabled) return
         val storage = ProfileStorageData.profileSpecific?.hoppityEvent ?: return
+        if (storage.eventYear == null) return
 
         val currentYear = SkyBlockTime.now().year
         val currentSeason = SkyblockSeason.currentSeason
+        val isSpring = currentSeason == SkyblockSeason.SPRING
 
-        if (storage == HoppityEventStatsStorage()) {
-            ProfileStorageData.profileSpecific!!.hoppityEvent!!.currentYear = currentYear
+        if (storage.eventYear!! < currentYear || (storage.eventYear!! == currentYear && !isSpring)) {
+            handleEventEnd(storage)
+        }
+    }
+
+    private fun handleEventEnd(storage: HoppityEventStatsStorage) {
+        if (!config.eventSummary.enabled) return
+
+        if (config.eventSummary.statDisplayList.contains(HoppityStat.LEADERBOARD_CHANGE) && storage.stats.finalLbPos == null) {
+            needLeaderboardFinalization = true
+            if (lastLeaderboardFinWarning.passedSince() >= 60.seconds) {
+                ChatUtils.chat("Open chocolate factory to set your finalized Leaderboard position for Hoppity Event!")
+                lastLeaderboardFinWarning = SimpleTimeMark.now()
+            }
             return
         }
 
-        if (storage.currentYear == null) return
-
-        val ended = storage.currentYear!! < currentYear || (storage.currentYear == currentYear && currentSeason != SkyblockSeason.SPRING)
-        if (ended) {
-            if (config.eventSummary.statDisplayList.contains(HoppityStat.TIME_IN_CF) && storage.stats.finalLbPos == null) {
-                needFinalLeaderboard = true
-                if (lastLeaderboardFinWarning.passedSince() >= 60.seconds) {
-                    ChatUtils.chat("Open chocolate factory to set your finalized Leaderboard position for Hoppity Event!")
-                    lastLeaderboardFinWarning = SimpleTimeMark.now()
-                }
-                return
-            } else needFinalLeaderboard = false
-            sendSummaryMessage(storage)
-            ProfileStorageData.profileSpecific?.pastHoppityEventStats?.put(
-                storage.currentYear, storage.stats
-            )
-            ProfileStorageData.profileSpecific?.hoppityEvent = HoppityEventStatsStorage()
-            ProfileStorageData.profileSpecific?.hoppityEvent!!.currentYear = currentYear + 1
+        sendSummaryMessage(storage)
+        ProfileStorageData.profileSpecific?.pastHoppityEventStats?.put(
+            storage.eventYear!!, storage.stats,
+        )
+        ProfileStorageData.profileSpecific?.hoppityEvent = HoppityEventStatsStorage().apply {
+            eventYear = null
+            stats = HoppityEventStatsStorage.HoppityEventStats()
         }
     }
 
@@ -157,9 +158,9 @@ object HoppityEventSummary {
     }
 
     fun forceEventEnd() {
-        ProfileStorageData.profileSpecific?.hoppityEvent?.currentYear ?: return
+        ProfileStorageData.profileSpecific?.hoppityEvent?.eventYear ?: return
         val currentYear = SkyBlockTime.now().year
-        ProfileStorageData.profileSpecific?.hoppityEvent!!.currentYear = currentYear - 1
+        ProfileStorageData.profileSpecific?.hoppityEvent!!.eventYear = currentYear - 1
     }
 
     fun sendProgressMessage() {
@@ -179,13 +180,15 @@ object HoppityEventSummary {
 
     private fun StringBuilder.addExtraChocFormatLine(chocGained: Long) {
         if (chocGained <= 0) return
-        appendHeadedLine(buildString {
-            append(" §6+${chocGained.addSeparators()} Chocolate")
-            if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
-                val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(chocGained).format(maxUnits = 2)
-                append(" §7(§a+§b$timeFormatted§7)")
-            }
-        })
+        appendHeadedLine(
+            buildString {
+                append(" §6+${chocGained.addSeparators()} Chocolate")
+                if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
+                    val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(chocGained).format(maxUnits = 2)
+                    append(" §7(§a+§b$timeFormatted§7)")
+                }
+            },
+        )
     }
 
     private val summaryOperationList by lazy {
@@ -193,41 +196,42 @@ object HoppityEventSummary {
             val stats = ProfileStorageData.profileSpecific?.hoppityEvent?.stats
             if (stats != null) {
                 put(HoppityStat.MEAL_EGGS_FOUND) {
-                    stats.getEggsFoundFormat().forEach {
-                        foundFormat -> it.appendHeadedLine(foundFormat)
+                    stats.getEggsFoundFormat().forEach { foundFormat ->
+                        it.appendHeadedLine(foundFormat)
                     }
                 }
 
                 put(HoppityStat.NEW_RABBITS) {
-                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach {
-                        newRabbitLine -> it.appendHeadedLine(newRabbitLine)
+                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach { newRabbitLine ->
+                        it.appendHeadedLine(newRabbitLine)
                     }
                 }
 
                 put(HoppityStat.DUPLICATE_RABBITS) {
-                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach {
-                        dupeRabbitLine -> it.appendHeadedLine(dupeRabbitLine)
+                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach { dupeRabbitLine ->
+                        it.appendHeadedLine(dupeRabbitLine)
                     }
                     it.addExtraChocFormatLine(stats.dupeChocolateGained)
                 }
 
                 put(HoppityStat.STRAY_RABBITS) {
-                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach {
-                        strayRabbitLine -> it.appendHeadedLine(strayRabbitLine)
+                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach { strayRabbitLine ->
+                        it.appendHeadedLine(strayRabbitLine)
                     }
                     it.addExtraChocFormatLine(stats.strayChocolateGained)
                 }
 
                 put(HoppityStat.LEADERBOARD_CHANGE) {
                     val initialPosition = stats.initLbPos ?: return@put
-                    val updatedPosition = stats.finalLbPos.takeIf { lb -> lb != null } ?: ChocolateFactoryAPI.leaderboardPosition ?: return@put
+                    val updatedPosition =
+                        stats.finalLbPos.takeIf { lb -> lb != null } ?: ChocolateFactoryAPI.leaderboardPosition ?: return@put
                     val leaderboardChange = initialPosition - updatedPosition
                     if (leaderboardChange == 0) {
                         it.appendHeadedLine("§7Leaderboard Change: §7§oNo change in position§r§7.")
                     } else {
                         val changeFormat = "${if (leaderboardChange < 0) "§c" else "§a+"}$leaderboardChange"
                         it.appendHeadedLine(
-                            "§7Leaderboard Change: §b#$initialPosition §c-> §b#$updatedPosition §7($changeFormat spots§7)"
+                            "§7Leaderboard Change: §b#$initialPosition §c-> §b#$updatedPosition §7($changeFormat spots§7)",
                         )
                     }
                 }
@@ -246,12 +250,12 @@ object HoppityEventSummary {
     }
 
     private fun sendSummaryMessage(storage: HoppityEventStatsStorage) {
-        if (storage.currentYear == null) return
+        if (storage.eventYear == null) return
         val summaryBuilder: StringBuilder = StringBuilder()
         summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")
 
         // Header
-        summaryBuilder.appendLine("${" ".repeat(26)}§d§lHoppity's Hunt #${getHoppityEventNumber(storage.currentYear!!)} Stats")
+        summaryBuilder.appendLine("${" ".repeat(26)}§d§lHoppity's Hunt #${getHoppityEventNumber(storage.eventYear!!)} Stats")
         summaryBuilder.appendLine()
 
         // Various stats from config
@@ -309,7 +313,7 @@ object HoppityEventSummary {
             "§7$name Rabbits: §f$rabbitsSum",
             HoppityRabbitRarity.entries.joinToString(" §7-") {
                 " ${it.colorCode}${rarityMap[it] ?: 0}"
-            }
+            },
         )
     }
 }
