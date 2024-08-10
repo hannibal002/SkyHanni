@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStatsStorage
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStatsStorage.HoppityEventStats.RabbitData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -47,17 +48,18 @@ object HoppityEventSummary {
 
         stats.mealsFound.addOrPut(event.eggType, 1)
         val rarity = HoppityRabbitRarity.getByRabbit(event.rabbitName) ?: return
-        if (event.duplicate) stats.dupeRabbits.addOrPut(rarity, 1)
-        else stats.newRabbits.addOrPut(rarity, 1)
-        if (event.chocGained > 0) stats.chocolateGained += event.chocGained
+        val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
+        if (event.duplicate) rarityMap.dupes++
+        else rarityMap.uniques++
+        if (event.chocGained > 0) stats.dupeChocolateGained += event.chocGained
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        checkEnded()
         checkLeaderboardInit()
         checkAddCfTime()
-        checkEnded()
     }
 
     @SubscribeEvent
@@ -70,7 +72,8 @@ object HoppityEventSummary {
 
     fun addStrayCaught(rarity: HoppityRabbitRarity, chocGained: Long) {
         val stats = ProfileStorageData.profileSpecific?.hoppityEvent?.stats ?: return
-        stats.strayRabbits.addOrPut(rarity, 1)
+        val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
+        rarityMap.strays++
         stats.strayChocolateGained += chocGained
     }
 
@@ -192,20 +195,20 @@ object HoppityEventSummary {
                 }
 
                 put(HoppityStat.NEW_RABBITS) {
-                    getRabbitsFormat(stats.newRabbits, "Unique").forEach {
+                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach {
                         newRabbitLine -> it.appendHeadedLine(newRabbitLine)
                     }
                 }
 
                 put(HoppityStat.DUPLICATE_RABBITS) {
-                    getRabbitsFormat(stats.dupeRabbits, "Duplicate").forEach {
+                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach {
                         dupeRabbitLine -> it.appendHeadedLine(dupeRabbitLine)
                     }
-                    it.addExtraChocFormatLine(stats.chocolateGained)
+                    it.addExtraChocFormatLine(stats.dupeChocolateGained)
                 }
 
                 put(HoppityStat.STRAY_RABBITS) {
-                    getRabbitsFormat(stats.strayRabbits, "Stray").forEach {
+                    getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach {
                         strayRabbitLine -> it.appendHeadedLine(strayRabbitLine)
                     }
                     it.addExtraChocFormatLine(stats.strayChocolateGained)

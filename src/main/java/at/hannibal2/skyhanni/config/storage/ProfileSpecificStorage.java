@@ -683,16 +683,21 @@ public class ProfileSpecificStorage {
             public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
 
             @Expose
-            public Map<HoppityRabbitRarity, Integer> newRabbits = new HashMap<>();
+            public Map<HoppityRabbitRarity, RabbitData> rabbitsFound = new HashMap<>();
+
+            public static class RabbitData {
+                @Expose
+                public int uniques = 0;
+
+                @Expose
+                public int dupes = 0;
+
+                @Expose
+                public int strays = 0;
+            }
 
             @Expose
-            public Map<HoppityRabbitRarity, Integer> dupeRabbits = new HashMap<>();
-
-            @Expose
-            public long chocolateGained = 0;
-
-            @Expose
-            public Map<HoppityRabbitRarity, Integer> strayRabbits = new HashMap<>();
+            public long dupeChocolateGained = 0;
 
             @Expose
             public long strayChocolateGained = 0;

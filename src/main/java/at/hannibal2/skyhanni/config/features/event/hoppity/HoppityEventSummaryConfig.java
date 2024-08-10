@@ -45,7 +45,7 @@ public class HoppityEventSummaryConfig {
         EMPTY_3(""),
         STRAY_RABBITS("§7Stray Rabbits: §f20\n §f10 §7- §a6 §7- §93 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+8,000,000 Chocolate\n  §c* §c§oRequires Stray Tracker being enabled to work."),
         EMPTY_4(""),
-        LEADERBOARD_CHANGE("§7Leaderboard Change: §b#1000 §c -> §b#750 §7(§a+250 spots§7)"),
+        LEADERBOARD_CHANGE("§7Leaderboard Change: §b#1000 §c-> §b#750 §7(§a+250 spots§7)"),
         TIME_IN_CF("§7You spent §b4h 36m §7in the §6Chocolate Factory§7.")
         ;
 
