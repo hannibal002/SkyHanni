@@ -137,7 +137,7 @@ object HoppityEventSummary {
             return
         }
 
-        sendSummaryMessage(storage)
+        sendStatsMessage(storage)
         ProfileStorageData.profileSpecific?.pastHoppityEventStats?.put(
             storage.eventYear!!, storage.stats,
         )
@@ -161,32 +161,6 @@ object HoppityEventSummary {
         ProfileStorageData.profileSpecific?.hoppityEvent?.eventYear ?: return
         val currentYear = SkyBlockTime.now().year
         ProfileStorageData.profileSpecific?.hoppityEvent!!.eventYear = currentYear - 1
-    }
-
-    fun sendStatsMessage(it: Array<String>) {
-        val pastStats = ProfileStorageData.profileSpecific?.pastHoppityEventStats
-        val statsYearList = pastStats?.keys ?: mutableListOf()
-        val eventStorage = ProfileStorageData.profileSpecific?.hoppityEvent
-        if (eventStorage != null && eventStorage.stats.rabbitsFound.any()) statsYearList.add(eventStorage.eventYear)
-
-        val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
-
-        if (parsedInt == null) {
-            ChatUtils.chat("Stats are available for the following years:\n${statsYearList.joinToString("§e,") { "§b$it" }}")
-        } else if (!statsYearList.contains(parsedInt)) {
-            ChatUtils.chat(
-                "Could not find stats for year §b$parsedInt§e. Stats are available for the following years:\n${
-                    statsYearList.joinToString(
-                        "§e,",
-                    ) { "§b$it" }
-                }",
-            )
-        } else if (parsedInt == eventStorage?.eventYear) {
-            sendSummaryMessage(eventStorage)
-        } else {
-            val historicalStats = pastStats?.get(parsedInt) ?: return
-            sendSummaryMessage(parsedInt, historicalStats)
-        }
     }
 
     private fun StringBuilder.appendHeadedLine(line: String) {
@@ -261,8 +235,34 @@ object HoppityEventSummary {
         }
     }
 
-    private fun sendSummaryMessage(storage: HoppityEventStatsStorage) = sendSummaryMessage(storage.eventYear, storage.stats)
-    private fun sendSummaryMessage(eventYear: Int?, stats: HoppityEventStats) {
+    fun sendStatsMessage(it: Array<String>) {
+        val pastStats = ProfileStorageData.profileSpecific?.pastHoppityEventStats
+        val statsYearList = pastStats?.keys ?: mutableListOf()
+        val eventStorage = ProfileStorageData.profileSpecific?.hoppityEvent
+        if (eventStorage != null && eventStorage.stats.rabbitsFound.any()) statsYearList.add(eventStorage.eventYear)
+
+        val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
+
+        if (parsedInt == null) {
+            ChatUtils.chat("Stats are available for the following years:\n${statsYearList.joinToString("§e,") { "§b$it" }}")
+        } else if (!statsYearList.contains(parsedInt)) {
+            ChatUtils.chat(
+                "Could not find stats for year §b$parsedInt§e. Stats are available for the following years:\n${
+                    statsYearList.joinToString(
+                        "§e,",
+                    ) { "§b$it" }
+                }",
+            )
+        } else if (parsedInt == eventStorage?.eventYear) {
+            sendStatsMessage(eventStorage)
+        } else {
+            val historicalStats = pastStats?.get(parsedInt) ?: return
+            sendStatsMessage(parsedInt, historicalStats)
+        }
+    }
+
+    private fun sendStatsMessage(storage: HoppityEventStatsStorage) = sendStatsMessage(storage.eventYear, storage.stats)
+    private fun sendStatsMessage(eventYear: Int?, stats: HoppityEventStats) {
         if (eventYear == null) return
         val summaryBuilder: StringBuilder = StringBuilder()
         summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")

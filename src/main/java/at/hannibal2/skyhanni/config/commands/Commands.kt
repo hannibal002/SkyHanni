@@ -339,12 +339,8 @@ object Commands {
             "Teleports you to the nearest infested plot",
         ) { PestFinder.teleportNearestInfestedPlot() }
         registerCommand(
-            "shhoppityprogress",
-            "Check your progress in the current Hoppity's Hunt event."
-        ) { HoppityEventSummary.sendStatsMessage() }
-        registerCommand(
             "shhoppitystats",
-            "Look up stats for a Hoppity's Event (by SkyBlock year).\nLeave blank for year list."
+            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
         ) { HoppityEventSummary.sendStatsMessage(it) }
     }
 
