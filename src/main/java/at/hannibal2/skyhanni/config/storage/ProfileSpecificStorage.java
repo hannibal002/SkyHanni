@@ -673,7 +673,8 @@ public class ProfileSpecificStorage {
 
     public static class HoppityEventStatsStorage {
         @Expose
-        public int currentYear = 0;
+        @Nullable
+        public Integer currentYear = null;
 
         @Expose
         public HoppityEventStats stats = new HoppityEventStats();

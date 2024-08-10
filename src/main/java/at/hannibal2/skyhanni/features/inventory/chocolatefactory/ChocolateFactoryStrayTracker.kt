@@ -294,7 +294,7 @@ object ChocolateFactoryStrayTracker {
         val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
         if (!nameText.equals("§6§lGolden Rabbit §8- §aSide Dish")) return
 
-        HoppityAPI.setSideDishActive()
+        HoppityAPI.fireSideDishMessage()
         if (!isEnabled()) return
 
         claimedStraysSlots.add(index)
