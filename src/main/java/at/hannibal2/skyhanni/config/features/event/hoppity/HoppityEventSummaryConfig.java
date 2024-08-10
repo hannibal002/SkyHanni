@@ -21,7 +21,7 @@ public class HoppityEventSummaryConfig {
     @Expose
     @ConfigOption(
         name = "Stats List",
-        desc = "Drag text to change what displays in the summary card"
+        desc = "Drag text to change what displays in the summary card."
     )
     @ConfigEditorDraggableList
     public List<HoppityStat> statDisplayList = new ArrayList<>(Arrays.asList(

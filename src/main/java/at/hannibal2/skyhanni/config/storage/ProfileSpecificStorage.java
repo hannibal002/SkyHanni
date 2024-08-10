@@ -666,42 +666,47 @@ public class ProfileSpecificStorage {
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 
     @Expose
-    public HoppityEventStatsStorage hoppityEventStats = new HoppityEventStatsStorage();
+    public HoppityEventStatsStorage hoppityEvent = new HoppityEventStatsStorage();
 
     @Expose
-    public Map<Integer, HoppityEventStatsStorage> pastHoppityEventStats = new HashMap<>();
+    public Map<Integer, HoppityEventStatsStorage.HoppityEventStats> pastHoppityEventStats = new HashMap<>();
 
     public static class HoppityEventStatsStorage {
         @Expose
         public int currentYear = 0;
 
         @Expose
-        public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
+        public HoppityEventStats stats = new HoppityEventStats();
 
-        @Expose
-        public Map<HoppityRabbitRarity, Integer> newRabbits = new HashMap<>();
+        public static class HoppityEventStats {
+            @Expose
+            public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
 
-        @Expose
-        public Map<HoppityRabbitRarity, Integer> dupeRabbits = new HashMap<>();
+            @Expose
+            public Map<HoppityRabbitRarity, Integer> newRabbits = new HashMap<>();
 
-        @Expose
-        public long chocolateGained = 0;
+            @Expose
+            public Map<HoppityRabbitRarity, Integer> dupeRabbits = new HashMap<>();
 
-        @Expose
-        public Map<HoppityRabbitRarity, Integer> strayRabbits = new HashMap<>();
+            @Expose
+            public long chocolateGained = 0;
 
-        @Expose
-        public long strayChocolateGained = 0;
+            @Expose
+            public Map<HoppityRabbitRarity, Integer> strayRabbits = new HashMap<>();
 
-        @Expose
-        public long millisInCf = 0;
+            @Expose
+            public long strayChocolateGained = 0;
 
-        @Expose
-        @Nullable
-        public Integer initLbPos = null;
+            @Expose
+            public long millisInCf = 0;
 
-        @Expose
-        @Nullable
-        public Integer finalLbPos = null;
+            @Expose
+            @Nullable
+            public Integer initLbPos = null;
+
+            @Expose
+            @Nullable
+            public Integer finalLbPos = null;
+        }
     }
 }
