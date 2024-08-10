@@ -187,20 +187,20 @@ You might have noticed that while the SkyHanni source code is found in `src/`, t
 are located in a subproject called `1.8.9`. This is because SkyHanni is preparing for the eventual fall of 1.8.9 (via the foraging update or
 otherwise).
 
-To do so (while not disrupting regular development) we use [preprocesor](https://github.com/Deftu/RM-Preprocessor). Preprocessor
+To do so (while not disrupting regular development) we use [preprocessor](https://github.com/Deftu/RM-Preprocessor). Preprocessor
 automatically transforms code based on mappings as well as comment directives to create multiple variants of your source code for
 different Minecraft versions.
 
-Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever latest version we may target). The other versions are only there
+Note also that the only targets we consider are 1.8.9 and 1.21 (or whatever the latest version we may target). The other versions are only there
 to make mappings translate more easily (more on that later).
 
 ### Goals
 
-It is the explicit goal with this operation to passively generate a 1.21 version of SH using preprocessor. To this end contributors are
+It is the explicit goal of this operation to passively generate a 1.21 version of SH using preprocessor. To this end, contributors are
 encouraged to add mappings and preprocessing directives to their features to make them compile on 1.21. *However*, this is considered a very
-low priority and due to the confusing nature (and the slower initial setup time due to decompiling 4 versions of Minecraft) this feature
-is disabled by default. Similarly, it is free for every contributor to decide if they want to learn how to and use preprocessor mappings and
-directives. An explicit non goal is to maintain two SH versions continuously, instead only to make the eventual transition to 1.21 a task
+low priority. Due to the confusing nature (and the slower initial setup time due to decompiling four versions of Minecraft), this feature
+is disabled by default. Similarly, it is up to each contributor to decide if they want to learn how to use preprocessor mappings and
+directives. An explicit non-goal is to maintain two SH versions continuously; instead, we only want to make the eventual transition to 1.21 a task
 that can be slowly worked on over a long span of time.
 
 ### Set Up
@@ -208,15 +208,15 @@ that can be slowly worked on over a long span of time.
 The modern version variants can be set using `skyhanni.multi-version` in `.gradle/private.properties` to three levels.
 
 `off` completely disables any preprocessor action or alternative versions. There will be only one project (although still at the `:1.8.9`
-subproject path) and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
-setting up a dev env as fast and discernible as possible this is the default option.
+subproject path), and alternative version sources will not be generated (although old generated sources **will not be deleted**). To make
+setting up a dev environment as fast and discernible as possible, this is the default option.
 
-`preprocess-only` adds the `preprocessCode` task as well as all the versions subprojects. Compiling or running newer versions is not
-possible, but the `preprocessCode` task can be ran manually to inspect the generated source code. This mode is what should most often be
+`preprocess-only` adds the `preprocessCode` task as well as all the version subprojects. Compiling or running newer versions is not
+possible, but the `preprocessCode` task can be run manually to inspect the generated source code. This mode is what should most often be
 used when making alterations to the mappings or modifying preprocessor directives. Note that while this setting generally ignores any failed
 renaming attempts, if something is so badly mangled that it cannot even guess a name for a function, it will still break the build. Those
-situations should be rare however (In the entire SH codebase prior to me introducing this system i only found <10 such cases). You can
-specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect regular execution of the client which will only compile
+situations should be rare, however. (In the entire SH codebase prior to me introducing this system I only found <10 such cases). You can
+specifically compile 1.8.9 using `./gradlew :1.8.9:build`. This does not affect the regular execution of the client which will only compile
 1.8.9.
 
 `compile` enables compilation for the `:1.21` subproject. This means that a `build` or `assemble` task will try (and fail) to compile a
@@ -225,23 +225,23 @@ operations since the compile will never succeed and will block things like hotsw
 
 ### Improving mappings
 
-The different version projects are set up in such a way that each version depends on a slightly older version from which it is then adapted.
-There are 2 main versions (1.8.9 and 1.21), but there are also a few bridge versions. These exist to make remapping easier since automatic
-name mappings between 1.8.9 and 1.21 do not really exist. This is the current layout for our remaps. First we remap to 1.12. This still
-largely uses the old rendering system and has a lot of similar names to 1.8.9. As such only very little needs to be adapted in terms of
-behaviour and at best a couple of names need to be updates manually. The big jump is from 1.12 to 1.16. We use 1.16 since we don't want to
-too large of a jump (which could lead to a lot more missing names), but we still want to jump to a version with fabric (and specifically
-with fabric intermediary mappings). We also can't really jump to an earlier version since 1.14 and 1.15 have a really poor fabric api and
+The different project versions are set up in such a way that each version depends on a slightly older version from which it is then adapted.
+There are two main versions (1.8.9 and 1.21), but there are also a few bridge versions. These exist to make remapping easier since automatic
+name mappings between 1.8.9 and 1.21 do not really exist. This is the current layout for our remaps: First, we remap to 1.12. This still
+largely uses the old rendering system and has a lot of similar names to 1.8.9. As such, only very little needs to be adapted in terms of
+behaviour, and at best, a couple of names need to be updated manually. The big jump is from 1.12 to 1.16. We use 1.16 since we don't want to
+make too large of a jump (which could lead to a lot more missing names), but we still want to jump to a version with Fabric (and specifically
+with Fabric intermediary mappings). We also can't really jump to an earlier version since 1.14 and 1.15 have a really poor Fabric API and
 still have some of the old rendering code, meaning we would need to adapt to two slightly different rendering engines instead of just one
-big rendering change. Despite preprocessors best efforts this version will likely have the most manual mapping changes. Note that we
+big rendering change. Despite the preprocessor's best efforts, this version will likely have the most manual mapping changes. Note that we
 actually have two projects on 1.16. There is the Forge project, which is the one we remap to first. Then we remap to the corresponding
-fabric/yarn mappings. This is because remapping between searge and yarn is very inconsistent, unless it is done on one and the same version.
-Finally, we remap from 1.16 to 1.21. This is a fairly small change, especially since fabric intermediary mappings make different names
-between version very rare. The only real changes that need to be done in this jump are behavioural ones.
+Fabric/Yarn mappings. This is because remapping between Searge and Yarn is very inconsistent unless it is done on one and the same version.
+Finally, we remap from 1.16 to 1.21. This is a fairly small change, especially since Fabric intermediary mappings make different names
+between versions very rare. The only real changes that need to be done in this jump are behavioural ones.
 
-Preprocessor does some built in remapping (changing names), based on obfuscated names, but sometimes the automatic matching fails. If it
+The preprocessor does some built-in remapping (changing names), based on obfuscated names, but sometimes the automatic matching fails. If it
 cannot find a new name (or the name it automatically determines was wrong), you can change the corresponding mapping. In order to make
-this as smooth as possible it is generally recommended to find the earliest spot at which the mappings deviate. So fixing a mapping on the
+this as smooth as possible, it is generally recommended to find the earliest spot at which the mappings deviate. So fixing a mapping on the
 hop from 1.16 to 1.21 is generally not recommended. This is because, while we do not care about 1.12 or 1.16 compiling for its own merit,
 we do care about the automatically inferred name changes from 1.12 to 1.16 and so on, which only work if those versions already have the
 correct names available.
@@ -249,40 +249,40 @@ correct names available.
 #### A missing/incorrect name
 
 This is the easiest part. If a name for a function simply could not be automatically remapped, all you need to do is to add an entry in the
-corresponding mapping.txt file. Those can be found at `versions/mapping-<newVersion>-<oldVersion>.txt`.
+corresponding mapping.txt file. These can be found at `versions/mapping-<newVersion>-<oldVersion>.txt`.
 
 ```
 # You can use # to comment lines
 
 # You can rename a class simply by writing the two names
-# The first name is the name on the newer version (the first one in the file name) the second one is the one in the old version.
+# The first name is the name on the newer version (the first one in the file name); the second one is the name in the old version.
 net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
 # If you want to rename an inner class, remember to use $s
 net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
 
-# You can rename a field by writing the name of the containing class in the new version, and then the new and old name of the field
-# Again the first field name is the one in the newer version (first in the file name)
+# You can rename a field by writing the name of the containing class in the new version, and then the new and old name of the field.
+# Again, the first field name is the one in the newer version (first in the file name).
 net.minecraft.world.entity.Entity xOld prevPosX
 
-# Finally you can also rename methods. To do so, you need to first specify the name of the containing class in the new version, then
-# the name of the new and old method name. The first method name is the newer version name (first in the file name)
+# Finally, you can also rename methods. To do so, you need to first specify the name of the containing class in the new version, then
+# the name of the new and old method name. The first method name is the newer version name (first in the file name).
 net.minecraft.util.text.Style getHoverEvent() getChatHoverEvent()
 ```
 
-Adding a mapping like this is the easiest way to fix a broken method call, field access or class reference. It will also apply to all files
-so you might be fixing issues in files you didn't even look at. It will even work in mixin targets, as long as they are unambiguous
+Adding a mapping like this is the easiest way to fix a broken method call, field access, or class reference. It will also apply to all
+files, so you might be fixing issues in files you didn't even look at. It will even work in mixin targets, as long as they are unambiguous
 (consider using the method descriptor instead of just the method name for your mixin). However, if something aside from the name changed,
-this will not do.
+this will not suffice.
 
 #### Conditional compilation
 
-In addition to the built in remapping there is also the more complicated art of preprocessor directives. Directives allow you to comment or
-uncomment sections of the code depending on the version you are on. Uncommented sections are renamed as usual, so even in those directives
-you only need to write code for the *lowest* version that your comment is active in. As such i once again highly recommend to target your
+In addition to the built-in remapping, there is also the more complicated art of preprocessor directives. Directives allow you to comment or
+uncomment sections of the code depending on the version you are on. Uncommented sections are renamed as usual, so even within those directives,
+you only need to write code for the *lowest* version that your comment is active in. As such, I once again highly recommend to target your
 directive to the lowest version in which it applies, so that other sections that call into that code as well as your code can make use of
 as many automatic renames as possible.
 
-There is only really one directive which is `if`. Take this function for example:
+There is only really one directive, which is `if`. Take this function, for example:
 
 ```kt
 private fun WorldClient.getAllEntities(): Iterable<Entity> =
@@ -293,19 +293,19 @@ private fun WorldClient.getAllEntities(): Iterable<Entity> =
 //#endif
 ```
 
-the first `#if` instructs preprocessor to only uncomment the following code it the minecraft version is less than 1.16. Then the `#else`
-uncomments the other section on versions 1.16 and above. Finally the `#endif` ends the else block and lets the following functions be always
+The first `#if` instructs the preprocessor to only uncomment the following code if the Minecraft version is less than 1.16. Then, the `#else`
+uncomments the other section on versions 1.16 and above. Finally, the `#endif` ends the else block and lets the following functions always remain
 active. To distinguish regular comments from preprocessor comments, preprocessor only works with comments that start with `//$$`. So let's
 walk through what is happening here.
 
-On 1.8.9 the code remains unchanged. **Note that this means that the programmer is responsible for commenting out the unused parts.
-Preprocessor will never change the `src/` directory**.
+In 1.8.9, the code remains unchanged. **Note that this means the programmer is responsible for commenting out the unused parts.
+The preprocessor will never change the `src/` directory**.
 
-Next the preprocessor converts the code to 1.12. 1.12 still has the `loadedEntityList` as well as the same name for the `WorldClient` and
+Next, the preprocessor converts the code to 1.12. 1.12 still has the `loadedEntityList` as well as the same name for the `WorldClient` and
 `Entity` classes, so nothing is changed.
 
-Next the code gets converted to 1.16 Forge. Since 1.16 is not less than 1.16 it will comment the first line and uncomment the second line.
-1.16 Forge also uses a different name for `WorldClient` and a different package for `Entity` so those are also changed (the package change
+Next, the code gets converted to 1.16 Forge. Since 1.16 is not less than 1.16, it will comment out the first line and uncomment the second line.
+1.16 Forge also uses a different name for `WorldClient` and a different package for `Entity`, so those are also changed (the package change
 is only visible in the imports):
 
 ```kt
@@ -317,10 +317,10 @@ private fun ClientLevel.getAllEntities(): Iterable<Entity> =
 //#endif
 ```
 
-Now the code gets converted to 1.16 Fabric. Since those two targets are on the same minecraft version name changes almost never fail to be
-done automatically. Notice the different names for `ClientWorld` as well as `entities`. The method is called `getEntities()` on fabric, but
-since this is kotlin code, the preprocessor automatically cleans up `getEntities()` using 
-[kotlin property access syntax](https://kotlinlang.org/docs/java-interop.html#getters-and-setters).
+Now the code gets converted to 1.16 Fabric. Since those two targets are on the same Minecraft version name changes almost never fail to be
+done automatically. Notice the different names for `ClientWorld` as well as `entities`. The method is called `getEntities()` on Fabric, but
+since this is Kotlin code, the preprocessor automatically cleans up `getEntities()` using
+[Kotlin property access syntax](https://kotlinlang.org/docs/java-interop.html#getters-and-setters).
 
 ```kt
 private fun ClientWorld.getAllEntities(): Iterable<Entity> =
@@ -346,28 +346,28 @@ private fun ClientWorld.getAllEntities(): Iterable<Entity> =
 
 Let's look at the syntax of those `#if` expressions.
 
-First of all the `#else` block is optional. If you just want code on some versions (for example for adding a method call that is implicitly
+First of all, the `#else` block is optional. If you just want code on some versions (for example for adding a method call that is implicitly
 done on newer versions, or simply because the corresponding code for newer versions has to be done in some other place), you can just omit
 the `#else` section and you will simply not compile any code at that spot.
 
 There is also an `#elseif` in case you want to switch behaviour based on multiple version brackets. Again, while we don't actually target
-1.12 or 1.16 making those versions compile will help other parts of the code to upgrade to 1.21 more cleanly and easily, so making those
+1.12 or 1.16, making those versions compile will help other parts of the code to upgrade to 1.21 more cleanly and easily. So, making those
 versions work (or at least providing a stub like `error("Not implemented on this version") as List<Entity>` to make types infer correctly)
 should be something you look out for.
 
 `#if` and `#elseif` also do not support complicated expressions. The only operations supported are `!=`, `==`, `>=`, `<=`, `<` and `>`. You
 cannot join two checks using `&&` or similar, instead needing to use nested `#if`s.
 
-The actual versions being worked with here are not actually semantically compared minecraft versions, but instead integers in the form
-`major * 10000 + minor * 100 + patch`. So for example `1.12` turns into `11200`. Both `11200` and `1.12` can be used in directives, but
+The actual versions being worked with here are not actually semantically compared Minecraft versions, but instead integers in the form
+`major * 10000 + minor * 100 + patch`. So, for example, `1.12` turns into `11200`. Both `11200` and `1.12` can be used in directives, but
 `1.12` style values are generally easier to understand.
 
-You can also check if you are on forge using the `FORGE` variable. It is set to either 1 or 0. Similarly, there is also a `JAVA` variable to
-check the java version this minecraft version is on. For the `FORGE` variable there is an implicit `!= 0` to check added if you just check
+You can also check if you are on Forge using the `FORGE` variable. It is set to either 1 or 0. Similarly, there is also a `JAVA` variable to
+check the Java version this Minecraft version is on. For the `FORGE` variable there is an implicit `!= 0` to check added if you just check
 for the variable using `#if FORGE`.
 
 #### Helpers
 
 Sadly, `#if` expressions cannot be applied globally (unlike name changes), so it is often very helpful to create a helper method and call
-that method from various places in the code base. This is generally already policy in SH for a lot of things. For more complex types that
-change beyond just what name they have (for example different generics), a `typealias` can be used in combination with `#if` expressions.
+that method from various places in the codebase. This is generally already policy in SH for a lot of things. For more complex types that
+change beyond just their name (for example different generics), a `typealias` can be used in combination with `#if` expressions.
