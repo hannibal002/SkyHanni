@@ -661,7 +661,7 @@ object DamageIndicatorManager {
             entityData.namePrefix = ""
         }
 
-        // Hit currentPhase
+        // Hit phase
         var hitPhaseText: String? = null
         val armorStandHits = entity.getNameTagWith(3, " Hit")
         if (armorStandHits != null) {
@@ -679,7 +679,7 @@ object DamageIndicatorManager {
             hitPhaseText = NumberUtil.percentageColor(hits.toLong(), maxHits.toLong()).getChatColor() + "$hits Hits"
         }
 
-        // Laser currentPhase
+        // Laser phase
         if (config.enderSlayer.laserPhaseTimer && entity.ridingEntity != null) {
             val totalTimeAlive = 8.2.seconds
 

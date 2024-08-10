@@ -7,12 +7,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class EnderSlayerConfig {
 
     @Expose
-    @ConfigOption(name = "Laser Phase Timer", desc = "Show a timer for when the laser currentPhase will end.")
+    @ConfigOption(name = "Laser Phase Timer", desc = "Show a timer for when the laser phase will end.")
     @ConfigEditorBoolean
     public boolean laserPhaseTimer = false;
 
     @Expose
-    @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser currentPhase.")
+    @ConfigOption(name = "Health During Laser", desc = "Show the health of Voidgloom Seraph 4 during the laser phase.")
     @ConfigEditorBoolean
     public boolean showHealthDuringLaser = false;
 }

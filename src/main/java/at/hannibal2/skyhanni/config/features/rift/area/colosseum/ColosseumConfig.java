@@ -20,7 +20,7 @@ public class ColosseumConfig {
     public boolean tentacleWaypoints = true;
 
     @Expose
-    @ConfigOption(name = "Show Bacte Phase", desc = "Show the current currentPhase of Bacte.")
+    @ConfigOption(name = "Show Bacte Phase", desc = "Show the current phase of Bacte.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showBactePhase = true;

@@ -15,13 +15,13 @@ public class BlazeConfig {
     public BlazeHellionConfig hellion = new BlazeHellionConfig();
 
     @Expose
-    @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit currentPhase starts for the Blaze Slayer tier 3 and 4.")
+    @ConfigOption(name = "Fire Pits", desc = "Warning when the fire pit phase starts for the Blaze Slayer tier 3 and 4.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean firePitsWarning = false;
 
     @Expose
-    @ConfigOption(name = "Phase Display", desc = "Show the current currentPhase of the Blaze Slayer boss.")
+    @ConfigOption(name = "Phase Display", desc = "Show the current phase of the Blaze Slayer boss.")
     @ConfigEditorBoolean
     public boolean phaseDisplay = false;
 
