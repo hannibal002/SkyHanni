@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -25,6 +26,11 @@ public class HoppityEggsConfig {
     )
     @ConfigEditorBoolean
     public boolean waypointsImmediately = false;
+
+    @Expose
+    @ConfigOption(name = "Color", desc = "Color of the waypoint.")
+    @ConfigEditorColour
+    public String waypointColor = "0:53:46:224:73";
 
     @Expose
     @ConfigOption(name = "Show Line", desc = "Show a line to the waypoint.")
@@ -83,7 +89,7 @@ public class HoppityEggsConfig {
     public boolean warnUnclaimedEggs = false;
 
     @Expose
-    @ConfigOption(name = "Click to Warp", desc = "Make the eggs ready chat message clickable to warp you to an island.")
+    @ConfigOption(name = "Click to Warp", desc = "Make the eggs ready chat message & unclaimed timer display clickable to warp you to an island.")
     @ConfigEditorBoolean
     public boolean warpUnclaimedEggs = false;
 
@@ -93,10 +99,16 @@ public class HoppityEggsConfig {
     public String warpDestination = "nucleus";
 
     @Expose
-    @ConfigOption(name = "Show during Contest", desc = "Show during a farming contest.")
+    @ConfigOption(name = "Show While Busy", desc = "Show while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showDuringContest = false;
+    public boolean showWhileBusy = false;
+
+    @Expose
+    @ConfigOption(name = "Warn While Busy", desc = "Warn while \"busy\" (in a farming contest, doing Kuudra, in the rift, etc).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnWhileBusy = false;
 
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show on Hypixel even when not playing SkyBlock.")

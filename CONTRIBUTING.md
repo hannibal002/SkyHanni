@@ -91,6 +91,7 @@ for more information and usages.
 - Do not use `fixedRateTimer` when possible and instead use `SecondPassedEvent` to safely execute the repeating event on
   the main thread.
 - When updating a config option variable, use the `ConfigUpdaterMigrator.ConfigFixEvent` with event.move() when moving a value, and event.transform() when updating a value. [For Example](https://github.com/hannibal002/SkyHanni/blob/e88f416c48f9659f89b7047d7629cd9a1d1535bc/src/main/java/at/hannibal2/skyhanni/features/gui/customscoreboard/CustomScoreboard.kt#L276).
+- Use American English spelling conventions (e.g., "color" not "colour").
 
 ## Software Used in SkyHanni
 
@@ -145,7 +146,7 @@ The repo is located at https://github.com/hannibal002/SkyHanni-REPO.
 A copy of all json files is stored on the computer under `.minecraft\config\skyhanni\repo`.
 On every game start, the copy gets updated (if outdated and if not manually disabled).
 If you add stuff to the repo make sure it gets serialised. See
-the [jsonobjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
+the [JsonObjects](src/main/java/at/hannibal2/skyhanni/data/jsonobjects/repo)
 folder for how to properly do this. You also may have to disable repo auto update in game.
 
 ### Discord IPC
