@@ -53,7 +53,7 @@ public class RewardWarningConfig {
         VisitorReward.MUSIC_RUNE,
         VisitorReward.SPACE_HELMET,
         VisitorReward.CULTIVATING,
-        VisitorReward.REPLENISH
+        VisitorReward.REPLENISH,
         VisitorReward.COPPER_DYE
     ));
 
