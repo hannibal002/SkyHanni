@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.garden.farming
+package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.features.garden.CropType
