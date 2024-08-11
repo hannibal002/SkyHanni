@@ -82,7 +82,7 @@ object FarmingPersonalBestGain {
         val oldFF = oldCollected / collectionPerFF
         val ffDiff = newFF - oldFF
 
-        ChatUtils.chat("This is §6${ffDiff.round(1)}☘ $crop Fortune §emore than previously!")
+        ChatUtils.chat("This is §6${ffDiff.round(2)}☘ $crop Fortune §emore than previously!")
     }
 
     fun isEnabled() = GardenAPI.inGarden() && config.contestPersonalBestIncreaseFF

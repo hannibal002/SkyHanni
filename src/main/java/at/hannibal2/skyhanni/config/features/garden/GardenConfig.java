@@ -220,7 +220,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(
         name = "Personal Best Increase FF",
-        desc = "Show mow much more FF you get from farming contest personal best bonus after beating the previous record."
+        desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record."
     )
     @ConfigEditorBoolean
     @FeatureToggle
