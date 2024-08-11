@@ -54,6 +54,7 @@ public class RewardWarningConfig {
         VisitorReward.SPACE_HELMET,
         VisitorReward.CULTIVATING,
         VisitorReward.REPLENISH
+        VisitorReward.COPPER_DYE
     ));
 
     @Expose
