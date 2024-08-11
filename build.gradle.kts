@@ -45,6 +45,11 @@ repositories {
 // Toolchains:
 java {
     toolchain.languageVersion.set(target.minecraftVersion.javaLanguageVersion)
+    // We specifically request ADOPTIUM because if we do not restrict the vendor DCEVM is a
+    // possible candidate. Some DCEVMs are however incompatible with some things gradle is doing,
+    // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
+    // IntelliJ run configuration.
+    toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
@@ -250,7 +255,7 @@ tasks.withType(JavaCompile::class) {
     options.encoding = "UTF-8"
 }
 
-tasks.withType(Jar::class) {
+tasks.withType(org.gradle.jvm.tasks.Jar::class) {
     archiveBaseName.set("SkyHanni")
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE // Why do we have this here? This only *hides* errors.
     manifest.attributes.run {
