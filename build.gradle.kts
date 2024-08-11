@@ -61,8 +61,10 @@ loom {
     }
     runs {
         named("client") {
-            if (target == ProjectTarget.MAIN)
+            if (target == ProjectTarget.MAIN) {
                 isIdeConfigGenerated = true
+                appendProjectPathToConfigName.set(false)
+            }
             this.runDir(runDirectory.relativeTo(projectDir).toString())
             property("mixin.debug", "true")
             if (System.getenv("repo_action") != "true") {
@@ -266,6 +268,7 @@ val remapJar by tasks.named<net.fabricmc.loom.task.RemapJarTask>("remapJar") {
     archiveClassifier.set("")
     dependsOn(tasks.shadowJar)
     inputFile.set(tasks.shadowJar.get().archiveFile)
+    destinationDirectory.set(rootProject.layout.buildDirectory.dir("libs"))
 }
 
 tasks.shadowJar {
