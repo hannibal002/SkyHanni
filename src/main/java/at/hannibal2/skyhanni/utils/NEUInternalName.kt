@@ -11,8 +11,10 @@ class NEUInternalName private constructor(private val internalName: String) {
         val NONE = "NONE".asInternalName()
         val MISSING_ITEM = "MISSING_ITEM".asInternalName()
 
-        val WISP_POTION = "WISP_POTION".asInternalName()
+        val JASPER_CRYSTAL = "JASPER_CRYSTAL".asInternalName()
+        val RUBY_CRYSTAL = "RUBY_CRYSTAL".asInternalName()
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".asInternalName()
+        val WISP_POTION = "WISP_POTION".asInternalName()
 
         fun String.asInternalName(): NEUInternalName {
             val internalName = uppercase().replace(" ", "_")

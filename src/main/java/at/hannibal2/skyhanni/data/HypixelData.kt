@@ -86,7 +86,7 @@ object HypixelData {
         "solo.profile.amount",
         "^\\s*(?:§.)*Island\\s*$",
     )
-    private val scoreboardVisitingAmoutPattern by patternGroup.pattern(
+    private val scoreboardVisitingAmountPattern by patternGroup.pattern(
         "scoreboard.visiting.amount",
         "\\s+§.✌ §.\\(§.(?<currentamount>\\d+)§./(?<maxamount>\\d+)\\)",
     )
@@ -201,7 +201,7 @@ object HypixelData {
     }
 
     fun getMaxPlayersForCurrentServer(): Int {
-        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmoutPattern) {
+        ScoreboardData.sidebarLinesFormatted.matchFirst(scoreboardVisitingAmountPattern) {
             return group("maxamount").toInt()
         }
 
@@ -293,6 +293,7 @@ object HypixelData {
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
+            ProfileStorageData.profileJoinMessage()
         }
     }
 
@@ -394,7 +395,7 @@ object HypixelData {
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.getCurrentServerData().serverIP) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -453,6 +454,7 @@ object HypixelData {
             islandType = getIslandType(foundIsland, guesting)
         }
 
+        // TODO don't send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != islandType) {
             IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
             if (islandType == IslandType.UNKNOWN) {

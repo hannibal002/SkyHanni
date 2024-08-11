@@ -145,11 +145,11 @@ object SlayerRngMeterDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        readRngmeterInventory(event)
+        readRngMeterInventory(event)
         readSlayerInventory(event)
     }
 
-    private fun readRngmeterInventory(event: InventoryFullyOpenedEvent) {
+    private fun readRngMeterInventory(event: InventoryFullyOpenedEvent) {
         val name = inventoryNamePattern.matchMatcher(event.inventoryName) {
             group("name")
         } ?: return
@@ -205,9 +205,12 @@ object SlayerRngMeterDisplay {
     }
 
     private fun makeLink(text: String) =
-        Renderable.clickAndHover(text, listOf("§eClick to open RNG Meter Inventory."), onClick = {
-            HypixelCommands.showRng("slayer", SlayerAPI.getActiveSlayer()?.rngName)
-        })
+        Renderable.clickAndHover(
+            text, listOf("§eClick to open RNG Meter Inventory."),
+            onClick = {
+                HypixelCommands.showRng("slayer", SlayerAPI.activeSlayer?.rngName)
+            },
+        )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""
