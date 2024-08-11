@@ -40,7 +40,7 @@ import java.io.IOException
 class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
-    private val oldScreen: GuiContainer? = null
+    private val oldScreen: GuiContainer? = null,
 ) : GuiScreen() {
 
     private var grabbedX = 0
@@ -86,18 +86,14 @@ class GuiPositionEditor(
         // When the mouse isn't currently hovering over a gui element
         if (displayPos == -1) {
             GuiRenderUtils.drawStringCentered(
-
                 "§eTo edit hidden GUI elements set a key in /sh edit",
                 getScaledWidth() / 2,
-                20
-
+                20,
             )
             GuiRenderUtils.drawStringCentered(
-
                 "§ethen click that key while the GUI element is visible",
                 getScaledWidth() / 2,
-                32
-
+                32,
             )
             return
         }
@@ -110,7 +106,7 @@ class GuiPositionEditor(
             GuiRenderUtils.drawStringCentered(
                 "§aRight-Click to open associated config options",
                 getScaledWidth() / 2,
-                38
+                38,
             )
     }
 
@@ -136,16 +132,13 @@ class GuiPositionEditor(
             drawRect(x - border, y - border, x + elementWidth + border * 2, y + elementHeight + border * 2, -0x7fbfbfc0)
 
             if (GuiRenderUtils.isPointInRect(
-
                     mouseX,
                     mouseY,
                     x - border,
                     y - border,
                     elementWidth + border * 2,
-                    elementHeight + border * 2
-
+                    elementHeight + border * 2,
                 )
-
             ) {
                 hoveredPos = index
             }
@@ -175,7 +168,7 @@ class GuiPositionEditor(
                 x - border,
                 y - border,
                 elementWidth + border * 2,
-                elementHeight + border * 2
+                elementHeight + border * 2,
             )
             if (!isHovered) continue
             if (mouseButton == 1) {
@@ -251,7 +244,7 @@ class GuiPositionEditor(
                 GuiRenderUtils.isPointInRect(
                     mx, my,
                     it.getAbsX() - border, it.getAbsY() - border,
-                    size.x + border * 2, size.y + border * 2
+                    size.x + border * 2, size.y + border * 2,
                 )
             } ?: return
         if (mw < 0)
