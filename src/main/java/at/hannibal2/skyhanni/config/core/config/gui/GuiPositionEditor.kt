@@ -28,8 +28,8 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -41,7 +41,7 @@ class GuiPositionEditor(
     private val positions: List<Position>,
     private val border: Int,
     private val oldScreen: GuiContainer? = null,
-) : GuiScreen() {
+) : SkyhanniBaseScreen() {
 
     private var grabbedX = 0
     private var grabbedY = 0
