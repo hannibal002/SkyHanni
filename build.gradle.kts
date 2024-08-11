@@ -3,6 +3,7 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
@@ -216,16 +217,10 @@ tasks.processResources {
 }
 
 if (target == ProjectTarget.MAIN) {
-    val generateRepoPatterns by tasks.creating(JavaExec::class) {
+    tasks.create("generateRepoPatterns", RunGameTask::class, loom.runs.named("client").get()).apply {
         javaLauncher.set(javaToolchains.launcherFor(java.toolchain))
-        mainClass.set("net.fabricmc.devlaunchinjector.Main")
         dependsOn(tasks.configureLaunch)
-        workingDir(project.file(runDirectory))
-        classpath(sourceSets.main.map { it.runtimeClasspath }, sourceSets.main.map { it.output })
         jvmArgs(
-            "-Dfabric.dli.config=${project.file(".gradle/loom-cache/launch.cfg").absolutePath}",
-            "-Dfabric.dli.env=client",
-            "-Dfabric.dli.main=net.minecraft.launchwrapper.Launch",
             "-Dorg.lwjgl.opengl.Display.allowSoftwareOpenGL=true",
             "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5006",
             "-javaagent:${headlessLwjgl.singleFile.absolutePath}",
