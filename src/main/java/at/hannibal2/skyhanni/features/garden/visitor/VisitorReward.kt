@@ -20,6 +20,7 @@ enum class VisitorReward(
     CULTIVATING("CULTIVATING;1", "§9Cultivating I", legacyId = 6),
     REPLENISH("REPLENISH;1", "§9Replenish I", legacyId = 7),
     DELICATE("DELICATE;5", "§9Delicate V"),
+    COPPER_DYE("DYE_COPPER", "§8Copper Dye"),
     ;
 
     private val internalName by lazy { rawInternalName.asInternalName() }
