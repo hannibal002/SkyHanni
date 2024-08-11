@@ -237,9 +237,9 @@ object HoppityEventSummary {
 
     fun sendStatsMessage(it: Array<String>) {
         val pastStats = ProfileStorageData.profileSpecific?.pastHoppityEventStats
-        val statsYearList = pastStats?.keys ?: mutableListOf()
+        val statsYearList = pastStats?.keys.takeIf { it != null && it.size != 0 }?.toMutableList() ?: mutableListOf<Int>()
         val eventStorage = ProfileStorageData.profileSpecific?.hoppityEvent
-        if (eventStorage != null && eventStorage.stats.rabbitsFound.any()) statsYearList.add(eventStorage.eventYear)
+        if (eventStorage?.eventYear != null && eventStorage.stats.rabbitsFound.any()) statsYearList.add(eventStorage.eventYear!!)
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
