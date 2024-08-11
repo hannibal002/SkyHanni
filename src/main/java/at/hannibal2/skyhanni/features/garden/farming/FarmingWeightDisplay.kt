@@ -362,7 +362,7 @@ object FarmingWeightDisplay {
                 "§eClick to open your Farming Weight",
                 "§eprofile on §celitebot.dev",
             ),
-            "shfarmingprofile ${LorenzUtils.getPlayerName()}",
+            "/shfarmingprofile ${LorenzUtils.getPlayerName()}",
         )
     }
 
