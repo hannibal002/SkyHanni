@@ -8,8 +8,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 enum class VisitorReward(
     private val rawInternalName: String,
     val displayName: String,
-    private val legacyId:
-    Int = -1
+    private val legacyId: Int = -1,
 ) : HasLegacyId {
     FLOWERING_BOUQUET("FLOWERING_BOUQUET", "§9Flowering Bouquet", legacyId = 0),
     OVERGROWN_GRASS("OVERGROWN_GRASS", "§9Overgrown Grass", legacyId = 1),
