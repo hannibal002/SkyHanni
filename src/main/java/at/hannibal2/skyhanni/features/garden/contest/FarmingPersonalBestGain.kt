@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -59,8 +60,13 @@ object FarmingPersonalBestGain {
             checkDelayed()
         }
         newFFPattern.matchMatcher(event.message) {
+            val cropName = group("crop")
             newFF = group("ff").formatDouble()
-            crop = group("crop")
+            crop = cropName
+            val cropType = CropType.getByName(cropName)
+            GardenAPI.storage?.let {
+                it.personalBestFF[cropType] = newFF
+            }
             checkDelayed()
         }
     }
