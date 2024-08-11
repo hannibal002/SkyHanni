@@ -69,43 +69,22 @@ object GardenCustomKeybinds {
         val cropName: String = cropInHand.simpleName
         println(cropName)
 
-        // Reset all keybinds to default
-        val clazz: Class<*> = config.keyBind.javaClass
+        map[mcSettings.keyBindAttack] = { config.KeyBind.Map[cropName]?.attack ?: 0 }
+        map[mcSettings.keyBindUseItem] = { config.KeyBind.Map[cropName]?.useItem ?: 0 }
+        map[mcSettings.keyBindLeft] = { config.KeyBind.Map[cropName]?.left ?: 0 }
+        map[mcSettings.keyBindRight] = { config.KeyBind.Map[cropName]?.right ?: 0 }
+        map[mcSettings.keyBindForward] = { config.KeyBind.Map[cropName]?.forward ?: 0 }
+        map[mcSettings.keyBindBack] = { config.KeyBind.Map[cropName]?.back ?: 0 }
+        map[mcSettings.keyBindJump] = { config.KeyBind.Map[cropName]?.jump ?: 0 }
+        map[mcSettings.keyBindSneak] = { config.KeyBind.Map[cropName]?.sneak ?: 0}
 
-        // Get all public fields of the class
-        val fields = clazz.fields
+        val override = map[keyBinding] ?: return
 
-        // Iterate through each field
-        for (field in fields) {
-            if (field.type == KeyBindCrop::class.java) {
-                try {
-                    val cropClassInstance = field[config.keyBind] as KeyBindCrop
-//                     if (cropClassInstance.cropType == cropName) {
-//                         map[mcSettings.keyBindAttack] = { cropClassInstance.attack }
-//                         map[mcSettings.keyBindUseItem] = { cropClassInstance.useItem }
-//                         map[mcSettings.keyBindLeft] = { cropClassInstance.left }
-//                         map[mcSettings.keyBindRight] = { cropClassInstance.right }
-//                         map[mcSettings.keyBindForward] = { cropClassInstance.forward }
-//                         map[mcSettings.keyBindBack] = { cropClassInstance.back }
-//                         map[mcSettings.keyBindJump] = { cropClassInstance.jump }
-//                         map[mcSettings.keyBindSneak] = { cropClassInstance.sneak }
-//
-//                         val override = map[keyBinding] ?: return
-//
-//                         val keyCode = override()
-//
-//                         currentCropName = cropName
-//
-//                         cir.returnValue = keyCode.isKeyHeld()
+        val keyCode = override()
 
-//                         return
-//                     }
-                } catch (e: IllegalAccessException) {
-                    // pass
-                }
-            }
-        }
+        currentCropName = cropName
 
+        cir.returnValue = keyCode.isKeyHeld()
     }
 
     // Cancel the CallbackInfo and increment the press time

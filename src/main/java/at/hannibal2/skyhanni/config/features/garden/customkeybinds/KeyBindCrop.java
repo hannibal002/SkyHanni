@@ -10,20 +10,6 @@ import org.lwjgl.input.Keyboard;
 import java.lang.reflect.Field;
 
 public class KeyBindCrop {
-    public KeyBindConfigCrops keyBind;
-    public String cropType;
-
-//     public void setValues(KeyBindConfigCrops keyBind, String cropType) {
-//         this.keyBind = keyBind;
-//         this.cropType = cropType;
-//     }
-
-
-//     public KeyBindCrop(String cropType, KeyBindConfigCrops keyBind) {
-
-    public KeyBindCrop(KeyBindConfigCrops keyBind) {
-        this.keyBind = keyBind;
-    }
 
 //     TODO: find out why the game crashes on button press, even with no code in the runnable
 
@@ -58,60 +44,6 @@ public class KeyBindCrop {
         sneak = Keyboard.KEY_LSHIFT;
     };
 
-//     @Expose
-//     @ConfigOption(name = "Copy Keybinds", desc = "Copy keybinds from another crop.")
-//     @ConfigEditorButton(buttonText = "Copy Keybinds")
-//     public Runnable copyKeybinds = this::CopyOverKeybinds;
-
-
-    @Expose
-    @ConfigOption(name = "Copy Keybinds from: ", desc = "Select what crop to copy keybind of.")
-    @ConfigEditorDropdown()
-    public cropTypeToCopy copyKeybindsFrom = cropTypeToCopy.Wheat;
-
-    public enum cropTypeToCopy {
-        Wheat,
-        Carrot,
-        Potato,
-        NetherWart,
-        Pumpkin,
-        Melon,
-        CocoaBeans,
-        SugarCane,
-        Cactus,
-        Mushroom
-    }
-
-//     private void CopyOverKeybinds() {
-//         Class<?> clazz = keyBind.getClass();
-//
-//         // Get all public fields of the class
-//         Field[] fields = clazz.getFields();
-//
-//         // Iterate through each field
-//         for (Field field : fields) {
-//             if (field.getType() == KeyBindCrop.class) {
-//                 try {
-//                     KeyBindCrop CropClassInstance = (KeyBindCrop) field.get(keyBind);
-//
-//                     if (CropClassInstance.cropType.equals(copyKeybindsFrom.toString())) {
-//                         attack = CropClassInstance.attack;
-//                         useItem = CropClassInstance.useItem;
-//                         left = CropClassInstance.left;
-//                         right = CropClassInstance.right;
-//                         forward = CropClassInstance.forward;
-//                         back = CropClassInstance.back;
-//                         jump = CropClassInstance.jump;
-//                         sneak = CropClassInstance.sneak;
-//                     }
-//
-//                 } catch (IllegalAccessException e) {
-//                     // pass
-//                 }
-//             }
-//         }
-//     }
-//
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")
