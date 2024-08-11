@@ -14,6 +14,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object SplatterHearts {
+    private val config get() = RiftAPI.config.area.stillgoreChateau
     private var lastHearts = SimpleTimeMark.farPast()
 
     private var shownHearts = setOf<LorenzVec>()
@@ -44,7 +45,5 @@ object SplatterHearts {
         }
     }
 
-    private fun isEnabled() =
-        RiftAPI.inRift() && RiftAPI.inStillgoreChateau() && RiftAPI.config.area.stillgoreChateau.highlightSplatterHearts
-
+    private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inStillgoreChateau() && config.highlightSplatterHearts
 }

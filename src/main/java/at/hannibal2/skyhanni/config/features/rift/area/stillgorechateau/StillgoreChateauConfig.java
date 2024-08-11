@@ -13,7 +13,7 @@ public class StillgoreChateauConfig {
     public EffigiesConfig bloodEffigies = new EffigiesConfig();
 
     @Expose
-    @ConfigOption(name = "Highlight Splatter Hearts", desc = "Highlight heart particles of hearts removed by Splatters.")
+    @ConfigOption(name = "Highlight Splatter Hearts", desc = "Highlight heart particles of hearts removed by Splatter Cruxes.")
     @ConfigEditorBoolean
     public boolean highlightSplatterHearts = true;
 
