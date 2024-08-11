@@ -31,8 +31,9 @@ object PresentWaypoints {
     private var presentEntranceLocations = mapOf<String, MutableSet<EventWaypoint>>()
     private var closest: EventWaypoint? = null
 
-    private val presentSet get() = presentLocations[HypixelData.lobbyType]
-    private val presentEntranceSet get() = presentEntranceLocations[HypixelData.lobbyType]
+    private val lobbyTypeKey get() = HypixelData.location?.lobbyType ?: ""
+    private val presentSet get() = presentLocations[lobbyTypeKey]
+    private val presentEntranceSet get() = presentEntranceLocations[lobbyTypeKey]
 
     private val patternGroup = RepoPattern.group("event.lobby.waypoint.presents")
     private val presentAlreadyFoundPattern by patternGroup.pattern(
@@ -91,7 +92,7 @@ object PresentWaypoints {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled() && config.onlyClosest && HypixelData.locrawData != null && closest == null) return
+        if (!isEnabled() && config.onlyClosest && closest == null) return
         val notFoundPresents = presentSet?.filterNot { it.isFound }
         if (notFoundPresents?.isEmpty() == true) return
         closest = notFoundPresents?.minByOrNull { it.position.distanceSqToPlayer() } ?: return

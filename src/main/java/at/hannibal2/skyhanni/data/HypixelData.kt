@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
+import at.hannibal2.skyhanni.data.hypixel.location.HypixelLocation
+import at.hannibal2.skyhanni.data.hypixel.location.NetworkData
+import at.hannibal2.skyhanni.data.hypixel.location.HypixelLocationData
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -29,11 +29,8 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.gson.JsonObject
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -42,14 +39,7 @@ object HypixelData {
     private val patternGroup = RepoPattern.group("data.hypixeldata")
 
     // TODO add regex tests
-    private val serverNameConnectionPattern by patternGroup.pattern(
-        "servername.connection",
-        "(?<prefix>.+\\.)?hypixel\\.net",
-    )
-    private val serverNameScoreboardPattern by patternGroup.pattern(
-        "servername.scoreboard",
-        "§e(?<prefix>.+\\.)?hypixel\\.net",
-    )
+
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
@@ -58,10 +48,7 @@ object HypixelData {
         "serverid.scoreboard",
         "§7\\d+/\\d+/\\d+ §8(?<servertype>[mM])(?<serverid>\\S+).*",
     )
-    private val lobbyTypePattern by patternGroup.pattern(
-        "lobbytype",
-        "(?<lobbyType>.*lobby)\\d+",
-    )
+
     private val playerAmountPattern by patternGroup.pattern(
         "playeramount",
         "^\\s*(?:§.)+Players (?:§.)+\\((?<amount>\\d+)\\)\\s*$",
@@ -108,13 +95,12 @@ object HypixelData {
         "\\s*§(?<symbol>7⏣|5ф) §(?<color>.)(?<area>.*)",
     )
 
-    private var lastLocRaw = SimpleTimeMark.farPast()
     private var hasScoreboardUpdated = false
 
-    var hypixelLive = false
-    var hypixelAlpha = false
-    var inLobby = false
-    var inLimbo = false
+    val location: HypixelLocation? get() = HypixelLocationData.location
+    val hypixelAlpha get() = NetworkData.onAlpha()
+    val hypixelLive get() = NetworkData.onLive()
+
     var skyBlock = false
     var skyBlockIsland = IslandType.UNKNOWN
     var serverId: String? = null
@@ -132,25 +118,8 @@ object HypixelData {
     var skyBlockArea: String? = null
     var skyBlockAreaWithSymbol: String? = null
 
-    // Data from locraw
-    var locrawData: JsonObject? = null
-    private var locraw: MutableMap<String, String> = listOf(
-        "server",
-        "gametype",
-        "lobbyname",
-        "lobbytype",
-        "mode",
-        "map",
-    ).associateWith { "" }.toMutableMap()
-
-    val server get() = locraw["server"] ?: ""
-    val gameType get() = locraw["gametype"] ?: ""
-    val lobbyName get() = locraw["lobbyname"] ?: ""
-    val lobbyType get() = locraw["lobbytype"] ?: ""
-    val mode get() = locraw["mode"] ?: ""
-    val map get() = locraw["map"] ?: ""
-
-    fun checkCurrentServerId() {
+    // TODO: replace with parsing the HypixelLocation server property
+    private fun checkCurrentServerId() {
         if (!LorenzUtils.inSkyBlock) return
         if (serverId != null) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
@@ -214,45 +183,13 @@ object HypixelData {
         }
     }
 
-    // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
-    private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-    //todo convert to proper json object
-    fun checkForLocraw(message: String) {
-        jsonBracketPattern.matchMatcher(message.removeColor()) {
-            try {
-                val obj: JsonObject = gson.fromJson(group(), JsonObject::class.java)
-                if (obj.has("server")) {
-                    locrawData = obj
-                    for (key in locraw.keys) {
-                        locraw[key] = obj[key]?.asString ?: ""
-                    }
-                    inLimbo = locraw["server"] == "limbo"
-                    inLobby = locraw["lobbyname"] != ""
-
-                    if (inLobby) {
-                        locraw["lobbyname"]?.let {
-                            lobbyTypePattern.matchMatcher(it) {
-                                locraw["lobbytype"] = group("lobbyType")
-                            }
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
-            }
-        }
-    }
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        locrawData = null
         skyBlock = false
-        inLimbo = false
-        inLobby = false
-        locraw.forEach { locraw[it.key] = "" }
         joinedWorld = SimpleTimeMark.now()
         serverId = null
         skyBlockArea = null
@@ -261,12 +198,7 @@ object HypixelData {
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
-        hypixelLive = false
-        hypixelAlpha = false
         skyBlock = false
-        inLobby = false
-        locraw.forEach { locraw[it.key] = "" }
-        locrawData = null
         skyBlockArea = null
         skyBlockAreaWithSymbol = null
         hasScoreboardUpdated = false
@@ -311,10 +243,6 @@ object HypixelData {
     // TODO rewrite everything in here
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!LorenzUtils.inSkyBlock) {
-            checkNEULocraw()
-        }
-
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
@@ -328,13 +256,6 @@ object HypixelData {
             checkProfileName()
         }
 
-        if (!LorenzUtils.onHypixel) {
-            checkHypixel()
-            if (LorenzUtils.onHypixel) {
-                HypixelJoinEvent().postAndCatch()
-                SkyHanniMod.repo.displayRepoStatus(true)
-            }
-        }
         if (!LorenzUtils.onHypixel) return
 
         if (!event.isMod(5)) return
@@ -347,21 +268,6 @@ object HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
-    }
-
-    // Modified from NEU.
-    // NEU does not send locraw when not in SkyBlock.
-    // So, as requested by Hannibal, use locraw from
-    // NEU and have NEU send it.
-    // Remove this when NEU dependency is removed
-    private fun checkNEULocraw() {
-        if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
-            lastLocRaw = SimpleTimeMark.now()
-            thread(start = true) {
-                Thread.sleep(1000)
-                NotEnoughUpdates.INSTANCE.sendChatMessage("/locraw")
-            }
-        }
     }
 
     @SubscribeEvent
@@ -380,38 +286,6 @@ object HypixelData {
             profileName = group("profile").lowercase()
             ProfileJoinEvent(profileName).postAndCatch()
         }
-    }
-
-    private fun checkHypixel() {
-        if (!hasScoreboardUpdated) return
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer ?: return
-
-        var hypixel = false
-
-        player.clientBrand?.let {
-            if (it.contains("hypixel", ignoreCase = true)) {
-                hypixel = true
-            }
-        }
-
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
-            hypixel = true
-            if (group("prefix") == "alpha.") {
-                hypixelAlpha = true
-            }
-        }
-
-        for (line in ScoreboardData.sidebarLinesFormatted) {
-            serverNameScoreboardPattern.matchMatcher(line) {
-                hypixel = true
-                if (group("prefix") == "alpha.") {
-                    hypixelAlpha = true
-                }
-            }
-        }
-
-        hypixelLive = hypixel && !hypixelAlpha
     }
 
     private fun checkSidebar() {
@@ -488,4 +362,8 @@ object HypixelData {
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
     }
+
+    /* Backup logic - mod API should do all the below generally */
+
 }
+

@@ -130,7 +130,8 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
-    implementation("net.hypixel:mod-api:0.3.1")
+    modImplementation("net.hypixel:mod-api-forge:1.0.1.1")
+    shadowImpl("net.hypixel:mod-api-forge-tweaker:1.0.1.1")
 }
 
 configurations.getByName("minecraftNamed").dependencies.forEach {
@@ -234,7 +235,6 @@ tasks.withType(Jar::class) {
         this["FMLCorePluginContainsFMLMod"] = "true"
         this["ForceLoadAsMod"] = "true"
         this["Main-Class"] = "SkyHanniInstallerFrame"
-
         this["TweakClass"] = "at.hannibal2.skyhanni.tweaker.SkyHanniTweaker"
         this["MixinConfigs"] = "mixins.skyhanni.json"
     }
@@ -257,6 +257,7 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
+    relocate("net.hypixel.modapi.tweaker", "at.hannibal2.skyhanni.deps.modapi")
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
