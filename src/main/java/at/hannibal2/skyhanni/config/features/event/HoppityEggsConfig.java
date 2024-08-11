@@ -164,4 +164,14 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Vacuum warning",
+        desc = "Warn when using a vacuum instead of an Egglocator" +
+            "§eOnly enable this setting if you cant seem to use your Egglocator"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean vacuumWarning = false;
 }
