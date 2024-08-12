@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.prefix
 import at.hannibal2.skyhanni.utils.chat.Text.url
+import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -82,7 +83,7 @@ object ChatUtils {
     }
 
     fun chat(message: IChatComponent): Boolean {
-        val formattedMessage = message.formattedText
+        val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
         val minecraft = Minecraft.getMinecraft()

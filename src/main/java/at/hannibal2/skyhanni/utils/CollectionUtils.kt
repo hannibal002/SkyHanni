@@ -143,6 +143,11 @@ object CollectionUtils {
         return newList
     }
 
+    inline fun <reified T, reified K : MutableList<T>> K.transformAt(index: Int, transform: T.() -> T): K {
+        this[index] = transform(this[index])
+        return this
+    }
+
     /**
      * This does not work inside a [buildList] block
      */
@@ -423,5 +428,15 @@ object CollectionUtils {
 
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
         return filterKeys { it != null } as Map<K, V>
+    }
+
+    /**
+     * Inserts the element at the index or appends it to the end if out of bounds of the list.
+     *
+     * @param index index to insert at, or append if >= size
+     * @param element element to insert or add
+     */
+    fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
+        if (index < size) add(index, element) else add(element)
     }
 }

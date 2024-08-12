@@ -13,12 +13,17 @@ import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.Simpl
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.WISHING_COMPASS
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningFilterConfig.SimplePowderMiningRewardTypes.YOGGIE
 import at.hannibal2.skyhanni.config.features.chat.PowderMiningGemstoneFilterConfig.GemstoneFilterEntry
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraftforge.fml.common.eventhandler.EventPriority
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
 @SkyHanniModule
 object PowderMiningChatFilter {
@@ -44,6 +49,14 @@ object PowderMiningChatFilter {
     private val successfulPickPattern by patternGroup.pattern(
         "warning.successpick",
         "§6You have successfully picked the lock on this chest!",
+    )
+
+    /**
+     * REGEX-TEST: §cThis chest has already been looted.
+     */
+    private val alreadyLootedPattern by patternGroup.pattern(
+        "warning.alreadylooted",
+        "§cThis chest has already been looted\\.",
     )
 
     /**
@@ -232,16 +245,18 @@ object PowderMiningChatFilter {
      * REGEX-TEST: §r§f❈ Rough Amethyst Gemstone §r§8x24
      * REGEX-TEST: §r§a❈ Flawed Amethyst Gemstone §r§8x4
      * REGEX-TEST: §r§9⸕ Fine Amber Gemstone
+     * REGEX-TEST: §r§5⸕ Flawless Amber Gemstone
      */
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
-        "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
+        "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
     )
 
     fun block(message: String): String? {
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
         if (successfulPickPattern.matches(message)) return "powder_mining_picked"
+        if (alreadyLootedPattern.matches(message)) return "powder_mining_dupe"
         // Breaking power warning
         if (breakingPowerPattern.matches(message) && gemstoneConfig.strongerToolMessages) return "stronger_tool"
         // Closing or opening a reward 'loop' with the spam of ▬
@@ -251,6 +266,7 @@ object PowderMiningChatFilter {
         }
 
         if (!unclosedRewards) return null
+        if (StringUtils.isEmpty(message)) return "powder_mining_empty"
         if (lockPickedPattern.matches(message)) return "powder_chest_lockpicked"
         if (lootChestCollectedPattern.matches(message)) return "loot_chest_opened"
         if (rewardHeaderPattern.matches((message))) return "powder_reward_header"
@@ -289,8 +305,11 @@ object PowderMiningChatFilter {
         return null
     }
 
-    private fun blockSimpleRewards(ssMessage: String): String? {
-        val rewardPatterns = mapOf(
+    var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
+
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        rewardPatterns = mapOf(
             ascensionRopeRewardPattern to ASCENSION_ROPE to "powder_mining_ascension_rope",
             wishingCompassRewardPattern to WISHING_COMPASS to "powder_mining_wishing_compass",
             oilBarrelRewardPattern to OIL_BARREL to "powder_mining_oil_barrel",
@@ -302,6 +321,9 @@ object PowderMiningChatFilter {
             robotPartsPattern to ROBOT_PARTS to "powder_mining_robot_parts",
             treasuritePattern to TREASURITE to "powder_mining_treasurite",
         )
+    }
+
+    private fun blockSimpleRewards(ssMessage: String): String? {
         for ((patternToReward, returnReason) in rewardPatterns) {
             if (patternToReward.first.matches(ssMessage)) {
                 return if (config.simplePowderMiningTypes.contains(patternToReward.second)) returnReason
@@ -316,8 +338,7 @@ object PowderMiningChatFilter {
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.SHOW_ALL) return "no_filter"
             if (config.goblinEggs == PowderMiningFilterConfig.GoblinEggFilterEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
-            val colorStr = groupOrNull("color")?.lowercase()
-            return when (colorStr) {
+            return when (val colorStr = groupOrNull("color")?.lowercase()) {
                 //'Colorless', base goblin eggs will never be shown in this code path
                 null -> "powder_mining_goblin_eggs"
                 "green" -> if (config.goblinEggs > PowderMiningFilterConfig.GoblinEggFilterEntry.GREEN_UP) {
@@ -372,9 +393,13 @@ object PowderMiningChatFilter {
                 "flawed" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FLAWED_UP) {
                     "powder_mining_gemstones"
                 } else "no_filter"
-                // FINE_ONLY enum not explicitly used in comparison, as the only
+
+                "fine" -> if (gemSpecificFilterEntry > GemstoneFilterEntry.FINE_UP) {
+                    "powder_mining_gemstones"
+                } else "no_filter"
+                // FLAWLESS_ONLY enum not explicitly used in comparison, as the only
                 // case that will block it is HIDE_ALL, which is covered above
-                "fine" -> "no_filter"
+                "flawless" -> "no_filter"
                 // This should not be reachable
                 else -> "no_filter"
             }
