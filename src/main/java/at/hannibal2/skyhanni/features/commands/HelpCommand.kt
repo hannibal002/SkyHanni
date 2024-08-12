@@ -37,7 +37,7 @@ object HelpCommand {
                 if (description.isNotEmpty()) description.prependIndent("  ") else null,
                 "",
                 "$color§l${category.categoryName}",
-                categoryDescription.prependIndent("  ")
+                categoryDescription.prependIndent("  "),
             )
             this.suggest = "/${command.name}"
         }
@@ -46,12 +46,15 @@ object HelpCommand {
     private fun showPage(
         page: Int,
         search: String,
-        commands: List<Commands.CommandInfo>
+        commands: List<Commands.CommandInfo>,
     ) {
         val filtered = commands.filter {
             it.name.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
         }
-        val maxPage = ceil(filtered.size.toDouble() / COMMANDS_PER_PAGE).toInt()
+
+        val maxPage = if (filtered.isNotEmpty()) {
+            ceil(filtered.size.toDouble() / COMMANDS_PER_PAGE).toInt()
+        } else 1
         val page = page.coerceIn(1, maxPage)
         val title = if (search.isEmpty()) "§6SkyHanni Commands" else "§6SkyHanni Commands matching '$search'"
 
@@ -59,19 +62,21 @@ object HelpCommand {
 
         text.add(createDivider())
         text.add(title.asComponent().center())
-        text.add(Text.join(
-            if (page > 1) "§6§l<<".asComponent {
-                this.hover = "§eClick to view page ${page - 1}".asComponent()
-                this.onClick { showPage(page - 1, search, commands) }
-            } else null,
-            " ",
-            "§6(Page $page of $maxPage)",
-            " ",
-            if (page < maxPage) "§6§l>>".asComponent {
-                this.hover = "§eClick to view page ${page + 1}".asComponent()
-                this.onClick { showPage(page + 1, search, commands) }
-            } else null
-        ).center())
+        text.add(
+            Text.join(
+                if (page > 1) "§6§l<<".asComponent {
+                    this.hover = "§eClick to view page ${page - 1}".asComponent()
+                    this.onClick { showPage(page - 1, search, commands) }
+                } else null,
+                " ",
+                "§6(Page $page of $maxPage)",
+                " ",
+                if (page < maxPage) "§6§l>>".asComponent {
+                    this.hover = "§eClick to view page ${page + 1}".asComponent()
+                    this.onClick { showPage(page + 1, search, commands) }
+                } else null,
+            ).center(),
+        )
         text.add(createDivider())
 
         if (filtered.isEmpty()) {

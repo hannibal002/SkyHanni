@@ -57,9 +57,14 @@ object DungeonFinderFeatures {
         "note",
         "§7§7Note: §f(?<note>.*)"
     )
+
+    /**
+     * REGEX-TEST: The Catacombs
+     * REGEX-TEST: Master Mode The Catacombs
+     */
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM Catacombs).*"
+        "(The Catacombs).*|.*(Master Mode The Catacombs).*",
     )
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
@@ -87,11 +92,16 @@ object DungeonFinderFeatures {
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
-        "(Any)"
+        "(Any)",
     )
+
+    /**
+     * REGEX-TEST: Master Mode The Catacombs
+     * REGEX-TEST: The Catacombs
+     */
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
-        "(MM )|(.*Master Mode Catacombs)"
+        "(MM )|(.*Master Mode The Catacombs)"
     )
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
