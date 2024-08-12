@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.compat.SkyhanniBaseScreen
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
@@ -147,8 +148,8 @@ class GuiPositionEditor(
         return hoveredPos
     }
 
-    private fun getScaledHeight() = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
-    private fun getScaledWidth() = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
+    private fun getScaledHeight() = GuiScreenUtils.scaledWindowHeight
+    private fun getScaledWidth() = GuiScreenUtils.scaledWindowWidth
 
     @Throws(IOException::class)
     override fun mouseClicked(originalX: Int, priginalY: Int, mouseButton: Int) {
