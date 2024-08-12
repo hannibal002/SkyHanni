@@ -167,9 +167,11 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         } ?: "No item in hand"
     }),
 
-    TIME({
-        SkyBlockTime.now().formatted()
-    }),
+    TIME(
+        {
+            SkyBlockTime.now().formatted().removeColor()
+        },
+    ),
 
     PROFILE({
         val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"

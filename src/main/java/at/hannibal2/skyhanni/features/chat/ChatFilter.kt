@@ -483,7 +483,10 @@ object ChatFilter {
         config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
+
+        // TODO need proper solution to hide empty messages in event text
+        config.eventLevelUp && (message.isPresent("event")) -> "event"
+
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
