@@ -42,8 +42,7 @@ object HoppityCallWarning {
     private var activeWarning = false
     private var nextWarningTime = 0L
     private var finalWarningTime = 0L
-    // I'm not 100% sure of actual length, start -> finish, 10s ?
-    private const val CALL_LENGTH_MS = 10000
+    private const val CALL_LENGTH_MS = 7000
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
