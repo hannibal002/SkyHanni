@@ -245,15 +245,6 @@ object GardenCropMilestoneDisplay {
             }
         }
 
-        if (overflowConfig.chat) {
-            if (currentTier > 46 && currentTier == previousNext &&
-                nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
-            ) {
-                GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
-                lastWarnedLevel = currentTier
-            }
-        }
-
         if (GardenAPI.mushroomCowPet && crop != CropType.MUSHROOM) {
             addMushroomCowData()
         }
