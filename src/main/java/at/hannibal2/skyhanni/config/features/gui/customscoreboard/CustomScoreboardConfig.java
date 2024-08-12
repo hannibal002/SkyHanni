@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardElement;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -31,6 +32,13 @@ public class CustomScoreboardConfig {
     )
     @ConfigEditorDraggableList()
     public List<ScoreboardElement> scoreboardEntries = new ArrayList<>(ScoreboardElement.defaultOption);
+
+    @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
+    @ConfigEditorButton(buttonText = "Reset")
+    public Runnable reset = () -> {
+        scoreboardEntries.clear();
+        scoreboardEntries.addAll(ScoreboardElement.defaultOption);
+    };
 
     @Expose
     @ConfigOption(name = "Display Options", desc = "")

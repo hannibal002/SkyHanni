@@ -127,6 +127,7 @@ public class MiscConfig {
     @ConfigOption(name = "Armor Stands", desc = "Hide armor stands that are sometimes visible for a fraction of a second.")
     @ConfigEditorBoolean
     @FeatureToggle
+    // TODO rename to hideTemporaryArmorStands
     public boolean hideTemporaryArmorstands = true;
 
     @Expose
@@ -137,6 +138,11 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean brewingStandOverlay = true;
+
+    @Expose
+    @ConfigOption(name = "Crash On Death", desc = "Crashes your game every time you die in Skyblock")
+    @ConfigEditorBoolean
+    public boolean crashOnDeath = false;
 
     // TODO move into scoreboard accordion
     @Expose
@@ -272,6 +278,12 @@ public class MiscConfig {
     public boolean replaceRomanNumerals = false;
 
     @Expose
+    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean thunderBottleNotification = true;
+
+    @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -281,4 +293,10 @@ public class MiscConfig {
     @Accordion
     @Expose
     public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
+
+    @Expose
+    @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean maintainGameVolume = false;
 }

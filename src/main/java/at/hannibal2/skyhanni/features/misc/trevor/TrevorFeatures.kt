@@ -111,11 +111,12 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onFarmingIsland()) return
-        if (!config.trapperSolver) return
         updateTrapper()
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
-        if (questActive) TrevorSolver.findMob()
+        if (config.trapperSolver && questActive) {
+            TrevorSolver.findMob()
+        }
     }
 
     @SubscribeEvent

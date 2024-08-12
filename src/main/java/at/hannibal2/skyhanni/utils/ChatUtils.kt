@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.prefix
 import at.hannibal2.skyhanni.utils.chat.Text.url
+import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
@@ -33,7 +34,6 @@ object ChatUtils {
 
     private const val DEBUG_PREFIX = "[SkyHanni Debug] §7"
     private const val USER_ERROR_PREFIX = "§c[SkyHanni] "
-    private val ERROR_PREFIX by lazy { "§c[SkyHanni-${SkyHanniMod.version}] " }
     private const val CHAT_PREFIX = "[SkyHanni] "
 
     /**
@@ -63,28 +63,6 @@ object ChatUtils {
     }
 
     /**
-     * Sends a message to the user that an error occurred caused by something in the code.
-     * This should be used for errors that are not caused by the user.
-     *
-     * Why deprecate this? Even if this message is descriptive for the user and the developer,
-     * we don't want inconsistencies in errors, and we would need to search
-     * for the code line where this error gets printed any way.
-     * So it's better to use the stack trace still.
-     *
-     * @param message The message to be sent
-     *
-     * @see ERROR_PREFIX
-     */
-    @Deprecated(
-        "Do not send the user a non clickable non stacktrace containing error message.",
-        ReplaceWith("ErrorManager.logErrorStateWithData(message)")
-    )
-    fun error(message: String) {
-        println("error: '$message'")
-        internalChat(ERROR_PREFIX + message)
-    }
-
-    /**
      * Sends a message to the user
      * @param message The message to be sent
      * @param prefix Whether to prefix the message with the chat prefix, default true
@@ -105,7 +83,7 @@ object ChatUtils {
     }
 
     fun chat(message: IChatComponent): Boolean {
-        val formattedMessage = message.formattedText
+        val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
         val minecraft = Minecraft.getMinecraft()
@@ -268,9 +246,8 @@ object ChatUtils {
     fun chatAndOpenConfig(message: String, property: KMutableProperty0<*>) {
         clickableChat(
             message,
-            onClick = {
-                property.jumpToEditor()
-            }
+            onClick = { property.jumpToEditor() },
+            "§eClick to find setting in the config!"
         )
     }
 

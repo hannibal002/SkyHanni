@@ -63,16 +63,18 @@ object ChocolateFactoryCustomReminder {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val item = event.item ?: return
+        if (event.clickedButton != 0) return
         // TODO add support for prestige and for Chocolate Milestone
         val cost = ChocolateFactoryAPI.getChocolateBuyCost(item.getLore()) ?: return
         val duration = ChocolateAmount.CURRENT.timeUntilGoal(cost)
+        val nextLevelName = ChocolateFactoryAPI.getNextLevelName(item) ?: return
 
         // the user has enough chocolate, and just bought something
         if (duration.isNegative()) {
             reset()
             return
         }
-        setReminder(cost, item.name)
+        setReminder(cost, nextLevelName)
     }
 
     @SubscribeEvent
@@ -110,9 +112,14 @@ object ChocolateFactoryCustomReminder {
     private fun update() {
         display = mutableListOf<Renderable>().also { list ->
             getTargetDescription()?.let {
-                list.add(Renderable.clickAndHover(it, listOf("§eClick to remove the goal!"), onClick = {
-                    reset()
-                }))
+                list.add(
+                    Renderable.clickAndHover(
+                        it, listOf("§eClick to remove the goal!"),
+                        onClick = {
+                            reset()
+                        },
+                    ),
+                )
             }
         }
     }
@@ -138,10 +145,13 @@ object ChocolateFactoryCustomReminder {
         if (configUpgradeWarnings.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        ChatUtils.clickableChat("You can now purchase §f$targetName §ein Chocolate factory!",
+        ChatUtils.clickableChat(
+            "You can now purchase §f$targetName §ein Chocolate factory!",
             onClick = {
                 HypixelCommands.chocolateFactory()
-            })
+            },
+            "§eClick to run /cf!",
+        )
     }
 
     private fun reset() {
