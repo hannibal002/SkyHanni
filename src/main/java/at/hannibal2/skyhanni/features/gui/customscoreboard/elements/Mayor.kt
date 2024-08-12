@@ -34,7 +34,7 @@ object Mayor : ScoreboardElement() {
         add(extraMayorName + extraTimeTillNextMayor)
     }
 
-    override val configLine = "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
+    override val configLine = "§2Diana §7(§e4d 12h§7)\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
 
     override fun showIsland() = !RiftAPI.inRift()
 }
