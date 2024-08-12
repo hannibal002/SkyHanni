@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.bar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.gui.BarConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -62,7 +63,10 @@ object Bar {
 
         display?.let {
             val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
-            val position = Position(0, scaledHeight - it.height)
+            val position = Position(
+                0,
+                if (config.alignment == BarConfig.BarAlignment.TOP) 0 else scaledHeight - it.height,
+            )
             position.renderRenderable(it, "Bar", addToGuiManager = false)
         }
     }
