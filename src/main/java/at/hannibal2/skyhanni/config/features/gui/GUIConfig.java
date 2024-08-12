@@ -87,9 +87,9 @@ public class GUIConfig {
     public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
-    @ConfigOption(name = "Bar", desc = "")
+    @ConfigOption(name = "Custom HUD Bar", desc = "")
     @Accordion
-    public BarConfig bar = new BarConfig();
+    public CustomHUDBarConfig bar = new CustomHUDBarConfig();
 
     @Expose
     @ConfigOption(name = "Beacon Power", desc = "Display the current beacon power duration and what stat is boosted.")

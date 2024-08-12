@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.bar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.gui.BarConfig
+import at.hannibal2.skyhanni.config.features.gui.CustomHUDBarConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 // TODO better name?
-object Bar {
+object CustomHUDBar {
 
     private val config get() = SkyHanniMod.feature.gui.bar
     private var display: Renderable? = null
@@ -65,7 +65,7 @@ object Bar {
             val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
             val position = Position(
                 0,
-                if (config.alignment == BarConfig.BarAlignment.TOP) 0 else scaledHeight - it.height,
+                if (config.alignment == CustomHUDBarConfig.BarAlignment.TOP) 0 else scaledHeight - it.height,
             )
             position.renderRenderable(it, "Bar", addToGuiManager = false)
         }
@@ -79,7 +79,7 @@ object Bar {
         var alignLeft = true
 
         config.entries.forEach {
-            if (it == BarEntry.ALIGN_LEFT_RIGHT) {
+            if (it == CustomHUDBarEntry.ALIGN_LEFT_RIGHT) {
                 alignLeft = false
             } else {
                 val renderable = Renderable.string(it.element.getString())

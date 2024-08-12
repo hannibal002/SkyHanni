@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.config.features.gui;
 
-import at.hannibal2.skyhanni.features.gui.bar.BarEntry;
+import at.hannibal2.skyhanni.features.gui.bar.CustomHUDBarEntry;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
@@ -12,17 +12,17 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BarConfig {
+public class CustomHUDBarConfig {
 
     @Expose
-    @ConfigOption(name = "Toggle", desc = "Enable/Disable the Bar.")
+    @ConfigOption(name = "Toggle", desc = "Enable/Disable the Bar.\nInspired by the Bar from Apec.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Appearance", desc = "Change the appearance of the Bar.")
     @ConfigEditorDraggableList(requireNonEmpty = true)
-    public List<BarEntry> entries = new ArrayList<>(BarEntry.getEntries());
+    public List<CustomHUDBarEntry> entries = new ArrayList<>(CustomHUDBarEntry.getEntries());
 
     @Expose
     @ConfigOption(name = "Bar Alignment", desc = "Change the alignment of the Bar.")

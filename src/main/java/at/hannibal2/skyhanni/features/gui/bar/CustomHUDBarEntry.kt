@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.gui.bar.elements.Location
 import at.hannibal2.skyhanni.features.gui.bar.elements.Purse
 import at.hannibal2.skyhanni.features.gui.bar.elements.Time
 
-enum class BarEntry(val element: BarElement) {
+enum class CustomHUDBarEntry(val element: BarElement) {
     PURSE(Purse),
     BITS(Bits),
     LOCATION(Location),
