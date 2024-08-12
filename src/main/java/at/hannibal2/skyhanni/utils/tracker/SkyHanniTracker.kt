@@ -2,22 +2,20 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
-import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,6 +23,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
+    // TODO change to renderable
     private val drawDisplay: (Data) -> List<List<Any>>,
 ) {
 
@@ -40,12 +39,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
-        fun getPricePer(name: NEUInternalName) = when (config.priceFrom) {
-            PriceFromEntry.INSTANT_SELL -> name.getBazaarData()?.instantBuyPrice ?: name.getPriceOrNull() ?: 0.0
-            PriceFromEntry.SELL_OFFER -> name.getBazaarData()?.sellOfferPrice ?: name.getPriceOrNull() ?: 0.0
-
-            else -> name.getNpcPriceOrNull() ?: 0.0
-        }
+        fun getPricePer(name: NEUInternalName) = name.getPrice(config.priceSource)
     }
 
     fun isInventoryOpen() = inventoryOpen
@@ -55,7 +49,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
         },
-        oneTimeClick = true
+        "§eClick to confirm.",
+        oneTimeClick = true,
     )
 
     fun modify(modifyFunction: (Data) -> Unit) {
@@ -78,7 +73,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
         if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
             return
         }
@@ -116,14 +111,15 @@ open class SkyHanniTracker<Data : TrackerData>(
         listOf(
             "§cThis will reset your",
             "§ccurrent session of",
-            "§c$name"
+            "§c$name",
         ),
         onClick = {
             if (sessionResetTime.passedSince() > 3.seconds) {
                 reset(DisplayMode.SESSION, "Reset this session of $name!")
                 sessionResetTime = SimpleTimeMark.now()
             }
-        })
+        },
+    )
 
     private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
         "§7Display Mode: ",
@@ -133,7 +129,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             displayMode = it
             storedTrackers[name] = it
             update()
-        }
+        },
     )
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
