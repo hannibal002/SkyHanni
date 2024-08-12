@@ -16,7 +16,6 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-// TODO better name?
 object CustomHUDBar {
 
     private val config get() = SkyHanniMod.feature.gui.bar
