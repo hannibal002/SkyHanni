@@ -27,7 +27,7 @@ open class CustomLinesGui : GuiScreen() {
         set(value) {
             field = value
             if (value) {
-                textBox.textBox = CustomScoreboard.customlineConfig.customLine1
+                textBox.textBox = CustomScoreboard.customLineConfig.customLine1
                 textBox.makeActive()
             } else {
                 textBox.disable()
@@ -75,15 +75,15 @@ open class CustomLinesGui : GuiScreen() {
             list.add(
                 Renderable.clickable(
                     Renderable.wrappedString(
-                        "${it.third} | ${it.second.invoke()}", maxSecondColumnWidth
+                        "${it.name} | ${it.replacement()}", maxSecondColumnWidth,
                     ),
                     {
                         if (inTextMode) {
-                            textBox.textBox += it.first
+                            textBox.textBox += it.trigger
                         }
                     },
-                    bypassChecks = true
-                )
+                    bypassChecks = true,
+                ),
             )
         }
         val replacementsRenderable = Renderable.verticalContainer(list)
@@ -102,19 +102,19 @@ open class CustomLinesGui : GuiScreen() {
                 Renderable.string("Custom Lines"),
                 Renderable.clickable(
                     Renderable.drawInsideRoundedRectWithOutline(
-                        Renderable.wrappedString(CustomScoreboard.customlineConfig.customLine1, maxWidth - 10),
+                        Renderable.wrappedString(CustomScoreboard.customLineConfig.customLine1, maxWidth - 10),
                         if (inTextMode) LorenzColor.BLACK.addOpacity(100) else LorenzColor.BLACK.addOpacity(150),
                         padding = 5,
                         topOutlineColor = LorenzColor.BLACK.addOpacity(100).rgb,
                         bottomOutlineColor = LorenzColor.BLACK.addOpacity(100).rgb,
-                        borderOutlineThickness = 2
+                        borderOutlineThickness = 2,
                     ),
                     {
                         inTextMode = !inTextMode
                     },
-                    bypassChecks = true
-                )
-            )
+                    bypassChecks = true,
+                ),
+            ),
         )
 
     @SubscribeEvent
@@ -139,7 +139,7 @@ open class CustomLinesGui : GuiScreen() {
 
         if (inTextMode) {
             textBox.handle()
-            CustomScoreboard.customlineConfig.customLine1 = textBox.finalText().replace("§", "&")
+            CustomScoreboard.customLineConfig.customLine1 = textBox.finalText().replace("§", "&")
         }
     }
 }
