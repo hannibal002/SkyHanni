@@ -272,7 +272,7 @@ object ItemUtils {
      */
     var ItemStack.name: String
         get() = this.displayName ?: ErrorManager.skyHanniError(
-            "Could not get name if ItemStack",
+            "Could not get name of ItemStack",
             "itemStack" to this,
             "displayName" to displayName,
             "internal name" to getInternalNameOrNull(),
