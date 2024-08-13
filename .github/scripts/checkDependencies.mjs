@@ -17,8 +17,7 @@ async function run() {
     const match = prBody.match(dependencyRegex);
 
     if (match) {
-        const dependenciesSection = match[1];
-        const prLinks = dependenciesSection.match(/- https:\/\/github\.com\/[\w-]+\/[\w-]+\/pull\/\d+/g);
+        const prLinks = prBody.match(/- https:\/\/github\.com\/[\w-]+\/[\w-]+\/pull\/\d+/g);
 
         if (prLinks && prLinks.length > 0) {
             let hasOpenDependencies = false;
