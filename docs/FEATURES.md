@@ -813,6 +813,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Change Highlight color.
 + Punchcard Artifact Highlighter & Overlay. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1089)
     + Highlights unpunched players in the Rift.
++ Added Splatter Hearts Highlight for the Rift. - Empa (https://github.com/hannibal002/SkyHanni/pull/2318)
 
 </details>
 <details open><summary>
