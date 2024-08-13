@@ -1,6 +1,8 @@
 import {Octokit} from "@octokit/rest";
 import fetch from "node-fetch";
 
+const labelName = "Waiting on Dependency PR";
+
 async function run() {
     const octokit = new Octokit({
         auth: process.env.GITHUB_TOKEN,
@@ -44,19 +46,19 @@ async function run() {
 
             const labels = pull_request.labels.map(label => label.name);
 
-            if (hasOpenDependencies && !labels.includes("Waiting on Dependency PR")) {
+            if (hasOpenDependencies && !labels.includes(labelName)) {
                 await octokit.issues.addLabels({
                     owner,
                     repo: name,
                     issue_number: prNumber,
-                    labels: ["Waiting on Dependency PR"],
+                    labels: [labelName],
                 });
-            } else if (!hasOpenDependencies && labels.includes("Waiting on Dependency PR")) {
+            } else if (!hasOpenDependencies && labels.includes(labelName)) {
                 await octokit.issues.removeLabel({
                     owner,
                     repo: name,
                     issue_number: prNumber,
-                    name: "Waiting on Dependency PR",
+                    name: labelName,
                 });
             }
         }
