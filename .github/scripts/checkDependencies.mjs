@@ -1,8 +1,12 @@
 import {Octokit} from "@octokit/rest";
+import fetch from "node-fetch";
 
 async function run() {
     const octokit = new Octokit({
         auth: process.env.GITHUB_TOKEN,
+        request: {
+            fetch: fetch,
+        },
     });
 
     const {event, repository} = JSON.parse(process.env.GITHUB_CONTEXT);
