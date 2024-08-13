@@ -309,7 +309,7 @@ object RepoPatternManager {
      * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
      * */
     internal fun getUnusedPatterns(prefix: String): List<Pattern> {
-        if (config.forceLocal.get()) return emptyList()
+        if (localLoading) return emptyList()
         try {
             verifyKeyShape(prefix)
         } catch (e: IllegalArgumentException) {

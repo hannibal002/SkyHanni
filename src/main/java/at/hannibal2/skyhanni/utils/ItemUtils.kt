@@ -14,8 +14,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -46,6 +44,8 @@ object ItemUtils {
         return list
     }
 
+    val ItemStack.extraAttributes: NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
+
     // TODO change else janni is sad
     fun ItemStack.isCoopSoulBound(): Boolean =
         getLore().any {
@@ -74,23 +74,6 @@ object ItemUtils {
             list.add(player.inventory.itemStack)
         }
         return list
-    }
-
-    fun hasAttributes(stack: ItemStack): Boolean {
-        if (stack.hasTagCompound()) {
-            val tagCompound = stack.tagCompound
-            if (tagCompound.hasKey("ExtraAttributes")) {
-                val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-                try {
-                    val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
-                    if (json.has("attributes")) {
-                        return true
-                    }
-                } catch (_: Exception) {
-                }
-            }
-        }
-        return false
     }
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
@@ -294,11 +277,11 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
+    private val bookPattern = "(?<name>.* [IVX]+) Book".toPattern()
+
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
         // This workaround fixes 'Turbo Cacti I Book'
-        val input = (if (originalInput.endsWith(" Book")) {
-            originalInput.replace(" Book", "")
-        } else originalInput).removeResets()
+        val input = (bookPattern.matchMatcher(originalInput) { group("name") } ?: originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
@@ -423,15 +406,9 @@ object ItemUtils {
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe): Double =
+    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
         neededItems(recipe).map {
-            // prevents stack overflow errors with ENDERMAN_MONSTER
-            if (it.key.endsWith("_MONSTER")) {
-                0.0
-            } else {
-                it.key.getPrice() * it.value
-            }
+            it.key.getPrice(pastRecipes = pastRecipes) * it.value
         }.sum()
-
 
 }

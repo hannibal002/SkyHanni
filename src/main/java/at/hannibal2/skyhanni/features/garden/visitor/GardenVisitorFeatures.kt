@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -201,7 +202,11 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
-                            BazaarApi.searchForBazaarItem(name, amount)
+                            if (internalName.isBazaarItem()) {
+                                BazaarApi.searchForBazaarItem(name, amount)
+                            } else {
+                                HypixelCommands.auctionSearch(name.removeColor())
+                            }
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
@@ -234,8 +239,8 @@ object GardenVisitorFeatures {
         var amountInSacks = 0
         internalName.getAmountInSacksOrNull()?.let {
             amountInSacks = it
-            val textColour = if (it >= amount) "a" else "e"
-            list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+            val textColor = if (it >= amount) "a" else "e"
+            list.add(" §7(§${textColor}x${it.addSeparators()} §7in sacks)")
         }
 
         val ingredients = NEUItems.getRecipes(internalName)
@@ -258,7 +263,7 @@ object GardenVisitorFeatures {
                 break
             }
         }
-        if (hasIngredients) {
+        if (hasIngredients && (amount - amountInSacks) > 0) {
             val leftToCraft = amount - amountInSacks
             list.add(" §7(")
             list.add(
@@ -268,7 +273,7 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$leftToCraft")
                         } else {
-                            HypixelCommands.viewRecipe(internalName.toString())
+                            HypixelCommands.viewRecipe(internalName.asString())
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
@@ -722,6 +727,14 @@ object GardenVisitorFeatures {
                 drops.add(JsonPrimitive(new.name))
             }
 
+            drops
+        }
+        event.transform(54, "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (entry in element.asJsonArray) {
+                drops.add(JsonPrimitive(entry.asString))
+            }
+            drops.add(JsonPrimitive(VisitorReward.COPPER_DYE.name))
             drops
         }
 

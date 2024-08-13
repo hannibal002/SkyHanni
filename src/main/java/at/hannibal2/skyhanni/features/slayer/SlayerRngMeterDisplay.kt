@@ -205,9 +205,12 @@ object SlayerRngMeterDisplay {
     }
 
     private fun makeLink(text: String) =
-        Renderable.clickAndHover(text, listOf("§eClick to open RNG Meter Inventory."), onClick = {
-            HypixelCommands.showRng("slayer", SlayerAPI.getActiveSlayer()?.rngName)
-        })
+        Renderable.clickAndHover(
+            text, listOf("§eClick to open RNG Meter Inventory."),
+            onClick = {
+                HypixelCommands.showRng("slayer", SlayerAPI.activeSlayer?.rngName)
+            },
+        )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""

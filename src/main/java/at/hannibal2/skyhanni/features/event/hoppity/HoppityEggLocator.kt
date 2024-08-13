@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -140,7 +141,7 @@ object HoppityEggLocator {
                     if (eyeLocation.distance(it) > 2) {
                         drawWaypointFilled(
                             it,
-                            LorenzColor.GREEN.toColor(),
+                            config.waypointColor.toChromaColor(),
                             seeThroughBlocks = true,
                         )
                         drawDynamicText(it.add(y = 1), "§aGuess", 1.5)
@@ -158,7 +159,7 @@ object HoppityEggLocator {
             && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
-            drawWaypointFilled(location, LorenzColor.GREEN.toColor(), seeThroughBlocks = true)
+            drawWaypointFilled(location, config.waypointColor.toChromaColor(), seeThroughBlocks = true)
         } else {
             drawColor(location, LorenzColor.RED.toColor(), false, 0.5f)
         }
@@ -166,7 +167,7 @@ object HoppityEggLocator {
     }
 
     private fun shouldShowAllEggs() =
-        config.showAllWaypoints && !hasLocatorInHotbar() && HoppityEggType.eggsRemaining()
+        config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
     fun eggFound() {
         resetData()
@@ -175,7 +176,7 @@ object HoppityEggLocator {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        if (!hasLocatorInHotbar()) return
+        if (!locatorInHotbar) return
         if (!event.isVillagerParticle() && !event.isEnchantmentParticle()) return
 
         val lastParticlePosition = lastParticlePosition ?: run {
@@ -281,9 +282,9 @@ object HoppityEggLocator {
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 
-    private fun hasLocatorInHotbar() = RecalculatingValue(1.seconds) {
+    private val locatorInHotbar by RecalculatingValue(1.seconds) {
         LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
-    }.getValue()
+    }
 
     private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
         val distToLine = this.distanceToLine(firstPoint, secondPoint)
