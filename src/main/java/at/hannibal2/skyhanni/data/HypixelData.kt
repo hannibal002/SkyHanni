@@ -293,6 +293,7 @@ object HypixelData {
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
+            ProfileStorageData.profileJoinMessage()
         }
     }
 

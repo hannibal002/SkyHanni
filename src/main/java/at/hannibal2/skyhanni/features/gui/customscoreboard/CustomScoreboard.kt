@@ -333,13 +333,13 @@ object CustomScoreboard {
             array
         }
         event.move(
-            52,
+            55,
             "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
             "$displayPrefix.titleAndFooter.useCustomTitle",
         ) {
             JsonPrimitive(!it.asBoolean)
         }
-        event.transform(53, "$displayPrefix.events.eventEntries") { element ->
+        event.transform(56, "$displayPrefix.events.eventEntries") { element ->
             val jsonArray = element.asJsonArray
             val newArray = JsonArray()
             val oldElements = listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING")
@@ -358,7 +358,7 @@ object CustomScoreboard {
             newArray
         }
         listOf("customTitle", "customFooter").forEach {
-            event.transform(53, "$displayPrefix.titleAndFooter.$it") { element ->
+            event.transform(56, "$displayPrefix.titleAndFooter.$it") { element ->
                 JsonPrimitive(element.asString.replace("&", "&&"))
             }
         }

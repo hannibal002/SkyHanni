@@ -31,7 +31,7 @@ object Party : ScoreboardElement() {
             else -> inAnyIsland(IslandType.DUNGEON_HUB, IslandType.KUUDRA_ARENA, IslandType.CRIMSON_ISLE) || MiningAPI.inColdIsland()
         }
 
-    override val configLine = "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fVahvl\n §7- §fSkirtwearer"
+    override val configLine = "§9§lParty (4):\n §7- §fhannibal2\n §7- §fMoulberry\n §7- §fEmpa_\n §7- §fSkirtwearer"
 
     override fun showIsland() = !DungeonAPI.inDungeon()
 }

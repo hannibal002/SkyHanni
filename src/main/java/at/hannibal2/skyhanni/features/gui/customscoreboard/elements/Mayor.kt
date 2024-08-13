@@ -23,6 +23,15 @@ object Mayor : ScoreboardElement() {
         }
 
         if (!mayorConfig.showExtraMayor) return@buildList
+        val ministerName = MayorAPI.currentMinister?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
+        add(ministerName)
+
+        if (mayorConfig.showMayorPerks) {
+            MayorAPI.currentMinister?.activePerks?.forEach { perk ->
+                add(" §7- §e${perk.perkName}")
+            }
+        }
+
         val jerryExtraMayor = MayorAPI.jerryExtraMayor
         val extraMayor = jerryExtraMayor.first ?: return@buildList
 
@@ -34,7 +43,7 @@ object Mayor : ScoreboardElement() {
         add(extraMayorName + extraTimeTillNextMayor)
     }
 
-    override val configLine = "§2Diana:\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
+    override val configLine = "§2Diana §7(§e4d 12h§7)\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
 
     override fun showIsland() = !RiftAPI.inRift()
 }
