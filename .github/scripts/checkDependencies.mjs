@@ -5,11 +5,7 @@ async function run() {
         auth: process.env.GITHUB_TOKEN,
     });
 
-    const context = JSON.parse(process.env.GITHUB_CONTEXT);
-
-    //console.log("Context:", JSON.stringify(context, null, 2));
-
-    const {event, repository} = context;
+    const {event, repository} = JSON.parse(process.env.GITHUB_CONTEXT);
 
     const pull_request = event.pull_request;
 
