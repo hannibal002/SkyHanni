@@ -257,4 +257,19 @@ object ChatUtils {
         }
         return this
     }
+
+    fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
+        ChatUtils.clickableChat(
+            "$message\n§e[CLICK to $actionName or disable this feature]",
+            onClick = {
+                if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
+                    option.jumpToEditor()
+                } else {
+                    action()
+                }
+            },
+            hover = "§eClick to $actionName!\n" +
+                "§eShift-Click to disable this feature!",
+        )
+    }
 }
