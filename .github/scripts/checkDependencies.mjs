@@ -7,9 +7,11 @@ async function run() {
 
     const context = JSON.parse(process.env.GITHUB_CONTEXT);
 
-    console.log("Context:", JSON.stringify(context, null, 2));
+    //console.log("Context:", JSON.stringify(context, null, 2));
 
-    const {pull_request, repository} = context;
+    const {event, repository} = context;
+
+    const pull_request = event.pull_request;
 
     const {owner, repo} = repository;
     const prNumber = pull_request.number;
