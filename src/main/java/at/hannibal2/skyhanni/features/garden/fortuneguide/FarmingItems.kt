@@ -142,10 +142,10 @@ enum class FarmingItems(
 
         fun getArmorDisplay(clickEnabled: Boolean = false): List<Renderable> = armor.map { it.getDisplay(clickEnabled) }
 
-        fun getEquipmentDisplay(clickEnabled: Boolean = false): List<Renderable> =
-            equip.map { it.getDisplay(clickEnabled) }
+        fun getEquipmentDisplay(clickEnabled: Boolean = false): List<Renderable> = equip.map { it.getDisplay(clickEnabled) }
 
         fun getPetsDisplay(clickEnabled: Boolean = false): List<Renderable> = pets.map { it.getDisplay(clickEnabled) }
+
         fun resetClickState() {
             entries.filterNot { pets.contains(it) }.forEach { it.selectedState = false }
         }
