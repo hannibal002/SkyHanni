@@ -1,4 +1,4 @@
-const {Octokit} = require("@octokit/rest");
+import {Octokit} from "@octokit/rest";
 
 async function run() {
     const octokit = new Octokit({
