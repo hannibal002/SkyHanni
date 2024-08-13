@@ -11,9 +11,7 @@ async function run() {
 
     const context = JSON.parse(process.env.GITHUB_CONTEXT);
 
-    const {event, repository} = context;
-
-    const pull_request = event.pull_request;
+    const pull_request = context.event.pull_request;
 
     const owner = context.repository_owner;
     const name = context.repository.split("/")[1];
