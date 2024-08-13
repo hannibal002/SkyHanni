@@ -76,14 +76,13 @@ object EntityData {
         val entity = EntityUtils.getEntityByID(entityId) ?: return
         if (entity.javaClass in ignoredEntities) return
 
-        watchableObjects.find { it.dataValueId == 6 }
-            ?.let {
-                val health = (it.`object` as Float).toInt()
-                if (entity is EntityWither && health == 300 && entityId < 0) return
-                if (entity is EntityLivingBase) {
-                    EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
-                }
+        watchableObjects.find { it.dataValueId == 6 }?.let {
+            val health = (it.`object` as Float).toInt()
+            if (entity is EntityWither && health == 300 && entityId < 0) return
+            if (entity is EntityLivingBase) {
+                EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
             }
+        }
     }
 
     @JvmStatic

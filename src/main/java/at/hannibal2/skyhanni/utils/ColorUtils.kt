@@ -36,6 +36,7 @@ object ColorUtils {
 
     val TRANSPARENT_COLOR = Color(0, 0, 0, 0)
 
+    @Deprecated("Don't use int colors", ReplaceWith("this.addAlpha()"))
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (rgb and 0x00ffffff)
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
