@@ -9,12 +9,15 @@ async function run() {
         },
     });
 
-    const {event, repository} = JSON.parse(process.env.GITHUB_CONTEXT);
+    const context = JSON.parse(process.env.GITHUB_CONTEXT);
+
+    const {event, repository} = context;
 
     const pull_request = event.pull_request;
 
-    const {ownerObj, name} = repository;
-    const owner = ownerObj.login;
+    const owner = context.repository_owner;
+    const name = context.repository.split("/")[1];
+
     const prNumber = pull_request.number;
     const prBody = pull_request.body || "";
 
