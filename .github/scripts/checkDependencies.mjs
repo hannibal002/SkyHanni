@@ -5,8 +5,12 @@ async function run() {
         auth: process.env.GITHUB_TOKEN,
     });
 
-    const context = process.env.GITHUB_CONTEXT;
-    const {pull_request, repository} = JSON.parse(context);
+    const context = JSON.parse(process.env.GITHUB_CONTEXT);
+
+    console.log("Context:", JSON.stringify(context, null, 2));
+
+    const {pull_request, repository} = context;
+
     const {owner, repo} = repository;
     const prNumber = pull_request.number;
     const prBody = pull_request.body;
