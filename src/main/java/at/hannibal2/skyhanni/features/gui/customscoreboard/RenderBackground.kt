@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY

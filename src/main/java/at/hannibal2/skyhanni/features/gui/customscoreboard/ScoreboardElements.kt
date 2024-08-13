@@ -152,7 +152,7 @@ enum class ScoreboardElement(
     SOULFLOW(
         ::getSoulflowDisplayPair,
         ::getSoulflowDisplayWhen,
-        "Soulflow: §3761"
+        "Soulflow: §3761",
     ),
     EMPTY_LINE(
         ::getEmptyLineDisplayPair,
@@ -528,7 +528,7 @@ private fun getSoulflowDisplayPair(): List<ScoreboardElementType> {
             informationFilteringConfig.hideEmptyLines && soulflow == "0" -> "<hidden>"
             displayConfig.displayNumbersFirst -> "§3$soulflow Soulflow"
             else -> "Soulflow: §3$soulflow"
-        } to HorizontalAlignment.LEFT
+        } to HorizontalAlignment.LEFT,
     )
 }
 

@@ -572,7 +572,7 @@ object ScoreboardPattern {
     )
     val soulflowPattern by tablistGroup.pattern(
         "soulflow",
-        "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$"
+        "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$",
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",

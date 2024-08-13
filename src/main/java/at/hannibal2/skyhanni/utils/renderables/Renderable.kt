@@ -934,7 +934,7 @@ interface Renderable {
                     bottomOutlineColor,
                     borderOutlineThickness,
                     radius,
-                    blur
+                    blur,
                 )
             }
         }
