@@ -16,7 +16,7 @@ enum class Mayor(
         "§3",
         Perk.SLASHED_PRICING,
         Perk.SLAYER_XP_BUFF,
-        Perk.PATHFINDER
+        Perk.PATHFINDER,
     ),
     COLE(
         "Cole",
@@ -24,7 +24,7 @@ enum class Mayor(
         Perk.PROSPECTION,
         Perk.MINING_XP_BUFF,
         Perk.MINING_FIESTA,
-        Perk.MOLTEN_FORGE
+        Perk.MOLTEN_FORGE,
     ),
     DIANA(
         "Diana",
@@ -32,7 +32,7 @@ enum class Mayor(
         Perk.LUCKY,
         Perk.MYTHOLOGICAL_RITUAL,
         Perk.PET_XP_BUFF,
-        Perk.SHARING_IS_CARING
+        Perk.SHARING_IS_CARING,
     ),
     DIAZ(
         "Diaz",
@@ -40,7 +40,7 @@ enum class Mayor(
         Perk.VOLUME_TRADING,
         Perk.SHOPPING_SPREE,
         Perk.STOCK_EXCHANGE,
-        Perk.LONG_TERM_INVESTMENT
+        Perk.LONG_TERM_INVESTMENT,
     ),
     FINNEGAN(
         "Finnegan",
@@ -48,7 +48,7 @@ enum class Mayor(
         Perk.FARMING_SIMULATOR,
         Perk.PELT_POCALYPSE,
         Perk.GOATED,
-        Perk.BLOOMING_BUSINESS
+        Perk.BLOOMING_BUSINESS,
     ),
     FOXY(
         "Foxy",
@@ -66,28 +66,28 @@ enum class Mayor(
         Perk.FISHING_XP_BUFF,
         Perk.LUCK_OF_THE_SEA,
         Perk.FISHING_FESTIVAL,
-        Perk.DOUBLE_TROUBLE
+        Perk.DOUBLE_TROUBLE,
     ),
     PAUL(
         "Paul",
         "§c",
         Perk.MARAUDER,
         Perk.EZPZ,
-        Perk.BENEDICTION
+        Perk.BENEDICTION,
     ),
 
     SCORPIUS(
         "Scorpius",
         "§d",
         Perk.BRIBE,
-        Perk.DARKER_AUCTIONS
+        Perk.DARKER_AUCTIONS,
     ),
     JERRY(
         "Jerry",
         "§d",
         Perk.PERKPOCALYPSE,
         Perk.STATSPOCALYPSE,
-        Perk.JERRYPOCALYPSE
+        Perk.JERRYPOCALYPSE,
     ),
     DERPY(
         "Derpy",
@@ -95,7 +95,7 @@ enum class Mayor(
         Perk.TURBO_MINIONS,
         Perk.AH_TAX,
         Perk.DOUBLE_MOBS_HP,
-        Perk.MOAR_SKILLZ
+        Perk.MOAR_SKILLZ,
     ),
 
     UNKNOWN("Unknown", "§c"),
@@ -136,11 +136,11 @@ enum class Mayor(
                 Perk.entries.firstOrNull { it.perkName == perk.renameIfFoxyExtraEventPerkFound() }
             }
 
-            mayor.setAssumeMayor(perks)
+            mayor.addPerks(perks)
             return mayor
         }
 
-        fun Mayor.setAssumeMayor(perks: List<Perk>) {
+        fun Mayor.addPerks(perks: List<Perk>) {
             perks.forEach { it.isActive = false }
             activePerks.clear()
             for (perk in perks.filter { perks.contains(it) }) {
