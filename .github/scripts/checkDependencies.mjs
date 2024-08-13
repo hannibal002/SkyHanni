@@ -13,7 +13,8 @@ async function run() {
 
     const pull_request = event.pull_request;
 
-    const {owner, repo} = repository;
+    const {ownerObj, name} = repository;
+    const owner = ownerObj.login;
     const prNumber = pull_request.number;
     const prBody = pull_request.body || "";
 
@@ -45,14 +46,14 @@ async function run() {
             if (hasOpenDependencies && !labels.includes("Waiting on Dependency PR")) {
                 await octokit.issues.addLabels({
                     owner,
-                    repo,
+                    repo: name,
                     issue_number: prNumber,
                     labels: ["Waiting on Dependency PR"],
                 });
             } else if (!hasOpenDependencies && labels.includes("Waiting on Dependency PR")) {
                 await octokit.issues.removeLabel({
                     owner,
-                    repo,
+                    repo: name,
                     issue_number: prNumber,
                     name: "Waiting on Dependency PR",
                 });
