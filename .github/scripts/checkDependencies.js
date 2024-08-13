@@ -11,7 +11,7 @@ async function run() {
     const prNumber = pull_request.number;
     const prBody = pull_request.body;
 
-    const dependencyRegex = /## Dependencies\s*([\s\S]*)/;
+    const dependencyRegex = /## Dependencies/;
     const match = prBody.match(dependencyRegex);
 
     if (match) {
