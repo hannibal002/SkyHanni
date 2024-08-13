@@ -15,7 +15,7 @@ async function run() {
 
     const {owner, repo} = repository;
     const prNumber = pull_request.number;
-    const prBody = pull_request.body;
+    const prBody = pull_request.body || "";
 
     const dependencyRegex = /## Dependencies/;
     const match = prBody.match(dependencyRegex);
