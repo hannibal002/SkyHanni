@@ -17,7 +17,7 @@ jobs:
                     node-version: '16'
 
             -   name: Install octokit
-                run: npm install @octokit/rest
+                run: npm install @octokit/rest node-fetch
 
             -   name: Run dependency check script
                 run: node .github/scripts/checkDependencies.mjs
