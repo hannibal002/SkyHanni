@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
@@ -120,7 +119,7 @@ object GardenVisitorTimer {
             millis = sixthVisitorArrivalTime.timeUntil()
 
             val nextSixthVisitorArrival = SimpleTimeMark.now() + millis + (visitorInterval * (5 - visitorsAmount))
-            GardenAPI.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival.toMillis()
+            GardenAPI.storage?.nextSixthVisitorArrival = nextSixthVisitorArrival
             if (isSixthVisitorEnabled() && millis.isNegative()) {
                 visitorsAmount++
                 if (!sixthVisitorReady) {
@@ -183,9 +182,8 @@ object GardenVisitorTimer {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastVisitors = -1
         GardenAPI.storage?.nextSixthVisitorArrival?.let {
-            val badTime = Duration.INFINITE.inWholeMilliseconds
-            if (it != badTime && it != -9223370336633802065) {
-                sixthVisitorArrivalTime = it.asTimeMark()
+            if (it.isFarFuture() && it.toMillis() != -9223370336633802065) {
+                sixthVisitorArrivalTime = it
             }
         }
         sixthVisitorReady = false

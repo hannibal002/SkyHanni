@@ -24,16 +24,15 @@ import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
-import net.minecraft.util.IChatComponent
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
-    private val nametagCache = TimeLimitedCache<Entity, IChatComponent>(50.milliseconds)
+    private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
 
     @SubscribeEvent
@@ -97,11 +96,11 @@ object EntityData {
     }
 
     @JvmStatic
-    fun getDisplayName(entity: Entity, ci: CallbackInfoReturnable<IChatComponent>) {
-        ci.returnValue = postRenderNametag(entity, ci.returnValue)
+    fun getDisplayName(entity: Entity, oldValue: ChatComponentText): ChatComponentText {
+        return postRenderNametag(entity, oldValue)
     }
 
-    private fun postRenderNametag(entity: Entity, chatComponent: IChatComponent) = nametagCache.getOrPut(entity) {
+    private fun postRenderNametag(entity: Entity, chatComponent: ChatComponentText) = nametagCache.getOrPut(entity) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
         event.postAndCatch()
         event.chatComponent

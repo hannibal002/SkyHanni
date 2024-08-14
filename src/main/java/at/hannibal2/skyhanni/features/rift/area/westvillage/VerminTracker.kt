@@ -87,7 +87,7 @@ object VerminTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        VerminType.entries.forEach { verminType ->
+        for (verminType in VerminType.entries) {
             if (verminType.pattern.matches(event.message)) {
                 tracker.modify { it.count.addOrPut(verminType, 1) }
 
@@ -152,7 +152,7 @@ object VerminTracker {
 
     private fun drawDisplay(data: Data): List<List<Any>> = buildList {
         addAsSingletonList("§7Vermin Tracker:")
-        data.count.entries.sortedBy { it.key.order }.forEach { (vermin, amount) ->
+        for ((vermin, amount) in data.count.entries.sortedBy { it.key.order }) {
             val verminName = vermin.vermin
             addAsSingletonList(" §7- §e${amount.addSeparators()} $verminName")
         }

@@ -28,7 +28,7 @@ public class MixinContributorRendererEntityLiving<T extends EntityLivingBase> {
     @Redirect(
         method = "rotateCorpse",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayer;isWearing(Lnet/minecraft/entity/player/EnumPlayerModelParts;)Z"))
-    private boolean alwaysMarkAsHavingCape(EntityPlayer instance, EnumPlayerModelParts p_175148_1_) {
+    private boolean alwaysMarkAsHavingCape(EntityPlayer instance, EnumPlayerModelParts enumPlayerModelParts) {
         // Always returning true here ensures maximal compatibility with other mods. This will no longer block other mods from implementing this same mixin.
         return true;
     }

@@ -15,8 +15,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -154,7 +154,7 @@ object FrozenTreasureTracker {
 
     fun formatNumber(amount: Number): String {
         if (amount is Int) return amount.addSeparators()
-        if (amount is Long) return NumberUtil.format(amount)
+        if (amount is Long) return amount.shortFormat()
         return "$amount"
     }
 

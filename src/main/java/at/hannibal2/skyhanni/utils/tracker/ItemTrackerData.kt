@@ -24,7 +24,7 @@ abstract class ItemTrackerData : TrackerData() {
         resetItems()
     }
 
-    fun additem(internalName: NEUInternalName, stackSize: Int) {
+    fun addItem(internalName: NEUInternalName, stackSize: Int) {
         val item = items.getOrPut(internalName) { TrackedItem() }
 
         item.timesGained++
