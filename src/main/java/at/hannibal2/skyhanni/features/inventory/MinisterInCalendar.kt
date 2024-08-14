@@ -37,6 +37,10 @@ object MinisterInCalendar {
                 }
 
                 add("§8§m--------------------------")
+                add("")
+                add("§7The Minister is who came in 2nd place")
+                add("§7during the election. They have one")
+                add("§7of their perks active.")
             }
 
             event.replace(
