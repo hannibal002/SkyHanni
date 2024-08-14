@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.partyConfig
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 // internal
@@ -19,7 +18,7 @@ object Party : ScoreboardElement() {
 
         PartyAPI.partyMembers
             .take(partyConfig.maxPartyList)
-            .apply { if (partyConfig.showPartyLeader) removeFirst { it == PartyAPI.partyLeader } }
+            .apply { if (partyConfig.showPartyLeader) remove(PartyAPI.partyLeader) }
             .forEach {
                 add(" §7- §f$it")
             }
