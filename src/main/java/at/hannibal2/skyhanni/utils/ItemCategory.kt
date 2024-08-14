@@ -52,6 +52,7 @@ enum class ItemCategory {
     PORTAL,
     SACK,
     CHISEL,
+    DYE,
 
     NONE,
     ;
