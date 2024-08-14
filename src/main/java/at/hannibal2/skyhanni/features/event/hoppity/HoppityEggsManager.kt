@@ -153,9 +153,9 @@ object HoppityEggsManager {
         if (!HoppityAPI.isHoppityEvent()) return
 
         eggFoundPattern.matchMatcher(event.message) {
-            val meal = getEggType(event)
             HoppityEggLocations.saveNearestEgg()
             HoppityEggLocator.eggFound()
+            val meal = getEggType(event)
             val note = group("note").removeColor()
             meal.markClaimed()
             lastMeal = meal
