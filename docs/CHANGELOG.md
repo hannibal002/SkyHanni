@@ -587,7 +587,7 @@
     + Just add the @SkyHanniModule annotation to an object to auto load it.
 + Modified removeColor for visual formatting consistency. - appable (https://github.com/hannibal002/SkyHanni/pull/1824)
     + Keeps formatting consistency in the presence of color codes acting as implicit reset codes.
-+ Added RepoPattern.list. - !nea (https://github.com/hannibal002/SkyHanni/pull/1733)
++ Added RepoPattern.list. - nea (https://github.com/hannibal002/SkyHanni/pull/1733)
     + A way to store x amount of patterns.
 + Added unit test for repo pattern lists. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1733)
 + Added RepoPattern.exclusiveGroup. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1733)
@@ -689,7 +689,7 @@
 + Cache rewardPatterns in the powder chat filter. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2276)
 + Added Minister data to the MayorAPI. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2313)
 + Added ItemPriceUtils and moved all item price functions into it. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2290)
-+ Added a preprocessor to prepare for 1.21. - !nea (https://github.com/hannibal002/SkyHanni/pull/2283)
++ Added a preprocessor to prepare for 1.21. - nea (https://github.com/hannibal002/SkyHanni/pull/2283)
     + This will require a minor adjustment in how the Minecraft client is launched.
 + Deleted an unnecessary function in Garden Crop Milestone. - notafrogo (https://github.com/hannibal002/SkyHanni/pull/2339)
 + Removed repository item errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2338)
