@@ -21,3 +21,5 @@ object StartingSoonTablist : ScoreboardEvent() {
 
     override val configLine = "§7(All Starting Soon Tablist Events)\n§6Mining Fiesta\n §fStarts in: §e52min"
 }
+
+// click: open /calendar

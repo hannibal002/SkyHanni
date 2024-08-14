@@ -25,3 +25,5 @@ object Objective : ScoreboardElement() {
 
     override val configLine = "Objective:\n§eStar SkyHanni on Github"
 }
+
+// click: open the objective page (i think a command should exist)

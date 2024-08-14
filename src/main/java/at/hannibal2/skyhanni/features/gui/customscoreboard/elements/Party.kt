@@ -35,3 +35,6 @@ object Party : ScoreboardElement() {
 
     override fun showIsland() = !DungeonAPI.inDungeon()
 }
+
+// click (title): run /party list
+// click (members): run /pv <name> or  /party kick <name> (maybe option?)

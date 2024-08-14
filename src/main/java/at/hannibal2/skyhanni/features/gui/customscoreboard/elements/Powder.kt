@@ -46,3 +46,5 @@ object Powder : ScoreboardElement() {
 
     override fun showIsland() = MiningAPI.inAdvancedMiningIsland()
 }
+
+// click: open /hotm

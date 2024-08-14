@@ -11,3 +11,5 @@ object Profile : ScoreboardElement() {
 
     override val configLine = "§7♲ Blueberry"
 }
+
+// click: does a command for profile management exist?

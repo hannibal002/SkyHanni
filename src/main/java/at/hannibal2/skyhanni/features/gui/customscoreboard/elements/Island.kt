@@ -9,3 +9,5 @@ object Island : ScoreboardElement() {
 
     override val configLine = "§7㋖ §aHub"
 }
+
+// click: open /warp

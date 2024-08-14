@@ -30,3 +30,5 @@ object Bits : ScoreboardElement() {
 
     override fun showIsland() = !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
 }
+
+// click: open /sbmenu

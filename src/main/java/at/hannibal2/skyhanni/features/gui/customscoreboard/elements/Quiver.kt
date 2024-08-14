@@ -44,3 +44,5 @@ object Quiver : ScoreboardElement() {
 
     override fun showIsland() = !RiftAPI.inRift()
 }
+
+// click: open /quiver

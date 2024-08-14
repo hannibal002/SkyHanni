@@ -21,3 +21,5 @@ object Cold : ScoreboardElement() {
 
     override fun showIsland() = MiningAPI.inColdIsland()
 }
+
+// click: warp basecamp
