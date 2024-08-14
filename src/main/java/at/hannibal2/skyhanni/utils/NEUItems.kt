@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
@@ -48,6 +46,11 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull as getPriceOrNullNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull as getRawCraftCostOrNullNew
 
 @SkyHanniModule
 object NEUItems {
@@ -171,62 +174,29 @@ object NEUItems {
             ?: error("hypixel item id does not match internal name: $hypixelId")
 
 
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<NeuRecipe> = emptyList(),
-    ) = getPriceOrNull(priceSource, pastRecipes) ?: -1.0
+    ): Double = getPriceNew(priceSource, pastRecipes)
 
-    fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceNew()
 
-    fun NEUInternalName.getNpcPriceOrNull(): Double? {
-        if (this == NEUInternalName.WISP_POTION) {
-            return 20_000.0
-        }
-        return BazaarDataHolder.getNpcPrice(this)
-    }
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPriceOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<NeuRecipe> = emptyList(),
-    ): Double? {
-        when (this) {
-            NEUInternalName.JASPER_CRYSTAL -> return 0.0
-            NEUInternalName.RUBY_CRYSTAL -> return 0.0
-            NEUInternalName.SKYBLOCK_COIN -> return 1.0
-            NEUInternalName.WISP_POTION -> return 20_000.0
-        }
+    ): Double? = this.getPriceOrNullNew(priceSource, pastRecipes)
 
-        if (priceSource != ItemPriceSource.NPC_SELL) {
-            getBazaarData()?.let {
-                return if (priceSource == ItemPriceSource.BAZAAR_INSTANT_BUY) it.sellOfferPrice else it.instantBuyPrice
-            }
-
-            val result = manager.auctionManager.getLowestBin(asString())
-            if (result != -1L) return result.toDouble()
-
-            if (equals("JACK_O_LANTERN")) {
-                return "PUMPKIN".asInternalName().getPrice(priceSource) + 1
-            }
-        }
-        if (equals("GOLDEN_CARROT")) {
-            // 6.8 for some players
-            return 7.0 // NPC price
-        }
-
-        return getNpcPriceOrNull() ?: getRawCraftCostOrNull(pastRecipes)
-    }
-
-    // If NEU fails to calculate the craft costs, we calculate it ourself.
-    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
-        manager.auctionManager.getCraftCost(asString())?.craftCost ?: run {
-            getRecipes(this).filter { it !in pastRecipes }
-                .map { ItemUtils.getRecipePrice(it, pastRecipes + it) }
-                .filter { it >= 0 }
-                .minOrNull()
-        }
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? = getRawCraftCostOrNullNew(pastRecipes)
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
@@ -236,7 +206,7 @@ object NEUItems {
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
-            getPriceOrNull() ?: return@run fallbackItem
+            getPriceOrNullNew() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
             ErrorManager.logErrorWithData(
                 IllegalStateException("Something went wrong!"),

@@ -151,6 +151,8 @@ object SkyBlockItemModifierUtils {
             }.sortedBy { it.first }
         }
 
+    fun ItemStack.hasAttributes() = getAttributes() != null
+
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
@@ -167,6 +169,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.hasEtherwarp() = getAttributeBoolean("ethermerge")
 
     fun ItemStack.hasWoodSingularity() = getAttributeBoolean("wood_singularity_count")
+
+    fun ItemStack.hasDivanPowderCoating() = getAttributeBoolean("divan_powder_coating")
 
     fun ItemStack.hasArtOfWar() = getAttributeBoolean("art_of_war_count")
 
