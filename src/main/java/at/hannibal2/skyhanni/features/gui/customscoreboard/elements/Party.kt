@@ -19,7 +19,7 @@ object Party : ScoreboardElement() {
 
         PartyAPI.partyMembers
             .take(partyConfig.maxPartyList)
-            .removeFirst { partyConfig.showPartyLeader && it == PartyAPI.partyLeader }
+            .apply { if (partyConfig.showPartyLeader) removeFirst { it == PartyAPI.partyLeader } }
             .forEach {
                 add(" §7- §f$it")
             }
