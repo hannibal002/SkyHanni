@@ -44,6 +44,19 @@ object ItemUtils {
         return list
     }
 
+    fun ItemStack.setLore(lore: List<String>): ItemStack {
+        val tagCompound = this.tagCompound ?: NBTTagCompound()
+        val display = tagCompound.getCompoundTag("display")
+        val tagList = NBTTagList()
+        for (line in lore) {
+            tagList.appendTag(NBTTagString(line))
+        }
+        display.setTag("Lore", tagList)
+        tagCompound.setTag("display", display)
+        this.tagCompound = tagCompound
+        return this
+    }
+
     val ItemStack.extraAttributes: NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
 
     // TODO change else janni is sad

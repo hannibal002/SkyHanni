@@ -73,7 +73,7 @@ object MayorAPI {
      * REGEX-TEST: §dMayor Jerry
      * REGEX-TEST: §cMayor Aatrox
      */
-    val mayorHeadPattern by group.pattern(
+    private val mayorHeadPattern by group.pattern(
         "mayor.head",
         "§.Mayor (?<name>.*)",
     )

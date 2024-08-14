@@ -1,39 +1,51 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.events.item.ItemHoverEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.setLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MinisterInCalendar {
 
-    @HandleEvent(onlyOnSkyblock = true)
-    fun onTooltip(event: ItemHoverEvent) {
-        if (!SkyHanniMod.feature.inventory.ministerInCalendar) return
+    @SubscribeEvent
+    fun replaceItem(event: ReplaceItemEvent) {
+        if (!isEnabled()) return
         if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
-        if (!MayorAPI.mayorHeadPattern.matches(event.itemStack.displayName)) return
         val minister = MayorAPI.currentMinister ?: return
-        val ministerColor = MayorAPI.mayorNameToColorCode(minister.mayorName)
+        if (event.inventory is ContainerLocalMenu && event.slot == 38) {
+            val item = "${minister.name}_MAYOR_MONSTER".asInternalName().getItemStack()
 
-        val ministerLore = buildList {
-            add("${ministerColor}Minister ${minister.mayorName}")
+            val ministerColor = MayorAPI.mayorNameToColorCode(minister.mayorName)
 
-            add("§8§m--------------------------")
+            val ministerLore = buildList {
+                add("§8(from SkyHanni)")
+                add("")
+                add("§8§m--------------------------")
 
-            for (perk in minister.activePerks) {
-                add("$ministerColor${perk.perkName}")
-                add("§7${perk.description}")
+                for (perk in minister.activePerks) {
+                    add("$ministerColor${perk.perkName}")
+                    add("§7${perk.description}")
+                }
+
+                add("§8§m--------------------------")
             }
 
-            add("§8§m--------------------------")
-            add("")
+            event.replace(
+                item
+                    .setLore(ministerLore)
+                    .setStackDisplayName("${ministerColor}Minister ${minister.mayorName}"),
+            )
         }
-
-        event.toolTip.addAll(event.toolTip.size - 3, ministerLore)
     }
 
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.ministerInCalendar
 }
