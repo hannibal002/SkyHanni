@@ -273,6 +273,12 @@ public class MiscConfig {
     public boolean replaceRomanNumerals = false;
 
     @Expose
+    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean thunderBottleNotification = true;
+
+    @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
     @ConfigEditorBoolean
     @FeatureToggle
