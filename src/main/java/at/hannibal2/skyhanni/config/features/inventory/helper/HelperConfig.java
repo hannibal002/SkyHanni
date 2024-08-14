@@ -53,6 +53,11 @@ public class HelperConfig {
     public TiaRelayConfig tiaRelay = new TiaRelayConfig();
 
     @Expose
+    @ConfigOption(name = "Reforge Helper", desc = "")
+    @Accordion
+    public ReforgeHelperConfig reforge = new ReforgeHelperConfig();
+
+    @Expose
     @ConfigOption(name = "Enchanting", desc = "")
     @Accordion
     public EnchantingConfig enchanting = new EnchantingConfig();
