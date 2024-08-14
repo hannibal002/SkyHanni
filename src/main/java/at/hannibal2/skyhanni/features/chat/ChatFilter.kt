@@ -405,6 +405,10 @@ object ChatFilter {
         "§e§k.§a>> {3}§aAchievement Unlocked: .* {3}<<§e§k.".toPattern(),
     )
 
+    private val parkourPatterns = listOf(
+        "§aStarted parkour".toPattern(), "§aFinished parkour".toPattern(), "§aReach checkpoint".toPattern(), "§4Wrong checkpoint for parkour".toPattern(),
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -427,6 +431,7 @@ object ChatFilter {
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
         "achievement_get" to achievementGetPatterns,
+        "parkour" to parkourPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -477,6 +482,7 @@ object ChatFilter {
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
+        config.parkour && message.isPresent("parkour") -> "parkour"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 

@@ -111,6 +111,12 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean hideAlphaAchievements = false;
 
+    @Expose
+    @ConfigOption(name = "Parkour", desc = "Hide parkour messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean parkour = false;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")
