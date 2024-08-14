@@ -132,8 +132,13 @@ enum class Mayor(
                 )
                 return null
             }
-            val perks = perksJson.mapNotNull { perk ->
-                Perk.entries.firstOrNull { it.perkName == perk.renameIfFoxyExtraEventPerkFound() }
+
+            val perks = perksJson.mapNotNull { perkJson ->
+                val perk = Perk.entries.firstOrNull { it.perkName == perkJson.renameIfFoxyExtraEventPerkFound() }
+                if (perk != null) {
+                    perk.description = perkJson.description
+                }
+                perk
             }
 
             mayor.addPerks(perks)
@@ -149,17 +154,16 @@ enum class Mayor(
             }
         }
 
-        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String? {
+        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String {
             val foxyExtraEventPairs = mapOf(
                 "Spooky Festival" to "Extra Event (Spooky)",
                 "Mining Fiesta" to "Extra Event (Mining)",
                 "Fishing Festival" to "Extra Event (Fishing)",
             )
 
-            foxyExtraEventPattern.matchMatcher(this.description) {
-                return foxyExtraEventPairs.entries.firstOrNull { it.key == group("event") }?.value
-            }
-            return this.name
+            return foxyExtraEventPattern.matchMatcher(this.description) {
+                foxyExtraEventPairs.entries.firstOrNull { it.key == group("event") }?.value
+            } ?: this.name
         }
     }
 }
@@ -225,13 +229,14 @@ enum class Perk(val perkName: String) {
     // Derpy
     TURBO_MINIONS("TURBO MINIONS!!!"),
     AH_TAX("MOAR TAX!!!"),
-
-    // I don't know what the perk is actually gonna be named
     DOUBLE_MOBS_HP("DOUBLE MOBS HP!!!"),
     MOAR_SKILLZ("MOAR SKILLZ!!!"),
     ;
 
     var isActive = false
+    var description = ""
+
+    override fun toString(): String = "$perkName: $description"
 
     companion object {
         fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
