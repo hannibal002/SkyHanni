@@ -16,6 +16,20 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object MinisterInCalendar {
 
+    val prefix = listOf(
+        "§8(from SkyHanni)",
+        "",
+        "§8§m--------------------------",
+    )
+    val suffix = listOf(
+        "",
+        "§8§m--------------------------",
+        "",
+        "§7The Minister is who came in 2nd place",
+        "§7during the election. They have one",
+        "§7of their perks active.",
+    )
+
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
@@ -27,20 +41,12 @@ object MinisterInCalendar {
             val ministerColor = MayorAPI.mayorNameToColorCode(minister.mayorName)
 
             val ministerLore = buildList {
-                add("§8(from SkyHanni)")
-                add("")
-                add("§8§m--------------------------")
-
+                addAll(prefix)
                 for (perk in minister.activePerks) {
                     add("$ministerColor${perk.perkName}")
                     add("§7${perk.description}")
                 }
-
-                add("§8§m--------------------------")
-                add("")
-                add("§7The Minister is who came in 2nd place")
-                add("§7during the election. They have one")
-                add("§7of their perks active.")
+                addAll(suffix)
             }
 
             event.replace(
