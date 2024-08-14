@@ -747,7 +747,7 @@ private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEven
 private fun getEventsShowWhen() = ScoreboardEvent.getEvent().isNotEmpty()
 
 private fun getMayorDisplayPair() = buildList {
-    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: "<hidden>"
+    val currentMayorName = MayorAPI.currentMayor?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
     val timeTillNextMayor = if (mayorConfig.showTimeTillNextMayor) {
         "§7 (§e${MayorAPI.nextMayorTimestamp.timeUntil().format(maxUnits = 2)}§7)"
     } else {
@@ -763,6 +763,15 @@ private fun getMayorDisplayPair() = buildList {
     }
 
     if (!mayorConfig.showExtraMayor) return@buildList
+    val ministerName = MayorAPI.currentMinister?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
+    add(ministerName to HorizontalAlignment.LEFT)
+
+    if (mayorConfig.showMayorPerks) {
+        MayorAPI.currentMinister?.activePerks?.forEach { perk ->
+            add(" §7- §e${perk.perkName}" to HorizontalAlignment.LEFT)
+        }
+    }
+
     val jerryExtraMayor = MayorAPI.jerryExtraMayor
     val extraMayor = jerryExtraMayor.first ?: return@buildList
 
@@ -774,7 +783,6 @@ private fun getMayorDisplayPair() = buildList {
     }
 
     add((extraMayorName + extraTimeTillNextMayor) to HorizontalAlignment.LEFT)
-
 }
 
 private fun getMayorShowWhen() =

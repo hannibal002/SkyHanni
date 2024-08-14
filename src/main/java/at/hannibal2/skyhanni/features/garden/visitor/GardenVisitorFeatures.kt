@@ -729,6 +729,14 @@ object GardenVisitorFeatures {
 
             drops
         }
+        event.transform(54, "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (entry in element.asJsonArray) {
+                drops.add(JsonPrimitive(entry.asString))
+            }
+            drops.add(JsonPrimitive(VisitorReward.COPPER_DYE.name))
+            drops
+        }
 
         event.transform(15, "garden.visitors.highlightStatus") { element ->
             ConfigUtils.migrateIntToEnum(element, HighlightMode::class.java)

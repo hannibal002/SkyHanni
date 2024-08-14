@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfWar
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasBookOfStats
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasDivanPowderCoating
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
@@ -74,6 +75,7 @@ object EstimatedItemValueCalculator {
         ::addJalapenoBook,
         ::addStatsBook,
         ::addEnrichment,
+        ::addDivanPowderCoating,
 
         // counted
         ::addMasterStars,
@@ -302,6 +304,14 @@ object EstimatedItemValueCalculator {
 
         val price = "WOOD_SINGULARITY".asInternalName().getPrice()
         list.add("§7Wood Singularity: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        return price
+    }
+
+    private fun addDivanPowderCoating(stack: ItemStack, list: MutableList<String>): Double {
+        if (!stack.hasDivanPowderCoating()) return 0.0
+
+        val price = "DIVAN_POWDER_COATING".asInternalName().getPrice()
+        list.add("§7Divan Powder Coating: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
         return price
     }
 

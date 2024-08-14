@@ -276,6 +276,10 @@ public class ProfileSpecificStorage {
         @Expose
         public Map<CropType, Double> latestTrueFarmingFortune = new HashMap<>();
 
+        // TODO use in /ff guide
+        @Expose
+        public Map<CropType, Double> personalBestFF = new HashMap<>();
+
         @Expose
         @Nullable
         public CropAccessory savedCropAccessory = CropAccessory.NONE;
