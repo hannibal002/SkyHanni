@@ -15,10 +15,11 @@ object Party : ScoreboardElement() {
     override fun getDisplay() = buildList {
         if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList
         add(if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})")
-        PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
+        if (partyConfig.showPartyLeader) PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
+
         PartyAPI.partyMembers
             .take(partyConfig.maxPartyList)
-            .removeFirst { it == PartyAPI.partyLeader }
+            .removeFirst { partyConfig.showPartyLeader && it == PartyAPI.partyLeader }
             .forEach {
                 add(" §7- §f$it")
             }
