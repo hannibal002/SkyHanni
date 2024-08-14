@@ -23,16 +23,15 @@ import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
-import net.minecraft.util.IChatComponent
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object EntityData {
 
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
-    private val nametagCache = TimeLimitedCache<Entity, IChatComponent>(50.milliseconds)
+    private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
 
     private val ignoredEntities = listOf(
         EntityArmorStand::class.java,
@@ -77,19 +76,18 @@ object EntityData {
         val entity = EntityUtils.getEntityByID(entityId) ?: return
         if (entity.javaClass in ignoredEntities) return
 
-        watchableObjects.find { it.dataValueId == 6 }
-            ?.let {
-                val health = (it.`object` as Float).toInt()
-                if (entity is EntityWither && health == 300 && entityId < 0) return
-                if (entity is EntityLivingBase) {
-                    EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
-                }
+        watchableObjects.find { it.dataValueId == 6 }?.let {
+            val health = (it.`object` as Float).toInt()
+            if (entity is EntityWither && health == 300 && entityId < 0) return
+            if (entity is EntityLivingBase) {
+                EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
             }
+        }
     }
 
     @JvmStatic
-    fun getDisplayName(entity: Entity, ci: CallbackInfoReturnable<IChatComponent>) {
-        ci.returnValue = postRenderNametag(entity, ci.returnValue)
+    fun getDisplayName(entity: Entity, oldValue: ChatComponentText): ChatComponentText {
+        return postRenderNametag(entity, oldValue)
     }
 
     @JvmStatic
@@ -97,7 +95,7 @@ object EntityData {
         EntityLeaveWorldEvent(entity).post()
     }
 
-    private fun postRenderNametag(entity: Entity, chatComponent: IChatComponent) = nametagCache.getOrPut(entity) {
+    private fun postRenderNametag(entity: Entity, chatComponent: ChatComponentText) = nametagCache.getOrPut(entity) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
         event.postAndCatch()
         event.chatComponent

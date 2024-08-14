@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils.mob
@@ -45,7 +46,7 @@ object AshfangManager {
             else -> return
         }
         ashfangMobs += mob
-        if (config.highlightBlazes) mob.highlight(color.toColor())
+        if (config.highlightBlazes) mob.highlight(color.toColor().addAlpha(40))
     }
 
     @SubscribeEvent
