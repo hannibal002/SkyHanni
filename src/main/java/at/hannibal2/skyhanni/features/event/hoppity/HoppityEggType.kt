@@ -44,7 +44,6 @@ enum class HoppityEggType(
 
     companion object {
         val resettingEntries = entries.filter { it.resetsAt != -1 }
-        fun isTrackableMeal(meal: HoppityEggType) = resettingEntries.contains(meal)
 
         fun allFound() = resettingEntries.forEach { it.markClaimed() }
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPatterns
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -50,7 +51,7 @@ object HoppityAPI {
      */
     private val milestoneNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.milestone",
-        "(?:§.)*?(?<milestone>\\d{1,2})[a-z]{2} Chocolate Milestone"
+        "(?:§.)*?(?<milestone>\\d{1,2})[a-z]{2} Chocolate Milestone",
     )
 
     /**
@@ -59,7 +60,7 @@ object HoppityAPI {
      */
     private val allTimeLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "milestone.alltime",
-        "§7Reach §6(?<amount>[\\d.MBk]*) Chocolate §7all-time.*"
+        "§7Reach §6(?<amount>[\\d.MBk]*) Chocolate §7all-time.*",
     )
 
     /**
@@ -68,11 +69,14 @@ object HoppityAPI {
      */
     private val shopLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "milestone.shop",
-        "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*"
+        "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
     )
 
     fun fireSideDishMessage() {
-        LorenzChatEvent("§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!", ChatComponentText("")).postAndCatch()
+        LorenzChatEvent(
+            "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!",
+            ChatComponentText(""),
+        ).postAndCatch()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
@@ -87,15 +91,21 @@ object HoppityAPI {
 
         milestoneNamePattern.matchMatcher(nameText) {
             val itemLore = clickedStack.getLore()
-            if (!itemLore.any { it == "§eClick to claim!"}) return
+            if (!itemLore.any { it == "§eClick to claim!" }) return
 
             // Will never match both all time and shop patterns together
             allTimeLorePattern.firstMatcher(clickedStack.getLore()) {
-                LorenzChatEvent("§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!", ChatComponentText("")).postAndCatch()
+                LorenzChatEvent(
+                    "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!",
+                    ChatComponentText(""),
+                ).postAndCatch()
             }
 
             shopLorePattern.firstMatcher(clickedStack.getLore()) {
-                LorenzChatEvent("§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!", ChatComponentText("")).postAndCatch()
+                LorenzChatEvent(
+                    "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!",
+                    ChatComponentText(""),
+                ).postAndCatch()
             }
         }
     }
@@ -103,16 +113,12 @@ object HoppityAPI {
     // Dumbed down version of the Compact Chat for Hoppity's,
     // with the additional native context of side dishes
     fun handleChat(event: LorenzChatEvent) {
-        HoppityEggsManager.eggFoundPattern.matchMatcher(event.message) {
-            resetChatData()
-            lastChatMeal = getEggType(event)
-            attemptFire(event)
-        }
-
-        HoppityEggsManager.milestoneRabbitFoundPattern.matchMatcher(event.message) {
-            resetChatData()
-            lastChatMeal = getEggType(event)
-            attemptFire(event)
+        eggFoundPatterns.forEach {
+            it.matchMatcher(event.message) {
+                resetChatData()
+                lastChatMeal = getEggType(event)
+                attemptFire(event)
+            }
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
