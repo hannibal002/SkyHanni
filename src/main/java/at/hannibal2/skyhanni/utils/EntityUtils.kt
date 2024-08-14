@@ -11,9 +11,15 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceToIgnoreY
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.compat.getArmorOrFullInventory
+import at.hannibal2.skyhanni.utils.compat.getLoadedPlayers
+import at.hannibal2.skyhanni.utils.compat.getNameAsString
+import at.hannibal2.skyhanni.utils.compat.isOnMainThread
+import at.hannibal2.skyhanni.utils.compat.normalizeAsArray
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -26,8 +32,11 @@ import net.minecraft.potion.Potion
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
+
+//#if FORGE
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+//#endif
 
 @SkyHanniModule
 object EntityUtils {
@@ -44,7 +53,7 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld.playerEntities) {
+        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers() ?: emptyList()) {
             if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
@@ -56,7 +65,7 @@ object EntityUtils {
         contains: String,
         radius: Double = 3.0,
     ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
-        it.name.contains(contains)
+        it.getNameAsString().contains(contains)
     }
 
     fun EntityLivingBase.getNameTagWith(
@@ -76,7 +85,7 @@ object EntityUtils {
     ): List<EntityArmorStand> {
         val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
-            val result = it.name.contains(contains)
+            val result = it.getNameAsString().contains(contains)
             if (debugWrongEntity && !result) {
                 LorenzUtils.consoleLog("wrong entity in aabb: '" + it.name + "'")
             }
@@ -139,31 +148,57 @@ object EntityUtils {
     fun EntityLivingBase.isAtFullHealth() = baseMaxHealth == health.toInt()
 
     fun EntityArmorStand.hasSkullTexture(skin: String): Boolean {
-        if (inventory == null) return false
+        val inventory = this.getArmorOrFullInventory() ?: return false
         return inventory.any { it != null && it.getSkullTexture() == skin }
     }
 
     fun EntityPlayer.isNPC() = !isRealPlayer()
 
-    fun EntityLivingBase.hasPotionEffect(potion: Potion) = getActivePotionEffect(potion) != null
+    fun EntityLivingBase.hasPotionEffect(
+        potion:
+        //#if MC <1.21
+        Potion,
+        //#else
+        //$$ net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>
+        //#endif
+    ) = getActivePotionEffect(potion) != null
 
     fun EntityLivingBase.getArmorInventory(): Array<ItemStack?>? =
-        if (this is EntityPlayer) inventory.armorInventory else null
+        if (this is EntityPlayer) inventory.armorInventory.normalizeAsArray() else null
 
     fun EntityEnderman.getBlockInHand(): IBlockState? = heldBlockState
 
     inline fun <reified R : Entity> getEntities(): Sequence<R> = getAllEntities().filterIsInstance<R>()
 
-    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft()?.theWorld?.loadedEntityList?.let {
-        if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
+    private fun WorldClient.getAllEntities(): Iterable<Entity> =
+//#if MC < 1.14
+        loadedEntityList
+//#else
+//$$    entitiesForRendering()
+//#endif
+
+    fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
+        if (Minecraft.getMinecraft()
+                .isOnMainThread()
+        ) it else it.toMutableList() // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization, but *does* make crashes because of it rarer.
     }?.asSequence()?.filterNotNull() ?: emptySequence()
 
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().up(0.5).canBeSeen(radius)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 
+//#if FORGE
+
     @SubscribeEvent
-    fun onEntityRenderPre(event: RenderLivingEvent.Pre<*>) {
+    fun onEntityRenderPre(
+        event:
+        //#if MC < 1.14
+        RenderLivingEvent.Pre<*>,
+        //#else
+        //$$ RenderLivingEvent.Pre<*, *>
+        //#endif
+
+    ) {
         val shEvent = SkyHanniRenderEntityEvent.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
             event.cancel()
@@ -171,12 +206,24 @@ object EntityUtils {
     }
 
     @SubscribeEvent
-    fun onEntityRenderPost(event: RenderLivingEvent.Post<*>) {
+    fun onEntityRenderPost(
+        event:
+        //#if MC < 11400
+        RenderLivingEvent.Post<*>,
+        //#else
+        //$$ RenderLivingEvent.Post<*, *>
+        //#endif
+
+    ) {
         SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
+//#if MC < 11400
     @SubscribeEvent
-    fun onEntityRenderSpecialsPre(event: RenderLivingEvent.Specials.Pre<*>) {
+    fun onEntityRenderSpecialsPre(
+        event:
+        RenderLivingEvent.Specials.Pre<*>,
+    ) {
         val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
             event.cancel()
@@ -184,38 +231,47 @@ object EntityUtils {
     }
 
     @SubscribeEvent
-    fun onEntityRenderSpecialsPost(event: RenderLivingEvent.Specials.Post<*>) {
+    fun onEntityRenderSpecialsPost(
+        event:
+        RenderLivingEvent.Specials.Post<*>,
+    ) {
         SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
+//#endif
+
+//#endif
 
     fun EntityLivingBase.isCorrupted() = baseMaxHealth == health.toInt().derpy() * 3 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunic() = baseMaxHealth == health.toInt().derpy() * 4 || isRunicAndCorrupt()
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
-    fun Entity.cleanName() = this.name.removeColor()
+    fun Entity.cleanName() = this.getNameAsString().removeColor()
 
     /**
      * @return a fake player with the same skin as the real player
      */
     fun getFakePlayer(): EntityOtherPlayerMP {
         val mc = Minecraft.getMinecraft()
+        val player = mc.thePlayer!!
         return object : EntityOtherPlayerMP(
             mc.theWorld,
-            mc.thePlayer.gameProfile
+            player.gameProfile,
         ) {
             override fun getLocationSkin() =
-                mc.thePlayer.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(mc.thePlayer.uniqueID)
+                player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
 
             override fun getTeam() = object : ScorePlayerTeam(null, null) {
                 override fun getNameTagVisibility() = EnumVisible.NEVER
             }
 
-            override fun isWearing(part: EnumPlayerModelParts?) =
-                mc.thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
+            override fun isWearing(part: EnumPlayerModelParts): Boolean =
+                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
         }
     }
 }
 
+//#if FORGE
 private fun Event.cancel() {
     isCanceled = true
 }
+//#endif
