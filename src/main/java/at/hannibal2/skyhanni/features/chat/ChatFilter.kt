@@ -406,7 +406,17 @@ object ChatFilter {
     )
 
     private val parkourPatterns = listOf(
-        "§aStarted parkour".toPattern(), "§aFinished parkour".toPattern(), "§aReach checkpoint".toPattern(), "§4Wrong checkpoint for parkour".toPattern(),
+        "§aStarted parkour (.*)!".toPattern(),
+        "§aFinished parkour (.*) in (.*)!".toPattern(),
+        "§aReached checkpoint (.*) for parkour (.*)!".toPattern(),
+        "§4Wrong checkpoint for parkour (.*)!".toPattern(),
+        "§4You havent't reached all checkpoints for parkour (.*)!".toPattern(),
+    )
+
+    private val parkourCancelMessages = listOf(
+        "§4Cancelled parkour! You cannot fly.",
+        "§4Cancelled parkour! You cannot use item abilities.",
+        "§4Cancelled parkour!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -451,6 +461,8 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "parkour" to parkourCancelMessages,
+
     )
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
