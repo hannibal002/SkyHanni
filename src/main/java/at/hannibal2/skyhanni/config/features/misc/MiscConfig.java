@@ -294,4 +294,10 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean userluckEnabled = true;
 }
