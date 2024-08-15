@@ -405,24 +405,38 @@ object ChatFilter {
         "§e§k.§a>> {3}§aAchievement Unlocked: .* {3}<<§e§k.".toPattern(),
     )
 
+    /**
+     * REGEX-TEST: §aStarted parkour cocoa!
+     * REGEX-TEST: §aFinished parkour cocoa in 12:34.567
+     * REGEX-TEST: §aReached checkpoint #4 for parkour cocoa!
+     * REGEX-TEST: §4Wrong checkpoint for parkour cocoa!
+     * REGEX-TEST: §4You haven't reached all checkpoints for parkour cocoa!
+     */
     private val parkourPatterns = listOf(
         "§aStarted parkour (.*)!".toPattern(),
         "§aFinished parkour (.*) in (.*)!".toPattern(),
-        "§aReached checkpoint (.*) for parkour (.*)!".toPattern(),
+        "§aReached checkpoint #(.*) for parkour (.*)!".toPattern(),
         "§4Wrong checkpoint for parkour (.*)!".toPattern(),
-        "§4You havent't reached all checkpoints for parkour (.*)!".toPattern(),
+        "§4You haven't reached all checkpoints for parkour (.*)!".toPattern(),
     )
 
+    /**
+     * REGEX-TEST: §4Cancelled parkour! You cannot fly.
+     * REGEX-TEST: §4Cancelled parkour! You cannot use item abilities.
+     * REGEX-TEST: §4Cancelled parkour!
+     */
     private val parkourCancelMessages = listOf(
         "§4Cancelled parkour! You cannot fly.",
         "§4Cancelled parkour! You cannot use item abilities.",
         "§4Cancelled parkour!",
     )
 
+    // §r§aWarped from the tppadone §r§ato the tppadtwo§r§a!
     private val teleportPadPatterns = listOf(
-        "§aWarped from the (.*) §ato the (.*)§a!".toPattern(),
+        "§aWarped from the (.*) §r§ato the (.*)§r§a!".toPattern(),
     )
 
+    // §r§4This Teleport Pad does not have a destination set!
     private val teleportPadMessages = listOf(
         "§4This Teleport Pad does not have a destination set!"
     )
@@ -477,7 +491,7 @@ object ChatFilter {
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
     )
-    
+
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith,
