@@ -290,6 +290,7 @@ object HypixelData {
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+            ProfileStorageData.profileJoinMessage()
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
