@@ -117,6 +117,12 @@ public class FilterTypesConfig {
     @FeatureToggle
     public boolean parkour = false;
 
+    @Expose
+    @ConfigOption(name = "Teleport pads", desc = "Hide annoying messages from teleport pads.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean teleport_pads = false;
+
     //TODO remove
     @Expose
     @ConfigOption(name = "Others", desc = "Hide other annoying messages.")

@@ -419,6 +419,14 @@ object ChatFilter {
         "§4Cancelled parkour!",
     )
 
+    private val teleportPadPatterns = listOf(
+        "§aWarped from the (.*) §ato the (.*)§a!".toPattern(),
+    )
+
+    private val teleportPadMessages = listOf(
+        "§4This Teleport Pad does not have a destination set!"
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -442,6 +450,7 @@ object ChatFilter {
         "fairy" to fairyPatterns,
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
+        "teleport_pads" to teleportPadPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -462,11 +471,13 @@ object ChatFilter {
         "event" to eventMessage,
         "skymall" to skymallMessages,
         "parkour" to parkourCancelMessages,
-
+        "teleport_pads" to teleportPadMessages,
     )
+
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
     )
+    
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith,
@@ -495,6 +506,7 @@ object ChatFilter {
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
+        config.teleport_pads && message.isPresent("teleport_pads") -> "teleport_pads"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
