@@ -56,7 +56,7 @@ var beenAfkFor = SimpleTimeMark.now()
 
 fun getPetDisplay(): String = PetAPI.currentPet?.let {
     val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2)
+    val petName = it.substring(2).removeColor()
     val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
 
     "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
