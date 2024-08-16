@@ -1,8 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
@@ -129,7 +126,4 @@ object LocationUtils {
             else -> LorenzVec(0, 0, -1)
         }
     }
-
-    private fun getSbLines(): List<String> = CustomScoreboard.activeLines
-    fun isAtTopOfNest(): Boolean = getSbLines().any { ScoreboardPattern.broodmotherPattern.matches(it) }
 }

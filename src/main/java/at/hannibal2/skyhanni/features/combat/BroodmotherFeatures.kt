@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.LocationUtils.isAtTopOfNest
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -81,7 +80,7 @@ object BroodmotherFeatures {
             return
         }
 
-        if (config.stages.contains(currentStage)) {
+        if (config.stages.contains(currentStage) && lastStage != null) {
             if (currentStage == StageEntry.SLAIN) {
                 onBroodmotherSlain()
             } else {
@@ -98,10 +97,11 @@ object BroodmotherFeatures {
         // this is so that two messages aren't immediately sent upon joining a server
         if (config.stageOnJoin && !(currentStage == StageEntry.ALIVE && isAliveMessageEnabled())) {
             val pluralize = StringUtils.pluralize(currentStage?.minutes ?: 0, "minute")
-            ChatUtils.chat("The Broodmother's current stage in this server is ${currentStage.toString().replace("!", "")}.")
+            var message = "The Broodmother's current stage in this server is ${currentStage.toString().replace("!", "")}§e."
             if (currentStage?.minutes != 0) {
-                ChatUtils.chat("It will spawn in §bup to ${currentStage?.minutes} $pluralize§e.")
+                message += " It will spawn within §b${currentStage?.minutes} $pluralize§e."
             }
+            ChatUtils.chat(message)
             return true
         } else {
             return false
@@ -135,7 +135,7 @@ object BroodmotherFeatures {
 
     private fun onBroodmotherSlain() {
         broodmotherSpawnTime = SimpleTimeMark.now() + 10.minutes
-        if (!(config.hideSlainWhenNearby && isAtTopOfNest())) {
+        if (!(config.hideSlainWhenNearby && SpidersDenAPI.isAtTopOfNest())) {
             ChatUtils.chat("The Broodmother was killed!")
         }
     }
