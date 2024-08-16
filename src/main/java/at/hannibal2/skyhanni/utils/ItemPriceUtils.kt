@@ -16,7 +16,7 @@ object ItemPriceUtils {
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
         pastRecipes: List<NeuRecipe> = emptyList(),
-    ) = getPriceOrNull(priceSource, pastRecipes) ?: -1.0
+    ) = getPriceOrNull(priceSource, pastRecipes) ?: 0.0
 
     fun NEUInternalName.getPriceOrNull(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
