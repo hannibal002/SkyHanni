@@ -89,7 +89,6 @@ object PestProfitTracker {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
             tracker.addItem(internalName, 1)
-            addKill()
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
