@@ -35,8 +35,14 @@ object ScoreboardData {
 
             val lastColor = start.lastColorCode() ?: ""
 
-            if (end.startsWith(lastColor)) {
-                end = end.removePrefix(lastColor)
+            // Determine the longest prefix of "end" that matches any suffix of "lastColor"
+            val colorSuffixes = generateSequence(lastColor) { it.dropLast(2) }
+                .takeWhile { it.isNotEmpty() }
+                .toList()
+
+            val matchingPrefix = colorSuffixes.find { end.startsWith(it) } ?: ""
+            if (matchingPrefix.isNotEmpty()) {
+                end = end.removePrefix(matchingPrefix)
             }
 
             add(start + end)
