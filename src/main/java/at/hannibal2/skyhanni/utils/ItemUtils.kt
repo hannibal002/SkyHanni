@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -418,10 +418,12 @@ object ItemUtils {
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
-        neededItems(recipe).map {
-            it.key.getPrice(pastRecipes = pastRecipes) * it.value
-        }.sum()
+    fun NeuRecipe.getRecipePrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ): Double = neededItems(this).map {
+        it.key.getPrice(priceSource, pastRecipes) * it.value
+    }.sum()
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
