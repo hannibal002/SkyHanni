@@ -66,7 +66,7 @@ object ItemPriceUtils {
         .filter { it >= 0 }
         .minOrNull()
 
-    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceOrNull() ?: -1.0
+    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceOrNull() ?: 0.0
 
     fun NEUInternalName.getNpcPriceOrNull(): Double? {
         if (this == NEUInternalName.WISP_POTION) {
