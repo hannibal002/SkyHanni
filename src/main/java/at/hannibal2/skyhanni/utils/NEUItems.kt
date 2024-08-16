@@ -197,14 +197,9 @@ object NEUItems {
         getItemStackOrNull() ?: run {
             getPriceOrNullNew() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
-            ErrorManager.logErrorWithData(
-                IllegalStateException("Something went wrong!"),
-                "Encountered an error getting the item for §7$this§c. " +
-                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                    "Discord if this is the case.",
-                "Item name" to this.asString(),
-                "repo commit" to manager.latestRepoCommit,
-            )
+
+            val name = this.toString()
+            ItemUtils.addMissingRepoItem(name, "Could not create item stack for $name")
             fallbackItem
         }
 
