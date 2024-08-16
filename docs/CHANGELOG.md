@@ -27,6 +27,8 @@
   Paloys (https://github.com/hannibal002/SkyHanni/pull/1891)
 + Added crop last farmed waypoint. - appable (https://github.com/hannibal002/SkyHanni/pull/1335)
     + Accessible in the Crop Start Locations section.
++ Added Farming Personal Best FF Gain. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2332)
+    + Displays in chat how much additional FF you earn from the farming contest personal best bonus after beating your previous record.
 
 #### Dungeon Features
 
@@ -144,7 +146,7 @@
 + Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)
 + Added Hide Useless Armor Stands. - Empa (https://github.com/hannibal002/SkyHanni/pull/1962)
     + Hides armor stands that briefly appear on Hypixel.
-+ Added Custom Wardrobe, a new look for the wardrobe. - j10an15, Empa (https://github.com/hannibal002/SkyHanni/pull/2039)
++ Added Custom Wardrobe, a new look for the wardrobe. - j10a1n15, Empa (https://github.com/hannibal002/SkyHanni/pull/2039)
     + Highly customizable: Colors, display sizes.
     + Estimated Price Integration.
     + Favorite slots; option to only display favorite slots.
@@ -263,6 +265,9 @@
 + Added an option for the Estimated Chest Value display to also work in your own inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2218)
 + Added SkyBlock Level number in SB Menu to Item Number config. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2172)
 + Added Divan's Powder Coating to the Estimated Item Value feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2317)
++ Added support for Chocolate Milestones in Custom Reminder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2334)
++ Clicking on the chat message when you try to open /cf without a rabbit pet will now open /pets. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2333)
++ Improved Wardrobe Keybinds when using favorite mode. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2331)
 
 #### Fishing Improvements
 
@@ -314,6 +319,8 @@
 + Reduced the frequency of "tab list not found" error messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2266)
 + Hide Beacon Power display while on a Bingo profile. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2286)
 + Added the current Minister's name and perks to the Mayor Display on the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2313)
++ Hide repo errors in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2338)
+    + Errors will be displayed directly in the GUI when necessary, making them less intrusive.
 
 ### Fixes
 
@@ -417,6 +424,7 @@
 + Fixed Hoppity Chat Compact not working outside of Hoppity's event for Abiphone users who have Hoppity as a contact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2250)
 + Fixed stray rabbit production time tooltip display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2239)
 + Fixed Hoppity custom goals being off by one level. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2280)
++ Fixed Custom Reminder not working in the Chocolate Shop. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2334)
 
 #### Custom Scoreboard Fixes
 
@@ -579,7 +587,7 @@
     + Just add the @SkyHanniModule annotation to an object to auto load it.
 + Modified removeColor for visual formatting consistency. - appable (https://github.com/hannibal002/SkyHanni/pull/1824)
     + Keeps formatting consistency in the presence of color codes acting as implicit reset codes.
-+ Added RepoPattern.list. - !nea (https://github.com/hannibal002/SkyHanni/pull/1733)
++ Added RepoPattern.list. - nea (https://github.com/hannibal002/SkyHanni/pull/1733)
     + A way to store x amount of patterns.
 + Added unit test for repo pattern lists. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1733)
 + Added RepoPattern.exclusiveGroup. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1733)
@@ -681,8 +689,14 @@
 + Cache rewardPatterns in the powder chat filter. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2276)
 + Added Minister data to the MayorAPI. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2313)
 + Added ItemPriceUtils and moved all item price functions into it. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2290)
-+ Added a preprocessor to prepare for 1.21. - !nea (https://github.com/hannibal002/SkyHanni/pull/2283)
++ Added a preprocessor to prepare for 1.21. - nea (https://github.com/hannibal002/SkyHanni/pull/2283)
     + This will require a minor adjustment in how the Minecraft client is launched.
++ Deleted an unnecessary function in Garden Crop Milestone. - notafrogo (https://github.com/hannibal002/SkyHanni/pull/2339)
++ Removed repository item errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2338)
+    + Instead of stack traces for "no item name for internal name", "no item stack for internal name", and "no internal name for item stack", we now return the internal name in red, the internal name `MISSING_ITEM`, or a barrier item instead.
+    + Command /shdebug lists all failed item names.
+    + Debug chat still logs the errors.
+    + Shows a popup (currently disabled).
 
 ### Removed Features
 
