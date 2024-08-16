@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewer
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
@@ -169,6 +170,7 @@ object Commands {
             { DefaultConfigFeatures.onCommand(it) },
             DefaultConfigFeatures::onComplete,
         )
+        registerCommand("shelection", "Opens the election viewer") { openElectionViewer() }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
@@ -601,6 +603,11 @@ object Commands {
             if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
             SkyHanniMod.screenToOpen = VisualWordGui()
         }
+    }
+
+    @JvmStatic
+    fun openElectionViewer() {
+        SkyHanniMod.screenToOpen = ElectionViewer()
     }
 
     private fun clearFarmingItems() {
