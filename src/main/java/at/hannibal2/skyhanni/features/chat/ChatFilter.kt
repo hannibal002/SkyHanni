@@ -483,7 +483,10 @@ object ChatFilter {
         config.others && isOthers(message) -> othersMsg
 
         config.winterGift && message.isPresent("winter_gift") -> "winter_gift"
-        config.eventLevelUp && (message.isPresent("event") || StringUtils.isEmpty(message)) -> "event"
+
+        // TODO need proper solution to hide empty messages in event text
+        config.eventLevelUp && (message.isPresent("event")) -> "event"
+
         config.fireSale && (fireSalePattern.matches(message) || message.isPresent("fire_sale")) -> "fire_sale"
         config.factoryUpgrade && message.isPresent("factory_upgrade") -> "factory_upgrade"
         config.sacrifice && message.isPresent("sacrifice") -> "sacrifice"
@@ -576,5 +579,12 @@ object ChatFilter {
         event.move(3, "chat.profileJoin", "chat.filterType.profileJoin")
         event.move(3, "chat.others", "chat.filterType.others")
         event.move(52, "chat.filterType.powderMining", "chat.filterType.powderMiningFilter.enabled")
+        event.transform(53, "chat.filterType.powderMiningFilter.gemstoneFilterConfig") { element ->
+            element.asJsonObject.apply {
+                entrySet().forEach { (key, value) ->
+                    if (value.asString == "FINE_ONLY") addProperty(key, "FINE_UP")
+                }
+            }
+        }
     }
 }
