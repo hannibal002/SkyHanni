@@ -21,10 +21,13 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -52,7 +55,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
      */
     val tabListQuestPattern by RepoPattern.pattern(
         "crimson.reputation.tablist",
-        " §r§[cdea].*"
+        " §r§[cdea].*",
     )
 
     init {
@@ -143,14 +146,24 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         if (!config.enabled.get()) return
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
-        if (config.useHotkey && !config.hotkey.isKeyHeld()) {
+        if (config.useHotkey && !isHotkeyHeld()) {
             return
         }
 
         config.position.renderStringsAndItems(
             display,
-            posLabel = "Crimson Isle Reputation Helper"
+            posLabel = "Crimson Isle Reputation Helper",
         )
+    }
+
+    fun isHotkeyHeld(): Boolean {
+        val isAllowedGui = Minecraft.getMinecraft().currentScreen.let {
+            it == null || it is GuiInventory
+        }
+        if (!isAllowedGui) return false
+        if (NEUItems.neuHasFocus()) return false
+
+        return config.hotkey.isKeyHeld()
     }
 
     @SubscribeEvent
@@ -193,7 +206,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     fun showLocations() = when (config.showLocation) {
         ShowLocationEntry.ALWAYS -> true
-        ShowLocationEntry.ONLY_HOTKEY -> config.hotkey.isKeyHeld()
+        ShowLocationEntry.ONLY_HOTKEY -> isHotkeyHeld()
         else -> false
     }
 }
