@@ -69,7 +69,7 @@ object FishingBaitWarnings {
 
     private fun checkBait() {
         val bobber = FishingAPI.bobber ?: return
-        val bait = baitEntities.filter { it.distanceTo(bobber) < 8 }.minByOrNull { it.distanceTo(bobber) }?.name
+        val bait = baitEntities.toSet().filter { it.distanceTo(bobber) < 8 }.minByOrNull { it.distanceTo(bobber) }?.name
         baitEntities.clear()
 
         if (bait == null) {
