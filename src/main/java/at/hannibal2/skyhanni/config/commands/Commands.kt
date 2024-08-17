@@ -420,10 +420,6 @@ object Commands {
             "shresetpunchcard",
             "Resets the Rift Punchcard Artifact player list.",
         ) { PunchcardHighlight.clearList() }
-        registerCommand(
-            "shendhoppity",
-            "Simulates ending the current hoppity's event to send the event summary."
-        ) { HoppityEventSummary.forceEventEnd() }
     }
 
     private fun developersDebugFeatures() {

@@ -670,53 +670,36 @@ public class ProfileSpecificStorage {
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 
     @Expose
-    public HoppityEventStatsStorage hoppityEvent = new HoppityEventStatsStorage();
+    public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
-    @Expose
-    public Map<Integer, HoppityEventStatsStorage.HoppityEventStats> pastHoppityEventStats = new HashMap<>();
-
-    public static class HoppityEventStatsStorage {
+    public static class HoppityEventStats {
         @Expose
-        @Nullable
-        public Integer eventYear = null;
+        public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
 
         @Expose
-        public HoppityEventStats stats = new HoppityEventStats();
+        public Map<HoppityRabbitRarity, RabbitData> rabbitsFound = new HashMap<>();
 
-        public static class HoppityEventStats {
+        public static class RabbitData {
             @Expose
-            public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
-
-            @Expose
-            public Map<HoppityRabbitRarity, RabbitData> rabbitsFound = new HashMap<>();
-
-            public static class RabbitData {
-                @Expose
-                public int uniques = 0;
-
-                @Expose
-                public int dupes = 0;
-
-                @Expose
-                public int strays = 0;
-            }
+            public int uniques = 0;
 
             @Expose
-            public long dupeChocolateGained = 0;
+            public int dupes = 0;
 
             @Expose
-            public long strayChocolateGained = 0;
-
-            @Expose
-            public long millisInCf = 0;
-
-            @Expose
-            @Nullable
-            public Integer initLbPos = null;
-
-            @Expose
-            @Nullable
-            public Integer finalLbPos = null;
+            public int strays = 0;
         }
+
+        @Expose
+        public long dupeChocolateGained = 0;
+
+        @Expose
+        public long strayChocolateGained = 0;
+
+        @Expose
+        public long millisInCf = 0;
+
+        @Expose
+        public boolean summarized = false;
     }
 }
