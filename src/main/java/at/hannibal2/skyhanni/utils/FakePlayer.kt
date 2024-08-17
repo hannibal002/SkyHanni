@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.scoreboard.ScorePlayerTeam
+import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
 import java.io.File
 import java.io.FileOutputStream
@@ -21,7 +23,7 @@ object FakePlayer {
         val skinResource = skinUrl?.let { url ->
             val skinFile = getSkinFile(url)
             loadTextureFromFile(skinFile)
-        } ?: player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+        } ?: player.locationSkin ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
 
         return object : EntityOtherPlayerMP(mc.theWorld, player.gameProfile) {
             override fun getLocationSkin(): ResourceLocation = skinResource
@@ -30,8 +32,7 @@ object FakePlayer {
                 override fun getNameTagVisibility() = EnumVisible.NEVER
             }
 
-            override fun isWearing(part: EnumPlayerModelParts): Boolean =
-                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
+            override fun isWearing(part: EnumPlayerModelParts): Boolean = player.isWearing(part) && part != EnumPlayerModelParts.CAPE
         }
     }
 
