@@ -171,7 +171,7 @@ object Commands {
             { DefaultConfigFeatures.onCommand(it) },
             DefaultConfigFeatures::onComplete,
         )
-        registerCommand("shelection", "Opens the election viewer") { openElectionViewer() }
+        registerCommand("shelection", "View the current Election.") { openElectionViewer() }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
