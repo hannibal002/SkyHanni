@@ -51,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.gui.electionviewer.CurrentMayorScreen
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerScreen
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -607,7 +608,7 @@ object Commands {
 
     @JvmStatic
     fun openElectionViewer() {
-        SkyHanniMod.screenToOpen = ElectionViewerScreen
+        SkyHanniMod.screenToOpen = CurrentMayorScreen
     }
 
     private fun clearFarmingItems() {
