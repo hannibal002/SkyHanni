@@ -6,27 +6,22 @@ import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.FakePlayer
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import com.google.gson.JsonParser
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
-import java.util.Base64
 
 @SkyHanniModule
-object CurrentMayor : GuiScreen() {
+object CurrentMayorScreen : GuiScreen() {
 
     private val scaledResolution get() = ScaledResolution(Minecraft.getMinecraft())
     private val windowWidth get() = scaledResolution.scaledWidth
@@ -36,15 +31,6 @@ object CurrentMayor : GuiScreen() {
     private val guiHeight = (windowHeight / (3 / 4f)).toInt()
 
     var display: Renderable? = null
-
-    private fun getSkinFromMayorName(mayorName: String): String? {
-        val base64Texture = "${mayorName}_MAYOR_MONSTER".asInternalName().getItemStack().getSkullTexture()
-        val decodedTextureJson = String(Base64.getDecoder().decode(base64Texture), Charsets.UTF_8)
-        val decodedJsonObject = JsonParser().parse(decodedTextureJson).asJsonObject
-        val textures = decodedJsonObject.getAsJsonObject("textures")
-        val skin = textures.getAsJsonObject("SKIN")
-        return skin["url"].asString
-    }
 
     @SubscribeEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -88,7 +74,7 @@ object CurrentMayor : GuiScreen() {
                         verticalAlign = VerticalAlignment.BOTTOM,
                     ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
                     onClick = {
-                        SkyHanniMod.screenToOpen = ElectionViewer
+                        SkyHanniMod.screenToOpen = ElectionViewerScreen
                     },
                     bypassChecks = true,
                 ),
@@ -108,11 +94,7 @@ object CurrentMayor : GuiScreen() {
     }
 
     private fun getMayorRenderable(mayor: Mayor, type: String): Renderable {
-        val fakePlayer = Renderable.fakePlayer(
-            FakePlayer.getFakePlayer(getSkinFromMayorName(mayor.name)),
-            followMouse = true,
-            entityScale = 50,
-        )
+        val fakePlayer = getFakeMayor(mayor)
 
         val mayorDescription = getMayorDescription(mayor, type)
 
@@ -144,5 +126,5 @@ object CurrentMayor : GuiScreen() {
         )
     }
 
-    fun isInGui() = Minecraft.getMinecraft().currentScreen is CurrentMayor
+    fun isInGui() = Minecraft.getMinecraft().currentScreen is CurrentMayorScreen
 }

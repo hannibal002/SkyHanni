@@ -5,9 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -19,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
-object ElectionViewer : GuiScreen() {
+object ElectionViewerScreen : GuiScreen() {
 
     private val scaledResolution get() = ScaledResolution(Minecraft.getMinecraft())
     private val windowWidth get() = scaledResolution.scaledWidth
@@ -58,7 +56,14 @@ object ElectionViewer : GuiScreen() {
                             Renderable.string("Current Mayor"),
                             bypassChecks = true,
                             onClick = {
-                                SkyHanniMod.screenToOpen = CurrentMayor
+                                SkyHanniMod.screenToOpen = CurrentMayorScreen
+                            },
+                        ),
+                        Renderable.clickable(
+                            Renderable.string("Current Election"),
+                            bypassChecks = true,
+                            onClick = {
+                                SkyHanniMod.screenToOpen = CurrentElectionScreen
                             },
                         ),
                     ),
@@ -71,5 +76,5 @@ object ElectionViewer : GuiScreen() {
         )
     }
 
-    fun isInGui() = Minecraft.getMinecraft().currentScreen is ElectionViewer
+    fun isInGui() = Minecraft.getMinecraft().currentScreen is ElectionViewerScreen
 }
