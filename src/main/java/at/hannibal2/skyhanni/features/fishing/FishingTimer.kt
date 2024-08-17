@@ -165,9 +165,7 @@ object FishingTimer {
     }
 
     private fun updateInfo() {
-        currentCount = mobDespawnTime.entries.sumOf {
-            1 + it.key.extraEntities.size
-        }
+        currentCount = mobDespawnTime.size
         startTime = mobDespawnTime.maxByOrNull { it.value.passedSince() }?.value ?: SimpleTimeMark.farPast()
         display = createDisplay()
     }
