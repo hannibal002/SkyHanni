@@ -43,7 +43,13 @@ class TimeLimitedCache<K : Any, V : Any>(
     fun values(): Collection<V> = getMap().values
 
     fun keys(): Set<K> = getMap().keys
-    
+
+    /**
+     * Modifications to the returned map are not supported and may lead to unexpected behavior.
+     * This method is intended for read-only operations such as iteration or retrieval of values.
+     *
+     * @return A read-only view of the cache's underlying map.
+     */
     private fun getMap(): ConcurrentMap<K, V> {
         val asMap: ConcurrentMap<K, V>
 
@@ -53,7 +59,7 @@ class TimeLimitedCache<K : Any, V : Any>(
         } finally {
             cacheLock.readLock().unlock()
         }
-        
+
         return asMap
     }
 
