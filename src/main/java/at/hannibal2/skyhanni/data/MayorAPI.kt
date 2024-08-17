@@ -86,6 +86,8 @@ object MayorAPI {
 
     var currentMayor: Mayor? = null
         private set
+    var currentMinister: Mayor? = null
+        private set
     private var lastMayor: Mayor? = null
     var jerryExtraMayor: Pair<Mayor?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
         private set
@@ -216,6 +218,7 @@ object MayorAPI {
             val currentMayorName = data.mayor.name
             if (lastMayor?.name != currentMayorName) {
                 currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
+                currentMinister = setAssumeMayorJson(data.mayor.minister.name, listOf(data.mayor.minister.perk))
             }
         }
     }
@@ -246,6 +249,8 @@ object MayorAPI {
             add("Active Perks: ${currentMayor?.activePerks}")
             add("Last Update: $lastUpdate (${lastUpdate.passedSince()} ago)")
             add("Time Till Next Mayor: ${nextMayorTimestamp.timeUntil()}")
+            add("Current Minister: ${currentMinister?.name ?: "Unknown"}")
+            add("Current Minister Perk: ${currentMinister?.activePerks}")
             if (jerryExtraMayor.first != null) {
                 add("Jerry Mayor: ${jerryExtraMayor.first?.name} expiring at: ${jerryExtraMayor.second.timeUntil()}")
             }
