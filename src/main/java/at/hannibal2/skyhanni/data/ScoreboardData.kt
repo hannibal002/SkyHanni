@@ -22,7 +22,13 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    var objectiveTitle = ""
+    val objectiveTitle: String get() = grabObjectiveTitle()
+
+    fun grabObjectiveTitle(): String {
+        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return ""
+        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return ""
+        return objective.displayName
+    }
 
     private var dirty = false
 
@@ -35,8 +41,14 @@ object ScoreboardData {
 
             val lastColor = start.lastColorCode() ?: ""
 
-            if (end.startsWith(lastColor)) {
-                end = end.removePrefix(lastColor)
+            // Determine the longest prefix of "end" that matches any suffix of "lastColor"
+            val colorSuffixes = generateSequence(lastColor) { it.dropLast(2) }
+                .takeWhile { it.isNotEmpty() }
+                .toList()
+
+            val matchingPrefix = colorSuffixes.find { end.startsWith(it) } ?: ""
+            if (matchingPrefix.isNotEmpty()) {
+                end = end.removePrefix(matchingPrefix)
             }
 
             add(start + end)
@@ -84,7 +96,6 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
-        objectiveTitle = objective.displayName
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")
