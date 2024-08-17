@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonParser
 import net.minecraft.client.Minecraft
@@ -69,6 +70,10 @@ object CurrentMayor : GuiScreen() {
         val mainContent = Renderable.verticalContainer(
             listOf(
                 Renderable.string("Current Mayor & Minister", horizontalAlign = HorizontalAlignment.CENTER),
+                Renderable.string(
+                    "Next election in §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}",
+                    horizontalAlign = HorizontalAlignment.CENTER,
+                ),
                 Renderable.horizontalContainer(
                     listOf(
                         getMayorRenderable(mayor, "Mayor"),
