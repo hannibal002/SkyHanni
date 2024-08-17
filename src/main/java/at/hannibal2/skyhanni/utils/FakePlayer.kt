@@ -1,13 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraft.util.IChatComponent
 import net.minecraft.util.ResourceLocation
 import java.io.File
 import java.io.FileOutputStream
