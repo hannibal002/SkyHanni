@@ -607,7 +607,7 @@ object Commands {
 
     @JvmStatic
     fun openElectionViewer() {
-        SkyHanniMod.screenToOpen = ElectionViewer()
+        SkyHanniMod.screenToOpen = ElectionViewer
     }
 
     private fun clearFarmingItems() {

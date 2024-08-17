@@ -1,63 +1,82 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.centerString
-import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobe.config
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
-import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.gui.ScaledResolution
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-open class ElectionViewer : GuiScreen() {
+@SkyHanniModule
+object ElectionViewer : GuiScreen() {
 
-    override fun drawScreen(mouseX: Int, mouseY: Int, partialTicks: Float) {
-        //super.drawScreen(mouseX, mouseY, partialTicks)
+    private val scaledResolution get() = ScaledResolution(Minecraft.getMinecraft())
+    private val windowWidth get() = scaledResolution.scaledWidth
+    private val windowHeight get() = scaledResolution.scaledHeight
 
-        val width = 4 * this.width / 5
-        val height = 4 * this.height / 5
-        val xTranslate = this.width / 10
-        val yTranslate = this.height / 10
-        RenderUtils.drawRoundRect(
-            xTranslate - 2,
-            yTranslate - 2,
-            width + 4,
-            height + 4,
-            Color.BLACK.withAlpha(100),
-        )
+    private val guiWidth = (windowWidth / (3 / 4f)).toInt()
+    private val guiHeight = (windowHeight / (3 / 4f)).toInt()
 
-        GlStateManager.translate(xTranslate.toFloat(), yTranslate.toFloat(), 0f)
-        Renderable.withMousePosition(mouseX - xTranslate, mouseY - yTranslate) {
-            Renderable.horizontalContainer(
-                listOf(
-                    createLabeledButton("Current Mayor", Color.CYAN, onClick = { ChatUtils.chat("balls") }),
-                    createLabeledButton("Current Election", Color.CYAN, onClick = { }),
-                    createLabeledButton("Next Special Mayors", Color.CYAN, onClick = { }),
-                ),
-                spacing = 10,
-                verticalAlign = VerticalAlignment.CENTER,
-                horizontalAlign = HorizontalAlignment.CENTER,
-            ).renderXYAligned(0, 0, width, height)
+    var display: Renderable? = null
 
+    @SubscribeEvent
+    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!isInGui()) return
+
+        val position = Position(windowWidth / 2 - guiWidth / 2, windowHeight / 2 - guiHeight / 2)
+
+        display?.let {
+            position.renderRenderable(
+                it,
+                posLabel = "Election Viewer",
+                addToGuiManager = false,
+            )
         }
-        GlStateManager.translate(-xTranslate.toFloat(), -yTranslate.toFloat(), 0f)
     }
 
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isInGui()) return
+
+        display = Renderable.drawInsideRoundedRect(
+            Renderable.doubleLayered(
+                Renderable.placeholder(guiWidth, guiHeight),
+                Renderable.horizontalContainer(
+                    listOf(
+                        createLabeledButton("Current Election", Color.GRAY, onClick = { }),
+                        createLabeledButton("Current Mayor", Color.GRAY, onClick = { ChatUtils.chat("balls") }),
+                        createLabeledButton("Next Special Mayors", Color.GRAY, onClick = { }),
+                        Renderable.clickable(Renderable.string("im stupid"), bypassChecks = true, onClick = { ChatUtils.chat("balls") }),
+                    ),
+                    spacing = 10,
+                    verticalAlign = VerticalAlignment.CENTER,
+                    horizontalAlign = HorizontalAlignment.CENTER,
+                ),
+            ),
+            Color.BLACK.addAlpha(100),
+        )
+    }
+
+    // TODO: Move to renderutils or smth idk, it currently dupes wi th the wardrobe thing
     private fun createLabeledButton(
         text: String,
         hoveredColor: Color = Color(130, 130, 130, 200),
         unhoveredColor: Color = hoveredColor.darker(0.57),
         onClick: () -> Unit,
     ): Renderable {
-        val buttonWidth = 100
-        val buttonHeight = 50
+        val buttonWidth = 120
+        val buttonHeight = 60
 
         val renderable = Renderable.hoverable(
             Renderable.drawInsideRoundedRectWithOutline(
@@ -65,14 +84,15 @@ open class ElectionViewer : GuiScreen() {
                     Renderable.clickable(
                         Renderable.placeholder(buttonWidth, buttonHeight),
                         onClick,
+                        bypassChecks = true, // this is so stupid, why is it needed
                     ),
                     centerString(text),
                     false,
                 ),
                 hoveredColor,
-                padding = 0,
-                topOutlineColor = config.color.topBorderColor.toChromaColorInt(),
-                bottomOutlineColor = config.color.bottomBorderColor.toChromaColorInt(),
+                padding = 5,
+                topOutlineColor = Color.PINK.rgb,
+                bottomOutlineColor = Color.BLUE.rgb,
                 borderOutlineThickness = 2,
                 horizontalAlign = HorizontalAlignment.CENTER,
             ),
@@ -90,7 +110,5 @@ open class ElectionViewer : GuiScreen() {
         return renderable
     }
 
-    companion object {
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is ElectionViewer
-    }
+    fun isInGui() = Minecraft.getMinecraft().currentScreen is ElectionViewer
 }

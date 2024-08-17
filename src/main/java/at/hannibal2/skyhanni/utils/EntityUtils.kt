@@ -36,6 +36,7 @@ import net.minecraftforge.client.event.RenderLivingEvent
 //#if FORGE
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+
 //#endif
 
 @SkyHanniModule
@@ -218,7 +219,7 @@ object EntityUtils {
         SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
-//#if MC < 11400
+    //#if MC < 11400
     @SubscribeEvent
     fun onEntityRenderSpecialsPre(
         event:
@@ -257,15 +258,13 @@ object EntityUtils {
             mc.theWorld,
             player.gameProfile,
         ) {
-            override fun getLocationSkin() =
-                player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+            override fun getLocationSkin() = player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
 
             override fun getTeam() = object : ScorePlayerTeam(null, null) {
                 override fun getNameTagVisibility() = EnumVisible.NEVER
             }
 
-            override fun isWearing(part: EnumPlayerModelParts): Boolean =
-                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
+            override fun isWearing(part: EnumPlayerModelParts): Boolean = player.isWearing(part) && part != EnumPlayerModelParts.CAPE
         }
     }
 }
