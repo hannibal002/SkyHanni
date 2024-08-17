@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -343,7 +345,20 @@ object ItemUtils {
 
     // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val ItemStack.itemName: String
-        get() = getInternalName().itemName
+        get() {
+            getAttributeFromShard()?.let {
+                return it.getAttributeName()
+            }
+            return getInternalName().itemName
+        }
+
+
+    fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
+        if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
+        val attributes = getAttributes() ?: return null
+        return attributes.firstOrNull()
+    }
+
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
@@ -380,6 +395,11 @@ object ItemUtils {
         }
         if (name.endsWith("Enchanted Book Bundle")) {
             return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+        }
+
+        // obfuscated trophy fish
+        if (name.contains("§kObfuscated")) {
+            return name.replace("§kObfuscated", "Obfuscated")
         }
 
         // hide pet level
