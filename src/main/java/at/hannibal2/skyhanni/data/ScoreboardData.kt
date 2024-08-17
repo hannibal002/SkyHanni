@@ -22,7 +22,13 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    var objectiveTitle = ""
+    val objectiveTitle: String get() = grabObjectiveTitle()
+
+    fun grabObjectiveTitle(): String {
+        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return ""
+        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return ""
+        return objective.displayName
+    }
 
     private var dirty = false
 
@@ -90,7 +96,6 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
-        objectiveTitle = objective.displayName
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")

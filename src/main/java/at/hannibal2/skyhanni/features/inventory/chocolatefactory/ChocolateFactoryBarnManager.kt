@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -77,10 +78,14 @@ object ChocolateFactoryBarnManager {
 
         val profileStorage = profileStorage ?: return
 
+        // TODO rename maxRabbits to maxUnlockedBarnSpace
         if (profileStorage.maxRabbits >= ChocolateFactoryAPI.maxRabbits) return
 
+        // when the unlocked barn space has already surpassed the total amount of rabbits
+        val alreadyBigEnough = profileStorage.maxRabbits >= HoppityCollectionData.knownRabbitCount
+
         val remainingSpace = profileStorage.maxRabbits - profileStorage.currentRabbits
-        barnFull = remainingSpace <= config.barnCapacityThreshold
+        barnFull = remainingSpace <= config.barnCapacityThreshold && !alreadyBigEnough
         if (!barnFull) return
 
         if (inventory && sentBarnFullWarning) return

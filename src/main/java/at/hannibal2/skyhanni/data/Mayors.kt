@@ -45,10 +45,10 @@ enum class Mayor(
     FINNEGAN(
         "Finnegan",
         "§c",
-        Perk.FARMING_SIMULATOR,
         Perk.PELT_POCALYPSE,
         Perk.GOATED,
         Perk.BLOOMING_BUSINESS,
+        Perk.PEST_ERADICATOR,
     ),
     FOXY(
         "Foxy",
@@ -193,10 +193,10 @@ enum class Perk(val perkName: String) {
     LONG_TERM_INVESTMENT("Long Term Investment"),
 
     // Finnegan
-    FARMING_SIMULATOR("Farming Simulator"),
     PELT_POCALYPSE("Pelt-pocalypse"),
     GOATED("GOATed"),
     BLOOMING_BUSINESS("Blooming Business"),
+    PEST_ERADICATOR("Pest Eradicator"),
 
     // Foxy
     SWEET_BENEVOLENCE("Sweet Benevolence"),
@@ -228,7 +228,7 @@ enum class Perk(val perkName: String) {
 
     // Derpy
     TURBO_MINIONS("TURBO MINIONS!!!"),
-    AH_TAX("MOAR TAX!!!"),
+    AH_TAX("MOAR TAX!!!"), // TODO: Change to actual perk name when known
     DOUBLE_MOBS_HP("DOUBLE MOBS HP!!!"),
     MOAR_SKILLZ("MOAR SKILLZ!!!"),
     ;
