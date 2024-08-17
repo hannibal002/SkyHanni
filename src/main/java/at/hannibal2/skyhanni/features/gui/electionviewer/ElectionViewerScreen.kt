@@ -47,21 +47,34 @@ abstract class ElectionViewerScreen : GuiScreen() {
 
     abstract fun isInGui(): Boolean
 
-    private fun createButtons() =
-        Renderable.verticalContainer(
-            listOf(
-                createButton("Mayor") { SkyHanniMod.screenToOpen = CurrentMayorScreen },
-                createButton("Election") { SkyHanniMod.screenToOpen = CurrentElectionScreen },
-            ),
+    private fun createButtons(): Renderable {
+        val currentScreen = Minecraft.getMinecraft().currentScreen
+
+        val mayorButton = createButton(
+            label = "Mayor",
+            isActive = currentScreen is CurrentMayorScreen,
+            onClick = { SkyHanniMod.screenToOpen = CurrentMayorScreen },
+        )
+
+        val electionButton = createButton(
+            label = "Election",
+            isActive = currentScreen is CurrentElectionScreen,
+            onClick = { SkyHanniMod.screenToOpen = CurrentElectionScreen },
+        )
+
+        return Renderable.verticalContainer(
+            listOf(mayorButton, electionButton),
             spacing = 10,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
         )
+    }
 
-    private fun createButton(label: String, onClick: () -> Unit) =
+    private fun createButton(label: String, isActive: Boolean, onClick: () -> Unit) =
         Renderable.clickable(
-            render = Renderable.drawInsideRoundedRect(
-                Renderable.string(label, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER), Color.DARK_GRAY.addAlpha(200),
+            Renderable.drawInsideRoundedRect(
+                Renderable.string(label, horizontalAlign = RenderUtils.HorizontalAlignment.CENTER),
+                if (isActive) Color.GRAY.addAlpha(200) else Color.DARK_GRAY.addAlpha(200),
                 padding = 7,
                 horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
             ),
