@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeCandidate
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,30 +9,15 @@ import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraft.client.gui.GuiScreen
-import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
 object CurrentElectionScreen : ElectionViewerScreen() {
-    @SubscribeEvent
-    override fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isInGui()) return
 
-        val position = Position(windowWidth / 2 - guiWidth / 2 - PADDING, windowHeight / 2 - guiHeight / 2 - PADDING)
-
-        display?.let {
-            position.renderRenderable(
-                it,
-                posLabel = "Election Viewer - Current Election",
-                addToGuiManager = false,
-            )
-        }
-    }
+    override val posLabel = "Election Viewer - Current Election"
 
     @SubscribeEvent
     override fun onSecondPassed(event: SecondPassedEvent) {
