@@ -442,6 +442,7 @@ interface Renderable {
             color: Color = Color.WHITE,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.CENTER,
+            internalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
         ) = object : Renderable {
 
             val fontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }

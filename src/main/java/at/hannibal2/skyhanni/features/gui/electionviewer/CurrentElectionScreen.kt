@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
@@ -97,15 +96,16 @@ object CurrentElectionScreen : GuiScreen() {
                             },
                             candidateContainer.width,
                             horizontalAlign = HorizontalAlignment.CENTER,
-                        ).renderBounds(Color.CYAN),
+                            internalAlign = HorizontalAlignment.CENTER,
+                        ),
                         listOf(Renderable.wrappedString("§7" + it.description, 200)),
                         bypassChecks = true,
-                    ).renderBounds(Color.PINK)
+                    )
                 },
                 spacing = 5,
                 verticalAlign = VerticalAlignment.CENTER,
                 horizontalAlign = HorizontalAlignment.CENTER,
-            ).renderBounds(Color.RED)
+            )
 
             val fullCandidateContainer = Renderable.verticalContainer(
                 listOf(
