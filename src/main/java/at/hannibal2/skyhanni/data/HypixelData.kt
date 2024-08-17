@@ -318,7 +318,7 @@ object HypixelData {
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
-                    val originalLocation = group("area").removeColor()
+                    val originalLocation = group("area")
                     skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
                     skyBlockAreaWithSymbol = line.trim()
                     break@loop
