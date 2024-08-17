@@ -21,21 +21,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
-object CurrentMayorScreen : GuiScreen() {
-
-    private val scaledResolution get() = ScaledResolution(Minecraft.getMinecraft())
-    private val windowWidth get() = scaledResolution.scaledWidth
-    private val windowHeight get() = scaledResolution.scaledHeight
-
-    private val guiWidth = (windowWidth / (3 / 4f)).toInt()
-    private val guiHeight = (windowHeight / (3 / 4f)).toInt()
-
-    private const val PADDING = 10
-
-    var display: Renderable? = null
-
+object CurrentMayorScreen : ElectionViewerScreen() {
     @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    override fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isInGui()) return
 
         display?.let {
@@ -50,7 +38,7 @@ object CurrentMayorScreen : GuiScreen() {
     }
 
     @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    override fun onSecondPassed(event: SecondPassedEvent) {
         if (!isInGui()) return
         val mayor = MayorAPI.currentMayor ?: return
         val minister = MayorAPI.currentMinister ?: return
@@ -68,17 +56,6 @@ object CurrentMayorScreen : GuiScreen() {
                         getMayorRenderable(minister, "Minister"),
                     ),
                     spacing = 50,
-                ),
-                Renderable.clickable(
-                    Renderable.string(
-                        "§7Go Back",
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        verticalAlign = VerticalAlignment.BOTTOM,
-                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
-                    onClick = {
-                        SkyHanniMod.screenToOpen = ElectionViewerScreen
-                    },
-                    bypassChecks = true,
                 ),
             ),
             spacing = 20,
@@ -129,5 +106,5 @@ object CurrentMayorScreen : GuiScreen() {
         )
     }
 
-    fun isInGui() = Minecraft.getMinecraft().currentScreen is CurrentMayorScreen
+    override fun isInGui() = Minecraft.getMinecraft().currentScreen is CurrentMayorScreen
 }

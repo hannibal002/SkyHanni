@@ -19,23 +19,10 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
-// §6✯
-
 @SkyHanniModule
-object CurrentElectionScreen : GuiScreen() {
-    private val scaledResolution get() = ScaledResolution(Minecraft.getMinecraft())
-    private val windowWidth get() = scaledResolution.scaledWidth
-    private val windowHeight get() = scaledResolution.scaledHeight
-
-    private val guiWidth = (windowWidth / (3 / 4f)).toInt()
-    private val guiHeight = (windowHeight / (3 / 4f)).toInt()
-
-    private const val PADDING = 10
-
-    private var display: Renderable? = null
-
+object CurrentElectionScreen : ElectionViewerScreen() {
     @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    override fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isInGui()) return
 
         val position = Position(windowWidth / 2 - guiWidth / 2 - PADDING, windowHeight / 2 - guiHeight / 2 - PADDING)
@@ -50,7 +37,7 @@ object CurrentElectionScreen : GuiScreen() {
     }
 
     @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent) {
+    override fun onSecondPassed(event: SecondPassedEvent) {
         if (!isInGui()) return
 
         val currentElection = MayorAPI.rawMayorData?.current ?: return
@@ -149,5 +136,5 @@ object CurrentElectionScreen : GuiScreen() {
     }
 
 
-    fun isInGui() = Minecraft.getMinecraft().currentScreen is CurrentElectionScreen
+    override fun isInGui() = Minecraft.getMinecraft().currentScreen is CurrentElectionScreen
 }
