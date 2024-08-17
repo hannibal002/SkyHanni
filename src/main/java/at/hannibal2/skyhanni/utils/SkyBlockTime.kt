@@ -28,6 +28,7 @@ data class SkyBlockTime(
     companion object {
         private const val SKYBLOCK_EPOCH_START_MILLIS = 1559829300000L // Day 1, Year 1
         const val SKYBLOCK_YEAR_MILLIS = 124 * 60 * 60 * 1000L
+        const val SKYBLOCK_SEASON_MILLIS = SKYBLOCK_YEAR_MILLIS / 4
         private const val SKYBLOCK_MONTH_MILLIS = SKYBLOCK_YEAR_MILLIS / 12
         const val SKYBLOCK_DAY_MILLIS = SKYBLOCK_MONTH_MILLIS / 31
         const val SKYBLOCK_HOUR_MILLIS = SKYBLOCK_DAY_MILLIS / 24
