@@ -26,13 +26,15 @@ object ElectionViewerScreen : GuiScreen() {
     private val guiWidth = (windowWidth / (3 / 4f)).toInt()
     private val guiHeight = (windowHeight / (3 / 4f)).toInt()
 
+    private const val PADDING = 10
+
     private var display: Renderable? = null
 
     @SubscribeEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isInGui()) return
 
-        val position = Position(windowWidth / 2 - guiWidth / 2, windowHeight / 2 - guiHeight / 2)
+        val position = Position(windowWidth / 2 - guiWidth / 2 - PADDING, windowHeight / 2 - guiHeight / 2 - PADDING)
 
         display?.let {
             position.renderRenderable(
@@ -73,6 +75,7 @@ object ElectionViewerScreen : GuiScreen() {
                 ),
             ),
             Color.BLACK.addAlpha(180),
+            padding = PADDING,
         )
     }
 

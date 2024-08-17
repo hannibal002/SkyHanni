@@ -30,6 +30,8 @@ object CurrentMayorScreen : GuiScreen() {
     private val guiWidth = (windowWidth / (3 / 4f)).toInt()
     private val guiHeight = (windowHeight / (3 / 4f)).toInt()
 
+    private const val PADDING = 10
+
     var display: Renderable? = null
 
     @SubscribeEvent
@@ -37,7 +39,7 @@ object CurrentMayorScreen : GuiScreen() {
         if (!isInGui()) return
 
         display?.let {
-            val position = Position(windowWidth / 2 - guiWidth / 2, windowHeight / 2 - guiHeight / 2)
+            val position = Position(windowWidth / 2 - guiWidth / 2 - PADDING, windowHeight / 2 - guiHeight / 2 - PADDING)
 
             position.renderRenderable(
                 it,
@@ -90,6 +92,7 @@ object CurrentMayorScreen : GuiScreen() {
                 mainContent,
             ),
             Color.BLACK.addAlpha(180),
+            padding = PADDING,
         )
     }
 

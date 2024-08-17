@@ -44,7 +44,7 @@ object CurrentElectionScreen : GuiScreen() {
         display?.let {
             position.renderRenderable(
                 it,
-                posLabel = "Election Viewer",
+                posLabel = "Election Viewer - Current Election",
                 addToGuiManager = false,
             )
         }
