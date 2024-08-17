@@ -131,48 +131,47 @@ object HoppityEventSummary {
     }
 
     private val summaryOperationList by lazy {
-        buildMap<HoppityStat, (sb: StringBuilder, stats: HoppityEventStats, isPast: Boolean) -> Unit> {
-            put(HoppityStat.MEAL_EGGS_FOUND) { sb, stats, isPast ->
-                stats.getEggsFoundFormat(isPast).forEach { foundFormat ->
-                    sb.appendHeadedLine(foundFormat)
+        buildMap<HoppityStat, (sb: StringBuilder, stats: HoppityEventStats) -> Unit> {
+            put(HoppityStat.MEAL_EGGS_FOUND) { sb, stats ->
+                stats.getEggsFoundFormat().forEach {
+                    sb.appendHeadedLine(it)
                 }
             }
 
-            put(HoppityStat.NEW_RABBITS) { sb, stats, _ ->
-                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach { newRabbitLine ->
-                    sb.appendHeadedLine(newRabbitLine)
+            put(HoppityStat.NEW_RABBITS) { sb, stats ->
+                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach {
+                    sb.appendHeadedLine(it)
                 }
             }
 
-            put(HoppityStat.DUPLICATE_RABBITS) { sb, stats, _ ->
-                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach { dupeRabbitLine ->
-                    sb.appendHeadedLine(dupeRabbitLine)
+            put(HoppityStat.DUPLICATE_RABBITS) { sb, stats ->
+                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach {
+                    sb.appendHeadedLine(it)
                 }
                 sb.addExtraChocFormatLine(stats.dupeChocolateGained)
             }
 
-            put(HoppityStat.STRAY_RABBITS) { sb, stats, _ ->
-                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach { strayRabbitLine ->
-                    sb.appendHeadedLine(strayRabbitLine)
+            put(HoppityStat.STRAY_RABBITS) { sb, stats ->
+                getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach {
+                    sb.appendHeadedLine(it)
                 }
                 sb.addExtraChocFormatLine(stats.strayChocolateGained)
             }
 
-            put(HoppityStat.TIME_IN_CF) { sb, stats, _ ->
-                val timeFormat = stats.millisInCf.milliseconds.format(maxUnits = 2)
-                sb.appendHeadedLine("§7You spent §b$timeFormat §7in the §6Chocolate Factory§7.")
+            put(HoppityStat.TIME_IN_CF) { sb, stats ->
+                sb.appendHeadedLine("§7You spent §b${stats.millisInCf.milliseconds.format(maxUnits = 2)} §7in the §6Chocolate Factory§7.")
             }
 
-            put(HoppityStat.EMPTY_1) { sb, _, _ -> sb.appendLine() }
-            put(HoppityStat.EMPTY_2) { sb, _, _ -> sb.appendLine() }
-            put(HoppityStat.EMPTY_3) { sb, _, _ -> sb.appendLine() }
-            put(HoppityStat.EMPTY_4) { sb, _, _ -> sb.appendLine() }
+            put(HoppityStat.EMPTY_1) { sb, _ -> sb.appendLine() }
+            put(HoppityStat.EMPTY_2) { sb, _ -> sb.appendLine() }
+            put(HoppityStat.EMPTY_3) { sb, _ -> sb.appendLine() }
+            put(HoppityStat.EMPTY_4) { sb, _ -> sb.appendLine() }
         }
     }
 
     fun sendStatsMessage(it: Array<String>) {
         val statsStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
-        val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty()} ?: mutableListOf()
+        val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
         val statsYearFormatList = statsStorage.keys.takeIf { it.isNotEmpty() }?.map {
             "$it${if (it == SkyBlockTime.now().year) " §a(Current)§r" else ""}"
         }?.toMutableList() ?: mutableListOf()
@@ -204,7 +203,7 @@ object HoppityEventSummary {
 
         // Various stats from config
         config.eventSummary.statDisplayList.forEach {
-            summaryOperationList[it]?.invoke(summaryBuilder, stats, (eventYear < SkyBlockTime.now().year))
+            summaryOperationList[it]?.invoke(summaryBuilder, stats)
         }
 
         // Footer
@@ -212,11 +211,11 @@ object HoppityEventSummary {
         ChatUtils.chat(summaryBuilder.toString(), prefix = false)
     }
 
-    private fun HoppityEventStats.getEggsFoundFormat(isPast: Boolean): List<String> {
+    private fun HoppityEventStats.getEggsFoundFormat(): List<String> {
         val eggsFoundFormatList: MutableList<String> = buildList {
             mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt().takeIf { it > 0 }?.let {
                 add(
-                    "§7You found §b$it§7/§a${if (isPast) "279" else getMealEggsSinceStart()} §6Chocolate Meal ${
+                    "§7You found §b$it§7/§a${getMealEggsSinceStart()} §6Chocolate Meal ${
                         StringUtils.pluralize(it, "Egg")
                     }§7.",
                 )
@@ -238,6 +237,8 @@ object HoppityEventSummary {
 
         val sbTimeNow = SkyBlockTime.now()
         val milliDifference = sbTimeNow.toMillis() - SkyBlockTime.fromSbYear(sbTimeNow.year).toMillis()
+        // The event happened in the past - full egg spawn count
+        if (milliDifference < 0) return 279
 
         // Calculate total eggs from complete days and incomplete day periods
         var spawnedMealsEggs = (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3
