@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -73,7 +74,7 @@ object ElectionViewer : GuiScreen() {
                     listOf(
                         Renderable.clickable(Renderable.string("im stupid"), bypassChecks = true, onClick = { ChatUtils.chat("balls") }),
                         Renderable.fakePlayer(
-                            EntityUtils.getFakePlayer(aatroxSkin),
+                            FakePlayer.getFakePlayer(aatroxSkin),
                             followMouse = true,
                         ),
                     ),

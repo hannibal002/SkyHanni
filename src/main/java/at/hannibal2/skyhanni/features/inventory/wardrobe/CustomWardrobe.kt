@@ -24,7 +24,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils.getFakePlayer
+import at.hannibal2.skyhanni.utils.FakePlayer.getFakePlayer
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.removeEnchants
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
