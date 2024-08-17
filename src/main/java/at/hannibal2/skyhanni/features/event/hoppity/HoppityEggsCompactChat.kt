@@ -82,7 +82,7 @@ object HoppityEggsCompactChat {
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
             "$mealNameFormatted! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
-            "$mealNameFormatted! §d§lNEW $lastName §7(${lastProfit}§7)"
+            "$mealNameFormatted! §d§lNEW $lastRarity $lastName §7(${lastProfit}§7)"
         } else "?"
     }
 

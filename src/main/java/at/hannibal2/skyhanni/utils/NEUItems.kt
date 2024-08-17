@@ -139,8 +139,9 @@ object NEUItems {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
             val internalName = rawInternalName.asInternalName()
 
-            // TODO remove one of them once neu is consistent
+            // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
+            name = name.removePrefix("§f§f§7[lvl {lvl}] ")
             name = name.removePrefix("§7[lvl 1➡100] ")
 
             if (name.contains("[lvl 1➡100]")) {
@@ -185,7 +186,8 @@ object NEUItems {
     ): Double? = this.getPriceOrNullNew(priceSource, pastRecipes)
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? = getRawCraftCostOrNullNew(pastRecipes)
+    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
+        getRawCraftCostOrNullNew(ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes)
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
