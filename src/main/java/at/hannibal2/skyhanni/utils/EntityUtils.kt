@@ -20,6 +20,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
+import net.minecraft.client.renderer.texture.DynamicTexture
 import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -31,11 +32,17 @@ import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.AxisAlignedBB
+import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.event.RenderLivingEvent
 
 //#if FORGE
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.io.File
+import java.io.FileOutputStream
+import java.net.HttpURLConnection
+import java.net.URL
+import javax.imageio.ImageIO
 
 //#endif
 
@@ -248,24 +255,71 @@ object EntityUtils {
 
     fun Entity.cleanName() = this.getNameAsString().removeColor()
 
-    /**
-     * @return a fake player with the same skin as the real player
-     */
-    fun getFakePlayer(): EntityOtherPlayerMP {
+    fun getFakePlayer(skinUrl: String? = null): EntityOtherPlayerMP {
         val mc = Minecraft.getMinecraft()
         val player = mc.thePlayer!!
-        return object : EntityOtherPlayerMP(
-            mc.theWorld,
-            player.gameProfile,
-        ) {
-            override fun getLocationSkin() = player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+
+        val skinResource = skinUrl?.let { url ->
+            val skinFile = getSkinFile(url)
+            loadTextureFromFile(skinFile)
+        } ?: player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+
+        return object : EntityOtherPlayerMP(mc.theWorld, player.gameProfile) {
+            override fun getLocationSkin(): ResourceLocation = skinResource
 
             override fun getTeam() = object : ScorePlayerTeam(null, null) {
                 override fun getNameTagVisibility() = EnumVisible.NEVER
             }
 
-            override fun isWearing(part: EnumPlayerModelParts): Boolean = player.isWearing(part) && part != EnumPlayerModelParts.CAPE
+            override fun isWearing(part: EnumPlayerModelParts): Boolean =
+                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
         }
+    }
+
+
+    // todo: move
+
+    fun downloadAndSaveSkin(url: String, file: File) {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.inputStream.use { input ->
+            FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+    }
+
+    fun getSkinFile(url: String): File {
+        val mc = Minecraft.getMinecraft()
+        val skinDirectory = File(mc.mcDataDir, "skins")
+
+        // Ensure the directory exists
+        if (!skinDirectory.exists()) {
+            skinDirectory.mkdirs() // Create the directory if it does not exist
+        }
+
+        val skinFile = File(skinDirectory, "${url.hashCode()}.png")
+
+        // Download and save the skin if it does not already exist
+        if (!skinFile.exists()) {
+            downloadAndSaveSkin(url, skinFile)
+        }
+
+        return skinFile
+    }
+
+
+    fun loadTextureFromFile(file: File): ResourceLocation? {
+        val mc = Minecraft.getMinecraft()
+        val textureManager = mc.textureManager
+
+        // Load the image
+        val bufferedImage = ImageIO.read(file)
+
+        // Create a DynamicTexture from the BufferedImage
+        val dynamicTexture = DynamicTexture(bufferedImage)
+        textureManager.loadTexture(ResourceLocation("skins/${file.name}"), dynamicTexture)
+
+        return ResourceLocation("skins/${file.name}")
     }
 }
 
