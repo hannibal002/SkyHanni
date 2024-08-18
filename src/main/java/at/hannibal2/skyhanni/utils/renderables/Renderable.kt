@@ -252,6 +252,9 @@ interface Renderable {
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NEUItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
+            val isInSkytilsSettings =
+                openGui.let { it.startsWith("gg.skytils.vigilance.gui.") || it.startsWith("gg.skytils.skytilsmod.gui.") }
+            val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result = isGuiScreen &&
                 isGuiPositionEditor &&
@@ -260,7 +263,9 @@ interface Renderable {
                 isConfigScreen &&
                 !isInNeuPv &&
                 !isInSkytilsPv &&
-                !neuFocus
+                !neuFocus &&
+                !isInSkytilsSettings &&
+                !isInNeuSettings
 
             if (debug) {
                 if (!result) {
@@ -274,6 +279,8 @@ interface Renderable {
                     if (isInNeuPv) logger.log("isInNeuPv")
                     if (neuFocus) logger.log("neuFocus")
                     if (isInSkytilsPv) logger.log("isInSkytilsPv")
+                    if (isInSkytilsSettings) logger.log("isInSkytilsSettings")
+                    if (isInNeuSettings) logger.log("isInNeuSettings")
                     logger.log("")
                 } else {
                     logger.log("allowed click")
