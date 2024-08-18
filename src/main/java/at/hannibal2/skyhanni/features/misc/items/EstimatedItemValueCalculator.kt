@@ -777,7 +777,7 @@ object EstimatedItemValueCalculator {
 
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
-        return "§9$name ${second}"
+        return "§b$name ${second} Shard"
     }
 
     fun Pair<String, Int>.getAttributePrice(): Double? =
