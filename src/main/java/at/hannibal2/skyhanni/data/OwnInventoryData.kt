@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -37,7 +38,7 @@ object OwnInventoryData {
     private var dirty = false
     private val sackToInventoryChatPattern by RepoPattern.pattern(
         "data.owninventory.chat.movedsacktoinventory",
-        "§aMoved §r§e\\d* (?<name>.*)§r§a from your Sacks to your inventory."
+        "§aMoved §r§e\\d* (?<name>.*)§r§a from your Sacks to your inventory.",
     )
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true, onlyOnSkyblock = true)
@@ -117,6 +118,16 @@ object OwnInventoryData {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
+
+        // ignore AH movements for 2s
+        val itemName = event.item?.name ?: return
+        if (InventoryUtils.openInventoryName().let { it == "BIN Auction View" || it == "Auction View" }) {
+            if (itemName == "§cCancel Auction") {
+                val item = InventoryUtils.getItemAtSlotIndex(13)
+                val internalName = item?.getInternalNameOrNull() ?: return
+                OwnInventoryData.ignoreItem(2.seconds, { it == internalName })
+            }
+        }
     }
 
     @SubscribeEvent
@@ -127,7 +138,6 @@ object OwnInventoryData {
         }
     }
 
-    // TODO add ah movements
     fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
         ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration))
     }
