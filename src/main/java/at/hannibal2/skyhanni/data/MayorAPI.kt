@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -224,7 +225,9 @@ object MayorAPI {
             val currentMayorName = data.mayor.name
             if (lastMayor?.name != currentMayorName) {
                 currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
+                ChatUtils.debug("Mayor changed to $currentMayorName with ${pluralize(data.mayor.perks.size, "perk")}")
                 currentMinister = setAssumeMayorJson(data.mayor.minister.name, listOf(data.mayor.minister.perk))
+                ChatUtils.debug("Minister changed to ${data.mayor.minister.name} with 1 perk")
             }
         }
     }
