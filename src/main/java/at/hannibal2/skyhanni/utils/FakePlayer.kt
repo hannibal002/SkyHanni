@@ -13,7 +13,19 @@ import java.net.HttpURLConnection
 import java.net.URL
 import javax.imageio.ImageIO
 
+/**
+ * Utility class for creating fake players with either the player's skin or a custom skin.
+ *
+ * These skins are loaded from URLs and saved to disk to avoid downloading them multiple times
+ * and because it's the only way to load the custom skins.
+ *
+ * They are downloaded and saved to the `skins` directory in the Minecraft directory.
+ */
 object FakePlayer {
+    /**
+     * @param skinUrl The URL of the skin to use for the fake player, or null to use the player skin
+     * @return A fake player with the specified skin
+     */
     fun getFakePlayer(skinUrl: String? = null): EntityOtherPlayerMP {
         val mc = Minecraft.getMinecraft()
         val player = mc.thePlayer!!
@@ -34,22 +46,16 @@ object FakePlayer {
         }
     }
 
-    private fun downloadAndSaveSkin(url: String, file: File) {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.inputStream.use { input ->
-            FileOutputStream(file).use { output ->
-                input.copyTo(output)
-            }
-        }
-    }
-
+    /**
+     * Get the skin file for the specified URL, downloading it if it does not already exist
+     */
     private fun getSkinFile(url: String): File {
         val mc = Minecraft.getMinecraft()
         val skinDirectory = File(mc.mcDataDir, "skins")
 
-        // Ensure the directory exists
+        // Ensure the directory exists, creating it if it does not
         if (!skinDirectory.exists()) {
-            skinDirectory.mkdirs() // Create the directory if it does not exist
+            skinDirectory.mkdirs()
         }
 
         val skinFile = File(skinDirectory, "${url.hashCode()}.png")
@@ -62,8 +68,22 @@ object FakePlayer {
         return skinFile
     }
 
+    /**
+     * Download the skin from the specified URL and save it to the specified file
+     */
+    private fun downloadAndSaveSkin(url: String, file: File) {
+        val connection = URL(url).openConnection() as HttpURLConnection
+        connection.inputStream.use { input ->
+            FileOutputStream(file).use { output ->
+                input.copyTo(output)
+            }
+        }
+    }
 
-    private fun loadTextureFromFile(file: File): ResourceLocation? {
+    /**
+     * Load a texture from the specified file
+     */
+    private fun loadTextureFromFile(file: File): ResourceLocation {
         val mc = Minecraft.getMinecraft()
         val textureManager = mc.textureManager
 
