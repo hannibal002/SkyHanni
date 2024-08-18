@@ -153,17 +153,24 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: Submerges In: §e01m 00s
+     * REGEX-TEST: Submerges In: §e???
      */
     val submergesPattern by kuudraSb.pattern(
         "submerges",
-        "(?:§.)*Submerges In: (?:§.)*[\\w\\s]+",
+        "(?:§.)*Submerges In: (?:§.)*[\\w\\s?]+",
     )
 
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
+
+    /**
+     * REGEX-TEST: §6§lGOLD §fmedals: §6111
+     * REGEX-TEST: §f§lSILVER §fmedals: §f1,154
+     * REGEX-TEST: §c§lBRONZE §fmedals: §c268
+     */
     val medalsPattern by farmingSb.pattern(
         "medals",
-        "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$",
+        "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc][\\d.,]+",
     )
     val lockedPattern by farmingSb.pattern(
         "locked",
@@ -392,7 +399,10 @@ object ScoreboardPattern {
         "§d\\d+(?:st|nd|rd|th) Anniversary§f (?:\\d|:)+",
     )
 
-    // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third scoreboard line
+    // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
+    /**
+     * REGEX-TEST: §eProtect Elle §7(§a98%§7)
+     */
     val thirdObjectiveLinePattern by miscSb.pattern(
         "thirdobjectiveline",
         "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)",
@@ -434,9 +444,14 @@ object ScoreboardPattern {
         "wintereventwave",
         "(§.)*Wave \\d+$",
     )
+
+    /**
+     * REGEX-TEST: Magma Cubes Left: §c-4
+     * REGEX-TEST: Magma Cubes Left: §c3
+     */
     val winterMagmaLeftPattern by eventsSb.pattern(
         "wintereventmagmaleft",
-        "(§.)*Magma Cubes Left: §.\\d+$",
+        "(§.)*Magma Cubes Left: §.-?\\d+$",
     )
     val winterTotalDmgPattern by eventsSb.pattern(
         "wintereventtotaldmg",
@@ -496,10 +511,11 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §fCarnival Tokens: §e129
+     * REGEX-TEST: §fCarnival Tokens: §e1,031
      */
     val carnivalTokensPattern by carnivalSb.pattern(
         "tokens",
-        "(?:§f)*Carnival Tokens: §e\\d+",
+        "(?:§f)*Carnival Tokens: §e[\\d,]+",
     )
 
     /**

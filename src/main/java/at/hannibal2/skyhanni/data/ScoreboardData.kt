@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -22,34 +22,37 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    var objectiveTitle = ""
+    val objectiveTitle: String get() = grabObjectiveTitle()
+
+    fun grabObjectiveTitle(): String {
+        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return ""
+        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return ""
+        return objective.displayName
+    }
 
     private var dirty = false
 
-    private val minecraftColorCodesPattern = "(?i)[0-9a-fkmolnr]".toPattern()
-
-    fun formatLines(rawList: List<String>): List<String> {
-        val list = mutableListOf<String>()
+    private fun formatLines(rawList: List<String>) = buildList {
         for (line in rawList) {
             val separator = splitIcons.find { line.contains(it) } ?: continue
             val split = line.split(separator)
             val start = split[0]
-            var end = split[1]
-            // get last color code in start
-            val lastColorIndex = start.lastIndexOf('§')
-            val lastColor = if (lastColorIndex != -1
-                && lastColorIndex + 1 < start.length
-                && (minecraftColorCodesPattern.matches(start[lastColorIndex + 1].toString()))
-            ) start.substring(lastColorIndex, lastColorIndex + 2)
-            else ""
+            var end = if (split.size > 1) split[1] else ""
 
-            // remove first color code from end, when it is the same as the last color code in start
-            end = end.removePrefix(lastColor)
+            val lastColor = start.lastColorCode() ?: ""
 
-            list.add(start + end)
+            // Determine the longest prefix of "end" that matches any suffix of "lastColor"
+            val colorSuffixes = generateSequence(lastColor) { it.dropLast(2) }
+                .takeWhile { it.isNotEmpty() }
+                .toList()
+
+            val matchingPrefix = colorSuffixes.find { end.startsWith(it) } ?: ""
+            if (matchingPrefix.isNotEmpty()) {
+                end = end.removePrefix(matchingPrefix)
+            }
+
+            add(start + end)
         }
-
-        return list
     }
 
     @HandleEvent(receiveCancelled = true)
@@ -93,7 +96,6 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
-        objectiveTitle = objective.displayName
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")

@@ -61,20 +61,21 @@ object SlayerQuestWarning {
 
     private fun getSlayerData() = if (RiftAPI.inRift()) outsideRiftData else insideRiftData
 
+    private fun String.inCombat() = contains("Combat") || contains("Kills")
+    private fun String.inBoss() = this == "Slay the boss!"
+    private fun String?.bossSlain() = this == "Boss slain!"
+    private fun String.noSlayer() = this == "no slayer"
+
     private fun change(old: String, new: String) {
-        if (new.contains("Combat")) {
-            if (!old.contains("Combat")) {
-                needSlayerQuest = false
-            }
+        if (!old.inCombat() && new.inCombat()) {
+            needSlayerQuest = false
         }
-        if (new == "no slayer") {
-            if (old == "Slay the boss!") {
-                needNewQuest("The old slayer quest has failed!")
-            }
+        if (old.inBoss() && new.noSlayer()) {
+            needNewQuest("The old slayer quest has failed!")
         }
-        if (new == "Boss slain!") {
+        if (new.bossSlain()) {
             DelayedRun.runDelayed(2.seconds) {
-                if (getSlayerData().currentSlayerState == "Boss slain!") {
+                if (getSlayerData().currentSlayerState.bossSlain()) {
                     needNewQuest("You have no Auto-Slayer active!")
                 }
             }
@@ -124,6 +125,11 @@ object SlayerQuestWarning {
     private fun isSlayerMob(entity: EntityLivingBase): Boolean {
         val slayerType = SlayerAPI.getSlayerTypeForCurrentArea() ?: return false
 
+        // workaround for rift mob that is unrelated to slayer
+        if (entity.name == "Oubliette Guard") return false
+        // workaround for Bladesoul in  Crimson Isle
+        if (LorenzUtils.skyBlockArea == "Stronghold" && entity.name == "Skeleton") return false
+
         val activeSlayer = SlayerAPI.activeSlayer
 
         if (activeSlayer != null) {
@@ -133,12 +139,12 @@ object SlayerQuestWarning {
                 SlayerAPI.latestWrongAreaWarning = SimpleTimeMark.now()
                 warn(
                     "Wrong Slayer!",
-                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!"
+                    "Wrong slayer selected! You have $activeSlayerName selected and you are in an $slayerName area!",
                 )
             }
         }
-        // workaround for rift mob that is unrelated to slayer
-        val isSlayer = slayerType.clazz.isInstance(entity) && entity.name != "Oubliette Guard"
+
+        val isSlayer = slayerType.clazz.isInstance(entity)
         return (getSlayerData().lastSlayerType == slayerType) && isSlayer
     }
 
