@@ -24,44 +24,46 @@ object SpecialMayorScreen : ElectionViewerScreen() {
     override fun onSecondPassed(event: SecondPassedEvent) {
         if (!isInGui()) return
 
-        ElectionViewerUtils.getNextSpecialMayors(SkyBlockTime.now().year).let { nextMayors ->
-            display = Renderable.verticalContainer(
-                listOf(
-                    Renderable.string("Next Special Mayors", horizontalAlign = HorizontalAlignment.CENTER),
-                    Renderable.string(
-                        "The next three special mayors and the year they will (most likely) be elected",
-                        horizontalAlign = HorizontalAlignment.CENTER,
+        val specialMayorRenderables = ElectionViewerUtils.getNextSpecialMayors(SkyBlockTime.now().year).let { nextMayors ->
+            nextMayors.map { (name, year) ->
+                val electionTime = SkyBlockTime(year, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
+                val color = MayorAPI.mayorNameToColorCode(name)
+                Renderable.horizontalContainer(
+                    listOf(
+                        ElectionViewerUtils.getFakeMayor(Mayor.getMayorFromName(name) ?: Mayor.UNKNOWN),
+                        Renderable.verticalContainer(
+                            listOf(
+                                "$color$name",
+                                "in year $color$year",
+                                "Election in: $color${electionTime.timeUntil().format(maxUnits = 2)}",
+                                "Election at: $color${electionTime.formattedDate("EEEE, MMM d h:mm a")}",
+                            ).map { Renderable.wrappedString(it, 130) },
+                            spacing = 5,
+                            verticalAlign = VerticalAlignment.CENTER,
+                        ),
                     ),
-                    Renderable.horizontalContainer(
-                        nextMayors.map { (name, year) ->
-                            val electionTime = SkyBlockTime(year, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
-                            val color = MayorAPI.mayorNameToColorCode(name)
-                            Renderable.horizontalContainer(
-                                listOf(
-                                    ElectionViewerUtils.getFakeMayor(Mayor.getMayorFromName(name) ?: Mayor.UNKNOWN),
-                                    Renderable.verticalContainer(
-                                        listOf(
-                                            "$color$name",
-                                            "in year $color$year",
-                                            "Election in: $color${electionTime.timeUntil().format(maxUnits = 2)}",
-                                            "Election at: $color${electionTime.formattedDate("EEEE, MMM d h:mm a")}",
-                                        ).map { Renderable.wrappedString(it, 130) },
-                                        spacing = 5,
-                                        verticalAlign = VerticalAlignment.CENTER,
-                                    ),
-                                ),
-                                spacing = 10,
-                            )
-                        },
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                        spacing = 10,
-                    ),
-                ),
-                spacing = 20,
-                verticalAlign = VerticalAlignment.CENTER,
-                horizontalAlign = HorizontalAlignment.CENTER,
-            )
+                    spacing = 10,
+                )
+            }
         }
+
+        display = Renderable.verticalContainer(
+            listOf(
+                Renderable.string("Next Special Mayors", horizontalAlign = HorizontalAlignment.CENTER),
+                Renderable.string(
+                    "The next three special mayors and the year they will (most likely) be elected",
+                    horizontalAlign = HorizontalAlignment.CENTER,
+                ),
+                Renderable.horizontalContainer(
+                    specialMayorRenderables,
+                    horizontalAlign = HorizontalAlignment.CENTER,
+                    spacing = 10,
+                ),
+            ),
+            spacing = 20,
+            verticalAlign = VerticalAlignment.CENTER,
+            horizontalAlign = HorizontalAlignment.CENTER,
+        )
 
     }
 
