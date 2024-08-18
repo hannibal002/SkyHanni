@@ -60,11 +60,11 @@ object DungeonFinderFeatures {
 
     /**
      * REGEX-TEST: The Catacombs
-     * REGEX-TEST: Master Mode The Catacombs
+     * REGEX-TEST: MM The Catacombs
      */
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(Master Mode The Catacombs).*",
+        "(The Catacombs).*|.*(MM The Catacombs).*",
     )
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
