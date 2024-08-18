@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.time.ZoneId
 
 @SkyHanniModule
 object SpecialMayorScreen : ElectionViewerScreen() {
@@ -28,7 +27,7 @@ object SpecialMayorScreen : ElectionViewerScreen() {
         ElectionViewerUtils.getNextSpecialMayors(SkyBlockTime.now().year).let { nextMayors ->
             display = Renderable.verticalContainer(
                 listOf(
-                    Renderable.string("Next Mayors", horizontalAlign = HorizontalAlignment.CENTER),
+                    Renderable.string("Next Special Mayors", horizontalAlign = HorizontalAlignment.CENTER),
                     Renderable.string(
                         "The next three special mayors and the year they will (most likely) be elected",
                         horizontalAlign = HorizontalAlignment.CENTER,
