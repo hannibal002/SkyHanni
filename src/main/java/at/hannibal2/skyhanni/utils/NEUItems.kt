@@ -137,10 +137,16 @@ object NEUItems {
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
+
+            // we ignore all builder blocks from the item name -> internal name cache
+            // because builder blocks can have the same display name as normal items.
+            if (rawInternalName.startsWith("BUILDER_")) continue
+
             val internalName = rawInternalName.asInternalName()
 
-            // TODO remove one of them once neu is consistent
+            // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
+            name = name.removePrefix("§f§f§7[lvl {lvl}] ")
             name = name.removePrefix("§7[lvl 1➡100] ")
 
             if (name.contains("[lvl 1➡100]")) {
@@ -185,7 +191,8 @@ object NEUItems {
     ): Double? = this.getPriceOrNullNew(priceSource, pastRecipes)
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
-    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? = getRawCraftCostOrNullNew(pastRecipes)
+    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
+        getRawCraftCostOrNullNew(ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes)
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
@@ -349,6 +356,8 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
+        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
+        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
         if (NEUOverlay.searchBarHasFocus) return true
 
