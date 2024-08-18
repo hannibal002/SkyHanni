@@ -23,29 +23,10 @@ object CurrentMayorScreen : ElectionViewerScreen() {
     override fun onSecondPassed(event: SecondPassedEvent) {
         if (!isInGui()) return
 
-        val mayor = MayorAPI.currentMayor
-        val minister = MayorAPI.currentMinister
+        val mayor = MayorAPI.currentMayor ?: return
+        val minister = MayorAPI.currentMinister ?: return
 
-        val mainContent = /*if (mayor == null || minister == null) {
-            Renderable.verticalContainer(
-                listOf(
-                    Renderable.string("§cNo/Unknown Mayor & Minister", horizontalAlign = HorizontalAlignment.CENTER),
-                    Renderable.verticalContainer(
-                        listOf(
-                            Renderable.string("Try joining SkyBlock or restarting your game."),
-                            Renderable.string("If the issue persists, contact support."),
-                        ),
-                        spacing = 5,
-                        verticalAlign = VerticalAlignment.CENTER,
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                    ),
-                ),
-                spacing = 20,
-                verticalAlign = VerticalAlignment.CENTER,
-                horizontalAlign = HorizontalAlignment.CENTER,
-            )
-        } else {*/
-            Renderable.verticalContainer(
+        val mainContent = Renderable.verticalContainer(
                 listOf(
                     Renderable.string("Current Mayor & Minister", horizontalAlign = HorizontalAlignment.CENTER),
                     Renderable.string(
@@ -54,8 +35,8 @@ object CurrentMayorScreen : ElectionViewerScreen() {
                     ),
                     Renderable.horizontalContainer(
                         listOf(
-                            getMayorRenderable(mayor!!, "Mayor"),
-                            getMayorRenderable(minister!!, "Minister"),
+                            getMayorRenderable(mayor, "Mayor"),
+                            getMayorRenderable(minister, "Minister"),
                         ),
                         spacing = 50,
                     ),
@@ -64,7 +45,6 @@ object CurrentMayorScreen : ElectionViewerScreen() {
                 verticalAlign = VerticalAlignment.CENTER,
                 horizontalAlign = HorizontalAlignment.CENTER,
             )
-        //}
 
         display = Renderable.drawInsideRoundedRect(
             Renderable.doubleLayered(
