@@ -27,7 +27,7 @@ object SplatterHearts {
         if (event.count != 3 || event.speed != 0f) return
 
         if (lastHearts.passedSince() > 50.milliseconds) {
-            shownHearts = currentHearts
+            shownHearts = currentHearts.toSet()
             currentHearts.clear()
         }
         lastHearts = SimpleTimeMark.now()
