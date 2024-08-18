@@ -5,14 +5,12 @@ import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 
 @SkyHanniModule
 object CurrentMayorScreen : ElectionViewerScreen() {
@@ -26,33 +24,24 @@ object CurrentMayorScreen : ElectionViewerScreen() {
         val mayor = MayorAPI.currentMayor ?: return
         val minister = MayorAPI.currentMinister ?: return
 
-        val mainContent = Renderable.verticalContainer(
-                listOf(
-                    Renderable.string("Current Mayor & Minister", horizontalAlign = HorizontalAlignment.CENTER),
-                    Renderable.string(
-                        "Next election in §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}",
-                        horizontalAlign = HorizontalAlignment.CENTER,
-                    ),
-                    Renderable.horizontalContainer(
-                        listOf(
-                            getMayorRenderable(mayor, "Mayor"),
-                            getMayorRenderable(minister, "Minister"),
-                        ),
-                        spacing = 50,
-                    ),
+        display = Renderable.verticalContainer(
+            listOf(
+                Renderable.string("Current Mayor & Minister", horizontalAlign = HorizontalAlignment.CENTER),
+                Renderable.string(
+                    "Next election in §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}",
+                    horizontalAlign = HorizontalAlignment.CENTER,
                 ),
-                spacing = 20,
-                verticalAlign = VerticalAlignment.CENTER,
-                horizontalAlign = HorizontalAlignment.CENTER,
-            )
-
-        display = Renderable.drawInsideRoundedRect(
-            Renderable.doubleLayered(
-                Renderable.placeholder(guiWidth, guiHeight),
-                mainContent,
+                Renderable.horizontalContainer(
+                    listOf(
+                        getMayorRenderable(mayor, "Mayor"),
+                        getMayorRenderable(minister, "Minister"),
+                    ),
+                    spacing = 50,
+                ),
             ),
-            Color.BLACK.addAlpha(180),
-            padding = PADDING,
+            spacing = 20,
+            verticalAlign = VerticalAlignment.CENTER,
+            horizontalAlign = HorizontalAlignment.CENTER,
         )
     }
 

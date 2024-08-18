@@ -1,24 +1,53 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.Mayor
+import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonParser
+import net.minecraft.client.Minecraft
+import net.minecraft.entity.passive.EntityVillager
 import java.util.Base64
 
 object ElectionViewerUtils {
 
-    fun getFakeMayor(mayor: Mayor) = Renderable.fakePlayer(
-        FakePlayer.getFakePlayer(getSkinFromMayorName(mayor.name)),
-        followMouse = true,
-        entityScale = 50,
-    )
+    /**
+     * The code doesn't work correctly if the [currentYear] is below 16
+     * @param currentYear The current year
+     * @return A list of the next three mayors and the year they will be elected
+     */
+    fun getNextMayors(currentYear: Int) = listOf(
+        Pair("Scorpius", 0),
+        Pair("Derpy", 8),
+        Pair("Jerry", 16),
+    ).map { it.first to it.second + ((currentYear - it.second) / 24 + 1) * 24 }.sortedBy { it.second }.take(3)
+
+    fun getFakeMayor(mayor: Mayor): Renderable {
+        // NEU Repo store special mayors with SPECIAL infix
+        val mayorName = if (mayor in listOf(Mayor.DERPY, Mayor.JERRY, Mayor.SCORPIUS)) {
+            mayor.name + "_SPECIAL"
+        } else {
+            mayor.name
+        }
+
+        // Jerry is a Villager, not a player
+        val entity = if (mayor == Mayor.JERRY) {
+            EntityVillager(Minecraft.getMinecraft().theWorld)
+        } else {
+            FakePlayer.getFakePlayer(getSkinFromMayorName(mayorName))
+        }
+
+        return Renderable.fakePlayer(
+            entity,
+            followMouse = true,
+            entityScale = 50,
+        )
+    }
 
     fun getFakeCandidate(candidate: MayorCandidate) = Renderable.fakePlayer(
         FakePlayer.getFakePlayer(getSkinFromMayorName(candidate.name)),

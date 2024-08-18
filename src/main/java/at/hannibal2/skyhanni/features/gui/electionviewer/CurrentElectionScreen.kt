@@ -98,7 +98,7 @@ object CurrentElectionScreen : ElectionViewerScreen() {
             }
         }
 
-        val mainContent = Renderable.verticalContainer(
+        display = Renderable.verticalContainer(
             listOf(
                 Renderable.string("Current Election", horizontalAlign = HorizontalAlignment.CENTER),
                 Renderable.horizontalContainer(candidateRenderables, spacing = 10),
@@ -106,15 +106,6 @@ object CurrentElectionScreen : ElectionViewerScreen() {
             verticalAlign = VerticalAlignment.CENTER,
             horizontalAlign = HorizontalAlignment.CENTER,
             spacing = 20,
-        )
-
-        display = Renderable.drawInsideRoundedRect(
-            Renderable.doubleLayered(
-                Renderable.placeholder(guiWidth, guiHeight),
-                mainContent,
-            ),
-            padding = PADDING,
-            color = Color.BLACK.addAlpha(180),
         )
     }
 

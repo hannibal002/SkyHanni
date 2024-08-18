@@ -62,8 +62,14 @@ abstract class ElectionViewerScreen : GuiScreen() {
             onClick = { SkyHanniMod.screenToOpen = CurrentElectionScreen },
         )
 
+        val specialButton = createButton(
+            label = "Special",
+            isActive = currentScreen is SpecialMayorScreen,
+            onClick = { SkyHanniMod.screenToOpen = SpecialMayorScreen },
+        )
+
         return Renderable.verticalContainer(
-            listOf(mayorButton, electionButton),
+            listOf(mayorButton, electionButton, specialButton),
             spacing = 10,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
@@ -88,7 +94,14 @@ abstract class ElectionViewerScreen : GuiScreen() {
             windowHeight / 2 - guiHeight / 2 - PADDING,
         )
         position.renderRenderable(
-            renderable,
+            Renderable.drawInsideRoundedRect(
+                Renderable.doubleLayered(
+                    Renderable.placeholder(guiWidth, guiHeight),
+                    renderable,
+                ),
+                Color.BLACK.addAlpha(180),
+                padding = PADDING,
+            ),
             posLabel = posLabel,
             addToGuiManager = false,
         )
