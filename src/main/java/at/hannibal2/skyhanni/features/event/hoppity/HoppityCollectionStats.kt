@@ -39,9 +39,15 @@ object HoppityCollectionStats {
     private val config get() = ChocolateFactoryAPI.config
 
     private val patternGroup = ChocolateFactoryAPI.patternGroup.group("collection")
+
+    /**
+     * REGEX-TEST: (1/17) Hoppity's Collection
+     * REGEX-TEST: (12/17) Hoppity's Collection
+     * REGEX-TEST: Hoppity's Collection
+     */
     private val pagePattern by patternGroup.pattern(
         "page.current",
-        "\\((?<page>\\d+)/(?<maxPage>\\d+)\\) Hoppity's Collection",
+        "(?:\\((?<page>\\d+)\\/(?<maxPage>\\d+)\\) )?Hoppity's Collection",
     )
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
