@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemUtils.getAttributeFromShard
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -128,16 +129,8 @@ object EstimatedItemValueCalculator {
         if (isKuudraSet(internalName)) {
             genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
-        if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
-            val price = getPriceOrCompositePriceForAttribute(
-                "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
-                attributes[0].second,
-            )
-            if (price != null) {
-                val name = attributes[0].first.fixMending().allLettersFirstUppercase()
-                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${price.shortFormat()}§7)")
-                return price
-            }
+        stack.getAttributeFromShard()?.let {
+            return 0.0
         }
         if (attributes.size != 2) return 0.0
         val basePrice = internalName.asInternalName().getPriceOrNull() ?: 0.0
@@ -546,6 +539,16 @@ object EstimatedItemValueCalculator {
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = removeKuudraArmorPrefix(stack.getInternalName().asString()).asInternalName()
+
+        stack.getAttributeFromShard()?.let {
+            val price = it.getAttributePrice()
+            if (price != null) {
+                val name = it.getAttributeName()
+                list.add("§7Base item: $name §7(§6" + price.shortFormat() + "§7)")
+                return price
+            }
+        }
+
         var price = internalName.getPrice()
         if (price == -1.0) {
             price = 0.0
@@ -771,4 +774,15 @@ object EstimatedItemValueCalculator {
     private fun NEUInternalName.getPriceOrNull(): Double? {
         return getPriceOrNull(config.priceSource.get())
     }
+
+    fun Pair<String, Int>.getAttributeName(): String {
+        val name = first.fixMending().allLettersFirstUppercase()
+        return "§b$name ${second} Shard"
+    }
+
+    fun Pair<String, Int>.getAttributePrice(): Double? =
+        EstimatedItemValueCalculator.getPriceOrCompositePriceForAttribute(
+            "ATTRIBUTE_SHARD+ATTRIBUTE_" + first,
+            second,
+        )
 }
