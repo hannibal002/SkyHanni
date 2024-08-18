@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.Mayor
-import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.FakePlayer
@@ -16,16 +15,19 @@ import java.util.Base64
 
 object ElectionViewerUtils {
 
+    private val specialMayorStart = mapOf(
+        "Scorpius" to 1,
+        "Derpy" to 9,
+        "Jerry" to 17,
+    )
+
     /**
-     * The code doesn't work correctly if the [currentYear] is below 16
+     * The code doesn't work correctly if the [currentYear] is below 17
      * @param currentYear The current year
-     * @return A list of the next three mayors and the year they will be elected
+     * @return A list of the next three special mayors and the year they will be elected
      */
-    fun getNextMayors(currentYear: Int) = listOf(
-        Pair("Scorpius", 0),
-        Pair("Derpy", 8),
-        Pair("Jerry", 16),
-    ).map { it.first to it.second + ((currentYear - it.second) / 24 + 1) * 24 }.sortedBy { it.second }.take(3)
+    fun getNextSpecialMayors(currentYear: Int) =
+        specialMayorStart.map { it.key to it.value + ((currentYear - it.value) / 24 + 1) * 24 }.sortedBy { it.second }
 
     fun getFakeMayor(mayor: Mayor): Renderable {
         // NEU Repo store special mayors with SPECIAL infix

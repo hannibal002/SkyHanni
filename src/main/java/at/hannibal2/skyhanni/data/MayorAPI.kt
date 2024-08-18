@@ -105,8 +105,8 @@ object MayorAPI {
     var nextMayorTimestamp = SimpleTimeMark.farPast()
         private set
 
-    private const val ELECTION_END_MONTH = 3 // Late Spring
-    private const val ELECTION_END_DAY = 27
+    const val ELECTION_END_MONTH = 3 // Late Spring
+    const val ELECTION_END_DAY = 27
 
     /**
      * @param input: The name of the mayor
