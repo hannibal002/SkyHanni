@@ -225,7 +225,7 @@ object MayorAPI {
             val currentMayorName = data.mayor.name
             if (lastMayor?.name != currentMayorName) {
                 currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-                ChatUtils.debug("Mayor changed to $currentMayorName with ${pluralize(data.mayor.perks.size, "perk")}")
+                ChatUtils.debug("Mayor changed to $currentMayorName with ${pluralize(data.mayor.perks.size, "perk", withNumber = true)}")
                 currentMinister = setAssumeMayorJson(data.mayor.minister.name, listOf(data.mayor.minister.perk))
                 ChatUtils.debug("Minister changed to ${data.mayor.minister.name} with 1 perk")
             }
