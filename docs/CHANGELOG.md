@@ -187,6 +187,7 @@
 + The Rancher Boots Optimal Speed GUI now highlights the crop corresponding to the last held tool. - Empa (https://github.com/hannibal002/SkyHanni/pull/2137)
 + Added Slug pet to the FF Guide. - maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/2249)
 + Added Copper dye to the list of blocked visitor rewards. - not-a-cow (https://github.com/hannibal002/SkyHanni/pull/2329)
++ Added Copper Dye to Visitor Drop Statistics. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2346)
 
 #### Hoppity Event Improvements
 
@@ -361,6 +362,7 @@
 + Fixed an issue where TunnelMaps could stop functioning. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2277)
 + Fixed blocks mined by Efficient Miner not being detected in the Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2307)
 + Fixed empty lines not being blocked by the Powder Mining filter. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2309)
++ Fixed a rare crash occurring on a mining island. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2354)
 
 #### Garden Fixes
 
@@ -393,6 +395,7 @@
 + Fixed visitor shopping list with AH items. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2297)
 + Fixed Zorro's Cape not working with Green Thumb in the FF stats breakdown in item lore. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2299)
 + Fixed Composter Overlay calculating incorrectly while Composter Display is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2294)
++ Fixed own garden not being detected when swapping islands from a guesting server. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2355)
 
 #### Chocolate Factory & Hoppity Hunt Fixes
 
@@ -425,6 +428,7 @@
 + Fixed stray rabbit production time tooltip display. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2239)
 + Fixed Hoppity custom goals being off by one level. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2280)
 + Fixed Custom Reminder not working in the Chocolate Shop. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2334)
++ Fixed a warning about space in the Chocolate Factory appearing even when the barn was already large enough to store all rabbits. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2356)
 
 #### Custom Scoreboard Fixes
 
@@ -446,6 +450,8 @@
 + Fixed Scoreboard Reset not updating the draggable list. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2252)
 + Fixed a scoreboard error message when a Hypixel bug shows a negative number of magma cubes remaining in the scoreboard. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2267)
 + Fixed Custom Scoreboard Error when having more than 1000 medals. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2319)
++ Fixed a Custom Scoreboard error during the Winter Event. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2345)
++ Fixed getting mayor/minister information for Custom Scoreboard. - Luna (https://github.com/hannibal002/SkyHanni/pull/2343)
 
 #### Dungeon Fixes
 
@@ -474,6 +480,7 @@
 + Fixed a rare double hook detection issue. - appable (https://github.com/hannibal002/SkyHanni/pull/2125)
 + Fixed Commission Mob Highlighter incorrectly highlighting Deep Sea Protectors as Automatons. - Luna (https://github.com/hannibal002/SkyHanni/pull/2130)
 + Fixed Squid Pet counting towards the Fishing Timer. - Empa (https://github.com/hannibal002/SkyHanni/pull/1960)
++ Fixed an error during fishing. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2350)
 
 #### Performance Fixes
 
@@ -490,6 +497,7 @@
 
 + Fixed rift slayer warning showing while hitting Oubliette Guard. -
   hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1950)
++ Fixed an error when killing Splatter Cruxes in the Rift. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2349)
 
 #### Inventory Fixes
 
@@ -518,6 +526,7 @@
 + Fixed the incorrect "This item has no attributes" message appearing in the Attribute Fusion menu for some items. - Luna (https://github.com/hannibal002/SkyHanni/pull/2304)
 + Fixed shift-clicking items in GUIs triggering the Item Pickup Log. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2305)
 + Fixed the Master Mode Dungeon stack size display in the party finder menu. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2316)
++ Fixed the Item Pickup Log detecting "Magical Map" in dungeons when using Skytils. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2351)
 
 #### Combat Fixes
 
@@ -570,6 +579,10 @@
 + Fixed Contributor name tag flickering when using Patcher. - nea (https://github.com/hannibal002/SkyHanni/pull/2296)
 + Fixed Discord Rich Presence dynamic fallback. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/2279)
     + Placeholder messages that should not be visible will no longer appear.
++ Fixed pet detection with newer NEU versions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2358)
++ Fixed Item Trackers displaying the incorrect NPC price. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2352)
++ Fixed players with similar names to friends being incorrectly marked as friends in the tab list. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2353)
++ Fixed color codes in Discord RPC pet status. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/2344)
 
 ### Technical Details
 

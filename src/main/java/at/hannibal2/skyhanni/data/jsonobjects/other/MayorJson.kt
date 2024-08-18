@@ -30,7 +30,7 @@ data class MayorCandidate(
 data class Minister(
     @Expose val key: String,
     @Expose val name: String,
-    @Expose val perk: List<MayorPerk>,
+    @Expose val perk: MayorPerk,
 )
 
 data class MayorPerk(
