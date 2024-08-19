@@ -59,6 +59,11 @@ public class InventoryConfig {
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @Expose
+    @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
+    @Accordion
+    public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
+
+    @Expose
     @Category(name = "Craftable Item List", desc = "")
     @Accordion
     public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
@@ -257,4 +262,10 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeHeldInLore = false;
+
+    @Expose
+    @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean stonkOfStonkPrice = true;
 }

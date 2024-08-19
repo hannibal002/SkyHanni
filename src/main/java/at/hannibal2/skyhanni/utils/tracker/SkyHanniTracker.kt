@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
@@ -49,7 +50,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             reset(DisplayMode.TOTAL, "Reset total $name!")
         },
         "§eClick to confirm.",
-        oneTimeClick = true
+        oneTimeClick = true,
     )
 
     fun modify(modifyFunction: (Data) -> Unit) {
@@ -72,7 +73,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
-        val currentlyOpen = Minecraft.getMinecraft().currentScreen is GuiInventory
+        val currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
         if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
             return
         }
@@ -110,14 +111,15 @@ open class SkyHanniTracker<Data : TrackerData>(
         listOf(
             "§cThis will reset your",
             "§ccurrent session of",
-            "§c$name"
+            "§c$name",
         ),
         onClick = {
             if (sessionResetTime.passedSince() > 3.seconds) {
                 reset(DisplayMode.SESSION, "Reset this session of $name!")
                 sessionResetTime = SimpleTimeMark.now()
             }
-        })
+        },
+    )
 
     private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
         "§7Display Mode: ",
@@ -127,7 +129,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             displayMode = it
             storedTrackers[name] = it
             update()
-        }
+        },
     )
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
