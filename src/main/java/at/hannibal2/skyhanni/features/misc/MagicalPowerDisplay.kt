@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -47,7 +48,15 @@ object MagicalPowerDisplay {
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
 
+    private val abiphoneNamePattern by abiphoneGroup.pattern(
+        "name",
+        "Abiphone .*"
+    )
 
+    private val yourContactPattern by abiphoneGroup.pattern(
+        "contacts",
+        """"Your contacts: (?<contacts>\d+)/\d+"""
+    )
 
     @SubscribeEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
@@ -74,14 +83,14 @@ object MagicalPowerDisplay {
     @SubscribeEvent
     fun onInventoryOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (event.inventoryName.startsWith("Abiphone")) {
+        if (abiphoneNamePattern.matches(event.inventoryName)) {
             val theBookLore = event.inventoryItems[51]?.getLore() ?: return
             for (line in theBookLore) {
                 val stripped = line.removeColor()
-                if (stripped.startsWith("Your contacts: ")) {
-                    contactAmount = stripped.split(" ")[2].split("/")[0].toInt()
-                    return
-                }
+
+                yourContactPattern.matchMatcher(
+                    stripped
+                ) { contactAmount = group("contacts").toInt(); return }
             }
         }
     }
