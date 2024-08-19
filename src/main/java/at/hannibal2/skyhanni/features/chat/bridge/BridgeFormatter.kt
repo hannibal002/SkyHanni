@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat.bridge
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.hypixel.chat.event.GuildChatEvent
@@ -21,7 +21,7 @@ object BridgeFormatter {
         if (!player.contains(config.bridgeName.spaceless())) return
 
         val sep = config.separator.spaceless()
-        val pattern = """^\s*(\S+)\s*${Regex.escape(sep)}\s+(.*)$""".toRegex()
+        val pattern = """^\s*(.+)\s*${Regex.escape(sep)}\s*(.*)$""".toRegex()
         val matchRes = pattern.matchEntire(message) ?: return
         val (ign, msg) = matchRes.destructured
 

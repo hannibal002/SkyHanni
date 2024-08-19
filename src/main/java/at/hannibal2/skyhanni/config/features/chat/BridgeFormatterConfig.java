@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.features.chat.BridgeFormatter;
+import at.hannibal2.skyhanni.features.chat.bridge.BridgeFormatter;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
@@ -15,7 +15,7 @@ public class BridgeFormatterConfig {
     @ConfigOption(
         name = "What is a Bridge?",
         desc = "A bridge is an account that forwards Hypixel guild chat to a Discord channel and vice versa." +
-            "Some guild uses this to communicate with their Discord members."
+            "Guilds can use this to communicate with their members on Discord from within the game."
     )
     @ConfigEditorInfoText
     public String bridgeInfo = "§eBridge Info";
