@@ -26,8 +26,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
-    private var contactAmount: Int?
-        get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
+    private var contactAmount: Int
+        get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount ?: 0
         private set(value) {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
@@ -51,12 +51,13 @@ object MagicalPowerDisplay {
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
 
     /*
-    * REGEX-TEST: Accessory Bag
-    * REGEX-TEST: Accessory Bag (1/75)
-    * REGEX-TEST: Accessory Bag (909/394294)
-    * REGEX-TEST: Auctions Browser
-    * REGEX-TEST: Auctions: "ligma"
-    * REGEX-TEST: Auctions: ""sugoma""
+    * REGEX-TEST: Abiphone X Plus
+    * REGEX-TEST: Abiphone X Plus Special Edition
+    * REGEX-TEST: Abiphone XI Ultra Style
+    * REGEX-TEST: Abiphone XII Mega Color
+    * REGEX-TEST: Abiphone XIII Pro
+    * REGEX-TEST: Abiphone XIV Enormous Purple
+    * REGEX-TEST: Abiphone Flip
     * */
     private val abiphoneNamePattern by abiphoneGroup.pattern(
         "name",
@@ -64,12 +65,9 @@ object MagicalPowerDisplay {
     )
 
     /*
-    * REGEX-TEST: Accessory Bag
-    * REGEX-TEST: Accessory Bag (1/75)
-    * REGEX-TEST: Accessory Bag (909/394294)
-    * REGEX-TEST: Auctions Browser
-    * REGEX-TEST: Auctions: "ligma"
-    * REGEX-TEST: Auctions: ""sugoma""
+    * REGEX-TEST: Your contacts: 0/0
+    * REGEX-TEST: Your contacts: 1/75
+    * REGEX-TEST: Your contacts: 52/60
     * */
     private val yourContactPattern by abiphoneGroup.pattern(
         "contacts",
