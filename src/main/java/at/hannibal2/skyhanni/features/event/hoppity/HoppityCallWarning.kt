@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -8,14 +9,18 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HoppityCallWarning {
@@ -43,6 +48,16 @@ object HoppityCallWarning {
     private var nextWarningTime = 0L
     private var finalWarningTime = 0L
     private const val CALL_LENGTH_MS = 7000
+    private var lastAcceptSent = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onKeybind(event: GuiKeyPressEvent) {
+        if (!config.acceptHotkey.isKeyHeld()) return
+        if (lastAcceptSent.passedSince() < 3.seconds) return
+        lastAcceptSent = SimpleTimeMark.now()
+        // Call-back? Hoppity ID: eaf78cc9-260d-407f-b1df-efea83e5038a
+        HypixelCommands.cb("eaf78cc9-260d-407f-b1df-efea83e5038a")
+    }
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {

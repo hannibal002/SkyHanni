@@ -6,9 +6,11 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 public class HoppityCallWarningConfig {
 
@@ -17,6 +19,16 @@ public class HoppityCallWarningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Accept Call Hotkey",
+        desc = "Accept the call from hoppity by pressing this keybind."
+    )
+    @ConfigEditorKeybind(
+        defaultKey = Keyboard.KEY_NONE
+    )
+    public int acceptHotkey = Keyboard.KEY_NONE;
 
     @Expose
     @ConfigOption(name = "Warning Sound", desc = "The sound that plays when hoppity calls.\n" +

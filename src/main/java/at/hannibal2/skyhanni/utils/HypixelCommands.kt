@@ -145,6 +145,10 @@ object HypixelCommands {
         send("chatprompt $prompt")
     }
 
+    fun cb(uuid: String) {
+        send("cb $uuid")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function
