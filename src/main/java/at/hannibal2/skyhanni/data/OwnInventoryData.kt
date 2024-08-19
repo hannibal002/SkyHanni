@@ -154,7 +154,7 @@ object OwnInventoryData {
         if (inventoryName == "Your Bids" && itemName == "§aClaim All") {
             for (stack in InventoryUtils.getItemsInOpenChest().map { it.stack }) {
                 if (stack.getLore().any { it == "§7Status: §aSold!" || it == "7Status: §aEnded!" }) {
-                    val internalName = stack.getInternalNameOrNull()
+                    val internalName = stack.getInternalNameOrNull() ?: return
                     OwnInventoryData.ignoreItem(5.seconds, { it == internalName })
                 }
             }
