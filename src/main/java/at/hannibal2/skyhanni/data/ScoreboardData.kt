@@ -22,13 +22,7 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() = grabObjectiveTitle()
-
-    fun grabObjectiveTitle(): String {
-        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return ""
-        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return ""
-        return objective.displayName
-    }
+    val objectiveTitle: String get() = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName ?: ""
 
     private var dirty = false
 
