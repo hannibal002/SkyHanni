@@ -661,5 +661,5 @@ public class ProfileSpecificStorage {
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 
     @Expose
-    public int abiphoneContactAmount = -1;
+    public int abiphoneContactAmount = 0;
 }

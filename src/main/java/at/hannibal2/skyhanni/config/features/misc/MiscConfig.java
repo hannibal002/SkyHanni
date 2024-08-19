@@ -288,6 +288,4 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
-
-
 }

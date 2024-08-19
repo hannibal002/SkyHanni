@@ -26,9 +26,11 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
-    private var contactAmount: Int
-        get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount ?: -1
-        private set(value) { ProfileStorageData.profileSpecific?.abiphoneContactAmount = value }
+    private var contactAmount: Int?
+        get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
+        private set(value) {
+            ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
+        }
 
     private val hegemonyArtifact = "HEGEMONY_ARTIFACT".asInternalName()
     private val riftPrism = "RIFT_PRISM".asInternalName()
@@ -43,19 +45,35 @@ object MagicalPowerDisplay {
     * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$"""
+        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$""",
     )
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
 
+    /*
+    * REGEX-TEST: Accessory Bag
+    * REGEX-TEST: Accessory Bag (1/75)
+    * REGEX-TEST: Accessory Bag (909/394294)
+    * REGEX-TEST: Auctions Browser
+    * REGEX-TEST: Auctions: "ligma"
+    * REGEX-TEST: Auctions: ""sugoma""
+    * */
     private val abiphoneNamePattern by abiphoneGroup.pattern(
         "name",
-        "Abiphone .*"
+        "Abiphone .*",
     )
 
+    /*
+    * REGEX-TEST: Accessory Bag
+    * REGEX-TEST: Accessory Bag (1/75)
+    * REGEX-TEST: Accessory Bag (909/394294)
+    * REGEX-TEST: Auctions Browser
+    * REGEX-TEST: Auctions: "ligma"
+    * REGEX-TEST: Auctions: ""sugoma""
+    * */
     private val yourContactPattern by abiphoneGroup.pattern(
         "contacts",
-        """"Your contacts: (?<contacts>\d+)/\d+"""
+        """"Your contacts: (?<contacts>\d+)/\d+""",
     )
 
     @SubscribeEvent
@@ -64,17 +82,18 @@ object MagicalPowerDisplay {
         if (!acceptedInvPattern.matches(InventoryUtils.openInventoryName().removeColor())) return
 
         val item = event.stack
-        val rarity = item.isAccessory() ?: return
+        val rarity = item.getAccessoryRarityOrNull() ?: return
         val itemID = item.getInternalNameOrNull() ?: return
+        val amount = contactAmount ?: 0
 
         var endMP = rarity.toMP() ?: ErrorManager.skyHanniError(
-            "Unknown rarity '$rarity' for item '${item.displayName}§7'"
+            "Unknown rarity '$rarity' for item '${item.displayName}§7'",
         )
 
         when (itemID) {
             hegemonyArtifact -> endMP *= 2
             riftPrism -> endMP = 11
-            else -> if (itemID.isAbicase()) endMP += contactAmount / 2
+            else -> if (itemID.isAbicase()) endMP += amount / 2
         }
 
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}${endMP}"
@@ -83,15 +102,15 @@ object MagicalPowerDisplay {
     @SubscribeEvent
     fun onInventoryOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (abiphoneNamePattern.matches(event.inventoryName)) {
-            val theBookLore = event.inventoryItems[51]?.getLore() ?: return
-            for (line in theBookLore) {
-                val stripped = line.removeColor()
+        if (!abiphoneNamePattern.matches(event.inventoryName)) return
 
-                yourContactPattern.matchMatcher(
-                    stripped
-                ) { contactAmount = group("contacts").toInt(); return }
-            }
+        val theBookLore = event.inventoryItems[51]?.getLore() ?: return
+        for (line in theBookLore) {
+            val stripped = line.removeColor()
+
+            yourContactPattern.matchMatcher(
+                stripped,
+            ) { contactAmount = group("contacts").toInt(); return }
         }
     }
 
@@ -107,7 +126,7 @@ object MagicalPowerDisplay {
         else -> null
     }
 
-    private fun ItemStack.isAccessory(): LorenzRarity? {
+    private fun ItemStack.getAccessoryRarityOrNull(): LorenzRarity? {
         val category = this.getItemCategoryOrNull() ?: return null
         if (category != ItemCategory.ACCESSORY && category != ItemCategory.HATCESSORY) return null
         return this.getItemRarityOrNull()
