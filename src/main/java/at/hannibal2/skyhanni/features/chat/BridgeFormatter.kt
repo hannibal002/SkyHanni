@@ -40,8 +40,8 @@ object BridgeFormatter {
     fun testFormat() {
         val toSend = config.bridgeFormat
             .replace("&", "§")
-            .replace("%ign%", "DiscordName")
-            .replace("%msg%", "DiscordMessage")
+            .replace("%ign%", "Some Discord User")
+            .replace("%msg%", "Some Discord Message")
         ChatUtils.chat(toSend, prefix = false)
     }
 }
