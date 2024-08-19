@@ -82,7 +82,6 @@ object MagicalPowerDisplay {
         val item = event.stack
         val rarity = item.getAccessoryRarityOrNull() ?: return
         val itemID = item.getInternalNameOrNull() ?: return
-        val amount = contactAmount ?: 0
 
         var endMP = rarity.toMP() ?: ErrorManager.skyHanniError(
             "Unknown rarity '$rarity' for item '${item.displayName}§7'",
@@ -91,7 +90,7 @@ object MagicalPowerDisplay {
         when (itemID) {
             hegemonyArtifact -> endMP *= 2
             riftPrism -> endMP = 11
-            else -> if (itemID.isAbicase()) endMP += amount / 2
+            else -> if (itemID.isAbicase()) endMP += contactAmount / 2
         }
 
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}${endMP}"
