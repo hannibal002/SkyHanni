@@ -22,6 +22,11 @@ public class DisplayConfig {
     public ArrowConfig arrow = new ArrowConfig();
 
     @Expose
+    @ConfigOption(name = "Chunked Stats Options", desc = "")
+    @Accordion
+    public ChunkedStatsConfig chunkedStats = new ChunkedStatsConfig();
+
+    @Expose
     @ConfigOption(name = "Events Options", desc = "")
     @Accordion
     public EventsConfig events = new EventsConfig();
@@ -78,7 +83,7 @@ public class DisplayConfig {
     public enum PowderDisplay {
         AVAILABLE("Available"),
         TOTAL("Total"),
-        BOTH("Available / All")
+        BOTH("Available / All"),
         ;
 
         private final String str;

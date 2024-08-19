@@ -75,7 +75,7 @@ object HoppityEggsCompactChat {
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
             "$mealNameFormatted! §7Duplicate $lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
-            "$mealNameFormatted! §d§lNEW $lastName §7(${lastProfit}§7)"
+            "$mealNameFormatted! §d§lNEW $lastRarity $lastName §7(${lastProfit}§7)"
         } else "?"
     }
 
@@ -87,8 +87,10 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
-            rabbitBought = true
-            compactChat(event)
+            if (group("rabbitname").equals(lastName)) {
+                rabbitBought = true
+                compactChat(event)
+            }
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
@@ -107,9 +109,14 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
+            newRabbit = true
+            groupOrNull("other")?.let {
+                lastProfit = it
+                compactChat(event)
+                return
+            }
             val chocolate = groupOrNull("chocolate")
             val perSecond = group("perSecond")
-            newRabbit = true
             lastProfit = chocolate?.let {
                 "§6+$it §7and §6+${perSecond}x c/s!"
             } ?: "§6+${perSecond}x c/s!"
