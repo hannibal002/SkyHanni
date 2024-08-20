@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -363,12 +364,11 @@ object LorenzUtils {
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.hasGroup"))
     fun Matcher.hasGroup(groupName: String): Boolean = groupOrNull(groupName) != null
 
-    // TODO move into Mining API
-    fun inAdvancedMiningIsland() = IslandType.DWARVEN_MINES.isInIsland() ||
-        IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.MINESHAFT.isInIsland()
+    @Deprecated("Use IslandTypeTags.ADVANCED_MINING.inAny() instead", ReplaceWith("IslandTypeTags.ADVANCED_MINING.inAny()"))
+    fun inAdvancedMiningIsland() = IslandTypeTags.ADVANCED_MINING.inAny()
 
-    fun inMiningIsland() = IslandType.GOLD_MINES.isInIsland() ||
-        IslandType.DEEP_CAVERNS.isInIsland() || inAdvancedMiningIsland()
+    @Deprecated("Use IslandTypeTags.MINING.inAny() instead", ReplaceWith("IslandTypeTags.MINING.inAny()"))
+    fun inMiningIsland() = IslandTypeTags.MINING.inAny()
 
     fun isBetaVersion() = UpdateManager.isCurrentlyBeta()
 

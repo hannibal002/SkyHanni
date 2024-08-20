@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -90,16 +89,9 @@ object MiningAPI {
 
     fun inGlacialTunnels() = IslandType.DWARVEN_MINES.isInIsland() && glaciteAreaPattern.matches(LorenzUtils.skyBlockArea)
 
-    fun inCustomMiningIsland() = inAnyIsland(
-        IslandType.DWARVEN_MINES,
-        IslandType.MINESHAFT,
-        IslandType.CRYSTAL_HOLLOWS,
-        IslandType.THE_END,
-        IslandType.CRIMSON_ISLE,
-        IslandType.SPIDER_DEN,
-    )
+    fun inCustomMiningIsland() = IslandTypeTags.CUSTOM_MINING.inAny()
 
-    fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
+    fun inColdIsland() = IslandTypeTags.IS_COLD.inAny()
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {

@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.HypixelData.getMaxPlayersForCurrentServer
 import at.hannibal2.skyhanni.data.HypixelData.getPlayersOnCurrentServer
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.IslandTypeTags
 import at.hannibal2.skyhanni.data.MaxwellAPI
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MiningAPI
@@ -42,7 +43,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
@@ -384,7 +384,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getPurseShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
+private fun getPurseShowWhen() = !IslandTypeTags.SB_COINS_NOT_SHOWN.inAny()
 
 private fun getMotesDisplayPair(): List<ScoreboardElementType> {
     val motes = getMotes().formatNum()
@@ -398,7 +398,7 @@ private fun getMotesDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getMotesShowWhen() = inAnyIsland(IslandType.THE_RIFT)
+private fun getMotesShowWhen() = IslandTypeTags.SB_MOTES_SHOWN.inAny()
 
 private fun getBankDisplayPair(): List<ScoreboardElementType> {
     val bank = getBank()
@@ -412,7 +412,7 @@ private fun getBankDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getBankShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
+private fun getBankShowWhen() = !IslandTypeTags.SB_COINS_NOT_SHOWN.inAny()
 
 private fun getBitsDisplayPair(): List<ScoreboardElementType> {
     val bits = BitsAPI.bits.coerceAtLeast(0).formatNum()
@@ -431,7 +431,7 @@ private fun getBitsDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getBitsShowWhen() = !HypixelData.bingo && !inAnyIsland(IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
+private fun getBitsShowWhen() = !HypixelData.bingo && !IslandTypeTags.SB_BITS_NOT_SHOWN.inAny()
 
 private fun getCopperDisplayPair(): List<ScoreboardElementType> {
     val copper = getCopper().formatNum()
@@ -445,7 +445,7 @@ private fun getCopperDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getCopperShowWhen() = inAnyIsland(IslandType.GARDEN)
+private fun getCopperShowWhen() = IslandTypeTags.SB_COPPER_SHOWN.inAny()
 
 private fun getGemsDisplayPair(): List<ScoreboardElementType> {
     val gems = getGems()
@@ -459,7 +459,7 @@ private fun getGemsDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getGemsShowWhen() = !inAnyIsland(IslandType.THE_RIFT, IslandType.CATACOMBS, IslandType.KUUDRA_ARENA)
+private fun getGemsShowWhen() = !IslandTypeTags.SB_GEMS_NOT_SHOWN.inAny()
 
 private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     val heat = getHeat()
@@ -488,8 +488,8 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
-    && ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
+private fun getColdShowWhen() = IslandTypeTags.IS_COLD.inAny() &&
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
     val northStars = getNorthStars().formatNum()
@@ -736,7 +736,7 @@ private fun getPowderDisplayPair() = buildList {
     }
 }
 
-private fun getPowderShowWhen() = inAdvancedMiningIsland()
+private fun getPowderShowWhen() = IslandTypeTags.ADVANCED_MINING.inAny()
 
 private fun getEventsDisplayPair(): List<ScoreboardElementType> = ScoreboardEvent.getEvent()
     .filterNotNull()
@@ -806,15 +806,7 @@ private fun getPartyDisplayPair() =
 private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
     false // Hidden bc the scoreboard lines already exist
 } else {
-    if (partyConfig.showPartyEverywhere) {
-        true
-    } else {
-        inAnyIsland(
-            IslandType.DUNGEON_HUB,
-            IslandType.KUUDRA_ARENA,
-            IslandType.CRIMSON_ISLE,
-        )
-    }
+    partyConfig.showPartyEverywhere || IslandTypeTags.SB_PARTY_SHOWN.inAny()
 }
 
 private fun getFooterDisplayPair(): List<ScoreboardElementType> = listOf(
