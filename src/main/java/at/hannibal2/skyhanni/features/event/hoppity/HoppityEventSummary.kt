@@ -171,21 +171,23 @@ object HoppityEventSummary {
 
     fun sendStatsMessage(it: Array<String>) {
         val statsStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
+        val currentYear = SkyBlockTime.now().year
         val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
         val statsYearFormatList = statsStorage.keys.takeIf { it.isNotEmpty() }?.map {
-            "$it${if (it == SkyBlockTime.now().year) " §a(Current)§r" else ""}"
+            "$it${if (it == currentYear) " §a(Current)§r" else ""}"
         }?.toMutableList() ?: mutableListOf()
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
+        val availableYearsFormat = "Stats are available for the following years:\n${statsYearFormatList.joinToString("§e,") { it }}"
+
         if (parsedInt == null) {
-            ChatUtils.chat("Stats are available for the following years:\n${statsYearList.joinToString("§e,") { "§b$it" }}")
+            if (HoppityAPI.isHoppityEvent()) {
+                val stats = getYearStats(currentYear).first ?: return
+                sendStatsMessage(stats, currentYear)
+            } else ChatUtils.chat(availableYearsFormat)
         } else if (!statsYearList.contains(parsedInt)) {
-            ChatUtils.chat(
-                "Could not find stats for year §b$parsedInt§e. Stats are available for the following years:\n${
-                    statsYearFormatList.joinToString("§e,") { it }
-                }",
-            )
+            ChatUtils.chat("Could not find stats for year §b$parsedInt§e.\n$availableYearsFormat")
         } else {
             val stats = getYearStats(parsedInt).first ?: return
             sendStatsMessage(stats, parsedInt)
