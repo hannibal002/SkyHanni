@@ -193,7 +193,7 @@ object MiningAPI {
     fun onTick(event: LorenzTickEvent) {
         if (!inCustomMiningIsland()) return
 
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 4.seconds) return
+        if (LorenzUtils.lastWorldSwitch.passedSince() < 50.milliseconds) return
         updateLocation()
 
         if (currentAreaOreBlocks.isEmpty()) return
