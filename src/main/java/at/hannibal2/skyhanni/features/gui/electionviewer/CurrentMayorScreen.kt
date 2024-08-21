@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.get
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -22,7 +23,8 @@ object CurrentMayorScreen : ElectionViewerScreen() {
         if (!isInGui()) return
 
         val mayor = MayorAPI.currentMayor ?: return
-        val minister = MayorAPI.currentMinister ?: return
+        val minister = MayorAPI.currentMinister ?: null
+        val jerryMayor = MayorAPI.jerryExtraMayor ?: null
 
         display = Renderable.verticalContainer(
             listOf(
@@ -32,8 +34,9 @@ object CurrentMayorScreen : ElectionViewerScreen() {
                     horizontalAlign = HorizontalAlignment.CENTER,
                 ),
                 Renderable.horizontalContainer(
-                    listOf(
+                    listOfNotNull(
                         getMayorRenderable(mayor, "Mayor"),
+                        getMayorRenderable(jerryMayor?.first, "Jerry Mayor", jerryMayor?.second),
                         getMayorRenderable(minister, "Minister"),
                     ),
                     spacing = 50,
@@ -45,10 +48,12 @@ object CurrentMayorScreen : ElectionViewerScreen() {
         )
     }
 
-    private fun getMayorRenderable(mayor: Mayor, type: String): Renderable {
+    private fun getMayorRenderable(mayor: Mayor?, type: String, time: SimpleTimeMark? = null): Renderable? {
+        if (mayor == null) return null
+
         val fakePlayer = getFakeMayor(mayor)
 
-        val mayorDescription = getMayorDescription(mayor, type)
+        val mayorDescription = getMayorDescription(mayor, type, time)
 
         return if (type == "Mayor") {
             Renderable.horizontalContainer(
@@ -63,12 +68,16 @@ object CurrentMayorScreen : ElectionViewerScreen() {
         }
     }
 
-    private fun getMayorDescription(mayor: Mayor, type: String): Renderable {
+    private fun getMayorDescription(mayor: Mayor, type: String, time: SimpleTimeMark? = null): Renderable {
         val color = MayorAPI.mayorNameToColorCode(mayor.mayorName)
         return Renderable.verticalContainer(
             buildList {
                 add("$color$type ${mayor.mayorName}")
                 add("")
+                if (time != null) {
+                    add("§7Time left: §e${time.timeUntil().format(showMilliSeconds = false)}")
+                    add("")
+                }
                 mayor.activePerks.forEach {
                     add(color + it.perkName)
                     add("§7${it.description}")
