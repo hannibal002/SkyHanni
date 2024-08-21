@@ -20,13 +20,18 @@ abstract class ElectionViewerScreen : GuiScreen() {
     private val windowWidth get() = scaledResolution.scaledWidth
     private val windowHeight get() = scaledResolution.scaledHeight
 
-    val guiWidth get() = (windowWidth * 0.65f).toInt()
-    val guiHeight get() = (windowHeight * 0.65f).toInt()
+    private val guiWidth get() = (windowWidth * 0.65f).toInt()
+    private val guiHeight get() = (windowHeight * 0.65f).toInt()
 
-    val PADDING = 10
+    private val padding = 10
 
     open val posLabel = ""
 
+    /**
+     * The main content of the display.
+     *
+     * Should **not** include the background Renderable.
+     */
     var display: Renderable? = null
 
     @SubscribeEvent
@@ -51,22 +56,19 @@ abstract class ElectionViewerScreen : GuiScreen() {
         val currentScreen = Minecraft.getMinecraft().currentScreen
 
         val mayorButton = createButton(
-            label = "Mayor",
-            isActive = currentScreen is CurrentMayorScreen,
-            onClick = { SkyHanniMod.screenToOpen = CurrentMayorScreen },
-        )
+            "Mayor",
+            currentScreen is CurrentMayorScreen,
+        ) { SkyHanniMod.screenToOpen = CurrentMayorScreen }
 
         val electionButton = createButton(
-            label = "Election",
-            isActive = currentScreen is CurrentElectionScreen,
-            onClick = { SkyHanniMod.screenToOpen = CurrentElectionScreen },
-        )
+            "Election",
+            currentScreen is CurrentElectionScreen,
+        ) { SkyHanniMod.screenToOpen = CurrentElectionScreen }
 
         val specialButton = createButton(
-            label = "Special",
-            isActive = currentScreen is SpecialMayorScreen,
-            onClick = { SkyHanniMod.screenToOpen = SpecialMayorScreen },
-        )
+            "Special",
+            currentScreen is SpecialMayorScreen,
+        ) { SkyHanniMod.screenToOpen = SpecialMayorScreen }
 
         return Renderable.verticalContainer(
             listOf(mayorButton, electionButton, specialButton),
@@ -90,8 +92,8 @@ abstract class ElectionViewerScreen : GuiScreen() {
 
     private fun renderContent(renderable: Renderable) {
         val position = Position(
-            windowWidth / 2 - guiWidth / 2 - PADDING,
-            windowHeight / 2 - guiHeight / 2 - PADDING,
+            windowWidth / 2 - guiWidth / 2 - padding,
+            windowHeight / 2 - guiHeight / 2 - padding,
         )
         position.renderRenderable(
             Renderable.drawInsideRoundedRect(
@@ -100,7 +102,7 @@ abstract class ElectionViewerScreen : GuiScreen() {
                     renderable,
                 ),
                 Color.BLACK.addAlpha(180),
-                padding = PADDING,
+                padding = padding,
             ),
             posLabel = posLabel,
             addToGuiManager = false,
@@ -109,7 +111,7 @@ abstract class ElectionViewerScreen : GuiScreen() {
 
     private fun renderButtons(buttons: Renderable) {
         val buttonPosition = Position(
-            windowWidth / 2 - guiWidth / 2 - PADDING * 2 - buttons.width,
+            windowWidth / 2 - guiWidth / 2 - padding * 2 - buttons.width,
             windowHeight / 2,
         )
         buttonPosition.renderRenderable(
