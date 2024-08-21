@@ -12,9 +12,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ActionBarData {
-    private var actionBar = ""
-
-    fun getActionBar() = actionBar
+    var actionBar = ""
+        private set
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

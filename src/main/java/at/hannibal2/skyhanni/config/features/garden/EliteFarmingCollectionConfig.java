@@ -25,7 +25,7 @@ public class EliteFarmingCollectionConfig {
 
     @Expose
     @ConfigOption(name = "Show Time Until Reached", desc = "Show the time until you pass the person in front, or " +
-        "time until §b#5000")
+        "time until §b#5000§7.")
     @ConfigEditorBoolean
     public boolean showTimeUntilReached = true;
 
@@ -36,7 +36,7 @@ public class EliteFarmingCollectionConfig {
 
     @Expose
     @ConfigOption(name = "Estimate Collection", desc = "Estimates how many crops you have broken between leaderboard refreshes. " +
-        "only works in the garden")
+        "Only works in the garden.")
     @ConfigEditorBoolean
     public boolean estimateCollected = true;
 
@@ -85,12 +85,12 @@ public class EliteFarmingCollectionConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Position", desc = "Show your current position next to the collection amount if below §b#5000")
+    @ConfigOption(name = "Show Position", desc = "Show your current position next to the collection amount if below §b#5000§7.")
     @ConfigEditorBoolean
     public boolean showPosition = true;
 
     @Expose
-    @ConfigOption(name = "Show Person To Beat", desc = "Show the person in front of you to be passed")
+    @ConfigOption(name = "Show Person To Beat", desc = "Show the person in front of you to be passed.")
     @ConfigEditorBoolean
     public boolean showPersonToBeat = true;
 }

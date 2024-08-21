@@ -73,12 +73,12 @@ public class ElitePestKillsDisplayConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Position", desc = "Show your current position next to the collection amount if below §b#5000")
+    @ConfigOption(name = "Show Position", desc = "Show your current position next to the collection amount if below §b#5000§7.")
     @ConfigEditorBoolean
     public boolean showPosition = false;
 
     @Expose
-    @ConfigOption(name = "Show Person To Beat", desc = "Show the person in front of you to be passed")
+    @ConfigOption(name = "Show Person To Beat", desc = "Show the person in front of you to be passed§7.")
     @ConfigEditorBoolean
     public boolean showPersonToBeat = true;
 }

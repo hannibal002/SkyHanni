@@ -73,13 +73,12 @@ object EliteFarmingCollectionDisplay {
         }
     private var lastLeaderboardFetch = SimpleTimeMark.farPast()
 
-    private var display = emptyList<Renderable>()
+    private var display = listOf<Renderable>()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (GardenAPI.hideExtraGuis()) return
         if (!isEnabled()) return
-
 
         config.pos.renderRenderables(display, posLabel = "Farming Collection Display")
     }
@@ -331,6 +330,5 @@ object EliteFarmingCollectionDisplay {
         else -> crop.simpleName
     }
 
-    private fun isEnabled() =
-        config.display && LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)
+    private fun isEnabled() = config.display && LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden)
 }

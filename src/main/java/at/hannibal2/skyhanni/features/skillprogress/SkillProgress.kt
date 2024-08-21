@@ -143,10 +143,9 @@ object SkillProgress {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (event.repeatSeconds(1)) {
-            update()
-            updateSkillInfo()
-        }
+        if (!LorenzUtils.inSkyBlock) return
+        update()
+        updateSkillInfo()
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 

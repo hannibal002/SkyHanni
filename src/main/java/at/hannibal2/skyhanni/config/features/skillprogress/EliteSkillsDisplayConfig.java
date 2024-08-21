@@ -29,18 +29,18 @@ public class EliteSkillsDisplayConfig {
     public boolean alwaysShow = true;
 
     @Expose
-    @ConfigOption(name = "Cooldown", desc = "How long the display will stay after you've stopped collecting xp, in seconds")
+    @ConfigOption(name = "Cooldown", desc = "How long the display will stay after you've stopped collecting xp, in seconds.")
     @ConfigEditorSlider(minValue = 5, maxValue = 60, minStep = 5)
     public int alwaysShowTime = 30;
 
     @Expose
-    @ConfigOption(name = "Only Show In Garden", desc = "Only show the skill display while on the garden island")
+    @ConfigOption(name = "Only Show In Garden", desc = "Only show the skill display while on the garden island.")
     @ConfigEditorBoolean
     public boolean showInGarden = false;
 
     @Expose
     @ConfigOption(name = "Show Time Until Reached", desc = "Show the time until you pass the person in front, or " +
-        "time until §b#5000")
+        "time until §b#5000§7.")
     @ConfigEditorBoolean
     public boolean showTimeUntilReached = true;
 
@@ -90,12 +90,12 @@ public class EliteSkillsDisplayConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Position", desc = "Show your current position next to the xp amount if below §b#5000")
+    @ConfigOption(name = "Show Position", desc = "Show your current position next to the xp amount if below §b#5000§7.")
     @ConfigEditorBoolean
     public boolean showPosition = true;
 
     @Expose
-    @ConfigOption(name = "Show Person To Beat", desc = "Show the person in front of you to be passed")
+    @ConfigOption(name = "Show Person To Beat", desc = "Show the person in front of you to be passed.")
     @ConfigEditorBoolean
     public boolean showPersonToBeat = true;
 }
