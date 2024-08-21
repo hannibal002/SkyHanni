@@ -26,10 +26,10 @@ object PatcherFixes {
         lastChatMessage = SimpleTimeMark.now()
 
         ChatUtils.clickToActionOrDisable(
-            "§cPatcher's Parallax Fix breaks SkyHanni's line rendering!", config::fixPatcherLines, "disable this option in Patcher",
-            action = {
-                tryFix()
-            },
+            "§cPatcher's Parallax Fix breaks SkyHanni's line rendering!",
+            config::fixPatcherLines,
+            "disable this option in Patcher",
+            action = { tryFix() },
         )
     }
 
