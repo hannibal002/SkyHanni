@@ -88,6 +88,7 @@ object MayorAPI {
     )
 
     var currentMayor: Mayor? = null
+        private set
     var currentMinister: Mayor? = null
         private set
     private var lastMayor: Mayor? = null
