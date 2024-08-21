@@ -26,8 +26,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object MagicalPowerDisplay {
     private val config get() = SkyHanniMod.feature.inventory.magicalPower
-    private var contactAmount: Int
-        get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount ?: 0
+    private var contactAmount: Int?
+        get() = ProfileStorageData.profileSpecific?.abiphoneContactAmount
         private set(value) {
             ProfileStorageData.profileSpecific?.abiphoneContactAmount = value
         }
@@ -90,7 +90,7 @@ object MagicalPowerDisplay {
         when (itemID) {
             hegemonyArtifact -> endMP *= 2
             riftPrism -> endMP = 11
-            else -> if (itemID.isAbicase()) endMP += contactAmount / 2
+            else -> if (itemID.isAbicase()) endMP += (contactAmount ?: 0) / 2
         }
 
         event.stackTip = "${if (config.colored) rarity.chatColorCode else "§7"}${endMP}"
