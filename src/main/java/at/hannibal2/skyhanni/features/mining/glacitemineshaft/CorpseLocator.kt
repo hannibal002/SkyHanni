@@ -53,7 +53,12 @@ object CorpseLocator {
 
                 val canSee = entity.getLorenzVec().canBeSeen(-1..3)
                 if (canSee) {
-                    ChatUtils.chat("Located a ${corpseType.displayText} and marked its location with a waypoint.")
+                    if (corpseType.displayText == "Umber Corpse") {
+                        ChatUtils.chat("Located an ${corpseType.displayText} and marked its location with a waypoint.")
+                    } else {
+                        ChatUtils.chat("Located a ${corpseType.displayText} and marked its location with a waypoint.")
+                    }
+
                     MineshaftWaypoints.waypoints.add(
                         MineshaftWaypoint(
                             waypointType = corpseType,
