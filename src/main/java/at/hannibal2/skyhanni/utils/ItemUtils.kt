@@ -227,6 +227,7 @@ object ItemUtils {
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to rarity,
                     "lore" to getLore(),
+                    betaOnly = true,
                     condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
             }
