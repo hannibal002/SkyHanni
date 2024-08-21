@@ -70,7 +70,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
-    fun renderDisplay(position: Position) {
+    fun renderDisplay(position: Position, sessionTracking: Boolean = true) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         val currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
@@ -84,7 +84,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
         if (dirty || TrackerManager.dirty) {
             display = getSharedTracker()?.let {
-                buildFinalDisplay(drawDisplay(it.get(getDisplayMode())))
+                buildFinalDisplay(drawDisplay(it.get(getDisplayMode())), sessionTracking)
             } ?: emptyList()
             dirty = false
         }
@@ -96,7 +96,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         dirty = true
     }
 
-    private fun buildFinalDisplay(rawList: List<List<Any>>) = rawList.toMutableList().also {
+    private fun buildFinalDisplay(rawList: List<List<Any>>, sessionTracking: Boolean) = rawList.toMutableList().also {
         if (it.isEmpty()) return@also
         if (inventoryOpen) {
             it.add(1, buildDisplayModeView())
