@@ -26,7 +26,7 @@ object PatcherFixes {
         lastChatMessage = SimpleTimeMark.now()
 
         ChatUtils.clickToActionOrDisable(
-            "§cPatcher's Parallax Fix breaks SkyHanni's line rendering.", config::fixPatcherLines, "disable this option in Patcher",
+            "§cPatcher's Parallax Fix breaks SkyHanni's line rendering!", config::fixPatcherLines, "disable this option in Patcher",
             action = {
                 tryFix()
             },
@@ -40,17 +40,6 @@ object PatcherFixes {
             ChatUtils.chat("§aDisabled Patcher's Parallax Fix! SkyHanni's lines should now work correctly.")
         } else {
             ChatUtils.userError("Patcher's Parallax is already disabled!")
-        }
-    }
-
-    private fun tryFix2() {
-        OtherModsSettings.patcher().let {
-            if (it.getBoolean("parallaxFix")) {
-                it.setBoolean("parallaxFix", false)
-                ChatUtils.chat("Disabled Patcher's Parallax Fix! SkyHanni's lines should now work again.")
-            } else {
-                ChatUtils.userError("Patcher's Patcher's Parallax is already disabled!")
-            }
         }
     }
 
