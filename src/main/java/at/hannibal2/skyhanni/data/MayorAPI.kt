@@ -253,7 +253,7 @@ object MayorAPI {
         event.addIrrelevant {
             add("Current Mayor: ${currentMayor?.name ?: "Unknown"}")
             add("Active Perks: ${currentMayor?.activePerks}")
-            add("Last Update: $lastUpdate (${lastUpdate.passedSince()} ago)")
+            add("Last Update: ${lastUpdate.formattedDate("EEEE, MMM d h:mm a")} (${lastUpdate.passedSince()} ago)")
             add("Time Till Next Mayor: ${nextMayorTimestamp.timeUntil()}")
             add("Current Minister: ${currentMinister?.name ?: "Unknown"}")
             add("Current Minister Perk: ${currentMinister?.activePerks}")
