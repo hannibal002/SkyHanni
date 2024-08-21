@@ -23,8 +23,8 @@ object CurrentMayorScreen : ElectionViewerScreen() {
         if (!isInGui()) return
 
         val mayor = MayorAPI.currentMayor ?: return
-        val minister = MayorAPI.currentMinister ?: null
-        val jerryMayor = MayorAPI.jerryExtraMayor ?: null
+        val minister = MayorAPI.currentMinister
+        val jerryMayor = MayorAPI.jerryExtraMayor
 
         display = Renderable.verticalContainer(
             listOf(

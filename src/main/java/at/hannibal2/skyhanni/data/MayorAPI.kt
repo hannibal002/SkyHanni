@@ -87,11 +87,11 @@ object MayorAPI {
         "§9Perkpocalypse Perks:",
     )
 
-    var currentMayor: Mayor? = Mayor.JERRY.addAllPerks()
+    var currentMayor: Mayor? = null
     var currentMinister: Mayor? = null
         private set
     private var lastMayor: Mayor? = null
-    var jerryExtraMayor: Pair<Mayor?, SimpleTimeMark> = Mayor.DIANA.addAllPerks() to SimpleTimeMark.now().plus(4.hours)
+    var jerryExtraMayor: Pair<Mayor?, SimpleTimeMark> = null to SimpleTimeMark.farPast()
         private set
     private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
@@ -222,14 +222,14 @@ object MayorAPI {
             candidates = map
 
             val currentMayorName = data.mayor.name
-//             if (lastMayor?.name != currentMayorName) {
-//                 currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-//                 ChatUtils.debug("Mayor changed to $currentMayorName with ${pluralize(data.mayor.perks.size, "perk", withNumber = true)}")
-//                 currentMinister = data.mayor.minister?.let {
-//                     ChatUtils.debug("Minister changed to ${data.mayor.minister.name} with 1 perk")
-//                     setAssumeMayorJson(it.name, listOf(data.mayor.minister.perk))
-//                 }
-//             }
+            if (lastMayor?.name != currentMayorName) {
+                currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
+                ChatUtils.debug("Mayor changed to $currentMayorName with ${pluralize(data.mayor.perks.size, "perk", withNumber = true)}")
+                currentMinister = data.mayor.minister?.let {
+                    ChatUtils.debug("Minister changed to ${data.mayor.minister.name} with 1 perk")
+                    setAssumeMayorJson(it.name, listOf(data.mayor.minister.perk))
+                }
+            }
         }
     }
 
