@@ -196,15 +196,8 @@ object ItemUtils {
             val itemRarity = LorenzRarity.getByName(rarity)
 
             if (itemCategory == null) {
-                ErrorManager.logErrorStateWithData(
-                    "Could not read category for item $name",
-                    "Failed to read category from item rarity via item lore",
-                    "internal name" to getInternalName(),
-                    "item name" to name,
-                    "inventory name" to InventoryUtils.openInventoryName(),
-                    "pattern result" to category,
-                    "lore" to getLore(),
-                )
+                val last = getLore().lastOrNull() ?: "empty lore"
+                ChatUtils.debug("Could not read category for ${getInternalName()} ($last)")
             }
             if (itemRarity == null) {
                 ErrorManager.logErrorStateWithData(
