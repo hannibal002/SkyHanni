@@ -234,7 +234,7 @@ enum class Perk(val perkName: String) {
     ;
 
     var isActive = false
-    var description = ""
+    var description = "§cDescription failed to load from the API."
 
     override fun toString(): String = "$perkName: $description"
 
