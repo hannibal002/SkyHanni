@@ -131,7 +131,7 @@ object CakeTracker {
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (inCakeBag || (inAuctionHouse && (unobtainedCakesDisplayed || searchingForCakes))) {
-            tracker.renderDisplay(config.cakeTrackerPosition, sessionTracking = false)
+            tracker.renderDisplay(config.cakeTrackerPosition, displayModeToggleable = false)
         }
     }
 
