@@ -204,6 +204,7 @@ object ItemUtils {
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
+                    betaOnly = true,
                 )
             }
             if (itemRarity == null) {
@@ -214,6 +215,7 @@ object ItemUtils {
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "lore" to getLore(),
+                    betaOnly = true,
                 )
             }
 
