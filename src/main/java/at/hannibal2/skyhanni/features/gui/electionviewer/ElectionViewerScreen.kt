@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -60,10 +61,12 @@ abstract class ElectionViewerScreen : GuiScreen() {
             currentScreen is CurrentMayorScreen,
         ) { SkyHanniMod.screenToOpen = CurrentMayorScreen }
 
-        val electionButton = createButton(
-            "Election",
-            currentScreen is CurrentElectionScreen,
-        ) { SkyHanniMod.screenToOpen = CurrentElectionScreen }
+        val electionButton = if (MayorAPI.rawMayorData?.current != null) {
+            createButton(
+                "Election",
+                currentScreen is CurrentElectionScreen,
+            ) { SkyHanniMod.screenToOpen = CurrentElectionScreen }
+        } else null
 
         val specialButton = createButton(
             "Special",
@@ -71,7 +74,7 @@ abstract class ElectionViewerScreen : GuiScreen() {
         ) { SkyHanniMod.screenToOpen = SpecialMayorScreen }
 
         return Renderable.verticalContainer(
-            listOf(mayorButton, electionButton, specialButton),
+            listOfNotNull(mayorButton, electionButton, specialButton),
             spacing = 10,
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             horizontalAlign = RenderUtils.HorizontalAlignment.RIGHT,
