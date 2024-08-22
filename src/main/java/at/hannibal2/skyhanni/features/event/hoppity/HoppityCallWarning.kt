@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -97,7 +98,7 @@ object HoppityCallWarning {
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onChat(event: LorenzChatEvent) {
-        if (callRingPattern.matches(event.message) && acceptUUID == null) acceptUUID = extractPickupUuid(event)
+        if (callRingPattern.matches(event.message) && acceptUUID == null) extractPickupUuid(event)
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
@@ -132,12 +133,13 @@ object HoppityCallWarning {
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
-    private fun extractPickupUuid(event: LorenzChatEvent): String? {
+    private fun extractPickupUuid(event: LorenzChatEvent) {
         val siblings = event.chatComponent.siblings
-        if (siblings.size < 3) return null
-        val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return null
-        if (clickEvent.action.name != "run_command" || !clickEvent.value.startsWith("/cb")) return null
-        return clickEvent.value.replace("/cb ", "").takeIf { cbUuidPattern.matches(it )}
+        if (siblings.size < 3) return
+        val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
+        if (clickEvent.action.name != "run_command" || !clickEvent.value.startsWith("/cb")) return
+        acceptUUID = clickEvent.value.replace("/cb ", "").takeIf { cbUuidPattern.matches(it )}
+        if (acceptUUID != null) DelayedRun.runDelayed(10.seconds) { acceptUUID = null }
     }
 
     private fun startWarningUser() {
