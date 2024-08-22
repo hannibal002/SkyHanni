@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -19,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
@@ -133,11 +131,10 @@ object HoppityCallWarning {
 
     private fun extractPickupUuid(event: LorenzChatEvent): String? {
         val siblings = event.chatComponent.siblings
-        if (siblings.size < 2) return null
-        if (!siblings[0].chatStyle.chatClickEvent.value.startsWith("/cb")) return null
-        ChatUtils.chat("§Style event value: §b${siblings[0].chatStyle.chatClickEvent.value}")
-        val uuid = siblings[0].chatStyle.chatClickEvent.value.substring(4)
-        return if (cbUuidPattern.matches(uuid)) uuid else null
+        if (siblings.size < 3) return null
+        val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return null
+        if (clickEvent.action.name != "run_command" || !clickEvent.value.startsWith("/cb")) return null
+        return clickEvent.value.replace("/cb ", "").takeIf { cbUuidPattern.matches(it )}
     }
 
     private fun startWarningUser() {
