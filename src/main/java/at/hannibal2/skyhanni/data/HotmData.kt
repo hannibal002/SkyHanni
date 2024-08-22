@@ -3,8 +3,10 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -25,6 +28,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -475,6 +479,15 @@ enum class HotmData(
             "§b§lMAYHEM! §r§7(?<perk>.*)",
         )
 
+        /**
+         * REGEX-TEST:  Mithril: §r§299,918
+         * REGEX-TEST:  Gemstone: §r§d37,670
+         */
+        private val powderPattern by patternGroup.pattern(
+            "widget.powder",
+            "\\s*(?<type>\\w+:) (?:§.)+(?<amount>[\\d,.]+)"
+        )
+
         var inInventory = false
 
         var tokens: Int
@@ -682,6 +695,23 @@ enum class HotmData(
                 InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
                 abilities.filter { it.isUnlocked }.forEach {
                     it.rawLevel = if (PEAK_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
+                }
+            }
+        }
+
+        @SubscribeEvent
+        fun onWidgetUpdate(event: WidgetUpdateEvent) {
+            if (!event.isWidget(TabWidget.POWDER)) return
+            event.lines.forEach {
+                powderPattern.matchMatcher(it) {
+                    val type = HotmAPI.Powder.entries.firstOrNull { it.displayName == group("type") } ?: return
+                    val amount = group("amount").replace(",", "").toLong()
+                    val difference = amount - type.getCurrent()
+
+                    if (difference > 0) {
+                        type.gain(difference)
+                        ChatUtils.debug("Gained §a${difference.addSeparators()} §e${type.displayName} Powder")
+                    }
                 }
             }
         }

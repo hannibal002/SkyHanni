@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.mining.PowderGainEvent
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -74,6 +75,7 @@ object HotmAPI {
         fun gain(value: Long) {
             addTotal(value)
             addCurrent(value)
+            PowderGainEvent(this, value).post()
         }
 
         fun reset() {
