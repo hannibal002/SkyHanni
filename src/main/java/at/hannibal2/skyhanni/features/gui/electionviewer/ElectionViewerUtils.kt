@@ -51,11 +51,7 @@ object ElectionViewerUtils {
         )
     }
 
-    fun getFakeCandidate(candidate: MayorCandidate) = Renderable.fakePlayer(
-        FakePlayer.getFakePlayer(getSkinFromMayorName(candidate.name)),
-        followMouse = true,
-        entityScale = 50,
-    )
+    fun getFakeCandidate(candidate: MayorCandidate) = getFakeMayor(Mayor.getMayorFromName(candidate.name) ?: Mayor.UNKNOWN)
 
     private fun getSkinFromMayorName(mayorName: String): String? {
         try {
