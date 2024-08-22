@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -77,11 +77,9 @@ object HoppityCallWarning {
     private var acceptUUID: String? = null
 
     @SubscribeEvent
-    fun onKeybind(event: GuiKeyPressEvent) {
-        if (acceptUUID == null) return
-        if (config.acceptHotkey == Keyboard.KEY_NONE) return
-        if (!config.acceptHotkey.isKeyHeld()) return
-        if (lastAcceptSent.passedSince() < 3.seconds) return
+    fun onKeypress(event: LorenzKeyPressEvent) {
+        if (acceptUUID == null || config.acceptHotkey == Keyboard.KEY_NONE ||
+            config.acceptHotkey != event.keyCode || lastAcceptSent.passedSince() < 3.seconds) return
         lastAcceptSent = SimpleTimeMark.now()
         HypixelCommands.cb(acceptUUID!!)
     }
