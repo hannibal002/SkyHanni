@@ -28,12 +28,15 @@ import kotlin.time.Duration.Companion.seconds
 object HoppityCallWarning {
 
     /**
+     * Test messages (and the real ones from Hypixel) have a space at the end of
+     * them that the IDE kills. So it's "§r§e ✆ "
+     *
      * REGEX-TEST: §e✆ §r§bHoppity§r§e ✆
      * REGEX-TEST: §e✆ §r§aHoppity§r§e ✆
      */
     private val initHoppityCallPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hoppity.call.init",
-        "§e✆ §r(?:§a|§b)Hoppity§r§e ✆"
+        "§e✆ §r(?:§a|§b)Hoppity§r§e ✆.*"
     )
 
     /**
