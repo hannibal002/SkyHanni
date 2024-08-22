@@ -485,7 +485,7 @@ enum class HotmData(
          */
         private val powderPattern by patternGroup.pattern(
             "widget.powder",
-            "\\s*(?<type>\\w+:) (?:§.)+(?<amount>[\\d,.]+)"
+            "\\s*(?<type>\\w+): (?:§.)+(?<amount>[\\d,.]+)"
         )
 
         var inInventory = false
