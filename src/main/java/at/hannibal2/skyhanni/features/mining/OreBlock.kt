@@ -25,7 +25,7 @@ enum class OreBlock(
     // MITHRIL
     LOW_TIER_MITHRIL(
         checkBlock = ::isLowTierMithril,
-        checkArea = { inGlacite },
+        checkArea = { inDwarvenMines || inCrystalHollows || inGlacite },
     ),
     MID_TIER_MITHRIL(
         checkBlock = { it.block == Blocks.prismarine },
