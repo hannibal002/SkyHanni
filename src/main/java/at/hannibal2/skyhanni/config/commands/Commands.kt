@@ -610,7 +610,7 @@ object Commands {
         if (!LorenzUtils.onHypixel) {
             ChatUtils.userError("You need to join Hypixel to use this feature!")
         } else {
-            SkyHanniMod.screenToOpen = CustomLinesGui()
+            SkyHanniMod.screenToOpen = CustomLinesGui
         }
     }
 

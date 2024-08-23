@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -12,7 +13,8 @@ import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-open class CustomLinesGui : GuiScreen() {
+@SkyHanniModule
+object CustomLinesGui : GuiScreen() {
 
     private val scaledResolution get() = ScaledResolution(Minecraft.getMinecraft())
     private val windowWidth get() = scaledResolution.scaledWidth
@@ -36,9 +38,7 @@ open class CustomLinesGui : GuiScreen() {
 
     private val textBox = TextInput()
 
-    companion object {
-        fun isInGui() = Minecraft.getMinecraft().currentScreen is CustomLinesGui
-    }
+    fun isInGui() = Minecraft.getMinecraft().currentScreen is CustomLinesGui
 
     private fun getDisplay(): Renderable {
         val secondColumn = createRenderableSecondColumn()
@@ -48,8 +48,8 @@ open class CustomLinesGui : GuiScreen() {
         val secondColumnRenderable = Renderable.horizontalContainer(
             listOf(
                 Renderable.placeholder(guiWidth - secondColumnWidth, 0),
-                secondColumn
-            )
+                secondColumn,
+            ),
         )
 
         val firstRenderable = createRenderableFirstColumn(firstColumnMaxWidth)
@@ -59,7 +59,7 @@ open class CustomLinesGui : GuiScreen() {
                 Renderable.placeholder(guiWidth, guiHeight),
                 Renderable.doubleLayered(
                     secondColumnRenderable,
-                    firstRenderable
+                    firstRenderable,
                 ),
             ),
             LorenzColor.BLACK.addOpacity(100),
@@ -91,8 +91,8 @@ open class CustomLinesGui : GuiScreen() {
         return Renderable.verticalContainer(
             listOf(
                 Renderable.string("Replacements"),
-                replacementsRenderable
-            )
+                replacementsRenderable,
+            ),
         )
     }
 
@@ -126,7 +126,7 @@ open class CustomLinesGui : GuiScreen() {
         position.renderRenderable(
             getDisplay(),
             posLabel = "Custom Lines Gui",
-            addToGuiManager = false
+            addToGuiManager = false,
         )
     }
 
