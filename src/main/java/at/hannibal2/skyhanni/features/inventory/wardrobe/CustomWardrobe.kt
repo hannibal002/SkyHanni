@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -41,7 +42,6 @@ import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO add support for estimated item value
 @SkyHanniModule
 object CustomWardrobe {
 
@@ -89,9 +89,16 @@ object CustomWardrobe {
             loadingPos.renderRenderable(loadingRenderable, posLabel = guiName, addToGuiManager = false)
         }
 
+        GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
+
         pos.renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
-        GlStateManager.translate(0f, 0f, -100f)
+
+        if (EstimatedItemValue.config.enabled) {
+            GlStateManager.translate(0f, 0f, 400f)
+            EstimatedItemValue.tryRendering()
+        }
+        GlStateManager.popMatrix()
         event.cancel()
     }
 
@@ -210,8 +217,12 @@ object CustomWardrobe {
                     renderable = Renderable.hoverTips(
                         renderable,
                         tips = toolTip,
+                        stack = stack,
                         condition = {
                             !config.showTooltipOnlyKeybind || config.tooltipKeybind.isKeyHeld()
+                        },
+                        onHover = {
+                            if (EstimatedItemValue.config.enabled) EstimatedItemValue.updateItem(stack)
                         },
                     )
                 }
