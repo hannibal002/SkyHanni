@@ -909,7 +909,6 @@ interface Renderable {
             }
         }
 
-
         fun drawInsideRoundedRectOutline(
             input: Renderable,
             padding: Int = 2,
@@ -941,7 +940,7 @@ interface Renderable {
                     bottomOutlineColor,
                     borderOutlineThickness,
                     radius,
-                    blur
+                    blur,
                 )
             }
         }
