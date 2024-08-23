@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
@@ -1132,6 +1133,7 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player) + add
     }
 
