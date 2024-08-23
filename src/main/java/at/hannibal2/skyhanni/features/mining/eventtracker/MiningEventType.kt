@@ -21,7 +21,7 @@ enum class MiningEventType(
     val eventName: String,
     private val shortName: String,
     val defaultLength: Duration,
-    private val colourCode: Char,
+    private val colorCode: Char,
     val dwarvenSpecific: Boolean,
     iconInput: Renderable,
 ) {
@@ -101,18 +101,18 @@ enum class MiningEventType(
         eventName: String,
         shortName: String,
         defaultLength: Duration,
-        colourCode: Char,
+        colorCode: Char,
         dwarvenSpecific: Boolean,
         iconInput: ItemStack,
     ) : this(
-        eventName, shortName, defaultLength, colourCode, dwarvenSpecific, Renderable.itemStack(
+        eventName, shortName, defaultLength, colorCode, dwarvenSpecific, Renderable.itemStack(
             iconInput, xSpacing = 0
         )
     )
 
     val icon = Renderable.hoverTips(iconInput, listOf(eventName))
-    val compactText = Renderable.string("§$colourCode$shortName")
-    val normalText = Renderable.string("§$colourCode$eventName")
+    val compactText = Renderable.string("§$colorCode$shortName")
+    val normalText = Renderable.string("§$colorCode$eventName")
 
     val compactTextWithIcon = Renderable.horizontalContainer(listOf(icon, compactText), 0)
     val normalTextWithIcon = Renderable.horizontalContainer(listOf(icon, normalText), 0)

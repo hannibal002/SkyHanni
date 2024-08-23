@@ -142,16 +142,17 @@ object UnknownLinesHandler {
         }
 
         /**
-         * remove known text
+         * Remove Known Text
          **/
-        // remove objectives
-        val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) }
-            ?: "Objective"
-        unknownLines = unknownLines.filter { sidebarLines.nextAfter(objectiveLine) != it }
-        // TODO create function
-        unknownLines = unknownLines.filter {
-            sidebarLines.nextAfter(objectiveLine, 2) != it &&
-                !SbPattern.thirdObjectiveLinePattern.matches(it)
+        // Remove objectives
+        val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) } ?: "Objective"
+
+        unknownLines = unknownLines.filter { line ->
+            val nextLine = sidebarLines.nextAfter(objectiveLine)
+            val secondNextLine = sidebarLines.nextAfter(objectiveLine, 2)
+            val thirdNextLine = sidebarLines.nextAfter(objectiveLine, 3)
+
+            line != nextLine && line != secondNextLine && line != thirdNextLine && !SbPattern.thirdObjectiveLinePattern.matches(line)
         }
 
         // Remove jacobs contest
