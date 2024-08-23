@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.collect.Lists
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.NotificationHandler
@@ -192,6 +193,15 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
+    private val itemCategoryRepoCheckPattern by RepoPattern.pattern(
+        "itemcategory.repocheck",
+        ItemCategory.entries.joinToString(separator = "|") { it.name },
+    )
+    private val rarityCategoryRepoCheckPattern by RepoPattern.pattern(
+        "rarity.repocheck",
+        LorenzRarity.entries.joinToString(separator = "|") { it.name },
+    )
+
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val cleanName = this.cleanName()
 
@@ -217,6 +227,8 @@ object ItemUtils {
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             }
             if (itemRarity == null) {
@@ -226,7 +238,10 @@ object ItemUtils {
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern result" to rarity,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
             }
 
@@ -365,13 +380,11 @@ object ItemUtils {
             return getInternalName().itemName
         }
 
-
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
         if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
         val attributes = getAttributes() ?: return null
         return attributes.firstOrNull()
     }
-
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
