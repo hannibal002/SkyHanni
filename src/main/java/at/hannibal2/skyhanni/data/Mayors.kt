@@ -93,7 +93,7 @@ enum class Mayor(
         "Derpy",
         "§d",
         Perk.TURBO_MINIONS,
-        Perk.AH_TAX,
+        Perk.QUAD_TAXES,
         Perk.DOUBLE_MOBS_HP,
         Perk.MOAR_SKILLZ,
     ),
@@ -228,7 +228,7 @@ enum class Perk(val perkName: String) {
 
     // Derpy
     TURBO_MINIONS("TURBO MINIONS!!!"),
-    AH_TAX("MOAR TAX!!!"), // TODO: Change to actual perk name when known
+    QUAD_TAXES("QUAD TAXES!!!"),
     DOUBLE_MOBS_HP("DOUBLE MOBS HP!!!"),
     MOAR_SKILLZ("MOAR SKILLZ!!!"),
     ;
