@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.lobby.waypoints.halloween
 
 import at.hannibal2.skyhanni.utils.LorenzVec
 
-enum class BasketEntrances(
+enum class BasketEntrance(
     val basketEntranceName: String,
     val waypoint: LorenzVec,
     vararg val basket: Basket,

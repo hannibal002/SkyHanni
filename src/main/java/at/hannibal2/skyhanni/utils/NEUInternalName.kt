@@ -1,7 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.test.command.ErrorManager
-
 class NEUInternalName private constructor(private val internalName: String) {
 
     companion object {
@@ -11,8 +9,10 @@ class NEUInternalName private constructor(private val internalName: String) {
         val NONE = "NONE".asInternalName()
         val MISSING_ITEM = "MISSING_ITEM".asInternalName()
 
-        val WISP_POTION = "WISP_POTION".asInternalName()
+        val JASPER_CRYSTAL = "JASPER_CRYSTAL".asInternalName()
+        val RUBY_CRYSTAL = "RUBY_CRYSTAL".asInternalName()
         val SKYBLOCK_COIN = "SKYBLOCK_COIN".asInternalName()
+        val WISP_POTION = "WISP_POTION".asInternalName()
 
         fun String.asInternalName(): NEUInternalName {
             val internalName = uppercase().replace(" ", "_")
@@ -22,11 +22,11 @@ class NEUInternalName private constructor(private val internalName: String) {
         fun fromItemNameOrNull(itemName: String): NEUInternalName? =
             ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet"))
 
-        fun fromItemName(itemName: String): NEUInternalName =
-            fromItemNameOrNull(itemName) ?: ErrorManager.skyHanniError(
-                "NEUInternalName is null for item name: '$itemName'",
-                "inventoryName" to InventoryUtils.openInventoryName()
-            )
+        fun fromItemName(itemName: String): NEUInternalName = fromItemNameOrNull(itemName) ?: run {
+            val name = "itemName:$itemName"
+            ItemUtils.addMissingRepoItem(name, "Could not find internal name for $name")
+            return NEUInternalName.MISSING_ITEM
+        }
     }
 
     fun asString() = internalName
