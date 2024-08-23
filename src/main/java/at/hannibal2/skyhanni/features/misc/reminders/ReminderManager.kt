@@ -206,7 +206,7 @@ object ReminderManager {
         val remindersToSend = mutableListOf<IChatComponent>()
 
         for ((id, reminder) in getSortedReminders()) {
-            if (!reminder.shouldRemind(config.interval.minutes)) break
+            if (!reminder.shouldRemind(config.interval.minutes)) continue
             reminder.lastReminder = SimpleTimeMark.now()
             var actionsComponent: IChatComponent? = null
 
