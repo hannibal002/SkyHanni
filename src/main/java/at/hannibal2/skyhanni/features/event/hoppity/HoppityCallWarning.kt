@@ -44,10 +44,11 @@ object HoppityCallWarning {
      * REGEX-TEST: §a✆ RING... §r §r§2§l[PICK UP]
      * REGEX-TEST: §a✆ RING... RING... §r §r§2§l[PICK UP]
      * REGEX-TEST: §a✆ RING... RING... RING... §r §r§2§l[PICK UP]
+     * REGEX-TEST: §a✆ RING... RING... RING...
      */
     private val callRingPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hoppity.call.ring",
-        "§a✆ (?:RING\\.{3} ){1,3}§r §r§2§l\\[PICK UP]"
+        "§a✆ (?:RING\\.{3} ?){1,3}(?:§r §r§2§l\\[PICK UP])?"
     )
 
     /**
