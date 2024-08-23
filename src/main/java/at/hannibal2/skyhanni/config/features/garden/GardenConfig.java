@@ -79,7 +79,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Armor Drop Tracker", desc = "")
     @Accordion
-    // TODO renmae to armorDropTracker
+    // TODO rename to armorDropTracker
     public ArmorDropTrackerConfig farmingArmorDrop = new ArmorDropTrackerConfig();
 
     @Expose
@@ -216,6 +216,15 @@ public class GardenConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean jacobContestSummary = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Personal Best Increase FF",
+        desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean contestPersonalBestIncreaseFF = true;
 
     // Does not have a config element!
     @Expose

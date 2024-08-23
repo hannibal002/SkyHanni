@@ -85,8 +85,8 @@ object ReminderManager {
                 if (listPage < maxPage) "§6§l>>".asComponent {
                     hover = "§eClick to view page ${listPage + 1}".asComponent()
                     command = "/shremind list ${listPage + 1}"
-                } else null
-            ).center()
+                } else null,
+            ).center(),
         )
 
         if (reminders.isNotEmpty()) {
@@ -110,8 +110,8 @@ object ReminderManager {
                             hover = "§7${reminder.formatFull()}".asComponent()
                         }.wrap("§8[", "§8]"),
                         " ",
-                        "§7${reminder.reason}"
-                    )
+                        "§7${reminder.reason}",
+                    ),
                 )
             }
         } else {
@@ -140,7 +140,7 @@ object ReminderManager {
         args: List<String>,
         command: String,
         vararg arguments: String,
-        action: (List<String>, Reminder) -> String
+        action: (List<String>, Reminder) -> String,
     ) {
         val argumentText = arguments.joinToString(" ")
         if (args.size < arguments.size) return ChatUtils.userError("/shremind $command $argumentText")
@@ -221,7 +221,7 @@ object ReminderManager {
                     "§e§l⟳".asComponent {
                         hover = "§7Click to move".asComponent()
                         suggest = "/shremind move $id 1m"
-                    }.wrap("§8[", "§8]")
+                    }.wrap("§8[", "§8]"),
                 )
             } else {
                 storage.remove(id)
@@ -234,8 +234,8 @@ object ReminderManager {
                     },
                     actionsComponent,
                     " ",
-                    "§6${reminder.reason}"
-                )
+                    "§6${reminder.reason}",
+                ),
             )
         }
 

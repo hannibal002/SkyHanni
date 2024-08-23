@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
-import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
@@ -52,6 +51,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -59,17 +59,19 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
+import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.TestBingo
@@ -85,6 +87,7 @@ import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
+import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -273,6 +276,10 @@ object Commands {
             "Resets the Sea Creature Tracker",
         ) { SeaCreatureTracker.resetCommand() }
         registerCommand(
+            "shresetstrayrabbittracker",
+            "Resets the Stray Rabbit Tracker",
+        ) { ChocolateFactoryStrayTracker.resetCommand() }
+        registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
         ) { WikiManager.otherWikiCommands(it, true) }
@@ -320,10 +327,6 @@ object Commands {
             "shlimbostats",
             "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!",
         ) { LimboTimeTracker.printStats() }
-        registerCommand(
-            "shlimbo",
-            "Warps you to Limbo.",
-        ) { MiscFeatures.goToLimbo() }
         registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden",
@@ -382,7 +385,7 @@ object Commands {
         ) { SkyHanniDebugsAndTests.toggleRender() }
         registerCommand(
             "shcarrolyn",
-            "Toggels if the specified crops effect is active from carrolyn",
+            "Toggles if the specified crops effect is active from carrolyn",
         ) {
             CaptureFarmingGear.handelCarrolyn(it)
         }
@@ -392,11 +395,11 @@ object Commands {
         ) { SkyHanniMod.repo.displayRepoStatus(false) }
         registerCommand(
             "shclearkismet",
-            "Cleares the saved values of the applied kismet feathers in Croesus",
+            "Clears the saved values of the applied kismet feathers in Croesus",
         ) { CroesusChestTracker.resetChest() }
         registerCommand(
             "shkingfix",
-            "Reseting the local King Talisman Helper offset.",
+            "Resets the local King Talisman Helper offset.",
         ) { KingTalismanHelper.kingFix() }
         registerCommand(
             "shupdate",
@@ -410,6 +413,10 @@ object Commands {
             "shclearsavedrabbits",
             "Clears the saved rabbits on this profile.",
         ) { HoppityCollectionStats.clearSavedRabbits() }
+        registerCommand(
+            "shresetpunchcard",
+            "Resets the Rift Punchcard Artifact player list.",
+        ) { PunchcardHighlight.clearList() }
     }
 
     private fun developersDebugFeatures() {
@@ -443,6 +450,11 @@ object Commands {
             "shtestgriffinspots",
             "Show potential griffin spots around you.",
         ) { GriffinBurrowHelper.testGriffinSpots() }
+        registerCommand(
+            "shtestisland",
+            "Sets the current skyblock island for testing purposes.",
+        ) { SkyBlockIslandTest.onCommand(it) }
+        registerCommand("shdebugprice", "Debug different price sources for an item.") { ItemPriceUtils.debugItemPrice(it) }
     }
 
     private fun developersCodingHelp() {
@@ -511,7 +523,7 @@ object Commands {
         ) { TestChatCommand.command(it) }
         registerCommand(
             "shtestrainbow",
-            "Sends a rainbow in chat"
+            "Sends a rainbow in chat",
         ) { ExtendedChatColor.testCommand() }
         registerCommand(
             "shcopyinternalname",
@@ -536,7 +548,7 @@ object Commands {
                 "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
-            "readcropmilestonefromclipboard",
+            "shreadcropmilestonefromclipboard",
             "Read crop milestone from clipboard. This helps fixing wrong crop milestone data",
         ) { GardenCropMilestonesCommunityFix.readDataFromClipboard() }
         registerCommand(
@@ -617,6 +629,7 @@ object Commands {
                 onClick = {
                     UpdateManager.checkUpdate(true, updateStream)
                 },
+                "§eClick to confirm!",
                 oneTimeClick = true,
             )
         } else {

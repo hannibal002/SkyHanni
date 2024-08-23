@@ -1,20 +1,11 @@
 //
 // TODO LIST
 // V2 RELEASE
-//  - Soulflow API
 //  - Bank API (actually maybe not, I like the current design)
-//  - beacon power
-//  - skyblock level
-//  - more bg options (round, blurr, outline)
 //  - countdown events like fishing festival + fiesta when its not on tablist
-//  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
-//  - Rng meter display
-//  - option to hide coins earned
+//  - improve hide coin difference to also work with bits, motes, etc
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - more anchor points (alignment enums in renderutils)
-//  - 24h instead of 12h for skyblock time
-//  - only alert for lines that exist longer than 1s
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
@@ -29,14 +20,15 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
@@ -58,19 +50,25 @@ object CustomScoreboard {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
-        RenderBackground().renderBackground()
-
         val render =
             if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
                 cache
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(
-            render,
-            posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10
+
+        val textRenderable = Renderable.verticalContainer(
+            render.map { Renderable.string(it.first, horizontalAlign = it.second) },
+            0,
+            horizontalAlign = HorizontalAlignment.CENTER,
+            verticalAlign = VerticalAlignment.CENTER,
         )
+
+        val finalRenderable = RenderBackground.addBackground(textRenderable)
+
+        RenderBackground.updatePosition(finalRenderable)
+
+        config.position.renderRenderable(finalRenderable, posLabel = guiName)
     }
 
     @SubscribeEvent
@@ -108,6 +106,7 @@ object CustomScoreboard {
     internal val displayConfig get() = config.display
     internal val alignmentConfig get() = displayConfig.alignment
     internal val arrowConfig get() = displayConfig.arrow
+    internal val chunkedConfig get() = displayConfig.chunkedStats
     internal val eventsConfig get() = displayConfig.events
     internal val mayorConfig get() = displayConfig.mayor
     internal val partyConfig get() = displayConfig.party
@@ -170,7 +169,7 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+        ConditionalUtils.onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
@@ -193,7 +192,7 @@ object CustomScoreboard {
                     add(
                         "${element.name.firstLetterUppercase()} - " +
                             "${element.showWhen.invoke()} - " +
-                            "${element.getVisiblePair().map { it.first }}"
+                            "${element.getVisiblePair().map { it.first }}",
                     )
                 }
             }
@@ -212,7 +211,7 @@ object CustomScoreboard {
         event.move(
             28,
             "$prefix.displayConfig.showAllActiveEvents",
-            "$prefix.displayConfig.eventsConfig.showAllActiveEvents"
+            "$prefix.displayConfig.eventsConfig.showAllActiveEvents",
         )
 
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
@@ -229,7 +228,7 @@ object CustomScoreboard {
         event.move(
             31,
             "$displayConfigPrefix.cacheScoreboardOnIslandSwitch",
-            "$displayPrefix.cacheScoreboardOnIslandSwitch"
+            "$displayPrefix.cacheScoreboardOnIslandSwitch",
         )
         // Categories
         event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
@@ -242,7 +241,7 @@ object CustomScoreboard {
 
         event.transform(37, "$displayPrefix.events.eventEntries") { element ->
             val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.QUEUE.name))
+            array.add(JsonPrimitive(ScoreboardEvent.QUEUE.name))
             array
         }
         event.transform(40, "$displayPrefix.events.eventEntries") { element ->
@@ -257,16 +256,10 @@ object CustomScoreboard {
             }
 
             if (jsonArray.any { it.asString in listOf("HOT_DOG_CONTEST", "EFFIGIES") }) {
-                newArray.add(JsonPrimitive(ScoreboardEvents.RIFT.name))
+                newArray.add(JsonPrimitive(ScoreboardEvent.RIFT.name))
             }
 
             newArray
-        }
-        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEvents.ANNIVERSARY.name))
-            array.add(JsonPrimitive(ScoreboardEvents.CARNIVAL.name))
-            array
         }
 
         event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
@@ -275,7 +268,7 @@ object CustomScoreboard {
                     HorizontalAlignment.RIGHT.name
                 } else {
                     HorizontalAlignment.DONT_ALIGN.name
-                }
+                },
             )
         }
         event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
@@ -284,8 +277,19 @@ object CustomScoreboard {
                     VerticalAlignment.CENTER.name
                 } else {
                     VerticalAlignment.DONT_ALIGN.name
-                }
+                },
             )
+        }
+        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvent.ANNIVERSARY.name))
+            array.add(JsonPrimitive(ScoreboardEvent.CARNIVAL.name))
+            array
+        }
+        event.transform(51, "$displayPrefix.events.eventEntries") { element ->
+            val array = element.asJsonArray
+            array.add(JsonPrimitive(ScoreboardEvent.NEW_YEAR.name))
+            array
         }
     }
 }

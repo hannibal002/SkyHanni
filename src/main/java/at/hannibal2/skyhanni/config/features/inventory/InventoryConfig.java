@@ -59,6 +59,16 @@ public class InventoryConfig {
     public ChocolateFactoryConfig chocolateFactory = new ChocolateFactoryConfig();
 
     @Expose
+    @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
+    @Accordion
+    public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
+
+    @Expose
+    @Category(name = "Craftable Item List", desc = "")
+    @Accordion
+    public CraftableItemListConfig craftableItemList = new CraftableItemListConfig();
+
+    @Expose
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
@@ -104,6 +114,11 @@ public class InventoryConfig {
     public PocketSackInASackConfig pocketSackInASack = new PocketSackInASackConfig();
 
     @Expose
+    @ConfigOption(name = "Page Scrolling", desc = "")
+    @Accordion
+    public PageScrollingConfig pageScrolling = new PageScrollingConfig();
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
@@ -132,6 +147,8 @@ public class InventoryConfig {
         DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
+        SKYBLOCK_LEVEL("§bSkyblock Level"),
+        BESTIARY_LEVEL("§bBestiary Level")
         ;
 
         private final String str;
@@ -172,7 +189,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Quick Craft Confirmation",
         desc = "Require Ctrl+Click to craft items that aren't often quick crafted " +
-        "(e.g. armor, weapons, accessories). " +
+            "(e.g. armor, weapons, accessories). " +
             "Sack items can be crafted normally."
     )
     @ConfigEditorBoolean
@@ -240,4 +257,10 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeHeldInLore = false;
+
+    @Expose
+    @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean stonkOfStonkPrice = true;
 }
