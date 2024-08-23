@@ -66,6 +66,11 @@ public class DisplayConfig {
     public boolean displayNumbersFirst = false;
 
     @Expose
+    @ConfigOption(name = "Hide coins earned/lost", desc = "Hide the amount of coins earned or lost.")
+    @ConfigEditorBoolean
+    public boolean hideCoinsDifference = false;
+
+    @Expose
     @ConfigOption(name = "Use Custom Lines", desc = "Use custom lines instead of the default ones.")
     @ConfigEditorBoolean
     public boolean useCustomLines = true;
@@ -123,6 +128,11 @@ public class DisplayConfig {
             return str;
         }
     }
+
+    @Expose
+    @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")
+    @ConfigEditorBoolean
+    public boolean skyblockTime24hFormat = false;
 
     @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
