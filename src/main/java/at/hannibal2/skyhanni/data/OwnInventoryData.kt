@@ -127,7 +127,8 @@ object OwnInventoryData {
         }
     }
 
-    private fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
+    // TODO add ah movements
+    fun ignoreItem(duration: Duration, condition: (NEUInternalName) -> Boolean) {
         ignoredItemsUntil.add(IgnoredItem(condition, SimpleTimeMark.now() + duration))
     }
 
