@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -74,15 +73,13 @@ object HoppityCallWarning {
     private var nextWarningTime = 0L
     private var finalWarningTime = 0L
     private const val CALL_LENGTH_MS = 7000
-    private var lastAcceptSent = SimpleTimeMark.farPast()
     private var acceptUUID: String? = null
 
     @SubscribeEvent
     fun onKeypress(event: LorenzKeyPressEvent) {
-        if (acceptUUID == null || config.acceptHotkey == Keyboard.KEY_NONE ||
-            config.acceptHotkey != event.keyCode || lastAcceptSent.passedSince() < 3.seconds) return
-        lastAcceptSent = SimpleTimeMark.now()
+        if (acceptUUID == null || config.acceptHotkey == Keyboard.KEY_NONE || config.acceptHotkey != event.keyCode) return
         HypixelCommands.cb(acceptUUID!!)
+        acceptUUID = null
     }
 
     @SubscribeEvent
@@ -133,12 +130,11 @@ object HoppityCallWarning {
     }
 
     private fun extractPickupUuid(event: LorenzChatEvent) {
-        val siblings = event.chatComponent.siblings
-        if (siblings.size < 3) return
+        val siblings = event.chatComponent.siblings.takeIf { it.size >= 3} ?: return
         val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
-        if (clickEvent.action.name != "run_command" || !clickEvent.value.startsWith("/cb")) return
-        acceptUUID = clickEvent.value.replace("/cb ", "").takeIf { cbUuidPattern.matches(it )}
-        if (acceptUUID != null) DelayedRun.runDelayed(10.seconds) { acceptUUID = null }
+        if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value.lowercase().startsWith("/cb")) return
+        acceptUUID = clickEvent.value.lowercase().replace("/cb ", "").takeIf { cbUuidPattern.matches(it )}
+        if (acceptUUID != null) DelayedRun.runDelayed(12.seconds) { acceptUUID = null }
     }
 
     private fun startWarningUser() {
@@ -154,7 +150,6 @@ object HoppityCallWarning {
         activeWarning = false
         finalWarningTime = 0L
         nextWarningTime = 0L
-        acceptUUID = null
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
