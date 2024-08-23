@@ -73,8 +73,8 @@ object RenderBackground {
 
         val scaledWidth = ScaledResolution(Minecraft.getMinecraft()).scaledWidth
         val scaledHeight = ScaledResolution(Minecraft.getMinecraft()).scaledHeight
-        val elementWidth = renderable.width
-        val elementHeight = renderable.height
+        val elementWidth = (renderable.width * position.scale).toInt()
+        val elementHeight = (renderable.height * position.scale).toInt()
 
         with(alignmentConfig) {
             var x = when (horizontalAlignment) {
