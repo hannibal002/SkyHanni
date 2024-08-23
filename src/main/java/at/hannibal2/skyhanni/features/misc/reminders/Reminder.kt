@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.util.Locale
@@ -13,22 +14,24 @@ import kotlin.time.Duration
 data class Reminder(
     @Expose var reason: String,
     @Expose var remindAt: SimpleTimeMark,
-    @Expose var lastReminder: SimpleTimeMark = SimpleTimeMark.farPast()
+    @Expose var lastReminder: SimpleTimeMark = SimpleTimeMark.farPast(),
 ) {
 
     fun formatShort(): String {
-        val time = Instant.ofEpochMilli(remindAt.toMillis()).atZone(ZoneId.systemDefault())
+        val time = getRemindTime()
         val date = time.toLocalDate()
         if (date.isEqual(LocalDate.now())) {
-            return time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(Locale.getDefault()))
+            return time.format(DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withDefaultLocale())
         }
-        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withLocale(Locale.getDefault()))
+        return date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT).withDefaultLocale())
     }
 
-    fun formatFull(): String {
-        val dateTime = Instant.ofEpochMilli(remindAt.toMillis()).atZone(ZoneId.systemDefault())
-        return dateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withLocale(Locale.getDefault()))
-    }
+    fun formatFull(): String = getRemindTime().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.SHORT).withDefaultLocale())
 
     fun shouldRemind(interval: Duration) = remindAt.isInPast() && lastReminder.passedSince() >= interval
+
+    private fun getRemindTime(): ZonedDateTime = Instant.ofEpochMilli(remindAt.toMillis()).atZone(ZoneId.systemDefault())
+
+    private fun DateTimeFormatter.withDefaultLocale(): DateTimeFormatter = withLocale(Locale.getDefault())
 }
+
