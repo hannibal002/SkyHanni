@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -36,7 +35,7 @@ object HoppityCallWarning {
      */
     private val initHoppityCallPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hoppity.call.init",
-        "§e✆ §r(?:§a|§b)Hoppity§r§e ✆.*"
+        "§e✆ §r(?:§a|§b)Hoppity§r§e ✆.*",
     )
 
     /**
@@ -47,7 +46,7 @@ object HoppityCallWarning {
      */
     private val callRingPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hoppity.call.ring",
-        "§a✆ (?:RING\\.{3} ?){1,3}(?:§r §r§2§l\\[PICK UP])?"
+        "§a✆ (?:RING\\.{3} ?){1,3}(?:§r §r§2§l\\[PICK UP])?",
     )
 
     /**
@@ -56,7 +55,7 @@ object HoppityCallWarning {
      */
     private val cbUuidPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hoppity.call.uuid",
-        "[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}"
+        "[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}",
     )
 
     /**
@@ -64,7 +63,7 @@ object HoppityCallWarning {
      */
     private val pickupHoppityCallPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "hoppity.call.pickup",
-        "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?"
+        "§e\\[NPC] §aHoppity§f: §b✆ §f§rWhat's up, .*§f\\?",
     )
 
     private val config get() = HoppityEggsManager.config.hoppityCallWarning
@@ -76,7 +75,7 @@ object HoppityCallWarning {
     private var acceptUUID: String? = null
 
     @SubscribeEvent
-    fun onKeypress(event: LorenzKeyPressEvent) {
+    fun onKeyPress(event: LorenzKeyPressEvent) {
         if (acceptUUID == null || config.acceptHotkey == Keyboard.KEY_NONE || config.acceptHotkey != event.keyCode) return
         HypixelCommands.cb(acceptUUID!!)
         acceptUUID = null
@@ -130,15 +129,15 @@ object HoppityCallWarning {
     }
 
     private fun extractPickupUuid(event: LorenzChatEvent) {
-        val siblings = event.chatComponent.siblings.takeIf { it.size >= 3} ?: return
+        val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
         val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
         if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value.lowercase().startsWith("/cb")) return
-        acceptUUID = clickEvent.value.lowercase().replace("/cb ", "").takeIf { cbUuidPattern.matches(it )}
+        acceptUUID = clickEvent.value.lowercase().replace("/cb ", "").takeIf { cbUuidPattern.matches(it) }
         if (acceptUUID != null) DelayedRun.runDelayed(12.seconds) { acceptUUID = null }
     }
 
     private fun startWarningUser() {
-        if(activeWarning) return
+        if (activeWarning) return
         activeWarning = true
         SoundUtils.repeatSound(100, 10, warningSound)
         val currentTime = System.currentTimeMillis()
