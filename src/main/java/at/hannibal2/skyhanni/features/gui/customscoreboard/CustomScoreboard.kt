@@ -78,9 +78,19 @@ object CustomScoreboard {
                 if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
                     || verticalAlignment != VerticalAlignment.DONT_ALIGN
                 ) {
+                    val tempHori = horizontalAlignment
+                    val tempVert = verticalAlignment
+
                     horizontalAlignment = HorizontalAlignment.DONT_ALIGN
                     verticalAlignment = VerticalAlignment.DONT_ALIGN
-                    ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+                    ChatUtils.clickableChat(
+                        "Disabled Custom Scoreboard auto-alignment. Click here to undo this action!",
+                        onClick = {
+                            horizontalAlignment = tempHori
+                            verticalAlignment = tempVert
+                            ChatUtils.chat("Enabled Custom Scoreboard auto-alignment.")
+                        },
+                    )
                 }
             }
         }
