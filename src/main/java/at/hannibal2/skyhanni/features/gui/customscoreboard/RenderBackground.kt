@@ -96,13 +96,13 @@ object RenderBackground {
             if (outlineConfig.enabled) {
                 val thickness = outlineConfig.thickness
 
-                when (alignmentConfig.horizontalAlignment) {
+                when (horizontalAlignment) {
                     RenderUtils.HorizontalAlignment.RIGHT -> x -= thickness / 2
                     RenderUtils.HorizontalAlignment.LEFT -> x += thickness / 2
                     else -> x
                 }
 
-                when (alignmentConfig.verticalAlignment) {
+                when (verticalAlignment) {
                     RenderUtils.VerticalAlignment.TOP -> y += thickness / 2
                     RenderUtils.VerticalAlignment.BOTTOM -> y -= thickness / 2
                     else -> y
