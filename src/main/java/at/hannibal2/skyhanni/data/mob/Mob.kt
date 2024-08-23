@@ -167,8 +167,10 @@ class Mob(
     }
 
     private fun makeRelativeBoundingBox() =
-        (baseEntity.entityBoundingBox.union(extraEntities.filter { it !is EntityArmorStand }
-            .mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+        (baseEntity.entityBoundingBox.union(
+            extraEntities.filter { it !is EntityArmorStand }
+                .mapNotNull { it.entityBoundingBox },
+        ))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +

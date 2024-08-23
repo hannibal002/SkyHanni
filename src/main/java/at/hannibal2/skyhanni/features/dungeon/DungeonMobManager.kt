@@ -23,21 +23,23 @@ import java.awt.Color
 object DungeonMobManager {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHighlighter
-    private val starred get() = config.starred
+    private val starredConfig get() = config.starred
     private val fel get() = config.fel
+
+    private val staredInvisible = mutableSetOf<Mob>()
+    private val felOnTheGround = mutableSetOf<Mob>()
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
-            starred.highlight,
-            starred.colour,
-//             starred.showOutline
+            starredConfig.highlight,
+            starredConfig.colour,
         ) {
-            val color = if (starred.highlight.get()) null else starred.colour.get().toChromaColor()
+            val color = if (starredConfig.highlight.get()) null else getStarColor()
             MobData.skyblockMobs.filter { it.hasStar }.forEach {
                 handleStar0(it, color)
             }
-            if (!starred.highlight.get()) {
+            if (!starredConfig.highlight.get()) {
                 staredInvisible.clear()
             }
         }
@@ -65,7 +67,7 @@ object DungeonMobManager {
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
-        if (starred.highlight.get()) {
+        if (starredConfig.highlight.get()) {
             staredInvisible.remove(event.mob)
         }
         handleFelDespawn(event.mob)
@@ -75,43 +77,6 @@ object DungeonMobManager {
     fun onLorenzTick(event: LorenzTickEvent) {
         if (!IslandType.CATACOMBS.isInIsland()) return
         handleInvisibleStar()
-    }
-
-    private val staredInvisible = mutableSetOf<Mob>()
-
-    private fun handleStar(mob: Mob) {
-        if (!starred.highlight.get()) return
-        if (!mob.hasStar) return
-        handleStar0(mob, starred.colour.get().toChromaColor())
-    }
-
-    private fun handleInvisibleStar() {
-        if (!starred.highlight.get()) return
-        if (staredInvisible.isEmpty()) return
-        staredInvisible.removeIf {
-            val visible = !it.isInvisible()
-            if (visible) {
-                it.highlight(starred.colour.get().toChromaColor())
-            }
-            visible
-        }
-    }
-
-    private fun handleStar0(mob: Mob, colour: Color?) {
-        if (mob.isInvisible()) {
-            staredInvisible.add(mob)
-            return
-        }
-        mob.highlight(colour)
-    }
-
-    private val felOnTheGround = mutableSetOf<Mob>()
-
-    private fun handleFel(mob: Mob) {
-        if (!fel.highlight.get()) return
-        if (mob.name != "Fels") return
-        if (!mob.isInvisible()) return
-        felOnTheGround.add(mob)
     }
 
     @SubscribeEvent
@@ -133,14 +98,48 @@ object DungeonMobManager {
             event.drawWaypointFilled(
                 mob.baseEntity.getLorenzVec().add(-0.5, -0.23, -0.5),
                 fel.colour.get().toChromaColor(),
-                false,
-                false,
+                seeThroughBlocks = false,
+                beacon = false,
                 extraSize = -0.2,
                 minimumAlpha = 0.8f,
                 inverseAlphaScale = true,
             )
             !mob.isInvisible()
         }
+    }
+
+    private fun handleStar(mob: Mob) {
+        if (!starredConfig.highlight.get()) return
+        if (!mob.hasStar) return
+        handleStar0(mob, getStarColor())
+    }
+
+    private fun handleInvisibleStar() {
+        if (!starredConfig.highlight.get()) return
+        staredInvisible.removeIf {
+            val visible = !it.isInvisible()
+            if (visible) {
+                it.highlight(getStarColor())
+            }
+            visible
+        }
+    }
+
+    private fun getStarColor(): Color = starredConfig.colour.get().toChromaColor()
+
+    private fun handleStar0(mob: Mob, colour: Color?) {
+        if (mob.isInvisible()) {
+            staredInvisible.add(mob)
+            return
+        }
+        mob.highlight(colour)
+    }
+
+    private fun handleFel(mob: Mob) {
+        if (!fel.highlight.get()) return
+        if (mob.name != "Fels") return
+        if (!mob.isInvisible()) return
+        felOnTheGround.add(mob)
     }
 
     private fun handleFelDespawn(mob: Mob) {
