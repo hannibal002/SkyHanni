@@ -30,37 +30,37 @@ enum class OreType(
     COAL(
         "Coal",
         "COAL",
-        listOf(OreBlock.COAL_ORE),
+        listOf(OreBlock.COAL_ORE, OreBlock.PURE_COAL),
     ),
     IRON(
         "Iron",
         "IRON_INGOT",
-        listOf(OreBlock.IRON_ORE),
+        listOf(OreBlock.IRON_ORE, OreBlock.PURE_IRON),
     ),
     GOLD(
         "Gold",
         "GOLD_INGOT",
-        listOf(OreBlock.GOLD_ORE, OreBlock.DWARVEN_GOLD),
+        listOf(OreBlock.GOLD_ORE, OreBlock.PURE_GOLD),
     ),
     LAPIS(
         "Lapis Lazuli",
         "INK_SACK-4",
-        listOf(OreBlock.LAPIS_ORE),
+        listOf(OreBlock.LAPIS_ORE, OreBlock.PURE_LAPIS),
     ),
     REDSTONE(
         "Redstone",
         "REDSTONE",
-        listOf(OreBlock.REDSTONE_ORE, OreBlock.DWARVEN_REDSTONE),
+        listOf(OreBlock.REDSTONE_ORE, OreBlock.PURE_REDSTONE),
     ),
     EMERALD(
         "Emerald",
         "EMERALD",
-        listOf(OreBlock.EMERALD_ORE, OreBlock.DWARVEN_EMERALD),
+        listOf(OreBlock.EMERALD_ORE, OreBlock.PURE_EMERALD),
     ),
     DIAMOND(
         "Diamond",
         "DIAMOND",
-        listOf(OreBlock.DIAMOND_ORE, OreBlock.DWARVEN_DIAMOND),
+        listOf(OreBlock.DIAMOND_ORE, OreBlock.PURE_DIAMOND),
     ),
     NETHERRACK(
         "Netherrack",
