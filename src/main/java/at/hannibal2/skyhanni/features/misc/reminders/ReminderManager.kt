@@ -39,21 +39,15 @@ object ReminderManager {
 
     private var listPage = 1
 
-    private fun newId(): String {
-        var id: String
-        do {
-            id = UUID.randomUUID().toString()
-        } while (storage.containsKey(id))
-        return id
-    }
+    private fun generateRandomId() = UUID.randomUUID().toString()
 
     private fun getSortedReminders() = storage.entries.sortedBy { it.value.remindAt }
 
     private fun sendMessage(message: String) = Text.join("§e[Reminder]", " ", message).send(REMINDERS_ACTION_ID)
 
     private fun createDivider() = Text.HYPHEN.fitToChat().style {
-        setStrikethrough(true)
-        setColor(EnumChatFormatting.BLUE)
+        strikethrough = true
+        color = EnumChatFormatting.BLUE
     }
 
     private fun parseReminder(text: String) = try {
@@ -132,7 +126,7 @@ object ReminderManager {
         val reminder = args.drop(1).joinToString(" ")
         val remindAt = SimpleTimeMark.now().plus(time)
 
-        storage[newId()] = Reminder(reminder, remindAt)
+        storage[generateRandomId()] = Reminder(reminder, remindAt)
         sendMessage("§6Reminder set for ${time.format()}")
     }
 
