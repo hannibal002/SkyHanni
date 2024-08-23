@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.backgroundConfig
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -15,48 +16,46 @@ object RenderBackground {
     private val textureLocation by lazy { ResourceLocation("skyhanni", "scoreboard.png") }
 
     internal fun addBackground(renderable: Renderable): Renderable {
-        val backgroundConfig = CustomScoreboard.backgroundConfig
-        val outlineConfig = backgroundConfig.outline
-        val padding = backgroundConfig.borderSize
+        with(backgroundConfig) {
+            if (!backgroundConfig.enabled) return renderable
 
-        if (!backgroundConfig.enabled) return renderable
+            val backgroundRenderable = if (backgroundConfig.useCustomBackgroundImage) {
+                Renderable.drawInsideImage(
+                    renderable,
+                    textureLocation,
+                    (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
+                    borderSize,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    radius = backgroundConfig.roundedCornerSmoothness,
+                )
+            } else {
+                Renderable.drawInsideRoundedRect(
+                    renderable,
+                    backgroundConfig.color.toChromaColor(),
+                    borderSize,
+                    backgroundConfig.roundedCornerSmoothness,
+                    1,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                )
+            }
 
-        val backgroundRenderable = if (backgroundConfig.useCustomBackgroundImage) {
-            Renderable.drawInsideImage(
-                renderable,
-                textureLocation,
-                (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
-                padding,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                radius = backgroundConfig.roundedCornerSmoothness,
-            )
-        } else {
-            Renderable.drawInsideRoundedRect(
-                renderable,
-                backgroundConfig.color.toChromaColor(),
-                padding,
-                backgroundConfig.roundedCornerSmoothness,
-                1,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            )
+            return if (outline.enabled) {
+                Renderable.drawInsideRoundedRectOutline(
+                    backgroundRenderable,
+                    0,
+                    backgroundConfig.roundedCornerSmoothness,
+                    1,
+                    outline.colorTop.toChromaColor().rgb,
+                    outline.colorBottom.toChromaColor().rgb,
+                    outline.thickness,
+                    outline.blur,
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                )
+            } else backgroundRenderable
         }
-
-        return if (outlineConfig.enabled) {
-            Renderable.drawInsideRoundedRectOutline(
-                backgroundRenderable,
-                0,
-                backgroundConfig.roundedCornerSmoothness,
-                1,
-                outlineConfig.colorTop.toChromaColor().rgb,
-                outlineConfig.colorBottom.toChromaColor().rgb,
-                outlineConfig.thickness,
-                outlineConfig.blur,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            )
-        } else backgroundRenderable
     }
 
     internal fun updatePosition(renderable: Renderable) {
