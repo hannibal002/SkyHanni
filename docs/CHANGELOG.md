@@ -1,6 +1,60 @@
 # SkyHanni - Change Log
 
-## Version 0.26 (In Beta)
+## Version 0.27 (in Beta)
+
+### New Features
+
+#### Scoreboard Features
+
++ Added Soulflow to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+    + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
+
+### Improvements
+
+#### Diana Improvements
+
++ Added /warp stonks to the Burrow Warp Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2399)
+
+#### Scoreboard Improvements
+
++ Added an option to display the SkyBlock time in 24-hour format in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added an option to hide coins earned/lost in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added margin customization to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added an opacity slider for the Custom Background Image in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+
+### Fixes
+
+#### DIana Fixes
+
++ Added a chat option to disable a Patcher setting that breaks SkyHanni's line from the center of the player to something else. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2387)
+    + E.g. Diana guesses, Slayer Mini Bosses, etc.
+
+#### Inventory Fixes
+
++ Fixed ItemCategory errors being sent even though we already have a fix. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2392)
++ Fixed AH item movements being detected by Item Trackers as new drops. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2380)
+
+#### Mining Fixes
+
++ Added new Pure Ores support. - Empa (https://github.com/hannibal002/SkyHanni/pull/2388)
++ Fixed a typo in corpse detection. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/2386)
+
+#### Scoreboard Fixes
+
++ Fixed a Scoreboard Error during M7 Dragons. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2382)
++ Fixed Custom Scoreboard Background position being updated 1 frame after the scoreboard text. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+
+#### Misc Fixes
+
++ Fixed Mayor Detection failing when Special Mayors are in office. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2389)
++ Updated Derpy's extra tax perk to use the correct name. - Luna (https://github.com/hannibal002/SkyHanni/pull/2393)
+
+### Technical Details
+
++ Cleaned up IslandExceptions to improve readability. - walker (https://github.com/hannibal002/SkyHanni/pull/1560)
++ Added drawInsideRoundedRectOutline, drawInsideImage, and image Renderables. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+
+## Version 0.26
 
 ### New Features
 
@@ -16,7 +70,7 @@
   azurejelly (https://github.com/hannibal002/SkyHanni/pull/1888)
 + Added In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
-+ Added toggle for compacting Garden visitor summary messages. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2026)
++ Added toggle for compacting Garden visitor summary messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2026)
 + Add Armor Stack Display. - Xupie (https://github.com/hannibal002/SkyHanni/pull/1811)
     + Display the number of stacks on armor pieces like Crimson, Terror etc.
 + Add a line to Nukekebi Skull. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2148)
@@ -150,7 +204,7 @@
     + Highly customizable: Colors, display sizes.
     + Estimated Price Integration.
     + Favorite slots; option to only display favorite slots.
-+ Added toggle for compacting Garden visitor summary messages. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2026)
++ Added toggle for compacting Garden visitor summary messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2026)
 + Added SkyHanni User Luck to the stats breakdown. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1288)
     + This can be viewed in /sbmenu, /equipment, and the Misc Stats submenu.
 + Added a source download verification checker. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/1914)
@@ -180,7 +234,7 @@
     + Also shortened the default display.
 + Minor GUI improvements in /ff. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/873)
 + Displays in /ff the fortune from bestiary and armor stats for enchantments and gemstones. - maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/1861)
-+ Allow clicking on the Craftable! text in the shopping list to open the "view recipe" menu. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2075)
++ Allow clicking on the Craftable! text in the shopping list to open the "view recipe" menu. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2075)
 + Rename Mushroom Tier to Mushroom Milestone in Mooshroom Cow Perk. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2159)
 + Add Fine Flour to the /ff menu. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2194)
 + Added a "Compact" option to the Rancher Boots Optimal Speed GUI. - Empa (https://github.com/hannibal002/SkyHanni/pull/2137)
@@ -197,7 +251,7 @@
 + Hoppity Collection Stats are now persistent. - appable (https://github.com/hannibal002/SkyHanni/pull/1836)
     + No longer reset on profile swap or game restart.
 + Merged duplicate times in compacted Hoppity's messages. -
-  DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/1887)
+  Daveed (https://github.com/hannibal002/SkyHanni/pull/1887)
 + Option to show Hoppity Eggs timer outside of SkyBlock. -
   maxime-bodifee (https://github.com/hannibal002/SkyHanni/pull/1926)
 + Adjusted and added Rabbit Uncle & Dog Keybinds. - raven (https://github.com/hannibal002/SkyHanni/pull/1907)
@@ -388,7 +442,7 @@
 + Fixed Fine Flour exportation not getting detected from chat messages for use in FF Guide. - Luna (https://github.com/hannibal002/SkyHanni/pull/2215)
 + Fixed "Craftable!" text not opening the recipe. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2219)
 + Fixed favorite pets not being detected by FF Guide. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2202)
-+ Fixed farming weight estimate being much too large. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2230)
++ Fixed farming weight estimate being much too large. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2230)
 + Fixed Jacob's Contest FF needed display not showing. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2262)
 + Fixed Dicer Tracker Reset Button misalignment. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2248)
 + Fixed errors when selecting Fine Flour with the Sprayonator. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2251)
@@ -413,7 +467,7 @@
   appable (https://github.com/hannibal002/SkyHanni/pull/1925)
 + Fixed incorrect API name conversion for Fish the Rabbit. - appable (https://github.com/hannibal002/SkyHanni/pull/1975)
 + Fixed stray rabbit sound not playing for the Golden Rabbit. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1913)
-+ Fixed compact chat sometimes breaking when obtaining legendary or higher tier rabbits. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2041)
++ Fixed compact chat sometimes breaking when obtaining legendary or higher tier rabbits. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2041)
 + Fixed highlight missing requirements even when Hoppity Rabbit is already found. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2101)
 + Fixed Compact Hoppity Chat not working with rabbits purchased from the Hoppity NPC. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2100)
 + Fixed a rare case where golden strays caused incorrect duplicate detection during Compact Chat for Hoppity's. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2090)
