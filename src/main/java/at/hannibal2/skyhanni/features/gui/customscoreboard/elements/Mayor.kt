@@ -47,3 +47,6 @@ object Mayor : ScoreboardElement() {
 
     override fun showIsland() = !RiftAPI.inRift()
 }
+
+// click: open /calendar
+// hover on perks: show description

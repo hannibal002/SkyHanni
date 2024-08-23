@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.informationFilteringConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.partyConfig
-import at.hannibal2.skyhanni.utils.CollectionUtils.removeFirst
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 
 // internal
@@ -15,10 +14,11 @@ object Party : ScoreboardElement() {
     override fun getDisplay() = buildList {
         if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList
         add(if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})")
-        PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
+        if (partyConfig.showPartyLeader) PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
+
         PartyAPI.partyMembers
             .take(partyConfig.maxPartyList)
-            .removeFirst { it == PartyAPI.partyLeader }
+            .apply { if (partyConfig.showPartyLeader) remove(PartyAPI.partyLeader) }
             .forEach {
                 add(" §7- §f$it")
             }
@@ -35,3 +35,6 @@ object Party : ScoreboardElement() {
 
     override fun showIsland() = !DungeonAPI.inDungeon()
 }
+
+// click (title): run /party list
+// click (members): run /pv <name> or  /party kick <name> (maybe option?)

@@ -12,3 +12,5 @@ object Unknown : ScoreboardElement() {
 
     override val configLine = "§cUnknown lines the mod is not detecting"
 }
+
+// click: join skyhanni discord

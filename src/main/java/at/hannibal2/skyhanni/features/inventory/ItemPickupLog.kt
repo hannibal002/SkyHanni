@@ -229,13 +229,9 @@ object ItemPickupLog {
     }
 
     private fun isBannedItem(item: ItemStack): Boolean {
-        if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
-            return true
-        }
-
-        if (bannedItemsConverted.contains(item.getInternalNameOrNull())) {
-            return true
-        }
+        val internalName = item.getInternalNameOrNull() ?: return true
+        if (internalName.startsWith("MAP") == true) return true
+        if (internalName in bannedItemsConverted) return true
 
         if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
             return true

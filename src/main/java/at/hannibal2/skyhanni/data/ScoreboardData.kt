@@ -22,7 +22,7 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    var objectiveTitle = ""
+    val objectiveTitle: String get() = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName ?: ""
 
     private var dirty = false
 
@@ -33,16 +33,32 @@ object ScoreboardData {
             val start = split[0]
             var end = if (split.size > 1) split[1] else ""
 
+            /**
+             * If the line is split into two parts, we need to remove the color code prefixes from the end part
+             * to prevent the color from being applied to the start of `end`, which would cause the color to be
+             * duplicated in the final output.
+             *
+             * This fucks up different Regex checks if not working correctly, like here:
+             * ```
+             * Pattern: '§8- (§.)+[\w\s]+Dragon§a [\w,.]+§.❤'
+             * Lines: - '§8- §c§aApex Dra§agon§a 486M§c❤'
+             *        - '§8- §c§6Flame Dr§6agon§a 460M§c❤'
+             * ```
+             */
             val lastColor = start.lastColorCode() ?: ""
 
-            // Determine the longest prefix of "end" that matches any suffix of "lastColor"
+            // Generate the list of color suffixes
             val colorSuffixes = generateSequence(lastColor) { it.dropLast(2) }
                 .takeWhile { it.isNotEmpty() }
-                .toList()
+                .toMutableList()
 
-            val matchingPrefix = colorSuffixes.find { end.startsWith(it) } ?: ""
-            if (matchingPrefix.isNotEmpty()) {
-                end = end.removePrefix(matchingPrefix)
+            // Iterate through the colorSuffixes to remove matching prefixes from 'end'
+            for (suffix in colorSuffixes.toList()) {
+                if (end.startsWith(suffix)) {
+                    end = end.removePrefix(suffix)
+                    colorSuffixes.remove(suffix)
+                    break
+                }
             }
 
             add(start + end)
@@ -90,7 +106,6 @@ object ScoreboardData {
     private fun fetchScoreboardLines(): List<String> {
         val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return emptyList()
         val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return emptyList()
-        objectiveTitle = objective.displayName
         var scores = scoreboard.getSortedScores(objective)
         val list = scores.filter { input: Score? ->
             input != null && input.playerName != null && !input.playerName.startsWith("#")

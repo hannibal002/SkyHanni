@@ -20,3 +20,5 @@ object Cookie : ScoreboardElement() {
 
     override val configLine = "§dCookie Buff§f: 3d 17h"
 }
+
+// click: open sbmenu

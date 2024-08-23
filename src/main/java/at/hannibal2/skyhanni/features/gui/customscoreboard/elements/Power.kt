@@ -20,3 +20,5 @@ object Power : ScoreboardElement() {
 
     override fun showIsland() = !RiftAPI.inRift()
 }
+
+// click: does a "your bags" command exist?

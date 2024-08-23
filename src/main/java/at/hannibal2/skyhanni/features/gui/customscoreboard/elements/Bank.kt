@@ -22,3 +22,5 @@ object Bank : ScoreboardElement() {
 
     override fun showIsland() = !RiftAPI.inRift()
 }
+
+// click: open /bank (does that even exist?)
