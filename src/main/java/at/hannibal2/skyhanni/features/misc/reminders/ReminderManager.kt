@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.misc.reminders
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.Base62
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -22,6 +21,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.wrap
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -42,7 +42,7 @@ object ReminderManager {
     private fun newId(): String {
         var id: String
         do {
-            id = Base62.encode((Math.random() * Int.MAX_VALUE).toInt())
+            id = UUID.randomUUID().toString()
         } while (storage.containsKey(id))
         return id
     }
@@ -126,7 +126,7 @@ object ReminderManager {
     }
 
     private fun createReminder(args: Array<String>) {
-        if (args.size < 2) return ChatUtils.userError("/shremind [time] [reminder]")
+        if (args.size < 2) return help()
 
         val time = parseReminder(args.first()) ?: return ChatUtils.userError("Invalid time format")
         val reminder = args.drop(1).joinToString(" ")
