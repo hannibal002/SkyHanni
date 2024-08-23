@@ -96,16 +96,16 @@ object RenderBackground {
             if (outlineConfig.enabled) {
                 val thickness = outlineConfig.thickness
 
-                if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.RIGHT) {
-                    x -= thickness / 2
-                } else if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.LEFT) {
-                    x += thickness / 2
+                when (alignmentConfig.horizontalAlignment) {
+                    RenderUtils.HorizontalAlignment.RIGHT -> x -= thickness / 2
+                    RenderUtils.HorizontalAlignment.LEFT -> x += thickness / 2
+                    else -> x
                 }
 
-                if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.TOP) {
-                    y += thickness / 2
-                } else if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.BOTTOM) {
-                    y -= thickness / 2
+                when (alignmentConfig.verticalAlignment) {
+                    RenderUtils.VerticalAlignment.TOP -> y += thickness / 2
+                    RenderUtils.VerticalAlignment.BOTTOM -> y -= thickness / 2
+                    else -> y
                 }
             }
             CustomScoreboard.config.position.moveTo(x, y)
