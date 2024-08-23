@@ -36,7 +36,7 @@ object CorpseLocator {
      */
     private val mineshaftCoordsPattern by RepoPattern.pattern(
         "mineshaft.corpse.coords",
-        "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?"
+        "x: (?<x>-?\\d+), y: (?<y>-?\\d+), z: (?<z>-?\\d+)(?:.+)?",
     )
 
     private val sharedWaypoints: MutableList<LorenzVec> = mutableListOf()
@@ -53,18 +53,15 @@ object CorpseLocator {
 
                 val canSee = entity.getLorenzVec().canBeSeen(-1..3)
                 if (canSee) {
-                    if (corpseType.displayText == "Umber Corpse") {
-                        ChatUtils.chat("Located an ${corpseType.displayText} and marked its location with a waypoint.")
-                    } else {
-                        ChatUtils.chat("Located a ${corpseType.displayText} and marked its location with a waypoint.")
-                    }
+                    val article = if (corpseType.displayText == "Umber Corpse") "an" else "a"
+                    ChatUtils.chat("Located $article ${corpseType.displayText} and marked its location with a waypoint.")
 
                     MineshaftWaypoints.waypoints.add(
                         MineshaftWaypoint(
                             waypointType = corpseType,
                             location = entity.getLorenzVec().add(y = 1),
-                            isCorpse = true
-                        )
+                            isCorpse = true,
+                        ),
                     )
                 }
             }
@@ -75,7 +72,7 @@ object CorpseLocator {
             .filterNot { corpse ->
                 sharedWaypoints.any { corpse.location.distance(it) <= 5 }
             }
-            .filter { it.location.distanceToPlayer() <= 5}
+            .filter { it.location.distanceToPlayer() <= 5 }
             .minByOrNull { it.location.distanceToPlayer() } ?: return
 
         val (x, y, z) = closestCorpse.location.toDoubleArray().map { it.toInt() }
