@@ -104,7 +104,7 @@ public class DownloadSourceChecker {
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,
             null,
-            new JPanel[]{links, buttons},
+            new JPanel[] { links, buttons },
             links
         );
 
