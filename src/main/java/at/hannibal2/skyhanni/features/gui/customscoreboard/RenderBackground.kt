@@ -77,19 +77,36 @@ object RenderBackground {
         val elementHeight = renderable.height
 
         with(alignmentConfig) {
-            val x = when (horizontalAlignment) {
+            var x = when (horizontalAlignment) {
                 RenderUtils.HorizontalAlignment.DONT_ALIGN -> position.getAbsX()
                 RenderUtils.HorizontalAlignment.LEFT -> 0 + margin
                 RenderUtils.HorizontalAlignment.CENTER -> scaledWidth / 2 - elementWidth / 2
                 RenderUtils.HorizontalAlignment.RIGHT -> scaledWidth - elementWidth - margin
                 else -> 0
             }
-            val y = when (verticalAlignment) {
+            var y = when (verticalAlignment) {
                 RenderUtils.VerticalAlignment.DONT_ALIGN -> position.getAbsY()
                 RenderUtils.VerticalAlignment.TOP -> 0 + margin
                 RenderUtils.VerticalAlignment.CENTER -> scaledHeight / 2 - elementHeight / 2
                 RenderUtils.VerticalAlignment.BOTTOM -> scaledHeight - elementHeight - margin
                 else -> 0
+            }
+
+            val outlineConfig = CustomScoreboard.backgroundConfig.outline
+            if (outlineConfig.enabled) {
+                val thickness = outlineConfig.thickness
+
+                if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.RIGHT) {
+                    x -= thickness / 2
+                } else if (alignmentConfig.horizontalAlignment == RenderUtils.HorizontalAlignment.LEFT) {
+                    x += thickness / 2
+                }
+
+                if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.TOP) {
+                    y += thickness / 2
+                } else if (alignmentConfig.verticalAlignment == RenderUtils.VerticalAlignment.BOTTOM) {
+                    y -= thickness / 2
+                }
             }
             CustomScoreboard.config.position.moveTo(x, y)
         }
