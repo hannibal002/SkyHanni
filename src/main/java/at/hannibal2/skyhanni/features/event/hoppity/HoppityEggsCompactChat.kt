@@ -67,6 +67,7 @@ object HoppityEggsCompactChat {
         val mealNameFormatted = if (rabbitBought) "§aBought Rabbit" else "$mealName Egg"
         val showRarity = HoppityEggsManager.config.rarityInCompact
 
+        val rarityText = if (showRarity) "$lastRarity " else ""
         return if (duplicate) {
             val format = lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = lastDuplicateAmount?.let {
@@ -74,9 +75,9 @@ object HoppityEggsCompactChat {
             } ?: "?"
 
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormatted! §7Duplicate ${ if(showRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormatted! §7Duplicate $rarityText$lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
-            "$mealNameFormatted! §d§lNEW ${ if(showRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
+            "$mealNameFormatted! §d§lNEW $rarityText$lastName §7(${lastProfit}§7)"
         } else "?"
     }
 
