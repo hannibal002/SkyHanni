@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.features.gui.electionviewer.CurrentMayorScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
@@ -54,6 +58,17 @@ object MinisterInCalendar {
                     .setLore(ministerLore)
                     .setStackDisplayName("${ministerColor}Minister ${minister.mayorName}"),
             )
+        }
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
+
+        if (event.slotId in listOf(37, 38)) {
+            event.cancel()
+
+            SkyHanniMod.screenToOpen = CurrentMayorScreen
         }
     }
 
