@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.APIUtil
@@ -44,6 +45,11 @@ object Translator {
         editedComponent.setChatStyle(clickStyle)
     }
 
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(55, "chat.translator", "chat.translator.translateOnClick")
+    }
+
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
         val text = messageContentRegex.find(message)!!.groupValues[1].removeColor()
         style.setChatClickEvent(ClickEvent(ClickEvent.Action.RUN_COMMAND, "/shtranslate $text"))
@@ -51,7 +57,7 @@ object Translator {
         return style
     }
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.translator
 
     /*
      * Simplified version of the JSON response:
@@ -130,9 +136,22 @@ object Translator {
         val message = args.joinToString(" ").removeColor()
 
         coroutineScope.launch {
-            val translation = getTranslationToEnglish(message)
-            if (translation == "Unable to translate!") ChatUtils.userError("Unable to translate message :( (is it in English?)")
-            else ChatUtils.chat("Found translation: §f$translation")
+            var lang = config.languageCode.get()
+            val translation = if (lang.isEmpty()) {
+                getTranslationToEnglish(message)
+            } else {
+                getTranslationFromEnglish(message, lang)
+            }
+            if (message == translation) {
+                ChatUtils.userError("Translation is the same as the original message!")
+                return@launch
+            }
+
+            if (translation == "Unable to translate!") {
+                ChatUtils.userError("Unable to translate message :( (is it in English?)")
+                return@launch
+            }
+            ChatUtils.chat("Found translation: §f$translation")
         }
     }
 
@@ -151,5 +170,5 @@ object Translator {
         }
     }
 
-    fun isEnabled() = config.translator
+    fun isEnabled() = config.translateOnClick
 }
