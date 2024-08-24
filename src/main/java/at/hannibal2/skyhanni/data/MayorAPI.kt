@@ -218,7 +218,7 @@ object MayorAPI {
             val currentMayorName = data.mayor.name
             if (lastMayor?.name != currentMayorName) {
                 currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-                currentMinister = setAssumeMayorJson(data.mayor.minister.name, data.mayor.minister.perk)
+                currentMinister = data.mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
             }
         }
     }

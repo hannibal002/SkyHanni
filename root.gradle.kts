@@ -12,7 +12,7 @@ plugins {
 
 allprojects {
     group = "at.hannibal2.skyhanni"
-    version = "0.26.Beta.22"
+    version = "0.27.Beta.1"
 }
 
 preprocess {
