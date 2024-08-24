@@ -35,7 +35,7 @@ object DungeonMobManager {
             starredConfig.highlight,
             starredConfig.colour,
         ) {
-            val color = if (starredConfig.highlight.get()) null else getStarColor()
+            val color = if (starredConfig.highlight.get()) getStarColor() else null
             MobData.skyblockMobs.filter { it.hasStar }.forEach {
                 handleStar0(it, color)
             }

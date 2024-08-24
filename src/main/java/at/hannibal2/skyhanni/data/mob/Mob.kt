@@ -115,13 +115,15 @@ class Mob(
 
     private var highlightColor: Color? = null
 
-    /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
+    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
+     * If [color] is set to null it removes a highlight*/
     fun highlight(color: Color?) {
         if (color == highlightColor) return
-        highlightColor = color?.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         if (color == null) {
             internalRemoveColor()
+            highlightColor = null
         } else {
+            highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
             internalHighlight()
         }
     }
