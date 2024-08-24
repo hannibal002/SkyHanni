@@ -21,6 +21,13 @@ object ElectionViewerUtils {
         "Jerry" to 17,
     )
 
+    private val mayorRenderables = mutableMapOf<String, Renderable>()
+
+    fun getFakeMayorRenderable(mayor: Mayor) = mayorRenderables.getOrPut(mayor.name) { getFakeMayor(mayor) }
+
+    fun getFakeCandidateRenderable(candidate: MayorCandidate) =
+        getFakeMayorRenderable(Mayor.getMayorFromName(candidate.name) ?: Mayor.UNKNOWN)
+
     /**
      * The code doesn't work correctly if the [currentYear] is below 17
      * @param currentYear The current year
@@ -29,7 +36,7 @@ object ElectionViewerUtils {
     fun getNextSpecialMayors(currentYear: Int) =
         specialMayorStart.map { it.key to it.value + ((currentYear - it.value) / 24 + 1) * 24 }.sortedBy { it.second }
 
-    fun getFakeMayor(mayor: Mayor): Renderable {
+    private fun getFakeMayor(mayor: Mayor): Renderable {
         // NEU Repo store special mayors with SPECIAL infix
         val mayorName = if (mayor in listOf(Mayor.DERPY, Mayor.JERRY, Mayor.SCORPIUS)) {
             mayor.name + "_SPECIAL"
@@ -50,8 +57,6 @@ object ElectionViewerUtils {
             entityScale = 50,
         )
     }
-
-    fun getFakeCandidate(candidate: MayorCandidate) = getFakeMayor(Mayor.getMayorFromName(candidate.name) ?: Mayor.UNKNOWN)
 
     private fun getSkinFromMayorName(mayorName: String): String? {
         try {

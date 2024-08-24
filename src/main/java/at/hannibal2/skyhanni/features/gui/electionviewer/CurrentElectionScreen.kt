@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeCandidate
+import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeCandidateRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -57,7 +57,7 @@ object CurrentElectionScreen : ElectionViewerScreen() {
 
             val candidateContainer = Renderable.horizontalContainer(
                 listOf(
-                    getFakeCandidate(candidate),
+                    getFakeCandidateRenderable(candidate),
                     candidateContent,
                 ),
             )

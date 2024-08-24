@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.MayorAPI.ELECTION_END_DAY
 import at.hannibal2.skyhanni.data.MayorAPI.ELECTION_END_MONTH
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayorRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -30,7 +31,7 @@ object SpecialMayorScreen : ElectionViewerScreen() {
                 val color = MayorAPI.mayorNameToColorCode(name)
                 Renderable.horizontalContainer(
                     listOf(
-                        ElectionViewerUtils.getFakeMayor(Mayor.getMayorFromName(name) ?: Mayor.UNKNOWN),
+                        getFakeMayorRenderable(Mayor.getMayorFromName(name) ?: Mayor.UNKNOWN),
                         Renderable.verticalContainer(
                             listOf(
                                 "$color$name",

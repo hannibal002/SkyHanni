@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.gui.electionviewer
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayor
+import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayorRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
@@ -51,7 +51,7 @@ object CurrentMayorScreen : ElectionViewerScreen() {
     private fun getMayorRenderable(mayor: Mayor?, type: String, time: SimpleTimeMark? = null): Renderable? {
         if (mayor == null) return null
 
-        val fakePlayer = getFakeMayor(mayor)
+        val fakePlayer = getFakeMayorRenderable(mayor)
 
         val mayorDescription = getMayorDescription(mayor, type, time)
 
