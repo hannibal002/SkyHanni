@@ -1,14 +1,17 @@
-package at.hannibal2.skyhanni.features.chat
+package at.hannibal2.skyhanni.features.chat.translation
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.getPlayerNameFromChatMessage
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.JsonArray
@@ -21,6 +24,7 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
+import kotlin.time.Duration.Companion.milliseconds
 
 // TODO split into two classes: TranslatorCommand and GoogleTranslator. only communicates via getTranslationFromEnglish and getTranslationToEnglish
 @SkyHanniModule
@@ -48,6 +52,36 @@ object Translator {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(55, "chat.translator", "chat.translator.translateOnClick")
+    }
+
+    var lastUserChange = SimpleTimeMark.farPast()
+
+    @SubscribeEvent
+    fun onConfigReload(event: ConfigLoadEvent) {
+        config.languageCode.onToggle {
+            if (lastUserChange.passedSince() < 50.milliseconds) return@onToggle
+            lastUserChange = SimpleTimeMark.now()
+
+            val text = config.languageCode.get()
+            if (text.isEmpty()) {
+                config.languageName.set(TranslatableLanguage.ENGLISH)
+            } else {
+                for (language in TranslatableLanguage.values()) {
+                    if (language.languageCode.equals(text, ignoreCase = true)) {
+                        config.languageName.set(language)
+                        return@onToggle
+                    }
+                }
+                config.languageName.set(TranslatableLanguage.UNKNOWN)
+            }
+        }
+
+        config.languageName.onToggle {
+            if (lastUserChange.passedSince() < 50.milliseconds) return@onToggle
+            lastUserChange = SimpleTimeMark.now()
+
+            config.languageCode.set(config.languageName.get().languageCode)
+        }
     }
 
     private fun createClickStyle(message: String, style: ChatStyle): ChatStyle {
