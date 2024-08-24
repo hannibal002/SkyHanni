@@ -146,7 +146,7 @@ object CustomScoreboard {
     }
 
     private fun addDefaultSkyBlockLines() = buildList {
-        add(ScoreboardData.objectiveTitle align displayConfig.titleAndFooter.alignTitleAndFooter)
+        add(ScoreboardData.objectiveTitle align displayConfig.titleAndFooter.alignTitle)
         addAll(ScoreboardData.sidebarLinesFormatted.map { it.align() })
     }
 
@@ -360,6 +360,9 @@ object CustomScoreboard {
                 JsonPrimitive(element.asString.replace("&", "&&"))
             }
         }
+
+        event.move(56, "$displayPrefix.titleAndFooter.alignTitleAndFooter", "$displayPrefix.titleAndFooter.alignTitle")
+        event.move(56, "$displayPrefix.titleAndFooter.alignTitleAndFooter", "$displayPrefix.titleAndFooter.alignFooter")
 
     }
 }
