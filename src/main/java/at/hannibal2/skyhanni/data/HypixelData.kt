@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -15,10 +16,12 @@ import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.slots
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
@@ -487,5 +490,16 @@ object HypixelData {
         val displayName = objective.displayName
         val scoreboardTitle = displayName.removeColor()
         return scoreboardTitlePattern.matches(scoreboardTitle)
+    }
+
+    @SubscribeEvent
+    fun onDebugCollect(event: DebugDataCollectEvent) {
+        event.title("Location")
+        event.addIrrelevant {
+            "serverId" to serverId
+            "skyBlock" to skyBlock
+            "skyBlockIsland" to skyBlockIsland
+            "skyBlockArea" to skyBlockArea
+        }
     }
 }
