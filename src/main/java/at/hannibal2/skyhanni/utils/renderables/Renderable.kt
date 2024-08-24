@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
 import io.github.moulberry.notenoughupdates.util.Utils
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -40,7 +39,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
-import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
