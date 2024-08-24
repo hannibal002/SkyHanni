@@ -36,7 +36,7 @@ object CurrentMayorScreen : ElectionViewerScreen() {
                 Renderable.horizontalContainer(
                     listOfNotNull(
                         getMayorRenderable(mayor, "Mayor"),
-                        getMayorRenderable(jerryMayor?.first, "Jerry Mayor", jerryMayor?.second),
+                        getMayorRenderable(jerryMayor.first, "Jerry Mayor", jerryMayor.second),
                         getMayorRenderable(minister, "Minister"),
                     ),
                     spacing = 50,

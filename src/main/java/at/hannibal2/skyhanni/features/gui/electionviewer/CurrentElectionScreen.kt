@@ -24,25 +24,31 @@ object CurrentElectionScreen : ElectionViewerScreen() {
         if (!isInGui()) return
 
         val currentElection = MayorAPI.rawMayorData?.current ?: return
+        val votesHidden = currentElection.candidates.sumOf { it.votes } == 0
 
         val sortedCandidates = currentElection.candidates.sortedByDescending { it.votes }
 
-        val candidateWithRank = sortedCandidates.mapIndexed { index, candidate ->
-            candidate to when (index) {
-                0 -> Color.YELLOW
-                1 -> Color.LIGHT_GRAY
-                else -> null
+        val candidateWithRank = if (votesHidden) {
+            sortedCandidates.map { it to null }
+        } else {
+            sortedCandidates.mapIndexed { index, candidate ->
+                candidate to when (index) {
+                    0 -> Color.YELLOW
+                    1 -> Color.LIGHT_GRAY
+                    else -> null
+                }
             }
         }
 
         val candidateRenderables = currentElection.candidates.map { candidate ->
             val (_, rankColor) = candidateWithRank.first { it.first == candidate }
             val color = MayorAPI.mayorNameToColorCode(candidate.name)
+            val votesText = if (votesHidden) "§7????" else "§7" + candidate.votes.addSeparators()
 
             val candidateContent = Renderable.verticalContainer(
                 listOf(
                     Renderable.string(color + candidate.name),
-                    Renderable.string(candidate.votes.addSeparators()),
+                    Renderable.string(votesText),
                 ),
                 spacing = 10,
                 verticalAlign = VerticalAlignment.CENTER,
