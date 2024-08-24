@@ -648,7 +648,7 @@ object RenderUtils {
 
     /**
      * Accepts a single line to print.
-     * This  line is a list of things to print. Can print String or ItemStack objects.
+     * This line is a list of things to print. Can print String or ItemStack objects.
      */
     @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderSingleLineWithItems(
