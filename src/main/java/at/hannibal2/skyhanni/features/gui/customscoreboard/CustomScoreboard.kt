@@ -48,10 +48,10 @@ object CustomScoreboard {
     private var cache = emptyList<ScoreboardElementType>()
     private val guiName = "Custom Scoreboard"
 
-    // cached scoreboard data, only update after no change for 300ms
+    // Cached scoreboard data, only update after no change for 300ms
     var activeLines = emptyList<String>()
 
-    // most recent scoreboard state, not in use until cached
+    // Most recent scoreboard state, not in use until cached
     private var mostRecentLines = emptyList<String>()
     private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
 
@@ -100,7 +100,7 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        // we want to update the scoreboard as soon as we have new data, not 5 ticks delayed
+        // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
         var dirty = false
         if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
             activeLines = mostRecentLines
