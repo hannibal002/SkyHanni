@@ -48,7 +48,7 @@ object CustomScoreboard {
     private var cache = emptyList<ScoreboardElementType>()
     private val guiName = "Custom Scoreboard"
 
-    // cached scoreboard data, only update after no change for 300ms
+    // Cached scoreboard data, only update after no change for 300ms
     var activeLines = emptyList<String>()
 
     // most recent scoreboard state, not in use until cached
