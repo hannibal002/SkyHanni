@@ -52,6 +52,7 @@ object HoppityEventSummary {
         if (!LorenzUtils.inSkyBlock) return
         checkEnded()
         if (!HoppityAPI.isHoppityEvent()) return
+        checkInit()
         checkAddCfTime()
     }
 
