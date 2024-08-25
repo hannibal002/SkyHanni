@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
@@ -22,44 +23,48 @@ object RenderBackground {
         with(backgroundConfig) {
             if (!backgroundConfig.enabled) return renderable
 
-            val backgroundRenderable = if (backgroundConfig.useCustomBackgroundImage) {
-                Renderable.drawInsideImage(
-                    renderable.renderBounds(Color.RED.addAlpha(100)),
-                    textureLocation,
-                    (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
-                    borderSize,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                    radius = backgroundConfig.roundedCornerSmoothness,
-                ).renderBounds(Color.BLUE.addAlpha(100))
-            } else {
-                Renderable.drawInsideRoundedRect(
-                    renderable.renderBounds(Color.RED.addAlpha(100)),
-                    backgroundConfig.color.toChromaColor(),
-                    borderSize,
-                    backgroundConfig.roundedCornerSmoothness,
-                    1,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                ).renderBounds(Color.BLUE.addAlpha(100))
-            }
+            val backgroundRenderable = createBackground(renderable)
 
-            return if (outline.enabled) {
-                Renderable.drawInsideRoundedRectOutline(
-                    backgroundRenderable,
-                    0,
-                    backgroundConfig.roundedCornerSmoothness,
-                    1,
-                    outline.colorTop.toChromaColor().rgb,
-                    outline.colorBottom.toChromaColor().rgb,
-                    outline.thickness,
-                    outline.blur,
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                    verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                )
-            } else backgroundRenderable
+            if (!outline.enabled) return backgroundRenderable
+
+            return Renderable.drawInsideRoundedRectOutline(
+                backgroundRenderable,
+                0,
+                backgroundConfig.roundedCornerSmoothness,
+                1,
+                outline.colorTop.toChromaColor().rgb,
+                outline.colorBottom.toChromaColor().rgb,
+                outline.thickness,
+                outline.blur,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            )
         }
     }
+
+    private fun BackgroundConfig.createBackground(renderable: Renderable): Renderable =
+        if (backgroundConfig.useCustomBackgroundImage) {
+            Renderable.drawInsideImage(
+                renderable.renderBounds(Color.RED.addAlpha(100)),
+                textureLocation,
+                (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
+                borderSize,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                radius = backgroundConfig.roundedCornerSmoothness,
+            ).renderBounds(Color.BLUE.addAlpha(100))
+        } else {
+            Renderable.drawInsideRoundedRect(
+                renderable.renderBounds(Color.RED.addAlpha(100)),
+                backgroundConfig.color.toChromaColor(),
+                borderSize,
+                backgroundConfig.roundedCornerSmoothness,
+                1,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            ).renderBounds(Color.BLUE.addAlpha(100))
+        }
+
 
     internal fun updatePosition(renderable: Renderable) {
         if (GuiEditManager.isInGui()) return
