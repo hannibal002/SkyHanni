@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -17,6 +18,14 @@ public class HoppityEventSummaryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Viewing Stats",
+        desc = "View current and past event stats at any time using §b/shhoppitystats§7."
+    )
+    @ConfigEditorInfoText
+    public String commandInfo;
 
     @Expose
     @ConfigOption(

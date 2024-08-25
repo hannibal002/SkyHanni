@@ -223,12 +223,20 @@ object HoppityEventSummary {
         summaryBuilder.appendLine()
 
         // Various stats from config
+        val statsBuilder: StringBuilder = StringBuilder()
         config.eventSummary.statDisplayList.forEach {
-            summaryOperationList[it]?.invoke(summaryBuilder, stats, eventYear)
+            summaryOperationList[it]?.invoke(statsBuilder, stats, eventYear)
         }
+        if (statsBuilder.toString().replace("\n", "").isEmpty()) {
+            statsBuilder.appendHeadedLine("§c§lNothing to show!\n§c§oGo find some eggs!")
+        }
+
+        // Append stats
+        summaryBuilder.append(statsBuilder.toString())
 
         // Footer
         summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")
+
         ChatUtils.chat(summaryBuilder.toString(), prefix = false)
     }
 
