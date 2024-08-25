@@ -85,6 +85,7 @@ object CustomScoreboard {
                     verticalAlignment = VerticalAlignment.DONT_ALIGN
                     ChatUtils.clickableChat(
                         "Disabled Custom Scoreboard auto-alignment. Click here to undo this action!",
+                        oneTimeClick = true,
                         onClick = {
                             horizontalAlignment = tempHori
                             verticalAlignment = tempVert
