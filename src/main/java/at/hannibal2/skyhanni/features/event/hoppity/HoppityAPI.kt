@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPatterns
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -113,7 +112,7 @@ object HoppityAPI {
     // Dumbed down version of the Compact Chat for Hoppity's,
     // with the additional native context of side dishes
     fun handleChat(event: LorenzChatEvent) {
-        eggFoundPatterns.forEach {
+        HoppityEggsManager.eggFoundPatterns.forEach {
             it.matchMatcher(event.message) {
                 resetChatData()
                 lastChatMeal = getEggType(event)
@@ -162,9 +161,9 @@ object HoppityAPI {
         if (lastDuplicateAmount != null) {
             this.duplicate = true
         }
-        if (lastChatMeal == null) return
+        val lastChatMeal = lastChatMeal ?: return
         if (hoppityEggChat.size == 3) {
-            RabbitFoundEvent(lastChatMeal!!, duplicate, lastName, lastDuplicateAmount ?: 0).post()
+            RabbitFoundEvent(lastChatMeal, duplicate, lastName, lastDuplicateAmount ?: 0).post()
         }
     }
 }

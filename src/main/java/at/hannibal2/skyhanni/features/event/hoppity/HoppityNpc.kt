@@ -59,7 +59,7 @@ object HoppityNpc {
                 disableReminder()
                 ChatUtils.chat("§eHoppity's Shop reminder disabled.")
             },
-            oneTimeClick = true
+            oneTimeClick = true,
         )
 
         lastReminderSent = SimpleTimeMark.now()
