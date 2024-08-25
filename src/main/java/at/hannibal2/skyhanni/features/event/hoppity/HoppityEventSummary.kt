@@ -58,7 +58,6 @@ object HoppityEventSummary {
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        checkInit()
         checkEnded()
     }
 
@@ -175,12 +174,12 @@ object HoppityEventSummary {
         val currentYear = SkyBlockTime.now().year
         val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
         val statsYearFormatList = statsStorage.keys.takeIf { it.isNotEmpty() }?.map {
-            "$it${if (it == currentYear) " §a(Current)§r" else ""}"
+            "§b$it${if (it == currentYear) " §a(Current)§r" else ""}"
         }?.toMutableList() ?: mutableListOf()
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
-        val availableYearsFormat = "Stats are available for the following years:\n${statsYearFormatList.joinToString("§e,") { it }}"
+        val availableYearsFormat = "§eStats are available for the following years:§af\n${statsYearFormatList.joinToString("§e,") { it }}"
 
         if (parsedInt == null) {
             if (HoppityAPI.isHoppityEvent()) {
