@@ -570,6 +570,10 @@ object ScoreboardPattern {
         "bank",
         "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 \\/ §6(?<coop>[\\w.,]+))?)$",
     )
+    val soulflowPattern by tablistGroup.pattern(
+        "soulflow",
+        "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$",
+    )
     val eventNamePattern by tablistGroup.pattern(
         "event",
         "^\\s*§e§lEvent: §r(?<name>§.*)$",
