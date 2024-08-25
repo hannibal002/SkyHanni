@@ -133,8 +133,27 @@ object HoppityEventSummary {
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (sb: StringBuilder, stats: HoppityEventStats, year: Int) -> Unit> {
             put(HoppityStat.MEAL_EGGS_FOUND) { sb, stats, year ->
-                stats.getEggsFoundFormat(year).forEach {
+                stats.getEggsFoundFormat(year).takeIf { it != null }?.let {
                     sb.appendHeadedLine(it)
+                }
+            }
+
+            put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { sb, stats, _ ->
+                stats.mealsFound[HoppityEggType.BOUGHT]?.let {
+                    sb.appendHeadedLine("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7.")
+                }
+            }
+
+            put(HoppityStat.SIDE_DISH_EGGS) { sb, stats, _ ->
+                stats.mealsFound[HoppityEggType.SIDE_DISH]?.let {
+                    sb.appendHeadedLine("§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 §7in the §6Chocolate Factory§7.")
+                }
+            }
+
+            put(HoppityStat.MILESTONE_RABBITS) { sb, stats, _ ->
+                ((stats.mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
+                (stats.mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)).takeIf { it > 0 }?.let {
+                    sb.appendHeadedLine("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7.")
                 }
             }
 
@@ -213,38 +232,24 @@ object HoppityEventSummary {
         ChatUtils.chat(summaryBuilder.toString(), prefix = false)
     }
 
-    private fun HoppityEventStats.getEggsFoundFormat(year: Int): List<String> {
-        val eggsFoundFormatList: MutableList<String> = buildList {
-            mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt().takeIf { it > 0 }?.let {
-                val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSbYear(year).toMillis()
-                val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
-                // Calculate total eggs from complete days and incomplete day periods
-                val spawnedMealsEggs =
-                    (if (pastEvent) 279 else (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3) + when {
-                        pastEvent -> 0
-                        // Add eggs for the current day based on time of day
-                        milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 21 -> 3 // Dinner egg, 9 PM
-                        milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 14 -> 2 // Lunch egg, 2 PM
-                        milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 7 -> 1 // Breakfast egg, 7 AM
-                        else -> 0
-                    }
+    private fun HoppityEventStats.getEggsFoundFormat(year: Int): String? {
+        mealsFound.filterKeys { it in HoppityEggType.resettingEntries }.sumAllValues().toInt().takeIf { it > 0 }?.let {
+            val milliDifference = SkyBlockTime.now().toMillis() - SkyBlockTime.fromSbYear(year).toMillis()
+            val pastEvent = milliDifference > SkyBlockTime.SKYBLOCK_SEASON_MILLIS
+            // Calculate total eggs from complete days and incomplete day periods
+            val spawnedMealsEggs =
+                (if (pastEvent) 279 else (milliDifference / SKYBLOCK_DAY_MILLIS).toInt() * 3) + when {
+                    pastEvent -> 0
+                    // Add eggs for the current day based on time of day
+                    milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 21 -> 3 // Dinner egg, 9 PM
+                    milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 14 -> 2 // Lunch egg, 2 PM
+                    milliDifference % SKYBLOCK_DAY_MILLIS >= SKYBLOCK_HOUR_MILLIS * 7 -> 1 // Breakfast egg, 7 AM
+                    else -> 0
+                }
 
-                add(
-                    "§7You found §b$it§7/§a$spawnedMealsEggs §6Chocolate Meal ${
-                        StringUtils.pluralize(it, "Egg")
-                    }§7.",
-                )
-            }
-            mealsFound[HoppityEggType.SIDE_DISH]?.let {
-                add("§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 §7in the §6Chocolate Factory§7.")
-            }
-            mealsFound[HoppityEggType.BOUGHT]?.let {
-                add("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7.")
-            }
-        }.toMutableList()
-
-        return if (eggsFoundFormatList.isEmpty()) listOf("§cNo Chocolate Eggs or Rabbits found during this event§7.")
-        else eggsFoundFormatList
+            return "§7You found §b$it§7/§a$spawnedMealsEggs §6Chocolate Meal ${StringUtils.pluralize(it, "Egg")}§7."
+        }
+        return null
     }
 
     private fun getRabbitsFormat(rarityMap: Map<HoppityRabbitRarity, Int>, name: String): List<String> {
