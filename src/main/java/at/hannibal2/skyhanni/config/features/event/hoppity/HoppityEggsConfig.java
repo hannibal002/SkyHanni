@@ -162,6 +162,31 @@ public class HoppityEggsConfig {
     public boolean compactChat = false;
 
     @Expose
+    @ConfigOption(name = "Compacted Rarity", desc = "Show rarity of found rabbit in Compacted chat messages.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public CompactRarityTypes rarityInCompact = CompactRarityTypes.NEW;
+
+    public enum CompactRarityTypes {
+        NONE("Neither"),
+        NEW("New Rabbits"),
+        DUPE("Duplicate Rabbits"),
+        BOTH("New & Duplicate Rabbits")
+        ;
+
+        private final String name;
+
+        CompactRarityTypes(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
+
+    @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
