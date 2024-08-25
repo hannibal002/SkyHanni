@@ -101,7 +101,7 @@ object CustomScoreboard {
         if (!isEnabled()) return
 
         // we want to update the scoreboard as soon as we have new data, not 5 ticks delayed
-        var dirty = true
+        var dirty = false
         if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
             activeLines = mostRecentLines
             lastScoreboardUpdate = SimpleTimeMark.farFuture()
