@@ -219,8 +219,7 @@ object CustomScoreboard {
         }
     }
 
-    private fun isEnabled() =
-        (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
 
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
@@ -314,7 +313,7 @@ object CustomScoreboard {
             array
         }
         event.move(
-            54,
+            55,
             "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
             "$displayPrefix.titleAndFooter.useCustomTitle",
         ) {
