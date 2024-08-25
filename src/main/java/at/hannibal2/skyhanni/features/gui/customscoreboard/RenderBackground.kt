@@ -42,24 +42,24 @@ object RenderBackground {
     private fun BackgroundConfig.createBackground(renderable: Renderable): Renderable =
         if (backgroundConfig.useCustomBackgroundImage) {
             Renderable.drawInsideImage(
-                renderable.renderBounds(Color.RED.addAlpha(100)),
+                renderable,
                 textureLocation,
                 (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
                 borderSize,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                 radius = backgroundConfig.roundedCornerSmoothness,
-            ).renderBounds(Color.BLUE.addAlpha(100))
+            )
         } else {
             Renderable.drawInsideRoundedRect(
-                renderable.renderBounds(Color.RED.addAlpha(100)),
+                renderable,
                 backgroundConfig.color.toChromaColor(),
                 borderSize,
                 backgroundConfig.roundedCornerSmoothness,
                 1,
                 horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            ).renderBounds(Color.BLUE.addAlpha(100))
+            )
         }
 
 
@@ -96,7 +96,7 @@ object RenderBackground {
                 else -> 0
             }
 
-            val outlineConfig = CustomScoreboard.backgroundConfig.outline
+            val outlineConfig = backgroundConfig.outline
             if (outlineConfig.enabled) {
                 val thickness = outlineConfig.thickness
 
