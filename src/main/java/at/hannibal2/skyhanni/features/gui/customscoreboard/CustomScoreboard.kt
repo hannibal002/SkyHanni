@@ -100,7 +100,7 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        // we want to update the scoreboard as soon as we have new data, not 5 ticks delayed
+        // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
         var dirty = true
         if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
             activeLines = mostRecentLines
