@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -26,6 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -34,6 +36,7 @@ import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
@@ -44,6 +47,13 @@ object CustomScoreboard {
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
     private val guiName = "Custom Scoreboard"
+
+    // cached scoreboard data, only update after no change for 300ms
+    var activeLines = emptyList<String>()
+
+    // most recent scoreboard state, not in use until cached
+    private var mostRecentLines = emptyList<String>()
+    private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -90,8 +100,16 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
+        // we want to update the scoreboard as soon as we have new data, not 5 ticks delayed
+        var dirty = true
+        if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
+            activeLines = mostRecentLines
+            lastScoreboardUpdate = SimpleTimeMark.farFuture()
+            dirty = true
+        }
+
         // Creating the lines
-        if (event.isMod(5)) {
+        if (event.isMod(5) || dirty) {
             display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
@@ -101,6 +119,13 @@ object CustomScoreboard {
         // Remove Known Lines, so we can get the unknown ones
         UnknownLinesHandler.handleUnknownLines()
     }
+
+    @SubscribeEvent
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        mostRecentLines = event.scoreboard
+        lastScoreboardUpdate = SimpleTimeMark.now()
+    }
+
 
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display
