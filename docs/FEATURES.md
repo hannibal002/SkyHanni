@@ -1230,6 +1230,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + A ton of settings.
     + Added Chunked Stats as a draggable list to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1341)
         + Select and prioritize the order of the stats you want to see.
+    + Added Soulflow to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+      + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
 + Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
