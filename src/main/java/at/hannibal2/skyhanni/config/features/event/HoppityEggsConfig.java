@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -154,6 +155,30 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean compactChat = false;
+
+    @Expose
+    @ConfigOption(name = "Compacted Rarity", desc = "Show rarity of found rabbit in Compacted chat messages.")
+    @ConfigEditorDropdown
+    public CompactRarityTypes rarityInCompact = CompactRarityTypes.NEW;
+
+    public enum CompactRarityTypes {
+        NONE("Neither"),
+        NEW("New Rabbits"),
+        DUPE("Duplicate Rabbits"),
+        BOTH("New & Duplicate Rabbits"),
+        ;
+
+        private final String name;
+
+        CompactRarityTypes(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @Expose
     @ConfigOption(
