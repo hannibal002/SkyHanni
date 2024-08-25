@@ -75,8 +75,8 @@ object CustomScoreboard {
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
-                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
+                    verticalAlignment != VerticalAlignment.DONT_ALIGN
                 ) {
                     val tempHori = horizontalAlignment
                     val tempVert = verticalAlignment
@@ -85,6 +85,7 @@ object CustomScoreboard {
                     verticalAlignment = VerticalAlignment.DONT_ALIGN
                     ChatUtils.clickableChat(
                         "Disabled Custom Scoreboard auto-alignment. Click here to undo this action!",
+                        oneTimeClick = true,
                         onClick = {
                             horizontalAlignment = tempHori
                             verticalAlignment = tempVert
