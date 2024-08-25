@@ -156,7 +156,7 @@ object FossilSolverDisplay {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
         if (slotToClick == null) return
