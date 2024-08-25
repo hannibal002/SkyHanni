@@ -51,7 +51,7 @@ object CustomScoreboard {
     // Cached scoreboard data, only update after no change for 300ms
     var activeLines = emptyList<String>()
 
-    // most recent scoreboard state, not in use until cached
+    // Most recent scoreboard state, not in use until cached
     private var mostRecentLines = emptyList<String>()
     private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
 
