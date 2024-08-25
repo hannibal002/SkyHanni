@@ -136,7 +136,7 @@ object UnknownLinesHandler {
             SbPattern.carnivalKillsPattern,
         )
 
-        if (!::remoteOnlyPatterns.isInitialized) {
+        if (::remoteOnlyPatterns.isInitialized) {
             patternsToExclude.addAll(remoteOnlyPatterns)
         }
 
