@@ -159,7 +159,26 @@ public class HoppityEggsConfig {
     @ConfigOption(name = "Compacted Rarity", desc = "Show rarity of found rabbit in Compacted chat messages.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean rarityInCompact = true;
+    public CompactRarityTypes rarityInCompact = CompactRarityTypes.NEW;
+
+    public enum CompactRarityTypes {
+        NONE("Neither"),
+        NEW("New Rabbits"),
+        DUPE("Duplicate Rabbits"),
+        BOTH("New & Duplicate Rabbits")
+        ;
+
+        private final String name;
+
+        CompactRarityTypes(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 
     @Expose
     @ConfigOption(

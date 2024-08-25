@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.config.features.event.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -65,19 +66,21 @@ object HoppityEggsCompactChat {
     private fun createCompactMessage(): String {
         val mealName = lastChatMeal?.coloredName ?: ""
         val mealNameFormatted = if (rabbitBought) "§aBought Rabbit" else "$mealName Egg"
-        val showRarity = HoppityEggsManager.config.rarityInCompact
 
-        val rarityText = if (showRarity) "$lastRarity " else ""
         return if (duplicate) {
             val format = lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
 
+            val showDupeRarity = HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.BOTH ||
+                HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.DUPE
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormatted! §7Duplicate $rarityText$lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormatted! §7Duplicate ${ if(showDupeRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
-            "$mealNameFormatted! §d§lNEW $rarityText$lastName §7(${lastProfit}§7)"
+            val showNewRarity = HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.BOTH ||
+                HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.NEW
+            "$mealNameFormatted! §d§lNEW ${ if(showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
         } else "?"
     }
 
