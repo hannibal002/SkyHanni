@@ -4,15 +4,12 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.backgroundConfig
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.ResourceLocation
-import java.awt.Color
 
 object RenderBackground {
 
@@ -24,24 +21,24 @@ object RenderBackground {
 
             val backgroundRenderable = if (backgroundConfig.useCustomBackgroundImage) {
                 Renderable.drawInsideImage(
-                    renderable.renderBounds(Color.RED.addAlpha(100)),
+                    renderable,
                     textureLocation,
                     (backgroundConfig.customBackgroundImageOpacity * 255) / 100,
                     borderSize,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     verticalAlign = RenderUtils.VerticalAlignment.CENTER,
                     radius = backgroundConfig.roundedCornerSmoothness,
-                ).renderBounds(Color.BLUE.addAlpha(100))
+                )
             } else {
                 Renderable.drawInsideRoundedRect(
-                    renderable.renderBounds(Color.RED.addAlpha(100)),
+                    renderable,
                     backgroundConfig.color.toChromaColor(),
                     borderSize,
                     backgroundConfig.roundedCornerSmoothness,
                     1,
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
                     verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-                ).renderBounds(Color.BLUE.addAlpha(100))
+                )
             }
 
             return if (outline.enabled) {
