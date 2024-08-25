@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+typealias RarityType = HoppityEggsConfig.CompactRarityTypes
+
 object HoppityEggsCompactChat {
 
     private var hoppityEggChat = mutableListOf<String>()
@@ -67,20 +69,19 @@ object HoppityEggsCompactChat {
         val mealName = lastChatMeal?.coloredName ?: ""
         val mealNameFormatted = if (rabbitBought) "§aBought Rabbit" else "$mealName Egg"
 
+        val rarityConfig = HoppityEggsManager.config.rarityInCompact
         return if (duplicate) {
             val format = lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
 
-            val showDupeRarity = HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.BOTH ||
-                HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.DUPE
+            val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormatted! §7Duplicate ${ if(showDupeRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormatted! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
-            val showNewRarity = HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.BOTH ||
-                HoppityEggsManager.config.rarityInCompact == HoppityEggsConfig.CompactRarityTypes.NEW
-            "$mealNameFormatted! §d§lNEW ${ if(showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
+            val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
+            "$mealNameFormatted! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
         } else "?"
     }
 
