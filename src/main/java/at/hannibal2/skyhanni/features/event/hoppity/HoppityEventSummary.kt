@@ -239,7 +239,7 @@ object HoppityEventSummary {
         summaryBuilder.append(statsBuilder)
 
         // Footer
-        summaryBuilder.appendLine("§d§l${"▬".repeat(64)}")
+        summaryBuilder.append("§d§l${"▬".repeat(64)}")
 
         ChatUtils.chat(summaryBuilder.toString(), prefix = false)
     }
