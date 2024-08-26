@@ -138,7 +138,7 @@ class GuiPositionEditor(
                     x - border,
                     y - border,
                     elementWidth + border * 2,
-                    elementHeight + border * 2
+                    elementHeight + border * 2,
                 )
             ) {
                 hoveredPos = index
