@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.wrap
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -48,7 +49,7 @@ object ReminderManager {
         color = EnumChatFormatting.BLUE
     }
 
-    private fun parseReminder(text: String) = try {
+    private fun parseDuration(text: String): Duration? = try {
         val duration = TimeUtils.getDuration(text)
         if (duration <= 1.seconds) null else duration
     } catch (e: Exception) {
@@ -120,7 +121,7 @@ object ReminderManager {
     private fun createReminder(args: Array<String>) {
         if (args.size < 2) return help()
 
-        val time = parseReminder(args.first()) ?: return ChatUtils.userError("Invalid time format")
+        val time = parseDuration(args.first()) ?: return ChatUtils.userError("Invalid time format")
         val reminder = args.drop(1).joinToString(" ")
         val remindAt = SimpleTimeMark.now().plus(time)
 
@@ -176,7 +177,7 @@ object ReminderManager {
         "[id]",
         "[time]",
     ) { arguments, reminder ->
-        val time = parseReminder(arguments.first()) ?: return@actionReminder "§cInvalid time format!"
+        val time = parseDuration(arguments.first()) ?: return@actionReminder "§cInvalid time format!"
         reminder.remindAt = SimpleTimeMark.now().plus(time)
         "§6Reminder moved to ${time.format()}"
     }
