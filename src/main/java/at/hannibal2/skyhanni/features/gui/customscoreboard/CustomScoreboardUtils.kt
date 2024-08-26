@@ -29,7 +29,7 @@ object CustomScoreboardUtils {
     fun getProfileTypeSymbol() = when {
         HypixelData.ironman -> "§7♲ "
         HypixelData.stranded -> "§a☀ "
-        HypixelData.bingo -> getSbLines().firstNotNullOfOrNull {
+        HypixelData.bingo -> CustomScoreboard.activeLines.firstNotNullOfOrNull {
             BingoAPI.getIconFromScoreboard(it)?.plus(" ") // TODO: add bingo rank to bingo api
         } ?: "§e❤ "
 
@@ -45,6 +45,10 @@ object CustomScoreboardUtils {
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
 
     internal fun getMotes() = getGroup(SbPattern.motesPattern, getSbLines(), "motes") ?: "0"
+
+    internal fun getMotes() = getGroup(SbPattern.motesPattern, getSbLines(), "motes") ?: "0"
+
+    internal fun getBank() = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
@@ -86,5 +90,5 @@ object CustomScoreboardUtils {
         else -> null
     }
 
-    internal fun getSbLines() = ScoreboardData.sidebarLinesFormatted
+    internal fun getSbLines() = CustomScoreboard.activeLines
 }

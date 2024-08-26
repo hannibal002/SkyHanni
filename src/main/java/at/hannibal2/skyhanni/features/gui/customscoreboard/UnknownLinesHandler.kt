@@ -60,7 +60,7 @@ object UnknownLinesHandler {
     internal lateinit var remoteOnlyPatterns: Array<Pattern>
 
     fun handleUnknownLines() {
-        val sidebarLines = ScoreboardData.sidebarLinesFormatted
+        val sidebarLines = CustomScoreboard.activeLines
 
         var unknownLines = sidebarLines
             .map { it.removeResets() }
