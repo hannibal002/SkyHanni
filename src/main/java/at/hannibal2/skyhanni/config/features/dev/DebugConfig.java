@@ -66,6 +66,11 @@ public class DebugConfig {
     public boolean showNpcPrice = false;
 
     @Expose
+    @ConfigOption(name = "Show Craft Price", desc = "Show craft price in item lore.")
+    @ConfigEditorBoolean
+    public boolean showCraftPrice = false;
+
+    @Expose
     @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
     @ConfigEditorBoolean
     public boolean showBZPrice = false;
@@ -127,8 +132,9 @@ public class DebugConfig {
     public boolean currentAreaDebug = true;
 
     @Expose
-    @ConfigOption(name = "Oreblock Name", desc = "Show the OreBlock you are currently looking at.")
+    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
     @ConfigEditorBoolean
+    // TODO rename to rayTracedOreBlock
     public boolean raytracedOreblock = true;
 
     @Expose
@@ -150,6 +156,11 @@ public class DebugConfig {
     @ConfigOption(name = "Never April Fools", desc = "Admit it, you hate fun.")
     @ConfigEditorBoolean
     public boolean neverFunnyTime = false;
+
+    @Expose
+    @ConfigOption(name = "Always Hoppity's", desc = "Always act as if Hoppity's Hunt is active.")
+    @ConfigEditorBoolean
+    public boolean alwaysHoppitys = false;
 
     // Does not have a config element!
     @Expose
