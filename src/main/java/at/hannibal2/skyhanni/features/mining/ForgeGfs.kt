@@ -26,10 +26,10 @@ object ForgeGfs {
 
     private val confirmScreenPattern by patternGroup.pattern(
         "recipe.confirm",
-        "Confirm Process\$"
+        "Confirm Process",
     )
 
-    private val config get() = SkyHanniMod.feature.mining.forgeGfs
+    private val config get() = SkyHanniMod.feature.mining
 
     private val gfsFakeItem by lazy {
         ItemUtils.createSkull(
@@ -41,7 +41,7 @@ object ForgeGfs {
                 "RleHR1cmUvODBhMDc3ZTI0OGQxNDI3NzJlYTgwMDg2NGY4YzU3OGI5ZDM2ODg1YjI5ZGFmODM2YjY0YTcwNjg4MmI2ZWMxMCIKICAgIH0KICB9Cn0=",
             "§8(from SkyHanni)",
             "§7Click here to try to get all of this",
-            "§7recipe's ingredients from sacks."
+            "§7recipe's ingredients from sacks.",
         )
     }
 
@@ -49,8 +49,7 @@ object ForgeGfs {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryUpdatedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config) return
+        if (!isEnabled()) return
         if (!confirmScreenPattern.matches(event.inventoryName)) return
 
         showFakeItem = true
@@ -70,7 +69,7 @@ object ForgeGfs {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!config) return
+        if (!isEnabled()) return
         if (!showFakeItem || event.slotId != 53) return
 
         event.cancel()
@@ -101,4 +100,6 @@ object ForgeGfs {
     private fun MutableMap<NEUInternalName, Int>.addAndFold(key: NEUInternalName, value: Int) {
         this[key] = this.getOrDefault(key, 0) + value
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.forgeGfs
 }
