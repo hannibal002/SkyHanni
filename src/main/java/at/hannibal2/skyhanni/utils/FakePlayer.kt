@@ -43,6 +43,10 @@ object FakePlayer {
             }
 
             override fun isWearing(part: EnumPlayerModelParts): Boolean = player.isWearing(part) && part != EnumPlayerModelParts.CAPE
+
+            // Fixes the FakePlayer being affected by the Upside-Down Contributor option
+            override fun hasCustomName(): Boolean = true
+            override fun getName(): String = "§k§da§r Fake Player §k§da"
         }
     }
 
