@@ -108,10 +108,15 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
+    @ConfigOption(name = "Reminders", desc = "")
+    @Accordion
+    public RemindersConfig reminders = new RemindersConfig();
+
+    @Expose
     @ConfigOption(name = "Last Servers", desc = "")
     @Accordion
     public LastServersConfig lastServers = new LastServersConfig();
-  
+
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
@@ -308,4 +313,10 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean userluckEnabled = true;
 }
