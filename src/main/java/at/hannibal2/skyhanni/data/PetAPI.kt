@@ -1,22 +1,29 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
+@SkyHanniModule
 object PetAPI {
     private val patternGroup = RepoPattern.group("misc.pet")
     private val petMenuPattern by patternGroup.pattern(
         "menu.title",
-        "Pets(?: \\(\\d+/\\d+\\) )?"
+        "Pets(?: \\(\\d+/\\d+\\) )?",
     )
+
+    /**
+     * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
+     * REGEX-TEST: ⭐ [Lvl 100] Black Cat ✦
+     */
     private val petItemName by patternGroup.pattern(
         "item.name",
-        "(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)"
+        "(?<favorite>(?:§.)*⭐ )?(?:§.)*\\[Lvl (?<level>\\d+)] (?<name>.*)",
     )
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
-        "(§f§f)?§7\\[Lvl 1➡(100|200)] (?<name>.*)"
+        "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?<name>.*)",
     )
 
     private val ignoredPetStrings = listOf(

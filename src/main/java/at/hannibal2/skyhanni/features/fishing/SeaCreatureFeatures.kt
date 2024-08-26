@@ -3,17 +3,22 @@ package at.hannibal2.skyhanni.features.fishing
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
+import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -21,35 +26,41 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class SeaCreatureFeatures {
+@SkyHanniModule
+object SeaCreatureFeatures {
 
     private val config get() = SkyHanniMod.feature.fishing.rareCatches
     private val damageIndicatorConfig get() = SkyHanniMod.feature.combat.damageIndicator
-    private var rareSeaCreatures = listOf<EntityLivingBase>()
     private var lastRareCatch = SimpleTimeMark.farPast()
-    private var armorStandIds = TimeLimitedSet<Int>(6.minutes)
+    private var rareSeaCreatures = TimeLimitedSet<Mob>(6.minutes)
+    private var entityIds = TimeLimitedSet<Int>(6.minutes)
 
     // TODO remove spawn event, check per tick if can see, cache if already warned about
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
-        val creature = SeaCreatureManager.allFishingMobs[event.mob.name] ?: return
+        val mob = event.mob
+        val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
         if (!creature.rare) return
 
-        if (config.highlight && !(damageIndicatorConfig.enabled &&
-                DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow)
-        ) {
-            event.mob.highlight(LorenzColor.GREEN.toColor())
-            rareSeaCreatures += event.mob.baseEntity
+        val entity = mob.baseEntity
+        val shouldNotify = entity.entityId !in entityIds
+        entityIds.addIfAbsent(entity.entityId)
+        rareSeaCreatures.add(mob)
+
+        var shouldHighlight = config.highlight
+        if (damageIndicatorConfig.enabled && DamageIndicatorConfig.BossCategory.SEA_CREATURES in damageIndicatorConfig.bossesToShow) {
+            val seaCreaturesBosses =
+                BossType.entries.filter { it.bossTypeToggle == DamageIndicatorConfig.BossCategory.SEA_CREATURES }
+            if (seaCreaturesBosses.any { it.fullName.removeColor() == mob.name }) {
+                shouldHighlight = false
+            }
         }
-        val id = event.mob.armorStand?.entityId ?: return
-        if (armorStandIds.contains(id)) return
-        armorStandIds.add(id)
+        if (shouldHighlight) mob.highlight(LorenzColor.GREEN.toColor())
 
         if (lastRareCatch.passedSince() < 1.seconds) return
-        if (event.mob.name == "Water Hydra" && event.mob.baseEntity.health == (event.mob.baseEntity.baseMaxHealth.toFloat() / 2)) return
-
-        if (config.alertOtherCatches) {
+        if (mob.name == "Water Hydra" && entity.health == (entity.baseMaxHealth.toFloat() / 2)) return
+        if (config.alertOtherCatches && shouldNotify) {
             val text = if (config.creatureName) "${creature.displayName} NEARBY!"
             else "${creature.rarity.chatColorCode}RARE SEA CREATURE!"
             LorenzUtils.sendTitle(text, 1.5.seconds, 3.6, 7f)
@@ -59,7 +70,7 @@ class SeaCreatureFeatures {
 
     @SubscribeEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
-        rareSeaCreatures.filter { it != event.mob.baseEntity }
+        rareSeaCreatures.remove(event.mob)
     }
 
     @SubscribeEvent
@@ -78,8 +89,8 @@ class SeaCreatureFeatures {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        rareSeaCreatures = listOf()
-        armorStandIds.clear()
+        rareSeaCreatures.clear()
+        entityIds.clear()
     }
 
     @SubscribeEvent
@@ -97,8 +108,10 @@ class SeaCreatureFeatures {
     private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 
     private val getEntityOutlineColor: (entity: Entity) -> Int? = { entity ->
-        if (entity is EntityLivingBase && entity in rareSeaCreatures && entity.distanceToPlayer() < 30) {
-            LorenzColor.GREEN.toColor().rgb
-        } else null
+        (entity as? EntityLivingBase)?.mob?.let { mob ->
+            if (mob in rareSeaCreatures && entity.distanceToPlayer() < 30) {
+                LorenzColor.GREEN.toColor().rgb
+            } else null
+        }
     }
 }

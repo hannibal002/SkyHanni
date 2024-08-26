@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.dev.DebugMobConfig.HowToShow
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.utils.LocationUtils.getTopCenter
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -16,7 +17,8 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class MobDebug {
+@SkyHanniModule
+object MobDebug {
 
     private val config get() = SkyHanniMod.feature.dev.mobDebug.mobDetection
 
@@ -30,17 +32,19 @@ class MobDebug {
 
     private fun Mob.isNotInvisible() = !this.isInvisible() || (config.showInvisible && this == lastRayHit)
 
-    private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) =
-        this.filter { it.isNotInvisible() }.forEach {
-            event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color.invoke(it).toColor(), 0.3f)
+    private fun MobData.MobSet.highlight(event: LorenzRenderWorldEvent, color: (Mob) -> (LorenzColor)) {
+        for (mob in filter { it.isNotInvisible() }) {
+            event.drawFilledBoundingBox_nea(mob.boundingBox.expandBlock(), color.invoke(mob).toColor(), 0.3f)
         }
+    }
 
-    private fun MobData.MobSet.showName(event: LorenzRenderWorldEvent) =
-        this.filter { it.canBeSeen() && it.isNotInvisible() }.map { it.boundingBox.getTopCenter() to it.name }.forEach {
-            event.drawString(
-                it.first.add(y = 0.5), "§5" + it.second, seeThroughBlocks = true
-            )
+    private fun MobData.MobSet.showName(event: LorenzRenderWorldEvent) {
+        val map = filter { it.canBeSeen() && it.isNotInvisible() }
+            .map { it.boundingBox.getTopCenter() to it.name }
+        for ((location, text) in map) {
+            event.drawString(location.add(y = 0.5), "§5$text", seeThroughBlocks = true)
         }
+    }
 
     @SubscribeEvent
     fun onWorldRenderDebug(event: LorenzRenderWorldEvent) {

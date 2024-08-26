@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -7,6 +10,10 @@ object HypixelCommands {
 
     fun bazaar(searchTerm: String) {
         send("bz $searchTerm")
+    }
+
+    fun auctionSearch(searchTerm: String) {
+        send("ahs $searchTerm")
     }
 
     fun playtime() {
@@ -38,7 +45,7 @@ object HypixelCommands {
     }
 
     fun teleportToPlot(plotName: String) {
-        send("tptoplot $plotName")
+        send("plottp $plotName")
     }
 
     fun gardenLevels() {
@@ -50,7 +57,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        send("gfs $itemName $amount")
+        GetFromSackAPI.getFromSack(itemName.asInternalName(), amount)
     }
 
     fun widget() {
@@ -59,6 +66,10 @@ object HypixelCommands {
 
     fun chocolateFactory() {
         send("cf")
+    }
+
+    fun pet() {
+        send("pet")
     }
 
     fun openBaker() {

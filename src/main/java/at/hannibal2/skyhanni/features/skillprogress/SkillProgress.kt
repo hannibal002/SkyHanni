@@ -11,10 +11,11 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -29,7 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -41,6 +42,7 @@ import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object SkillProgress {
 
     val config get() = SkyHanniMod.feature.skillProgress
@@ -110,7 +112,7 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get()
             )
@@ -120,8 +122,8 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
-                endColor = Color(SpecialColour.specialToChromaRGB(barConfig.barStartColor)),
+                startColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
+                endColor = Color(SpecialColor.specialToChromaRGB(barConfig.barStartColor)),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get()
@@ -140,23 +142,21 @@ object SkillProgress {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
 
-        if (event.repeatSeconds(1)) {
-            allDisplay = formatAllDisplay(drawAllDisplay())
-            etaDisplay = drawETADisplay()
-        }
+        allDisplay = formatAllDisplay(drawAllDisplay())
+        etaDisplay = drawETADisplay()
 
-        if (event.repeatSeconds(2)) {
+        if (event.repeatSeconds(1)) {
             update()
             updateSkillInfo()
         }
     }
 
     @SubscribeEvent
-    fun onLevelUp(event: SkillOverflowLevelupEvent) {
+    fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
@@ -503,8 +503,7 @@ object SkillProgress {
             xpInfo.xpGainQueue.removeLast()
         }
 
-        var totalGain = 0f
-        for (f in xpInfo.xpGainQueue) totalGain += f
+        val totalGain = xpInfo.xpGainQueue.sum()
 
         xpInfo.xpGainHour = totalGain * (60 * 60) / xpInfo.xpGainQueue.size
         xpInfo.isActive = true

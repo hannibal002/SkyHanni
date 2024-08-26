@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ModGuiSwitcherJson
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -18,6 +19,7 @@ import net.minecraftforge.client.ClientCommandHandler
 import net.minecraftforge.client.event.GuiScreenEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object QuickModMenuSwitch {
 
     private val config get() = SkyHanniMod.feature.misc.quickModMenuSwitch
@@ -32,17 +34,10 @@ object QuickModMenuSwitch {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val modsJar = event.getConstant<ModGuiSwitcherJson>("ModGuiSwitcher")
-        mods = buildList {
-            out@ for ((name, mod) in modsJar.mods) {
-                for (path in mod.guiPath) {
-                    try {
-                        Class.forName(path)
-                        add(Mod(name, mod.description, mod.command, mod.guiPath))
-                        continue@out
-                    } catch (_: Exception) {
-                    }
-                }
-            }
+        mods = modsJar.mods.filter { mod ->
+            mod.value.guiPath.any { runCatching { Class.forName(it) }.isSuccess }
+        }.map { (name, mod) ->
+            Mod(name, mod.description, mod.command, mod.guiPath)
         }
     }
 
@@ -106,11 +101,21 @@ object QuickModMenuSwitch {
             return config.javaClass.name
         }
         if (openGui == "cc.polyfrost.oneconfig.gui.OneConfigGui") {
-            /** TODO support different oneconfig mods:
-             * Partly Sane Skies
-             * Dankers SkyBlock Mod
-             * Dulkir
-             */
+            val actualGui = Minecraft.getMinecraft().currentScreen
+            val currentPage = actualGui.javaClass.getDeclaredField("currentPage")
+                .makeAccessible()
+                .get(actualGui)
+            if (currentPage.javaClass.simpleName == "ModConfigPage") {
+                val optionPage = currentPage.javaClass.getDeclaredField("page")
+                    .makeAccessible()
+                    .get(currentPage)
+                val mod = optionPage.javaClass.getField("mod")
+                    .makeAccessible()
+                    .get(optionPage)
+                val modName = mod.javaClass.getField("name")
+                    .get(mod) as String
+                return "cc.polyfrost.oneconfig.gui.OneConfigGui:$modName"
+            }
         }
 
         return openGui
@@ -130,7 +135,7 @@ object QuickModMenuSwitch {
                 Renderable.string(nameFormat + mod.name),
                 bypassChecks = true,
                 onClick = { open(mod) },
-                condition = { System.currentTimeMillis() > lastGuiOpen + 250 }
+                condition = { System.currentTimeMillis() > lastGuiOpen + 250 },
             )
             add(listOf(renderable, nameSuffix))
         }
@@ -141,44 +146,8 @@ object QuickModMenuSwitch {
         currentlyOpeningMod = mod.name
         update()
         try {
-            when (mod.command) {
-                "patcher" -> {
-                    val patcher = Class.forName("club.sk1er.patcher.Patcher")
-                    val instance = patcher.getDeclaredField("instance").get(null)
-                    val config = instance.javaClass.getDeclaredMethod("getPatcherConfig").invoke(instance)
-                    val gui = Class.forName("gg.essential.vigilance.Vigilant").getDeclaredMethod("gui").invoke(config)
-                    val guiUtils = Class.forName("gg.essential.api.utils.GuiUtil")
-                    for (method in guiUtils.declaredMethods) {
-                        try {
-                            method.invoke(null, gui)
-                            return
-                        } catch (_: Exception) {
-                        }
-                    }
-                    ChatUtils.error("Error trying to open the gui for mod " + mod.name + "!")
-                }
-
-                "hytil" -> {
-                    val hytilsReborn = Class.forName("cc.woverflow.hytils.HytilsReborn")
-                    val instance = hytilsReborn.getDeclaredField("INSTANCE").get(null)
-                    val config = instance.javaClass.getDeclaredMethod("getConfig").invoke(instance)
-                    val gui = Class.forName("gg.essential.vigilance.Vigilant").getDeclaredMethod("gui").invoke(config)
-                    val guiUtils = Class.forName("gg.essential.api.utils.GuiUtil")
-                    for (method in guiUtils.declaredMethods) {
-                        try {
-                            method.invoke(null, gui)
-                            return
-                        } catch (_: Exception) {
-                        }
-                    }
-                    ChatUtils.chat("Error trying to open the gui for mod " + mod.name + "!")
-                }
-
-                else -> {
-                    val thePlayer = Minecraft.getMinecraft().thePlayer
-                    ClientCommandHandler.instance.executeCommand(thePlayer, "/${mod.command}")
-                }
-            }
+            val thePlayer = Minecraft.getMinecraft().thePlayer
+            ClientCommandHandler.instance.executeCommand(thePlayer, "/" + mod.command)
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(e, "Error trying to open the gui for mod " + mod.name)
         }
