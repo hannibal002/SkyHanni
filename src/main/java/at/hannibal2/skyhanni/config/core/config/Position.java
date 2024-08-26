@@ -91,7 +91,7 @@ public class Position {
     }
 
     public float getEffectiveScale() {
-        return Math.max(Math.min(getScale() * SkyHanniMod.getFeature().gui.globalScale, 10F), 0.1F);
+        return Math.max(Math.min(getScale() * SkyHanniMod.feature.gui.globalScale, 10F), 0.1F);
     }
 
     public float getScale() {
@@ -113,6 +113,11 @@ public class Position {
 
     public int getRawY() {
         return y;
+    }
+
+    public void moveTo(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     public void setClicked(boolean state) {

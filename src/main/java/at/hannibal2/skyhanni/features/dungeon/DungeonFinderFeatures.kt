@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,7 +23,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO Remove all removeColor calls in this class. Deal with the color code in regex.
-class DungeonFinderFeatures {
+@SkyHanniModule
+object DungeonFinderFeatures {
     private val config get() = SkyHanniMod.feature.dungeon.partyFinder
 
     //  Repo group and patterns
@@ -55,9 +57,14 @@ class DungeonFinderFeatures {
         "note",
         "§7§7Note: §f(?<note>.*)"
     )
+
+    /**
+     * REGEX-TEST: The Catacombs
+     * REGEX-TEST: MM The Catacombs
+     */
     private val floorTypePattern by patternGroup.pattern(
         "floor.type",
-        "(The Catacombs).*|.*(MM Catacombs).*"
+        "(The Catacombs).*|.*(MM The Catacombs).*",
     )
     private val checkIfPartyPattern by patternGroup.pattern(
         "check.if.party",
@@ -85,11 +92,16 @@ class DungeonFinderFeatures {
     )
     private val anyFloorPattern by patternGroup.pattern(
         "floor.any",
-        "(Any)"
+        "(Any)",
     )
+
+    /**
+     * REGEX-TEST: Master Mode The Catacombs
+     * REGEX-TEST: MM The Catacombs
+     */
     private val masterModeFloorPattern by patternGroup.pattern(
         "floor.mastermode",
-        "(MM )|(.*Master Mode Catacombs)"
+        "(MM|.*Master Mode) The Catacombs.*"
     )
     private val dungeonFloorPattern by patternGroup.pattern(
         "floor.dungeon",
@@ -295,7 +307,7 @@ class DungeonFinderFeatures {
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
-        val toolTip = toolTipMap[event.slot.slotIndex]
+        val toolTip = toolTipMap[event.slot.slotNumber]
         if (toolTip.isNullOrEmpty()) return
         // TODO @Thunderblade73 fix that to "event.toolTip = toolTip"
         val oldToolTip = event.toolTip

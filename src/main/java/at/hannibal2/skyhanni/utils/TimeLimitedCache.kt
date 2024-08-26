@@ -1,17 +1,28 @@
 package at.hannibal2.skyhanni.utils
 
 import com.google.common.cache.CacheBuilder
+import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.time.Duration
 
-class TimeLimitedCache<K: Any, V: Any>(
+class TimeLimitedCache<K : Any, V : Any>(
     expireAfterWrite: Duration,
     private val removalListener: (K?, V?) -> Unit = { _, _ -> },
-): Iterable<Map.Entry<K, V>> {
+) : Iterable<Map.Entry<K, V>> {
+
+    private val cacheLock = ReentrantReadWriteLock()
 
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-        .removalListener { removalListener(it.key, it.value) }
+        .removalListener {
+            cacheLock.writeLock().lock()
+            try {
+                removalListener(it.key, it.value)
+            } finally {
+                cacheLock.writeLock().unlock()
+            }
+        }
         .build<K, V>()
 
     // TODO IntelliJ cant replace this, find another way?
@@ -25,11 +36,32 @@ class TimeLimitedCache<K: Any, V: Any>(
 
     fun clear() = cache.invalidateAll()
 
-    fun entries(): Set<Map.Entry<K, V>> = cache.asMap().entries
+    fun remove(key: K) = cache.invalidate(key)
 
-    fun values(): Collection<V> = cache.asMap().values
+    fun entries(): Set<Map.Entry<K, V>> = getMap().entries
 
-    fun keys(): Set<K> = cache.asMap().keys
+    fun values(): Collection<V> = getMap().values
+
+    fun keys(): Set<K> = getMap().keys
+
+    /**
+     * Modifications to the returned map are not supported and may lead to unexpected behavior.
+     * This method is intended for read-only operations such as iteration or retrieval of values.
+     *
+     * @return A read-only view of the cache's underlying map.
+     */
+    private fun getMap(): ConcurrentMap<K, V> {
+        val asMap: ConcurrentMap<K, V>
+
+        cacheLock.readLock().lock()
+        try {
+            asMap = cache.asMap()
+        } finally {
+            cacheLock.readLock().unlock()
+        }
+
+        return asMap
+    }
 
     fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
 

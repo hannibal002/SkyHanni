@@ -1,12 +1,21 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
-enum class FortuneStats(val label: String, val tooltip: String) {
+import at.hannibal2.skyhanni.features.garden.CropType
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumOfPair
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
+
+enum class FortuneStats(
+    private val label0: (CropType) -> String,
+    private val tooltip0: (CropType) -> String,
+    val onClick: (CropType) -> Unit = {},
+) {
     BASE(
         "§2Universal Farming Fortune",
-        "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" +
-            "§eSee on the grass block page"
+        "§7§2Farming fortune in that is\n§2applied to every crop\n§eNot the same as tab FF\n" + "§eSee on the grass block page"
     ),
-    CROP_TOTAL("§6Crop Farming Fortune", "§7§2Farming fortune for this crop"),
+    CROP_TOTAL(
+        { crop -> "§6${crop.niceName.firstLetterUppercase()} Farming Fortune" },
+        { "§7§2Farming fortune for this crop" }),
     ACCESSORY("§2Talisman Bonus", "§7§2Fortune from your talisman\n§2You get 10☘ per talisman tier"),
     CROP_UPGRADE("§2Crop Upgrade", "§7§2Fortune from Desk crop upgrades\n§2You get 5☘ per level"),
     BASE_TOOL("§2Base tool fortune", "§7§2Crop specific fortune from your tool"),
@@ -20,19 +29,53 @@ enum class FortuneStats(val label: String, val tooltip: String) {
     CULTIVATING("§2Cultivating Enchantment", "§7§2Fortune for each enchantment level\n§2You get 2☘ per level"),
     TURBO("§2Turbo-Crop Enchantment", "§7§2Fortune for each enchantment level\n§2You get 5☘ per level"),
     DEDICATION("§2Dedication Enchantment", "§7§2Fortune for each enchantment level\n§2and crop milestone"),
-    EXPORTED_CARROT(
-        "§2Exportable Carrots",
-        "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
-            "§eRun /shcarrot to toggle the stat"
-    ),
-    EXPIRED_PUMPKIN(
-        "§2Expired Pumpkin",
-        "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
-            "§eRun /shpumpkin to toggle the stat"
-    ),
-    SUPREME_CHOCOLATE_BAR(
-        "§2Supreme Chocolate Bar",
-        "§7§2Gain 12☘ from giving 3,000 to Carrolyn in Scarleton!\n" +
-            "§eRun /shcocoabeans to toggle the stat"
-    ),
+    CARROLYN(::carrolynLabel, ::carrolynToolTip, ::carrolynOnClick),
+    ;
+
+    constructor(label: String, tooltip: String) : this({ label }, { tooltip })
+
+    var current: Double = 0.0
+    var max: Double = -1.0
+
+    fun label(crop: CropType) = label0(crop)
+    fun tooltip(crop: CropType) = tooltip0(crop)
+
+    fun reset() {
+        current = 0.0
+        max = -1.0
+    }
+
+    fun set(value: Pair<Double, Double>) {
+        current = value.first
+        max = value.second
+    }
+
+    fun set(current: Double, max: Double) {
+        this.current = current
+        this.max = max
+    }
+
+    fun isActive() = max != -1.0
+
+    companion object {
+
+        fun getTotal(): Pair<Double, Double> = entries.filter { it.isActive() }.sumOfPair { it.current to it.max }
+
+        fun reset() = entries.forEach { it.reset() }
+    }
 }
+
+private fun carrolynLabel(crop: CropType): String =
+    CarrolynTable.getByCrop(crop)?.label?.let { "§2$it" } ?: "§cError"
+
+private fun carrolynToolTip(crop: CropType): String =
+    "§7§2Gain 12☘ from giving 3,000\n§2 to Carrolyn in Scarleton!\n §e`Run /shcarrolyn ${
+        crop.niceName
+    }` to toggle the stat\n §eor click the value"
+
+private fun carrolynOnClick(crop: CropType) =
+    CarrolynTable.getByCrop(crop)?.let {
+        it.setVisibleActive(!it.get())
+        FFGuideGUI.updateDisplay()
+    }
+

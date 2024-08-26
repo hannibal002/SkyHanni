@@ -151,6 +151,8 @@ object SkyBlockItemModifierUtils {
             }.sortedBy { it.first }
         }
 
+    fun ItemStack.hasAttributes() = getAttributes() != null
+
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
@@ -168,6 +170,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.hasWoodSingularity() = getAttributeBoolean("wood_singularity_count")
 
+    fun ItemStack.hasDivanPowderCoating() = getAttributeBoolean("divan_powder_coating")
+
     fun ItemStack.hasArtOfWar() = getAttributeBoolean("art_of_war_count")
 
     // TODO untested
@@ -179,16 +183,20 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getLivingMetalProgress() = getAttributeInt("lm_evo")
 
+    fun ItemStack.getSecondsHeld() = getAttributeInt("seconds_held")
+
     fun ItemStack.getBottleOfJyrreSeconds() = getAttributeInt("bottle_of_jyrre_seconds")
 
     fun ItemStack.getEdition() = getAttributeInt("edition")
 
     fun ItemStack.getNewYearCake() = getAttributeInt("new_years_cake")
 
-    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()?.takeIf { it.hasKey("enchantments") }?.run {
-        val enchantments = this.getCompoundTag("enchantments")
-        enchantments.keySet.associateWith { enchantments.getInteger(it) }
-    }
+    fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
+        ?.takeIf { it.hasKey("enchantments") }
+        ?.run {
+            val enchantments = this.getCompoundTag("enchantments")
+            enchantments.keySet.associateWith { enchantments.getInteger(it) }
+        }
 
     fun ItemStack.getAppliedPocketSackInASack(): Int? {
         val data = cachedData
@@ -323,7 +331,7 @@ object SkyBlockItemModifierUtils {
 
             fun getByName(name: String): GemstoneSlotType =
                 entries.firstOrNull { name.uppercase(Locale.ENGLISH).contains(it.name) }
-                    ?: error("Unknwon GemstoneSlotType: '$name'")
+                    ?: error("Unknown GemstoneSlotType: '$name'")
 
             fun getColorCode(name: String) = getByName(name).colorCode
         }

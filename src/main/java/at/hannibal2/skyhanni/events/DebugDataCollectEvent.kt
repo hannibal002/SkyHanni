@@ -18,7 +18,7 @@ class DebugDataCollectEvent(private val list: MutableList<String>, private val s
 
     fun addIrrelevant(text: String) = addIrrelevant(listOf(text))
 
-    private fun addIrrelevant(text: List<String>) {
+    fun addIrrelevant(text: List<String>) {
         irrelevant = true
         addData(text)
     }

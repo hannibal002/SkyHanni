@@ -82,11 +82,11 @@ class ShaderHelper {
             ) else GL20.glGetProgramInfoLog(program, maxLength)
         }
 
-        fun glGetProgrami(program: Int, pname: Int): Int {
+        fun glGetProgramInt(program: Int, pName: Int): Int {
             return if (USING_ARB_SHADERS) ARBShaderObjects.glGetObjectParameteriARB(
                 program,
-                pname
-            ) else GL20.glGetProgrami(program, pname)
+                pName
+            ) else GL20.glGetProgrami(program, pName)
         }
 
         fun glUseProgram(program: Int) {
@@ -115,11 +115,11 @@ class ShaderHelper {
             if (USING_ARB_SHADERS) ARBShaderObjects.glCompileShaderARB(shader) else GL20.glCompileShader(shader)
         }
 
-        fun glGetShaderi(shader: Int, pname: Int): Int {
+        fun glGetShaderInt(shader: Int, pName: Int): Int {
             return if (USING_ARB_SHADERS) ARBShaderObjects.glGetObjectParameteriARB(
                 shader,
-                pname
-            ) else GL20.glGetShaderi(shader, pname)
+                pName
+            ) else GL20.glGetShaderi(shader, pName)
         }
 
         fun glGetShaderInfoLog(shader: Int, maxLength: Int): String {
@@ -135,6 +135,10 @@ class ShaderHelper {
 
         fun glUniform1f(location: Int, v0: Float) {
             if (USING_ARB_SHADERS) ARBShaderObjects.glUniform1fARB(location, v0) else GL20.glUniform1f(location, v0)
+        }
+
+        fun glUniform1i(location: Int, v0: Int) {
+            if (USING_ARB_SHADERS) ARBShaderObjects.glUniform1iARB(location, v0) else GL20.glUniform1i(location, v0)
         }
 
         fun glUniform2f(location: Int, v0: Float, v1: Float) {
