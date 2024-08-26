@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
@@ -45,10 +46,6 @@ object CustomScoreboardUtils {
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
 
     internal fun getMotes() = getGroup(SbPattern.motesPattern, getSbLines(), "motes") ?: "0"
-
-    internal fun getMotes() = getGroup(SbPattern.motesPattern, getSbLines(), "motes") ?: "0"
-
-    internal fun getBank() = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.bankPattern, "bank")
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
