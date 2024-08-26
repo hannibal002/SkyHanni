@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemNameResolver
@@ -38,16 +37,36 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ItemPickupLog {
-    enum class DisplayLayout(private val display: String) {
-        CHANGE_AMOUNT("§a+256"),
-        ICON("§e✎"),
-        ITEM_NAME("§d[:3] TransRights's Cake Soul"),
+    enum class DisplayLayout(private val display: String, val renderable: (PickupEntry, String) -> Renderable) {
+        CHANGE_AMOUNT(
+            "§a+256",
+            { entry, prefix ->
+                val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
+                Renderable.string("${prefix}${formattedAmount}")
+            },
+        ),
+        ICON(
+            "§e✎",
+            { entry, _ ->
+                val itemIcon = entry.neuInternalName?.getItemStackOrNull()
+                if (itemIcon != null) {
+                    Renderable.itemStack(itemIcon)
+                } else {
+                    ItemNameResolver.getInternalNameOrNull(entry.name)?.let { Renderable.itemStack(it.getItemStack()) }
+                        ?: Renderable.string("§c?")
+                }
+            },
+        ),
+        ITEM_NAME(
+            "§d[:3] TransRights's Cake Soul",
+            { entry, _ -> Renderable.string(entry.name) },
+        ),
         ;
 
         override fun toString() = display
     }
 
-    private data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
+    data class PickupEntry(val name: String, var amount: Long, val neuInternalName: NEUInternalName?) {
         var timeUntilExpiry = SimpleTimeMark.now()
 
         fun updateAmount(change: Long) {
@@ -117,31 +136,32 @@ object ItemPickupLog {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 
         oldItemList.putAll(itemList)
 
-        itemList.clear()
+        if (!InventoryUtils.inInventory()) {
+            itemList.clear()
 
-        val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-        val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
+            val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
+            val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
 
-        if (cursorItem != null) {
-            val hash = cursorItem.hash()
-            //this prevents items inside hypixel guis counting when picked up
-            if (oldItemList.contains(hash)) {
-                inventoryItems.add(cursorItem)
+            if (cursorItem != null) {
+                val hash = cursorItem.hash()
+                //this prevents items inside hypixel guis counting when picked up
+                if (oldItemList.contains(hash)) {
+                    inventoryItems.add(cursorItem)
+                }
             }
-        }
 
-        for (itemStack in inventoryItems) {
-            val hash = itemStack.hash()
-            val old = itemList[hash]
-            if (old != null) {
-                itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
-            } else {
-                itemList[hash] = itemStack to itemStack.stackSize
+            for (itemStack in inventoryItems) {
+                val hash = itemStack.hash()
+                val old = itemList[hash]
+                if (old != null) {
+                    itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
+                } else {
+                    itemList[hash] = itemStack to itemStack.stackSize
+                }
             }
         }
 
@@ -183,25 +203,7 @@ object ItemPickupLog {
         buildList {
             val displayLayout: List<DisplayLayout> = config.displayLayout
             for (item in displayLayout) {
-                when (item) {
-                    DisplayLayout.ICON -> {
-                        val itemIcon = entry.neuInternalName?.getItemStackOrNull()
-                        if (itemIcon != null) {
-                            addItemStack(itemIcon)
-                        } else {
-                            ItemNameResolver.getInternalNameOrNull(entry.name)?.let { addItemStack(it) }
-                        }
-                    }
-
-                    DisplayLayout.CHANGE_AMOUNT -> {
-                        val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                        add(Renderable.string("${prefix}${formattedAmount}"))
-                    }
-
-                    DisplayLayout.ITEM_NAME -> {
-                        add(Renderable.string(entry.name))
-                    }
-                }
+                add(item.renderable(entry, prefix))
             }
         },
     )
@@ -227,13 +229,9 @@ object ItemPickupLog {
     }
 
     private fun isBannedItem(item: ItemStack): Boolean {
-        if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
-            return true
-        }
-
-        if (bannedItemsConverted.contains(item.getInternalNameOrNull())) {
-            return true
-        }
+        val internalName = item.getInternalNameOrNull() ?: return true
+        if (internalName.startsWith("MAP") == true) return true
+        if (internalName in bannedItemsConverted) return true
 
         if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
             return true

@@ -162,9 +162,15 @@ object ScoreboardPattern {
 
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
+
+    /**
+     * REGEX-TEST: §6§lGOLD §fmedals: §6111
+     * REGEX-TEST: §f§lSILVER §fmedals: §f1,154
+     * REGEX-TEST: §c§lBRONZE §fmedals: §c268
+     */
     val medalsPattern by farmingSb.pattern(
         "medals",
-        "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$",
+        "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc][\\d.,]+",
     )
     val lockedPattern by farmingSb.pattern(
         "locked",
@@ -563,6 +569,10 @@ object ScoreboardPattern {
     val bankPattern by tablistGroup.pattern(
         "bank",
         "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 \\/ §6(?<coop>[\\w.,]+))?)$",
+    )
+    val soulflowPattern by tablistGroup.pattern(
+        "soulflow",
+        "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$",
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",
