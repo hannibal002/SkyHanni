@@ -23,12 +23,12 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -45,7 +45,7 @@ object PestFinder {
     private var display = emptyList<Renderable>()
     val noPestsChatPattern by RepoPattern.pattern(
         "chat.garden.no.pest",
-        "§cThere are not any Pests on your Garden right now! Keep farming!"
+        "§cThere are not any Pests on your Garden right now! Keep farming!",
     )
 
     @HandleEvent
@@ -76,26 +76,28 @@ object PestFinder {
                     "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
                     "",
-                    "§eClick here to warp!"
+                    "§eClick here to warp!",
                 ),
                 onClick = {
                     plot.sendTeleportTo()
-                }
+                },
             )
             add(renderable)
         }
 
         if (PestAPI.getInfestedPlots().isEmpty() && PestAPI.scoreboardPests != 0) {
             add(Renderable.string("§e${PestAPI.scoreboardPests} §6Bugged pests!"))
-            add(Renderable.clickAndHover(
-                "§cTry opening your plots menu.",
-                listOf(
-                    "Runs /desk."
+            add(
+                Renderable.clickAndHover(
+                    "§cTry opening your plots menu.",
+                    listOf(
+                        "Runs /desk.",
+                    ),
+                    onClick = {
+                        HypixelCommands.gardenDesk()
+                    },
                 ),
-                onClick = {
-                    HypixelCommands.gardenDesk()
-                }
-            ))
+            )
         }
     }
 
@@ -159,7 +161,7 @@ object PestFinder {
             pests
             ) + " §c$pestsName §7in §b$plotName"
         event.drawDynamicText(
-            location, text, 1.5
+            location, text, 1.5,
         )
     }
 
