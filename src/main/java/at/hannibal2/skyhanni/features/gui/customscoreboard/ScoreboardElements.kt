@@ -411,7 +411,7 @@ private fun getMotesDisplayPair(): List<ScoreboardElementType> {
 private fun getMotesShowWhen() = inAnyIsland(IslandType.THE_RIFT)
 
 private fun getBankDisplayPair(): List<ScoreboardElementType> {
-    val bank = getBank()
+    val bank = getBank() ?: "0"
 
     return listOf(
         when {
