@@ -146,9 +146,10 @@ public class InventoryConfig {
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
         DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
+        ENCHANTING_EXP("§bEnchanting EXP (Superpairs)"),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
-        BESTIARY_LEVEL("§bBestiary Level")
+        BESTIARY_LEVEL("§bBestiary Level"),
         ;
 
         private final String str;
@@ -263,6 +264,12 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean stonkOfStonkPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hexAsColorInLore = true;
 
     @Expose
     @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD to move around in the AbiPhone snake game.")

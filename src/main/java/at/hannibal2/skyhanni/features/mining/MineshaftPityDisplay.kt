@@ -73,6 +73,8 @@ object MineshaftPityDisplay {
             profileStorage?.mineshaftTotalCount = value
         }
 
+    private var sessionMineshafts = 0
+
     var lastMineshaftSpawn = SimpleTimeMark.farPast()
 
     private var display = listOf<Renderable>()
@@ -104,6 +106,7 @@ object MineshaftPityDisplay {
 
             mineshaftTotalBlocks += totalBlocks
             mineshaftTotalCount++
+            sessionMineshafts++
 
             val message = event.message + " §e($counterUntilPity)"
 
@@ -201,27 +204,24 @@ object MineshaftPityDisplay {
             ),
         )
 
-        val map = buildMap {
-            put(MineshaftPityLine.TITLE, Renderable.string("§9§lMineshaft Pity Counter"))
-            put(MineshaftPityLine.COUNTER, Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"))
-            put(
-                MineshaftPityLine.CHANCE,
-                Renderable.string(
-                    "§3Chance: §e1§6/§e${chance.round(1).addSeparators()} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
-                ),
-            )
-            put(MineshaftPityLine.NEEDED_TO_PITY, neededToPityRenderable)
-            put(
-                MineshaftPityLine.TIME_SINCE_MINESHAFT,
+        val map = mapOf(
+            MineshaftPityLine.TITLE to Renderable.string("§9§lMineshaft Pity Counter"),
+            MineshaftPityLine.COUNTER to Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
+            MineshaftPityLine.CHANCE to Renderable.string(
+                "§3Chance: §e1§6/§e${
+                    chance.round(1).addSeparators()
+                } §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
+            ),
+            MineshaftPityLine.NEEDED_TO_PITY to neededToPityRenderable,
+            MineshaftPityLine.TIME_SINCE_MINESHAFT to
                 Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
-            )
-            put(
-                MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT,
+            MineshaftPityLine.AVERAGE_BLOCKS_MINESHAFT to
                 Renderable.string(
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
-            )
-        }
+            MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.string("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
+            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
+        )
 
         display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
     }
@@ -247,6 +247,7 @@ object MineshaftPityDisplay {
         resetCounter()
         mineshaftTotalBlocks = 0
         mineshaftTotalCount = 0
+        sessionMineshafts = 0
         lastMineshaftSpawn = SimpleTimeMark.farPast()
         update()
     }
@@ -268,7 +269,9 @@ object MineshaftPityDisplay {
         CHANCE("§3Chance: §e1§6/§e1439 §7(§b0.069%§7)"),
         NEEDED_TO_PITY("§3Needed to pity:\n§7   <blocks>"),
         TIME_SINCE_MINESHAFT("§3Last Mineshaft: §e21m 5s", { !lastMineshaftSpawn.isFarPast() }),
-        AVERAGE_BLOCKS_MINESHAFT("§3Average Blocks/Mineshaft: §e361.5", { mineshaftTotalCount != 0 })
+        AVERAGE_BLOCKS_MINESHAFT("§3Average Blocks/Mineshaft: §e361.5", { mineshaftTotalCount != 0 }),
+        MINESHAFTS_TOTAL("§3Mineshafts total: §e23", { mineshaftTotalCount != 0 }),
+        MINESHAFTS_SESSION("§3Mineshafts this session: §e3", { sessionMineshafts != 0 }),
         ;
 
         override fun toString() = display
