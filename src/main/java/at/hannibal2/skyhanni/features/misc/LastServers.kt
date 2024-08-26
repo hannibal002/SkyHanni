@@ -17,7 +17,7 @@ object LastServers {
 
     private val config get() = SkyHanniMod.feature.misc.lastServers
 
-    private var lastServers: MutableMap<String, SimpleTimeMark> = mutableMapOf()
+    private var lastServers = mutableMapOf<String, SimpleTimeMark>()
 
     @SubscribeEvent
     fun onWorldSwitch(event: LorenzWorldChangeEvent) {
@@ -29,7 +29,7 @@ object LastServers {
             lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
 
             lastServers[serverId]?.passedSince()?.let {
-                ChatUtils.chat("§7You joined this server §e${it.format()}§7 ago.")
+                ChatUtils.chat("§7You already joined this server §e${it.format()}§7 ago.")
             }
 
             ChatUtils.debug("Adding $serverId to last servers.")
