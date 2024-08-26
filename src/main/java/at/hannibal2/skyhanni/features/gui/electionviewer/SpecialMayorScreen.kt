@@ -37,7 +37,7 @@ object SpecialMayorScreen : ElectionViewerScreen() {
                                 "$color$name",
                                 "in year $color$year",
                                 "Election in: $color${electionTime.timeUntil().format(maxUnits = 2)}",
-                                "Election at: $color${electionTime.formattedDate("EEEE, MMM d h:mm a")}",
+                                "Election at: $color${electionTime.formattedDate()}",
                             ).map { Renderable.wrappedString(it, 130) },
                             spacing = 5,
                             verticalAlign = VerticalAlignment.CENTER,

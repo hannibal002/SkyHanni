@@ -103,7 +103,7 @@ object ChocolateFactoryStats {
                         "§eHappens at: §a§lNow"
                 } else {
                     "§eFull Tower Charges: §b${timeTowerFull.timeUntil().format()}\n" +
-                        "§eHappens at: §b${timeTowerFull.formattedDate("EEEE, MMM d h:mm a")}"
+                        "§eHappens at: §b${timeTowerFull.formattedDate()}"
                 },
             )
             put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Prestige: $prestigeEstimate")
