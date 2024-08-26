@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Footer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
@@ -46,12 +47,14 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -65,6 +68,13 @@ object CustomScoreboard {
         private set
 
     private const val GUI_NAME = "Custom Scoreboard"
+
+    // Cached scoreboard data, only update after no change for 300ms
+    var activeLines = emptyList<String>()
+
+    // Most recent scoreboard state, not in use until cached
+    private var mostRecentLines = emptyList<String>()
+    private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -118,8 +128,16 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
+        // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
+        var dirty = false
+        if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
+            activeLines = mostRecentLines
+            lastScoreboardUpdate = SimpleTimeMark.farFuture()
+            dirty = true
+        }
+
         // Creating the lines
-        if (event.isMod(5)) {
+        if (event.isMod(5) || dirty) {
             display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
@@ -130,18 +148,24 @@ object CustomScoreboard {
         if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
     }
 
-    val config: CustomScoreboardConfig get() = SkyHanniMod.feature.gui.customScoreboard
-    val displayConfig: DisplayConfig get() = config.display
-    val alignmentConfig: AlignmentConfig get() = displayConfig.alignment
-    val arrowConfig: ArrowConfig get() = displayConfig.arrow
-    val chunkedConfig: ChunkedStatsConfig get() = displayConfig.chunkedStats
-    val customLineConfig: CustomLinesConfig get() = displayConfig.customLines
-    val eventsConfig: EventsConfig get() = displayConfig.events
-    val mayorConfig: MayorConfig get() = displayConfig.mayor
-    val partyConfig: PartyConfig get() = displayConfig.party
-    val maxwellConfig: MaxwellConfig get() = displayConfig.maxwell
-    val informationFilteringConfig: InformationFilteringConfig get() = config.informationFiltering
-    val backgroundConfig: BackgroundConfig get() = config.background
+    @SubscribeEvent
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        mostRecentLines = event.scoreboard
+        lastScoreboardUpdate = SimpleTimeMark.now()
+    }
+
+    internal val config get() = SkyHanniMod.feature.gui.customScoreboard
+    internal val displayConfig get() = config.display
+    internal val alignmentConfig get() = displayConfig.alignment
+    internal val arrowConfig get() = displayConfig.arrow
+    internal val chunkedConfig get() = displayConfig.chunkedStats
+    internal val customLineConfig get() = displayConfig.customLines
+    internal val eventsConfig get() = displayConfig.events
+    internal val mayorConfig get() = displayConfig.mayor
+    internal val partyConfig get() = displayConfig.party
+    internal val maxwellConfig get() = displayConfig.maxwell
+    internal val informationFilteringConfig get() = config.informationFiltering
+    internal val backgroundConfig get() = config.background
 
     private fun createLines() = when {
         !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()

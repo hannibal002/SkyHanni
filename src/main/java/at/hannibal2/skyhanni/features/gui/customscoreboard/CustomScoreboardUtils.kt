@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
+import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
@@ -29,7 +30,7 @@ object CustomScoreboardUtils {
     fun getProfileTypeSymbol() = when {
         HypixelData.ironman -> "§7♲ "
         HypixelData.stranded -> "§a☀ "
-        HypixelData.bingo -> getSbLines().firstNotNullOfOrNull {
+        HypixelData.bingo -> CustomScoreboard.activeLines.firstNotNullOfOrNull {
             BingoAPI.getIconFromScoreboard(it)?.plus(" ") // TODO: add bingo rank to bingo api
         } ?: "§e❤ "
 
@@ -86,5 +87,5 @@ object CustomScoreboardUtils {
         else -> null
     }
 
-    internal fun getSbLines() = ScoreboardData.sidebarLinesFormatted
+    internal fun getSbLines() = CustomScoreboard.activeLines
 }
