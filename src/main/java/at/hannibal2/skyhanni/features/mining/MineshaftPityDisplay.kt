@@ -207,10 +207,11 @@ object MineshaftPityDisplay {
         val map = mapOf(
             MineshaftPityLine.TITLE to Renderable.string("§9§lMineshaft Pity Counter"),
             MineshaftPityLine.COUNTER to Renderable.string("§3Pity Counter: §e$counterUntilPity§6/§e$MAX_COUNTER"),
-            MineshaftPityLine.CHANCE to
-                Renderable.string(
-                    "§3Chance: §e1§6/§e${chance.round(1).addSeparators()} §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
-                ),
+            MineshaftPityLine.CHANCE to Renderable.string(
+                "§3Chance: §e1§6/§e${
+                    chance.round(1).addSeparators()
+                } §7(§b${((1.0 / chance) * 100).addSeparators()}%§7)",
+            ),
             MineshaftPityLine.NEEDED_TO_PITY to neededToPityRenderable,
             MineshaftPityLine.TIME_SINCE_MINESHAFT to
                 Renderable.string("§3Last Mineshaft: §e${lastMineshaftSpawn.passedSince().format()}"),
@@ -219,7 +220,7 @@ object MineshaftPityDisplay {
                     "§3Average Blocks/Mineshaft: §e${(mineshaftTotalBlocks / mineshaftTotalCount.toDouble()).addSeparators()}",
                 ),
             MineshaftPityLine.MINESHAFTS_TOTAL to Renderable.string("§3Mineshafts total: §e${mineshaftTotalCount.addSeparators()}"),
-            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}")
+            MineshaftPityLine.MINESHAFTS_SESSION to Renderable.string("§3Mineshafts this session: §e${sessionMineshafts.addSeparators()}"),
         )
 
         display = config.mineshaftPityLines.filter { it.shouldDisplay() }.mapNotNull { map[it] }
