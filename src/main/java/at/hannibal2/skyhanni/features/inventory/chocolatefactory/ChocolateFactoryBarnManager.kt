@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionData
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsCompactChat
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager
@@ -56,6 +57,7 @@ object ChocolateFactoryBarnManager {
             }
             ChocolateAmount.addToAll(amount)
             HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
+            HoppityAPI.attemptFire(event, lastDuplicateAmount = amount)
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {
@@ -101,7 +103,7 @@ object ChocolateFactoryBarnManager {
             return
         }
 
-        if (config.rabbitCrushOnlyDuringHoppity && !ChocolateFactoryAPI.isHoppityEvent()) return
+        if (config.rabbitCrushOnlyDuringHoppity && !HoppityAPI.isHoppityEvent()) return
 
         val fullLevel = if (profileStorage.currentRabbits == profileStorage.maxRabbits) "full" else "almost full"
         ChatUtils.clickableChat(

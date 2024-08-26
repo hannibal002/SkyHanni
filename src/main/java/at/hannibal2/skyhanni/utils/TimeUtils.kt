@@ -163,3 +163,8 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }
+
+val Duration.inPartialSeconds: Double get() = inWholeMilliseconds.toDouble() / 1000
+val Duration.inPartialMinutes: Double get() = inPartialSeconds / 60
+val Duration.inPartialHours: Double get() = inPartialSeconds / 3600
+val Duration.inPartialDays: Double get() = inPartialSeconds / 86_400
