@@ -348,7 +348,7 @@ object Commands {
         ) { PestFinder.teleportNearestInfestedPlot() }
         registerCommand(
             "shhoppitystats",
-            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
+            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats.",
         ) { HoppityEventSummary.sendStatsMessage(it) }
         registerCommand(
             "shcolors",
