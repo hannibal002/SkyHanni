@@ -637,7 +637,9 @@ object EstimatedItemValueCalculator {
                     9 -> multiplier = 16
                     10 -> multiplier = 32
                 }
-                level = 5
+                if (multiplier > 1) {
+                    level = 5
+                }
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
