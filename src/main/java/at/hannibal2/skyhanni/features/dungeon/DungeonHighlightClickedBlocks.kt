@@ -124,7 +124,7 @@ object DungeonHighlightClickedBlocks {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(52, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
+        event.move(56, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }
 
     class ClickedBlock(val displayText: String, var color: Color)
