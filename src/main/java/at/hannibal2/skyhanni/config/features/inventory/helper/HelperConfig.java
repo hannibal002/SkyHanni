@@ -53,6 +53,11 @@ public class HelperConfig {
     public TiaRelayConfig tiaRelay = new TiaRelayConfig();
 
     @Expose
+    @ConfigOption(name = "Reforge Helper", desc = "")
+    @Accordion
+    public ReforgeHelperConfig reforge = new ReforgeHelperConfig();
+
+    @Expose
     @ConfigOption(name = "Enchanting", desc = "")
     @Accordion
     public EnchantingConfig enchanting = new EnchantingConfig();
@@ -69,6 +74,12 @@ public class HelperConfig {
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean ultraRareBookAlert = false;
+
+        @Expose
+        @ConfigOption(name = "Guardian Reminder", desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped.")
+        @ConfigEditorBoolean
+        @FeatureToggle
+        public boolean guardianReminder = false;
     }
 
 }

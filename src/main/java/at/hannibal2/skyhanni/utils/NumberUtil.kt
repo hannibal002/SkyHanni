@@ -33,7 +33,7 @@ object NumberUtil {
             5 to "V",
             4 to "IV",
             1 to "I",
-        )
+        ),
     )
 
     @Deprecated("outdated", ReplaceWith("value.shortFormat(preciseBillions)"))
@@ -169,6 +169,8 @@ object NumberUtil {
             romanSymbols[this]!!
         } else romanSymbols[l] + (this - l).toRoman()
     }
+
+    fun Number.toStringWithPlus() = (if (this.toDouble() >= 0.0) "+" else "") + this.toString()
 
     private fun processDecimal(decimal: Int, lastNumber: Int, lastDecimal: Int) = if (lastNumber > decimal) {
         lastDecimal - decimal
