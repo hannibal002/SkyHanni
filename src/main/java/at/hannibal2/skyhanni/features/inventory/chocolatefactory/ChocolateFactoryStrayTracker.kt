@@ -141,7 +141,7 @@ object ChocolateFactoryStrayTracker {
         val extraTime = ChocolateFactoryAPI.timeUntilNeed(chocAmount + 1)
         tracker.modify { it.straysExtraChocMs.addOrPut(rarity, extraTime.inWholeMilliseconds) }
         if (HoppityAPI.isHoppityEvent()) {
-            LorenzRarity.fromString(rarity)?.let {
+            LorenzRarity.getByName(rarity)?.let {
                 HoppityEventSummary.addStrayCaught(it, chocAmount)
             }
         }
