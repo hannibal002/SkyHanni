@@ -313,7 +313,7 @@ object CustomScoreboard {
             array
         }
         event.move(
-            55,
+            56,
             "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
             "$displayPrefix.titleAndFooter.useCustomTitle",
         ) {
