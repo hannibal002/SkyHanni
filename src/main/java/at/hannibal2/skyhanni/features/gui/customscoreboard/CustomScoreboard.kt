@@ -255,8 +255,12 @@ object CustomScoreboard {
         val prefix = "gui.customScoreboard"
         val displayConfigPrefix = "$prefix.displayConfig"
         val displayPrefix = "$prefix.display"
+        val eventsConfigKey = "$displayConfigPrefix.eventsConfig"
+        val alignmentKey = "$displayPrefix.alignment"
+        val titleAndFooterKey = "$displayPrefix.titleAndFooter"
+        val eventEntriesKey = "$displayPrefix.events.eventEntries"
 
-        event.move(28, "$displayConfigPrefix.showAllActiveEvents", "$displayConfigPrefix.eventsConfig.showAllActiveEvents")
+        event.move(28, "$displayConfigPrefix.showAllActiveEvents", "$eventsConfigKey.showAllActiveEvents")
         event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
         event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
         event.move(31, "$displayConfigPrefix.showMagicalPower", "$displayPrefix.maxwell.showMagicalPower")
@@ -269,20 +273,21 @@ object CustomScoreboard {
         event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
         event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
         event.move(31, "$displayConfigPrefix.cacheScoreboardOnIslandSwitch", "$displayPrefix.cacheScoreboardOnIslandSwitch")
-        event.move(31, "$displayConfigPrefix.alignment", "$displayPrefix.alignment")
-        event.move(31, "$displayConfigPrefix.titleAndFooter", "$displayPrefix.titleAndFooter")
+        event.move(31, "$displayConfigPrefix.alignment", alignmentKey)
+        event.move(31, titleAndFooterKey, titleAndFooterKey)
         event.move(31, "$prefix.backgroundConfig", "$prefix.background")
         event.move(31, "$prefix.informationFilteringConfig", "$prefix.informationFiltering")
-        event.move(31, "$displayConfigPrefix.eventsConfig", "$displayPrefix.events")
+        event.move(31, eventsConfigKey, "$displayPrefix.events")
         event.move(31, "$prefix.mayorConfig", "$displayPrefix.mayor")
         event.move(31, "$prefix.partyConfig", "$displayPrefix.party")
 
-        event.transform(37, "$displayPrefix.events.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEventEntry.QUEUE.name))
-            array
+        event.transform(37, eventEntriesKey) { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive(ScoreboardEventEntry.QUEUE.name))
+            }
         }
-        event.transform(40, "$displayPrefix.events.eventEntries") { element ->
+
+        event.transform(40, eventEntriesKey) { element ->
             val jsonArray = element.asJsonArray
             val newArray = JsonArray()
             val oldElements = listOf("HOT_DOG_CONTEST", "EFFIGIES")
@@ -301,43 +306,38 @@ object CustomScoreboard {
             newArray
         }
 
-        event.move(43, "$displayPrefix.alignment.alignRight", "$displayPrefix.alignment.horizontalAlignment") {
+        event.move(43, "$alignmentKey.alignRight", "$alignmentKey.horizontalAlignment") {
             JsonPrimitive(
-                if (it.asBoolean) {
-                    HorizontalAlignment.RIGHT.name
-                } else {
-                    HorizontalAlignment.DONT_ALIGN.name
-                },
+                if (it.asBoolean) HorizontalAlignment.RIGHT.name
+                else HorizontalAlignment.DONT_ALIGN.name,
             )
         }
-        event.move(43, "$displayPrefix.alignment.alignCenterVertically", "$displayPrefix.alignment.verticalAlignment") {
+
+        event.move(43, "$alignmentKey.alignCenterVertically", "$alignmentKey.verticalAlignment") {
             JsonPrimitive(
-                if (it.asBoolean) {
-                    VerticalAlignment.CENTER.name
-                } else {
-                    VerticalAlignment.DONT_ALIGN.name
-                },
+                if (it.asBoolean) VerticalAlignment.CENTER.name
+                else VerticalAlignment.DONT_ALIGN.name,
             )
         }
-        event.transform(50, "$displayPrefix.events.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEventEntry.ANNIVERSARY.name))
-            array.add(JsonPrimitive(ScoreboardEventEntry.CARNIVAL.name))
-            array
+
+        event.transform(50, eventEntriesKey) { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive(ScoreboardEventEntry.ANNIVERSARY.name))
+                add(JsonPrimitive(ScoreboardEventEntry.CARNIVAL.name))
+            }
         }
-        event.transform(51, "$displayPrefix.events.eventEntries") { element ->
-            val array = element.asJsonArray
-            array.add(JsonPrimitive(ScoreboardEventEntry.NEW_YEAR.name))
-            array
+
+        event.transform(51, eventEntriesKey) { element ->
+            element.asJsonArray.apply {
+                add(JsonPrimitive(ScoreboardEventEntry.NEW_YEAR.name))
+            }
         }
-        event.move(
-            56,
-            "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
-            "$displayPrefix.titleAndFooter.useCustomTitle",
-        ) {
+
+        event.move(56, "$titleAndFooterKey.useHypixelTitleAnimation", "$titleAndFooterKey.useCustomTitle") {
             JsonPrimitive(!it.asBoolean)
         }
-        event.transform(57, "$displayPrefix.events.eventEntries") { element ->
+
+        event.transform(57, eventEntriesKey) { element ->
             val jsonArray = element.asJsonArray
             val newArray = JsonArray()
             val oldElements = listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING")
@@ -355,14 +355,14 @@ object CustomScoreboard {
 
             newArray
         }
+
         listOf("customTitle", "customFooter").forEach {
-            event.transform(57, "$displayPrefix.titleAndFooter.$it") { element ->
+            event.transform(57, "$titleAndFooterKey.$it") { element ->
                 JsonPrimitive(element.asString.replace("&", "&&"))
             }
         }
 
-        event.move(57, "$displayPrefix.titleAndFooter.alignTitleAndFooter", "$displayPrefix.titleAndFooter.alignTitle")
-        event.move(57, "$displayPrefix.titleAndFooter.alignTitleAndFooter", "$displayPrefix.titleAndFooter.alignFooter")
-
+        event.move(57, "$titleAndFooterKey.alignTitleAndFooter", "$titleAndFooterKey.alignTitle")
+        event.move(57, "$titleAndFooterKey.alignTitleAndFooter", "$titleAndFooterKey.alignFooter")
     }
 }
