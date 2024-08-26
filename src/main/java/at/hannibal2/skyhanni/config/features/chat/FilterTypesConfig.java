@@ -111,6 +111,12 @@ public class FilterTypesConfig {
     public boolean sacrifice = false;
 
     @Expose
+    @ConfigOption(name = "Garden Pest", desc = "Hide the message of no pests on garden.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gardenNoPest = false;
+
+    @Expose
     @ConfigOption(name = "Block Alpha Achievements", desc = "Hide achievement messages while on the Alpha network.")
     @ConfigEditorBoolean
     @FeatureToggle

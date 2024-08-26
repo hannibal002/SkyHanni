@@ -56,6 +56,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -64,6 +65,7 @@ import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -171,6 +173,7 @@ object Commands {
             { DefaultConfigFeatures.onCommand(it) },
             DefaultConfigFeatures::onComplete,
         )
+        registerCommand("shremind", "Set a reminder for yourself") { ReminderManager.command(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
@@ -280,6 +283,10 @@ object Commands {
             "shresetstrayrabbittracker",
             "Resets the Stray Rabbit Tracker",
         ) { ChocolateFactoryStrayTracker.resetCommand() }
+        registerCommand(
+            "shresetexcavatortracker",
+            "Resets the Fossil Excavator Profit Tracker",
+        ) { ExcavatorProfitTracker.resetCommand() }
         registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
