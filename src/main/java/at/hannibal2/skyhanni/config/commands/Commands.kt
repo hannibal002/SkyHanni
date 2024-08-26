@@ -55,6 +55,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -280,6 +281,10 @@ object Commands {
             "shresetstrayrabbittracker",
             "Resets the Stray Rabbit Tracker",
         ) { ChocolateFactoryStrayTracker.resetCommand() }
+        registerCommand(
+            "shresetexcavatortracker",
+            "Resets the Fossil Excavator Profit Tracker",
+        ) { ExcavatorProfitTracker.resetCommand() }
         registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
