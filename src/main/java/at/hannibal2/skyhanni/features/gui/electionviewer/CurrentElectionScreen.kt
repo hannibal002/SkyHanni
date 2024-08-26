@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeCandidateRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -11,7 +10,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -19,10 +17,7 @@ object CurrentElectionScreen : ElectionViewerScreen() {
 
     override val posLabel = "Election Viewer - Current Election"
 
-    @SubscribeEvent
-    override fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isInGui()) return
-
+    override fun updateDisplay() {
         val currentElection = MayorAPI.rawMayorData?.current ?: return
         val votesHidden = currentElection.candidates.sumOf { it.votes } == 0
 

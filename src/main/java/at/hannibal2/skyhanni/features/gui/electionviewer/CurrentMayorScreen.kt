@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.gui.electionviewer
 
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerUtils.getFakeMayorRenderable
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
@@ -11,17 +10,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CurrentMayorScreen : ElectionViewerScreen() {
 
     override val posLabel = "Election Viewer - Current Mayor"
 
-    @SubscribeEvent
-    override fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isInGui()) return
-
+    override fun updateDisplay() {
         val mayor = MayorAPI.currentMayor ?: return
         val minister = MayorAPI.currentMinister
         val jerryMayor = MayorAPI.jerryExtraMayor

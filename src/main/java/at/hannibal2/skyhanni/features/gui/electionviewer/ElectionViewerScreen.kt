@@ -49,7 +49,22 @@ abstract class ElectionViewerScreen : GuiScreen() {
 
     @SubscribeEvent
     open fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isInGui()) return
+        updateDisplay()
     }
+
+    override fun initGui() {
+        super.initGui()
+        updateDisplay()
+    }
+
+    /**
+     * Generates the content of the display.
+     * The content should **not** include the background Renderable.
+     *
+     * This method is called every second and when the GUI is opened.
+     */
+    abstract fun updateDisplay()
 
     abstract fun isInGui(): Boolean
 
@@ -119,7 +134,7 @@ abstract class ElectionViewerScreen : GuiScreen() {
         )
         buttonPosition.renderRenderable(
             buttons,
-            posLabel = posLabel,
+            posLabel = "Election Viewer - Buttons",
             addToGuiManager = false,
         )
     }
