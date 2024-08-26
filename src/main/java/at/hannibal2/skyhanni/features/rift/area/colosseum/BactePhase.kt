@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -16,12 +17,22 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object BactePhase {
 
+    private val group = RepoPattern.group("rift.colosseum.bacte")
     /**
      * REGEX-TEST: §2﴾ §8[§7Lv10§8] §l§aBa§r §a800§f/§a1,000§c❤ §2﴿
      */
-    private val namePattern by RepoPattern.pattern(
-        "rift.colosseum.bacte.name",
+    private val namePattern by group.pattern(
+        "name",
         "§2﴾ §8\\[§7Lv\\d+§8\\] §l§a(?<name>.*)§r §.[\\d.,]+§f\\/§a[\\d.,]+§c❤ §2﴿",
+    )
+
+    /**
+     * REGEX-TEST: §aBac §r§eis growing into §r§aBact§r§e!
+     * REGEX-TEST: §aB §r§eis growing into §r§aBa§r§e!
+     */
+    private val nameChatPattern by group.pattern(
+        "chat.name",
+        "§a(?<previousName>.*) §r§eis growing into §r§a(?<name>.*)§r§e!",
     )
 
     enum class BactePhase(val displayName: String) {
@@ -32,10 +43,21 @@ object BactePhase {
         PHASE_4("Phase 4"),
         PHASE_5("Phase 5"),
         ;
+
+        companion object {
+            fun fromNumber(number: Int) = entries.find { it.ordinal == number } ?: NOT_ACTIVE
+        }
     }
 
     var currentPhase = BactePhase.NOT_ACTIVE
     private var bacte: Mob? = null
+
+    @SubscribeEvent
+    fun onChatMessage(event: LorenzChatEvent) {
+        nameChatPattern.matchMatcher(event.message) {
+            currentPhase = BactePhase.fromNumber(group("name").length)
+        }
+    }
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -58,14 +80,7 @@ object BactePhase {
         val name = bacte.armorStand?.name ?: return
 
         namePattern.matchMatcher(name) {
-            currentPhase = when (group("name").length) {
-                1 -> BactePhase.PHASE_1
-                2 -> BactePhase.PHASE_2
-                3 -> BactePhase.PHASE_3
-                4 -> BactePhase.PHASE_4
-                5 -> BactePhase.PHASE_5
-                else -> BactePhase.NOT_ACTIVE
-            }
+            currentPhase = BactePhase.fromNumber(group("name").length)
             return
         }
 
