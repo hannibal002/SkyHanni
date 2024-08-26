@@ -268,5 +268,5 @@ public class InventoryConfig {
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean hexDisplay = true;
+    public boolean hexAsColorInLore = true;
 }

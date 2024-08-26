@@ -9,13 +9,14 @@ import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 @SkyHanniModule
 object ColorHexInLore {
 
-    private val patternGroup = RepoPattern.group("hex")
+    private val patternGroup = RepoPattern.group("color.item.hex.lore")
 
     /**
      * REGEX-TEST: §5§o§7to §4#960018§7!
@@ -37,24 +38,26 @@ object ColorHexInLore {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onTooltip(event: ItemHoverEvent) {
-        if (!SkyHanniMod.feature.inventory.hexDisplay) return
+        if (!isEnabled()) return
         val itemCategory = event.itemStack.getItemCategoryOrNull()
         if (itemCategory != ItemCategory.DYE &&
             itemCategory !in ItemCategory.armor &&
-            !InventoryUtils.openInventoryName().startsWith("Dye")) return
+            !InventoryUtils.openInventoryName().startsWith("Dye")
+        ) return
 
         event.toolTip = event.toolTip.map {
             doubleHexPattern.matchMatcher(it) {
-                val group1 = group("hexfirst")
-                val group2 = group("hexsecond")
-                var newLine = it.replace(group1, ExtendedChatColor(ColorUtils.getColorFromHex(group1), false).toString() + group1)
-                newLine = newLine.replace(group2, ExtendedChatColor(ColorUtils.getColorFromHex(group2), false).toString() + group2)
-                newLine
+                it.replaceColor(group("hexfirst")).replaceColor(group("hexsecond"))
             } ?: hexPattern.matchMatcher(it) {
-                val group = group("hex")
-                it.replace(group, ExtendedChatColor(ColorUtils.getColorFromHex(group), false).toString() + group)
+                it.replaceColor(group("hex"))
             } ?: it
 
         }.toMutableList()
     }
+
+    private fun String.replaceColor(hexCode: String) = replace(hexCode, addColor(hexCode))
+
+    private fun addColor(hexFirst: String): String = ExtendedChatColor(ColorUtils.getColorFromHex(hexFirst), false).toString() + hexFirst
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.hexAsColorInLore
 }
