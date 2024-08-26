@@ -139,13 +139,13 @@ object ReminderManager {
 
         if (args.first() == "-l") {
             if (args.size < arguments.size + 1) return ChatUtils.userError("/shremind $command -l $argumentText")
-            if (storage[args.drop(1).first()] == null) return ChatUtils.userError("Reminder not found")
+            if (storage[args.drop(1).first()] == null) return ChatUtils.userError("Reminder not found!")
             action(args.drop(2), storage[args.drop(1).first()]!!).apply {
                 listReminders(listPage)
                 sendMessage(this)
             }
         } else if (storage[args.first()] == null) {
-            return ChatUtils.userError("Reminder not found")
+            return ChatUtils.userError("Reminder not found!")
         } else {
             sendMessage(action(args.drop(1), storage[args.first()]!!))
         }
