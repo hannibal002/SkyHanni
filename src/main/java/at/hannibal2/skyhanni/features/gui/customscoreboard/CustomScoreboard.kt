@@ -11,7 +11,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.AlignmentConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig
@@ -49,8 +48,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import com.google.gson.JsonArray
-import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -249,120 +246,4 @@ object CustomScoreboard {
     private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
 
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
-
-    @SubscribeEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        val prefix = "gui.customScoreboard"
-        val displayConfigPrefix = "$prefix.displayConfig"
-        val displayPrefix = "$prefix.display"
-        val eventsConfigKey = "$displayConfigPrefix.eventsConfig"
-        val alignmentKey = "$displayPrefix.alignment"
-        val titleAndFooterKey = "$displayPrefix.titleAndFooter"
-        val eventEntriesKey = "$displayPrefix.events.eventEntries"
-
-        event.move(28, "$displayConfigPrefix.showAllActiveEvents", "$eventsConfigKey.showAllActiveEvents")
-        event.move(31, "$displayConfigPrefix.arrowAmountDisplay", "$displayPrefix.arrow.amountDisplay")
-        event.move(31, "$displayConfigPrefix.colorArrowAmount", "$displayPrefix.arrow.colorArrowAmount")
-        event.move(31, "$displayConfigPrefix.showMagicalPower", "$displayPrefix.maxwell.showMagicalPower")
-        event.move(31, "$displayConfigPrefix.compactTuning", "$displayPrefix.maxwell.compactTuning")
-        event.move(31, "$displayConfigPrefix.tuningAmount", "$displayPrefix.maxwell.tuningAmount")
-        event.move(31, "$displayConfigPrefix.hideVanillaScoreboard", "$displayPrefix.hideVanillaScoreboard")
-        event.move(31, "$displayConfigPrefix.displayNumbersFirst", "$displayPrefix.displayNumbersFirst")
-        event.move(31, "$displayConfigPrefix.showUnclaimedBits", "$displayPrefix.showUnclaimedBits")
-        event.move(31, "$displayConfigPrefix.showMaxIslandPlayers", "$displayPrefix.showMaxIslandPlayers")
-        event.move(31, "$displayConfigPrefix.numberFormat", "$displayPrefix.numberFormat")
-        event.move(31, "$displayConfigPrefix.lineSpacing", "$displayPrefix.lineSpacing")
-        event.move(31, "$displayConfigPrefix.cacheScoreboardOnIslandSwitch", "$displayPrefix.cacheScoreboardOnIslandSwitch")
-        event.move(31, "$displayConfigPrefix.alignment", alignmentKey)
-        event.move(31, titleAndFooterKey, titleAndFooterKey)
-        event.move(31, "$prefix.backgroundConfig", "$prefix.background")
-        event.move(31, "$prefix.informationFilteringConfig", "$prefix.informationFiltering")
-        event.move(31, eventsConfigKey, "$displayPrefix.events")
-        event.move(31, "$prefix.mayorConfig", "$displayPrefix.mayor")
-        event.move(31, "$prefix.partyConfig", "$displayPrefix.party")
-
-        event.transform(37, eventEntriesKey) { element ->
-            element.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardEventEntry.QUEUE.name))
-            }
-        }
-
-        event.transform(40, eventEntriesKey) { element ->
-            val jsonArray = element.asJsonArray
-            val newArray = JsonArray()
-            val oldElements = listOf("HOT_DOG_CONTEST", "EFFIGIES")
-
-            for (jsonElement in jsonArray) {
-                val stringValue = jsonElement.asString
-                if (stringValue !in oldElements) {
-                    newArray.add(jsonElement)
-                }
-            }
-
-            if (jsonArray.any { it.asString in oldElements }) {
-                newArray.add(JsonPrimitive(ScoreboardEventEntry.RIFT.name))
-            }
-
-            newArray
-        }
-
-        event.move(43, "$alignmentKey.alignRight", "$alignmentKey.horizontalAlignment") {
-            JsonPrimitive(
-                if (it.asBoolean) HorizontalAlignment.RIGHT.name
-                else HorizontalAlignment.DONT_ALIGN.name,
-            )
-        }
-
-        event.move(43, "$alignmentKey.alignCenterVertically", "$alignmentKey.verticalAlignment") {
-            JsonPrimitive(
-                if (it.asBoolean) VerticalAlignment.CENTER.name
-                else VerticalAlignment.DONT_ALIGN.name,
-            )
-        }
-
-        event.transform(50, eventEntriesKey) { element ->
-            element.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardEventEntry.ANNIVERSARY.name))
-                add(JsonPrimitive(ScoreboardEventEntry.CARNIVAL.name))
-            }
-        }
-
-        event.transform(51, eventEntriesKey) { element ->
-            element.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardEventEntry.NEW_YEAR.name))
-            }
-        }
-
-        event.move(56, "$titleAndFooterKey.useHypixelTitleAnimation", "$titleAndFooterKey.useCustomTitle") {
-            JsonPrimitive(!it.asBoolean)
-        }
-
-        event.transform(57, eventEntriesKey) { element ->
-            val jsonArray = element.asJsonArray
-            val newArray = JsonArray()
-            val oldElements = listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING")
-
-            for (jsonElement in jsonArray) {
-                val stringValue = jsonElement.asString
-                if (stringValue !in oldElements) {
-                    newArray.add(jsonElement)
-                }
-            }
-
-            if (jsonArray.any { it.asString in oldElements }) {
-                newArray.add(JsonPrimitive(ScoreboardEventEntry.GARDEN.name))
-            }
-
-            newArray
-        }
-
-        listOf("customTitle", "customFooter").forEach {
-            event.transform(57, "$titleAndFooterKey.$it") { element ->
-                JsonPrimitive(element.asString.replace("&", "&&"))
-            }
-        }
-
-        event.move(57, "$titleAndFooterKey.alignTitleAndFooter", "$titleAndFooterKey.alignTitle")
-        event.move(57, "$titleAndFooterKey.alignTitleAndFooter", "$titleAndFooterKey.alignFooter")
-    }
 }
