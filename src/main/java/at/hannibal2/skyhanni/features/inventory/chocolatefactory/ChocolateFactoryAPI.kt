@@ -192,9 +192,6 @@ object ChocolateFactoryAPI {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    // TODO add debug toggle
-    fun isHoppityEvent() = SkyblockSeason.currentSeason == SkyblockSeason.SPRING
-
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 
     fun timeTowerChargeDuration() =

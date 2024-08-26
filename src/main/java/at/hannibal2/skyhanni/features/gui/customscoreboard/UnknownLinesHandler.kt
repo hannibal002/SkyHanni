@@ -70,7 +70,7 @@ object UnknownLinesHandler {
         /**
          * Remove known lines with patterns
          **/
-        val patternsToExclude = listOf(
+        val patternsToExclude = mutableListOf(
             PurseAPI.coinsPattern,
             SbPattern.motesPattern,
             BitsAPI.bitsScoreboardPattern,
@@ -177,8 +177,11 @@ object UnknownLinesHandler {
             SbPattern.carnivalCatchStreakPattern,
             SbPattern.carnivalAccuracyPattern,
             SbPattern.carnivalKillsPattern,
-            *remoteOnlyPatterns,
         )
+
+        if (::remoteOnlyPatterns.isInitialized) {
+            patternsToExclude.addAll(remoteOnlyPatterns)
+        }
 
         unknownLines = unknownLines.filterNot { line ->
             if (line in confirmedLinesCache) return@filterNot true
