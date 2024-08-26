@@ -149,7 +149,7 @@ public class InventoryConfig {
         ENCHANTING_EXP("§bEnchanting EXP"),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
-        BESTIARY_LEVEL("§bBestiary Level")
+        BESTIARY_LEVEL("§bBestiary Level"),
         ;
 
         private final String str;
