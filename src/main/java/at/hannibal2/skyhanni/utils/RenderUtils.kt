@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -542,37 +541,6 @@ object RenderUtils {
         return renderer.getStringWidth(display)
     }
 
-    // Aligns using the width of element to render
-    private fun Position.renderString0(
-        string: String?,
-        offsetX: Int = 0,
-        offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment,
-    ): Int {
-        val display = "§f$string"
-        GlStateManager.pushMatrix()
-        transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
-        val width = this.getDummySize().x / this.scale
-
-        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
-
-        val strLen: Int = renderer.getStringWidth(string)
-        val x2 = when (alignmentEnum) {
-            HorizontalAlignment.LEFT -> offsetX.toFloat()
-            HorizontalAlignment.CENTER -> offsetX + width / 2f - strLen / 2f
-            HorizontalAlignment.RIGHT -> offsetX + width - strLen.toFloat()
-            else -> offsetX.toFloat()
-        }
-        GL11.glTranslatef(x2, 0f, 0f)
-        renderer.drawStringWithShadow(display, 0f, 0f, 0)
-
-        GlStateManager.popMatrix()
-
-        return renderer.getStringWidth(display)
-    }
-
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
@@ -580,25 +548,6 @@ object RenderUtils {
         var longestX = 0
         for (s in list) {
             val x = renderString0(s, offsetY = offsetY, centered = false)
-            if (x > longestX) {
-                longestX = x
-            }
-            offsetY += 10 + extraSpace
-        }
-        GuiEditManager.add(this, posLabel, longestX, offsetY)
-    }
-
-    fun Position.renderStringsAlignedWidth(
-        list: List<Pair<String, HorizontalAlignment>>,
-        extraSpace: Int = 0,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-
-        var offsetY = 0
-        var longestX = 0
-        for (pair in list) {
-            val x = renderString0(pair.first, offsetY = offsetY, alignmentEnum = pair.second)
             if (x > longestX) {
                 longestX = x
             }
@@ -698,7 +647,7 @@ object RenderUtils {
 
     /**
      * Accepts a single line to print.
-     * This  line is a list of things to print. Can print String or ItemStack objects.
+     * This line is a list of things to print. Can print String or ItemStack objects.
      */
     @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderSingleLineWithItems(
