@@ -68,6 +68,10 @@ object HypixelCommands {
         send("cf")
     }
 
+    fun pet() {
+        send("pet")
+    }
+
     fun openBaker() {
         send("openbaker")
     }
