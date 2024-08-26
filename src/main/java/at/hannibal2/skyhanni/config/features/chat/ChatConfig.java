@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.chat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
+import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
@@ -104,16 +105,9 @@ public class ChatConfig {
     @FeatureToggle
     public boolean hideSacksChange = false;
 
+    @Category(name = "Translator", desc = "Chat translator settings.")
     @Expose
-    @ConfigOption(
-        name = "Translator",
-        desc = "Click on a message to translate it to English.\n" +
-            "Use §e/shcopytranslation§7 to translate from English.\n" +
-            "§cTranslation is not guaranteed to be 100% accurate."
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean translator = false;
+    public TranslatorConfig translator = new TranslatorConfig();
 
     @Expose
     @ConfigOption(name = "SkyBlock XP in Chat", desc = "Send the SkyBlock XP messages into the chat.")
