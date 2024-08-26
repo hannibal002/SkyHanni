@@ -1,22 +1,27 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.common.collect.Lists
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
+import io.github.moulberry.notenoughupdates.util.NotificationHandler
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -24,13 +29,17 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
+
+    private val missingRepoItems = mutableSetOf<String>()
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -46,7 +55,7 @@ object ItemUtils {
         return list
     }
 
-    val ItemStack.extraAttributes : NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
+    val ItemStack.extraAttributes: NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
 
     // TODO change else janni is sad
     fun ItemStack.isCoopSoulBound(): Boolean =
@@ -76,23 +85,6 @@ object ItemUtils {
             list.add(player.inventory.itemStack)
         }
         return list
-    }
-
-    fun hasAttributes(stack: ItemStack): Boolean {
-        if (stack.hasTagCompound()) {
-            val tagCompound = stack.tagCompound
-            if (tagCompound.hasKey("ExtraAttributes")) {
-                val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-                try {
-                    val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
-                    if (json.has("attributes")) {
-                        return true
-                    }
-                } catch (_: Exception) {
-                }
-            }
-        }
-        return false
     }
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
@@ -188,6 +180,15 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
+    private val itemCategoryRepoCheckPattern by RepoPattern.pattern(
+        "itemcategory.repocheck",
+        ItemCategory.entries.joinToString(separator = "|") { it.name },
+    )
+    private val rarityCategoryRepoCheckPattern by RepoPattern.pattern(
+        "rarity.repocheck",
+        LorenzRarity.entries.joinToString(separator = "|") { it.name },
+    )
+
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val cleanName = this.cleanName()
 
@@ -213,6 +214,8 @@ object ItemUtils {
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             }
             if (itemRarity == null) {
@@ -222,7 +225,10 @@ object ItemUtils {
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern result" to rarity,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
             }
 
@@ -283,7 +289,7 @@ object ItemUtils {
      */
     var ItemStack.name: String
         get() = this.displayName ?: ErrorManager.skyHanniError(
-            "Could not get name if ItemStack",
+            "Could not get name of ItemStack",
             "itemStack" to this,
             "displayName" to displayName,
             "internal name" to getInternalNameOrNull(),
@@ -354,7 +360,18 @@ object ItemUtils {
 
     // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val ItemStack.itemName: String
-        get() = getInternalName().itemName
+        get() {
+            getAttributeFromShard()?.let {
+                return it.getAttributeName()
+            }
+            return getInternalName().itemName
+        }
+
+    fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
+        if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
+        val attributes = getAttributes() ?: return null
+        return attributes.firstOrNull()
+    }
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
@@ -379,7 +396,11 @@ object ItemUtils {
         }
 
         val itemStack = getItemStackOrNull()
-        val name = itemStack?.name ?: error("Could not find item name for $this")
+        val name = itemStack?.name ?: run {
+            val name = toString()
+            addMissingRepoItem(name, "Could not find item name for $name")
+            return "§c$name"
+        }
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
@@ -387,6 +408,11 @@ object ItemUtils {
         }
         if (name.endsWith("Enchanted Book Bundle")) {
             return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+        }
+
+        // obfuscated trophy fish
+        if (name.contains("§kObfuscated")) {
+            return name.replace("§kObfuscated", "Obfuscated")
         }
 
         // hide pet level
@@ -425,9 +451,46 @@ object ItemUtils {
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
-        neededItems(recipe).map {
-            it.key.getPrice(pastRecipes = pastRecipes) * it.value
-        }.sum()
+    fun NeuRecipe.getRecipePrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ): Double = neededItems(this).map {
+        it.key.getPrice(priceSource, pastRecipes) * it.value
+    }.sum()
 
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Missing Repo Items")
+
+        if (missingRepoItems.isNotEmpty()) {
+            event.addData {
+                add("Detected ${missingRepoItems.size} missing items:")
+                for (itemName in missingRepoItems) {
+                    add(" - $itemName")
+                }
+            }
+        } else {
+            event.addIrrelevant("No Repo Item fails detected.")
+        }
+    }
+
+    fun addMissingRepoItem(name: String, message: String) {
+        if (!missingRepoItems.add(name)) return
+        ChatUtils.debug(message)
+//         showRepoWarning()
+    }
+
+    // Running NEU's function `Utils.showOutdatedRepoNotification()` caused a NoSuchMethodError in dev env.
+    // Therefore we run NotificationHandler.displayNotification directly
+    private fun showRepoWarning() {
+        NotificationHandler.displayNotification(
+            Lists.newArrayList(
+                "§c§lMissing repo data",
+                "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
+                "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
+                "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
+            ),
+            true, true,
+        )
+    }
 }
