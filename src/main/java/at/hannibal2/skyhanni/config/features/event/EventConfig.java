@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.event;
 
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig;
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
+import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig;
 import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig;
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig;
 import com.google.gson.annotations.Expose;

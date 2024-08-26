@@ -137,6 +137,11 @@ object NEUItems {
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
+
+            // we ignore all builder blocks from the item name -> internal name cache
+            // because builder blocks can have the same display name as normal items.
+            if (rawInternalName.startsWith("BUILDER_")) continue
+
             val internalName = rawInternalName.asInternalName()
 
             // TODO remove all except one of them once neu is consistent
@@ -351,6 +356,8 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
+        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
+        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
         if (NEUOverlay.searchBarHasFocus) return true
 
