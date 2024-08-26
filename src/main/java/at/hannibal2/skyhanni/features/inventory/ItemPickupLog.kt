@@ -136,32 +136,32 @@ object ItemPickupLog {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
-        if (InventoryUtils.inInventory()) return
-
         val oldItemList = mutableMapOf<Int, Pair<ItemStack, Int>>()
 
         oldItemList.putAll(itemList)
 
-        itemList.clear()
+        if (!InventoryUtils.inInventory()) {
+            itemList.clear()
 
-        val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
-        val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
+            val inventoryItems = InventoryUtils.getItemsInOwnInventory().toMutableList()
+            val cursorItem = Minecraft.getMinecraft().thePlayer.inventory?.itemStack
 
-        if (cursorItem != null) {
-            val hash = cursorItem.hash()
-            //this prevents items inside hypixel guis counting when picked up
-            if (oldItemList.contains(hash)) {
-                inventoryItems.add(cursorItem)
+            if (cursorItem != null) {
+                val hash = cursorItem.hash()
+                //this prevents items inside hypixel guis counting when picked up
+                if (oldItemList.contains(hash)) {
+                    inventoryItems.add(cursorItem)
+                }
             }
-        }
 
-        for (itemStack in inventoryItems) {
-            val hash = itemStack.hash()
-            val old = itemList[hash]
-            if (old != null) {
-                itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
-            } else {
-                itemList[hash] = itemStack to itemStack.stackSize
+            for (itemStack in inventoryItems) {
+                val hash = itemStack.hash()
+                val old = itemList[hash]
+                if (old != null) {
+                    itemList[hash] = old.copy(second = old.second + itemStack.stackSize)
+                } else {
+                    itemList[hash] = itemStack to itemStack.stackSize
+                }
             }
         }
 
@@ -229,13 +229,9 @@ object ItemPickupLog {
     }
 
     private fun isBannedItem(item: ItemStack): Boolean {
-        if (item.getInternalNameOrNull()?.startsWith("MAP") == true) {
-            return true
-        }
-
-        if (bannedItemsConverted.contains(item.getInternalNameOrNull())) {
-            return true
-        }
+        val internalName = item.getInternalNameOrNull() ?: return true
+        if (internalName.startsWith("MAP") == true) return true
+        if (internalName in bannedItemsConverted) return true
 
         if (item.getExtraAttributes()?.hasKey("quiver_arrow") == true) {
             return true

@@ -732,7 +732,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Checks if you have enough materials to craft the items and depending on that shows the button or not.
 + Overflow Garden crop milestones. - Luna & HiZe (https://github.com/hannibal002/SkyHanni/pull/997)
 + New "Craftable!" message when Visitor Items Needed are craftable. - Paloys (https://github.com/hannibal002/SkyHanni/pull/1891)
-+ Added toggle for compacting Garden visitor summary messages. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2026)
++ Added toggle for compacting Garden visitor summary messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2026)
++ Added Farming Personal Best FF Gain. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2332)
+    + Displays in chat how much additional FF you earn from the farming contest personal best bonus after beating your previous record.
 
 </details>
 <details open><summary>
@@ -960,6 +962,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Add reminder that the Time Tower is expired and has extra charges available. - appable (https://github.com/hannibal002/SkyHanni/pull/2133)
     + Replaces the previous Time Tower Reminder feature.
 + Added a tracker for stray rabbits caught in the Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2210)
++ Added Hoppity Hunt event summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
+    + Use /shhoppitystats for live stats.
 
 </details>
 <details open><summary>
@@ -1228,6 +1232,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + A ton of settings.
     + Added Chunked Stats as a draggable list to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1341)
         + Select and prioritize the order of the stats you want to see.
+    + Added Soulflow to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+      + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
 + Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
