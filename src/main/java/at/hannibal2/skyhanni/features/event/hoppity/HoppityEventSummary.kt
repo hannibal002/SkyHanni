@@ -269,7 +269,7 @@ object HoppityEventSummary {
 
         return mutableListOf(
             "§7$name Rabbits: §f$rabbitsSum",
-            LorenzRarity.hoppityEntries.joinToString(" §7-") {
+            HoppityAPI.hoppityRarities.joinToString(" §7-") {
                 " ${it.chatColorCode}${rarityMap[it] ?: 0}"
             },
         )

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -31,6 +32,8 @@ object HoppityAPI {
     private var lastDuplicateAmount: Long? = null
     private var rabbitBought = false
 
+    val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
+
     private fun resetChatData() {
         this.hoppityEggChat = mutableListOf()
         this.duplicate = false
@@ -43,7 +46,8 @@ object HoppityAPI {
     }
 
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun rarityByRabbit(rabbit: String) : LorenzRarity? = LorenzRarity.hoppityEntries.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
+
+    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
 
     /**
      * REGEX-TEST: §f1st Chocolate Milestone
