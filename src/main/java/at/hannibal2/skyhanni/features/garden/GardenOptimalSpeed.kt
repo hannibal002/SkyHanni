@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isRancherSign
@@ -175,7 +176,7 @@ object GardenOptimalSpeed {
         if (speed != currentSpeed && !recentlySwitchedTool && !recentlyStartedSneaking) warn(speed)
     }
 
-    private fun warn(speed: Int) {
+    private fun warn(optimalSpeed: Int) {
         if (!Minecraft.getMinecraft().thePlayer.onGround) return
         if (GardenAPI.onBarnPlot) return
         if (!config.warning) return
@@ -184,11 +185,16 @@ object GardenOptimalSpeed {
         lastWarnTime = SimpleTimeMark.now()
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
         cropInHand?.let {
-            var text = "Wrong speed for ${it.cropName}: §f$currentSpeed"
-            if (sneaking) text += " §7[Sneaking]"
-            text += " §e(§f$speed §eis optimal)"
+            var text = "§cWrong speed while farming ${it.cropName} detected!"
+            text += "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed §a[Click to change]"
 
-            ChatUtils.chat(text)
+            ChatUtils.clickableChat(
+                text,
+                onClick = {
+                    HypixelCommands.setMaxSpeed()
+                },
+                hover = "§eClick to change the Rancher Boots Speed!",
+            )
         }
     }
 
