@@ -170,7 +170,8 @@ object GetFromSackAPI {
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
         if (args.isEmpty()) return CommandResult.WRONG_ARGUMENT to null
 
-        val argsNull = args.last().last().toString().toIntOrNull() == null
+        // The last parameter could be "2*3". This does not support ending with ")", but it is good enough
+        val argsNull = !args.last().last().isDigit()
         val arguments = if (argsNull) {
             if (!config.defaultGFS) return CommandResult.WRONG_ARGUMENT to null
 
