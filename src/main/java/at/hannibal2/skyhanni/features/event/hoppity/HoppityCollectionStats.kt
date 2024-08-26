@@ -134,11 +134,13 @@ object HoppityCollectionStats {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!(LorenzUtils.inSkyBlock)) return
         if (!pagePattern.matches(event.inventoryName)) return
 
         inInventory = true
-        display = buildDisplay(event)
+        if (config.hoppityCollectionStats) {
+            display = buildDisplay(event)
+        }
     }
 
     @SubscribeEvent
@@ -150,6 +152,7 @@ object HoppityCollectionStats {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory) return
+        if (!config.hoppityCollectionStats) return
 
         config.hoppityStatsPosition.renderRenderables(
             display,
@@ -366,8 +369,6 @@ object HoppityCollectionStats {
     }
 
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 
     enum class RabbitCollectionRarity(
         val displayName: String,

@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 // config change event or scoreboard update event
 object Title : ScoreboardElement() {
     override fun getDisplay(): Any {
-        val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
+        val alignment = displayConfig.titleAndFooter.alignTitle
 
         if (!LorenzUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {
             return ScoreboardData.objectiveTitle align alignment

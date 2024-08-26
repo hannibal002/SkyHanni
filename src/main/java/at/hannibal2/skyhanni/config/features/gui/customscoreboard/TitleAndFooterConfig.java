@@ -9,10 +9,9 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class TitleAndFooterConfig {
     @Expose
-    @ConfigOption(name = "Title and Footer Alignment", desc = "Align the title and footer in the scoreboard.")
+    @ConfigOption(name = "Title Alignment", desc = "Align the title in the scoreboard.")
     @ConfigEditorDropdown
-    // TODO rename to "horizontalAlignment" or "alignment"
-    public RenderUtils.HorizontalAlignment alignTitleAndFooter = RenderUtils.HorizontalAlignment.CENTER;
+    public RenderUtils.HorizontalAlignment alignTitle = RenderUtils.HorizontalAlignment.CENTER;
 
     @Expose
     @ConfigOption(name = "Custom Title", desc = "What should be displayed as the title of the scoreboard." +
@@ -30,6 +29,11 @@ public class TitleAndFooterConfig {
     @ConfigOption(name = "Use Custom Title Outside SkyBlock", desc = "Use a custom title outside of SkyBlock.")
     @ConfigEditorBoolean
     public boolean useCustomTitleOutsideSkyBlock = false;
+
+    @Expose
+    @ConfigOption(name = "Footer Alignment", desc = "Align the footer in the scoreboard.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment alignFooter = RenderUtils.HorizontalAlignment.LEFT;
 
     @Expose
     @ConfigOption(name = "Custom Footer", desc = "What should be displayed as the footer of the scoreboard." +

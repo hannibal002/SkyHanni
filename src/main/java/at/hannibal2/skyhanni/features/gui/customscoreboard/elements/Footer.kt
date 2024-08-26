@@ -10,7 +10,7 @@ object Footer : ScoreboardElement() {
         displayConfig.titleAndFooter.customFooter
             .replace("&&", "§")
             .split("\\n")
-            .map { it align displayConfig.titleAndFooter.alignTitleAndFooter },
+            .map { it align displayConfig.titleAndFooter.alignFooter },
     ).flatten()
 
     override val configLine = "§ewww.hypixel.net"
