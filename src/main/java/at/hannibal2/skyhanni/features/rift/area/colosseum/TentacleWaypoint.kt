@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -43,6 +44,9 @@ object TentacleWaypoint {
     @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityDamage(event: EntityHurtEvent<EntitySlime>) {
         if (!isEnabled()) return
+
+        // Fixes Wall Damage counting as tentacle damage
+        if (event.source.damageType != "generic") return
         tentacles[event.entity]?.let { tentacles[event.entity] = it + 1 }
     }
 
