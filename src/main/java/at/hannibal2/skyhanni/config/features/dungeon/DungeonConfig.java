@@ -12,9 +12,8 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightClickedBlocks = false;
+    @Accordion
+    public HighlightClickedBlocksConfig clickedBlocks = new HighlightClickedBlocksConfig();
 
     @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
