@@ -511,7 +511,7 @@ object FarmingWeightDisplay {
             "Error loading user farming weight\n" +
                 "§eLoading the farming weight data from elitebot.dev failed!\n" +
                 "§eYou can re-enter the garden to try to fix the problem.\n" +
-                "§cIf this message repeats, please report it on Discord!\n",
+                "§cIf this message repeats, please report it on Discord",
             "url" to url,
             "apiResponse" to apiResponse,
             "localProfile" to localProfile,
