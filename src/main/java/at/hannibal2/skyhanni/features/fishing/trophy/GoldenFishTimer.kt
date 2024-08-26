@@ -12,11 +12,14 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
+import at.hannibal2.skyhanni.features.fishing.FishingAPI.isLavaRod
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -47,19 +50,19 @@ object GoldenFishTimer {
     private val patternGroup = RepoPattern.group("fishing.goldenfish")
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§9You spot a §r§6Golden Fish §r§9surface from beneath the lava!"
+        "§9You spot a §r§6Golden Fish §r§9surface from beneath the lava!",
     )
     private val interactPattern by patternGroup.pattern(
         "interact",
-        "§9The §r§6Golden Fish §r§9escapes your hook but looks weakened\\."
+        "§9The §r§6Golden Fish §r§9escapes your hook but looks weakened\\.",
     )
     private val weakPattern by patternGroup.pattern(
         "weak",
-        "§9The §r§6Golden Fish §r§9is weak!"
+        "§9The §r§6Golden Fish §r§9is weak!",
     )
     private val despawnPattern by patternGroup.pattern(
         "despawn",
-        "§9The §r§6Golden Fish §r§9swims back beneath the lava\\.\\.\\."
+        "§9The §r§6Golden Fish §r§9swims back beneath the lava\\.\\.\\.",
     )
 
     private val interactPatternsList = listOf(interactPattern, weakPattern)
@@ -81,13 +84,16 @@ object GoldenFishTimer {
 
     private var possibleEntities = TimeLimitedSet<EntityLivingBase>(1.seconds) { checkGoldenFish(it) }
 
+    private var isFishing = false
+    private var hasLavaRodInInventory = false
+
     private fun checkGoldenFish(entity: EntityLivingBase) {
         if (isGoldenFishActive()) return
         if (entity.inventory.none { it?.getSkullTexture() == goldenFishSkullTexture }) return
         possibleGoldenFishEntity = entity
         if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
             entity,
-            LorenzColor.GREEN.toColor().withAlpha(100)
+            LorenzColor.GREEN.toColor().withAlpha(100),
         ) { interactions == MAX_INTERACTIONS }
         lastFishEntity = SimpleTimeMark.now()
         handle()
@@ -99,7 +105,7 @@ object GoldenFishTimer {
         ItemUtils.createSkull(
             displayName = "§6Golden Fish",
             uuid = "b7fdbe67cd004683b9fa9e3e17738254",
-            value = goldenFishSkullTexture
+            value = goldenFishSkullTexture,
         )
     }
     private var interactions = 0
@@ -114,7 +120,7 @@ object GoldenFishTimer {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled()) return
+        if (!isActive()) return
         if (spawnPattern.matches(event.message)) {
             lastChatMessage = SimpleTimeMark.now()
             handle()
@@ -141,7 +147,7 @@ object GoldenFishTimer {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled()) return
+        if (!isActive()) return
         if (!config.nametag) return
         val entity = confirmedGoldenFishEntity ?: return
 
@@ -154,7 +160,7 @@ object GoldenFishTimer {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isActive()) return
         val list = display.takeIf { it.isNotEmpty() } ?: return
         val renderable = Renderable.horizontalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER)
         config.position.renderRenderables(listOf(renderable), posLabel = "Golden Fish Timer")
@@ -169,8 +175,8 @@ object GoldenFishTimer {
             Renderable.itemStack(
                 goldenFishSkullItem,
                 2.5,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            )
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            ),
         )
         val text = buildList {
             add("§6§lGolden Fish Timer")
@@ -180,13 +186,13 @@ object GoldenFishTimer {
                 if (lastRodThrowTime.isFarPast()) add("§7Last Row Throw: §cNone yet")
                 else add(
                     "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().format()} " +
-                        "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().format()})"
+                        "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().format()})",
                 )
                 if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
                 else if (timePossibleSpawn.isInFuture()) add(
                     "§7Can spawn in: §b${
                         (timePossibleSpawn + 1.seconds).timeUntil().format()
-                    }"
+                    }",
                 )
                 else {
                     add("§7Can spawn since: §b${timePossibleSpawn.passedSince().format()}")
@@ -202,15 +208,23 @@ object GoldenFishTimer {
         add(
             Renderable.verticalContainer(
                 text.map { Renderable.string(it) },
-                1,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER
-            )
+                spacing = 1,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            ),
         )
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
+
+        if (FishingAPI.isFishing()) {
+            isFishing = true
+        }
+        hasLavaRodInInventory = InventoryUtils.containsInLowerInventory { it.getInternalNameOrNull()?.isLavaRod() == true }
+
+        if (!isActive()) return
+
         if (lastRodThrowTime.passedSince() > maxRodTime) {
             timePossibleSpawn = SimpleTimeMark.farFuture()
             lastRodThrowTime = SimpleTimeMark.farPast()
@@ -231,7 +245,7 @@ object GoldenFishTimer {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
+        if (!isActive()) return
         // This makes it only count as the rod being throw into lava if the rod goes down, up, and down again.
         // Not confirmed that this is correct, but it's the best solution found.
         val bobber = FishingAPI.bobber ?: return
@@ -247,14 +261,14 @@ object GoldenFishTimer {
 
     @SubscribeEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
-        if (!isEnabled()) return
+        if (!isActive()) return
         goingDownInit = true
         goingDownPost = false
     }
 
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
-        if (!isEnabled()) return
+        if (!isActive()) return
         if (isGoldenFishActive()) return
         val entity = event.entity
         if (entity.distanceToPlayer() > 25) return
@@ -297,5 +311,6 @@ object GoldenFishTimer {
     private fun isGoldenFishActive() = confirmedGoldenFishEntity != null
 
     private fun isEnabled() = config.enabled && (IslandType.CRIMSON_ISLE.isInIsland() || LorenzUtils.isStrandedProfile)
+    private fun isActive() = isEnabled() && isFishing && hasLavaRodInInventory
 
 }
