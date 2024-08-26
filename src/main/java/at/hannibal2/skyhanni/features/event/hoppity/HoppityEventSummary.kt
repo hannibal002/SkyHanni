@@ -197,7 +197,7 @@ object HoppityEventSummary {
         val currentYear = SkyBlockTime.now().year
         val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
         val statsYearFormatList = statsStorage.keys.takeIf { it.isNotEmpty() }?.map {
-            "§b$it${if (it == currentYear && SkyblockSeason.currentSeason == SkyblockSeason.SPRING) " §a(Current)§r" else ""}"
+            "§b$it${if (it == currentYear && HoppityAPI.isHoppityEvent()) " §a(Current)§r" else ""}"
         }?.toMutableList() ?: mutableListOf()
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
