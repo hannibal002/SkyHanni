@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.minutes
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.wrap
 import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.UUID
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -38,8 +38,6 @@ object ReminderManager {
     private val config get() = SkyHanniMod.feature.misc.reminders
 
     private var listPage = 1
-
-    private fun generateRandomId() = UUID.randomUUID().toString()
 
     private fun getSortedReminders() = storage.entries.sortedBy { it.value.remindAt }
 
@@ -126,7 +124,7 @@ object ReminderManager {
         val reminder = args.drop(1).joinToString(" ")
         val remindAt = SimpleTimeMark.now().plus(time)
 
-        storage[generateRandomId()] = Reminder(reminder, remindAt)
+        storage[StringUtils.generateRandomId()] = Reminder(reminder, remindAt)
         sendMessage("§6Reminder set for ${time.format()}")
     }
 
