@@ -46,6 +46,7 @@ public class Storage {
     @Expose
     public Map<UUID, PlayerSpecificStorage> players = new HashMap<>();
 
+    // TODO this should get moved into player specific
     @Expose
     public String currentFameRank = "New player";
 
