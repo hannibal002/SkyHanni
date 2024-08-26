@@ -76,7 +76,7 @@ public class HelperConfig {
         public boolean ultraRareBookAlert = false;
 
         @Expose
-        @ConfigOption(name = "Guardian Reminder", desc = "Sends a warning when opening the experimentation table")
+        @ConfigOption(name = "Guardian Reminder", desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean guardianReminder = false;
