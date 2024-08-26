@@ -87,20 +87,20 @@ object CustomScoreboardConfigFix {
             }
         }
 
-        event.move(56, "$TITLE_AND_FOOTER_KEY.useHypixelTitleAnimation", "$TITLE_AND_FOOTER_KEY.useCustomTitle") {
+        event.move(57, "$TITLE_AND_FOOTER_KEY.useHypixelTitleAnimation", "$TITLE_AND_FOOTER_KEY.useCustomTitle") {
             JsonPrimitive(!it.asBoolean)
         }
 
-        event.transform(57, EVENT_ENTRIES_KEY) { element ->
+        event.transform(58, EVENT_ENTRIES_KEY) { element ->
             replaceElements(element, listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING"), ScoreboardEventEntry.GARDEN.name)
         }
         listOf("customTitle", "customFooter").forEach { key ->
-            event.transform(57, "$TITLE_AND_FOOTER_KEY.$key") {
+            event.transform(58, "$TITLE_AND_FOOTER_KEY.$key") {
                 JsonPrimitive(it.asString.replace("&", "&&"))
             }
         }
         listOf("alignTitle", "alignFooter").forEach { key ->
-            event.move(57, "$TITLE_AND_FOOTER_KEY.alignTitleAndFooter", "$TITLE_AND_FOOTER_KEY.$key")
+            event.move(58, "$TITLE_AND_FOOTER_KEY.alignTitleAndFooter", "$TITLE_AND_FOOTER_KEY.$key")
         }
     }
 
