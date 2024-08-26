@@ -1,5 +1,109 @@
 # SkyHanni - Change Log
 
+## Version 0.27 (in Beta)
+
+### New Features
+
+#### Scoreboard Features
+
++ Added Soulflow to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+    + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
+
+#### Hoppity Features
+
++ Added Hoppity Hunt event summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
+    + Use /shhoppitystats for live stats.
+
+### Improvements
+
+#### Diana Improvements
+
++ Added /warp stonks to the Burrow Warp Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2399)
+
+#### Scoreboard Improvements
+
++ Added an option to display the SkyBlock time in 24-hour format in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added an option to hide coins earned/lost in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added margin customization to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added an opacity slider for the Custom Background Image in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added an Undo message when auto alignment inCustom Scoreboard gets disabled. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2402)
+
+#### Inventory Improvements
+
++ Added a toggle for displaying SkyHanni User Luck in Skyblock Stats. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2357)
+
+#### Chat Improvements
+
++ Added support for changing the translation language when clicking on a chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2403)
+
+#### Hoppity Improvements
+
++ Added config option to disable rarity in Compact Hoppity messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2383)
+
+#### Combat Improvements
+
++ Made the "Line to Arachne" width configurable. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/2406)
++ Made the "Line to Miniboss" width configurable. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/2406)
+
+#### Config Improvements
+
++ Improved the description of several config options. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2397)
++ Enabled more Dev Options to be changed via /shdefaultoptions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2397)
+
+### Fixes
+
+#### DIana Fixes
+
++ Added a chat option to disable a Patcher setting that breaks SkyHanni's line from the center of the player to something else. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2387)
+    + E.g. Diana guesses, Slayer Mini Bosses, etc.
+
+#### Inventory Fixes
+
++ Fixed ItemCategory errors being sent even though we already have a fix. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2392)
++ Fixed AH item movements being detected by Item Trackers as new drops. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2380)
++ Fixed Pickup Log Display Entries not expiring while in GUIs. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2401)
++ Fixed the price of mana enchantments tiers 1-4 in Estimated Chest value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2395)
+
+#### Mining Fixes
+
++ Added new Pure Ores support. - Empa (https://github.com/hannibal002/SkyHanni/pull/2388)
++ Fixed a typo in corpse detection. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/2386)
+
+#### Scoreboard Fixes
+
++ Fixed a Scoreboard Error during M7 Dragons. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2382)
++ Fixed Custom Scoreboard Background position being updated 1 frame after the scoreboard text. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Fixed various Custom Scoreboard issues. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2402)
+    + Bank showing "null" during Island Switch.
+    + Alignment not being affected by outline thickness.
+    + Alignment with scales that are not 1.
+    + Line Spacing not working.
++ Fixed Custom Scoreboard Error when no repository exists. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2407)
++ Fixed rounded rectangles not working with a scale less than 1. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2404)
+    + E.g. Custom Scoreboard Background.
+
+#### Hoppity Fixes
+
++ Fixed "Side Dish" and Milestone rabbits not sending a message when Compact Hoppity is enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
++ Fixed rabbit rarity not appearing on compacted Duplicate rabbit messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2383)
++ Fixed "Highlight Requirement Rabbits" requiring "Hoppity Collection Stats" to function. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2398)
+
+#### Misc Fixes
+
++ Fixed Mayor Detection failing when Special Mayors are in office. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2389)
++ Updated Derpy's extra tax perk to use the correct name. - Luna (https://github.com/hannibal002/SkyHanni/pull/2393)
++ Fixed Christmas presents in the Hypixel lobby being visible outside of December. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2396)
+
+### Technical Details
+
++ Cleaned up IslandExceptions to improve readability. - walker (https://github.com/hannibal002/SkyHanni/pull/1560)
++ Added drawInsideRoundedRectOutline, drawInsideImage, and image Renderables. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
++ Added `HoppityAPI`, which should house event-specific features rather than `ChocolateFactoryAPI`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
+    + Added an `Always Hoppity` dev config option, which will override `isHoppityEvent`.
++ Added `RabbitFoundEvent`, which will be fired when a chocolate rabbit is found from an egg, bought from Hoppity, or claimed from a milestone. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
++ Added `SIDE_DISH`, `CHOCOLATE_SHOP_MILESTONE`, `CHOCOLATE_FACTORY_MILESTONE`, and `BOUGHT` as `HoppityEggType` options. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
++ Added version to download source checker popup message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2400)
+
 ## Version 0.26
 
 ### New Features

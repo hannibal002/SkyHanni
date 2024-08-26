@@ -68,6 +68,11 @@ public class DungeonConfig {
     public boolean architectNotifier = true;
 
     @Expose
+    @ConfigOption(name = "Object Highlighter", desc = "Highlights various things in Dungeons.")
+    @Accordion
+    public ObjectHighlighterConfig objectHighlighter = new ObjectHighlighterConfig();
+
+    @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
     @Accordion
     public ObjectHiderConfig objectHider = new ObjectHiderConfig();

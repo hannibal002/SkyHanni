@@ -63,5 +63,7 @@ enum class ItemCategory {
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
         val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
+
+        val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
     }
 }
