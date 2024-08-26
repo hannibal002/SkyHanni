@@ -16,26 +16,21 @@ object LastServers {
 
     private val config get() = SkyHanniMod.feature.misc.lastServers
     private var lastServerId: String? = null
-    private var lastServers = mutableMapOf<String, SimpleTimeMark>()
+    private val lastServers = mutableMapOf<String, SimpleTimeMark>()
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || HypixelData.serverId == lastServerId) return
 
-        val serverId = HypixelData.serverId ?: return
-
-        if (lastServerId == serverId) return
-
-        lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
-
-        lastServers[serverId]?.passedSince()?.let {
-            ChatUtils.chat("§7You already joined this server §e${it.format()}§7 ago.")
+        HypixelData.serverId?.let { id ->
+            lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
+            lastServers[id]?.passedSince()?.let {
+                ChatUtils.chat("§7You already joined this server §e${it.format()}§7 ago.")
+            }
+            ChatUtils.debug("Adding $id to last servers.")
+            lastServers[id] = SimpleTimeMark.now()
+            lastServerId = id
         }
-
-        ChatUtils.debug("Adding $serverId to last servers.")
-
-        lastServers[serverId] = SimpleTimeMark.now()
-        lastServerId = serverId
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
