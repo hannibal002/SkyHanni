@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -32,7 +33,7 @@ object MotesSession {
      */
     private val lifetimeMotesPattern by repoGroup.pattern(
         "lifetime",
-        "\\s+Lifetime Motes: §r§d(?<motes>[\\d,.]+)"
+        "\\s+Lifetime Motes: §r§d(?<motes>[\\d,.]+)",
     )
 
     @SubscribeEvent
@@ -44,6 +45,7 @@ object MotesSession {
                 initialMotes = amount
                 enterRiftTime = SimpleTimeMark.now()
             }
+            // TODO move into RiftAPI, rename to lifetimeMotes, reuse in custom scoreboard maybe?
             currentMotes = amount
         }
     }
@@ -62,18 +64,17 @@ object MotesSession {
         val initial = initialMotes ?: return
         val current = currentMotes ?: return
         val gained = current - initial
-        val time = enterRiftTime.passedSince()
-        val motesPerHour = ((gained / time.inWholeSeconds.toDouble()) * 3600).toLong()
         if (gained == 0L) return
+        val timeInRift = enterRiftTime.passedSince()
+        val motesPerHour = (gained / timeInRift.inPartialHours).toLong()
         val hover = buildList {
-            add("Gained: §d${gained.addSeparators()} motes")
-            add("Time: §d${time.format()}")
-            add("Motes/h: §d${motesPerHour.addSeparators()}")
+            add("§7Gained: §d${gained.addSeparators()} motes")
+            add("§7Time spent: §d${timeInRift.format()}")
+            add("§7Motes/h: §d${motesPerHour.addSeparators()}")
         }
         ChatUtils.hoverableChat(
-            "Gained §d${gained.addSeparators()} motes §ethis session! (§d${motesPerHour.shortFormat()}/h§e)",
-            hover
+            "Gained §d${gained.addSeparators()} motes §ethis Rift session! (§d${motesPerHour.shortFormat()}/h§e)",
+            hover,
         )
     }
-
 }
