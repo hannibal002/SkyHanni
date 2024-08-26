@@ -59,7 +59,7 @@ object CustomScoreboard {
 
         val textRenderable = Renderable.verticalContainer(
             render.map { Renderable.string(it.first, horizontalAlign = it.second) },
-            0,
+            displayConfig.lineSpacing - 10,
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER,
         )
@@ -75,12 +75,23 @@ object CustomScoreboard {
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
-                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
+                    verticalAlignment != VerticalAlignment.DONT_ALIGN
                 ) {
+                    val tempHori = horizontalAlignment
+                    val tempVert = verticalAlignment
+
                     horizontalAlignment = HorizontalAlignment.DONT_ALIGN
                     verticalAlignment = VerticalAlignment.DONT_ALIGN
-                    ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+                    ChatUtils.clickableChat(
+                        "Disabled Custom Scoreboard auto-alignment. Click here to undo this action!",
+                        oneTimeClick = true,
+                        onClick = {
+                            horizontalAlignment = tempHori
+                            verticalAlignment = tempVert
+                            ChatUtils.chat("Enabled Custom Scoreboard auto-alignment.")
+                        },
+                    )
                 }
             }
         }
