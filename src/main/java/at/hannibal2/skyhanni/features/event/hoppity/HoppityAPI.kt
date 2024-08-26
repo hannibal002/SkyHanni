@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -42,6 +43,7 @@ object HoppityAPI {
     }
 
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
+    fun rarityByRabbit(rabbit: String) : LorenzRarity? = LorenzRarity.hoppityEntries.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
 
     /**
      * REGEX-TEST: §f1st Chocolate Milestone

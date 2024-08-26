@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -40,7 +41,7 @@ object HoppityEventSummary {
         val stats = getYearStats().first ?: return
 
         stats.mealsFound.addOrPut(event.eggType, 1)
-        val rarity = HoppityRabbitRarity.getByRabbit(event.rabbitName) ?: return
+        val rarity = HoppityAPI.rarityByRabbit(event.rabbitName) ?: return
         val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
         if (event.duplicate) rarityMap.dupes++
         else rarityMap.uniques++
@@ -105,7 +106,7 @@ object HoppityEventSummary {
     // First event was year 346 -> #1, 20th event was year 365, etc.
     private fun getHoppityEventNumber(skyblockYear: Int): Int = (skyblockYear - 345)
 
-    fun addStrayCaught(rarity: HoppityRabbitRarity, chocGained: Long) {
+    fun addStrayCaught(rarity: LorenzRarity, chocGained: Long) {
         if (!HoppityAPI.isHoppityEvent()) return
         val stats = getYearStats().first ?: return
         val rarityMap = stats.rabbitsFound.getOrPut(rarity) { RabbitData() }
@@ -262,14 +263,14 @@ object HoppityEventSummary {
         }
 
 
-    private fun getRabbitsFormat(rarityMap: Map<HoppityRabbitRarity, Int>, name: String): List<String> {
+    private fun getRabbitsFormat(rarityMap: Map<LorenzRarity, Int>, name: String): List<String> {
         val rabbitsSum = rarityMap.values.sum()
         if (rabbitsSum == 0) return emptyList()
 
         return mutableListOf(
             "§7$name Rabbits: §f$rabbitsSum",
-            HoppityRabbitRarity.entries.joinToString(" §7-") {
-                " ${it.colorCode}${rarityMap[it] ?: 0}"
+            LorenzRarity.hoppityEntries.joinToString(" §7-") {
+                " ${it.chatColorCode}${rarityMap[it] ?: 0}"
             },
         )
     }

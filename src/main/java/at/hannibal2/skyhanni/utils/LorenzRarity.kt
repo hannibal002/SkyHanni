@@ -51,5 +51,10 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
 
         fun getById(id: Int) = if (entries.size > id) entries[id] else null
         fun getByName(name: String) = entries.firstOrNull { it.name == name }
+
+        val hoppityEntries = entries.filter { it <= DIVINE }
+        fun fromString(value: String): LorenzRarity? {
+            return entries.find { it.name.equals(value, ignoreCase = true) }
+        }
     }
 }

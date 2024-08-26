@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitRarity
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -15,6 +14,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -141,7 +141,7 @@ object ChocolateFactoryStrayTracker {
         val extraTime = ChocolateFactoryAPI.timeUntilNeed(chocAmount + 1)
         tracker.modify { it.straysExtraChocMs.addOrPut(rarity, extraTime.inWholeMilliseconds) }
         if (HoppityAPI.isHoppityEvent()) {
-            HoppityRabbitRarity.getByKey(rarity)?.let {
+            LorenzRarity.fromString(rarity)?.let {
                 HoppityEventSummary.addStrayCaught(it, chocAmount)
             }
         }

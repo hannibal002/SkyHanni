@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType;
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityRabbitRarity;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
@@ -41,6 +40,7 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.GenericWrapper;
+import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
@@ -677,7 +677,7 @@ public class ProfileSpecificStorage {
         public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
 
         @Expose
-        public Map<HoppityRabbitRarity, RabbitData> rabbitsFound = new HashMap<>();
+        public Map<LorenzRarity, RabbitData> rabbitsFound = new HashMap<>();
 
         public static class RabbitData {
             @Expose
