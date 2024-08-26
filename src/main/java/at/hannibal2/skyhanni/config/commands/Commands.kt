@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
-import at.hannibal2.skyhanni.features.chat.Translator
+import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
 import at.hannibal2.skyhanni.features.commands.HelpCommand
@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.SeaCreatureTracker
@@ -52,17 +53,19 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
@@ -87,6 +90,7 @@ import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
+import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
@@ -169,6 +173,7 @@ object Commands {
             { DefaultConfigFeatures.onCommand(it) },
             DefaultConfigFeatures::onComplete,
         )
+        registerCommand("shremind", "Set a reminder for yourself") { ReminderManager.command(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
@@ -274,6 +279,14 @@ object Commands {
             "Resets the Sea Creature Tracker",
         ) { SeaCreatureTracker.resetCommand() }
         registerCommand(
+            "shresetstrayrabbittracker",
+            "Resets the Stray Rabbit Tracker",
+        ) { ChocolateFactoryStrayTracker.resetCommand() }
+        registerCommand(
+            "shresetexcavatortracker",
+            "Resets the Fossil Excavator Profit Tracker",
+        ) { ExcavatorProfitTracker.resetCommand() }
+        registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
         ) { WikiManager.otherWikiCommands(it, true) }
@@ -322,10 +335,6 @@ object Commands {
             "Prints your Limbo Stats.\n §7This includes your Personal Best, Playtime, and §aSkyHanni User Luck§7!",
         ) { LimboTimeTracker.printStats() }
         registerCommand(
-            "shlimbo",
-            "Warps you to Limbo.",
-        ) { MiscFeatures.goToLimbo() }
-        registerCommand(
             "shlanedetection",
             "Detect a farming lane in garden",
         ) { FarmingLaneCreator.commandLaneDetection() }
@@ -338,8 +347,12 @@ object Commands {
             "Teleports you to the nearest infested plot",
         ) { PestFinder.teleportNearestInfestedPlot() }
         registerCommand(
+            "shhoppitystats",
+            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
+        ) { HoppityEventSummary.sendStatsMessage(it) }
+        registerCommand(
             "shcolors",
-           "Prints a list of all Minecraft color & formatting codes",
+            "Prints a list of all Minecraft color & formatting codes",
         ) { ColorFormattingHelper.printColorCodeList() }
     }
 
@@ -456,6 +469,7 @@ object Commands {
             "shtestisland",
             "Sets the current skyblock island for testing purposes.",
         ) { SkyBlockIslandTest.onCommand(it) }
+        registerCommand("shdebugprice", "Debug different price sources for an item.") { ItemPriceUtils.debugItemPrice(it) }
     }
 
     private fun developersCodingHelp() {

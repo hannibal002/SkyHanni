@@ -50,7 +50,7 @@ object HoppityNpc {
         if (!isReminderEnabled()) return
         if (ReminderUtils.isBusy()) return
         if (hoppityYearOpened == SkyBlockTime.now().year) return
-        if (!ChocolateFactoryAPI.isHoppityEvent()) return
+        if (!HoppityAPI.isHoppityEvent()) return
         if (lastReminderSent.passedSince() <= 2.minutes) return
 
         ChatUtils.clickableChat(
@@ -59,7 +59,7 @@ object HoppityNpc {
                 disableReminder()
                 ChatUtils.chat("§eHoppity's Shop reminder disabled.")
             },
-            oneTimeClick = true
+            oneTimeClick = true,
         )
 
         lastReminderSent = SimpleTimeMark.now()

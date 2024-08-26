@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
@@ -17,6 +16,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -206,11 +206,11 @@ object SackDisplay {
         )
 
         if (config.showPrice) {
-            list.addSelector<PriceFrom>(" ",
-                getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
+            list.addSelector<ItemPriceSource>(" ",
+                getName = { type -> type.sellName },
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = SackDisplayConfig.PriceFrom.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update(false)
                 })
             list.addButton(
@@ -300,12 +300,6 @@ object SackDisplay {
         ;
     }
 
-    enum class PriceFrom(val displayName: String) {
-        BAZAAR("Bazaar Price"),
-        NPC("NPC Price"),
-        ;
-    }
-
     enum class PriceFormat(val displayName: String) {
         FORMATED("Formatted"),
         UNFORMATED("Unformatted"),
@@ -326,9 +320,6 @@ object SackDisplay {
         }
         event.transform(15, "inventory.sackDisplay.priceFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
-        }
-        event.transform(15, "inventory.sackDisplay.priceFrom") { element ->
-            ConfigUtils.migrateIntToEnum(element, SackDisplayConfig.PriceFrom::class.java)
         }
         event.transform(15, "inventory.sackDisplay.sortingType") { element ->
             ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)

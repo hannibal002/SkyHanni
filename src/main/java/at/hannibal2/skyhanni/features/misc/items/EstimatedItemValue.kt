@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -25,7 +24,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -123,7 +121,7 @@ object EstimatedItemValue {
                 ignoreHelmetSkins,
                 ignoreArmorDyes,
                 ignoreRunes,
-                bazaarPriceSource,
+                priceSource,
                 useAttributeComposite,
             ) {
                 cache.clear()
@@ -202,12 +200,6 @@ object EstimatedItemValue {
         if (internalName.isRune()) return listOf()
         if (internalName.contains("UNIQUE_RUNE")) return listOf()
         if (internalName.contains("WISP_POTION")) return listOf()
-
-
-        if (internalName.getItemStackOrNull() == null) {
-            ChatUtils.debug("Estimated Item Value is null for: '$internalName'")
-            return listOf()
-        }
 
         val list = mutableListOf<String>()
         list.add("§aEstimated Item Value:")

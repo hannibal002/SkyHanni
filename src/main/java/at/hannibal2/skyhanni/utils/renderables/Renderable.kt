@@ -28,6 +28,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -38,6 +39,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
@@ -84,7 +86,7 @@ interface Renderable {
         }
 
         fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable =
-            link(string(text), onClick, bypassChecks = bypassChecks) { true }
+            link(string(text), onClick, bypassChecks = bypassChecks)
 
         fun optionalLink(
             text: String,
@@ -101,10 +103,11 @@ interface Renderable {
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
+            underlineColor: Color = Color.WHITE,
         ): Renderable {
             return clickable(
                 hoverable(
-                    underlined(renderable), renderable, bypassChecks,
+                    underlined(renderable, underlineColor), renderable, bypassChecks,
                     condition = condition,
                     highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
@@ -251,6 +254,9 @@ interface Renderable {
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NEUItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
+            val isInSkytilsSettings =
+                openGui.let { it.startsWith("gg.skytils.vigilance.gui.") || it.startsWith("gg.skytils.skytilsmod.gui.") }
+            val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result = isGuiScreen &&
                 isGuiPositionEditor &&
@@ -259,7 +265,9 @@ interface Renderable {
                 isConfigScreen &&
                 !isInNeuPv &&
                 !isInSkytilsPv &&
-                !neuFocus
+                !neuFocus &&
+                !isInSkytilsSettings &&
+                !isInNeuSettings
 
             if (debug) {
                 if (!result) {
@@ -273,6 +281,8 @@ interface Renderable {
                     if (isInNeuPv) logger.log("isInNeuPv")
                     if (neuFocus) logger.log("neuFocus")
                     if (isInSkytilsPv) logger.log("isInSkytilsPv")
+                    if (isInSkytilsSettings) logger.log("isInSkytilsSettings")
+                    if (isInNeuSettings) logger.log("isInNeuSettings")
                     logger.log("")
                 } else {
                     logger.log("allowed click")
@@ -282,15 +292,16 @@ interface Renderable {
             return result
         }
 
-        fun underlined(renderable: Renderable) = object : Renderable {
+        fun underlined(renderable: Renderable, color: Color = Color.WHITE) = object : Renderable {
             override val width: Int
                 get() = renderable.width
-            override val height = 10
+            override val height: Int
+                get() = renderable.height + 1
             override val horizontalAlign = renderable.horizontalAlign
             override val verticalAlign = renderable.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                Gui.drawRect(0, 10, width, 11, 0xFFFFFFFF.toInt())
+                Gui.drawRect(0, height, width, 11, color.rgb)
                 GlStateManager.color(1F, 1F, 1F, 1F)
                 renderable.render(posX, posY)
             }
@@ -670,6 +681,24 @@ interface Renderable {
             }
         }
 
+        fun fixedSizeBox(
+            content: Renderable,
+            height: Int,
+            width: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val render = content
+
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+            override fun render(posX: Int, posY: Int) {
+                render.renderXYAligned(posX, posY, height, width)
+            }
+        }
+
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
@@ -877,6 +906,89 @@ interface Renderable {
                 GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideRoundedRectOutline(
+            input: Renderable,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            topOutlineColor: Int,
+            bottomOutlineColor: Int,
+            borderOutlineThickness: Int,
+            blur: Float = 0.7f,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+
+                RenderUtils.drawRoundRectOutline(
+                    0,
+                    0,
+                    width,
+                    height,
+                    topOutlineColor,
+                    bottomOutlineColor,
+                    borderOutlineThickness,
+                    radius,
+                    blur,
+                )
+            }
+        }
+
+        fun drawInsideImage(
+            input: Renderable,
+            texture: ResourceLocation,
+            alpha: Int = 255,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            radius: Int = 0,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
+                RenderUtils.drawRoundTexturedRect(0, 0, width, height, GL11.GL_NEAREST, radius)
+                GlStateManager.color(1f, 1f, 1f, 1f)
+
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun image(
+            texture: ResourceLocation,
+            width: Int,
+            height: Int,
+            alpha: Int = 255,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
+                Utils.drawTexturedRect(0f, 0f, width.toFloat(), height.toFloat(), GL11.GL_NEAREST)
+                GlStateManager.color(1f, 1f, 1f, 1f)
             }
         }
 
