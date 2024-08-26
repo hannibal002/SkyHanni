@@ -27,25 +27,7 @@ import kotlin.time.Duration.Companion.seconds
 object DungeonHighlightClickedBlocks {
 
     private val config get() = SkyHanniMod.feature.dungeon.clickedBlocks
-    private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
-    private var colorIndex = 0
-    private val colors = LorenzColor.entries.filter {
-        it !in listOf(
-            LorenzColor.BLACK,
-            LorenzColor.WHITE,
-            LorenzColor.CHROMA,
-            LorenzColor.GRAY,
-            LorenzColor.DARK_GRAY,
-        )
-    }
 
-    private fun getRandomColor(): LorenzColor {
-        var id = colorIndex + 1
-        if (id == colors.size) id = 0
-        colorIndex = id
-        return colors[colorIndex]
-    }
-    
     private val patternGroup = RepoPattern.group("dungeons.highlightclickedblock")
     private val leverPattern by patternGroup.pattern(
         "lever",
@@ -55,6 +37,24 @@ object DungeonHighlightClickedBlocks {
         "locked",
         "§cThat chest is locked!",
     )
+
+    private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
+    private var colorIndex = 0
+    val undesirableColors = listOf(
+        LorenzColor.BLACK,
+        LorenzColor.WHITE,
+        LorenzColor.CHROMA,
+        LorenzColor.GRAY,
+        LorenzColor.DARK_GRAY,
+    )
+    private val randomColors = LorenzColor.entries.filter { it !in undesirableColors }
+
+    private fun getRandomColor(): LorenzColor {
+        var id = colorIndex + 1
+        if (id == randomColors.size) id = 0
+        colorIndex = id
+        return randomColors[colorIndex]
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -98,16 +98,16 @@ object DungeonHighlightClickedBlocks {
         val inWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
         if (inWaterRoom && type == ClickedBlockType.LEVER) return
 
-        val color = if (config.randomColor) getRandomColor().toColor() else type.color()
+        val color = if (config.randomColor) getRandomColor().toColor() else type.color().toChromaColor()
         val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + type.display
         blocks[position] = ClickedBlock(displayText, color)
     }
 
-    enum class ClickedBlockType(val display: String, val color: () -> Color) {
-        LEVER("Lever", { config.leverColor.toChromaColor() }),
-        CHEST("Chest", { config.chestColor.toChromaColor() }),
-        TRAPPED_CHEST("Trapped Chest", { config.trappedChestColor.toChromaColor() }),
-        WITHER_ESSENCE("Wither Essence", { config.witherEssenceColor.toChromaColor() }),
+    enum class ClickedBlockType(val display: String, val color: () -> String) {
+        LEVER("Lever", { config.leverColor }),
+        CHEST("Chest", { config.chestColor }),
+        TRAPPED_CHEST("Trapped Chest", { config.trappedChestColor }),
+        WITHER_ESSENCE("Wither Essence", { config.witherEssenceColor }),
     }
 
     @SubscribeEvent
