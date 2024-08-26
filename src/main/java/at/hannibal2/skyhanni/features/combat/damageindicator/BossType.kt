@@ -84,7 +84,7 @@ enum class BossType(
     DUNGEON_F6_GIANT_1("§eBoulder Tosser", Type.DUNGEON_FLOOR_6, "§eGiant 1"),
     DUNGEON_F6_GIANT_2("§eSword Thrower", Type.DUNGEON_FLOOR_6, "§eGiant 2"),
     DUNGEON_F6_GIANT_3("§eBigfoot Jumper", Type.DUNGEON_FLOOR_6, "§eGiant 3"),
-    DUNGEON_F6_GIANT_4("§eLazer Shooter", Type.DUNGEON_FLOOR_6, "§eGiant 4"),
+    DUNGEON_F6_GIANT_4("§eLaser Shooter", Type.DUNGEON_FLOOR_6, "§eGiant 4"),
     DUNGEON_F6_SADAN("§cSadan", Type.DUNGEON_FLOOR_6),
 
     // TODO implement
@@ -92,7 +92,7 @@ enum class BossType(
 
     MINOS_INQUISITOR("§5Minos Inquisitor", Type.DIANA_MOBS),
     MINOS_CHAMPION("§2Minos Champion", Type.DIANA_MOBS),
-    GAIA_CONSTURUCT("§2Gaia Construct", Type.DIANA_MOBS),
+    GAIA_CONSTRUCT("§2Gaia Construct", Type.DIANA_MOBS),
     MINOTAUR("§2Minotaur", Type.DIANA_MOBS),
 
     THUNDER("§cThunder", Type.SEA_CREATURES),
@@ -121,7 +121,7 @@ enum class BossType(
 
     // TODO arachne
 
-    // TODO corelone
+    // TODO Corleone
     // TODO bal
 
     /**

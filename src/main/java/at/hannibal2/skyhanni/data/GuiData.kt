@@ -39,9 +39,9 @@ object GuiData {
         if (preDrawEventCancelled) event.isCanceled = true
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onGuiKeyPress(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
-        val keys = Minecraft.getMinecraft().gameSettings.let {
+        val allowedKeys = Minecraft.getMinecraft().gameSettings.let {
             listOf(
                 Keyboard.KEY_ESCAPE,
                 it.keyBindInventory.keyCode,
@@ -49,7 +49,7 @@ object GuiData {
                 it.keyBindFullscreen.keyCode,
             )
         }
-        if (keys.any { it.isKeyHeld() }) return
+        if (allowedKeys.any { it.isKeyHeld() }) return
 
         if (CustomWardrobeKeybinds.allowKeyboardClick()) return
 

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemUtils.getAttributeFromShard
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -16,8 +17,9 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
+import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -43,12 +45,14 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getTransmissionTune
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfPeace
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasArtOfWar
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasBookOfStats
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasDivanPowderCoating
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasEtherwarp
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
@@ -72,6 +76,7 @@ object EstimatedItemValueCalculator {
         ::addJalapenoBook,
         ::addStatsBook,
         ::addEnrichment,
+        ::addDivanPowderCoating,
 
         // counted
         ::addMasterStars,
@@ -124,16 +129,8 @@ object EstimatedItemValueCalculator {
         if (isKuudraSet(internalName)) {
             genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
-        if (internalName == "ATTRIBUTE_SHARD" && attributes.size == 1) {
-            val price = getPriceOrCompositePriceForAttribute(
-                "ATTRIBUTE_SHARD+ATTRIBUTE_" + attributes[0].first,
-                attributes[0].second,
-            )
-            if (price != null) {
-                val name = attributes[0].first.fixMending().allLettersFirstUppercase()
-                list.add("§7Attribute §9$name ${attributes[0].second}§7: (§6${price.shortFormat()}§7)")
-                return price
-            }
+        stack.getAttributeFromShard()?.let {
+            return 0.0
         }
         if (attributes.size != 2) return 0.0
         val basePrice = internalName.asInternalName().getPriceOrNull() ?: 0.0
@@ -206,7 +203,8 @@ object EstimatedItemValueCalculator {
     private fun String.fixMending() = if (this == "MENDING") "VITALITY" else this
 
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
-        return (1..10).mapNotNull { lowerLevel ->
+        val intRange = if (config.useAttributeComposite.get()) 1..10 else level..level
+        return intRange.mapNotNull { lowerLevel ->
             "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()
                 ?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
         }.minOrNull()
@@ -299,6 +297,14 @@ object EstimatedItemValueCalculator {
 
         val price = "WOOD_SINGULARITY".asInternalName().getPrice()
         list.add("§7Wood Singularity: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
+        return price
+    }
+
+    private fun addDivanPowderCoating(stack: ItemStack, list: MutableList<String>): Double {
+        if (!stack.hasDivanPowderCoating()) return 0.0
+
+        val price = "DIVAN_POWDER_COATING".asInternalName().getPrice()
+        list.add("§7Divan Powder Coating: §a§l✔ §7(§6" + price.shortFormat() + "§7)")
         return price
     }
 
@@ -477,18 +483,18 @@ object EstimatedItemValueCalculator {
         internalName: NEUInternalName,
         list: MutableList<String>,
         label: String,
-        shouldIgnorePrice: Boolean,
+        shouldIgnorePrice: Property<Boolean>,
     ): Double {
         val price = internalName.getPrice()
         val name = internalName.getNameOrRepoError()
         val displayName = name ?: "§c${internalName.asString()}"
-        val color = if (shouldIgnorePrice) "§7" else "§6"
+        val color = if (shouldIgnorePrice.get()) "§7" else "§6"
         list.add("§7$label: $displayName §7($color" + price.shortFormat() + "§7)")
         if (name == null) {
             list.add("   §8(Not yet in NEU Repo)")
         }
 
-        return if (shouldIgnorePrice) 0.0 else price
+        return if (shouldIgnorePrice.get()) 0.0 else price
     }
 
     private fun addEnrichment(stack: ItemStack, list: MutableList<String>): Double {
@@ -533,9 +539,30 @@ object EstimatedItemValueCalculator {
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = removeKuudraArmorPrefix(stack.getInternalName().asString()).asInternalName()
+
+        stack.getAttributeFromShard()?.let {
+            val price = it.getAttributePrice()
+            if (price != null) {
+                val name = it.getAttributeName()
+                list.add("§7Base item: $name §7(§6" + price.shortFormat() + "§7)")
+                return price
+            }
+        }
+
         var price = internalName.getPrice()
         if (price == -1.0) {
             price = 0.0
+        }
+
+        // If craft cost price is greater than npc price, and there is no ah/bz price, use craft cost instead
+        internalName.getNpcPriceOrNull()?.let { npcPrice ->
+            if (price == npcPrice) {
+                internalName.getRawCraftCostOrNull()?.let { rawCraftPrice ->
+                    if (rawCraftPrice > npcPrice) {
+                        price = rawCraftPrice
+                    }
+                }
+            }
         }
 
         val name = internalName.itemName
@@ -572,9 +599,10 @@ object EstimatedItemValueCalculator {
         val map = mutableMapOf<String, Double>()
 
         //todo use repo
-        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb")
+        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
         val onlyTierOnePrices =
             listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
+        val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
@@ -600,6 +628,18 @@ object EstimatedItemValueCalculator {
                     5 -> multiplier = 16
                 }
                 level = 1
+            }
+            if (rawName in onlyTierFivePrices) {
+                when (rawLevel) {
+                    6 -> multiplier = 2
+                    7 -> multiplier = 4
+                    8 -> multiplier = 8
+                    9 -> multiplier = 16
+                    10 -> multiplier = 32
+                }
+                if (multiplier > 1) {
+                    level = 5
+                }
             }
             if (internalName.startsWith("ENCHANTED_BOOK_BUNDLE_")) {
                 multiplier = EstimatedItemValue.bookBundleAmount.getOrDefault(rawName, 5)
@@ -730,4 +770,21 @@ object EstimatedItemValueCalculator {
         list += priceMap.sortedDesc().keys
         return totalPrice
     }
+
+    private fun NEUInternalName.getPrice(): Double = getPriceOrNull() ?: -1.0
+
+    private fun NEUInternalName.getPriceOrNull(): Double? {
+        return getPriceOrNull(config.priceSource.get())
+    }
+
+    fun Pair<String, Int>.getAttributeName(): String {
+        val name = first.fixMending().allLettersFirstUppercase()
+        return "§b$name ${second} Shard"
+    }
+
+    fun Pair<String, Int>.getAttributePrice(): Double? =
+        EstimatedItemValueCalculator.getPriceOrCompositePriceForAttribute(
+            "ATTRIBUTE_SHARD+ATTRIBUTE_" + first,
+            second,
+        )
 }
