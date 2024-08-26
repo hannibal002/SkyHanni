@@ -99,9 +99,14 @@ object ItemDisplayOverlayFeatures {
         "bestiarystack",
         "§7Progress to Tier (?<tier>[\\dIVXC]+): §b[\\d.]+%",
     )
+
+    /**
+     * REGEX-TEST: 5k Enchanting Exp
+     * REGEX-TEST: 5.5k Enchanting Exp
+     */
     private val enchantingExpPattern by patternGroup.pattern(
         "enchantingexp",
-        "(?<exp>[0-9]+)k Enchanting Exp",
+        "(?<exp>.*)k Enchanting Exp",
     )
 
     @SubscribeEvent

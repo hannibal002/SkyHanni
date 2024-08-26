@@ -146,7 +146,7 @@ public class InventoryConfig {
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
         DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
-        ENCHANTING_EXP("§bEnchanting EXP"),
+        ENCHANTING_EXP("§bEnchanting EXP (Superpairs)"),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
         BESTIARY_LEVEL("§bBestiary Level"),
