@@ -28,8 +28,8 @@ object ColorFormattingHelper {
         ChatUtils.clickableChat(
             "§eClick to view extra info about colors and formatting.",
             onClick = { printColorCodesExtra() },
-            "§zClick to see more!",
-            prefix = false
+            "§eClick to see more!",
+            prefix = false,
         )
     }
 
@@ -38,22 +38,22 @@ object ColorFormattingHelper {
         ChatUtils.clickableLinkChat(
             "§#§6§a§e§e§4§8§/[Click here to view codes on minecraft.wiki]",
             "https://minecraft.wiki/w/Formatting_codes#Color_codes",
-            "§fOpen minecraft.wiki",
+            "§eOpen §cminecraft.wiki§e!",
             false,
-            false
+            false,
         )
         ChatUtils.chat(
             "§eYou can also uses SkyHanni's system for any colors. " +
                 "This is different from chroma. " +
-                "Simply type &#&f&f&9&a&2&e&/ for color §#§f§f§9§a§2§e§/#ff9a2e§e " +
-                "(adds & before every characters including #, ends with '&/').",
-            false
+                "Simply type §6&#&f&f&9&a&2&e&/ §efor color §#§f§f§9§a§2§e§/#ff9a2e§e " +
+                "(adds §6& §ebefore every characters including §6#§e, ends with '§6&/§e').",
+            false,
         )
         ChatUtils.clickableLinkChat(
             "§z[Click here to open color picker color-hex.com]",
             url = "https://www.color-hex.com",
-            "§fOpen color-hex.com",
-            prefix = false
+            "§eOpen §ccolor-hex.com§e!",
+            prefix = false,
         )
         ChatUtils.chat("§c===================================================", false)
     }

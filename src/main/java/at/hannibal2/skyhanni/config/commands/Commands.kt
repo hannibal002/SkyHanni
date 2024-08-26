@@ -352,7 +352,7 @@ object Commands {
         ) { HoppityEventSummary.sendStatsMessage(it) }
         registerCommand(
             "shcolors",
-            "Prints a list of all Minecraft color & formatting codes",
+            "Prints a list of all Minecraft color & formatting codes in chat.",
         ) { ColorFormattingHelper.printColorCodeList() }
     }
 
