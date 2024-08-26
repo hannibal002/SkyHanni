@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.wrapText
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -48,7 +49,7 @@ object MinisterInCalendar {
                 addAll(prefix)
                 for (perk in minister.activePerks) {
                     add("$ministerColor${perk.perkName}")
-                    add("§7${perk.description}")
+                    addAll(perk.description.wrapText(50).map { "§7$it" })
                 }
                 addAll(suffix)
             }

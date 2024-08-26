@@ -32,7 +32,8 @@ object ExcavatorProfitTracker {
     private val tracker = SkyHanniItemTracker(
         "Fossil Excavation Profit Tracker",
         { Data() },
-        { it.mining.fossilExcavatorProfitTracker }) { drawDisplay(it) }
+        { it.mining.fossilExcavatorProfitTracker },
+    ) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -46,7 +47,7 @@ object ExcavatorProfitTracker {
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop rate: §c$dropRate."
+                "§7Your drop rate: §c$dropRate.",
             )
         }
 
@@ -54,7 +55,7 @@ object ExcavatorProfitTracker {
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
             return listOf(
-                "<no coins>"
+                "<no coins>",
             )
         }
 
@@ -78,8 +79,8 @@ object ExcavatorProfitTracker {
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Times excavated: §e${timesExcavated.addSeparators()}",
-                listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times.")
-            )
+                listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times."),
+            ),
         )
 
         profit = addScrap(timesExcavated, profit)
@@ -111,9 +112,9 @@ object ExcavatorProfitTracker {
                     "§7for all §e$fossilDustGained §fFossil Dust",
                     "§7you have collected.",
                     "",
-                    "§7Price Per Fossil Dust: §6${pricePer.shortFormat()}"
-                )
-            )
+                    "§7Price Per Fossil Dust: §6${pricePer.shortFormat()}",
+                ),
+            ),
         )
         return profit + fossilDustPrice
     }
@@ -127,8 +128,8 @@ object ExcavatorProfitTracker {
                 listOf(
                     "§7No real profit,",
                     "§7but still nice to see! Right?",
-                )
-            )
+                ),
+            ),
         )
     }
 
@@ -146,9 +147,9 @@ object ExcavatorProfitTracker {
                 listOf(
                     "§7You paid §c${scrapPrice.shortFormat()} coins §7in total",
                     "§7for all §e$timesExcavated $name",
-                    "§7you have used."
-                )
-            )
+                    "§7you have used.",
+                ),
+            ),
         )
         return profit - scrapPrice
     }
@@ -212,6 +213,11 @@ object ExcavatorProfitTracker {
         }
     }
 
-    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled
-        && LorenzUtils.skyBlockArea == "Fossil Research Center"
+    fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enabled &&
+        LorenzUtils.skyBlockArea == "Fossil Research Center"
+
+    fun resetCommand() {
+        tracker.resetCommand()
+    }
+
 }
