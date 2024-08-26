@@ -26,9 +26,9 @@ object MovableXpBar {
         val scaled = event.resolution
         val x = scaled.scaledWidth / 2 - 91
         val y = scaled.scaledHeight - 29
-        config.hotbar.transform()
+        config.position.transform()
         GlStateManager.translate(-x.toFloat(), -y.toFloat(), 0f) // Must be after transform to work with scaling
-        GuiEditManager.add(config.hotbar, "Xp Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
+        GuiEditManager.add(config.position, "Xp Bar", 182 - 1, 5 - 1) // -1 since the editor for some reason add +1
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -38,6 +38,6 @@ object MovableXpBar {
         post = false
     }
 
-    fun isEnabled(): Boolean =
-        (LorenzUtils.inSkyBlock || (Minecraft.getMinecraft().thePlayer != null && config.showOutsideSkyblock)) && config.editable
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || (Minecraft.getMinecraft().thePlayer != null && config.showOutsideSkyblock)) &&
+        config.enabled
 }
