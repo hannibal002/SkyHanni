@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -987,7 +987,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(0f, 0f, width.toFloat(), height.toFloat(), GL11.GL_NEAREST)
+                GuiRenderUtils.drawTexturedRect(0f, 0f, width.toFloat(), height.toFloat(), filter = GL11.GL_NEAREST)
                 GlStateManager.color(1f, 1f, 1f, 1f)
             }
         }
