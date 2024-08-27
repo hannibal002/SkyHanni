@@ -2,37 +2,48 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EssenceShopUpgrade
-import at.hannibal2.skyhanni.data.jsonobjects.repo.EssenceShopsJson
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import com.google.gson.Gson
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object EssenceShopHelper {
 
+    // Where the informational item stack will be placed in the GUI
+    private const val CUSTOM_STACK_LOCATION = 8
+
     private var essenceShops = mutableListOf<EssenceShop>()
     private var currentProgress: EssenceShopProgress? = null
+    private var currentEssenceType: String = ""
+    private var currentEssenceItem: NEUInternalName? = null
     private var ownedEssence: Int = 0
+    private var essenceNeeded: Int = 0
+    private var lastClick = SimpleTimeMark.farPast()
 
     /**
      * REGEX-TEST: Gold Essence Shop
@@ -40,7 +51,7 @@ object EssenceShopHelper {
      */
     private val essenceShopPattern by patternGroup.pattern(
         "essence.shop",
-        "(?<essence>.*) Essence Shop",
+        "(?:§.)*(?<essence>.*) Essence Shop",
     )
 
     /**
@@ -63,41 +74,60 @@ object EssenceShopHelper {
         "§.(?<upgrade>.*) (?<tier>[IVXLCDM].*)"
     )
 
-    data class EssenceShop(val shopName: String, val upgrades: List<EssenceShopUpgrade>) {
-        val totalCost: Int = upgrades.sumOf { it.costs.sum() }
-    }
+    data class EssenceShop(val shopName: String, val upgrades: List<EssenceShopUpgrade>)
+    data class EssenceShopUpgradeStatus(val upgradeName: String, val currentLevel: Int, val maxLevel: Int, val remainingCosts: MutableList<Int>)
 
     data class EssenceShopProgress(val essenceName: String, val purchasedUpgrades: Map<String, Int>) {
         private val essenceShop = essenceShops.find { it.shopName.equals(essenceName, ignoreCase = true) }
-        val remainingUpgrades: MutableMap<String, MutableList<Int>> = essenceShop?.upgrades?.associate {
-            it.name to buildList {
-                val purchasedAmount = purchasedUpgrades[it.name]
-                if (purchasedAmount == null) addAll(it.costs ?: emptyList())
-                else addAll(it.costs.drop(purchasedAmount) ?: emptyList())
-            }.toMutableList()
-        }?.toMutableMap() ?: mutableMapOf()
-        val nonRepoUpgrades = purchasedUpgrades.any { purchasedUpgrade ->
+        val remainingUpgrades: MutableList<EssenceShopUpgradeStatus> = essenceShop?.upgrades?.map {
+            val purchasedAmount = purchasedUpgrades[it.name]
+            EssenceShopUpgradeStatus(
+                it.name,
+                currentLevel = purchasedAmount ?: 0,
+                maxLevel = it.costs.count(),
+                remainingCosts = (if (purchasedAmount == null) it.costs else it.costs.drop(purchasedAmount)).toMutableList()
+            )
+        }?.toMutableList() ?: mutableListOf()
+        val nonRepoUpgrades = purchasedUpgrades.filter { purchasedUpgrade ->
             essenceShop?.upgrades?.none { it.name.equals(purchasedUpgrade.key, ignoreCase = true) } == true
         }
     }
 
     @SubscribeEvent
-    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val data = event.readConstant<EssenceShopsJson>("esenceshops", Gson())
-        essenceShops = data.shops.map { (key, value) ->
-            EssenceShop(key, value.upgrades.values.toMutableList() )
-        }.toMutableList()
+    fun replaceItem(event: ReplaceItemEvent) {
+        if (!enabled() || essenceShops.isEmpty() || currentProgress == null) return
+        if (!essenceShopPattern.matches(event.inventory.name)) return
+        if (event.slot == CUSTOM_STACK_LOCATION) {
+            val progressStack = getCustomItemStack() ?: return
+            event.replace(progressStack)
+        }
     }
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
-        if (!enabled() || !inEssenceShop() || essenceShops.isEmpty() || currentProgress == null || event.slot.slotNumber != 4) return
-        ChatUtils.chat("In tooltip event")
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION || currentEssenceItem == null) return
+        event.cancel()
+        if (lastClick.passedSince() > 0.3.seconds) {
+            BazaarApi.searchForBazaarItem(currentEssenceItem!!, essenceNeeded)
+            lastClick = SimpleTimeMark.now()
+        }
+    }
+
+    @SubscribeEvent
+    fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
+        val repoEssenceShops = event.readConstant<Map<String, Map<String, EssenceShopUpgrade>>>("essenceshops")
+        essenceShops = repoEssenceShops.map { (key, value) ->
+            EssenceShop(key, value.values.toMutableList() )
+        }.toMutableList()
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         currentProgress = null
+        currentEssenceType = ""
+        currentEssenceItem = null
+        ownedEssence = 0
+        essenceNeeded = 0
     }
 
     @SubscribeEvent
@@ -110,10 +140,54 @@ object EssenceShopHelper {
         processInventoryEvent(event)
     }
 
+    private fun getCustomItemStack(): ItemStack? {
+        return if (currentProgress == null) null else {
+            Utils.createItemStack(
+                "GOLD_NUGGET".asInternalName().getItemStack().item,
+                "§bRemaining $currentEssenceType Essence Upgrades",
+                *buildList<String> {
+                    val progress = currentProgress!!
+                    val remaining = progress.remainingUpgrades
+                    if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
+                    else {
+                        add("")
+                        remaining.filter { it.remainingCosts.isNotEmpty() }.forEach {
+                            add("  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${it.remainingCosts.sum().addSeparators()}")
+                        }
+                        add("")
+
+                        essenceNeeded = remaining.sumOf { it.remainingCosts.sum() } - ownedEssence
+                        add("§r§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
+                        val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
+
+                        val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
+                        val totalInstantPrice = bzInstantPrice * essenceNeeded
+                        add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
+
+                        val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
+                        val totalOrderPrice = bzOrderPrice * essenceNeeded
+                        add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
+
+                        add("")
+                        add("§a§oClick to open Bazaar!")
+                    }
+
+                    if (progress.nonRepoUpgrades.any()) {
+                        add("")
+                        add("§cFound upgrades not in repo§c§l:")
+                        progress.nonRepoUpgrades.forEach { add(it.key) }
+                    }
+                }.toTypedArray()
+            )
+        }
+    }
+
     private fun processInventoryEvent(event: InventoryOpenEvent) {
-        if (!enabled() || !inEssenceShop() || essenceShops.isEmpty()) return
+        if (!enabled() || essenceShops.isEmpty()) return
         essenceShopPattern.matchMatcher(event.inventoryName) {
-            val essenceName = groupOrNull("essence")?.let { "${it.uppercase()}_ESSENCE" } ?: return
+            currentEssenceType = groupOrNull("essence") ?: return
+            val essenceName = "ESSENCE_${currentEssenceType.uppercase()}"
+            currentEssenceItem = essenceName.asInternalName()
             essenceShops.find { it.shopName == essenceName } ?: return
             processEssenceShopUpgrades(essenceName, event.inventoryItems)
             processEssenceShopHeader(essenceName, event)
@@ -122,11 +196,11 @@ object EssenceShopHelper {
 
     private fun processEssenceShopHeader(essenceName: String, event: InventoryOpenEvent) {
         val essenceHeaderStack = event.inventoryItems[4]
-        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.itemName))
+        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.displayName))
             ErrorManager.skyHanniError("Could not read current Essence Count from inventory §c§l${event.inventoryName}")
 
         currentEssenceCountPattern.firstMatcher(essenceHeaderStack.getLore()) {
-            ownedEssence = groupOrNull("count")?.toInt() ?: 0
+            ownedEssence = groupOrNull("count")?.replace(",", "")?.toInt() ?: 0
         }
     }
 
@@ -147,7 +221,7 @@ object EssenceShopHelper {
         val upgradeStacks = inventoryItems.filter { it.key in 10..33 && it.value.item != null}
         val purchasedUpgrades: MutableMap<String, Int> = buildMap {
             upgradeStacks.forEach {
-                essenceUpgradePattern.matchMatcher(it.value.itemName) {
+                essenceUpgradePattern.matchMatcher(it.value.displayName) {
                     val upgradeName = groupOrNull("upgrade") ?: return
                     val nextUpgradeRoman = groupOrNull("tier") ?: return
                     val nextUpgrade = nextUpgradeRoman.romanToDecimal()
@@ -159,6 +233,5 @@ object EssenceShopHelper {
         currentProgress = EssenceShopProgress(essenceName, purchasedUpgrades)
     }
 
-    private fun inEssenceShop() = essenceShopPattern.matches(InventoryUtils.openInventoryName())
     private fun enabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.essenceShopHelper
 }
