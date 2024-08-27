@@ -39,7 +39,7 @@ object EnchantParser {
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
-        "enchants", "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)"
+        "enchants.new", "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)"
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
