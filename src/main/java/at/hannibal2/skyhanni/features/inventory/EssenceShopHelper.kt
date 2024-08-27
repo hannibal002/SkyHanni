@@ -71,7 +71,7 @@ object EssenceShopHelper {
      */
     private val essenceUpgradePattern by patternGroup.pattern(
         "essence.upgrade",
-        "§.(?<upgrade>.*) (?<tier>[IVXLCDM].*)",
+        "§.(?<upgrade>.*) (?<tier>[IVXLCDM]*)",
     )
 
     data class EssenceShop(val shopName: String, val upgrades: List<EssenceShopUpgrade>)
@@ -152,11 +152,11 @@ object EssenceShopHelper {
                 "§bRemaining $currentEssenceType Essence Upgrades",
                 *buildList {
                     val progress = currentProgress!!
-                    val remaining = progress.remainingUpgrades
+                    val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
                     if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
                     else {
                         add("")
-                        remaining.filter { it.remainingCosts.isNotEmpty() }.forEach {
+                        remaining.forEach {
                             add(
                                 "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
                                     it.remainingCosts.sum().addSeparators()
@@ -165,8 +165,13 @@ object EssenceShopHelper {
                         }
                         add("")
 
-                        essenceNeeded = remaining.sumOf { it.remainingCosts.sum() } - ownedEssence
-                        add("§r§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
+                        val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
+                        add("§7Upgrade Sum Cost: §8$upgradeTotal")
+                        essenceNeeded = upgradeTotal - ownedEssence
+                        if(essenceNeeded != upgradeTotal) {
+                            add("§7Essence Owned: §8$ownedEssence")
+                        }
+                        add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
                         val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
 
                         val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
@@ -178,13 +183,13 @@ object EssenceShopHelper {
                         add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
 
                         add("")
-                        add("§a§oClick to open Bazaar!")
+                        add("§e§oClick to open Bazaar!")
                     }
 
                     if (progress.nonRepoUpgrades.any()) {
                         add("")
                         add("§cFound upgrades not in repo§c§l:")
-                        progress.nonRepoUpgrades.forEach { add(it.key) }
+                        progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
                     }
                 }.toTypedArray(),
             )
