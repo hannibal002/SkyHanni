@@ -64,9 +64,12 @@ object EssenceShopHelper {
         ".*§7Your (?<essence>.*) Essence: §.(?<count>[\\d,]*)",
     )
 
+    /**
+     * REGEX-TEST: §a§lUNLOCKED
+     */
     private val maxedUpgradeLorePattern by patternGroup.pattern(
         "essence.maxedupgrade",
-        ".*§a§lUNLOCKED"
+        ".*§a§lUNLOCKED",
     )
 
     /**
@@ -116,7 +119,7 @@ object EssenceShopHelper {
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION) return
-        val currentEssenceItem = currentEssenceItem  ?: return
+        val currentEssenceItem = currentEssenceItem ?: return
         event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
             BazaarApi.searchForBazaarItem(currentEssenceItem, essenceNeeded)
@@ -224,8 +227,8 @@ object EssenceShopHelper {
                     "inventoryName" to event.inventoryName,
                     "essenceHeaderStack" to essenceHeaderStack?.displayName.orEmpty(),
                     "populatedInventorySize" to event.inventoryItems.filter { it.value.hasDisplayName() }.size,
-                    "eventType" to event.javaClass.simpleName
-                ).toTypedArray()
+                    "eventType" to event.javaClass.simpleName,
+                ).toTypedArray(),
             )
             return
         }
