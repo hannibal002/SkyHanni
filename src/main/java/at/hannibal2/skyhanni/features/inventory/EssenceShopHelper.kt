@@ -166,10 +166,10 @@ object EssenceShopHelper {
                         add("")
 
                         val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
-                        add("§7Upgrade Sum Cost: §8$upgradeTotal")
+                        add("§Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
                         essenceNeeded = upgradeTotal - ownedEssence
                         if (essenceNeeded != upgradeTotal) {
-                            add("§7Essence Owned: §8$ownedEssence")
+                            add("§7Essence Owned: §8${ownedEssence.addSeparators()}")
                         }
                         add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
                         val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
