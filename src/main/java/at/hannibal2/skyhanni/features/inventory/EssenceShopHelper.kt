@@ -166,7 +166,7 @@ object EssenceShopHelper {
                         add("")
 
                         val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
-                        add("§Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
+                        add("§7Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
                         essenceNeeded = upgradeTotal - ownedEssence
                         if (essenceNeeded != upgradeTotal) {
                             add("§7Essence Owned: §8${ownedEssence.addSeparators()}")
