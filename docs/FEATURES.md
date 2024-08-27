@@ -110,6 +110,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Dungeon hub race waypoints. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
     + Only works for Nothing; No return races.
 + Added the ability to hide solo class, solo class stats and fairy dialogue chat messages in Dungeons. - raven (https://github.com/hannibal002/SkyHanni/pull/1702)
++ Added highlight for starred dungeon mobs. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1558)
++ Added highlight for Fel skulls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1558)
+    + Optionally draws a line to them as well.
 
 </details>
 <details open><summary>
@@ -735,6 +738,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added toggle for compacting Garden visitor summary messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2026)
 + Added Farming Personal Best FF Gain. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2332)
     + Displays in chat how much additional FF you earn from the farming contest personal best bonus after beating your previous record.
++ Added No Pests Chat Filter. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
+    + Removed the chat message "There are no Pests on your Garden!".
++ Added No Pests Title. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
+    + Shows a title when you use the Pest Tracker without any pests to clear.
 
 </details>
 <details open><summary>
@@ -816,6 +823,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Punchcard Artifact Highlighter & Overlay. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1089)
     + Highlights unpunched players in the Rift.
 + Added Splatter Hearts Highlight for the Rift. - Empa (https://github.com/hannibal002/SkyHanni/pull/2318)
++ Added Motes per Session. - Empa (https://github.com/hannibal002/SkyHanni/pull/2323)
 
 </details>
 <details open><summary>
@@ -876,6 +884,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added powder cost for 10 levels.
 + Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1655)
     + Displays information about Mineshaft spawns, your progress towards a Pity Mineshaft, and more.
++ Added a "Get from Sack" button in the forge recipe menu to retrieve ingredients. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2106)
 
 </details>
 <details open><summary>
@@ -962,6 +971,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Add reminder that the Time Tower is expired and has extra charges available. - appable (https://github.com/hannibal002/SkyHanni/pull/2133)
     + Replaces the previous Time Tower Reminder feature.
 + Added a tracker for stray rabbits caught in the Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2210)
++ Added Hoppity Hunt event summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
+    + Use /shhoppitystats for live stats.
 
 </details>
 <details open><summary>
@@ -993,6 +1004,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can be used like `/shupdate <beta/full>` to download updates from a specific update stream.
 + /shignore. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1469)
     + This lets you block users from running party commands.
++ Added `/shcolors` command. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2216)
+    + Prints a list of all Minecraft color and formatting codes in chat.
++ Added Remind command. - ThatGravyBoat & Zickles (https://github.com/hannibal002/SkyHanni/pull/1708)
+    + Use `/shremind <time> <note>` to set reminders for your future self.
 
 </details>
 <details open><summary>
@@ -1259,6 +1274,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Editable Hotbar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1903)
     + Allows for moving and scaling in the SkyHanni GUI editor.
 + ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
++ Added a warning when opening the Experimentation Table without a Guardian pet. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2127)
++ Added Enchanting Experience as Stack Size in Experimentation Table. - saga (https://github.com/hannibal002/SkyHanni/pull/1988)
+    + Added to the Item Number list.
 + In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
 + Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)
@@ -1281,6 +1299,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Also punishes players who don't read patch notes.
 + Added Crown of Avarice counter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2229)
 + Added a title notification for when the Thunder Bottle is fully charged. - raven (https://github.com/hannibal002/SkyHanni/pull/2234)
++ Added Editable XP Bar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1944)
+    + Enabled moving and scaling of the XP bar in the SkyHanni GUI Editor.
++ Show dye hex code as the actual color in the item lore. - nopo (https://github.com/hannibal002/SkyHanni/pull/2321)
 
 </details>
 <details open><summary>

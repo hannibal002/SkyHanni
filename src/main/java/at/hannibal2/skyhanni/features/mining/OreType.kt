@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import net.minecraft.block.state.IBlockState
@@ -191,23 +190,21 @@ enum class OreType(
 
     companion object {
 
+        private val gemstones = setOf(
+            RUBY, AMBER, AMETHYST, JADE,
+            SAPPHIRE, TOPAZ, JASPER, OPAL,
+            AQUAMARINE, CITRINE, ONYX, PERIDOT,
+        )
+
         fun IBlockState.isOreType(oreType: OreType): Boolean {
             return oreType.oreBlocks.intersect(MiningAPI.currentAreaOreBlocks)
                 .any { it.checkBlock.invoke(this) }
         }
 
-        fun OreType.isGemstone(): Boolean {
-            return this.equalsOneOf(
-                RUBY, AMBER, AMETHYST, JADE,
-                SAPPHIRE, TOPAZ, JASPER, OPAL,
-                AQUAMARINE, CITRINE, ONYX, PERIDOT,
-            )
-        }
+        fun OreType.isGemstone(): Boolean = this in gemstones
 
         fun OreBlock.getOreType(): OreType? {
-            return OreType.entries.firstOrNull {
-                it.oreBlocks.contains(this)
-            }
+            return OreType.entries.firstOrNull { this in it.oreBlocks }
         }
     }
 }
