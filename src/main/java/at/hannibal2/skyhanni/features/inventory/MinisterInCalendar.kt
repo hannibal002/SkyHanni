@@ -17,12 +17,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object MinisterInCalendar {
 
-    val prefix = listOf(
+    private const val MINISTER_SLOT = 38
+
+    private val prefix = listOf(
         "§8(from SkyHanni)",
         "",
         "§8§m--------------------------",
     )
-    val suffix = listOf(
+    private val suffix = listOf(
         "",
         "§8§m--------------------------",
         "",
@@ -36,7 +38,7 @@ object MinisterInCalendar {
         if (!isEnabled()) return
         if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         val minister = MayorAPI.currentMinister ?: return
-        if (event.inventory is ContainerLocalMenu && event.slot == 38) {
+        if (event.inventory is ContainerLocalMenu && event.slot == MINISTER_SLOT) {
             val item = "${minister.name}_MAYOR_MONSTER".asInternalName().getItemStack()
 
             val ministerColor = MayorAPI.mayorNameToColorCode(minister.mayorName)
