@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
@@ -347,8 +348,12 @@ object Commands {
         ) { PestFinder.teleportNearestInfestedPlot() }
         registerCommand(
             "shhoppitystats",
-            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
+            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats.",
         ) { HoppityEventSummary.sendStatsMessage(it) }
+        registerCommand(
+            "shcolors",
+            "Prints a list of all Minecraft color & formatting codes in chat.",
+        ) { ColorFormattingHelper.printColorCodeList() }
     }
 
     private fun usersBugFix() {
