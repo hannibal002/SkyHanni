@@ -41,4 +41,11 @@ public class TitleAndFooterConfig {
         "\nUse \"\\n\" for new line.")
     @ConfigEditorText
     public String customFooter = "&&ewww.hypixel.net";
+
+    @Expose
+    @ConfigOption(name = "Custom Alpha Footer", desc = "What should be displayed as the footer of the scoreboard when on the Alpha Server." +
+        "\nUse && for colors." +
+        "\nUse \"\\n\" for new line.")
+    @ConfigEditorText
+    public String customAlphaFooter = "&&ealpha.hypixel.net";
 }
