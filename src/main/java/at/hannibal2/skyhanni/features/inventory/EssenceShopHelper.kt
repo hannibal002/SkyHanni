@@ -168,7 +168,7 @@ object EssenceShopHelper {
                         val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
                         add("§7Upgrade Sum Cost: §8$upgradeTotal")
                         essenceNeeded = upgradeTotal - ownedEssence
-                        if(essenceNeeded != upgradeTotal) {
+                        if (essenceNeeded != upgradeTotal) {
                             add("§7Essence Owned: §8$ownedEssence")
                         }
                         add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
@@ -204,11 +204,11 @@ object EssenceShopHelper {
             currentEssenceItem = essenceName.asInternalName()
             essenceShops.find { it.shopName == essenceName } ?: return
             processEssenceShopUpgrades(essenceName, event.inventoryItems)
-            processEssenceShopHeader(essenceName, event)
+            processEssenceShopHeader(event)
         }
     }
 
-    private fun processEssenceShopHeader(essenceName: String, event: InventoryOpenEvent) {
+    private fun processEssenceShopHeader(event: InventoryOpenEvent) {
         val essenceHeaderStack = event.inventoryItems[4]
         if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.displayName))
             ErrorManager.skyHanniError("Could not read current Essence Count from inventory §c§l${event.inventoryName}")
