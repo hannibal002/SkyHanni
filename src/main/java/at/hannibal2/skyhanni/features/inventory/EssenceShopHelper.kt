@@ -60,7 +60,7 @@ object EssenceShopHelper {
      */
     private val currentEssenceCountPattern by patternGroup.pattern(
         "essence.current",
-        ".*§7Your (?<essence>.*) Essence: §.(?<count>[\\d,]*)"
+        ".*§7Your (?<essence>.*) Essence: §.(?<count>[\\d,]*)",
     )
 
 
@@ -71,11 +71,16 @@ object EssenceShopHelper {
      */
     private val essenceUpgradePattern by patternGroup.pattern(
         "essence.upgrade",
-        "§.(?<upgrade>.*) (?<tier>[IVXLCDM].*)"
+        "§.(?<upgrade>.*) (?<tier>[IVXLCDM].*)",
     )
 
     data class EssenceShop(val shopName: String, val upgrades: List<EssenceShopUpgrade>)
-    data class EssenceShopUpgradeStatus(val upgradeName: String, val currentLevel: Int, val maxLevel: Int, val remainingCosts: MutableList<Int>)
+    data class EssenceShopUpgradeStatus(
+        val upgradeName: String,
+        val currentLevel: Int,
+        val maxLevel: Int,
+        val remainingCosts: MutableList<Int>,
+    )
 
     data class EssenceShopProgress(val essenceName: String, val purchasedUpgrades: Map<String, Int>) {
         private val essenceShop = essenceShops.find { it.shopName.equals(essenceName, ignoreCase = true) }
@@ -85,7 +90,7 @@ object EssenceShopHelper {
                 it.name,
                 currentLevel = purchasedAmount ?: 0,
                 maxLevel = it.costs.count(),
-                remainingCosts = (if (purchasedAmount == null) it.costs else it.costs.drop(purchasedAmount)).toMutableList()
+                remainingCosts = (if (purchasedAmount == null) it.costs else it.costs.drop(purchasedAmount)).toMutableList(),
             )
         }?.toMutableList() ?: mutableListOf()
         val nonRepoUpgrades = purchasedUpgrades.filter { purchasedUpgrade ->
@@ -117,7 +122,7 @@ object EssenceShopHelper {
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoEssenceShops = event.readConstant<Map<String, Map<String, EssenceShopUpgrade>>>("essenceshops")
         essenceShops = repoEssenceShops.map { (key, value) ->
-            EssenceShop(key, value.values.toMutableList() )
+            EssenceShop(key, value.values.toMutableList())
         }.toMutableList()
     }
 
@@ -145,14 +150,18 @@ object EssenceShopHelper {
             Utils.createItemStack(
                 "GOLD_NUGGET".asInternalName().getItemStack().item,
                 "§bRemaining $currentEssenceType Essence Upgrades",
-                *buildList<String> {
+                *buildList {
                     val progress = currentProgress!!
                     val remaining = progress.remainingUpgrades
                     if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
                     else {
                         add("")
                         remaining.filter { it.remainingCosts.isNotEmpty() }.forEach {
-                            add("  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${it.remainingCosts.sum().addSeparators()}")
+                            add(
+                                "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
+                                    it.remainingCosts.sum().addSeparators()
+                                }",
+                            )
                         }
                         add("")
 
@@ -177,7 +186,7 @@ object EssenceShopHelper {
                         add("§cFound upgrades not in repo§c§l:")
                         progress.nonRepoUpgrades.forEach { add(it.key) }
                     }
-                }.toTypedArray()
+                }.toTypedArray(),
             )
         }
     }
@@ -218,7 +227,7 @@ object EssenceShopHelper {
          *
          * Filter out items that fall outside the bounds of 10 - 33
          */
-        val upgradeStacks = inventoryItems.filter { it.key in 10..33 && it.value.item != null}
+        val upgradeStacks = inventoryItems.filter { it.key in 10..33 && it.value.item != null }
         val purchasedUpgrades: MutableMap<String, Int> = buildMap {
             upgradeStacks.forEach {
                 essenceUpgradePattern.matchMatcher(it.value.displayName) {
@@ -226,7 +235,7 @@ object EssenceShopHelper {
                     val nextUpgradeRoman = groupOrNull("tier") ?: return
                     val nextUpgrade = nextUpgradeRoman.romanToDecimal()
                     val isMaxed = it.value.getLore().any { loreLine -> Regex(".*§a§lUNLOCKED").containsMatchIn(loreLine) }
-                    put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1 )
+                    put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
                 }
             }
         }.toMutableMap()
