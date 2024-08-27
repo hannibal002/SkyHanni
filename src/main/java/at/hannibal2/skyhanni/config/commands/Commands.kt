@@ -54,7 +54,6 @@ import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.gui.electionviewer.CurrentMayorScreen
-import at.hannibal2.skyhanni.features.gui.electionviewer.ElectionViewerScreen
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
@@ -165,8 +164,8 @@ object Commands {
     }
 
     private fun usersMain() {
-        registerCommand("sh", "Opens the main SkyHanni config", openMainMenu)
-        registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
+        registerCommand("sh", "Opens the main SkyHanni config") { openMainMenu }
+        registerCommand("skyhanni", "Opens the main SkyHanni config") { openMainMenu }
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { HelpCommand.onCommand(it, commands) }
         registerCommand0(
@@ -175,8 +174,7 @@ object Commands {
             { DefaultConfigFeatures.onCommand(it) },
             DefaultConfigFeatures::onComplete,
         )
-        registerCommand("shelection", "View the current Mayor.") { openElectionViewer() }
-        registerCommand("shmayor", "View the current Mayor.") { openElectionViewer() }
+        registerCommand("shmayor", "View the current Mayor.", listOf("shelection")) { openElectionViewer() }
         registerCommand("shremind", "Set a reminder for yourself") { ReminderManager.command(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
@@ -661,12 +659,13 @@ object Commands {
         }
     }
 
-    private fun registerCommand(rawName: String, description: String, function: (Array<String>) -> Unit) {
+    private fun registerCommand(rawName: String, description: String, aliases: List<String> = listOf(), function: (Array<String>) -> Unit) {
         val name = rawName.lowercase()
-        if (commands.any { it.name == name }) {
-            error("The command '$name is already registered!'")
+        if (commands.any { it.name == name || it.name in aliases }) {
+            error("The command '$name' or one of its aliases is already registered!")
         }
-        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+        val command = SimpleCommand(name, aliases, createCommand(function))
+        ClientCommandHandler.instance.registerCommand(command)
         commands.add(CommandInfo(name, description, currentCategory))
     }
 
@@ -675,9 +674,11 @@ object Commands {
         description: String,
         function: (Array<String>) -> Unit,
         autoComplete: ((Array<String>) -> List<String>) = { listOf() },
+        aliases: List<String> = listOf(),
     ) {
         val command = SimpleCommand(
             name,
+            aliases,
             createCommand(function),
             object : SimpleCommand.TabCompleteRunnable {
                 override fun tabComplete(
@@ -689,6 +690,9 @@ object Commands {
                 }
             },
         )
+        if (commands.any { it.name == name || it.name in aliases }) {
+            error("The command '$name' or one of its aliases is already registered!")
+        }
         ClientCommandHandler.instance.registerCommand(command)
         commands.add(CommandInfo(name, description, currentCategory))
     }
