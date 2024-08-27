@@ -174,8 +174,7 @@ object CustomScoreboard {
 
     private fun addAllNonSkyBlockLines() = buildList {
         addAll(Title.getLines())
-        addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it.align() })
-        addAll(Footer.getLines())
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it.align() })
     }
 
     private fun addDefaultSkyBlockLines() = buildList {
