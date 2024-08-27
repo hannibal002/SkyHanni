@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -63,6 +64,10 @@ object EssenceShopHelper {
         ".*§7Your (?<essence>.*) Essence: §.(?<count>[\\d,]*)",
     )
 
+    private val maxedUpgradeLorePattern by patternGroup.pattern(
+        "essence.maxedupgrade",
+        ".*§a§lUNLOCKED"
+    )
 
     /**
      * REGEX-TEST: §aHigh Roller I
@@ -110,10 +115,11 @@ object EssenceShopHelper {
 
     @SubscribeEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION || currentEssenceItem == null) return
+        if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION) return
+        val currentEssenceItem = currentEssenceItem  ?: return
         event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
-            BazaarApi.searchForBazaarItem(currentEssenceItem!!, essenceNeeded)
+            BazaarApi.searchForBazaarItem(currentEssenceItem, essenceNeeded)
             lastClick = SimpleTimeMark.now()
         }
     }
@@ -210,11 +216,21 @@ object EssenceShopHelper {
 
     private fun processEssenceShopHeader(event: InventoryOpenEvent) {
         val essenceHeaderStack = event.inventoryItems[4]
-        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.displayName))
-            ErrorManager.skyHanniError("Could not read current Essence Count from inventory §c§l${event.inventoryName}")
-
+        if (essenceHeaderStack == null || !essenceShopPattern.matches(essenceHeaderStack.displayName)) {
+            ErrorManager.logErrorWithData(
+                NoSuchElementException(""),
+                "Could not read current Essence Count from inventory",
+                extraData = listOf(
+                    "inventoryName" to event.inventoryName,
+                    "essenceHeaderStack" to essenceHeaderStack?.displayName.orEmpty(),
+                    "populatedInventorySize" to event.inventoryItems.filter { it.value.hasDisplayName() }.size,
+                    "eventType" to event.javaClass.simpleName
+                ).toTypedArray()
+            )
+            return
+        }
         currentEssenceCountPattern.firstMatcher(essenceHeaderStack.getLore()) {
-            ownedEssence = groupOrNull("count")?.replace(",", "")?.toInt() ?: 0
+            ownedEssence = groupOrNull("count")?.formatInt() ?: 0
         }
     }
 
@@ -239,7 +255,7 @@ object EssenceShopHelper {
                     val upgradeName = groupOrNull("upgrade") ?: return
                     val nextUpgradeRoman = groupOrNull("tier") ?: return
                     val nextUpgrade = nextUpgradeRoman.romanToDecimal()
-                    val isMaxed = it.value.getLore().any { loreLine -> Regex(".*§a§lUNLOCKED").containsMatchIn(loreLine) }
+                    val isMaxed = it.value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
                     put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
                 }
             }
