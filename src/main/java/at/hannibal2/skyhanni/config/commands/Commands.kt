@@ -163,8 +163,7 @@ object Commands {
     }
 
     private fun usersMain() {
-        registerCommand("sh", "Opens the main SkyHanni config", openMainMenu)
-        registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
+        registerCommand("sh", "Opens the main SkyHanni config", listOf("skyhanni")) { openMainMenu }
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { HelpCommand.onCommand(it, commands) }
         registerCommand0(
@@ -353,6 +352,7 @@ object Commands {
         registerCommand(
             "shcolors",
             "Prints a list of all Minecraft color & formatting codes in chat.",
+            listOf("shcolours"),
         ) { ColorFormattingHelper.printColorCodeList() }
     }
 
@@ -652,12 +652,13 @@ object Commands {
         }
     }
 
-    private fun registerCommand(rawName: String, description: String, function: (Array<String>) -> Unit) {
+    private fun registerCommand(rawName: String, description: String, aliases: List<String> = listOf(), function: (Array<String>) -> Unit) {
         val name = rawName.lowercase()
-        if (commands.any { it.name == name }) {
-            error("The command '$name is already registered!'")
+        if (commands.any { it.name == name || it.name in aliases }) {
+            error("The command '$name' or one of its aliases is already registered!")
         }
-        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
+        val command = SimpleCommand(name, aliases, createCommand(function))
+        ClientCommandHandler.instance.registerCommand(command)
         commands.add(CommandInfo(name, description, currentCategory))
     }
 
@@ -666,9 +667,11 @@ object Commands {
         description: String,
         function: (Array<String>) -> Unit,
         autoComplete: ((Array<String>) -> List<String>) = { listOf() },
+        aliases: List<String> = listOf(),
     ) {
         val command = SimpleCommand(
             name,
+            aliases,
             createCommand(function),
             object : SimpleCommand.TabCompleteRunnable {
                 override fun tabComplete(
@@ -680,6 +683,9 @@ object Commands {
                 }
             },
         )
+        if (commands.any { it.name == name || it.name in aliases }) {
+            error("The command '$name' or one of its aliases is already registered!")
+        }
         ClientCommandHandler.instance.registerCommand(command)
         commands.add(CommandInfo(name, description, currentCategory))
     }
