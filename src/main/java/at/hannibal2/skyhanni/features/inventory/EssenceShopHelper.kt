@@ -13,8 +13,22 @@ object EssenceShopHelper {
 
     data class EssenceShop(val shopName: String, val upgrades: List<EssenceShopUpgrade>, val essenceId: String? = null) {
 
-        val itemId: String = essenceId ?: "ESSENCE_${shopName.uppercase()}"
+        val essenceItemId: String = essenceId ?: "ESSENCE_${shopName.uppercase()}"
         val totalCost: Int = upgrades.sumOf { it.costs?.sum() ?: 0}
+    }
+
+    data class EssenceShopProgress(val essenceName: String, val purchasedUpgrades: Map<String, Int>) {
+        private val essenceShop = essenceShops.find { it.shopName.equals(essenceName, ignoreCase = true) }
+        val remainingUpgrades: MutableMap<String, MutableList<Int>> = essenceShop?.upgrades?.associate {
+            it.name to buildList {
+                val purchasedAmount = purchasedUpgrades[it.name]
+                if (purchasedAmount == null) addAll(it.costs ?: emptyList())
+                else addAll(it.costs?.drop(purchasedAmount) ?: emptyList())
+            }.toMutableList()
+        }?.toMutableMap() ?: mutableMapOf()
+        val nonRepoUpgrades = purchasedUpgrades.any { purchasedUpgrade ->
+            essenceShop?.upgrades?.none { it.name.equals(purchasedUpgrade.key, ignoreCase = true) } == true
+        }
     }
 
     @SubscribeEvent
