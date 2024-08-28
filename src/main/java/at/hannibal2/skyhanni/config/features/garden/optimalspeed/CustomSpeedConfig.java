@@ -65,7 +65,7 @@ public class CustomSpeedConfig {
 
     @Expose
     @ConfigOption(name = "Cactus", desc = "Suggested farm speed:\n" +
-        "§eYaw 90§7: §f✦ 464 speed\n")
+        "§eYaw 90§7: §f✦ 464 speed")
     @ConfigEditorSlider(minValue = 1, maxValue = 500, minStep = 1)
     public Property<Float> cactus = Property.of(464f);
 
