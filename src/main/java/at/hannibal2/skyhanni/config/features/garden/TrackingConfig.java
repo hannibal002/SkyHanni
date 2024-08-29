@@ -60,7 +60,7 @@ public class TrackingConfig {
             GOD_POTION("§cGod Potion", "God Potion <:god_potion:1263204732390871151>"),
             JACOBS_CONTEST("§eJacob's Contest", "Contest <:hoe:1263206591218585640>"),
             ACTIVE_CROP("§aCrop", "Crop <:hoe:1263206591218585640>"),
-            ANITA_BUFF("§6Anita's Artifact", "Anita's Artifact <:anitas_artifact:1263212366330335376>"),
+            ANITA_BUFF("§6Anita Buff", "Anita Buff <:anitas_artifact:1263212366330335376>"),
             BPS("§eBlocks/Second", "BPS <:bps_sugar:1263285905083465729>"),
             FARMING_SINCE("§fFarming Since", "Farming For <:minecraftclock:1264539139911716866>");
 
@@ -79,12 +79,18 @@ public class TrackingConfig {
         }
 
         @Expose
-        @ConfigOption(name = "Skin Part", desc = "Skin Part to be displayed in the top right of the embed.")
+        @ConfigOption(name = "Skin Part", desc = "Skin Part to be displayed (image) in the top right of the embed.")
         @ConfigEditorDropdown
         public SkinBodyPart bodyPart = SkinBodyPart.HEAD;
 
         @Expose
-        @ConfigOption(name = "Embed Colour", desc = "Which color the sidebar of the embed should be (Chroma displays as black).")
+        @ConfigOption(name = "Use Default", desc = "Use default Discord color scheme for the embed sidebar" +
+            "(Online = Green, Idle = Yellow, Offline = Red).")
+        @ConfigEditorBoolean
+        public Boolean useDefault = true;
+
+        @Expose
+        @ConfigOption(name = "Embed Colour", desc = "Which color the embed sidebar should be (Chroma displays as black).")
         @ConfigEditorDropdown
         public LorenzColor color = LorenzColor.YELLOW;
     }

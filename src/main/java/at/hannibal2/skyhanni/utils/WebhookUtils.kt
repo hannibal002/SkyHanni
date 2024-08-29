@@ -10,7 +10,7 @@ import com.google.gson.Gson
 @SkyHanniModule
 object WebhookUtils {
 
-    private const val SKYHANNI_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png"
+    private const val SKYHANNI_URL = "https://github.com/hannibal002/SkyHanni/blob/beta/src/main/resources/assets/skyhanni/logo.png?raw=true"
 
     private var lastMessageID: Long? = null
 
@@ -117,15 +117,16 @@ object WebhookUtils {
         username: String? = null,
         avatarUrl: String? = SKYHANNI_URL,
         wait: Boolean = true,
-    ) {
+    ): Boolean {
         val finalUrl = convertToWebhook(webhookUrl, threadID, false, wait)
 
-        val messagePayload = checkAndCreateMessagePayload(finalUrl, message, username, avatarUrl) ?: return
+        val messagePayload = checkAndCreateMessagePayload(finalUrl, message, username, avatarUrl) ?: return false
 
         val response = postPayload(messagePayload, finalUrl)
         if (response.has("id")) lastMessageID = response.get("id").asLong
 
         ChatUtils.debug("Message sent to webhook.")
+        return true
     }
 
     fun sendEmbedsToWebhook(
@@ -135,14 +136,15 @@ object WebhookUtils {
         username: String? = null,
         avatarUrl: String? = SKYHANNI_URL,
         wait: Boolean = true,
-    ) {
+    ): Boolean {
         val finalUrl = convertToWebhook(webhookUrl, threadID, false, wait)
-        val embedPayload = checkAndCreateEmbedPayload(finalUrl, embeds, username, avatarUrl) ?: return
+        val embedPayload = checkAndCreateEmbedPayload(finalUrl, embeds, username, avatarUrl) ?: return false
 
         val response = postPayload(embedPayload, finalUrl)
         lastMessageID = if (response.has("id")) response.get("id").asLong else null
 
         ChatUtils.debug("Embeds sent to webhook.")
+        return true
     }
 
     fun editMessageEmbeds(
@@ -152,13 +154,15 @@ object WebhookUtils {
         username: String? = null,
         avatarUrl: String? = SKYHANNI_URL,
         wait: Boolean = true,
-    ) {
-        val finalUrl = convertToWebhook(webhookUrl, threadID, false, wait)
-        val embedPayload = checkAndCreateEmbedPayload(finalUrl, embeds, username, avatarUrl) ?: return
+    ): Boolean {
+        val edit = if (lastMessageID != null) true else false
+        val finalUrl = convertToWebhook(webhookUrl, threadID, edit, wait)
+        val embedPayload = checkAndCreateEmbedPayload(finalUrl, embeds, username, avatarUrl) ?: return false
 
-        val response = if (lastMessageID != null) patchPayload(embedPayload, finalUrl) else postPayload(embedPayload, finalUrl)
+        val response = if (edit) patchPayload(embedPayload, finalUrl) else postPayload(embedPayload, finalUrl)
         lastMessageID = if (response.has("id")) response.get("id").asLong else null
 
-        if (lastMessageID != null) ChatUtils.debug("Embeds edited.") else ChatUtils.debug("Embeds sent to webhook.")
+        if (edit) ChatUtils.debug("Embeds edited.") else ChatUtils.debug("Embeds sent to webhook.")
+        return true
     }
 }

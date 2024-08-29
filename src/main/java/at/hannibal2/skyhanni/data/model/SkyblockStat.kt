@@ -44,7 +44,7 @@ enum class SkyblockStat(
     PET_LUCK("§d♣", " Pet Luck: §r§d♣(?<value>.*)", " §d♣ Pet Luck §f(?<value>.*)"),
     FISHING_SPEED("§b☂", " Fishing Speed: §r§b☂(?<value>.*)", " §b☂ Fishing Speed §f(?<value>.*)"),
     DOUBLE_HOOK_CHANCE("§9⚓", " Double Hook Chance: §r§9⚓(?<value>.*)", ""),
-    BONUS_PEST_CHANCE("§2ൠ", " Bonus Pest Chance: §r§2ൠ(?<value>.*)", " §2ൠ Bonus Pest Chance §f(?<value>.*)"),
+    BONUS_PEST_CHANCE("§2ൠ", " (?:§r§7§m)?Bonus Pest Chance: (?:§r§2)?ൠ(?<value>.*)", " (?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?(?<value>.*)"),
     COMBAT_WISDOM("§3☯", " Combat Wisdom: §r§3☯(?<value>.*)", " §3☯ Combat Wisdom §f(?<value>.*)"),
     MINING_WISDOM("§3☯", " Mining Wisdom: §r§3☯(?<value>.*)", " §3☯ Mining Wisdom §f(?<value>.*)"),
     FARMING_WISDOM("§3☯", " Farming Wisdom: §r§3☯(?<value>.*)", " §3☯ Farming Wisdom §f(?<value>.*)"),
@@ -60,7 +60,7 @@ enum class SkyblockStat(
     BREAKING_POWER("§2Ⓟ", "", " §2Ⓟ Breaking Power §f(?<value>.*)"),
     PRISTINE("§5✧", " Pristine: §r§5✧(?<value>.*)", " §5✧ Pristine §f(?<value>.*)"),
     FORAGING_FORTUNE("§☘", " Foraging Fortune: §r§6☘(?<value>.*)", " §6☘ Foraging Fortune §f(?<value>.*)"),
-    FARMING_FORTUNE("§6☘", " §r§7(?:§m)?Farming Fortune: ☘(?<value>.*)", " §7(?:§m)☘ Farming Fortune (?<value>.*)"),
+    FARMING_FORTUNE("§6☘", " (?:§r§7§m)?Farming Fortune: (?:§r§6)?☘(?<value>.*)", " (?:§7§m|§6)☘ Farming Fortune (?:§f)?(?<value>.*)"),
     MINING_FORTUNE("§6☘", " Mining Fortune: §r§6☘(?<value>.*)", " §6☘ Mining Fortune §f(?<value>.*)"),
     FEAR("§a☠", "", ""), // Skyblock does not like fear. It only shows during Great Spook, therefore no Data.
     COLD_RESISTANCE("§b❄", " Cold Resistance: §r§b❄(?<value>.*)", ""),
