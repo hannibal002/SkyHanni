@@ -211,7 +211,8 @@ object EnchantParser {
         val item = currentItem
         val stacking = stackingEnchant
         // The startsWith check is to detect if sba already printed the xp, so that we don't print it again
-        if (config.stackingEnchantProgress && stacking != null && item != null && !(isSbaLoaded && loreList[loreList.size - 1].startsWith("§5§o§7"))) {
+        //LorenzDebug.chatAndLog("SBAADADAD: '${loreList[loreList.size - 2]}'")
+        if (config.stackingEnchantProgress && stacking != null && item != null) { //&& !(isSbaLoaded && loreList[loreList.size - 1].startsWith("§7"))) {
             loreList.add(loreList.size - 1, stacking.progressString(item))
         }
 
