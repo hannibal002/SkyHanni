@@ -146,8 +146,7 @@ object StringUtils {
         matcher(text).let { if (it.find()) consumer(it) else null }
 
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
-    inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
-        toList().matchFirst(pattern, consumer)
+    inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? = toList().matchFirst(pattern, consumer)
 
     @Deprecated("Use the new one instead", ReplaceWith("RegexUtils.matchFirst(pattern, consumer)"))
     inline fun <T> List<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? {
@@ -247,7 +246,6 @@ object StringUtils {
         } ?: text
     }
 
-
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
      * @param list - the list of strings to join into a string, containing 0 or more elements.
@@ -293,8 +291,7 @@ object StringUtils {
         return builder.toString()
     }
 
-    fun String.capAtMinecraftLength(limit: Int) =
-        capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
+    fun String.capAtMinecraftLength(limit: Int) = capAtLength(limit) { Minecraft.getMinecraft().fontRendererObj.getCharWidth(it) }
 
     private fun String.capAtLength(limit: Int, lengthJudger: (Char) -> Int): String {
         var i = 0
@@ -561,4 +558,6 @@ object StringUtils {
     fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.splitCamelCase() = this.replace("([a-z])([A-Z])".toRegex(), "$1 $2");
 }

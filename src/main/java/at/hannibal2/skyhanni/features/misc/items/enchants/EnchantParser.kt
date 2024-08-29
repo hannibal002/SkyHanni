@@ -39,10 +39,11 @@ object EnchantParser {
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
-        "enchants.new", "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)"
+        "enchants.new",
+        "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
-        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
+        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
 
     private var currentItem: ItemStack? = null
@@ -54,6 +55,8 @@ object EnchantParser {
     // Stacking enchants with their progress visible should have the
     // enchants stacked in a single column
     private var shouldBeSingleColumn = false
+
+    private var stackingEnchant: Enchant.Stacking? = null
 
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
@@ -153,6 +156,7 @@ object EnchantParser {
             return
         }
 
+        stackingEnchant = null
         shouldBeSingleColumn = false
         loreLines = mutableListOf()
         orderedEnchants = TreeSet()
@@ -203,6 +207,14 @@ object EnchantParser {
 
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)
+
+        val item = currentItem
+        val stacking = stackingEnchant
+        // The startsWith check is to detect if sba already printed the xp, so that we don't print it again
+        if (config.stackingEnchantProgress && stacking != null && item != null && !(isSbaLoaded && loreList[loreList.size - 1].startsWith("§5§o§7"))) {
+            loreList.add(loreList.size - 1, stacking.progressString(item))
+        }
+
         // Cache parsed lore
         loreCache.updateAfter(loreList)
 
@@ -252,6 +264,10 @@ object EnchantParser {
                     matcher.group("stacking")
                 } else "empty"
 
+                if (enchant is Enchant.Stacking) {
+                    stackingEnchant = enchant
+                }
+
                 // Last found enchant
                 lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)
 
@@ -281,10 +297,10 @@ object EnchantParser {
         // Normal is leaving the formatting as Hypixel provides it
         if (config.format.get() == EnchantParsingConfig.EnchantFormat.NORMAL) {
             normalFormatting(insertEnchants)
-        // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
+            // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
         } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
             compressedFormatting(insertEnchants)
-        // Stacked is always forcing 1 enchant per line
+            // Stacked is always forcing 1 enchant per line
         } else {
             stackedFormatting(insertEnchants)
         }
