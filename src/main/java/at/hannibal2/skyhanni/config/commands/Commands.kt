@@ -336,7 +336,7 @@ object Commands {
         ) { LimboTimeTracker.printStats() }
         registerCommand(
             "shlanedetection",
-            "Detect a farming lane in garden",
+            "Detect a farming lane in the Garden",
         ) { FarmingLaneCreator.commandLaneDetection() }
         registerCommand(
             "shignore",

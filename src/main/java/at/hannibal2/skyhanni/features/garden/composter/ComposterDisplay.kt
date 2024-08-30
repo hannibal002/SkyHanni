@@ -198,7 +198,7 @@ object ComposterDisplay {
             ChatUtils.clickToActionOrDisable(
                 warningMessage,
                 config::warnAlmostClose,
-                actionName = "warp to the garden",
+                actionName = "warp to the Garden",
                 action = { HypixelCommands.warp("garden") },
             )
         }
