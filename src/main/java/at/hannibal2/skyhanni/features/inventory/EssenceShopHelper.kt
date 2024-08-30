@@ -42,7 +42,7 @@ object EssenceShopHelper {
     private var currentProgress: EssenceShopProgress? = null
     private var currentEssenceType: String = ""
     private var currentEssenceItem: NEUInternalName? = null
-    private var ownedEssence: Int = 0
+    private var essenceOwned: Int = 0
     private var essenceNeeded: Int = 0
     private var lastClick = SimpleTimeMark.farPast()
 
@@ -140,7 +140,7 @@ object EssenceShopHelper {
         currentProgress = null
         currentEssenceType = ""
         currentEssenceItem = null
-        ownedEssence = 0
+        essenceOwned = 0
         essenceNeeded = 0
     }
 
@@ -176,23 +176,23 @@ object EssenceShopHelper {
 
                         val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
                         add("§7Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
-                        essenceNeeded = upgradeTotal - ownedEssence
-                        if (essenceNeeded != upgradeTotal) {
-                            add("§7Essence Owned: §8${ownedEssence.addSeparators()}")
-                        }
-                        add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
-                        val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
+                        essenceNeeded = upgradeTotal - essenceOwned
+                        if (essenceOwned > 0) add("§7Essence Owned: §8${essenceOwned.addSeparators()}")
+                        if (essenceNeeded > 0) {
+                            add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
+                            val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
 
-                        val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
-                        val totalInstantPrice = bzInstantPrice * essenceNeeded
-                        add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
+                            val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
+                            val totalInstantPrice = bzInstantPrice * essenceNeeded
+                            add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
 
-                        val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
-                        val totalOrderPrice = bzOrderPrice * essenceNeeded
-                        add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
+                            val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
+                            val totalOrderPrice = bzOrderPrice * essenceNeeded
+                            add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
 
-                        add("")
-                        add("§e§oClick to open Bazaar!")
+                            add("")
+                            add("§e§oClick to open Bazaar!")
+                        } else addAll(listOf("", "§e§oYou have enough essence!"))
                     }
 
                     if (progress.nonRepoUpgrades.any()) {
@@ -233,7 +233,7 @@ object EssenceShopHelper {
             return
         }
         currentEssenceCountPattern.firstMatcher(essenceHeaderStack.getLore()) {
-            ownedEssence = groupOrNull("count")?.formatInt() ?: 0
+            essenceOwned = groupOrNull("count")?.formatInt() ?: 0
         }
     }
 
