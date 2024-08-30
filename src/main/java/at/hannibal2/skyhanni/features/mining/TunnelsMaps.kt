@@ -152,6 +152,8 @@ object TunnelsMaps {
 
     private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".asInternalName() }
 
+    private var isCommission = false
+
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
@@ -180,7 +182,14 @@ object TunnelsMaps {
         }.toMap()
         if (config.autoCommission) {
             clickTranslate.values.firstOrNull()?.let {
+                isCommission = true
                 setActiveAndGoal(it)
+            } ?: run {
+                if (isCommission) {
+                    active = ""
+                    goal = getNext()
+                    isCommission = false
+                }
             }
         }
     }
@@ -198,6 +207,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
+            isCommission = false
             setActiveAndGoal(it)
         }
     }
@@ -283,7 +293,8 @@ object TunnelsMaps {
             }
             addAll(locationDisplay)
         }
-        config.position.renderRenderables(display, posLabel = "TunnelsMaps")
+        config.position.renderRenderables(display, posLabel = "Tunnels Maps")
+
     }
 
     private fun generateLocationsDisplay() = buildList {
@@ -361,6 +372,7 @@ object TunnelsMaps {
     }
 
     private fun guiSetActive(it: String): () -> Unit = {
+        isCommission = false
         setActiveAndGoal(it)
     }
 
