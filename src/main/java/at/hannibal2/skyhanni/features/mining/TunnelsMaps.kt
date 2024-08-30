@@ -187,7 +187,7 @@ object TunnelsMaps {
             } ?: run {
                 if (isCommission) {
                     active = ""
-                    goal = getNext()
+                    goal = null
                     isCommission = false
                 }
             }
