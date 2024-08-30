@@ -207,7 +207,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
-            isCommission = false
+            isCommission = true
             setActiveAndGoal(it)
         }
     }
