@@ -40,7 +40,7 @@ object PowderPerHotmPerk {
         if (indexOfCost == -1) return
 
         val powderFor10Levels =
-            perk.calculateTotalCost(perk.rawLevel + 10) - perk.calculateTotalCost(perk.rawLevel)
+            perk.calculateTotalCost((perk.rawLevel + 10).coerceAtMost(perk.maxLevel)) - perk.calculateTotalCost(perk.rawLevel)
 
         event.toolTip.add(indexOfCost + 2, "§7Powder for 10 levels: §e${powderFor10Levels.addSeparators()}")
     }
@@ -85,6 +85,5 @@ object PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory &&
-        (config.powderSpent || config.powderFor10Levels)
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory && (config.powderSpent || config.powderFor10Levels)
 }

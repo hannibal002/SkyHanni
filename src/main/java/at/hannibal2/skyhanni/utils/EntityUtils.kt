@@ -41,15 +41,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object EntityUtils {
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
-    ): Boolean {
-        return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
-    }
+    ): Boolean = getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
@@ -68,6 +67,7 @@ object EntityUtils {
         it.getNameAsString().contains(contains)
     }
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
@@ -76,6 +76,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
@@ -107,9 +108,10 @@ object EntityUtils {
         return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
     }
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    // TODO remove baseMaxHealth
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
