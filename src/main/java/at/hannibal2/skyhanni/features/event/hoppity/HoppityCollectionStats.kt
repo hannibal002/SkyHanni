@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -31,6 +33,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -97,6 +100,23 @@ object HoppityCollectionStats {
     )
 
     /**
+     * REGEX-TEST: §6Factory Milestones§7.,
+     *
+     */
+    private val factoryMilestone by RepoPattern.pattern(
+        "rabbit.requirement.factory",
+        "§6Factory Milestones",
+    )
+
+    /**
+     * REGEX-TEST: §6Shop Milestones§7.,
+     */
+    private val shopMilestone by RepoPattern.pattern(
+        "rabbit.requirement.shop",
+        "§6Shop Milestones",
+    )
+
+    /**
      * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
      */
     private val locationRequirementDescription by patternGroup.pattern(
@@ -132,14 +152,67 @@ object HoppityCollectionStats {
 
     var inInventory = false
 
+    var highlightMet = false
+    var highlightNotMet = false
+    var highlightShop = false
+    var highlightFactory = false
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
-        if (!pagePattern.matches(event.inventoryName)) return
+        if (!pagePattern.matches(event.inventoryName)) {
+            highlightMap.clear()
+            return
+        }
 
         inInventory = true
         if (config.hoppityCollectionStats) {
             display = buildDisplay(event)
+        }
+
+        highlightMet = false
+        highlightNotMet = false
+        highlightShop = false
+        highlightFactory = false
+
+        when (config.highlightMilestoneRabbits) {
+            ChocolateFactoryConfig.HighlightMilestoneRabbits.BOTH -> {
+                highlightShop = true
+                highlightFactory = true
+            }
+            ChocolateFactoryConfig.HighlightMilestoneRabbits.SHOP -> highlightShop = true
+            ChocolateFactoryConfig.HighlightMilestoneRabbits.FACTORY -> highlightFactory = true
+            ChocolateFactoryConfig.HighlightMilestoneRabbits.NONE -> {}
+        }
+
+        when (config.highlightRequirementRabbits) {
+            ChocolateFactoryConfig.HighlightRequirementRabbits.BOTH -> {
+                highlightMet = true
+                highlightNotMet = true
+            }
+            ChocolateFactoryConfig.HighlightRequirementRabbits.MET -> highlightMet = true
+            ChocolateFactoryConfig.HighlightRequirementRabbits.NOTMET -> highlightNotMet = true
+            ChocolateFactoryConfig.HighlightRequirementRabbits.NONE -> {}
+        }
+    }
+
+    private var highlightMap = mutableMapOf<String, LorenzColor>()
+
+    @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        for ((slot, stack) in event.inventoryItems) {
+            val lore = stack.getLore()
+
+            if (lore.isEmpty()) continue
+            if (!rabbitNotFoundPattern.anyMatches(lore) && !config.highlightFoundRabbits) continue
+
+            highlightMap[stack.displayName] = when {
+                lore.any { requirementNotMet.find(it) } && highlightNotMet -> LorenzColor.RED
+                lore.any { requirementMet.find(it) } && highlightMet -> LorenzColor.GREEN
+                lore.any { shopMilestone.find(it) } && highlightShop -> LorenzColor.GOLD
+                lore.any { factoryMilestone.find(it) } && highlightFactory -> LorenzColor.YELLOW
+                else -> continue
+            }
         }
     }
 
@@ -161,22 +234,17 @@ object HoppityCollectionStats {
         )
     }
 
-    // TODO cache with inventory update event
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!config.highlightRabbitsWithRequirement) return
         if (!inInventory) return
+        if (!(highlightNotMet || highlightMet || highlightFactory || highlightShop)) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.stack.getLore()
-            if (lore.any { requirementMet.find(it) } && !config.onlyHighlightRequirementNotMet)
-                slot highlight LorenzColor.GREEN
-            if (lore.any { requirementNotMet.find(it) }) {
-                val found = !rabbitNotFoundPattern.anyMatches(lore)
-                // Hypixel allows purchasing Rabbits from Hoppity NPC even when the requirement is not yet met.
-                if (!found) {
-                    slot highlight LorenzColor.RED
-                }
+            if (slot.stack.displayName.isEmpty()) continue
+
+            val name = slot.stack.displayName
+            if (highlightMap.containsKey(name)) {
+                slot highlight highlightMap[name]!!
             }
         }
     }
