@@ -80,6 +80,11 @@ object PartyCommands {
         if (!config.reversePT.command) return
         if (PartyAPI.partyMembers.isEmpty()) return
         val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
+
+        autoPartyTransfer(prevPartyLeader)
+    }
+
+    private fun autoPartyTransfer(prevPartyLeader: String) {
         HypixelCommands.partyTransfer(prevPartyLeader)
         config.reversePT.message?.let {
             if (it.isNotBlank()) {
@@ -93,9 +98,7 @@ object PartyCommands {
         if (!config.partyKickReason) {
             return
         }
-        if (!event.message.startsWith("/party kick ", ignoreCase = true)
-            && !event.message.startsWith("/p kick ", ignoreCase = true)
-        ) {
+        if (!event.message.startsWith("/party kick ", ignoreCase = true) && !event.message.startsWith("/p kick ", ignoreCase = true)) {
             return
         }
         val args = event.message.substringAfter("kick").trim().split(" ")
@@ -149,12 +152,7 @@ object PartyCommands {
 
         ChatUtils.clickableChat(
             event.message,
-            onClick = {
-                HypixelCommands.partyTransfer(prevPartyLeader)
-                if (config.reversePT.message.isNotBlank()) {
-                    HypixelCommands.partyChat(config.reversePT.message)
-                }
-            },
+            onClick = { autoPartyTransfer(prevPartyLeader) },
             prefix = false,
         )
     }
