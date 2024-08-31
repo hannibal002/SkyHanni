@@ -37,9 +37,14 @@ object GuardianReminder {
         "mainmenu",
         "Experimentation Table",
     )
+
+    /**
+     * REGEX-TEST: §dGuardian
+     * REGEX-TEST: §9Guardian§e
+     */
     private val petNamePattern by patternGroup.pattern(
         "guardianpet",
-        "§[956d]Guardian",
+        "§[956d]Guardian.*",
     )
 
     @SubscribeEvent
