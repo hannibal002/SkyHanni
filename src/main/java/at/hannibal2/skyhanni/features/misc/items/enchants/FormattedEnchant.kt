@@ -7,7 +7,7 @@ class FormattedEnchant(
     private val enchant: Enchant,
     private val level: Int,
     stacking: String,
-    private val isRoman: Boolean
+    private val isRoman: Boolean,
 ) : Comparable<FormattedEnchant> {
     private val stacking: String = stacking
         get() = "§8$field"

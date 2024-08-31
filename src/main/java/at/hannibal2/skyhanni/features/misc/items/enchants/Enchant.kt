@@ -60,7 +60,7 @@ open class Enchant : Comparable<Enchant> {
      * @param level The level of the enchant currently being parsed
      * @param itemStack The ItemStack of the hovered item. Can be null, e.g. when hovering over `/show` items
      */
-    private fun checkExceptions(color: Property<LorenzColor>, level: Int, itemStack: ItemStack?) : Property<LorenzColor> {
+    private fun checkExceptions(color: Property<LorenzColor>, level: Int, itemStack: ItemStack?): Property<LorenzColor> {
         val config = SkyHanniMod.feature.inventory.enchantParsing
 
         val itemCategory = itemStack?.getItemCategoryOrNull()
@@ -70,7 +70,8 @@ open class Enchant : Comparable<Enchant> {
             // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
             // color the enchant as max
             if (itemName == "Stonk" ||
-                (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")) {
+                (itemCategory != null && !ItemCategory.miningTools.contains(itemCategory) && level == 5 && itemName != "Promising Shovel")
+            ) {
                 return config.perfectEnchantColor
             }
         }
