@@ -43,13 +43,14 @@ object BitsPerCookieVisual {
         if (wrongCookiePattern.matches(event.itemStack.name)) return
         var timeReplaced = false
 
-        val (cookieAmount, loreIndex) = amountPattern.firstMatcherWithIndex(event.toolTip) {
+        val toolTip = event.toolTip
+        val (cookieAmount, loreIndex) = amountPattern.firstMatcherWithIndex(toolTip) {
             group("amount").toInt() to it
         } ?: (1 to 0)
-        val positionIndex = timePattern.indexOfFirstMatch(event.toolTip)?.also {
+        val positionIndex = timePattern.indexOfFirstMatch(toolTip)?.also {
             timeReplaced = true
             if (config.bulkBuyCookieTime) {
-                event.toolTip.removeAt(it)
+                toolTip.removeAt(it)
             }
         } ?: (loreIndex + 1)
 
@@ -60,15 +61,15 @@ object BitsPerCookieVisual {
         var index = positionIndex
 
         if (timeReplaced) {
-            if (config.bulkBuyCookieTime) event.toolTip.add(index++, "§7§b$duration §7days")
-            event.toolTip.add(index++, "")
+            if (config.bulkBuyCookieTime) toolTip.add(index++, "§7§b$duration §7days")
+            toolTip.add(index++, "")
         } else {
-            event.toolTip.add(index++, "")
-            if (config.bulkBuyCookieTime) event.toolTip.add(index++, "§8‣ §7Cookie Buff for §b$duration §7days")
+            toolTip.add(index++, "")
+            if (config.bulkBuyCookieTime) toolTip.add(index++, "§8‣ §7Cookie Buff for §b$duration §7days")
         }
 
-        if (config.showBitsOnCookie) event.toolTip.add(index++, "§8‣ §7Gain §b${gain.addSeparators()} Bits")
-        if (config.showBitsChangeOnCookie) event.toolTip.add(
+        if (config.showBitsOnCookie) toolTip.add(index++, "§8‣ §7Gain §b${gain.addSeparators()} Bits")
+        if (config.showBitsChangeOnCookie) toolTip.add(
             index++,
             "§8‣ §7Available Bits: §3${BitsAPI.bitsAvailable.addSeparators()} §6→ §3${newAvailable.addSeparators()}",
         )
