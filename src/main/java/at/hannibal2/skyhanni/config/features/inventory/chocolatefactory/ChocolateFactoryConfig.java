@@ -182,9 +182,9 @@ public class ChocolateFactoryConfig {
     public boolean highlightFoundRabbits = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Milestone Rabbits", desc = "Highlight rabbits obtained from milestones:\n" +
-        "§eYellow: Factory Milestone rabbit.\n" +
-        "§6Gold: Shop Milestone rabbit.\"")
+    @ConfigOption(name = "Highlight Milestones", desc = "Highlight rabbits obtained from milestones:\n" +
+        "§eYellow: Factory Milestone.\n" +
+        "§6Gold: Shop Milestone.")
     @ConfigEditorDropdown
     @NotNull
     public HighlightMilestoneRabbits highlightMilestoneRabbits = HighlightMilestoneRabbits.BOTH;
@@ -206,7 +206,7 @@ public class ChocolateFactoryConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Highlight Requirement Rabbits", desc = "Highlight rabbits with requirements:\n" +
+    @ConfigOption(name = "Highlight Requirements", desc = "Highlight rabbits with requirements:\n" +
         "§cRed: Requirement not met.\n" +
         "§aGreen: Requirement met.")
     @ConfigEditorDropdown
