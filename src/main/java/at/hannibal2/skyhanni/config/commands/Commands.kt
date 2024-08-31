@@ -358,7 +358,7 @@ object Commands {
         ) { ColorFormattingHelper.printColorCodeList() }
         registerCommand(
             "shtps",
-            "Informs the TPS"
+            "Informs in chat about the server ticks per second (TPS)."
         ) { TpsCounter.tpsCommand() }
     }
 
