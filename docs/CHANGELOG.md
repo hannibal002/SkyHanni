@@ -4,6 +4,27 @@
 
 ### New Features
 
+#### Garden Features
+
++ Added No Pests Chat Filter. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
+    + Removed the chat message "There are no Pests on your Garden!".
++ Added No Pests Title. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
+    + Shows a title when you use the Pest Tracker without any pests to clear.
+
+#### Mining Features
+
++ Added a "Get from Sack" button in the forge recipe menu to retrieve ingredients. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2106)
+
+#### Rift Features
+
++ Added Motes per Session. - Empa (https://github.com/hannibal002/SkyHanni/pull/2323)
+
+#### Dungeon Features
+
++ Added highlight for starred dungeon mobs. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1558)
++ Added highlight for Fel skulls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1558)
+    + Optionally draws a line to them as well.
+
 #### Scoreboard Features
 
 + Added Soulflow to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
@@ -14,7 +35,32 @@
 + Added Hoppity Hunt event summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
     + Use /shhoppitystats for live stats.
 
+#### GUI Features
+
++ Added Editable XP Bar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1944)
+    + Enabled moving and scaling of the XP bar in the SkyHanni GUI Editor.
+
+#### Inventory Features
+
++ Added a warning when opening the Experimentation Table without a Guardian pet. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2127)
++ Added Enchanting Experience as Stack Size in Experimentation Table. - saga (https://github.com/hannibal002/SkyHanni/pull/1988)
+    + Added to the Item Number list.
++ Show dye hex code as the actual color in the item lore. - nopo (https://github.com/hannibal002/SkyHanni/pull/2321)
+
+#### Chat Features
+
++ Added `/shcolors` command. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2216)
+    + Prints a list of all Minecraft color and formatting codes in chat.
++ Added Remind command. - ThatGravyBoat & Zickles (https://github.com/hannibal002/SkyHanni/pull/1708)
+    + Use `/shremind <time> <note>` to set reminders for your future self.
+
 ### Improvements
+
+#### Mining Improvements
+
++ Now allows modifying the Mineshaft spawn message without requiring the Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2308)
++ Added reset command for Fossil Excavator Profit Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2408)
++ Added current session and total Mineshaft count to the Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2310)
 
 #### Diana Improvements
 
@@ -31,10 +77,17 @@
 #### Inventory Improvements
 
 + Added a toggle for displaying SkyHanni User Luck in Skyblock Stats. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2357)
++ Improved the clicked block highlight feature. - Vahvl & j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2166)
+    + Added extensive customization options for colors, locked chest detection, and more.
++ Improved Enchant Parsing compatibility with other mods. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1717)
+    + Now works with SBA's Convert Roman Numerals feature.
+    + Now works with NEU's inventories, such as `/pv` and storage overlay.
 
 #### Chat Improvements
 
 + Added support for changing the translation language when clicking on a chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2403)
++ Added support for using the "/gfs <item>" command without specifying an amount. - saga (https://github.com/hannibal002/SkyHanni/pull/1927)
+    + The default value can be modified in the config.
 
 #### Hoppity Improvements
 
@@ -68,6 +121,7 @@
 
 + Added new Pure Ores support. - Empa (https://github.com/hannibal002/SkyHanni/pull/2388)
 + Fixed a typo in corpse detection. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/2386)
++ Fixed a compatibility issue in Fossil Solver with resource packs like Hypixel+. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2409)
 
 #### Scoreboard Fixes
 
@@ -81,12 +135,14 @@
 + Fixed Custom Scoreboard Error when no repository exists. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2407)
 + Fixed rounded rectangles not working with a scale less than 1. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2404)
     + E.g. Custom Scoreboard Background.
++ Fixed rare Custom Scoreboard errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2411)
 
 #### Hoppity Fixes
 
 + Fixed "Side Dish" and Milestone rabbits not sending a message when Compact Hoppity is enabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
 + Fixed rabbit rarity not appearing on compacted Duplicate rabbit messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2383)
 + Fixed "Highlight Requirement Rabbits" requiring "Hoppity Collection Stats" to function. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2398)
++ Fixed minor formatting issues with Hoppity Event Summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2416)
 
 #### Misc Fixes
 
@@ -103,6 +159,7 @@
 + Added `RabbitFoundEvent`, which will be fired when a chocolate rabbit is found from an egg, bought from Hoppity, or claimed from a milestone. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
 + Added `SIDE_DISH`, `CHOCOLATE_SHOP_MILESTONE`, `CHOCOLATE_FACTORY_MILESTONE`, and `BOUGHT` as `HoppityEggType` options. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
 + Added version to download source checker popup message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2400)
++ Added "hex string to color int" method in ColorUtils. - nopo (https://github.com/hannibal002/SkyHanni/pull/2321)
 
 ## Version 0.26
 

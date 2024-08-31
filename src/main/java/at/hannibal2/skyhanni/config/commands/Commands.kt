@@ -10,10 +10,12 @@ import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
+import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
@@ -55,6 +57,7 @@ import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
+import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
@@ -281,6 +284,10 @@ object Commands {
             "Resets the Stray Rabbit Tracker",
         ) { ChocolateFactoryStrayTracker.resetCommand() }
         registerCommand(
+            "shresetexcavatortracker",
+            "Resets the Fossil Excavator Profit Tracker",
+        ) { ExcavatorProfitTracker.resetCommand() }
+        registerCommand(
             "shfandomwiki",
             "Searches the fandom wiki with SkyHanni's own method.",
         ) { WikiManager.otherWikiCommands(it, true) }
@@ -342,8 +349,12 @@ object Commands {
         ) { PestFinder.teleportNearestInfestedPlot() }
         registerCommand(
             "shhoppitystats",
-            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
+            "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats.",
         ) { HoppityEventSummary.sendStatsMessage(it) }
+        registerCommand(
+            "shcolors",
+            "Prints a list of all Minecraft color & formatting codes in chat.",
+        ) { ColorFormattingHelper.printColorCodeList() }
     }
 
     private fun usersBugFix() {
@@ -460,6 +471,10 @@ object Commands {
             "Sets the current skyblock island for testing purposes.",
         ) { SkyBlockIslandTest.onCommand(it) }
         registerCommand("shdebugprice", "Debug different price sources for an item.") { ItemPriceUtils.debugItemPrice(it) }
+        registerCommand(
+            "shdebugscoreboard",
+            "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update.",
+        ) { ScoreboardData.toggleMonitor() }
     }
 
     private fun developersCodingHelp() {
