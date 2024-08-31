@@ -43,10 +43,9 @@ object ChocolateFactoryBlockOpen {
         ChatUtils.clickToActionOrDisable(
             "§cBlocked opening the Chocolate Factory without a §dMythic Rabbit Pet §cequipped!",
             config::mythicRabbitRequirement,
-            "open pets menu",
-        ) {
-            HypixelCommands.pet()
-        }
+            actionName = "open pets menu",
+            action = { HypixelCommands.pet() },
+        )
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.mythicRabbitRequirement
