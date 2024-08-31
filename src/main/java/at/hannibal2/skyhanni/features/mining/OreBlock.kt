@@ -222,7 +222,7 @@ enum class OreBlock(
         checkArea = { inGlacite },
     ),
     LOW_TIER_TUNGSTEN(
-        checkBlock = { it.block == Blocks.cobblestone },
+        checkBlock = { it.block.let { it == Blocks.cobblestone || it == Blocks.monster_egg } },
         checkArea = { inGlacite },
     ),
     HIGH_TIER_TUNGSTEN(
@@ -240,13 +240,12 @@ enum class OreBlock(
     }
 }
 
-private fun isLowTierMithril(state: IBlockState): Boolean {
-    return when (state.block) {
+private fun isLowTierMithril(state: IBlockState): Boolean =
+    when (state.block) {
         Blocks.wool -> state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY
         Blocks.stained_hardened_clay -> state.getValue(BlockColored.COLOR) == EnumDyeColor.CYAN
         else -> false
     }
-}
 
 private fun isHighTierMithril(state: IBlockState): Boolean {
     return (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.LIGHT_BLUE)
