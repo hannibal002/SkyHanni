@@ -22,8 +22,8 @@ object RegexUtils {
     }
 
     inline fun <T> Pattern.firstMatcherWithIndex(sequence: Sequence<String>, consumer: Matcher.(Int) -> T): T? {
-        for ((index,line) in sequence.withIndex()) {
-            matcher(line).let { if (it.matches()) return consumer(it,index) }
+        for ((index, line) in sequence.withIndex()) {
+            matcher(line).let { if (it.matches()) return consumer(it, index) }
         }
         return null
     }
@@ -33,7 +33,8 @@ object RegexUtils {
 
     inline fun <T> Pattern.firstMatcher(list: List<String>, consumer: Matcher.() -> T): T? = firstMatcher(list.asSequence(), consumer)
 
-    inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? = firstMatcherWithIndex(list.asSequence(), consumer)
+    inline fun <T> Pattern.firstMatcherWithIndex(list: List<String>, consumer: Matcher.(Int) -> T): T? =
+        firstMatcherWithIndex(list.asSequence(), consumer)
 
     @Deprecated("", ReplaceWith("pattern.matchAll(this) { consumer() }"))
     inline fun <T> List<String>.matchAll(pattern: Pattern, consumer: Matcher.() -> T): T? = pattern.matchAll(this, consumer)
