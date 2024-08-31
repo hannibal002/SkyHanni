@@ -332,7 +332,7 @@ object NEUItems {
             val id = current.first
             return if (current.second > 1) {
                 val child = getPrimitiveMultiplier(id, tryCount + 1)
-                val result = child.multiply(current.second)
+                val result = child.times(current.second)
                 multiplierCache[internalName] = result
                 result
             } else {

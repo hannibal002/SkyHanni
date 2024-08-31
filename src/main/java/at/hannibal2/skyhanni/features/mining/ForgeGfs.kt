@@ -8,12 +8,13 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
@@ -78,27 +79,16 @@ object ForgeGfs {
         // Search for the first 4 columns only
         // Normally would be 3, but the gemstone mixture is the only one that overflows to 4
 
-        for (i in 0..53) {
-            if (i % 9 <= 3) {
-                val currentItem = event.container.getSlot(i).stack
-                val amount = currentItem.stackSize
-                val currItemInternalName = currentItem.getInternalNameOrNull() ?: continue
-                if (SackAPI.sackListInternalNames.contains(currItemInternalName.asString())) {
-                    itemMap.addAndFold(currItemInternalName, amount)
-                }
+        for (i in CollectionUtils.takeColumn(0, 53, 0, 4)) {
+            val currentItem = event.container.getSlot(i).stack
+            val amount = currentItem.stackSize
+            val currItemInternalName = currentItem.getInternalNameOrNull() ?: continue
+            if (SackAPI.sackListInternalNames.contains(currItemInternalName.asString())) {
+                itemMap.addOrPut(currItemInternalName, amount)
             }
         }
 
-        for ((internalName, amount) in itemMap) {
-            val getItYet = GetFromSackAPI.getFromSack(internalName, amount)
-            if (!getItYet) {
-                ChatUtils.chat("§cFailed to get $amount ${internalName.itemNameWithoutColor} from sacks.")
-            }
-        }
-    }
-
-    private fun MutableMap<NEUInternalName, Int>.addAndFold(key: NEUInternalName, value: Int) {
-        this[key] = this.getOrDefault(key, 0) + value
+        GetFromSackAPI.getFromSack(itemMap.map { it.key.makePrimitiveStack(it.value) })
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.forgeGfs
