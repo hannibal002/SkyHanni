@@ -239,7 +239,7 @@ public class ChocolateFactoryConfig {
 
     @Expose
     @ConfigOption(
-        name = "Highlight Abi", desc = "Highlights rabbit obtained through Hoppity's contact:" +
+        name = "Highlight Abi", desc = "Highlights rabbit obtained through Hoppity's contact:\n" +
             "§0Black: Abi"
     )
     @ConfigEditorBoolean
