@@ -39,10 +39,11 @@ object EnchantParser {
 
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
-        "enchants.new", "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>§9, |\$| §8\\d{1,3}(,\\d{3})*)"
+        "enchants.new",
+        "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
-        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*"
+        "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
     )
 
     private var currentItem: ItemStack? = null
@@ -115,6 +116,8 @@ object EnchantParser {
     fun onChatHoverEvent(event: ChatHoverEvent) {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return
+
+        currentItem = null
 
         val lore = event.getHoverEvent().value.formattedText.split("\n").toMutableList()
 
@@ -281,10 +284,10 @@ object EnchantParser {
         // Normal is leaving the formatting as Hypixel provides it
         if (config.format.get() == EnchantParsingConfig.EnchantFormat.NORMAL) {
             normalFormatting(insertEnchants)
-        // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
+            // Compressed is always forcing 3 enchants per line, except when there is stacking enchant progress visible
         } else if (config.format.get() == EnchantParsingConfig.EnchantFormat.COMPRESSED && !shouldBeSingleColumn) {
             compressedFormatting(insertEnchants)
-        // Stacked is always forcing 1 enchant per line
+            // Stacked is always forcing 1 enchant per line
         } else {
             stackedFormatting(insertEnchants)
         }
@@ -297,7 +300,7 @@ object EnchantParser {
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
             val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
-            builder.append(orderedEnchant.getFormattedString())
+            builder.append(orderedEnchant.getFormattedString(currentItem))
             if (i % maxEnchantsPerLine != maxEnchantsPerLine - 1) {
                 builder.append(comma)
             } else {
@@ -320,7 +323,7 @@ object EnchantParser {
         for ((i, orderedEnchant: FormattedEnchant) in orderedEnchants.withIndex()) {
             val comma = if (commaFormat == CommaFormat.COPY_ENCHANT) ", " else "§9, "
 
-            builder.append(orderedEnchant.getFormattedString())
+            builder.append(orderedEnchant.getFormattedString(currentItem))
 
             if (itemIsBook() && maxEnchantsPerLine == 1) {
                 insertEnchants.add(builder.toString())
@@ -342,12 +345,12 @@ object EnchantParser {
     private fun stackedFormatting(insertEnchants: MutableList<String>) {
         if (!config.hideEnchantDescriptions.get() || itemIsBook()) {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getFormattedString())
+                insertEnchants.add(enchant.getFormattedString(currentItem))
                 insertEnchants.addAll(enchant.getLore())
             }
         } else {
             for (enchant: FormattedEnchant in orderedEnchants) {
-                insertEnchants.add(enchant.getFormattedString())
+                insertEnchants.add(enchant.getFormattedString(currentItem))
             }
         }
     }

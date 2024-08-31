@@ -20,6 +20,7 @@ object SoundUtils {
 
     fun ISound.playSound() {
         Minecraft.getMinecraft().addScheduledTask {
+            if (Minecraft.getMinecraft().soundHandler.isSoundPlaying(this)) return@addScheduledTask
             val gameSettings = Minecraft.getMinecraft().gameSettings
             val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
             if (!SkyHanniMod.feature.misc.maintainGameVolume) {
@@ -38,7 +39,7 @@ object SoundUtils {
                 }
                 ErrorManager.logErrorWithData(
                     e, "Failed to play a sound",
-                    "soundLocation" to this.soundLocation
+                    "soundLocation" to this.soundLocation,
                 )
             } finally {
                 if (!SkyHanniMod.feature.misc.maintainGameVolume) {
