@@ -33,6 +33,7 @@ object TpsCounter {
     init {
         // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
+            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
             if (ignoreFirstTicks > 0) {
@@ -62,6 +63,7 @@ object TpsCounter {
         }
         // TODO use DelayedRun
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
+            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
 
             if (hasPacketReceived) {
                 hasPacketReceived = false
@@ -84,6 +86,7 @@ object TpsCounter {
 
     @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
     fun onPacketReceive(event: PacketReceivedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         hasPacketReceived = true
     }
 

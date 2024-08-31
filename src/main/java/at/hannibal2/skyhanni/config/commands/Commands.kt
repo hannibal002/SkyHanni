@@ -63,7 +63,6 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
-import at.hannibal2.skyhanni.features.misc.MiscFeatures
 import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
@@ -476,7 +475,10 @@ object Commands {
             "shtestisland",
             "Sets the current skyblock island for testing purposes.",
         ) { SkyBlockIslandTest.onCommand(it) }
-        registerCommand("shdebugprice", "Debug different price sources for an item.") { ItemPriceUtils.debugItemPrice(it) }
+        registerCommand(
+            "shdebugprice",
+            "Debug different price sources for an item."
+        ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
             "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update.",
