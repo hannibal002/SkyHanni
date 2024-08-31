@@ -230,6 +230,23 @@ public class ChocolateFactoryConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Highlight Strays", desc = "Highlights rabbits obtained through Stray rabbits:\n" +
+            "§9Blue: Stray rabbits"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightStrays = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Highlight Abi", desc = "Highlights rabbit obtained through Hoppity's contact:" +
+            "§0Black: Abi"
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightAbi = true;
+
+    @Expose
     @ConfigOption(
         name = "Show Missing Location Rabbits",
         desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location."
