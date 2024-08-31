@@ -21,63 +21,63 @@ object PartyAPI {
     private val patternGroup = RepoPattern.group("data.party")
     private val youJoinedPartyPattern by patternGroup.pattern(
         "you.joined",
-        "§eYou have joined (?<name>.*)'s? §eparty!"
+        "§eYou have joined (?<name>.*)'s? §eparty!",
     )
     private val othersJoinedPartyPattern by patternGroup.pattern(
         "others.joined",
-        "(?<name>.*) §ejoined the party\\."
+        "(?<name>.*) §ejoined the party\\.",
     )
     private val othersInThePartyPattern by patternGroup.pattern(
         "others.inparty",
-        "§eYou'll be partying with: (?<names>.*)"
+        "§eYou'll be partying with: (?<names>.*)",
     )
     private val otherLeftPattern by patternGroup.pattern(
         "others.left",
-        "(?<name>.*) §ehas left the party\\."
+        "(?<name>.*) §ehas left the party\\.",
     )
     private val otherKickedPattern by patternGroup.pattern(
         "others.kicked",
-        "(?<name>.*) §ehas been removed from the party\\."
+        "(?<name>.*) §ehas been removed from the party\\.",
     )
     private val otherOfflineKickedPattern by patternGroup.pattern(
         "others.offline",
-        "§eKicked (?<name>.*) because they were offline\\."
+        "§eKicked (?<name>.*) because they were offline\\.",
     )
     private val otherDisconnectedPattern by patternGroup.pattern(
         "others.disconnect",
-        "(?<name>.*) §ewas removed from your party because they disconnected\\."
+        "(?<name>.*) §ewas removed from your party because they disconnected\\.",
     )
     private val transferOnLeavePattern by patternGroup.pattern(
         "others.transfer.leave",
-        "The party was transferred to (?<newowner>.*) because (?<name>.*) left"
+        "The party was transferred to (?<newowner>.*) because (?<name>.*) left",
     )
     val transferVoluntaryPattern by patternGroup.pattern(
         "others.transfer.voluntary",
-        "The party was transferred to (?<newowner>.*) by (?<name>.*)"
+        "The party was transferred to (?<newowner>.*) by (?<name>.*)",
     )
     private val disbandedPattern by patternGroup.pattern(
         "others.disband",
-        ".* §ehas disbanded the party!"
+        ".* §ehas disbanded the party!",
     )
     private val kickedPattern by patternGroup.pattern(
         "you.kicked",
-        "§eYou have been kicked from the party by .* §e"
+        "§eYou have been kicked from the party by .* §e",
     )
     private val partyMembersStartPattern by patternGroup.pattern(
         "members.start",
-        "§6Party Members \\(\\d+\\)"
+        "§6Party Members \\(\\d+\\)",
     )
     private val partyMemberListPattern by patternGroup.pattern(
         "members.list.withkind",
-        "Party (?<kind>Leader|Moderators|Members): (?<names>.*)"
+        "Party (?<kind>Leader|Moderators|Members): (?<names>.*)",
     )
     private val kuudraFinderJoinPattern by patternGroup.pattern(
         "kuudrafinder.join",
-        "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)"
+        "§dParty Finder §f> (?<name>.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)",
     )
     private val dungeonFinderJoinPattern by patternGroup.pattern(
         "dungeonfinder.join",
-        "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)"
+        "§dParty Finder §f> (?<name>.*?) §ejoined the dungeon group! \\(§[a-fA-F0-9].* Level \\d+§[a-fA-F0-9]\\)",
     )
 
     val partyMembers = mutableListOf<String>()
