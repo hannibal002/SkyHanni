@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -12,10 +13,8 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -32,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -111,11 +111,12 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onFarmingIsland()) return
-        if (!config.trapperSolver) return
         updateTrapper()
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
-        if (questActive) TrevorSolver.findMob()
+        if (config.trapperSolver && questActive) {
+            TrevorSolver.findMob()
+        }
     }
 
     @SubscribeEvent
@@ -143,7 +144,7 @@ object TrevorFeatures {
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = if (GardenCropSpeed.finneganPerkActive()) 16 else 21
+            timeUntilNextReady = if (Perk.PELT_POCALYPSE.isActive) 16 else 21
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
@@ -172,7 +173,7 @@ object TrevorFeatures {
         }
 
         clickOptionPattern.findMatcher(event.message) {
-            event.chatComponent.siblings.forEach { sibling ->
+            for (sibling in event.chatComponent.siblings) {
                 if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
                     lastChatPrompt = sibling.chatStyle.chatClickEvent.value.substringAfter(" ")

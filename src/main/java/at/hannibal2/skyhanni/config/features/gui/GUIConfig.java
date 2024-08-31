@@ -51,7 +51,7 @@ public class GUIConfig {
     public float globalScale = 1F;
 
     @Expose
-    @ConfigOption(name = "Time Format", desc = "Change Skyhanni to use 24h time instead of 12h time.")
+    @ConfigOption(name = "Time Format", desc = "Change SkyHanni to use 24h time instead of 12h time.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeFormat24h = false;
@@ -65,6 +65,11 @@ public class GUIConfig {
     @ConfigOption(name = "Hotbar", desc = "Settings for adjusting the hotbar")
     @Accordion
     public HotbarConfig hotbar = new HotbarConfig();
+
+    @Expose
+    @ConfigOption(name = "Xp Bar", desc = "Settings for adjusting the xp bar")
+    @Accordion
+    public XPBarConfig xpBar = new XPBarConfig();
 
     @Expose
     @ConfigOption(name = "Marked Players", desc = "Players that got marked with §e/shmarkplayer§7.")
@@ -87,7 +92,7 @@ public class GUIConfig {
     public InGameDateConfig inGameDate = new InGameDateConfig();
 
     @Expose
-    @ConfigOption(name = "Beacon Power", desc = "Displays the current beacon power duration and what stat is boosted.")
+    @ConfigOption(name = "Beacon Power", desc = "Display the current beacon power duration and what stat is boosted.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean beaconPower = false;

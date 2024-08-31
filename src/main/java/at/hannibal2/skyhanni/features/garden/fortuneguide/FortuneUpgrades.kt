@@ -107,11 +107,11 @@ object FortuneUpgrades {
             when (item.getReforgeName()) {
                 "rooted" -> {}
                 "blooming" -> {
-                    reforgeItem(item, FarmingReforges.ROOTED, genericUpgrades)
+                    reforgeItem(item, FarmingReforge.ROOTED, genericUpgrades)
                 }
 
                 else -> {
-                    reforgeItem(item, FarmingReforges.BLOOMING, genericUpgrades)
+                    reforgeItem(item, FarmingReforge.BLOOMING, genericUpgrades)
                 }
             }
         }
@@ -126,11 +126,11 @@ object FortuneUpgrades {
             when (item.getReforgeName()) {
                 "mossy" -> {}
                 "bustling" -> {
-                    reforgeItem(item, FarmingReforges.MOSSY, genericUpgrades)
+                    reforgeItem(item, FarmingReforge.MOSSY, genericUpgrades)
                 }
 
                 else -> {
-                    reforgeItem(item, FarmingReforges.BUSTLING, genericUpgrades, 100)
+                    reforgeItem(item, FarmingReforge.BUSTLING, genericUpgrades, 100)
                 }
             }
         }
@@ -242,7 +242,7 @@ object FortuneUpgrades {
             "blessed" -> {}
             "bountiful" -> {}
             else -> {
-                reforgeItem(tool, FarmingReforges.BLESSED, cropSpecificUpgrades)
+                reforgeItem(tool, FarmingReforge.BLESSED, cropSpecificUpgrades)
             }
         }
         cropSpecificUpgrades.populateAndSort(0)
@@ -251,7 +251,7 @@ object FortuneUpgrades {
     private fun recombobulateItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
         if (item.isRecombobulated()) return
         val reforge = item.getReforgeName()?.let {
-            FarmingReforges.entries.find { enumValue ->
+            FarmingReforge.entries.find { enumValue ->
                 enumValue.name == it.uppercase()
             }
         } ?: return
@@ -265,7 +265,7 @@ object FortuneUpgrades {
 
     private fun reforgeItem(
         item: ItemStack,
-        reforge: FarmingReforges,
+        reforge: FarmingReforge,
         list: MutableList<FortuneUpgrade>,
         copperPrice: Int? = null,
     ) {
