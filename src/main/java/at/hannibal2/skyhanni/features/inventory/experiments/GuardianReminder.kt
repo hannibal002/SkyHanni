@@ -39,8 +39,8 @@ object GuardianReminder {
     )
 
     /**
-     * REGEX-TEST: §dGuardian§e
-     * REGEX-TEST: §6Elephant§e
+     * REGEX-TEST: §dGuardian
+     * REGEX-TEST: §9Guardian§e
      */
     private val petNamePattern by patternGroup.pattern(
         "guardianpet",
