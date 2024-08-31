@@ -100,8 +100,7 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §6Factory Milestones§7.,
-     *
+     * REGEX-TEST: §6Factory Milestones§7.
      */
     private val factoryMilestone by RepoPattern.pattern(
         "rabbit.requirement.factory",
@@ -109,12 +108,21 @@ object HoppityCollectionStats {
     )
 
     /**
-     * REGEX-TEST: §6Shop Milestones§7.,
+     * REGEX-TEST: §6Shop Milestones§7.
      */
     private val shopMilestone by RepoPattern.pattern(
         "rabbit.requirement.shop",
         "§6Shop Milestones",
     )
+
+    /**
+     * REGEX-TEST: §7Obtained by finding the §aStray Rabbit
+     */
+    private val strayRabbit by RepoPattern.pattern(
+        "rabbit.requirement.stray",
+        "§7Obtained by finding the"
+    )
+
 
     /**
      * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
@@ -151,17 +159,25 @@ object HoppityCollectionStats {
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.locationRabbitRequirements ?: mutableMapOf()
 
     var inInventory = false
-
-    var highlightMet = false
-    var highlightNotMet = false
-    var highlightShop = false
-    var highlightFactory = false
+    var configSet = false
+    var highlightConfigMap = mutableMapOf<String, Boolean>(
+        "Met" to false,
+        "NotMet" to false,
+        "Shop" to false,
+        "Factory" to false,
+        "Strays" to false,
+        "Abi" to false
+    )
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
         if (!pagePattern.matches(event.inventoryName)) {
+            // Clear highlight cache in case options are toggled
             highlightMap.clear()
+            // Clear config cache
+            configSet = false
+            highlightConfigMap.mapKeys { false }
             return
         }
 
@@ -170,47 +186,56 @@ object HoppityCollectionStats {
             display = buildDisplay(event)
         }
 
-        highlightMet = false
-        highlightNotMet = false
-        highlightShop = false
-        highlightFactory = false
+        if (!configSet) setHighlightConfig()
+    }
 
+    private fun setHighlightConfig() {
         when (config.highlightMilestoneRabbits) {
             ChocolateFactoryConfig.HighlightMilestoneRabbits.BOTH -> {
-                highlightShop = true
-                highlightFactory = true
+                highlightConfigMap["Shop"] = true
+                highlightConfigMap["Factory"] = true
             }
-            ChocolateFactoryConfig.HighlightMilestoneRabbits.SHOP -> highlightShop = true
-            ChocolateFactoryConfig.HighlightMilestoneRabbits.FACTORY -> highlightFactory = true
+            ChocolateFactoryConfig.HighlightMilestoneRabbits.SHOP -> highlightConfigMap["Shop"] = true
+            ChocolateFactoryConfig.HighlightMilestoneRabbits.FACTORY -> highlightConfigMap["Factory"] = true
             ChocolateFactoryConfig.HighlightMilestoneRabbits.NONE -> {}
         }
 
         when (config.highlightRequirementRabbits) {
             ChocolateFactoryConfig.HighlightRequirementRabbits.BOTH -> {
-                highlightMet = true
-                highlightNotMet = true
+                highlightConfigMap["Met"] = true
+                highlightConfigMap["NotMet"] = true
             }
-            ChocolateFactoryConfig.HighlightRequirementRabbits.MET -> highlightMet = true
-            ChocolateFactoryConfig.HighlightRequirementRabbits.NOTMET -> highlightNotMet = true
+            ChocolateFactoryConfig.HighlightRequirementRabbits.MET -> highlightConfigMap["Met"] = true
+            ChocolateFactoryConfig.HighlightRequirementRabbits.NOTMET -> highlightConfigMap["NotMet"] = true
             ChocolateFactoryConfig.HighlightRequirementRabbits.NONE -> {}
         }
+
+        highlightConfigMap["Strays"] = config.highlightStrays
+        highlightConfigMap["Abi"] = config.highlightAbi
+
+        configSet = true
     }
 
     private var highlightMap = mutableMapOf<String, LorenzColor>()
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        for ((slot, stack) in event.inventoryItems) {
+        for ((_, stack) in event.inventoryItems) {
             val lore = stack.getLore()
 
             if (lore.isEmpty()) continue
             if (!rabbitNotFoundPattern.anyMatches(lore) && !config.highlightFoundRabbits) continue
 
             highlightMap[stack.displayName] = when {
-                lore.any { requirementNotMet.find(it) } && highlightNotMet -> LorenzColor.RED
-                lore.any { requirementMet.find(it) } && highlightMet -> LorenzColor.GREEN
-                lore.any { shopMilestone.find(it) } && highlightShop -> LorenzColor.GOLD
-                lore.any { factoryMilestone.find(it) } && highlightFactory -> LorenzColor.YELLOW
+                lore.any { requirementMet.find(it) } && highlightConfigMap["Met"] == true -> LorenzColor.GREEN
+                lore.any { requirementNotMet.find(it) } && highlightConfigMap["NotMet"] == true -> LorenzColor.RED
+
+                lore.any { shopMilestone.find(it) } && highlightConfigMap["Shop"] == true -> LorenzColor.GOLD
+                lore.any { factoryMilestone.find(it) } && highlightConfigMap["Factory"] == true -> LorenzColor.YELLOW
+
+                lore.any { strayRabbit.find(it) } && highlightConfigMap["Strays"] == true -> LorenzColor.BLUE
+                stack.displayName.removeColor() == "Abi" && highlightConfigMap["Abi"] == true -> LorenzColor.BLACK
+
                 else -> continue
             }
         }
@@ -237,7 +262,7 @@ object HoppityCollectionStats {
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!inInventory) return
-        if (!(highlightNotMet || highlightMet || highlightFactory || highlightShop)) return
+        if (!highlightConfigMap.any { it.value }) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack.displayName.isEmpty()) continue
