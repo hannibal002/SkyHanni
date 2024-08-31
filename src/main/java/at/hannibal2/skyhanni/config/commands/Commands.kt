@@ -612,6 +612,7 @@ object Commands {
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
         registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
+        registerCommand("rpt", "Reverse transfer party to the previous leader") { PartyCommands.reverseTransfer() }
     }
 
     @JvmStatic
