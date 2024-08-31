@@ -28,7 +28,7 @@ object PatcherFixes {
         ChatUtils.clickToActionOrDisable(
             "§cPatcher's Parallax Fix breaks SkyHanni's line rendering!",
             config::fixPatcherLines,
-            "disable this option in Patcher",
+            actionName = "disable this option in Patcher",
             action = { tryFix() },
         )
     }
