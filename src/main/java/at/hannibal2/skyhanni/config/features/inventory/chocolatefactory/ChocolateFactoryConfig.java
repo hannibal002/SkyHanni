@@ -7,9 +7,11 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -174,18 +176,58 @@ public class ChocolateFactoryConfig {
     public boolean hoppityMenuShortcut = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Requirement Rabbits", desc = "Highlight rabbits that have requirements.\n" +
-        "§cRed: Requirement not met.\n" +
-        "§aGreen: Requirement met.")
+    @ConfigOption(name = "Highlight Found Rabbits", desc = "Highlight rabbits that have already been found.\n")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean highlightRabbitsWithRequirement = false;
+    public boolean highlightFoundRabbits = true;
 
     @Expose
-    @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean onlyHighlightRequirementNotMet = true;
+    @ConfigOption(name = "Highlight Milestone Rabbits", desc = "Highlight rabbits obtained from milestones:\n" +
+        "§eYellow: Factory Milestone rabbit.\n" +
+        "§6Gold: Shop Milestone rabbit.\"")
+    @ConfigEditorDropdown
+    @NotNull
+    public HighlightMilestoneRabbits highlightMilestoneRabbits = HighlightMilestoneRabbits.BOTH;
+
+    public enum HighlightMilestoneRabbits{
+        NONE("None"),
+        FACTORY("Factory"),
+        SHOP("Shop"),
+        BOTH("Both"),
+        ;
+        private final String str;
+
+        HighlightMilestoneRabbits(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() { return str; }
+    }
+
+    @Expose
+    @ConfigOption(name = "Highlight Requirement Rabbits", desc = "Highlight rabbits with requirements:\n" +
+        "§cRed: Requirement not met.\n" +
+        "§aGreen: Requirement met.")
+    @ConfigEditorDropdown
+    @NotNull
+    public HighlightRequirementRabbits highlightRequirementRabbits = HighlightRequirementRabbits.BOTH;
+
+    public enum HighlightRequirementRabbits{
+        NONE("None"),
+        NOTMET("Not met"),
+        MET("Met"),
+        BOTH("Both"),
+        ;
+        private final String str;
+
+        HighlightRequirementRabbits(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() { return str; }
+    }
 
     @Expose
     @ConfigOption(
