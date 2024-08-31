@@ -184,18 +184,15 @@ object GardenOptimalSpeed {
 
         lastWarnTime = SimpleTimeMark.now()
         LorenzUtils.sendTitle("§cWrong speed!", 3.seconds)
-        cropInHand?.let {
-            var text = "§cWrong speed while farming ${it.cropName} detected!"
-            text += "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed §a[Click to change]"
-
-            ChatUtils.clickableChat(
-                text,
-                onClick = {
-                    HypixelCommands.setMaxSpeed()
-                },
-                hover = "§eClick to change the Rancher Boots Speed!",
-            )
-        }
+        val cropInHand = cropInHand ?: return
+        var text = "§cWrong speed while farming ${cropInHand.cropName} detected!"
+        text += "\n§eCurrent Speed: §f$currentSpeed§e, Optimal Speed: §f$optimalSpeed §a[Click to change]"
+        ChatUtils.clickToActionOrDisable(
+            text,
+            config::warning,
+            actionName = "change the speed",
+            action = { HypixelCommands.setMaxSpeed() },
+        )
     }
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
