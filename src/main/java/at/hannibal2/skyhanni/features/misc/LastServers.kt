@@ -22,15 +22,14 @@ object LastServers {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled() || HypixelData.serverId == lastServerId) return
 
-        HypixelData.serverId?.let { id ->
-            lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
-            lastServers[id]?.passedSince()?.let {
-                ChatUtils.chat("§7You already joined this server §e${it.format()}§7 ago.")
-            }
-            ChatUtils.debug("Adding $id to last servers.")
-            lastServers[id] = SimpleTimeMark.now()
-            lastServerId = id
+        val id = HypixelData.serverId ?: return
+        lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
+        lastServers[id]?.passedSince()?.let {
+            ChatUtils.chat("§7You already joined this server §b${it.format()}§7 ago.")
         }
+        ChatUtils.debug("Adding $id to last servers.")
+        lastServers[id] = SimpleTimeMark.now()
+        lastServerId = id
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
