@@ -108,6 +108,16 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
+    @ConfigOption(name = "Reminders", desc = "")
+    @Accordion
+    public RemindersConfig reminders = new RemindersConfig();
+
+    @Expose
+    @ConfigOption(name = "Last Servers", desc = "")
+    @Accordion
+    public LastServersConfig lastServers = new LastServersConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
@@ -218,6 +228,15 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Fix Patcher Lines",
+        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixPatcherLines = true;
+
+    @Expose
+    @ConfigOption(
         name = "Time In Limbo",
         desc = "Show the time since you entered the limbo.")
     @ConfigEditorBoolean
@@ -273,6 +292,12 @@ public class MiscConfig {
     public boolean replaceRomanNumerals = false;
 
     @Expose
+    @ConfigOption(name = "Thunder Bottle", desc = "Show a notification when your Thunder Bottle is fully charged.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean thunderBottleNotification = true;
+
+    @Expose
     @ConfigOption(name = "Unknown Perkpocalypse Mayor Warning", desc = "Show a warning when the Unknown Perkpocalypse Mayor is unknown.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -288,4 +313,10 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean userluckEnabled = true;
 }
