@@ -196,12 +196,11 @@ object ChocolateFactoryCustomReminder {
         if (configUpgradeWarnings.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        ChatUtils.clickableChat(
+        ChatUtils.clickToActionOrDisable(
             "You can now purchase §f$targetName §ein Chocolate factory!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            },
-            "§eClick to run /cf!",
+            configReminder::enabled,
+            actionName = "open Chocolate Factory",
+            action = { HypixelCommands.chocolateFactory() },
         )
     }
 

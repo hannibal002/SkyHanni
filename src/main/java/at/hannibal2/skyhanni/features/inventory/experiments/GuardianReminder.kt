@@ -51,11 +51,9 @@ object GuardianReminder {
         lastInventoryOpen = SimpleTimeMark.now()
         ChatUtils.clickToActionOrDisable(
             "Use a §9§lGuardian Pet §efor more Exp in the Experimentation Table.",
-            option = config::guardianReminder,
+            config::guardianReminder,
             actionName = "open pets menu",
-            action = {
-                HypixelCommands.pet()
-            },
+            action = { HypixelCommands.pet() },
         )
     }
 
