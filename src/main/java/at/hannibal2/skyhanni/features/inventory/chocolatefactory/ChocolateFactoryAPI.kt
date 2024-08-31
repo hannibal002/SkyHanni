@@ -12,8 +12,12 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyblockSeason
@@ -21,6 +25,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -42,6 +47,25 @@ object ChocolateFactoryAPI {
         "Hoppity|Chocolate Factory Milestones",
     )
 
+    /**
+     * REGEX-TEST: §a§lPROMOTE §8➜ §7[208§7] §dExecutive
+     * REGEX-TEST: §a§lUPGRADE §8➜ §aRabbit Barn CCXXI
+     */
+    private val upgradeLorePattern by patternGroup.pattern(
+        "item.lore.upgrade",
+        "§a§l(?:UPGRADE|PROMOTE) §8➜ (?:§7\\[(?<nextlevel>\\d+)§7] )?(?<upgradename>.*?) ?(?<nextlevelalt>[IVXLCDM]*)\$",
+    )
+
+    /**
+     * REGEX-TEST: §bRabbit Bro§8 - §7[220§7] §bBoard Member
+     * REGEX-TEST: §6Rabbit Dog§8 - §7[190§7] §6Director
+     * REGEX-TEST: §dRabbit Daddy§8 - §7[201§7] §dExecutive
+     */
+    private val employeeNamePattern by patternGroup.pattern(
+        "item.name.employee",
+        "(?<employee>(?:§.+)+Rabbit .*)§8 - §7\\[\\d*§7] .*",
+    )
+
     var rabbitSlots = mapOf<Int, Int>()
     var otherUpgradeSlots = setOf<Int>()
     var noPickblockSlots = setOf<Int>()
@@ -56,6 +80,7 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
+    var maxMilestoneChocolate = 700_000_000_000L
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -117,6 +142,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
+        maxMilestoneChocolate = data.maxMilestoneChocolate
         specialRabbitTextures = data.specialRabbits
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
@@ -153,10 +179,18 @@ object ChocolateFactoryAPI {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    fun getNextLevelName(stack: ItemStack): String? =
+        upgradeLorePattern.firstMatcher(stack.getLore()) {
+            val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
+                groupOrNull("employee")
+            } else groupOrNull("upgradename")
+            val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
+            if (upgradeName == null || nextLevel == null) null
+            else "$upgradeName $nextLevel"
+        }
 
-    // TODO add debug toggle
-    fun isHoppityEvent() = SkyblockSeason.currentSeason == SkyblockSeason.SPRING
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 

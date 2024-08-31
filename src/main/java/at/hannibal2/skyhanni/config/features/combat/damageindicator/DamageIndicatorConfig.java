@@ -171,7 +171,8 @@ public class DamageIndicatorConfig {
     public boolean hideVanillaNametag = false;
 
     @Expose
-    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.")
+    @ConfigOption(name = "Time to Kill", desc = "Show the time it takes to kill the slayer boss.\n" +
+        "§eRequires Damage Indicator to be active.")
     @ConfigEditorBoolean
     public boolean timeToKillSlayer = true;
 

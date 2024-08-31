@@ -4,15 +4,16 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
+import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
@@ -75,7 +76,7 @@ object RenderUtils {
     private val beaconBeam = ResourceLocation("textures/entity/beacon_beam.png")
 
     private val matrixBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
-    private val colourBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
+    private val colorBuffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(16)
     private val bezier2Buffer: FloatBuffer = GLAllocation.createDirectFloatBuffer(9)
 
     infix fun Slot.highlight(color: LorenzColor) {
@@ -540,37 +541,6 @@ object RenderUtils {
         return renderer.getStringWidth(display)
     }
 
-    // Aligns using the width of element to render
-    private fun Position.renderString0(
-        string: String?,
-        offsetX: Int = 0,
-        offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment,
-    ): Int {
-        val display = "§f$string"
-        GlStateManager.pushMatrix()
-        transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
-        val width = this.getDummySize().x / this.scale
-
-        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
-
-        val strLen: Int = renderer.getStringWidth(string)
-        val x2 = when (alignmentEnum) {
-            HorizontalAlignment.LEFT -> offsetX.toFloat()
-            HorizontalAlignment.CENTER -> offsetX + width / 2f - strLen / 2f
-            HorizontalAlignment.RIGHT -> offsetX + width - strLen.toFloat()
-            else -> offsetX.toFloat()
-        }
-        GL11.glTranslatef(x2, 0f, 0f)
-        renderer.drawStringWithShadow(display, 0f, 0f, 0)
-
-        GlStateManager.popMatrix()
-
-        return renderer.getStringWidth(display)
-    }
-
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
@@ -578,25 +548,6 @@ object RenderUtils {
         var longestX = 0
         for (s in list) {
             val x = renderString0(s, offsetY = offsetY, centered = false)
-            if (x > longestX) {
-                longestX = x
-            }
-            offsetY += 10 + extraSpace
-        }
-        GuiEditManager.add(this, posLabel, longestX, offsetY)
-    }
-
-    fun Position.renderStringsAlignedWidth(
-        list: List<Pair<String, HorizontalAlignment>>,
-        extraSpace: Int = 0,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-
-        var offsetY = 0
-        var longestX = 0
-        for (pair in list) {
-            val x = renderString0(pair.first, offsetY = offsetY, alignmentEnum = pair.second)
             if (x > longestX) {
                 longestX = x
             }
@@ -696,7 +647,7 @@ object RenderUtils {
 
     /**
      * Accepts a single line to print.
-     * This  line is a list of things to print. Can print String or ItemStack objects.
+     * This line is a list of things to print. Can print String or ItemStack objects.
      */
     @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderSingleLineWithItems(
@@ -1009,12 +960,12 @@ object RenderUtils {
         y: Float,
         shadow: Boolean,
         len: Int,
-        colour: Int,
+        color: Int,
     ) {
         val strLen = fr.getStringWidth(str)
         var factor = len / strLen.toFloat()
         factor = 1f.coerceAtMost(factor)
-        TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, colour, factor)
+        TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, color, factor)
     }
 
     fun LorenzRenderWorldEvent.drawDynamicText(
@@ -1131,6 +1082,7 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player) + add
     }
 
@@ -1608,14 +1560,14 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.outlineTopFace(
         boundingBox: AxisAlignedBB,
         lineWidth: Int,
-        colour: Color,
+        color: Color,
         depth: Boolean,
     ) {
         val (cornerOne, cornerTwo, cornerThree, cornerFour) = boundingBox.getCorners(boundingBox.maxY)
-        this.draw3DLine(cornerOne, cornerTwo, colour, lineWidth, depth)
-        this.draw3DLine(cornerTwo, cornerThree, colour, lineWidth, depth)
-        this.draw3DLine(cornerThree, cornerFour, colour, lineWidth, depth)
-        this.draw3DLine(cornerFour, cornerOne, colour, lineWidth, depth)
+        this.draw3DLine(cornerOne, cornerTwo, color, lineWidth, depth)
+        this.draw3DLine(cornerTwo, cornerThree, color, lineWidth, depth)
+        this.draw3DLine(cornerThree, cornerFour, color, lineWidth, depth)
+        this.draw3DLine(cornerFour, cornerOne, color, lineWidth, depth)
     }
 
     // TODO nea please merge with 'draw3DLine'
@@ -1717,6 +1669,48 @@ object RenderUtils {
 
         GlStateManager.enableLighting()
         GlStateManager.enableDepth()
+    }
+
+
+    /**
+     * Method to draw a rounded textured rect.
+     *
+     * **NOTE:** If you are using [GlStateManager.translate] or [GlStateManager.scale]
+     * with this method, ensure they are invoked in the correct order if you use both. That is, [GlStateManager.translate]
+     * is called **BEFORE** [GlStateManager.scale], otherwise the textured rect will not be rendered correctly
+     *
+     * @param filter the texture filter to use
+     * @param radius the radius of the corners (default 10), NOTE: If you pass less than 1 it will just draw as a normal textured rect
+     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
+     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
+     * It is best kept at its default.
+     */
+    fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
+        // if radius is 0 then just draw a normal textured rect
+        if (radius <= 0) {
+            Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+            return
+        }
+
+        val scaledRes = ScaledResolution(Minecraft.getMinecraft())
+        val widthIn = width * scaledRes.scaleFactor
+        val heightIn = height * scaledRes.scaleFactor
+        val xIn = x * scaledRes.scaleFactor
+        val yIn = y * scaledRes.scaleFactor
+
+        RoundedTextureShader.scaleFactor = scaledRes.scaleFactor.toFloat()
+        RoundedTextureShader.radius = radius.toFloat()
+        RoundedTextureShader.smoothness = smoothness.toFloat()
+        RoundedTextureShader.halfSize = floatArrayOf(widthIn / 2f, heightIn / 2f)
+        RoundedTextureShader.centerPos = floatArrayOf(xIn + (widthIn / 2f), yIn + (heightIn / 2f))
+
+        GlStateManager.pushMatrix()
+        ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
+
+        Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+
+        ShaderManager.disableShader()
+        GlStateManager.popMatrix()
     }
 
     /**
@@ -1861,9 +1855,9 @@ object RenderUtils {
     }
 
     fun getAlpha(): Float {
-        colourBuffer.clear()
-        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colourBuffer)
-        if (colourBuffer.limit() < 4) return 1f
-        return colourBuffer.get(3)
+        colorBuffer.clear()
+        GlStateManager.getFloat(GL11.GL_CURRENT_COLOR, colorBuffer)
+        if (colorBuffer.limit() < 4) return 1f
+        return colorBuffer.get(3)
     }
 }
