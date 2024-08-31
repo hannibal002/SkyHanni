@@ -146,24 +146,15 @@ object PartyAPI {
         // one member got removed
         otherLeftPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
-            partyMembers.remove(name)
-            if (name == prevPartyLeader) {
-                prevPartyLeader = null
-            }
+            removeWithLeader(name)
         }
         otherKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
-            partyMembers.remove(name)
-            if (name == prevPartyLeader) {
-                prevPartyLeader = null
-            }
+            removeWithLeader(name)
         }
         otherOfflineKickedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
-            partyMembers.remove(name)
-            if (name == prevPartyLeader) {
-                prevPartyLeader = null
-            }
+            removeWithLeader(name)
         }
         otherDisconnectedPattern.matchMatcher(message) {
             val name = group("name").cleanPlayerName()
@@ -209,6 +200,13 @@ object PartyAPI {
                     partyLeader = playerName
                 }
             }
+        }
+    }
+
+    private fun removeWithLeader(name: String) {
+        partyMembers.remove(name)
+        if (name == prevPartyLeader) {
+            prevPartyLeader = null
         }
     }
 

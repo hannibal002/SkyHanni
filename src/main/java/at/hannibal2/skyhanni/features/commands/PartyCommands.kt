@@ -79,10 +79,11 @@ object PartyCommands {
     fun reverseTransfer() {
         if (!config.reversePT.command) return
         if (PartyAPI.partyMembers.isEmpty()) return
-        PartyAPI.prevPartyLeader?.let {
-            HypixelCommands.partyTransfer(it)
-            if (config.reversePT.message.isNotBlank()) {
-                HypixelCommands.partyChat(config.reversePT.message)
+        val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
+        HypixelCommands.partyTransfer(prevPartyLeader)
+        config.reversePT.message?.let {
+            if (it.isNotBlank()) {
+                HypixelCommands.partyChat(it)
             }
         }
     }
@@ -140,24 +141,22 @@ object PartyCommands {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onChat(event: LorenzChatEvent) {
         if (!config.reversePT.clickable) return
-        if (transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) {
-            if (partyLeader != LorenzUtils.getPlayerName()) return
+        if (!transferVoluntaryPattern.matches(event.message.trimWhiteSpace().removeColor())) return
+        if (partyLeader != LorenzUtils.getPlayerName()) return
 
-            PartyAPI.prevPartyLeader?.let {
-                event.blockedReason = "replacing"
+        val prevPartyLeader = PartyAPI.prevPartyLeader ?: return
+        event.blockedReason = "replacing"
 
-                ChatUtils.clickableChat(
-                    event.message,
-                    onClick = {
-                        HypixelCommands.partyTransfer(it)
-                        if (config.reversePT.message.isNotBlank()) {
-                            HypixelCommands.partyChat(config.reversePT.message)
-                        }
-                    },
-                    prefix = false
-                )
-            }
-        }
+        ChatUtils.clickableChat(
+            event.message,
+            onClick = {
+                HypixelCommands.partyTransfer(prevPartyLeader)
+                if (config.reversePT.message.isNotBlank()) {
+                    HypixelCommands.partyChat(config.reversePT.message)
+                }
+            },
+            prefix = false,
+        )
     }
 }
 
@@ -169,5 +168,5 @@ private val otherPartyCommands = listOf(
     "Mute",
     "Private",
     "Warp",
-    "Settings"
+    "Settings",
 )
