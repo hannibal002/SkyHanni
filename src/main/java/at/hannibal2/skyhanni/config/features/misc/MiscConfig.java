@@ -113,6 +113,11 @@ public class MiscConfig {
     public RemindersConfig reminders = new RemindersConfig();
 
     @Expose
+    @ConfigOption(name = "Last Servers", desc = "")
+    @Accordion
+    public LastServersConfig lastServers = new LastServersConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
