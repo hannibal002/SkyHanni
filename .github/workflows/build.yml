@@ -33,7 +33,7 @@ jobs:
                 name: Upload development build
                 with:
                     name: "Development Build"
-                    path: versions/1.8.9/build/libs/*.jar
+                    path: build/libs/*.jar
             -   name: Test with Gradle
                 run: ./gradlew test
             -   uses: actions/upload-artifact@v3
