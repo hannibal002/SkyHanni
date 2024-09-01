@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import kotlin.math.floor
 import kotlin.math.pow
 import kotlin.math.round
 
-object RabbitUtils {
+object ChocolateFactoryUtils {
     /** Calculates the upgrade Cost for the upgrade at [slotIndex] with [level].
      *
      * @param slotIndex the slot index of the upgrade
@@ -15,25 +16,25 @@ object RabbitUtils {
      */
     fun getUpgradeCost(slotIndex: Int, level: Int): Long? {
         var price: Long? = null
-        if (level < (ChocolateFactoryAPI.maxUpgradeLevelPerPrestige[slotIndex]?.getOrNull(
-                ChocolateFactoryAPI.currentPrestige - 1,
-            ) ?: 0)
-        ) {
+        val maxLevel = ChocolateFactoryAPI.maxUpgradeLevelPerPrestige[slotIndex]?.getOrNull(ChocolateFactoryAPI.currentPrestige - 1) ?: 0
+        val dif: Int = maxLevel - level
+
+        if (dif > 0 || -dif < HoppityCollectionStats.getDivineRabbitCount()) {
 
             val prestigeMultiplier = 1 + (ChocolateFactoryAPI.upgradeCostFormulaConstants[slotIndex]?.get("prestige") ?: 0.0) *
                 (ChocolateFactoryAPI.currentPrestige - 1)
-            val zetaMultiplier = if (ChocolateFactoryAPI.foundZetaRabbit) 0.99 else 1.0
+            val otherMultipliers = if (HoppityCollectionStats.hasFoundRabbit("Zeta")) 0.99 else 1.0
 
             // Use upgrade cost per level if it exists, otherwise use the formula.
             if ((ChocolateFactoryAPI.upgradeCostPerLevel[slotIndex]?.size ?: 0) > level) {
                 val nextRaw = ChocolateFactoryAPI.upgradeCostPerLevel[slotIndex]?.get(level) ?: 0
 
-                price = floor(nextRaw * prestigeMultiplier * zetaMultiplier).toLong()
+                price = floor(nextRaw * prestigeMultiplier * otherMultipliers).toLong()
             } else {
                 val base = ChocolateFactoryAPI.upgradeCostFormulaConstants[slotIndex]?.get("base") ?: 0.0
                 val multiplier = ChocolateFactoryAPI.upgradeCostFormulaConstants[slotIndex]?.get("exp") ?: 0.0
 
-                price = floor(round(base * multiplier.pow((level + 1)) * prestigeMultiplier) * zetaMultiplier).toLong()
+                price = (floor(round(base * multiplier.pow(level)) * prestigeMultiplier) * otherMultipliers).toLong()
             }
         }
         return price
@@ -45,7 +46,7 @@ object RabbitUtils {
      *
      * @param upgrade the current upgrade
      */
-    fun getNextRabbit(upgrade: ChocolateFactoryUpgrade): ChocolateFactoryUpgrade? {
+    fun getNextUnlockedRabbitWorker(upgrade: ChocolateFactoryUpgrade): ChocolateFactoryUpgrade? {
         val nextSlot = upgrade.slotIndex + 1
         if (nextSlot !in ChocolateFactoryAPI.rabbitSlots) return null
 

@@ -6,11 +6,10 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.RabbitUtils.getNextRabbit
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.RabbitUtils.getNextUpgrade
-import at.hannibal2.skyhanni.features.inventory.chocolatefactory.RabbitUtils.getUpgradeCost
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUtils.getNextUnlockedRabbitWorker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUtils.getNextUpgrade
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryUtils.getUpgradeCost
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -198,6 +197,8 @@ object ChocolateFactoryDataLoader {
         if (config.showAllBestUpgrades) findAllBestUpgrades(list)
 
         ChocolateFactoryAPI.factoryUpgrades = list
+
+        //testCases()
     }
 
     private fun processChocolateItem(item: ItemStack) {
@@ -525,7 +526,7 @@ object ChocolateFactoryDataLoader {
 
         // Add new rabbit if unlocked via reaching level 20 on current rabbit.
         if (bestUpgrade.isRabbit && bestUpgrade.level == 19) {
-            val nextRabbit = getNextRabbit(bestUpgrade)
+            val nextRabbit = getNextUnlockedRabbitWorker(bestUpgrade)
             if (nextRabbit != null) {
                 list.add(nextRabbit)
                 allUpgrades[nextRabbit.slotIndex] = LinkedList()
