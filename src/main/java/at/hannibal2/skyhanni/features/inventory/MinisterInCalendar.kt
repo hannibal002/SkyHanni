@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.StringUtils.wrapText
+import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -47,20 +47,17 @@ object MinisterInCalendar {
 
             val ministerColor = MayorAPI.mayorNameToColorCode(minister.mayorName)
 
+            val ministerDisplayName = "${ministerColor}Minister ${minister.mayorName}"
             val ministerLore = buildList {
                 addAll(prefix)
                 for (perk in minister.activePerks) {
                     add("$ministerColor${perk.perkName}")
-                    addAll(perk.description.wrapText(50).map { "§7$it" })
+                    addAll(perk.description.splitLines(170).removePrefix("§r").split("\n").map { "§7$it" })
                 }
                 addAll(suffix)
             }
 
-            event.replace(
-                item
-                    .setLore(ministerLore)
-                    .setStackDisplayName("${ministerColor}Minister ${minister.mayorName}"),
-            )
+            event.replace(item.setLore(ministerLore).setStackDisplayName(ministerDisplayName))
         }
     }
 
