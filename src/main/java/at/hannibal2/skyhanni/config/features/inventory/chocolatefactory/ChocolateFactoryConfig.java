@@ -7,11 +7,9 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -176,75 +174,44 @@ public class ChocolateFactoryConfig {
     public boolean hoppityMenuShortcut = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Found Rabbits", desc = "Highlight rabbits that have already been found.\n")
+    @ConfigOption(name = "Highlight Found Rabbits", desc = "Highlight rabbits that have already been found.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean highlightFoundRabbits = true;
+    public boolean highlightFoundRabbits = false;
 
     @Expose
-    @ConfigOption(name = "Highlight Milestones", desc = "Highlight rabbits obtained from milestones:\n" +
-        "§eYellow: Factory Milestone.\n" +
-        "§6Gold: Shop Milestone.")
-    @ConfigEditorDropdown
-    @NotNull
-    public HighlightMilestoneRabbits highlightMilestoneRabbits = HighlightMilestoneRabbits.BOTH;
+    @ConfigOption(name = "Highlight Rabbits", desc = "Highlight specific rabbit types in Hoppity's Collection.")
+    @ConfigEditorDraggableList
+    public List<HighlightRabbitTypes> highlightRabbits = new ArrayList<>(Arrays.asList(
+        HighlightRabbitTypes.ABI,
+        HighlightRabbitTypes.FACTORY,
+        HighlightRabbitTypes.MET,
+        HighlightRabbitTypes.NOT_MET,
+        HighlightRabbitTypes.SHOP,
+        HighlightRabbitTypes.STRAYS
+    ));
 
-    public enum HighlightMilestoneRabbits{
-        NONE("None"),
-        FACTORY("Factory"),
-        SHOP("Shop"),
-        BOTH("Both"),
+    public enum HighlightRabbitTypes {
+
+        ABI("§2Abi"),
+        FACTORY("§eFactory Milestones"),
+        MET("§aRequirement Met"),
+        NOT_MET("§cRequirement not met."),
+        SHOP("§6Shop Milestones"),
+        STRAYS("§3Stray rabbits"),
         ;
+
         private final String str;
 
-        HighlightMilestoneRabbits(String str) {
+        HighlightRabbitTypes(String str) {
             this.str = str;
         }
 
         @Override
-        public String toString() { return str; }
-    }
-
-    @Expose
-    @ConfigOption(name = "Highlight Requirements", desc = "Highlight rabbits with requirements:\n" +
-        "§cRed: Requirement not met.\n" +
-        "§aGreen: Requirement met.")
-    @ConfigEditorDropdown
-    @NotNull
-    public HighlightRequirementRabbits highlightRequirementRabbits = HighlightRequirementRabbits.BOTH;
-
-    public enum HighlightRequirementRabbits{
-        NONE("None"),
-        NOTMET("Not met"),
-        MET("Met"),
-        BOTH("Both"),
-        ;
-        private final String str;
-
-        HighlightRequirementRabbits(String str) {
-            this.str = str;
+        public String toString() {
+            return str;
         }
-
-        @Override
-        public String toString() { return str; }
     }
-
-    @Expose
-    @ConfigOption(name = "Highlight Strays", desc = "Highlights rabbits obtained through Stray rabbits:\n" +
-            "§9Blue: Stray rabbits"
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightStrays = true;
-
-    @Expose
-    @ConfigOption(
-        name = "Highlight Abi", desc = "Highlights rabbit obtained through Hoppity's contact:\n" +
-            "§0Black: Abi"
-    )
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightAbi = true;
 
     @Expose
     @ConfigOption(
