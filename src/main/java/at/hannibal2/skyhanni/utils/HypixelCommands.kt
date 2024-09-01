@@ -68,6 +68,10 @@ object HypixelCommands {
         send("cf")
     }
 
+    fun pet() {
+        send("pet")
+    }
+
     fun openBaker() {
         send("openbaker")
     }
@@ -130,6 +134,11 @@ object HypixelCommands {
 
     fun particleQuality(quality: String) {
         send("pq $quality")
+    }
+
+    // Changes the speed of rancher boots in garden
+    fun setMaxSpeed() {
+        send("setmaxspeed")
     }
 
     fun showRng(major: String? = null, minor: String? = null) = when {

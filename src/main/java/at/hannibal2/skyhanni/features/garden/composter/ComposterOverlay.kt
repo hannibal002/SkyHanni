@@ -171,23 +171,19 @@ object ComposterOverlay {
             return
         }
         if (organicMatterFactors.isEmpty()) {
-            organicMatterDisplay =
-                Collections.singletonList(
-                    listOf(
-                        "§cSkyHanni composter error:", "§cRepo data not loaded!",
-                        "§7(organicMatterFactors is empty)",
-                    ),
-                )
+            organicMatterDisplay = listOf(
+                Collections.singletonList("§cSkyHanni composter error:"),
+                Collections.singletonList("§cRepo data not loaded!"),
+                Collections.singletonList("§7(organicMatterFactors is empty)"),
+            )
             return
         }
         if (fuelFactors.isEmpty()) {
-            organicMatterDisplay =
-                Collections.singletonList(
-                    listOf(
-                        "§cSkyHanni composter error:", "§cRepo data not loaded!",
-                        "§7(fuelFactors is empty)",
-                    ),
-                )
+            organicMatterDisplay = listOf(
+                Collections.singletonList("§cSkyHanni composter error:"),
+                Collections.singletonList("§cRepo data not loaded!"),
+                Collections.singletonList("§7(fuelFactors is empty)"),
+            )
             return
         }
         if (currentOrganicMatterItem.let { it !in organicMatterFactors.keys && it != NONE }) {

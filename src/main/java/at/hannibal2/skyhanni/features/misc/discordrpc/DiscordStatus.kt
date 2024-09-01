@@ -56,7 +56,7 @@ var beenAfkFor = SimpleTimeMark.now()
 
 fun getPetDisplay(): String = PetAPI.currentPet?.let {
     val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2)
+    val petName = it.substring(2).removeColor()
     val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
 
     "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
@@ -86,7 +86,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     NONE({ null }),
 
     LOCATION({
-        var location = LorenzUtils.skyBlockArea?.removeColor() ?: "invalid"
+        var location = LorenzUtils.skyBlockArea ?: "invalid"
         val island = LorenzUtils.skyBlockIsland
 
         if (location == "Your Island") location = "Private Island"
@@ -167,9 +167,11 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         } ?: "No item in hand"
     }),
 
-    TIME({
-        SkyBlockTime.now().formatted()
-    }),
+    TIME(
+        {
+            SkyBlockTime.now().formatted().removeColor()
+        },
+    ),
 
     PROFILE({
         val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"

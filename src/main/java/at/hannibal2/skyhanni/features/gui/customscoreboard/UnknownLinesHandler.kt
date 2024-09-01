@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -17,7 +16,7 @@ object UnknownLinesHandler {
     internal lateinit var remoteOnlyPatterns: Array<Pattern>
 
     fun handleUnknownLines() {
-        val sidebarLines = ScoreboardData.sidebarLinesFormatted
+        val sidebarLines = CustomScoreboard.activeLines
 
         var unknownLines = sidebarLines
             .map { it.removeResets() }
@@ -27,7 +26,7 @@ object UnknownLinesHandler {
         /**
          * Remove known lines with patterns
          **/
-        val patternsToExclude = listOf(
+        val patternsToExclude = mutableListOf(
             PurseAPI.coinsPattern,
             SbPattern.motesPattern,
             BitsAPI.bitsScoreboardPattern,
@@ -134,8 +133,11 @@ object UnknownLinesHandler {
             SbPattern.carnivalCatchStreakPattern,
             SbPattern.carnivalAccuracyPattern,
             SbPattern.carnivalKillsPattern,
-            *remoteOnlyPatterns,
         )
+
+        if (::remoteOnlyPatterns.isInitialized) {
+            patternsToExclude.addAll(remoteOnlyPatterns)
+        }
 
         unknownLines = unknownLines.filterNot { line ->
             patternsToExclude.any { pattern -> pattern.matches(line) }
