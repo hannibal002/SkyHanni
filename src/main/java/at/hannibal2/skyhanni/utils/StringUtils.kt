@@ -247,34 +247,6 @@ object StringUtils {
         } ?: text
     }
 
-    fun String.wrapText(maxLength: Int): List<String> {
-        val words = this.split(" ")
-        val wrappedLines = mutableListOf<String>()
-        var currentLine = ""
-
-        for (word in words) {
-            when {
-                currentLine.length + word.length + 1 > maxLength -> {
-                    wrappedLines.add(currentLine)
-                    currentLine = word
-                }
-
-                currentLine.isEmpty() -> currentLine = word
-                else -> currentLine += " $word"
-            }
-
-            if (word.length > maxLength) {
-                wrappedLines.addAll(word.chunked(maxLength))
-                currentLine = ""
-            }
-        }
-
-        if (currentLine.isNotEmpty()) wrappedLines.add(currentLine)
-
-        return wrappedLines
-    }
-
-
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
      * @param list - the list of strings to join into a string, containing 0 or more elements.
