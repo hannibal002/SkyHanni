@@ -68,8 +68,6 @@ object ItemUtils {
         return this
     }
 
-    val ItemStack.extraAttributes: NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
-
     var ItemStack.extraAttributes: NBTTagCompound
         get() = this.tagCompound?.getCompoundTag("ExtraAttributes") ?: NBTTagCompound()
         set(value) {
