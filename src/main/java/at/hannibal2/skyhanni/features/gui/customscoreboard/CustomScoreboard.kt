@@ -63,7 +63,7 @@ object CustomScoreboard {
         if (display.isEmpty()) return
 
         val render =
-            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
+            if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
                 cache
             } else {
                 display
@@ -160,13 +160,12 @@ object CustomScoreboard {
 
     private fun addAllNonSkyBlockLines() = buildList {
         addAll(ScoreboardElement.TITLE.getVisiblePair())
-        addAll(ScoreboardData.sidebarLinesFormatted.dropLast(1).map { it to HorizontalAlignment.LEFT })
-        addAll(ScoreboardElement.FOOTER.getVisiblePair())
+        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
     }
 
     private fun addDefaultSkyBlockLines() = buildList {
         add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
+        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
     }
 
     private fun addCustomSkyBlockLines() = buildList<ScoreboardElementType> {
