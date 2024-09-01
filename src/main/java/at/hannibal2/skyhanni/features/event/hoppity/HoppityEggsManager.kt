@@ -251,19 +251,17 @@ object HoppityEggsManager {
         val amount = HoppityEggType.resettingEntries.size
         val message = "All $amount Hoppity Eggs are ready to be found!"
         if (config.warpUnclaimedEggs) {
-            if (LorenzUtils.inSkyBlock) {
-                ChatUtils.clickableChat(
-                    message,
-                    onClick = { HypixelCommands.warp(config.warpDestination) },
-                    "§eClick to ${"/warp ${config.warpDestination}".trim()}!",
-                )
+            val (action, actionName) = if (LorenzUtils.inSkyBlock) {
+                { HypixelCommands.warp(config.warpDestination) } to "${"warp to ${config.warpDestination}".trim()}"
             } else {
-                ChatUtils.clickableChat(
-                    message,
-                    onClick = { HypixelCommands.skyblock() },
-                    "§eClick to join /skyblock!",
-                )
+                { HypixelCommands.skyblock() } to "join /skyblock!"
             }
+            ChatUtils.clickToActionOrDisable(
+                message,
+                config::warpUnclaimedEggs,
+                actionName = actionName,
+                action = action,
+            )
         } else ChatUtils.chat(message)
         LorenzUtils.sendTitle("§e$amount Hoppity Eggs!", 5.seconds)
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
