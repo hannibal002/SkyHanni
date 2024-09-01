@@ -46,6 +46,10 @@
 + Added Enchanting Experience as Stack Size in Experimentation Table. - saga (https://github.com/hannibal002/SkyHanni/pull/1988)
     + Added to the Item Number list.
 + Show dye hex code as the actual color in the item lore. - nopo (https://github.com/hannibal002/SkyHanni/pull/2321)
++ Added Display for Bits on Cookie buy. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2265)
+    + Shows the Bits you would gain.
+    + Can show the change for the available Bits.
+    + Also shows the time more clearly (or adds it if not present).
 
 #### Chat Features
 
@@ -54,6 +58,18 @@
 + Added Remind command. - ThatGravyBoat & Zickles (https://github.com/hannibal002/SkyHanni/pull/1708)
     + Use `/shremind <time> <note>` to set reminders for your future self.
 
+#### Command Features
+
++ Added Reverse Party Leader. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1712)
+    + Reverse party transfer via clickable chat message or via the `/rpt` command.
+    + Configurable party chat message after transferring.
++ Added /shtps command. - saga (https://github.com/hannibal002/SkyHanni/pull/1961)
+    + Informs in chat about the server's ticks per second (TPS).
+
+#### Misc Features
+
++ Added a notification when you join a server you have joined previously. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2046)
+
 ### Improvements
 
 #### Mining Improvements
@@ -61,6 +77,8 @@
 + Now allows modifying the Mineshaft spawn message without requiring the Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2308)
 + Added reset command for Fossil Excavator Profit Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2408)
 + Added current session and total Mineshaft count to the Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2310)
++ Some icons in the Mining Event Display now use the texture of the item they represent. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2425)
+    + E.g., Raffle Event -> Raffle Ticket.
 
 #### Diana Improvements
 
@@ -82,12 +100,17 @@
 + Improved Enchant Parsing compatibility with other mods. - Vixid (https://github.com/hannibal002/SkyHanni/pull/1717)
     + Now works with SBA's Convert Roman Numerals feature.
     + Now works with NEU's inventories, such as `/pv` and storage overlay.
++ Added exceptions to the enchant parser. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2254)
+    + Stonk and non-mining tools with Efficiency 5 use the maximum enchant color.
 
 #### Chat Improvements
 
 + Added support for changing the translation language when clicking on a chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2403)
 + Added support for using the "/gfs <item>" command without specifying an amount. - saga (https://github.com/hannibal002/SkyHanni/pull/1927)
     + The default value can be modified in the config.
++ Reworked the chat formatting for reminders and warnings across multiple features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2428)
+    + They now all allow performing an action on click (e.g., warping you somewhere or opening a menu) and can be disabled in the config via shift-click or control-click on the chat message.
+    + Changed chat messages: Account/Profile Upgrade reminder, Hoppity Cake reminder, New Year Hoppity NPC reminder, New Year Cake reminder, City Project reminder, Garden Composter empty warning, CF Custom Goal reached message, Time Tower warning, CF upgrade warning.
 
 #### Hoppity Improvements
 
@@ -103,6 +126,18 @@
 + Improved the description of several config options. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2397)
 + Enabled more Dev Options to be changed via /shdefaultoptions. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2397)
 
+#### Garden Improvements
+
++ Improved incorrect Rancher Boots speed warning. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2413)
+    + Also allows clicking on the message to open the edit sign directly.
+    + Now warns only when actually farming and wearing Rancher Boots.
++ Changed suggested cactus speed to 464 again. - DarkDash (https://github.com/hannibal002/SkyHanni/pull/2424)
+    + Since the cactus knife now allows 500 max speed.
+
+#### Rift Improvements
+
++ Updated the description of the config for Enigma Soul Waypoints to help find the Rift Guide in the game. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2433)
+
 ### Fixes
 
 #### DIana Fixes
@@ -116,12 +151,17 @@
 + Fixed AH item movements being detected by Item Trackers as new drops. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2380)
 + Fixed Pickup Log Display Entries not expiring while in GUIs. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2401)
 + Fixed the price of mana enchantments tiers 1-4 in Estimated Chest value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2395)
++ Fixed Guardian Reminder Experimentation Table not working with autopet rules. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2430)
++ Fixed SkyHanni Global Scale affecting Custom Wardrobe. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2420)
++ Fixed /show displaying an incorrect number of enchants. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2435)
 
 #### Mining Fixes
 
 + Added new Pure Ores support. - Empa (https://github.com/hannibal002/SkyHanni/pull/2388)
 + Fixed a typo in corpse detection. - Maratons4 (https://github.com/hannibal002/SkyHanni/pull/2386)
 + Fixed a compatibility issue in Fossil Solver with resource packs like Hypixel+. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2409)
++ Fixed Powder for 10 Levels overflowing over the max level. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2422)
++ Fixed Glacite Tunnel Maps repeatedly showing the last commission goal even when there is no new commission. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2432)
 
 #### Scoreboard Fixes
 
@@ -149,6 +189,11 @@
 + Fixed Mayor Detection failing when Special Mayors are in office. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2389)
 + Updated Derpy's extra tax perk to use the correct name. - Luna (https://github.com/hannibal002/SkyHanni/pull/2393)
 + Fixed Christmas presents in the Hypixel lobby being visible outside of December. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2396)
++ Fixed the mod crashing on startup when the game directory path contains a "!". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2427)
+
+#### Chat Fixes
+
++ Fixed an error with Patcher Coordinate Detection from chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2410)
 
 ### Technical Details
 
@@ -160,6 +205,9 @@
 + Added `SIDE_DISH`, `CHOCOLATE_SHOP_MILESTONE`, `CHOCOLATE_FACTORY_MILESTONE`, and `BOUGHT` as `HoppityEggType` options. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
 + Added version to download source checker popup message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2400)
 + Added "hex string to color int" method in ColorUtils. - nopo (https://github.com/hannibal002/SkyHanni/pull/2321)
++ Fixed Sound Errors in the console. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2431)
++ Added /shdebugscoreboard to monitor scoreboard changes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2412)
+    + Prints the raw scoreboard lines in the console after each update, with the time since the last update.
 
 ## Version 0.26
 
