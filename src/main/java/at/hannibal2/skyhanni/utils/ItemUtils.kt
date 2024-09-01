@@ -65,8 +65,19 @@ object ItemUtils {
         return name
     }
 
-    val ItemStack.extraAttributes: NBTTagCompound get() = this.tagCompound.extraAttributes
+    var ItemStack.extraAttributes: NBTTagCompound
+        get() = this.tagCompound?.extraAttributes ?: NBTTagCompound()
+        set(value) {
+            val tag = this.tagCompound ?: NBTTagCompound().also { tagCompound = it }
+            tag.setTag("ExtraAttributes", value)
+        }
+
     val NBTTagCompound.extraAttributes: NBTTagCompound get() = this.getCompoundTag("ExtraAttributes")
+
+    fun ItemStack.overrideId(id: String): ItemStack {
+        extraAttributes = extraAttributes.apply { setString("id", id) }
+        return this
+    }
 
     // TODO change else janni is sad
     fun ItemStack.isCoopSoulBound(): Boolean =
