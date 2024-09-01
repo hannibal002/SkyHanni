@@ -37,9 +37,14 @@ object GuardianReminder {
         "mainmenu",
         "Experimentation Table",
     )
+
+    /**
+     * REGEX-TEST: §dGuardian
+     * REGEX-TEST: §9Guardian§e
+     */
     private val petNamePattern by patternGroup.pattern(
         "guardianpet",
-        "§[956d]Guardian",
+        "§[956d]Guardian.*",
     )
 
     @SubscribeEvent
@@ -51,11 +56,9 @@ object GuardianReminder {
         lastInventoryOpen = SimpleTimeMark.now()
         ChatUtils.clickToActionOrDisable(
             "Use a §9§lGuardian Pet §efor more Exp in the Experimentation Table.",
-            option = config::guardianReminder,
+            config::guardianReminder,
             actionName = "open pets menu",
-            action = {
-                HypixelCommands.pet()
-            },
+            action = { HypixelCommands.pet() },
         )
     }
 
