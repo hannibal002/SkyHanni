@@ -577,7 +577,12 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
         getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
-            .formatted(dayAndMonthElement = false, yearElement = false, timeFormat24h = config.display.skyblockTime24hFormat) +
+            .formatted(
+                dayAndMonthElement = false,
+                yearElement = false,
+                timeFormat24h = config.display.skyblockTime24hFormat,
+                exactMinutes = config.display.skyblockTimeExactMinutes,
+            ) +
             " $symbol" to HorizontalAlignment.LEFT,
     )
 }
