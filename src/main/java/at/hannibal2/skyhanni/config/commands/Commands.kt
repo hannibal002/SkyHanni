@@ -441,7 +441,7 @@ object Commands {
         ) { PunchcardHighlight.clearList() }
         registerCommand(
             "shedittracker",
-            "Edit the value of ",
+            "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.",
         ) { TrackerManager.commandEditTracker(it) }
     }
 
