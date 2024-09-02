@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
+import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent.VOTING
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
@@ -11,7 +12,9 @@ import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigi
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -320,11 +323,48 @@ private fun getJacobContestLines() = buildList {
     getSbLines().firstOrNull { SbPattern.jacobsContestPattern.matches(it) }?.let { line ->
         add(line)
         getSbLines().nextAfter(line)?.let { add(it) }
-        getSbLines().nextAfter(line, 2)?.let { add(it) }
+        getSbLines().nextAfter(line, 2)?.let {
+            SbPattern.jacobsCollectedPattern.matchMatcher(it) {
+                val medal = groupOrNull("medal")
+                val collectedAmount = groupOrNull("amount")
+                if (collectedAmount == null) { add(it); return@matchMatcher }
+
+                val collectedAmountFixed = fixIncompleteJacobsNumber(collectedAmount)
+                val collectedFormat = collectedAmountFixed.formatLong().formatNum()
+
+                if (medal != null) add("$medal §fwith §e$collectedFormat")
+                else add("§fCollected §e$collectedFormat")
+            } ?: add(it)
+        }
         getSbLines().nextAfter(line, 3)?.let {
-            if (!SbPattern.footerPattern.matches(it)) add(it)
+            if (!SbPattern.footerPattern.matches(it)) {
+                SbPattern.jacobsRankingPattern.matchMatcher(it) {
+                    val thirdLineAmount = groupOrNull("amount")
+                    // Amount will be null when it's `Updating ranking...`
+                    thirdLineAmount?.let { tla ->
+                        val fixedAmount = fixIncompleteJacobsNumber(tla)
+                        val fixedAmountFormat = fixedAmount.formatLong().formatNum()
+
+                        val nextMedal = groupOrNull("nextmedal")
+                        val prevMedal = groupOrNull("previousmedal")
+
+                        if (nextMedal != null) add("§7$nextMedal has +$fixedAmountFormat")
+                        else if (prevMedal != null) add("§7+$fixedAmountFormat over $prevMedal")
+                        else add(it)
+                    } ?: add(it)
+                } ?: add(it)
+            }
         }
     }
+}
+
+private fun fixIncompleteJacobsNumber(numberAmount: String): String {
+    val parts = numberAmount.split(",")
+    val lastPart = parts.lastOrNull()
+
+    return if (lastPart != null && lastPart.length in 1..2 && parts.size > 1) {
+        numberAmount + ("0".repeat(3 - lastPart.length))
+    } else numberAmount
 }
 
 private fun getJacobContestShowWhen(): Boolean = SbPattern.jacobsContestPattern.anyMatches(getSbLines())
