@@ -73,6 +73,7 @@ object TpsCounter {
     }
 
     fun tpsCommand() {
+        if (display.isEmpty()) return
         ChatUtils.chat(display)
     }
 
