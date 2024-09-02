@@ -48,7 +48,7 @@ object ElectionViewerUtils {
         val entity = if (mayor == Mayor.JERRY) {
             EntityVillager(Minecraft.getMinecraft().theWorld)
         } else {
-            FakePlayer.getFakePlayer(getSkinFromMayorName(mayorName))
+            FakePlayer(getSkinFromMayorName(mayorName))
         }
 
         return Renderable.fakePlayer(
