@@ -22,10 +22,10 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object AdvancedPlayerList {
@@ -193,7 +193,7 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(it) } ?: ""
+            if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1) } ?: ""
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
