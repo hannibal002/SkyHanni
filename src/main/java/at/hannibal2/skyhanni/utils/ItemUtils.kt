@@ -68,10 +68,9 @@ object ItemUtils {
     }
 
     // TODO change else janni is sad
-    fun ItemStack.isCoopSoulBound(): Boolean =
-        getLore().any {
-            it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
-        }
+    fun ItemStack.isCoopSoulBound(): Boolean = getLore().any {
+        it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    }
 
     // TODO change else janni is sad
     fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
@@ -82,8 +81,7 @@ object ItemUtils {
 
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
-        val player = Minecraft.getMinecraft().thePlayer
-            ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
+        val player = Minecraft.getMinecraft().thePlayer ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
 
         for (slot in player.openContainer.inventorySlots) {
             if (slot.hasStack) {
@@ -138,8 +136,8 @@ object ItemUtils {
         if (tagCompound == null) return null
         val nbt = tagCompound
         if (!nbt.hasKey("SkullOwner")) return null
-        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
-            .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
+            .getCompoundTagAt(0).getString("Value")
     }
 
     fun ItemStack.getSkullOwner(): String? {
@@ -208,8 +206,7 @@ object ItemUtils {
 
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                group("itemCategory").replace(" ", "_") to
-                    group("rarity").replace(" ", "_")
+                group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
             val itemCategory = getItemCategory(category, name, cleanName)
@@ -290,8 +287,7 @@ object ItemUtils {
         return data.itemRarity
     }
 
-    private fun itemRarityLastCheck(data: CachedItemData) =
-        data.itemRarityLastCheck.passedSince() > 10.seconds
+    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     /**
      * Use when comparing the name (e.g. regex), not for showing to the user
@@ -390,6 +386,9 @@ object ItemUtils {
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
     val NEUInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
+
+    val NEUInternalName.readableInternalName: String
+        get() = asString().replace("_", " ").lowercase()
 
     private fun NEUInternalName.grabItemName(): String {
         if (this == NEUInternalName.WISP_POTION) {

@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
@@ -178,6 +179,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
         add("§eControl + Click to remove this item!")
+
+        add("")
+        add("§7Use §e/shedittracker ${internalName.readableInternalName} <amount>")
+        add("§7to edit the number.")
+        add("§7Use negative numbers to remove items.")
+
         if (SkyHanniMod.feature.dev.debug.enabled) {
             add("")
             add("§7${internalName}")
