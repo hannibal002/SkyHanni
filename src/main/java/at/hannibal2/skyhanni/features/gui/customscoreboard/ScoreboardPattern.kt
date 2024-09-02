@@ -208,16 +208,16 @@ object ScoreboardPattern {
     )
 
     /**
-     * REGEX-TEST: Updating ranking...
-     * REGEX-TEST: Bronze has +7,626
-     * REGEX-TEST: Silver has +7,146
-     * REGEX-TEST: Gold has +22,807
-     * REGEX-TEST: Diamond has +79,326
-     * REGEX-TEST: +176,692 over Platinum
+     * REGEX-TEST: §7Updating ranking...
+     * REGEX-TEST: §7Bronze has +7,626
+     * REGEX-TEST: §7Silver has +7,146
+     * REGEX-TEST: §7Gold has +22,807
+     * REGEX-TEST: §7Diamond has +79,326
+     * REGEX-TEST: §7+176,692 over Platinum
      */
     val jacobsRankingPattern by farmingSb.pattern(
         "jacobscontest.ranking",
-        "Updating ranking\\.{3}|((?<nextmedal>.*) has )?(?<amount>\\+[\\d,]*)(?: over (?<previousmedal>.*))?"
+        "(?:§.)*(Updating ranking\\.{3}|((?<nextmedal>.*) has )?(?<amount>\\+[\\d,]*)(?: over (?<previousmedal>.*))?)"
     )
     val plotPattern by farmingSb.pattern(
         "plot",
