@@ -394,7 +394,7 @@ object GraphEditor {
         val closedNode = closedNode
         if (closedNode != null && closedNode.position.distanceSqToPlayer() < 9.0) {
             if (closedNode == activeNode) {
-                feedBackInTutorial("Removed node, since you where closer than 3 blocks from a node.")
+                feedBackInTutorial("Removed node, since you where closer than 3 blocks from a the active node.")
                 nodes.remove(closedNode)
                 edges.removeIf { it.isInEdge(closedNode) }
                 if (closedNode == activeNode) activeNode = null
