@@ -110,6 +110,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Dungeon hub race waypoints. - seraid (https://github.com/hannibal002/SkyHanni/pull/1471)
     + Only works for Nothing; No return races.
 + Added the ability to hide solo class, solo class stats and fairy dialogue chat messages in Dungeons. - raven (https://github.com/hannibal002/SkyHanni/pull/1702)
++ Added highlight for starred dungeon mobs. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1558)
++ Added highlight for Fel skulls. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1558)
+    + Optionally draws a line to them as well.
 
 </details>
 <details open><summary>
@@ -195,7 +198,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Blocks picking up the Inferno Minion or replacing the fuel inside when expensive minion fuels are in use.
 + AH Show Price Comparison. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/339)
     + Highlight auctions based on the difference between their estimated value and the value they are listed for.
-    + Options to change the colours
+    + Options to change the colors
 + Highlight options in /tab. - Conutik (https://github.com/hannibal002/SkyHanni/pull/1175)
     + Green for enabled
     + Red for disabled
@@ -215,6 +218,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Show a list of all possible reforges for the item, with stats.
     + The reforge list can be sorted by a specific stat.
     + Optionally show the different stat values compared to the current reforge.
++ Show Bestiary Level as Stack Size. - saga (https://github.com/hannibal002/SkyHanni/pull/1945)
+    + Can be enabled/disabled on the Item Number list.
++ Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
++ Display the price per Stonk when taking the minimum bid in the Stonks Auction (Richard Menu). - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2195)
 
 </details>
 <details open><summary>
@@ -231,6 +238,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Lesser Orb of Healing Hider. - jani
 + Wand of Strength cooldown is now displayed. - saga (https://github.com/hannibal002/SkyHanni/pull/1948)
     + The cooldown displayed is for the buff, not the item usage.
++ Added Tactical Insertion Ability Cooldown feature. - DungeonHub (https://github.com/hannibal002/SkyHanni/pull/2278)
 
 </details>
 <details open><summary>
@@ -727,7 +735,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Checks if you have enough materials to craft the items and depending on that shows the button or not.
 + Overflow Garden crop milestones. - Luna & HiZe (https://github.com/hannibal002/SkyHanni/pull/997)
 + New "Craftable!" message when Visitor Items Needed are craftable. - Paloys (https://github.com/hannibal002/SkyHanni/pull/1891)
-+ Added toggle for compacting Garden visitor summary messages. - DavidArthurCole (https://github.com/hannibal002/SkyHanni/pull/2026)
++ Added toggle for compacting Garden visitor summary messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2026)
++ Added Farming Personal Best FF Gain. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2332)
+    + Displays in chat how much additional FF you earn from the farming contest personal best bonus after beating your previous record.
++ Added No Pests Chat Filter. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
+    + Removed the chat message "There are no Pests on your Garden!".
++ Added No Pests Title. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
+    + Shows a title when you use the Pest Tracker without any pests to clear.
 
 </details>
 <details open><summary>
@@ -808,6 +822,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Change Highlight color.
 + Punchcard Artifact Highlighter & Overlay. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1089)
     + Highlights unpunched players in the Rift.
++ Added Splatter Hearts Highlight for the Rift. - Empa (https://github.com/hannibal002/SkyHanni/pull/2318)
++ Added Motes per Session. - Empa (https://github.com/hannibal002/SkyHanni/pull/2323)
 
 </details>
 <details open><summary>
@@ -868,6 +884,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added powder cost for 10 levels.
 + Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1655)
     + Displays information about Mineshaft spawns, your progress towards a Pity Mineshaft, and more.
++ Added a "Get from Sack" button in the forge recipe menu to retrieve ingredients. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2106)
 
 </details>
 <details open><summary>
@@ -953,6 +970,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added an option to block Chocolate Factory access without a mythic rabbit pet. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2124)
 + Add reminder that the Time Tower is expired and has extra charges available. - appable (https://github.com/hannibal002/SkyHanni/pull/2133)
     + Replaces the previous Time Tower Reminder feature.
++ Added a tracker for stray rabbits caught in the Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2210)
++ Added Hoppity Hunt event summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2311)
+    + Use /shhoppitystats for live stats.
 
 </details>
 <details open><summary>
@@ -984,6 +1004,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can be used like `/shupdate <beta/full>` to download updates from a specific update stream.
 + /shignore. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1469)
     + This lets you block users from running party commands.
++ Added `/shcolors` command. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2216)
+    + Prints a list of all Minecraft color and formatting codes in chat.
++ Added Remind command. - ThatGravyBoat & Zickles (https://github.com/hannibal002/SkyHanni/pull/1708)
+    + Use `/shremind <time> <note>` to set reminders for your future self.
++ Added /shtps command. - saga (https://github.com/hannibal002/SkyHanni/pull/1961)
+    + Informs in chat about the server's ticks per second (TPS).
 
 </details>
 <details open><summary>
@@ -1221,8 +1247,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + A ton of settings.
     + Added Chunked Stats as a draggable list to the Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1341)
         + Select and prioritize the order of the stats you want to see.
+    + Added Soulflow to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
+      + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
++ Added Display for Bits on Cookie buy. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2265)
+    + Shows the Bits you would gain.
+    + Can show the change for the available Bits.
+    + Also shows the time more clearly (or adds it if not present).
 + Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
     + Simply right-click a HUD element in the HUD editor to jump to its associated options.
     + Does not yet work on every GUI element. Wait for the missing elements in the following betas.
@@ -1235,6 +1267,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
 + Allow party members to request allinvite to be turned on. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1464)
     + Say !allinv in party chat for them to enable all invite.
++ Added Reverse Party Leader. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1712)
+    + Reverse party transfer via clickable chat message or via the `/rpt` command.
+    + Configurable party chat message after transferring.
 + Added Hide Far Entities. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1064)
     + Can perhaps increase FPS for some users by 5% to 150%.
     + Options to change the distance and number of mobs to always show.
@@ -1248,6 +1283,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Editable Hotbar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1903)
     + Allows for moving and scaling in the SkyHanni GUI editor.
 + ULTRA RARE Book Notification when doing the Experiment Table. - raven (https://github.com/hannibal002/SkyHanni/pull/1738)
++ Added a warning when opening the Experimentation Table without a Guardian pet. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2127)
++ Added Enchanting Experience as Stack Size in Experimentation Table. - saga (https://github.com/hannibal002/SkyHanni/pull/1988)
+    + Added to the Item Number list.
 + In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
 + Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)
@@ -1266,6 +1304,14 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to include vanilla items.
 + Add Armor Stack Display. - Xupie (https://github.com/hannibal002/SkyHanni/pull/1811)
     + Display the number of stacks on armor pieces like Crimson, Terror etc.
++ Added Option to crash your game when you die, for extra suffering. - Stella (https://github.com/hannibal002/SkyHanni/pull/2238)
+    + Also punishes players who don't read patch notes.
++ Added Crown of Avarice counter. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2229)
++ Added a title notification for when the Thunder Bottle is fully charged. - raven (https://github.com/hannibal002/SkyHanni/pull/2234)
++ Added Editable XP Bar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1944)
+    + Enabled moving and scaling of the XP bar in the SkyHanni GUI Editor.
++ Show dye hex code as the actual color in the item lore. - nopo (https://github.com/hannibal002/SkyHanni/pull/2321)
++ Added a notification when you join a server you have joined previously. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2046)
 
 </details>
 <details open><summary>

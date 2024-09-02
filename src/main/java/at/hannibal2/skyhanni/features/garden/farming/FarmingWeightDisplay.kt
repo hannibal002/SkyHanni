@@ -362,7 +362,7 @@ object FarmingWeightDisplay {
                 "§eClick to open your Farming Weight",
                 "§eprofile on §celitebot.dev",
             ),
-            "shfarmingprofile ${LorenzUtils.getPlayerName()}",
+            "/shfarmingprofile ${LorenzUtils.getPlayerName()}",
         )
     }
 
@@ -372,6 +372,9 @@ object FarmingWeightDisplay {
     private fun isEtaEnabled() = config.overtakeETA
 
     fun addCrop(crop: CropType, addedCounter: Int) {
+        //Prevent div-by-0 errors
+        if (addedCounter == 0) return;
+
         val before = getExactWeight()
         localCounter[crop] = crop.getLocalCounter() + addedCounter
         val after = getExactWeight()
@@ -384,7 +387,7 @@ object FarmingWeightDisplay {
     private fun updateWeightPerSecond(crop: CropType, before: Double, after: Double, diff: Int) {
         val speed = crop.getSpeed() ?: return
         val weightDiff = (after - before) * 1000
-        weightPerSecond = weightDiff / diff * speed / 1000
+        weightPerSecond = (((weightDiff / diff) * speed) / 1000)
     }
 
     private fun getExactWeight(): Double {
@@ -508,7 +511,7 @@ object FarmingWeightDisplay {
             "Error loading user farming weight\n" +
                 "§eLoading the farming weight data from elitebot.dev failed!\n" +
                 "§eYou can re-enter the garden to try to fix the problem.\n" +
-                "§cIf this message repeats, please report it on Discord!\n",
+                "§cIf this message repeats, please report it on Discord",
             "url" to url,
             "apiResponse" to apiResponse,
             "localProfile" to localProfile,

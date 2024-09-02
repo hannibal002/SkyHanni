@@ -1,20 +1,11 @@
 //
 // TODO LIST
 // V2 RELEASE
-//  - Soulflow API
 //  - Bank API (actually maybe not, I like the current design)
-//  - beacon power
-//  - skyblock level
-//  - more bg options (round, blurr, outline)
 //  - countdown events like fishing festival + fiesta when its not on tablist
-//  - CookieAPI https://discord.com/channels/997079228510117908/1162844830360146080/1195695210433351821
-//  - Rng meter display
-//  - option to hide coins earned
+//  - improve hide coin difference to also work with bits, motes, etc
 //  - color options in the purse etc lines
 //  - choose the amount of decimal places in shorten nums
-//  - more anchor points (alignment enums in renderutils)
-//  - 24h instead of 12h for skyblock time
-//  - only alert for lines that exist longer than 1s
 //
 
 package at.hannibal2.skyhanni.features.gui.customscoreboard
@@ -27,6 +18,7 @@ import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -34,14 +26,17 @@ import at.hannibal2.skyhanni.utils.DelayedRun.runDelayed
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAlignedWidth
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonArray
 import com.google.gson.JsonPrimitive
 import net.minecraftforge.client.GuiIngameForge
 import net.minecraftforge.client.event.RenderGameOverlayEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 typealias ScoreboardElementType = Pair<String, HorizontalAlignment>
@@ -53,12 +48,17 @@ object CustomScoreboard {
     private var cache = emptyList<ScoreboardElementType>()
     private val guiName = "Custom Scoreboard"
 
+    // Cached scoreboard data, only update after no change for 300ms
+    var activeLines = emptyList<String>()
+
+    // Most recent scoreboard state, not in use until cached
+    private var mostRecentLines = emptyList<String>()
+    private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
-
-        RenderBackground().renderBackground()
 
         val render =
             if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
@@ -66,23 +66,42 @@ object CustomScoreboard {
             } else {
                 display
             }
-        config.position.renderStringsAlignedWidth(
-            render,
-            posLabel = guiName,
-            extraSpace = displayConfig.lineSpacing - 10,
+
+        val textRenderable = Renderable.verticalContainer(
+            render.map { Renderable.string(it.first, horizontalAlign = it.second) },
+            displayConfig.lineSpacing - 10,
+            horizontalAlign = HorizontalAlignment.CENTER,
+            verticalAlign = VerticalAlignment.CENTER,
         )
+
+        val finalRenderable = RenderBackground.addBackground(textRenderable)
+
+        RenderBackground.updatePosition(finalRenderable)
+
+        config.position.renderRenderable(finalRenderable, posLabel = guiName)
     }
 
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == guiName) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN
-                    || verticalAlignment != VerticalAlignment.DONT_ALIGN
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
+                    verticalAlignment != VerticalAlignment.DONT_ALIGN
                 ) {
+                    val tempHori = horizontalAlignment
+                    val tempVert = verticalAlignment
+
                     horizontalAlignment = HorizontalAlignment.DONT_ALIGN
                     verticalAlignment = VerticalAlignment.DONT_ALIGN
-                    ChatUtils.chat("Disabled Custom Scoreboard auto-alignment.")
+                    ChatUtils.clickableChat(
+                        "Disabled Custom Scoreboard auto-alignment. Click here to undo this action!",
+                        oneTimeClick = true,
+                        onClick = {
+                            horizontalAlignment = tempHori
+                            verticalAlignment = tempVert
+                            ChatUtils.chat("Enabled Custom Scoreboard auto-alignment.")
+                        },
+                    )
                 }
             }
         }
@@ -92,8 +111,16 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
+        // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
+        var dirty = false
+        if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
+            activeLines = mostRecentLines
+            lastScoreboardUpdate = SimpleTimeMark.farFuture()
+            dirty = true
+        }
+
         // Creating the lines
-        if (event.isMod(5)) {
+        if (event.isMod(5) || dirty) {
             display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
@@ -103,6 +130,13 @@ object CustomScoreboard {
         // Remove Known Lines, so we can get the unknown ones
         UnknownLinesHandler.handleUnknownLines()
     }
+
+    @SubscribeEvent
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        mostRecentLines = event.scoreboard
+        lastScoreboardUpdate = SimpleTimeMark.now()
+    }
+
 
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display

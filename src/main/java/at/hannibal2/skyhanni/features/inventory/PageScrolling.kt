@@ -35,6 +35,7 @@ object PageScrolling {
         "§aScroll Up",
         "§aLevels 26 - 50",
         "§aNext Page →",
+        "§aScroll Right",
     )
 
     private val backwardPattern by repoGroup.list(
@@ -43,6 +44,7 @@ object PageScrolling {
         "§aScroll Down",
         "§aLevels 1 - 25",
         "§a← Previous Page",
+        "§aScroll Left",
     )
 
     private val scroll = ScrollValue()

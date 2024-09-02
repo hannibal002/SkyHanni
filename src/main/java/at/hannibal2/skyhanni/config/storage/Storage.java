@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.features.garden.CropType;
 import at.hannibal2.skyhanni.features.garden.pests.PestType;
+import at.hannibal2.skyhanni.features.misc.reminders.Reminder;
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWord;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
@@ -47,11 +48,15 @@ public class Storage {
     @Expose
     public Map<UUID, PlayerSpecificStorage> players = new HashMap<>();
 
+    // TODO this should get moved into player specific
     @Expose
     public String currentFameRank = "New player";
 
     @Expose
     public List<String> blacklistedUsers = new ArrayList<>();
+
+    @Expose
+    public Map<String, Reminder> reminders = new HashMap<>();
 
     @Expose
     public CropType lastCropBroken = null;
