@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-//#if FORGE
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -30,6 +29,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
+
+//#if FORGE
 import net.minecraftforge.fml.common.eventhandler.Event
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -152,8 +153,7 @@ object EntityUtils {
     fun EntityPlayer.isNPC() = !isRealPlayer()
 
     fun EntityLivingBase.hasPotionEffect(
-        potion:
-        //#if MC <1.21
+        potion: //#if MC <1.21
         Potion,
         //#else
         //$$ net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>
@@ -188,8 +188,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPre(
-        event:
-        //#if MC < 1.14
+        event: //#if MC < 1.14
         RenderLivingEvent.Pre<*>,
         //#else
         //$$ RenderLivingEvent.Pre<*, *>
@@ -204,8 +203,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPost(
-        event:
-        //#if MC < 11400
+        event: //#if MC < 11400
         RenderLivingEvent.Post<*>,
         //#else
         //$$ RenderLivingEvent.Post<*, *>
@@ -215,11 +213,10 @@ object EntityUtils {
         SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
-//#if MC < 11400
+    //#if MC < 11400
     @SubscribeEvent
     fun onEntityRenderSpecialsPre(
-        event:
-        RenderLivingEvent.Specials.Pre<*>,
+        event: RenderLivingEvent.Specials.Pre<*>,
     ) {
         val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
@@ -229,8 +226,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(
-        event:
-        RenderLivingEvent.Specials.Post<*>,
+        event: RenderLivingEvent.Specials.Post<*>,
     ) {
         SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
