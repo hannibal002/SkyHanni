@@ -73,7 +73,10 @@ object TpsCounter {
     }
 
     fun tpsCommand() {
-        if (display.isEmpty()) return
+        if (display.isEmpty()) {
+            ChatUtils.chat("§cNo tps data available, make sure you have the setting on.")
+            return
+        }
         ChatUtils.chat(display)
     }
 
