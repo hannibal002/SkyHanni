@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.HideArmorConfig.ModeEntry
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.mixins.hooks.FakePlayerData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
@@ -26,6 +27,7 @@ object HideArmor {
     private fun shouldHideArmor(entity: EntityLivingBase): Boolean {
         if (!LorenzUtils.inSkyBlock) return false
         if (entity !is EntityPlayer) return false
+        if ((entity as FakePlayerData).isFakePlayer()) return false
         if (entity.hasPotionEffect(Effects.invisibility)) return false
         if (entity.isNPC()) return false
 

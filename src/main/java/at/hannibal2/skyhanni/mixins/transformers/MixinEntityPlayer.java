@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.EntityData;
+import at.hannibal2.skyhanni.mixins.hooks.FakePlayerData;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.IChatComponent;
@@ -9,7 +10,12 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
 @Mixin(EntityPlayer.class)
-public class MixinEntityPlayer {
+public class MixinEntityPlayer implements FakePlayerData {
+
+    @Override
+    public boolean isFakePlayer() {
+        return false;
+    }
 
     @ModifyVariable(
         method = "getDisplayName",

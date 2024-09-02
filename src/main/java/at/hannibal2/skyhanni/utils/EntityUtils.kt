@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.mixins.hooks.FakePlayerData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
@@ -256,16 +257,16 @@ object EntityUtils {
         return object : EntityOtherPlayerMP(
             mc.theWorld,
             player.gameProfile,
-        ) {
-            override fun getLocationSkin() =
-                player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
+        ), FakePlayerData {
+            override fun getLocationSkin() = player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
 
             override fun getTeam() = object : ScorePlayerTeam(null, null) {
                 override fun getNameTagVisibility() = EnumVisible.NEVER
             }
 
-            override fun isWearing(part: EnumPlayerModelParts): Boolean =
-                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
+            override fun isWearing(part: EnumPlayerModelParts): Boolean = player.isWearing(part) && part != EnumPlayerModelParts.CAPE
+
+            override fun isFakePlayer(): Boolean = true
         }
     }
 }
