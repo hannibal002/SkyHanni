@@ -393,14 +393,20 @@ object GraphEditor {
     private fun addNode() {
         val closedNode = closedNode
         if (closedNode != null && closedNode.position.distanceSqToPlayer() < 9.0) {
-            feedBackInTutorial("Removed node, since you where closer than 3 blocks from a node.")
-            nodes.remove(closedNode)
-            edges.removeIf { it.isInEdge(closedNode) }
-            if (closedNode == activeNode) activeNode = null
-            this.closedNode = null
-            return
+            if (closedNode == activeNode) {
+                feedBackInTutorial("Removed node, since you where closer than 3 blocks from a node.")
+                nodes.remove(closedNode)
+                edges.removeIf { it.isInEdge(closedNode) }
+                if (closedNode == activeNode) activeNode = null
+                this.closedNode = null
+                return
+            }
         }
         val position = LocationUtils.playerEyeLocation().roundLocationToBlock()
+        if (nodes.any { it.position == position }) {
+            feedBackInTutorial("Can't create node, here is already another one.")
+            return
+        }
         val node = GraphingNode(id++, position)
         nodes.add(node)
         feedBackInTutorial("Added graph node.")
