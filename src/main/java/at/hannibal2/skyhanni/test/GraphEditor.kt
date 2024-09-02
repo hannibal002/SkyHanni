@@ -379,7 +379,7 @@ object GraphEditor {
 
     private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
         if (this.keyCode.isKeyClicked()) {
-            activeNode?.position = activeNode?.position?.let { it + vector } ?: return
+            activeNode?.position = activeNode?.position?.plus(vector) ?: return
         }
     }
 
