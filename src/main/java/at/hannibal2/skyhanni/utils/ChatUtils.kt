@@ -258,6 +258,7 @@ object ChatUtils {
         return this
     }
 
+
     fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
         ChatUtils.clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
@@ -269,7 +270,7 @@ object ChatUtils {
                 }
             },
             hover = "§eClick to $actionName!\n" +
-                "§eShift-Click to disable this feature!",
+                "§eShift-Click or Control-Click to disable this feature!",
         )
     }
 }
