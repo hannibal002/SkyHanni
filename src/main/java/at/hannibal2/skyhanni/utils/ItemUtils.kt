@@ -22,9 +22,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.collect.Lists
 import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.NotificationHandler
-import java.util.LinkedList
-import java.util.regex.Matcher
-import kotlin.time.Duration.Companion.seconds
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -34,6 +31,9 @@ import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.LinkedList
+import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ItemUtils {

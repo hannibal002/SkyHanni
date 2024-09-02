@@ -7,10 +7,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import java.awt.Color
-import java.text.DecimalFormat
-import kotlin.math.ceil
-import kotlin.math.min
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.client.gui.GuiScreen
@@ -22,6 +18,10 @@ import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.item.ItemStack
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL14
+import java.awt.Color
+import java.text.DecimalFormat
+import kotlin.math.ceil
+import kotlin.math.min
 
 /**
  * Some functions taken from NotEnoughUpdates
