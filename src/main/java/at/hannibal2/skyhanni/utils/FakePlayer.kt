@@ -45,59 +45,57 @@ class FakePlayer(private val skinUrl: String? = null) :
     override fun isWearing(part: EnumPlayerModelParts): Boolean =
         Minecraft.getMinecraft().thePlayer.isWearing(part) && part != EnumPlayerModelParts.CAPE
 
-    // Fixes the FakePlayer being affected by the Upside-Down Contributor option
-    override fun hasCustomName(): Boolean = true
-    override fun getName(): String = "§k§da§r Fake Player §k§da"
 
+    companion object {
+        /**
+         * Get the skin file for the specified URL, downloading it if it does not already exist
+         */
+        private fun getSkinFile(url: String): File {
+            val mc = Minecraft.getMinecraft()
+            val skinDirectory = File(mc.mcDataDir, "skins")
 
-    /**
-     * Get the skin file for the specified URL, downloading it if it does not already exist
-     */
-    private fun getSkinFile(url: String): File {
-        val mc = Minecraft.getMinecraft()
-        val skinDirectory = File(mc.mcDataDir, "skins")
+            // Ensure the directory exists, creating it if it does not
+            if (!skinDirectory.exists()) {
+                skinDirectory.mkdirs()
+            }
 
-        // Ensure the directory exists, creating it if it does not
-        if (!skinDirectory.exists()) {
-            skinDirectory.mkdirs()
+            val skinFile = File(skinDirectory, "${url.hashCode()}.png")
+
+            // Download and save the skin if it does not already exist
+            if (!skinFile.exists()) {
+                downloadAndSaveSkin(url, skinFile)
+            }
+
+            return skinFile
         }
 
-        val skinFile = File(skinDirectory, "${url.hashCode()}.png")
-
-        // Download and save the skin if it does not already exist
-        if (!skinFile.exists()) {
-            downloadAndSaveSkin(url, skinFile)
-        }
-
-        return skinFile
-    }
-
-    /**
-     * Download the skin from the specified URL and save it to the specified file
-     */
-    private fun downloadAndSaveSkin(url: String, file: File) {
-        val connection = URL(url).openConnection() as HttpURLConnection
-        connection.inputStream.use { input ->
-            FileOutputStream(file).use { output ->
-                input.copyTo(output)
+        /**
+         * Download the skin from the specified URL and save it to the specified file
+         */
+        private fun downloadAndSaveSkin(url: String, file: File) {
+            val connection = URL(url).openConnection() as HttpURLConnection
+            connection.inputStream.use { input ->
+                FileOutputStream(file).use { output ->
+                    input.copyTo(output)
+                }
             }
         }
-    }
 
-    /**
-     * Load a texture from the specified file
-     */
-    private fun loadTextureFromFile(file: File): ResourceLocation {
-        val mc = Minecraft.getMinecraft()
-        val textureManager = mc.textureManager
+        /**
+         * Load a texture from the specified file
+         */
+        private fun loadTextureFromFile(file: File): ResourceLocation {
+            val mc = Minecraft.getMinecraft()
+            val textureManager = mc.textureManager
 
-        // Load the image
-        val bufferedImage = ImageIO.read(file)
+            // Load the image
+            val bufferedImage = ImageIO.read(file)
 
-        // Create a DynamicTexture from the BufferedImage
-        val dynamicTexture = DynamicTexture(bufferedImage)
-        textureManager.loadTexture(ResourceLocation("skins/${file.name}"), dynamicTexture)
+            // Create a DynamicTexture from the BufferedImage
+            val dynamicTexture = DynamicTexture(bufferedImage)
+            textureManager.loadTexture(ResourceLocation("skins/${file.name}"), dynamicTexture)
 
-        return ResourceLocation("skins/${file.name}")
+            return ResourceLocation("skins/${file.name}")
+        }
     }
 }
