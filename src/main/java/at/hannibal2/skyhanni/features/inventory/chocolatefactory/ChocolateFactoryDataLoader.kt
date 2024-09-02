@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.Deque
 import java.util.LinkedList
 
 @SkyHanniModule
@@ -463,7 +464,7 @@ object ChocolateFactoryDataLoader {
 
         ChocolateFactoryAPI.lastUpgradesWhenChecking = currentUpgrades.associateBy { it.slotIndex }
 
-        val bestUpgrades: HashMap<Int, MutableList<ChocolateFactoryUpgrade>> = hashMapOf()
+        val bestUpgrades = hashMapOf<Int, Deque<ChocolateFactoryUpgrade>>()
         for (upgrade in currentUpgrades) {
             bestUpgrades[upgrade.slotIndex] = LinkedList()
         }
@@ -489,7 +490,7 @@ object ChocolateFactoryDataLoader {
      */
     private fun findAllBestUpgradesImpl(
         list: ArrayList<ChocolateFactoryUpgrade>,
-        allUpgrades: MutableMap<Int, MutableList<ChocolateFactoryUpgrade>>,
+        allUpgrades: MutableMap<Int, Deque<ChocolateFactoryUpgrade>>,
         remainingChocolate: Long = profileStorage?.currentChocolate ?: 0,
         baseIncreaseAfterUpgrades: Int = 0,
         multiplierIncreaseAfterUpgrades: Double = 0.0
@@ -516,7 +517,7 @@ object ChocolateFactoryDataLoader {
         // Keep track of total base increase and multiplier increase after upgrades.
         val nextBaseIncrease = baseIncreaseAfterUpgrades + (ChocolateFactoryAPI.rabbitSlots[bestUpgrade.slotIndex] ?: 0)
         val nextMultiplierIncrease = multiplierIncreaseAfterUpgrades +
-            0.01 * if (bestUpgrade.slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 1 else 0
+            if (bestUpgrade.slotIndex == ChocolateFactoryAPI.coachRabbitIndex) 0.01 else 0.0
 
         // Should never throw since empty lists are added in caller method.
         allUpgrades[bestUpgrade.slotIndex]?.add(bestUpgrade) ?: throw IllegalStateException("Best upgrade not found in list")

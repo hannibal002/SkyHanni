@@ -20,13 +20,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.Deque
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -81,9 +81,6 @@ object ChocolateFactoryAPI {
     var coachRabbitIndex = 42
     var maxRabbits = 395
 
-    // TODO: Implement logic to determine if it has been found.
-    var foundZetaRabbit = true
-
     var maxMilestoneChocolate = 700_000_000_000L
     private var maxPrestige = 5
 
@@ -108,8 +105,8 @@ object ChocolateFactoryAPI {
     var bestPossibleSlot = -1
 
 
-    var allBestPossibleUpgrades: Map<Int, MutableList<ChocolateFactoryUpgrade>> = mapOf()
-    var lastUpgradesWhenChecking: Map<Int, ChocolateFactoryUpgrade> = mapOf()
+    var allBestPossibleUpgrades = mapOf<Int, Deque<ChocolateFactoryUpgrade>>()
+    var lastUpgradesWhenChecking = mapOf<Int, ChocolateFactoryUpgrade>()
     var lastBestNotAffordableUpgrade: ChocolateFactoryUpgrade? = null
     var totalUpgradeCost = 0L
 
