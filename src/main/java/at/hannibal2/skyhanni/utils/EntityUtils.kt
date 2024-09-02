@@ -215,10 +215,11 @@ object EntityUtils {
         SkyHanniRenderEntityEvent.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
 
-    //#if MC < 11400
+//#if MC < 11400
     @SubscribeEvent
     fun onEntityRenderSpecialsPre(
-        event: RenderLivingEvent.Specials.Pre<*>,
+        event:
+        RenderLivingEvent.Specials.Pre<*>,
     ) {
         val shEvent = SkyHanniRenderEntityEvent.Specials.Pre(event.entity, event.renderer, event.x, event.y, event.z)
         if (shEvent.postAndCatch()) {
@@ -228,7 +229,8 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderSpecialsPost(
-        event: RenderLivingEvent.Specials.Post<*>,
+        event:
+        RenderLivingEvent.Specials.Post<*>,
     ) {
         SkyHanniRenderEntityEvent.Specials.Post(event.entity, event.renderer, event.x, event.y, event.z).postAndCatch()
     }
