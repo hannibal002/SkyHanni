@@ -36,7 +36,7 @@ object AdvancedPlayerList {
 
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",
-        ".*\\[(?<level>.*)] §r(?<name>.*)"
+        ".*\\[(?<level>.*)] §r(?<name>.*)",
     )
 
     private var playerData = mutableMapOf<String, PlayerData>()
@@ -193,7 +193,9 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1) } ?: ""
+            if (data.ironman) "§7♲" else data.bingoLevel?.let {
+                BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1)
+            } ?: ""
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
