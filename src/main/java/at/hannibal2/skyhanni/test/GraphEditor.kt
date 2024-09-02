@@ -367,17 +367,19 @@ object GraphEditor {
     }
 
     private fun editModeClicks() {
-        KeyboardManager.WasdInputMatrix.w.handleEditClicks(x = 1)
-        KeyboardManager.WasdInputMatrix.s.handleEditClicks(x = -1)
-        KeyboardManager.WasdInputMatrix.a.handleEditClicks(z = 1)
-        KeyboardManager.WasdInputMatrix.d.handleEditClicks(z = -1)
-        KeyboardManager.WasdInputMatrix.up.handleEditClicks(y = 1)
-        KeyboardManager.WasdInputMatrix.down.handleEditClicks(y = -1)
+        var vector = LocationUtils.calculatePlayerFacingDirection()
+        KeyboardManager.WasdInputMatrix.w.handleEditClicks(vector)
+        KeyboardManager.WasdInputMatrix.a.handleEditClicks(vector.rotateXZ(Math.toRadians(90.0)))
+        KeyboardManager.WasdInputMatrix.s.handleEditClicks(vector.rotateXZ(Math.toRadians(180.0)))
+        KeyboardManager.WasdInputMatrix.d.handleEditClicks(vector.rotateXZ(Math.toRadians(270.0)))
+
+        KeyboardManager.WasdInputMatrix.up.handleEditClicks(LorenzVec(0, 1, 0))
+        KeyboardManager.WasdInputMatrix.down.handleEditClicks(LorenzVec(0, -1, 0))
     }
 
-    private fun KeyBinding.handleEditClicks(x: Int = 0, y: Int = 0, z: Int = 0) {
+    private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
         if (this.keyCode.isKeyClicked()) {
-            activeNode?.position = activeNode?.position?.add(x, y, z) ?: return
+            activeNode?.position = activeNode?.position?.let { it + vector } ?: return
         }
     }
 
