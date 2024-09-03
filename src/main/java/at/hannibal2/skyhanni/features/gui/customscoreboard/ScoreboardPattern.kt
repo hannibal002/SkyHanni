@@ -206,18 +206,17 @@ object ScoreboardPattern {
         "jacobscontest.progress",
         ".*(?:Collected|(?<medal>§.+§l[A-Z]*) §.+with) §e(?<amount>[\\d,]+)",
     )
-
     /**
-     * REGEX-TEST: §7 Updating ranking...
-     * REGEX-TEST:  §7Bronze has +7,626
-     * REGEX-TEST:  §7Silver has +7,146
-     * REGEX-TEST:  §7Gold has +22,807
-     * REGEX-TEST:  §7Diamond has +79,326
-     * REGEX-TEST: §7 +176,692 over Platinum
+     * REGEX-TEST:  §7Updating ranking...
+     * REGEX-TEST:  §7Bronze has §7+7,626
+     * REGEX-TEST:  §7Silver has §7+7,146
+     * REGEX-TEST:  §7Gold has §7+22,807
+     * REGEX-TEST:  §7Diamond has §7+79,326
+     * REGEX-TEST:  §7+176,692 over Platinum
      */
     val jacobsRankingPattern by farmingSb.pattern(
         "jacobscontest.ranking",
-        "(?:§.| )*(Updating ranking\\.{3}|((?<nextmedal>.*) has )?(?<amount>\\+[\\d,]*)(?: over (?<previousmedal>.*))?)"
+        "(?:§.| )*(?:Updating ranking\\.{3}|(?:(?<nextmedal>.*) has )?(?:§.| )*(?<amount>\\+[\\d,]*)(?: over (?<previousmedal>.*))?).*"
     )
     val plotPattern by farmingSb.pattern(
         "plot",
