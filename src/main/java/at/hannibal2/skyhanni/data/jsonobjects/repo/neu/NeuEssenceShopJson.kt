@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.data.jsonobjects.repo
+package at.hannibal2.skyhanni.data.jsonobjects.repo.neu
 
 import com.google.gson.annotations.Expose
 
