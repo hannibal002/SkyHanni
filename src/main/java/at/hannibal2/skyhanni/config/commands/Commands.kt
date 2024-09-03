@@ -54,6 +54,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.gui.ShTrack
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
@@ -179,8 +180,15 @@ object Commands {
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
-
     private fun usersNormal() {
+        registerCommand("shtrack", "Track any quantity", ShTrack.arguments) { ShTrack.ContextObject() }
+        registerCommand(
+            "shtrackitem",
+            "Track any item",
+            ShTrack.arguments,
+        ) {
+            ShTrack.ContextObject().apply { state = ShTrack.ContextObject.StateType.ITEM }
+        }
         registerCommand(
             "shmarkplayer",
             "Add a highlight effect to a player for better visibility",
@@ -358,7 +366,7 @@ object Commands {
         ) { ColorFormattingHelper.printColorCodeList() }
         registerCommand(
             "shtps",
-            "Informs in chat about the server ticks per second (TPS)."
+            "Informs in chat about the server ticks per second (TPS).",
         ) { TpsCounter.tpsCommand() }
     }
 
@@ -477,7 +485,7 @@ object Commands {
         ) { SkyBlockIslandTest.onCommand(it) }
         registerCommand(
             "shdebugprice",
-            "Debug different price sources for an item."
+            "Debug different price sources for an item.",
         ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
@@ -703,4 +711,68 @@ object Commands {
             if (args != null) function(args.asList().toTypedArray())
         }
     }
+
+    private fun <O : CommandContextAwareObject, A : CommandArgument<O>> registerCommand(
+        rawName: String,
+        description: String,
+        specifiers: Collection<A>,
+        context: () -> O,
+    ) {
+        registerCommand(rawName, description) {
+            advancedHandleCommand(it, specifiers, context())
+        }
+    }
+
+    private fun <O : CommandContextAwareObject, A : CommandArgument<O>> advancedHandleCommand(
+        args: Array<String>,
+        specifiers: Collection<A>,
+        context: O,
+    ) {
+        var index = 0
+        var amountNoPrefixArguments = 0
+
+        while (args.size > index) {
+            val current = args[index]
+            val (spec, lookup) = specifiers.firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
+                ?: specifiers.firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }
+                    ?.let {
+                        amountNoPrefixArguments++
+                        it to -1
+                    }
+                ?: specifiers.firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
+                    amountNoPrefixArguments++
+                    it to -1
+                } ?: (null to 0)
+            val result = spec?.handler?.let { it(args.slice((lookup + index + 1)..<args.size), context) }
+            if (result == null) {
+                context.errorMessage = "Unknown argument: '$current'"
+            }
+            context.errorMessage?.let {
+                ChatUtils.userError(it)
+                return
+            }
+            index += (1 + lookup) + (result ?: 0)
+        }
+        context.post()
+        context.errorMessage?.let {
+            ChatUtils.userError(it)
+            return
+        }
+    }
 }
+
+interface CommandContextAwareObject {
+    /** Setting this to none null will print the [errorMessage] as a user error and terminates the command handling */
+    var errorMessage: String?
+
+    /** Function that is executed after all arguments have been handled */
+    fun post()
+}
+
+data class CommandArgument<T : CommandContextAwareObject>(
+    val prefix: String = "",
+    /** -1 = invalid, -2 last element else index of the position of defaults */
+    val defaultPosition: Int = -1,
+    val validity: (T) -> Boolean = { true },
+    val handler: (Iterable<String>, T) -> Int,
+)
