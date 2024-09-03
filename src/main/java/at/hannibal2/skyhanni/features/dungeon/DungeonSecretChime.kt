@@ -14,28 +14,23 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DungeonSecretChime {
     private val config get() = SkyHanniMod.feature.dungeon.secretChime
+    private const val WITHER_ESSENCE_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled() || event.clickType != ClickType.RIGHT_CLICK) return
 
-        val position = event.position
-        val blockType = when (position.getBlockAt()) {
-            Blocks.chest, Blocks.trapped_chest, Blocks.lever, Blocks.skull -> true
-            else -> false
-        }
-
-        if (event.position.getBlockAt() == Blocks.skull) {
-            val text = BlockUtils.getTextureFromSkull(position.toBlockPos())
-            if (text != "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQ" +
-                "ubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3M" +
-                "DdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
-            ) {
-                return
+        val block = event.position.getBlockAt()
+        when (block) {
+            Blocks.chest, Blocks.trapped_chest, Blocks.lever -> playSound()
+            Blocks.skull -> {
+                val texture = BlockUtils.getTextureFromSkull(event.position.toBlockPos())
+                if (texture == WITHER_ESSENCE_TEXTURE) {
+                    playSound()
+                }
             }
+            else -> return
         }
-
-        if (blockType) playSound()
     }
 
     fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
