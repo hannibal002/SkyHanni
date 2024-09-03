@@ -19,8 +19,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import java.lang.ArithmeticException
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
@@ -202,7 +204,26 @@ object EnchantParser {
         val insertEnchants: MutableList<String> = mutableListOf()
 
         // Format enchants based on format config option
-        formatEnchants(insertEnchants)
+        try {
+            formatEnchants(insertEnchants)
+        } catch (e: ArithmeticException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Item has enchants in nbt but none were found?",
+                "item" to currentItem,
+                "loreList" to loreList,
+                "nbt" to currentItem?.getExtraAttributes()
+            )
+            return
+        } catch (e: ConcurrentModificationException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "ConcurrentModificationException whilst formatting enchants",
+                "loreList" to loreList,
+                "format" to config.format.get(),
+                "orderedEnchants" to orderedEnchants
+            )
+        }
 
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)
