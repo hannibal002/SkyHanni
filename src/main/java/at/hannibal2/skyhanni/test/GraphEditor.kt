@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
 import at.hannibal2.skyhanni.data.model.toJson
@@ -38,6 +39,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GraphEditor {
@@ -84,7 +86,7 @@ object GraphEditor {
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
 
     val scrollValue = ScrollValue()
-    var namedNodeList: List<Renderable> = emptyList()
+    var nodesDisplay = emptyList<Renderable>()
     var lastUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -128,7 +130,7 @@ object GraphEditor {
         }
         if (inTextMode) {
             add("§eFormat: ${textBox.finalText()}")
-            add("§eRaw:     ${textBox.editText()}")
+            add("§eRaw:     ${textBox.editText(textColor = LorenzColor.YELLOW)}")
         }
     }
 
@@ -137,7 +139,7 @@ object GraphEditor {
         if (!isEnabled()) return
         config.namedNodesList.renderRenderables(
             buildList {
-                val list = getNamedNodes()
+                val list = getNodeNames()
                 val size = list.size
                 addString("§eGraph Nodes: $size")
                 val height = (size * 10).coerceAtMost(150)
@@ -149,33 +151,116 @@ object GraphEditor {
         )
     }
 
-    private fun getNamedNodes(): List<Renderable> {
+    private fun getNodeNames(): List<Renderable> {
         if (lastUpdate.passedSince() > 250.milliseconds) {
-            lastUpdate = SimpleTimeMark.now()
-            namedNodeList = calculateNamedNodes()
+            updateNodeNames()
         }
-        return namedNodeList
+        return nodesDisplay
     }
 
+    private fun updateNodeNames() {
+        lastUpdate = SimpleTimeMark.now()
+        nodesDisplay = drawNodeNames()
+    }
 
-    private fun calculateNamedNodes(): List<Renderable> = buildList {
+    private fun updateTagView(node: GraphingNode) {
+        lastUpdate = SimpleTimeMark.now() + 60.seconds
+        nodesDisplay = drawTagNames(node)
+    }
+
+    private fun drawTagNames(node: GraphingNode): List<Renderable> = buildList {
+        addString("§eChange tag for node '${node.name}§e'")
+        addString("")
+
+        for (tag in GraphNodeTag.entries) {
+            val state = if (tag in node.tags) "§aYES" else "§cNO"
+            val name = state + " §r" + tag.displayName
+            add(createTagName(name, tag, node))
+        }
+        addString("")
+        add(
+            Renderable.clickAndHover(
+                "§cGo Back!",
+                tips = listOf("§eClick to go back to the node list!"),
+                onClick = {
+                    updateNodeNames()
+                },
+            ),
+        )
+    }
+
+    private fun createTagName(
+        name: String,
+        tag: GraphNodeTag,
+        node: GraphingNode,
+    ) = Renderable.clickAndHover(
+        name,
+        tips = listOf(
+            "Tag ${tag.name}",
+            "§7${tag.description}",
+            "",
+            "§eClick to set tag for ${node.name} to ${tag.name}!",
+        ),
+        onClick = {
+            if (tag in node.tags) {
+                node.tags.remove(tag)
+            } else {
+                node.tags.add(tag)
+            }
+            updateTagView(node)
+        },
+    )
+
+    private fun drawNodeNames(): List<Renderable> = buildList {
         for ((node, distance: Double) in nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
             val name = node.name?.takeIf { !it.isBlank() } ?: continue
             val color = if (node == activeNode) "§a" else "§7"
             val distanceFormat = sqrt(distance).toInt().addSeparators()
-            val text = "${color}Node §r$name §f($distanceFormat)"
-            add(
-                Renderable.clickAndHover(
-                    text,
-                    emptyList(),
-                    onClick = {
-                        activeNode = node
-                        lastUpdate = SimpleTimeMark.farPast()
-                    },
-                ),
-            )
+            val tagText = node.tags.let {
+                if (it.isEmpty()) {
+                    " §cNo tag§r"
+                } else {
+                    val text = node.tags.map { it.internalName }.joinToString(", ")
+                    " §f($text)"
+                }
+            }
+
+            val text = "${color}Node §r$name$tagText §7[$distanceFormat]"
+            add(createNodeTextLine(text, name, node))
         }
     }
+
+    private fun MutableList<Renderable>.createNodeTextLine(
+        text: String,
+        name: String,
+        node: GraphingNode,
+    ): Renderable = Renderable.clickAndHover(
+        text,
+        tips = buildList {
+            add("Node '$name'")
+            add("")
+
+            if (node.tags.isNotEmpty()) {
+                add("Tags: ")
+                for (tag in node.tags) {
+                    add(" §8- §r${tag.displayName}")
+                }
+                add("")
+            }
+
+            add("§eClick to select/deselect this node!")
+            add("§eControl-Click to edit the tags for this node!")
+
+        },
+        onClick = {
+            if (KeyboardManager.isModifierKeyDown()) {
+                updateTagView(node)
+            } else {
+                activeNode = node
+                updateNodeNames()
+            }
+        },
+    )
 
     private fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
@@ -199,15 +284,30 @@ object GraphEditor {
             minimumAlpha = 0.2f,
             inverseAlphaScale = true,
         )
-        if (node.name == null) return
+
+        val nodeName = node.name ?: return
         this.drawDynamicText(
             node.position,
-            node.name!!,
+            nodeName,
             0.8,
             ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
             smallestDistanceVew = 12.0,
             ignoreY = true,
             yOff = -15f,
+            maxDistance = 80,
+        )
+
+        val tags = node.tags
+        if (tags.isEmpty()) return
+        val tagText = tags.map { it.displayName }.joinToString(" §f+ ")
+        this.drawDynamicText(
+            node.position,
+            tagText,
+            0.8,
+            ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
+            smallestDistanceVew = 12.0,
+            ignoreY = true,
+            yOff = 0f,
             maxDistance = 80,
         )
     }
@@ -359,6 +459,7 @@ object GraphEditor {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
             ChatUtils.chat(
                 "§lStats\n" +
+                    "§eNamed Nodes: ${nodes.count { it.name != null }.addSeparators()}\n" +
                     "§eNodes: ${nodes.size.addSeparators()}\n" +
                     "§eEdges: ${edges.size.addSeparators()}\n" +
                     "§eLength: $length",
@@ -428,7 +529,7 @@ object GraphEditor {
     private fun compileGraph(): Graph {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name) }
+        val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name, it.tags.mapNotNull { it.internalName }) }
         val neighbours = this.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
@@ -441,7 +542,16 @@ object GraphEditor {
 
     fun import(graph: Graph) {
         clear()
-        nodes.addAll(graph.map { GraphingNode(it.id, it.position, it.name) })
+        nodes.addAll(
+            graph.map {
+                GraphingNode(
+                    it.id,
+                    it.position,
+                    it.name,
+                    it.tagNames?.mapNotNull { GraphNodeTag.byId(it) }?.toMutableList() ?: mutableListOf(),
+                )
+            },
+        )
         val translation = graph.mapIndexed { index, it -> it to nodes[index] }.toMap()
         edges.addAll(
             graph.map { node ->
@@ -494,7 +604,13 @@ object GraphEditor {
     }
 }
 
-private class GraphingNode(val id: Int, var position: LorenzVec, var name: String? = null) {
+// The node object the graph editor is working with
+private class GraphingNode(
+    val id: Int,
+    var position: LorenzVec,
+    var name: String? = null,
+    var tags: MutableList<GraphNodeTag> = mutableListOf(),
+) {
 
     override fun hashCode(): Int {
         return id
