@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -36,6 +36,7 @@ import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
+import java.awt.Color
 import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -53,6 +54,7 @@ object GraphEditor {
 
     private var activeNode: GraphingNode? = null
     private var closedNode: GraphingNode? = null
+    private var ghostPosition: LorenzVec? = null
 
     private var seeThroughBlocks = true
 
@@ -92,6 +94,15 @@ object GraphEditor {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
+        ghostPosition?.let {
+            event.drawWaypointFilled(
+                it,
+                if (activeNode == null) Color.RED else Color.GRAY,
+                seeThroughBlocks = seeThroughBlocks,
+                minimumAlpha = 0.2f,
+                inverseAlphaScale = true,
+            )
+        }
     }
 
     @SubscribeEvent
@@ -112,12 +123,19 @@ object GraphEditor {
             add("§eLoad: §6${KeyboardManager.getKeyName(config.loadKey)}")
             add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
             add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
+            add("§eToggle Ghost Position: §6${KeyboardManager.getKeyName(config.toggleGhostPosition)}")
             add(" ")
             if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
         }
-        if (!inTextMode && activeNode != null) {
-            add("§eEdit: §6${KeyboardManager.getKeyName(config.editKey)}")
+
+        if (!inTextMode) {
+            if (activeNode != null) {
+                add("§eEdit active node: §6${KeyboardManager.getKeyName(config.editKey)}")
+            } else if (ghostPosition != null) {
+                add("Edit Ghost Position: §6${KeyboardManager.getKeyName(config.editKey)}")
+            }
         }
+
         if (inEditMode) {
             add("§ex+ §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.w.keyCode)}")
             add("§ex- §6${KeyboardManager.getKeyName(KeyboardManager.WasdInputMatrix.s.keyCode)}")
@@ -274,7 +292,7 @@ object GraphEditor {
             editModeClicks()
             inEditMode = false
         }
-        if (activeNode != null && config.editKey.isKeyHeld()) {
+        if ((activeNode != null || ghostPosition != null) && config.editKey.isKeyHeld()) {
             inEditMode = true
             return
         }
@@ -312,9 +330,12 @@ object GraphEditor {
         if (config.placeKey.isKeyClicked()) {
             addNode()
         }
+        if (config.toggleGhostPosition.isKeyClicked()) {
+            toggleGhostPosition()
+        }
         if (config.selectKey.isKeyClicked()) {
             activeNode = if (activeNode == closedNode) {
-                feedBackInTutorial("De selected active node.")
+                feedBackInTutorial("De-selected active node.")
                 null
             } else {
                 feedBackInTutorial("Selected new active node.")
@@ -379,7 +400,13 @@ object GraphEditor {
 
     private fun KeyBinding.handleEditClicks(vector: LorenzVec) {
         if (this.keyCode.isKeyClicked()) {
-            activeNode?.position = activeNode?.position?.plus(vector) ?: return
+            activeNode?.let {
+                it.position = it.position + vector
+            } ?: run {
+                ghostPosition?.let {
+                    ghostPosition = it + vector
+                }
+            }
         }
     }
 
@@ -402,7 +429,8 @@ object GraphEditor {
                 return
             }
         }
-        val position = LocationUtils.playerEyeLocation().roundLocationToBlock()
+
+        val position = ghostPosition ?: LocationUtils.playerEyeLocation().roundLocationToBlock()
         if (nodes.any { it.position == position }) {
             feedBackInTutorial("Can't create node, here is already another one.")
             return
@@ -412,6 +440,16 @@ object GraphEditor {
         feedBackInTutorial("Added graph node.")
         if (activeNode == null) return
         addEdge(activeNode, node)
+    }
+
+    fun toggleGhostPosition() {
+        if (ghostPosition != null) {
+            ghostPosition = null
+            feedBackInTutorial("Disabled Ghost Position.")
+        } else {
+            ghostPosition = LocationUtils.playerEyeLocation().roundLocationToBlock()
+            feedBackInTutorial("Enabled Ghost Position.")
+        }
     }
 
     private fun getEdgeIndex(node1: GraphingNode?, node2: GraphingNode?) =
@@ -482,6 +520,7 @@ object GraphEditor {
         edges.clear()
         activeNode = null
         closedNode = null
+        ghostPosition = null
     }
 
     private fun prune() { //TODO fix
@@ -492,6 +531,8 @@ object GraphEditor {
         }
         nodes.removeIf { hasNeighbours[it] == false }
     }
+
+    fun LorenzVec.distanceSqToPlayer(): Double = ghostPosition?.let { distanceSq(it) } ?: distanceSq(playerLocation())
 }
 
 private class GraphingNode(val id: Int, var position: LorenzVec, var name: String? = null) {
@@ -540,6 +581,4 @@ private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode) {
         }
         return result
     }
-
 }
-
