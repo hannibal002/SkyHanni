@@ -177,7 +177,7 @@ object GraphEditor {
             val name = state + " §r" + category.displayName
             add(createCategoryName(name, category, node))
         }
-        addString(".")
+        addString("")
         add(
             Renderable.clickAndHover(
                 "§cGo Back!",
