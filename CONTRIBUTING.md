@@ -30,22 +30,22 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 ### Setting up IntelliJ
 
-Once your project is importing in IntelliJ from the previous step all dependencies like Minecraft, NEU and so on should be automatically
-downloaded. If not, you might need to link the gradle project in the gradle tab (little elephant) on the right.
+Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft, NEU, and so on should be automatically
+downloaded. If not, you might need to link the Gradle project in the Gradle tab (little elephant) on the right.
 
 <details>
-<summary>🖼️Show gradle tab image</summary>
+<summary>🖼️Show Gradle tab image</summary>
 
 ![Gradle tab with Link Project and Gradle Settings highlighted](docs/gradle-tab.jpg)
 
 </details>
 
-If importing fails make sure the Gradle JVM (found in the settings wheel in the gradle tab, or by searching <kbd>ctrl + shift + a</kbd> for
-"Gradle JVM") is set to a Java 21 JDK. While this is not the version of Java Minecraft 1.8.9 uses, we need this version for some of our
+If importing fails, make sure the Gradle JVM (found in the settings wheel in the Gradle tab, or by searching <kbd>Ctrl + Shift + A</kbd>
+for "Gradle JVM") is set to a Java 21 JDK. While this is not the version of Java Minecraft 1.8.9 uses, we need this version for some of our
 build tools.
 
 <details>
-<summary>🖼️Show gradle JVM image</summary>
+<summary>🖼️Show Gradle JVM image</summary>
 
 ![Gradle settings showing Java 21 being selected as JVM](docs/gradle-settings.png)
 
@@ -74,10 +74,10 @@ argument passing style.
 
 </details>
 
-Now that we are done with that you should be able to launch your game from your IDE with that run configuration.
+Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
 
-SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**, so if you want to look at another guide, check out
-[their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md).
+SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**, so if you want to look at another guide, check
+out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md).
 
 ## Creating a Pull Request
 
