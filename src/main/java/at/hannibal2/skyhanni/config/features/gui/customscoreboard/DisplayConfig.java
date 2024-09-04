@@ -130,6 +130,11 @@ public class DisplayConfig {
     public boolean skyblockTime24hFormat = false;
 
     @Expose
+    @ConfigOption(name = "SkyBlock Time Exact Minutes", desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments.")
+    @ConfigEditorBoolean
+    public boolean skyblockTimeExactMinutes = true;
+
+    @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int lineSpacing = 10;
