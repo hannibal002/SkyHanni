@@ -20,16 +20,13 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
-import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
-import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
 
@@ -248,28 +245,6 @@ object EntityUtils {
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.getNameAsString().removeColor()
-
-    /**
-     * @return a fake player with the same skin as the real player
-     */
-    fun getFakePlayer(): EntityOtherPlayerMP {
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer!!
-        return object : EntityOtherPlayerMP(
-            mc.theWorld,
-            player.gameProfile,
-        ) {
-            override fun getLocationSkin() =
-                player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
-
-            override fun getTeam() = object : ScorePlayerTeam(null, null) {
-                override fun getNameTagVisibility() = EnumVisible.NEVER
-            }
-
-            override fun isWearing(part: EnumPlayerModelParts): Boolean =
-                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
-        }
-    }
 }
 
 //#if FORGE
