@@ -465,7 +465,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onSHowCraftPrice(event: LorenzToolTipEvent) {
+    fun onShowCraftPrice(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return

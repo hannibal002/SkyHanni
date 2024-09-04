@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -74,11 +73,11 @@ object GardenVisitorSupercraft {
     private fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .firstOrNull { !it.allIngredients().first().internalItemId.contains("PEST") }
-            ?.allIngredients() ?: return
+            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            ?.ingredients ?: return
         val ingredientReqs = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
-            val key = ingredient.internalItemId
+            val key = ingredient.internalName
             ingredientReqs[key] = ingredientReqs.getOrDefault(key, 0) + ingredient.count.toInt()
         }
         hasIngredients = true

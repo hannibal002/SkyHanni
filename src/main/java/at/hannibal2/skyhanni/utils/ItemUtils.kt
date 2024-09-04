@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.collect.Lists
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.NotificationHandler
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
@@ -451,19 +450,19 @@ object ItemUtils {
         return list
     }
 
-    fun neededItems(recipe: NeuRecipe): Map<NEUInternalName, Int> {
+    fun neededItems(recipe: PrimitiveRecipe): Map<NEUInternalName, Int> {
         val neededItems = mutableMapOf<NEUInternalName, Int>()
         for (ingredient in recipe.ingredients) {
-            val material = ingredient.internalItemId.asInternalName()
+            val material = ingredient.internalName.asInternalName()
             val amount = ingredient.count.toInt()
             neededItems.addOrPut(material, amount)
         }
         return neededItems
     }
 
-    fun NeuRecipe.getRecipePrice(
+    fun PrimitiveRecipe.getRecipePrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double = neededItems(this).map {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
