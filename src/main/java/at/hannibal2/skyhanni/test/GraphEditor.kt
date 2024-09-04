@@ -52,7 +52,18 @@ object GraphEditor {
     private val edges = mutableListOf<GraphingEdge>()
 
     private var activeNode: GraphingNode? = null
+        set(value) {
+            field = value
+            selectedEdge = findEdgeBetweenActiveAndClosed()
+            checkDissolve()
+        }
     private var closedNode: GraphingNode? = null
+        set(value) {
+            field = value
+            selectedEdge = findEdgeBetweenActiveAndClosed()
+        }
+
+    private var selectedEdge: GraphingEdge? = null
 
     private var seeThroughBlocks = true
 
@@ -82,6 +93,7 @@ object GraphEditor {
 
     private val edgeColor = LorenzColor.GOLD.addOpacity(150)
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
+    private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
     val scrollValue = ScrollValue()
     var namedNodeList: List<Renderable> = emptyList()
@@ -113,7 +125,11 @@ object GraphEditor {
             add("§eClear: §6${KeyboardManager.getKeyName(config.clearKey)}")
             add("§eTutorial: §6${KeyboardManager.getKeyName(config.tutorialKey)}")
             add(" ")
-            if (activeNode != null) add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
+            if (activeNode != null) {
+                add("§eText: §6${KeyboardManager.getKeyName(config.textKey)}")
+                if (dissolvePossible) add("§eDissolve: §6${KeyboardManager.getKeyName(config.dissolveKey)}")
+                if (selectedEdge != null) add("§eSplit: §6${KeyboardManager.getKeyName(config.splitKey)}")
+            }
         }
         if (!inTextMode && activeNode != null) {
             add("§eEdit: §6${KeyboardManager.getKeyName(config.editKey)}")
@@ -130,6 +146,18 @@ object GraphEditor {
             add("§eFormat: ${textBox.finalText()}")
             add("§eRaw:     ${textBox.editText()}")
         }
+    }
+
+    private var dissolvePossible = false
+
+    private fun findEdgeBetweenActiveAndClosed(): GraphingEdge? = getEdgeIndex(activeNode, closedNode)?.let { edges[it] }
+
+    private fun checkDissolve() {
+        if (activeNode == null) {
+            dissolvePossible = false
+            return
+        }
+        dissolvePossible = edges.count { it.isInEdge(activeNode) } == 2
     }
 
     @SubscribeEvent
@@ -156,7 +184,6 @@ object GraphEditor {
         }
         return namedNodeList
     }
-
 
     private fun calculateNamedNodes(): List<Renderable> = buildList {
         for ((node, distance: Double) in nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
@@ -215,7 +242,11 @@ object GraphEditor {
     private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) = this.draw3DLine_nea(
         edge.node1.position.add(0.5, 0.5, 0.5),
         edge.node2.position.add(0.5, 0.5, 0.5),
-        if (edge !in highlightedEdges) edgeColor else edgeDijkstraColor,
+        when {
+            selectedEdge == edge -> edgeSelectedColor
+            edge in highlightedEdges -> edgeDijkstraColor
+            else -> edgeColor
+        },
         7,
         !seeThroughBlocks,
     )
@@ -328,6 +359,8 @@ object GraphEditor {
                 feedBackInTutorial("Added new edge.")
             } else {
                 this.edges.removeAt(edge)
+                checkDissolve()
+                selectedEdge = findEdgeBetweenActiveAndClosed()
                 feedBackInTutorial("Removed edge.")
             }
         }
@@ -344,6 +377,29 @@ object GraphEditor {
         if (config.tutorialKey.isKeyClicked()) {
             inTutorialMode = !inTutorialMode
             ChatUtils.chat("Tutorial mode is now ${if (inTutorialMode) "active" else "inactive"}.")
+        }
+        if (selectedEdge != null && config.splitKey.isKeyClicked()) {
+            val edge = selectedEdge ?: return
+            feedBackInTutorial("Split Edge into a Node and two edges.")
+            val middle = edge.node1.position.middle(edge.node2.position).roundLocationToBlock()
+            val node = GraphingNode(id++, middle)
+            nodes.add(node)
+            edges.remove(edge)
+            addEdge(node, edge.node1)
+            addEdge(node, edge.node2)
+            activeNode = node
+        }
+        if (dissolvePossible && config.dissolveKey.isKeyClicked()) {
+            feedBackInTutorial("Dissolved the node, now it is gone.")
+            val edgePair = edges.filter { it.isInEdge(activeNode) }
+            val edge1 = edgePair[0]
+            val edge2 = edgePair[1]
+            val neighbors1 = if (edge1.node1 == activeNode) edge1.node2 else edge1.node1
+            val neighbors2 = if (edge2.node1 == activeNode) edge2.node2 else edge2.node1
+            edges.removeAll(edgePair)
+            nodes.remove(activeNode)
+            activeNode = null
+            addEdge(neighbors1, neighbors2)
         }
     }
 
@@ -422,7 +478,14 @@ object GraphEditor {
         else null
 
     private fun addEdge(node1: GraphingNode?, node2: GraphingNode?) =
-        if (node1 != null && node2 != null && node1 != node2) edges.add(GraphingEdge(node1, node2)) else false
+        if (node1 != null && node2 != null && node1 != node2) {
+            val edge = GraphingEdge(node1, node2)
+            if (edge.isInEdge(activeNode)) {
+                checkDissolve()
+                selectedEdge = findEdgeBetweenActiveAndClosed()
+            }
+            edges.add(edge)
+        } else false
 
     /** Has a side effect on the graphing graph, since it runs [prune] on the graphing graph*/
     private fun compileGraph(): Graph {
@@ -449,6 +512,8 @@ object GraphEditor {
             }.flatten().distinct(),
         )
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0
+        checkDissolve()
+        selectedEdge = findEdgeBetweenActiveAndClosed()
     }
 
     private val highlightedNodes = mutableSetOf<GraphingNode>()
@@ -482,6 +547,7 @@ object GraphEditor {
         edges.clear()
         activeNode = null
         closedNode = null
+        dissolvePossible = false
     }
 
     private fun prune() { //TODO fix
@@ -514,7 +580,7 @@ private class GraphingNode(val id: Int, var position: LorenzVec, var name: Strin
 
 private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode) {
 
-    fun isInEdge(node: GraphingNode) = node1 == node || node2 == node
+    fun isInEdge(node: GraphingNode?) = node1 == node || node2 == node
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
