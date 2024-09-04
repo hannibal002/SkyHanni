@@ -357,16 +357,16 @@ enum class HotmData(
 
     val printName = name.allLettersFirstUppercase()
 
-    /** Level which are actually paid with powder (does exclude [blueEgg]*/
-    val rawLevel: Int
+    /** Level which are actually paid with powder (does exclude [blueEgg])*/
+    var rawLevel: Int
         get() = storage?.perks?.get(this.name)?.level ?: 0
+        private set(value) {
+            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value
+        }
 
     /** Level for which the effect that is present (considers [enabled] and [blueEgg])*/
-    var activeLevel: Int
+    val activeLevel: Int
         get() = if (enabled) effectivLevel else 0
-        private set(value) {
-            storage?.perks?.computeIfAbsent(this.name) { HotmTree.HotmPerk() }?.level = value.minus(blueEgg())
-        }
 
     /** Level that considering [blueEgg]*/
     val effectivLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
@@ -524,7 +524,7 @@ enum class HotmData(
         fun getPerkByNameOrNull(name: String): HotmData? = entries.find { it.guiName == name }
 
         private fun resetTree() = entries.forEach {
-            it.activeLevel = 0
+            it.rawLevel = 0
             it.enabled = false
             it.isUnlocked = false
             HotmAPI.Powder.entries.forEach { it.setCurrent(it.getTotal()) }
@@ -542,7 +542,7 @@ enum class HotmData(
             val lore = item.getLore().takeIf { it.isNotEmpty() } ?: return
 
             if (entry != PEAK_OF_THE_MOUNTAIN && notUnlockedPattern.matches(lore.last())) {
-                entry.activeLevel = 0
+                entry.rawLevel = 0
                 entry.enabled = false
                 entry.isUnlocked = false
                 return
@@ -550,7 +550,7 @@ enum class HotmData(
 
             entry.isUnlocked = true
 
-            entry.activeLevel = levelPattern.matchMatcher(lore.first()) {
+            entry.rawLevel = levelPattern.matchMatcher(lore.first()) {
                 group("level").toInt().transformIf({ group("color") == "b" }, { this.minus(1) })
             } ?: entry.maxLevel
 
@@ -565,7 +565,7 @@ enum class HotmData(
             }
 
             if (entry == PEAK_OF_THE_MOUNTAIN) {
-                entry.enabled = entry.activeLevel != 0
+                entry.enabled = entry.rawLevel != 0
                 return
             }
             entry.enabled = lore.any { enabledPattern.matches(it) }
@@ -681,7 +681,7 @@ enum class HotmData(
             DelayedRun.runNextTick {
                 InventoryUtils.getItemsInOpenChest().forEach { it.parse() }
                 abilities.filter { it.isUnlocked }.forEach {
-                    it.activeLevel = if (PEAK_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
+                    it.rawLevel = if (PEAK_OF_THE_MOUNTAIN.rawLevel >= 1) 2 else 1
                 }
             }
         }

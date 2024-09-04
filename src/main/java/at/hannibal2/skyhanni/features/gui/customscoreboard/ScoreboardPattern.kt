@@ -162,9 +162,15 @@ object ScoreboardPattern {
 
     // farming
     private val farmingSb = scoreboardGroup.group("farming")
+
+    /**
+     * REGEX-TEST: §6§lGOLD §fmedals: §6111
+     * REGEX-TEST: §f§lSILVER §fmedals: §f1,154
+     * REGEX-TEST: §c§lBRONZE §fmedals: §c268
+     */
     val medalsPattern by farmingSb.pattern(
         "medals",
-        "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc]\\d+$",
+        "§[6fc]§l(GOLD|SILVER|BRONZE) §fmedals: §[6fc][\\d.,]+",
     )
     val lockedPattern by farmingSb.pattern(
         "locked",
@@ -380,6 +386,14 @@ object ScoreboardPattern {
         "queued",
         "Queued:.*",
     )
+
+    /**
+     * REGEX-TEST: Tier: §eFloor VI
+     */
+    val queueTierPattern by miscSb.pattern(
+        "queuetier",
+        "Tier: §e.*",
+    )
     val queuePositionPattern by miscSb.pattern(
         "queueposition",
         "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*",
@@ -495,12 +509,12 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §3§lCatch a Fish
-     * REGEX-TEST: §6§lFruit Diggin§6§lg
-     * REGEX-TEST: §c§lZombie Shoot§c§lout
+     * REGEX-TEST: §6§lFruit Digging
+     * REGEX-TEST: §c§lZombie Shootout
      */
     val carnivalTasksPattern by carnivalSb.pattern(
         "tasks",
-        "§.§l(?:Catch a Fish|Fruit Diggin|Zombie Shoot)(?:§.§l(?:g|out))?",
+        "§.§l(?:Catch a Fish|Fruit Digging|Zombie Shootout)",
     )
 
     /**
@@ -563,6 +577,10 @@ object ScoreboardPattern {
     val bankPattern by tablistGroup.pattern(
         "bank",
         "^\\s*Bank: §6(?<bank>[\\w.,]+(?:§7 \\/ §6(?<coop>[\\w.,]+))?)$",
+    )
+    val soulflowPattern by tablistGroup.pattern(
+        "soulflow",
+        "^\\s*Soulflow: (?:§.)+(?<soulflow>[\\d,.]+)$",
     )
     val eventNamePattern by tablistGroup.pattern(
         "event",

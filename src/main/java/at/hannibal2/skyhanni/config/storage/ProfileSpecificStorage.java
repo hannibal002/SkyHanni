@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType;
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker;
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker;
@@ -41,6 +42,7 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal;
 import at.hannibal2.skyhanni.features.skillprogress.SkillType;
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker;
 import at.hannibal2.skyhanni.utils.GenericWrapper;
+import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
@@ -289,6 +291,10 @@ public class ProfileSpecificStorage {
 
         @Expose
         public Map<CropType, Double> latestTrueFarmingFortune = new HashMap<>();
+
+        // TODO use in /ff guide
+        @Expose
+        public Map<CropType, Double> personalBestFF = new HashMap<>();
 
         @Expose
         @Nullable
@@ -678,4 +684,38 @@ public class ProfileSpecificStorage {
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
+
+    @Expose
+    public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
+
+    public static class HoppityEventStats {
+        @Expose
+        public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
+
+        @Expose
+        public Map<LorenzRarity, RabbitData> rabbitsFound = new HashMap<>();
+
+        public static class RabbitData {
+            @Expose
+            public int uniques = 0;
+
+            @Expose
+            public int dupes = 0;
+
+            @Expose
+            public int strays = 0;
+        }
+
+        @Expose
+        public long dupeChocolateGained = 0;
+
+        @Expose
+        public long strayChocolateGained = 0;
+
+        @Expose
+        public long millisInCf = 0;
+
+        @Expose
+        public boolean summarized = false;
+    }
 }
