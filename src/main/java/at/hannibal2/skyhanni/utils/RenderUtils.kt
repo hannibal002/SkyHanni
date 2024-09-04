@@ -1267,6 +1267,7 @@ object RenderUtils {
         startAtEye: Boolean = true,
         textSize: Double = 1.0,
         waypointColor: Color =
+            // TODO remove color
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
     ) {

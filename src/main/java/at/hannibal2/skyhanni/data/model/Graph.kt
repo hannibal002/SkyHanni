@@ -42,17 +42,30 @@ value class Graph(
                 out.beginObject()
                 value.forEach {
                     out.name(it.id.toString()).beginObject()
+
                     out.name("Position").value(with(it.position) { "$x:$y:$z" })
-                    if (it.name != null) {
-                        out.name("Name").value(it.name)
+
+                    it.name?.let {
+                        out.name("Name").value(it)
                     }
+
+                    it.categoryNames?.takeIf { it.isNotEmpty() }?.let {
+                        out.name("Tags")
+                        out.beginArray()
+                        for (categoryName in it) {
+                            out.value(categoryName)
+                        }
+                        out.endArray()
+                    }
+
                     out.name("Neighbours")
                     out.beginObject()
-                    it.neighbours.forEach { (node, weight) ->
+                    for ((node, weight) in it.neighbours) {
                         val id = node.id.toString()
                         out.name(id).value(weight.round(2))
                     }
                     out.endObject()
+
                     out.endObject()
                 }
                 out.endObject()
@@ -66,6 +79,7 @@ value class Graph(
                     reader.beginObject()
                     var position: LorenzVec? = null
                     var name: String? = null
+                    var categories: List<String>? = null
                     var neighbors = mutableListOf<Pair<Int, Double>>()
                     while (reader.hasNext()) {
                         when (reader.nextName()) {
@@ -89,9 +103,19 @@ value class Graph(
                                 name = reader.nextString()
                             }
 
+                            "Tags" -> {
+                                categories = mutableListOf()
+                                reader.beginArray()
+                                while (reader.hasNext()) {
+                                    val categoryName = reader.nextString()
+                                    categories.add(categoryName)
+                                }
+                                reader.endArray()
+                            }
+
                         }
                     }
-                    val node = GraphNode(id, position!!, name)
+                    val node = GraphNode(id, position!!, name, categories)
                     list.add(node)
                     neighbourMap[node] = neighbors
                     reader.endObject()
@@ -111,7 +135,8 @@ value class Graph(
     }
 }
 
-class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null) {
+// The node object that gets parsed from/to json
+class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val categoryNames: List<String>? = null) {
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
     lateinit var neighbours: Map<GraphNode, Double>
