@@ -43,7 +43,7 @@ Give feedback or just chat with others on our community Discord!
 
 ## Contributing
 
-Are you interested in writing your own SkyHanni feature? do you want to fix that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for more information!
+Are you interested in writing your own SkyHanni feature? Do you want to fix that one annoying bug yourself? Check out our [contributing guide](CONTRIBUTING.md) for more information!
 
 ---
 
