@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.gui
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.config.commands.CommandArgument
 import at.hannibal2.skyhanni.config.commands.CommandContextAwareObject
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -26,6 +26,8 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ShTrack {
+
+    private val config get() = SkyHanniMod.feature.gui.shTrackConfig
 
     val arguments = listOf<CommandArgument<ContextObject>>(
         CommandArgument("-i") { _, c -> c.state = ContextObject.StateType.ITEM; 0 },
@@ -71,7 +73,7 @@ object ShTrack {
             null
         }
 
-        val grabbed = args.takeWhile { "[a-zA-Z:\\-_\"';]+([:-;]\\d+)?".toPattern().matches(it) }
+        val grabbed = args.takeWhile { "[a-zA-Z:_\"';]+([:-;]\\d+)?".toPattern().matches(it) }
 
         val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
 
@@ -267,8 +269,6 @@ object ShTrack {
 
     private val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingElement>> = mutableMapOf()
 
-    private val position = Position(20, 20)
-
     private var display: Renderable = Renderable.placeholder(0, 0)
 
     @SubscribeEvent
@@ -276,7 +276,7 @@ object ShTrack {
         if (scheduledUpdate) {
             display = Renderable.table(tracker.map { it.line })
         }
-        position.renderRenderable(display, posLabel = "Tracker")
+        config.position.renderRenderable(display, posLabel = "Tracker")
     }
 
     @SubscribeEvent
@@ -370,5 +370,7 @@ object ShTrack {
 
         abstract fun atAdd()
     }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
 
 }
