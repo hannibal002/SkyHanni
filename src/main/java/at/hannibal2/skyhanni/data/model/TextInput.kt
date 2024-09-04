@@ -15,12 +15,12 @@ class TextInput {
     var textBox: String = ""
     private var carriage: Int? = null
 
-    fun editText(textColor: LorenzColor = LorenzColor.WHITE, carriageColor: LorenzColor = LorenzColor.BLUE) = textBox.let {
+    fun editText(textColor: LorenzColor = LorenzColor.WHITE, carriageColor: LorenzColor = LorenzColor.GREEN) = textBox.let {
         with(carriage) {
             if (this == null) it
             else it.insert(this, "${carriageColor.getChatColor()}|${textColor.getChatColor()}")
         }
-    }.replace("§", "&&")
+    }.replace("(?<!§.\\|)§(?!.\\|§.)".toRegex(), "&&")
 
     fun finalText() = textBox.replace("&&", "§")
 
