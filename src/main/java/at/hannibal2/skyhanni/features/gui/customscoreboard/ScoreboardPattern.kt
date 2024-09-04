@@ -386,6 +386,14 @@ object ScoreboardPattern {
         "queued",
         "Queued:.*",
     )
+
+    /**
+     * REGEX-TEST: Tier: §eFloor VI
+     */
+    val queueTierPattern by miscSb.pattern(
+        "queuetier",
+        "Tier: §e.*",
+    )
     val queuePositionPattern by miscSb.pattern(
         "queueposition",
         "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*",
