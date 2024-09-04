@@ -25,7 +25,6 @@ object MinisterInCalendar {
         "§8§m--------------------------",
     )
     private val suffix = listOf(
-        "",
         "§8§m--------------------------",
         "",
         "§7The Minister is who came in 2nd place",
@@ -49,6 +48,7 @@ object MinisterInCalendar {
                 for (perk in minister.activePerks) {
                     add("$ministerColor${perk.perkName}")
                     addAll(perk.description.splitLines(170).removePrefix("§r").split("\n").map { "§7$it" })
+                    add("")
                 }
                 addAll(suffix)
             }
