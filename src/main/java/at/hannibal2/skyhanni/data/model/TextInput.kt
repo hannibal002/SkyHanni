@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
 import kotlinx.coroutines.runBlocking
@@ -14,12 +15,12 @@ class TextInput {
     var textBox: String = ""
     private var carriage: Int? = null
 
-    fun editText() = textBox.let {
+    fun editText(textColor: LorenzColor = LorenzColor.WHITE, carriageColor: LorenzColor = LorenzColor.GREEN) = textBox.let {
         with(carriage) {
             if (this == null) it
-            else it.insert(this, '|')
+            else it.insert(this, "${carriageColor.getChatColor()}|${textColor.getChatColor()}")
         }
-    }.replace("§", "&&")
+    }.replace("(?<!§.\\|)§(?!.\\|§.)".toRegex(), "&&")
 
     fun finalText() = textBox.replace("&&", "§")
 
