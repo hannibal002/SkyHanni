@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
-enum class GraphNodeCategory(val internalName: String?, val displayName: String, val description: String) {
-//     NO_CATEGORY(null, "<without category>", "Nodes without category"),
+enum class GraphNodeTag(val internalName: String?, val displayName: String, val description: String) {
     DEV("dev", "Dev", "Intentionally marked as dev."), // E.g. Spawn points, todos, etc
 
     // Everywhere
@@ -37,6 +36,6 @@ enum class GraphNodeCategory(val internalName: String?, val displayName: String,
     ;
 
     companion object {
-        fun byId(internalName: String?): GraphNodeCategory? = values().firstOrNull { it.internalName == internalName }
+        fun byId(internalName: String?): GraphNodeTag? = values().firstOrNull { it.internalName == internalName }
     }
 }

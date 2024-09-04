@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.test
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.GraphNodeCategory
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
 import at.hannibal2.skyhanni.data.model.toJson
@@ -163,19 +163,19 @@ object GraphEditor {
         nodesDisplay = drawNodeNames()
     }
 
-    private fun updateCategoryView(node: GraphingNode) {
+    private fun updateTagView(node: GraphingNode) {
         lastUpdate = SimpleTimeMark.now() + 60.seconds
-        nodesDisplay = drawCategoryNames(node)
+        nodesDisplay = drawTagNames(node)
     }
 
-    private fun drawCategoryNames(node: GraphingNode): List<Renderable> = buildList {
-        addString("§eChange category for node '${node.name}§e'")
+    private fun drawTagNames(node: GraphingNode): List<Renderable> = buildList {
+        addString("§eChange tag for node '${node.name}§e'")
         addString("")
 
-        for (category in GraphNodeCategory.entries) {
-            val state = if (category in node.categories) "§aYES" else "§cNO"
-            val name = state + " §r" + category.displayName
-            add(createCategoryName(name, category, node))
+        for (tag in GraphNodeTag.entries) {
+            val state = if (tag in node.tags) "§aYES" else "§cNO"
+            val name = state + " §r" + tag.displayName
+            add(createTagName(name, tag, node))
         }
         addString("")
         add(
@@ -189,25 +189,25 @@ object GraphEditor {
         )
     }
 
-    private fun createCategoryName(
+    private fun createTagName(
         name: String,
-        category: GraphNodeCategory,
+        tag: GraphNodeTag,
         node: GraphingNode,
     ) = Renderable.clickAndHover(
         name,
         tips = listOf(
-            "Category ${category.name}",
-            "§7${category.description}",
+            "Tag ${tag.name}",
+            "§7${tag.description}",
             "",
-            "§eClick to set category for ${node.name} to ${category.name}!",
+            "§eClick to set tag for ${node.name} to ${tag.name}!",
         ),
         onClick = {
-            if (category in node.categories) {
-                node.categories.remove(category)
+            if (tag in node.tags) {
+                node.tags.remove(tag)
             } else {
-                node.categories.add(category)
+                node.tags.add(tag)
             }
-            updateCategoryView(node)
+            updateTagView(node)
         },
     )
 
@@ -216,16 +216,16 @@ object GraphEditor {
             val name = node.name?.takeIf { !it.isBlank() } ?: continue
             val color = if (node == activeNode) "§a" else "§7"
             val distanceFormat = sqrt(distance).toInt().addSeparators()
-            val categoryText = node.categories.let {
+            val tagText = node.tags.let {
                 if (it.isEmpty()) {
                     " §cNo tag§r"
                 } else {
-                    val text = node.categories.map { it.internalName }.joinToString(", ")
+                    val text = node.tags.map { it.internalName }.joinToString(", ")
                     " §f($text)"
                 }
             }
 
-            val text = "${color}Node §r$name$categoryText §7[$distanceFormat]"
+            val text = "${color}Node §r$name$tagText §7[$distanceFormat]"
             add(createNodeTextLine(text, name, node))
         }
     }
@@ -240,21 +240,21 @@ object GraphEditor {
             add("Node '$name'")
             add("")
 
-            if (node.categories.isNotEmpty()) {
-                add("Categories: ")
-                for (category in node.categories) {
-                    add(" §8- §r${category.displayName}")
+            if (node.tags.isNotEmpty()) {
+                add("Tags: ")
+                for (tag in node.tags) {
+                    add(" §8- §r${tag.displayName}")
                 }
                 add("")
             }
 
             add("§eClick to select/deselect this node!")
-            add("§eControl-Click to edit the categories for this node!")
+            add("§eControl-Click to edit the tags for this node!")
 
         },
         onClick = {
             if (KeyboardManager.isModifierKeyDown()) {
-                updateCategoryView(node)
+                updateTagView(node)
             } else {
                 activeNode = node
                 updateNodeNames()
@@ -297,12 +297,12 @@ object GraphEditor {
             maxDistance = 80,
         )
 
-        val categories = node.categories
-        if (categories.isEmpty()) return
-        val categoryText = categories.map { it.displayName }.joinToString(" §f+ ")
+        val tags = node.tags
+        if (tags.isEmpty()) return
+        val tagText = tags.map { it.displayName }.joinToString(" §f+ ")
         this.drawDynamicText(
             node.position,
-            categoryText,
+            tagText,
             0.8,
             ignoreBlocks = seeThroughBlocks || node.position.distanceSqToPlayer() < 100,
             smallestDistanceVew = 12.0,
@@ -459,7 +459,7 @@ object GraphEditor {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
             ChatUtils.chat(
                 "§lStats\n" +
-                    "§eNamed Nodes: ${nodes.filter { it.name != null }.size.addSeparators()}\n" +
+                    "§eNamed Nodes: ${nodes.count { it.name != null }.addSeparators()}\n" +
                     "§eNodes: ${nodes.size.addSeparators()}\n" +
                     "§eEdges: ${edges.size.addSeparators()}\n" +
                     "§eLength: $length",
@@ -529,7 +529,7 @@ object GraphEditor {
     private fun compileGraph(): Graph {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name, it.categories.mapNotNull { it.internalName }) }
+        val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name, it.tags.mapNotNull { it.internalName }) }
         val neighbours = this.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
@@ -548,7 +548,7 @@ object GraphEditor {
                     it.id,
                     it.position,
                     it.name,
-                    it.categoryNames?.mapNotNull { GraphNodeCategory.byId(it) }?.toMutableList() ?: mutableListOf(),
+                    it.tagNames?.mapNotNull { GraphNodeTag.byId(it) }?.toMutableList() ?: mutableListOf(),
                 )
             },
         )
@@ -609,7 +609,7 @@ private class GraphingNode(
     val id: Int,
     var position: LorenzVec,
     var name: String? = null,
-    var categories: MutableList<GraphNodeCategory> = mutableListOf(),
+    var tags: MutableList<GraphNodeTag> = mutableListOf(),
 ) {
 
     override fun hashCode(): Int {
