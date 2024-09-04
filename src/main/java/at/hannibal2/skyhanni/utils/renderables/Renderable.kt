@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.contains
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
+import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -52,7 +53,11 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width) && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX..posX + width) && y in (posY..posY + height)
+    } ?: false
+
+    fun isBoxHovered(posX: Int, width: Int, posY: Int, height: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (posX..posX + width) && y in (posY..posY + height)
     } ?: false
 
     /**
@@ -531,6 +536,115 @@ interface Renderable {
                         GlStateManager.popMatrix()
                     }
                 }
+            }
+        }
+
+        fun verticalEditTable(
+            content: List<List<Renderable?>>,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            useEmptySpace: Boolean = false,
+            onHover: (Int) -> Unit,
+            onClick: (Int) -> Unit,
+            onDrop: (Int, Int) -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override val width = xOffsets.last() - xPadding
+            override val height = yOffsets.last() - yPadding
+
+            val emptySpaceX = if (useEmptySpace) 0 else xPadding
+            val emptySpaceY = if (useEmptySpace) 0 else yPadding
+
+            var holdingIndex = -1
+
+            override fun render(posX: Int, posY: Int) {
+                GlStateManager.pushMatrix()
+                var rowIndex = 0
+                var contentRowIndex = 0
+                while (rowIndex < content.size) {
+                    if (contentRowIndex == holdingIndex) {
+                        contentRowIndex++
+                        continue
+                    }
+                    if (isBoxHovered(posX, width, yOffsets[rowIndex], yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY)
+                        && condition() && shouldAllowLink(true, bypassChecks)
+                    ) {
+                        onHover(rowIndex)
+                        Gui.drawRect(
+                            posX,
+                            yOffsets[rowIndex],
+                            width,
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
+                            Color.GRAY.withAlpha(200),
+                        )
+                        DragNDrop.dragOnPress(Drag(rowIndex)) {
+                            holdingIndex = contentRowIndex
+                            onClick(rowIndex)
+                        }
+                        DragNDrop.handelDroppable(
+                            object : Droppable {
+
+                                override fun handle(drop: Any?) {
+                                    val element = drop as? Drag ?: return
+                                    holdingIndex = -1
+                                    onDrop(element.rowIndex, rowIndex)
+                                }
+
+                                override fun preDrop(drop: Any?) {
+                                    val element = drop as? Drag ?: return
+                                    val index = element.rowIndex
+                                    content[index].drawRow(rowIndex, posX, posY + yOffsets[rowIndex], yOffsets[rowIndex].toFloat())
+                                    rowIndex++
+                                }
+
+                                override fun validTarget(item: Any?): Boolean = item is Drag
+
+                            },
+                        )
+                    }
+                    content.getOrNull(contentRowIndex)?.drawRow(rowIndex, posX, posY + yOffsets[rowIndex], yOffsets[rowIndex].toFloat())
+                    rowIndex++
+                    contentRowIndex++
+                }
+                GlStateManager.popMatrix()
+            }
+
+            private fun List<Renderable?>.drawRow(rowIndex: Int, x: Int, y: Int, yOff: Float) {
+                for ((index, renderable) in this.withIndex()) {
+                    GlStateManager.pushMatrix()
+                    GlStateManager.translate(xOffsets[index].toFloat(), yOff, 0F)
+                    renderable?.renderXYAligned(
+                        x + xOffsets[index],
+                        y,
+                        xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
+                        yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
+                    )
+                    GlStateManager.popMatrix()
+                }
+            }
+
+            inner class Drag(val rowIndex: Int) : DragItem<Drag> {
+                override fun get() = this
+
+                override fun onDiscard() {
+                    holdingIndex = -1
+                }
+
+                override fun onRender(mouseX: Int, mouseY: Int) {
+                    GlStateManager.translate(3f, 0f, 0f)
+                    content[rowIndex].drawRow(rowIndex, 0, 0, 0f)
+                    Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.withAlpha(30))
+                    GlStateManager.translate(-3f, 0f, 0f)
+                }
+
             }
         }
 

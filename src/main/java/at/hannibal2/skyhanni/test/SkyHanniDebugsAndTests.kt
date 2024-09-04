@@ -50,6 +50,7 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -505,12 +506,32 @@ object SkyHanniDebugsAndTests {
     fun onChat(event: LorenzChatEvent) {
     }
 
+    val test by lazy {
+        Renderable.verticalEditTable(
+            listOf(
+                listOf(Renderable.string("Help"), Renderable.string("Me")),
+                listOf(Renderable.string("Not"), Renderable.string("Now")),
+                listOf(Renderable.string("I'm Fine"), Renderable.string("And You")),
+            ),
+            onClick = { ChatUtils.chat("Clicked: $it") },
+            onHover = { ChatUtils.chat("Hover: $it") },
+            onDrop = { f, t -> ChatUtils.chat("Dropped: $f to $t") },
+        )
+    }
+
+    @SubscribeEvent
+    fun onGuiRenderChestGuiOverlayRender2(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        config.debugPos.renderRenderable(
+            test,
+            posLabel = "Test",
+        )
+    }
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             itemRenderDebug()
         }
 
@@ -545,8 +566,7 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             dragAbleTest()
         }
     }
@@ -594,8 +614,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }
-                    .toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(
