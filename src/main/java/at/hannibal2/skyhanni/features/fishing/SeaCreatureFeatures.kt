@@ -39,7 +39,10 @@ object SeaCreatureFeatures {
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
+
         val mob = event.mob
+        if (!mob.canBeSeen()) return
+
         val creature = SeaCreatureManager.allFishingMobs[mob.name] ?: return
         if (!creature.rare) return
 
