@@ -82,6 +82,16 @@ public class GraphConfig {
     public int tutorialKey = Keyboard.KEY_K;
 
     @Expose
+    @ConfigOption(name = "Split Key", desc = "Key for splitting an edge that is between the active and the closed node.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int splitKey = Keyboard.KEY_NONE;
+
+    @Expose
+    @ConfigOption(name = "Dissolve Key", desc = "Dissolve the active node into one edge if it only has two edges.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int dissolveKey = Keyboard.KEY_NONE;
+
+    @Expose
     @ConfigLink(owner = GraphConfig.class, field = "enabled")
     public Position infoDisplay = new Position(20, 20);
 

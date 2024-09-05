@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
+import com.google.gson.stream.JsonToken
 import java.util.PriorityQueue
 
 @JvmInline
 value class Graph(
-    @Expose
-    val graph: List<GraphNode>,
+    @Expose val graph: List<GraphNode>,
 ) : List<GraphNode> {
     override val size
         get() = graph.size
@@ -82,6 +82,10 @@ value class Graph(
                     var tags: List<String>? = null
                     var neighbors = mutableListOf<Pair<Int, Double>>()
                     while (reader.hasNext()) {
+                        if (reader.peek() != JsonToken.NAME) {
+                            reader.skipValue()
+                            continue
+                        }
                         when (reader.nextName()) {
                             "Position" -> {
                                 position = reader.nextString().split(":").let { parts ->
@@ -157,8 +161,7 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
     }
 }
 
-fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph =
-    this.findShortestPathAsGraphWithDistance(start, end).first
+fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph = this.findShortestPathAsGraphWithDistance(start, end).first
 
 fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
     val distances = mutableMapOf<GraphNode, Double>()
@@ -199,11 +202,9 @@ fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode):
     ) to distances[end]!!
 }
 
-fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> =
-    this.findShortestPathAsGraph(start, end).toPositionsList()
+fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = this.findShortestPathAsGraph(start, end).toPositionsList()
 
-fun Graph.findShortestDistance(start: GraphNode, end: GraphNode): Double =
-    this.findShortestPathAsGraphWithDistance(start, end).second
+fun Graph.findShortestDistance(start: GraphNode, end: GraphNode): Double = this.findShortestPathAsGraphWithDistance(start, end).second
 
 fun Graph.toPositionsList() = this.map { it.position }
 
