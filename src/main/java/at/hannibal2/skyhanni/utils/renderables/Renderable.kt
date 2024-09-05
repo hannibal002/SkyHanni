@@ -564,8 +564,10 @@ interface Renderable {
             val emptySpaceY = if (useEmptySpace) 0 else yPadding
 
             var holdingIndex = -1
+            var isSnappingIn = false
 
             override fun render(posX: Int, posY: Int) {
+                isSnappingIn = false
                 GlStateManager.pushMatrix()
                 var rowIndex = 0
                 var contentRowIndex = 0
@@ -574,21 +576,15 @@ interface Renderable {
                         contentRowIndex++
                         continue
                     }
-                    if (isBoxHovered(posX, width, yOffsets[rowIndex], yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY)
+                    if (isBoxHovered(posX, width, posY + yOffsets[rowIndex], yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY - 1)
                         && condition() && shouldAllowLink(true, bypassChecks)
                     ) {
                         onHover(rowIndex)
-                        Gui.drawRect(
-                            posX,
-                            yOffsets[rowIndex],
-                            width,
-                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
-                            Color.GRAY.withAlpha(200),
-                        )
                         DragNDrop.dragOnPress(Drag(rowIndex)) {
                             holdingIndex = contentRowIndex
                             onClick(rowIndex)
                         }
+                        var dropped = false
                         DragNDrop.handelDroppable(
                             object : Droppable {
 
@@ -602,13 +598,24 @@ interface Renderable {
                                     val element = drop as? Drag ?: return
                                     val index = element.rowIndex
                                     content[index].drawRow(rowIndex, posX, posY + yOffsets[rowIndex], yOffsets[rowIndex].toFloat())
-                                    rowIndex++
+                                    dropped = true
+                                    isSnappingIn = true
                                 }
 
                                 override fun validTarget(item: Any?): Boolean = item is Drag
 
                             },
                         )
+                        Gui.drawRect(
+                            posX,
+                            posY + yOffsets[rowIndex],
+                            posX + width,
+                            posY + yOffsets[rowIndex + 1] - emptySpaceY,
+                            Color.GRAY.withAlpha(if (dropped) 50 else 35),
+                        )
+                        if (dropped) {
+                            rowIndex++
+                        }
                     }
                     content.getOrNull(contentRowIndex)?.drawRow(rowIndex, posX, posY + yOffsets[rowIndex], yOffsets[rowIndex].toFloat())
                     rowIndex++
@@ -639,10 +646,12 @@ interface Renderable {
                 }
 
                 override fun onRender(mouseX: Int, mouseY: Int) {
-                    GlStateManager.translate(3f, 0f, 0f)
-                    content[rowIndex].drawRow(rowIndex, 0, 0, 0f)
-                    Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.withAlpha(30))
-                    GlStateManager.translate(-3f, 0f, 0f)
+                    if (!isSnappingIn) {
+                        GlStateManager.translate(3f, 0f, 0f)
+                        content[rowIndex].drawRow(rowIndex, 0, 0, 0f)
+                        Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.withAlpha(30))
+                        GlStateManager.translate(-3f, 0f, 0f)
+                    }
                 }
 
             }
