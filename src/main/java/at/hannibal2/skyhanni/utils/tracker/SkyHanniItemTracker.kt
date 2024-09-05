@@ -43,6 +43,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             it.get(DisplayMode.SESSION).items[internalName]!!.hidden = hidden
         }
 
+        // TODO move the function to common
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
