@@ -163,6 +163,7 @@ object UnknownLinesHandler {
             SbPattern.riftHotdogEatenPattern,
             SbPattern.mineshaftNotStartedPattern,
             SbPattern.queuePattern,
+            SbPattern.queueTierPattern,
             SbPattern.queuePositionPattern,
             SbPattern.fortunateFreezingBonusPattern,
             SbPattern.riftAveikxPattern,

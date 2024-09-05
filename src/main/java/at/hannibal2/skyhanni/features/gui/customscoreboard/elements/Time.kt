@@ -10,7 +10,12 @@ import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 object Time : ScoreboardElement() {
     override fun getDisplay(): String {
         val time = SkyBlockTime.now()
-            .formatted(dayAndMonthElement = false, yearElement = false, timeFormat24h = displayConfig.skyblockTime24hFormat)
+            .formatted(
+                dayAndMonthElement = false,
+                yearElement = false,
+                timeFormat24h = displayConfig.skyblockTime24hFormat,
+                exactMinutes = displayConfig.skyblockTimeExactMinutes,
+            )
         return "§7$time ${getTimeSymbol()}".trim()
     }
 

@@ -68,9 +68,13 @@ object DungeonAPI {
         "Time Elapsed: §.(?:(?<minutes>\\d+)m )?(?<seconds>\\d+)s",
     )
 
+    /**
+     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor VII
+     * REGEX-TEST: §f                         §r§cThe Catacombs §r§8- §r§eFloor V
+     */
     private val dungeonComplete by patternGroup.pattern(
         "complete",
-        "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
+        "§.\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
     private val dungeonRoomPattern by patternGroup.pattern(
         "room",
@@ -144,7 +148,6 @@ object DungeonAPI {
     fun getRoomID(): String? = ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
         group("roomId")
     }
-
 
     fun getColor(level: Int): String = when {
         level >= 50 -> "§c§l"
