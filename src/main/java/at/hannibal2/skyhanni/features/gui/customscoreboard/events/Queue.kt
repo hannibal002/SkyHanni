@@ -10,6 +10,7 @@ object Queue : ScoreboardEvent() {
 
     private val patterns = listOf(
         ScoreboardPattern.queuePattern,
+        ScoreboardPattern.queueTierPattern,
         ScoreboardPattern.queuePositionPattern,
     )
 
