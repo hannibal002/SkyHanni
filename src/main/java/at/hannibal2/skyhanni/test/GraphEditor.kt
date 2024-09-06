@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
@@ -532,7 +533,10 @@ private fun createTagName(
             ChatUtils.chat("Copied nothing since the graph is empty.")
             return
         }
-        val json = compileGraph().toJson()
+        val compileGraph = compileGraph()
+        // TODO add option
+        IslandGraphs.setNewGraph(compileGraph)
+        val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
         if (config.showsStats) {

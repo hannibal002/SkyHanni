@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
@@ -25,6 +26,7 @@ object IslandAreas {
     private val config get() = SkyHanniMod.feature.misc.areaOverview
 
     private var nodes = mapOf<GraphNode, Double>()
+    private var paths = mapOf<GraphNode, Graph>()
     private var display = listOf<Renderable>()
     private var target = ""
     private var currentArea = ""
@@ -42,12 +44,16 @@ object IslandAreas {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val closedNote = IslandGraphs.closedNote ?: return
 
+        val paths = mutableMapOf<GraphNode, Graph>()
+
         val map = mutableMapOf<GraphNode, Double>()
         for (graphNode in graph.graph) {
             if (graphNode.getAreaTag() == null) continue
-            val (_, distance) = graph.findShortestPathAsGraphWithDistance(closedNote, graphNode)
+            val (path, distance) = graph.findShortestPathAsGraphWithDistance(closedNote, graphNode)
+            paths[graphNode] = path
             map[graphNode] = distance
         }
+        this.paths = paths
 
         val finalNodes = mutableMapOf<GraphNode, Double>()
 
@@ -102,7 +108,21 @@ object IslandAreas {
             val name = node.name ?: continue
             val color = if (name == target) LorenzColor.GOLD else tag.color
             val coloredName = "${color.getChatColor()}${name}"
-            val text = "${coloredName}§7: §e${difference.round(1)}"
+
+            var suffix = ""
+            paths[node]?.let { path ->
+                val passedAreas = path.graph.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
+                passedAreas.remove(name)
+                passedAreas.remove(null)
+                passedAreas.remove("null")
+                passedAreas.remove(currentArea)
+                if (passedAreas.isNotEmpty()) {
+                    // TODO option to show areas needed to pass thorough
+//                     suffix = " §7${passedAreas.joinToString(", ")}"
+                }
+            }
+
+            val text = "${coloredName}§7: §e${difference.round(1)}$suffix"
 
             if (!foundCurrentArea) {
                 foundCurrentArea = true

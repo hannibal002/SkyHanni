@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 
@@ -125,6 +126,10 @@ object IslandGraphs {
         }
 
         val graph = RepoUtils.getConstant(SkyHanniMod.repo.repoLocation, constant, Graph.gson, Graph::class.java)
+        setNewGraph(graph)
+    }
+
+    fun setNewGraph(graph: Graph) {
         reset()
         currentIslandGraph = graph
     }
@@ -174,7 +179,6 @@ object IslandGraphs {
             }
         }
         this.path = path to (distance + nodeDistance)
-
     }
 
     private fun onNewNote() {
@@ -200,10 +204,12 @@ object IslandGraphs {
             true,
             bezierPoint = 2.0,
             textSize = 1.0,
-            // TODO hide names
         )
         val a = graph.graph.last().position
         val b = currentTarget ?: return
         event.draw3DLine(a.add(0.5, 0.5, 0.5), b.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 4, true)
+
+        // TODO add option default disabled
+        event.drawWaypointFilled(b, LorenzColor.WHITE.toColor())
     }
 }

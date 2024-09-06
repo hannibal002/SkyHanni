@@ -441,6 +441,7 @@ object TunnelsMaps {
             true,
             bezierPoint = 2.0,
             textSize = config.textSize.toDouble(),
+            showNoteNames = true,
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
