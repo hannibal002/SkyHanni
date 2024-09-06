@@ -41,6 +41,10 @@ public class MiscConfig {
     @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
+    @Expose
+    @Category(name = "Area Overview", desc = "Helps navigate through the areas on an island.")
+    public AreaOverviewConfig areaOverview = new AreaOverviewConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose

@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
@@ -103,7 +104,7 @@ object GraphEditor {
     var nodesDisplay = emptyList<Renderable>()
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
@@ -188,7 +189,8 @@ object GraphEditor {
                 val list = getNodeNames()
                 val size = list.size
                 addString("§eGraph Nodes: $size")
-                val height = (size * 10).coerceAtMost(150)
+//                 val height = (size * 10).coerceAtMost(150)
+                val height = (size * 10).coerceAtMost(250)
                 if (list.isNotEmpty()) {
                     add(Renderable.scrollList(list, height, scrollValue = scrollValue, velocity = 10.0))
                 }

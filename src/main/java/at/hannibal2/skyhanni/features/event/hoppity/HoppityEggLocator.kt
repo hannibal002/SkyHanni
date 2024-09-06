@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -154,8 +155,7 @@ object HoppityEggLocator {
     }
 
     private fun LorenzRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
-        val shouldMarkDuplicate = config.highlightDuplicateEggLocations
-            && HoppityEggLocations.hasCollectedEgg(location)
+        val shouldMarkDuplicate = config.highlightDuplicateEggLocations && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
         if (!shouldMarkDuplicate) {
             drawWaypointFilled(location, config.waypointColor.toChromaColor(), seeThroughBlocks = true)
@@ -165,8 +165,7 @@ object HoppityEggLocator {
         drawDynamicText(location.add(y = 1), possibleDuplicateLabel, 1.5)
     }
 
-    private fun shouldShowAllEggs() =
-        config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
+    private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
     fun eggFound() {
         resetData()
@@ -214,6 +213,7 @@ object HoppityEggLocator {
         if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem) {
             lastClick = SimpleTimeMark.now()
             MythicRabbitPetWarning.check()
+            trySendingGraph()
         }
     }
 
@@ -264,20 +264,27 @@ object HoppityEggLocator {
 
         possibleEggLocations = filteredEggs
 
+        if (drawLocations) return
         drawLocations = true
+
+        trySendingGraph()
     }
 
-    fun isValidEggLocation(location: LorenzVec): Boolean =
-        HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
+    private fun trySendingGraph() {
+        // TODO add option
+        possibleEggLocations.firstOrNull()?.let {
+            IslandGraphs.find(it)
+        }
+    }
 
-    private fun ReceiveParticleEvent.isVillagerParticle() =
-        type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
+    fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
 
-    private fun ReceiveParticleEvent.isEnchantmentParticle() =
-        type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
+    private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden() &&
-        !ReminderUtils.isBusy(true) && HoppityAPI.isHoppityEvent()
+    private fun ReceiveParticleEvent.isEnchantmentParticle() = type == EnumParticleTypes.ENCHANTMENT_TABLE && speed == -2.0f && count == 10
+
+    fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.waypoints && !GardenAPI.inGarden() && !ReminderUtils.isBusy(true) && HoppityAPI.isHoppityEvent()
 
     private val ItemStack.isLocatorItem get() = getInternalName() == locatorItem
 

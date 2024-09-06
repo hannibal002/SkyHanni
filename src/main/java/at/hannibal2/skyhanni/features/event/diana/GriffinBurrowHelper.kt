@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
@@ -49,17 +50,16 @@ object GriffinBurrowHelper {
 
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val allowedBlocksAboveGround =
-        listOf(
-            Blocks.air,
-            Blocks.leaves,
-            Blocks.leaves2,
-            Blocks.tallgrass,
-            Blocks.double_plant,
-            Blocks.red_flower,
-            Blocks.yellow_flower,
-            Blocks.spruce_fence
-        )
+    private val allowedBlocksAboveGround = listOf(
+        Blocks.air,
+        Blocks.leaves,
+        Blocks.leaves2,
+        Blocks.tallgrass,
+        Blocks.double_plant,
+        Blocks.red_flower,
+        Blocks.yellow_flower,
+        Blocks.spruce_fence,
+    )
 
     var targetLocation: LorenzVec? = null
     private var guessLocation: LorenzVec? = null
@@ -134,7 +134,13 @@ object GriffinBurrowHelper {
             }
             locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
         }
-        targetLocation = locations.minByOrNull { it.distanceToPlayer() }
+        val newLocation = locations.minByOrNull { it.distanceToPlayer() }
+        if (targetLocation != newLocation) {
+            targetLocation = newLocation
+            newLocation?.let {
+                IslandGraphs.find(it)
+            }
+        }
 
         if (config.burrowNearestWarp) {
             targetLocation?.let {
@@ -401,7 +407,7 @@ object GriffinBurrowHelper {
             if (currentMayor != Mayor.DIANA) {
                 ChatUtils.chatAndOpenConfig(
                     "§cSelect Diana as mayor overwrite!",
-                    SkyHanniMod.feature.dev.debug::assumeMayor
+                    SkyHanniMod.feature.dev.debug::assumeMayor,
                 )
 
             } else {
