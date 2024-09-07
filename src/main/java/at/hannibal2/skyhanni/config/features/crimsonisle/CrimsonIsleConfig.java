@@ -27,10 +27,10 @@ public class CrimsonIsleConfig {
     public MatriarchHelperConfig matriarchHelper = new MatriarchHelperConfig();
 
     @Expose
-    @ConfigOption(name = "Miniboss Timer", desc = "Shows a timer for when minibosses will spawn.")
+    @ConfigOption(name = "Miniboss Respawn Timer", desc = "Shows a timer for when minibosses will respawn.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean minibossTimer = false;
+    public boolean minibossRespawnTimer = false;
 
     @Expose
     @ConfigLink(owner = CrimsonIsleConfig.class, field = "minibossTimer")
