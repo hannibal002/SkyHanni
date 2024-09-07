@@ -129,7 +129,7 @@ object RiftTimer {
     }
 
     @SubscribeEvent
-    fun onEntityHealthDIsplay(event: EntityHealthDisplayEvent) {
+    fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!RiftAPI.inRift() || !config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {
             group("time")?.toIntOrNull()
