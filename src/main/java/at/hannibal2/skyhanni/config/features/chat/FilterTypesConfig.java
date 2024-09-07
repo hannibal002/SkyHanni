@@ -106,10 +106,28 @@ public class FilterTypesConfig {
     public boolean sacrifice = false;
 
     @Expose
+    @ConfigOption(name = "Garden Pest", desc = "Hide the message of no pests on garden.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gardenNoPest = false;
+
+    @Expose
     @ConfigOption(name = "Block Alpha Achievements", desc = "Hide achievement messages while on the Alpha network.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hideAlphaAchievements = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Parkour", desc = "Hide parkour messages (starting, stopping, reaching a milestone).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideParkour = false;
+
+    @Expose
+    @ConfigOption(name = "Hide Teleport Pads", desc = "Hide annoying messages when using teleport pads.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideTeleportPads = false;
 
     //TODO remove
     @Expose

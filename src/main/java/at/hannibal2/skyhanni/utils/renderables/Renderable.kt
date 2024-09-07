@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfi
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
+import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.gui.GuiScreenElementWrapper
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
@@ -38,6 +40,7 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
+import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
@@ -50,7 +53,11 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width) && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX..posX + width) && y in (posY..posY + height)
+    } ?: false
+
+    fun isBoxHovered(posX: Int, width: Int, posY: Int, height: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (posX..posX + width) && y in (posY..posY + height)
     } ?: false
 
     /**
@@ -194,6 +201,7 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = listOf(),
             stack: ItemStack? = null,
             color: LorenzColor? = null,
+            spacedTitle: Boolean = false,
             bypassChecks: Boolean = false,
             snapsToTopIfToLong: Boolean = true,
             condition: () -> Boolean = { true },
@@ -224,6 +232,7 @@ interface Renderable {
                                 stack = stack,
                                 borderColor = color,
                                 snapsToTopIfToLong = snapsToTopIfToLong,
+                                spacedTitle = spacedTitle,
                             )
                             GlStateManager.popMatrix()
                         }
@@ -433,12 +442,7 @@ interface Renderable {
             val inverseScale = 1 / scale
 
             override fun render(posX: Int, posY: Int) {
-                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
-                GlStateManager.translate(1.0, 1.0, 0.0)
-                GlStateManager.scale(scale, scale, 1.0)
-                fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
-                GlStateManager.scale(inverseScale, inverseScale, 1.0)
-                GlStateManager.translate(-1.0, -1.0, 0.0)
+                RenderableUtils.renderString(text, scale, color, inverseScale)
             }
         }
 
@@ -530,6 +534,98 @@ interface Renderable {
                     }
                 }
             }
+        }
+
+        /**
+         * @param searchPrefix text that is static in front of the textbox
+         * @param onUpdateSize function that is called if the size changes (since the search text can get bigger than [content])
+         * @param textInput The text input, can be external or internal
+         * @param shouldRenderTopElseBottom true == Renders on top, false == Renders at the Bottom
+         * @param hideIfNoText hides text box if no input is given
+         * @param ySpacing space between the search and [content]
+         * @param onHover is triggered if [content] or the text box is hovered
+         * @param bypassChecks bypass the [shouldAllowLink] logic
+         * @param condition condition to being able to input / [onHover] to trigger
+         * @param scale text scale of the textbox
+         * @param color color of the textbox
+         * @param key event key for the [textInput] to register the event, needs clearing if [textInput] is external, default = 0
+         */
+        fun searchBox(
+            content: Renderable,
+            searchPrefix: String,
+            onUpdateSize: (Renderable) -> Unit,
+            textInput: TextInput = TextInput(),
+            shouldRenderTopElseBottom: Boolean = true,
+            hideIfNoText: Boolean = true,
+            ySpacing: Int = 0,
+            onHover: (TextInput) -> Unit = {},
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            key: Int = 0,
+        ) = object : Renderable {
+
+            val textBoxHeight = (9 * scale).toInt() + 1
+
+            override var width: Int = content.width
+            override val height: Int = content.height + ySpacing + textBoxHeight
+            override val horizontalAlign = content.horizontalAlign
+            override val verticalAlign = content.verticalAlign
+
+            val searchWidth get() = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(searchPrefix + textInput.editTextWithAlwaysCarriage()) * scale).toInt() + 1
+
+            init {
+                textInput.registerToEvent(key) {
+                    val searchWidth = searchWidth
+                    if (searchWidth > width) {
+                        width = searchWidth
+                        onUpdateSize(this)
+                    } else {
+                        if (width > content.width) {
+                            width = maxOf(content.width, searchWidth)
+                            onUpdateSize(this)
+                        }
+                    }
+                }
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                if (shouldRenderTopElseBottom) {
+                    if (!(hideIfNoText && textInput.textBox.isEmpty())) {
+                        RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    }
+                    GlStateManager.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
+                }
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    onHover(textInput)
+                    textInput.makeActive()
+                    textInput.handle()
+                    val yOff: Int
+                    if (shouldRenderTopElseBottom) {
+                        yOff = 0
+                    } else {
+                        yOff = content.height + ySpacing
+                    }
+                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && (-99).isKeyClicked()) {
+                        textInput.clear()
+                    }
+                } else {
+                    textInput.disable()
+                }
+                if (!shouldRenderTopElseBottom) {
+                    content.render(posX, posY)
+                    GlStateManager.translate(0f, (ySpacing).toFloat(), 0f)
+                    if (!(hideIfNoText && textInput.textBox.isEmpty())) {
+                        RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    }
+                    GlStateManager.translate(0f, -(ySpacing).toFloat(), 0f)
+                } else {
+                    content.render(posX, posY + textBoxHeight + ySpacing)
+                    GlStateManager.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
+                }
+            }
+
         }
 
         fun progressBar(
@@ -745,6 +841,25 @@ interface Renderable {
             }
         }
 
+        fun paddingContainer(
+            content: Renderable,
+            topSpacing: Int = 0,
+            bottomSpacing: Int = 0,
+            leftSpacing: Int = 0,
+            rightSpacing: Int = 0,
+        ) = object : Renderable {
+            override val width = content.width + leftSpacing + rightSpacing
+            override val height = content.height + topSpacing + bottomSpacing
+            override val horizontalAlign = content.horizontalAlign
+            override val verticalAlign = content.verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                GlStateManager.translate(leftSpacing.toFloat(), topSpacing.toFloat(), 0f)
+                content.render(posX + leftSpacing, posY + topSpacing)
+                GlStateManager.translate(-leftSpacing.toFloat(), -topSpacing.toFloat(), 0f)
+            }
+        }
+
         fun scrollList(
             list: List<Renderable>,
             height: Int,
@@ -904,6 +1019,144 @@ interface Renderable {
                 GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
                 input.render(posX + padding, posY + padding)
                 GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideRoundedRectOutline(
+            input: Renderable,
+            padding: Int = 2,
+            radius: Int = 10,
+            smoothness: Int = 2,
+            topOutlineColor: Int,
+            bottomOutlineColor: Int,
+            borderOutlineThickness: Int,
+            blur: Float = 0.7f,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+
+                RenderUtils.drawRoundRectOutline(
+                    0,
+                    0,
+                    width,
+                    height,
+                    topOutlineColor,
+                    bottomOutlineColor,
+                    borderOutlineThickness,
+                    radius,
+                    blur,
+                )
+            }
+        }
+
+        fun drawInsideImage(
+            input: Renderable,
+            texture: ResourceLocation,
+            alpha: Int = 255,
+            padding: Int = 2,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            radius: Int = 0,
+        ) = object : Renderable {
+            override val width = input.width + padding * 2
+            override val height = input.height + padding * 2
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
+                RenderUtils.drawRoundTexturedRect(0, 0, width, height, GL11.GL_NEAREST, radius)
+                GlStateManager.color(1f, 1f, 1f, 1f)
+
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun drawInsideFixedSizedImage(
+            input: Renderable,
+            texture: ResourceLocation,
+            width: Int = input.width,
+            height: Int = input.height,
+            alpha: Int = 255,
+            padding: Int = 2,
+            uMin: Float = 0f,
+            uMax: Float = 1f,
+            vMin: Float = 0f,
+            vMax: Float = 1f,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
+                Utils.drawTexturedRect(
+                    0f,
+                    0f,
+                    width.toFloat(),
+                    height.toFloat(),
+                    uMin,
+                    uMax,
+                    vMin,
+                    vMax,
+                    GL11.GL_NEAREST
+                )
+                GlStateManager.color(1f, 1f, 1f, 1f)
+
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun image(
+            texture: ResourceLocation,
+            width: Int,
+            height: Int,
+            alpha: Int = 255,
+            uMin: Float = 0f,
+            uMax: Float = 1f,
+            vMin: Float = 0f,
+            vMax: Float = 1f,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
+                Utils.drawTexturedRect(
+                    0f,
+                    0f,
+                    width.toFloat(),
+                    height.toFloat(),
+                    uMin,
+                    uMax,
+                    vMin,
+                    vMax,
+                    GL11.GL_NEAREST
+                )
+                GlStateManager.color(1f, 1f, 1f, 1f)
             }
         }
 
