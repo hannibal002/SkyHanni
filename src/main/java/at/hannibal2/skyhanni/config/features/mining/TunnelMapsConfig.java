@@ -45,13 +45,20 @@ public class TunnelMapsConfig {
     public int nextSpotHotkey = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "Dynamic Path Colour", desc = "Instead of the selected color use the color of the target as line colour.")
+    @ConfigOption(name = "Left Click Pigeon", desc = "Left click the Royal Pigeon to go to the next spot.")
     @ConfigEditorBoolean
+    public boolean leftClickPigeon = true;
+
+    @Expose
+    @ConfigOption(name = "Dynamic Path Color", desc = "Instead of the selected color use the color of the target as line color.")
+    @ConfigEditorBoolean
+    // TODO rename to dynamicPathColor
     public boolean dynamicPathColour = true;
 
     @Expose
-    @ConfigOption(name = "Path Colour", desc = "The colour for the paths, if the dynamic colour option is turned off.")
+    @ConfigOption(name = "Path Color", desc = "The color for the paths, if the dynamic color option is turned off.")
     @ConfigEditorColour
+    // TODO rename to pathColor
     public String pathColour = "0:255:0:255:0";
 
     @Expose

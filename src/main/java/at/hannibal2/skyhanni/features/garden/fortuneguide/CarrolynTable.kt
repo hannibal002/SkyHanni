@@ -27,17 +27,17 @@ enum class CarrolynTable(val crop: CropType, val label: String, completeMessage:
     FINE_FLOUR(
         CropType.WHEAT,
         "Fine Flour",
-        "WHEATS EXPORTATION COMPLETE!",
-        "[NPC] Carrolyn: Thank you for the flour.", // TODO confirm this, since this is only a estimate
+        "FINE FLOURS EXPORTATION COMPLETE!",
+        "[NPC] Carrolyn: Thank you for the flour.",
     ),
     ;
 
-    /** Pattern without colour codes */
+    /** Pattern without color codes */
     val completeMessagePattern by RepoPattern.pattern(
         "garden.ff.carrolyn.complete.${crop.patternKeyName}", completeMessage,
     )
 
-    /** Pattern without colour codes */
+    /** Pattern without color codes */
     val thxMessagePattern by RepoPattern.pattern(
         "garden.ff.carrolyn.thx.${crop.patternKeyName}", thxMessage,
     )
