@@ -69,7 +69,7 @@ public class FishingConfig {
     @Expose
     @ConfigOption(name = "Lava Replacement", desc = "")
     @Accordion
-    public LavaReplacementConfig lavaReplacementConfig = new LavaReplacementConfig();
+    public LavaReplacementConfig lavaReplacement = new LavaReplacementConfig();
 
     @Expose
     @ConfigOption(

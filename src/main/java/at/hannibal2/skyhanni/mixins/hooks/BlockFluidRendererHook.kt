@@ -8,7 +8,7 @@ import net.minecraft.block.BlockLiquid
 import net.minecraft.block.material.Material
 
 object BlockFluidRendererHook {
-    private val config get() = SkyHanniMod.feature.fishing.lavaReplacementConfig
+    private val config get() = SkyHanniMod.feature.fishing.lavaReplacement
 
     @JvmStatic
     fun replaceLava(block: BlockLiquid): Material {

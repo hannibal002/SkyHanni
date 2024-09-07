@@ -20,7 +20,11 @@ public class LavaReplacementConfig {
     @ConfigEditorBoolean
     public boolean onlyInCrimsonIsle = true;
 
-    @ConfigOption(name = "Reload", desc = "Reload renderers.\n§eUse if the lava still appear when the feature is enabled.\n§cMay freeze your game for a few seconds!")
+    @ConfigOption(name = "Reload",
+        desc = "Reload renderers.\n" +
+            "§eUse if the lava still appear when the feature is enabled.\n" +
+            "§cMay freeze your game for a few seconds!"
+    )
     @ConfigEditorButton(buttonText = "RELOAD")
     public Runnable loadListeners = Minecraft.getMinecraft().renderGlobal::loadRenderers;
 }
