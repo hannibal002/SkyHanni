@@ -195,6 +195,7 @@ interface Renderable {
             highlightsOnHoverSlots: List<Int> = listOf(),
             stack: ItemStack? = null,
             color: LorenzColor? = null,
+            spacedTitle: Boolean = false,
             bypassChecks: Boolean = false,
             snapsToTopIfToLong: Boolean = true,
             condition: () -> Boolean = { true },
@@ -225,6 +226,7 @@ interface Renderable {
                                 stack = stack,
                                 borderColor = color,
                                 snapsToTopIfToLong = snapsToTopIfToLong,
+                                spacedTitle = spacedTitle,
                             )
                             GlStateManager.popMatrix()
                         }
@@ -868,6 +870,25 @@ interface Renderable {
             }
         }
 
+        fun paddingContainer(
+            content: Renderable,
+            topSpacing: Int = 0,
+            bottomSpacing: Int = 0,
+            leftSpacing: Int = 0,
+            rightSpacing: Int = 0,
+        ) = object : Renderable {
+            override val width = content.width + leftSpacing + rightSpacing
+            override val height = content.height + topSpacing + bottomSpacing
+            override val horizontalAlign = content.horizontalAlign
+            override val verticalAlign = content.verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                GlStateManager.translate(leftSpacing.toFloat(), topSpacing.toFloat(), 0f)
+                content.render(posX + leftSpacing, posY + topSpacing)
+                GlStateManager.translate(-leftSpacing.toFloat(), -topSpacing.toFloat(), 0f)
+            }
+        }
+
         fun verticalSearchableContainer(
             content: Map<Renderable, String?>,
             spacing: Int = 0,
@@ -1279,11 +1300,17 @@ interface Renderable {
             }
         }
 
-        fun image(
+        fun drawInsideFixedSizedImage(
+            input: Renderable,
             texture: ResourceLocation,
-            width: Int,
-            height: Int,
+            width: Int = input.width,
+            height: Int = input.height,
             alpha: Int = 255,
+            padding: Int = 2,
+            uMin: Float = 0f,
+            uMax: Float = 1f,
+            vMin: Float = 0f,
+            vMax: Float = 1f,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
@@ -1295,7 +1322,56 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(0f, 0f, width.toFloat(), height.toFloat(), GL11.GL_NEAREST)
+                Utils.drawTexturedRect(
+                    0f,
+                    0f,
+                    width.toFloat(),
+                    height.toFloat(),
+                    uMin,
+                    uMax,
+                    vMin,
+                    vMax,
+                    GL11.GL_NEAREST
+                )
+                GlStateManager.color(1f, 1f, 1f, 1f)
+
+                GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
+                input.render(posX + padding, posY + padding)
+                GlStateManager.translate(-padding.toFloat(), -padding.toFloat(), 0f)
+            }
+        }
+
+        fun image(
+            texture: ResourceLocation,
+            width: Int,
+            height: Int,
+            alpha: Int = 255,
+            uMin: Float = 0f,
+            uMax: Float = 1f,
+            vMin: Float = 0f,
+            vMax: Float = 1f,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            override val width = width
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override fun render(posX: Int, posY: Int) {
+                Minecraft.getMinecraft().textureManager.bindTexture(texture)
+                GlStateManager.color(1f, 1f, 1f, alpha / 255f)
+                Utils.drawTexturedRect(
+                    0f,
+                    0f,
+                    width.toFloat(),
+                    height.toFloat(),
+                    uMin,
+                    uMax,
+                    vMin,
+                    vMax,
+                    GL11.GL_NEAREST
+                )
                 GlStateManager.color(1f, 1f, 1f, 1f)
             }
         }

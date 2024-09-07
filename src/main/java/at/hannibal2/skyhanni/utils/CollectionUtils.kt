@@ -301,6 +301,10 @@ object CollectionUtils {
         add(Renderable.itemStack(itemStack, scale = scale))
     }
 
+    fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
+        generateSequence(start) { it + 1 }.map { (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn }
+            .takeWhile { it <= end }
+
     fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
         addItemStack(internalName.getItemStack())
     }
