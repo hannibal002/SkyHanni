@@ -18,7 +18,7 @@ public class HoppityCallWarningConfig {
     @ConfigOption(name = "Hoppity Call Warning", desc = "Warn when hoppity is calling you.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public boolean enabled = true;
 
     @Expose
     @ConfigOption(
