@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -18,18 +19,19 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CompactExperimentRewards {
 
-    private val enabled get() = SkyHanniMod.feature.chat.compactRewards
+    private val config get() = SkyHanniMod.feature.chat
 
     private var gainedRewards = mutableListOf<String>()
     private var lastTimeTableOpened = SimpleTimeMark.farPast()
     private var currentMessage = ""
 
+    private val patternGroup = RepoPattern.group("chat.experiments.compact")
+
     /**
      * REGEX-TEST: Superpairs (Metaphysical)
      * REGEX-TEST: Superpairs Rewards
      */
-    private val patternGroup = RepoPattern.group("chat.experiments.compact")
-    val experimentInventoriesPattern by patternGroup.pattern(
+    private val experimentInventoriesPattern by patternGroup.pattern(
         "inventories",
         "(?:Superpairs|Chronomatron|Ultrasequencer) (?:\\(.+\\)|➜ Stakes|Rewards)|Experimentation Table",
     )
@@ -38,7 +40,7 @@ object CompactExperimentRewards {
      * REGEX-TEST: §eYou claimed the §r§dUltrasequencer §r§erewards!
      * REGEX-TEST: §eYou claimed the §r§cUltrasequencer §r§erewards!
      */
-    val claimMessagePattern by patternGroup.pattern(
+    private val claimMessagePattern by patternGroup.pattern(
         "message",
         "(?<message>§eYou claimed the §r§.\\S+ §r§erewards!)",
     )
@@ -58,42 +60,44 @@ object CompactExperimentRewards {
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
-        if (enabled && experimentInventoriesPattern.matches(InventoryUtils.openInventoryName())) {
+        if (isEnabled() && experimentInventoriesPattern.matches(InventoryUtils.openInventoryName())) {
             lastTimeTableOpened = SimpleTimeMark.now()
         }
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!enabled || lastTimeTableOpened.passedSince() >= 3.seconds || event.blockedReason != "") return
+        if (!isEnabled() || lastTimeTableOpened.passedSince() >= 3.seconds || event.blockedReason != "") return
 
-        event.message.let { message ->
-            claimMessagePattern.matchMatcher(message) {
-                currentMessage = group("message")
-                event.blockedReason = "COMPACT_REWARDS"
-                return
-            }
-            experimentsDropPattern.matchMatcher(message) {
-                val reward = group("reward")
+        val message = event.message
+        claimMessagePattern.matchMatcher(message) {
+            currentMessage = group("message")
+            event.blockedReason = "COMPACT_REWARDS"
+            return
+        }
+        experimentsDropPattern.matchMatcher(message) {
+            val reward = group("reward")
 
-                gainedRewards.add(reward)
-                event.blockedReason = "COMPACT_REWARDS"
+            gainedRewards.add(reward)
+            event.blockedReason = "COMPACT_REWARDS"
 
-                DelayedRun.runDelayed(100.milliseconds) {
-                    if (gainedRewards.last() == reward && currentMessage != "") {
-
-                        val expList = mutableListOf<String>().apply {
-                            gainedRewards.forEach {
-                                add("§8+$it")
-                            }
-                        }
-
-                        ChatUtils.hoverableChat(currentMessage, expList, null, false)
-                        gainedRewards.clear()
-                        currentMessage = ""
-                    }
-                }
+            DelayedRun.runDelayed(100.milliseconds) {
+                sendMessage(reward)
             }
         }
     }
+
+    private fun sendMessage(reward: String?) {
+        if (gainedRewards.last() != reward || currentMessage == "") return
+
+        val expList = mutableListOf<String>().apply {
+            gainedRewards.forEach { add("§8+$it") }
+        }
+
+        ChatUtils.hoverableChat(currentMessage, expList, null, false)
+        gainedRewards.clear()
+        currentMessage = ""
+    }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.compactExperimentationTable
 }
