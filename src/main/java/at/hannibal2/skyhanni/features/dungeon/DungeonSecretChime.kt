@@ -18,9 +18,12 @@ object DungeonSecretChime {
         val isWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
         if (isWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
-        val type = event.blockType
-        when (type) {
-            ClickedBlockType.CHEST, ClickedBlockType.TRAPPED_CHEST, ClickedBlockType.LEVER, ClickedBlockType.WITHER_ESSENCE -> playSound()
+        when (event.blockType) {
+            ClickedBlockType.CHEST,
+            ClickedBlockType.TRAPPED_CHEST,
+            ClickedBlockType.LEVER,
+            ClickedBlockType.WITHER_ESSENCE,
+            -> playSound()
         }
     }
 
@@ -29,8 +32,7 @@ object DungeonSecretChime {
     @JvmStatic
     fun playSound() {
         with(config) {
-            SoundUtils.createSound(soundName, soundPitch, 100f)
-                .playSound()
+            SoundUtils.createSound(soundName, soundPitch, 100f).playSound()
         }
     }
 }

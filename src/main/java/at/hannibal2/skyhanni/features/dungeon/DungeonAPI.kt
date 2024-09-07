@@ -44,13 +44,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonAPI {
 
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
-    private val uniqueClassBonus =
-        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
+    private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
-    private val bossPattern =
-        "View all your (?<name>\\w+) Collection".toPattern()
-    private val levelPattern =
-        " +(?<kills>\\d+).*".toPattern()
+    private val bossPattern = "View all your (?<name>\\w+) Collection".toPattern()
+    private val levelPattern = " +(?<kills>\\d+).*".toPattern()
     private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
@@ -65,7 +62,8 @@ object DungeonAPI {
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
-    private const val WITHER_ESSENCE_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
+    private const val WITHER_ESSENCE_TEXTURE =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
 
     /**
      * REGEX-TEST: Time Elapsed: §a01m 17s
@@ -181,10 +179,9 @@ object DungeonAPI {
             }
         }
         if (dungeonFloor != null && playerClass == null) {
-            val playerTeam =
-                TabListData.getTabList().firstOrNull {
-                    it.contains(LorenzUtils.getPlayerName())
-                }?.removeColor() ?: ""
+            val playerTeam = TabListData.getTabList().firstOrNull {
+                it.contains(LorenzUtils.getPlayerName())
+            }?.removeColor() ?: ""
 
             for (dungeonClass in DungeonClass.entries) {
                 if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
@@ -363,7 +360,6 @@ object DungeonAPI {
         }
     }
 
-
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!inDungeon() || event.clickType != ClickType.RIGHT_CLICK) return
@@ -381,6 +377,7 @@ object DungeonAPI {
                     return
                 }
             }
+
             else -> return
         }
         DungeonBlockClickEvent(position, blockType).post()
