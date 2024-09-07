@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.insert
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import org.lwjgl.input.Keyboard
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 class TextInput {
@@ -66,6 +67,13 @@ class TextInput {
         fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
                 cir.returnValue = false
+                return
+            }
+        }
+
+        fun onGuiInput(ci: CallbackInfo) {
+            if (activeInstance != null) {
+                ci.cancel()
                 return
             }
         }
