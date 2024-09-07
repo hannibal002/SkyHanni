@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -255,10 +256,10 @@ object SackDisplay {
         if (SackAPI.gemstoneItem.isEmpty()) return 0L
         list.addString("§7Gemstones:")
         var totalPrice = 0L
-        val table = mutableListOf<List<Renderable>>()
+        val table = mutableMapOf<List<Renderable>, String?>()
         for ((name, gem) in sort(SackAPI.gemstoneItem.toList())) {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
-            table.add(buildList {
+            table[buildList {
                 addString(" §7- ")
                 addItemStack(internalName)
                 add(Renderable.optionalLink(
@@ -274,9 +275,10 @@ object SackDisplay {
                 val price = roughprice + flawedprice + fineprice
                 totalPrice += price
                 if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
-            })
+            }] = name
         }
-        list.add(Renderable.table(table))
+
+        list.add(table.buildSearchableTable())
         return totalPrice
     }
 
