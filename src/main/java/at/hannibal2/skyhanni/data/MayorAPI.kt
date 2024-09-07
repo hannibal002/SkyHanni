@@ -152,6 +152,7 @@ object MayorAPI {
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
             currentMayor = Mayor.UNKNOWN
+            currentMinister = null
         }
     }
 
