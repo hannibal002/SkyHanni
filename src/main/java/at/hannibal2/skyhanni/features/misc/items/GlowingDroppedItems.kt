@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -15,7 +16,8 @@ import net.minecraft.entity.item.EntityItem
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class GlowingDroppedItems {
+@SkyHanniModule
+object GlowingDroppedItems {
 
     private val config get() = SkyHanniMod.feature.misc.glowingDroppedItems
 
@@ -64,12 +66,12 @@ class GlowingDroppedItems {
         return rarity?.color?.toColor()?.rgb
     }
 
-    private val isShowcaseArea = RecalculatingValue(1.seconds) {
-        showcaseItemIslands.contains(LorenzUtils.skyBlockIsland) || showcaseItemLocations.contains(LorenzUtils.skyBlockArea)
+    private val isShowcaseArea by RecalculatingValue(1.seconds) {
+        LorenzUtils.skyBlockIsland in showcaseItemIslands || LorenzUtils.skyBlockArea in showcaseItemLocations
     }
 
     private fun shouldHideShowcaseItem(entity: EntityItem): Boolean {
-        if (!isShowcaseArea.getValue() || config.highlightShowcase) return false
+        if (!isShowcaseArea || config.highlightShowcase) return false
 
         for (entityArmorStand in entity.worldObj.getEntitiesWithinAABB(
             EntityArmorStand::class.java,

@@ -4,20 +4,22 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class SuperpairsClicksAlert {
+@SkyHanniModule
+object SuperpairsClicksAlert {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
 
     private var roundsNeeded = -1
     private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")
     private val currentRoundRegex = Regex("""Round: (\d+)""")
-    private val targetInventoryNames = arrayOf("Chronomatron", "Ultrasequencer")
+    private val targetInventoryNames = arrayOf("Chronomatron", "c")
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {

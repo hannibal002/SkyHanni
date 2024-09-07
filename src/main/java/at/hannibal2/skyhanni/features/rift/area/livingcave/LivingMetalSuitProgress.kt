@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -12,7 +13,8 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getLivingMetalProgr
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class LivingMetalSuitProgress {
+@SkyHanniModule
+object LivingMetalSuitProgress {
 
     private val config get() = RiftAPI.config.area.livingCave.livingMetalSuitProgress
     private var display = emptyList<List<Any>>()

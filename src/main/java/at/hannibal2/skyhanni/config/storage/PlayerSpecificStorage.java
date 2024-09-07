@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
+import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
+import at.hannibal2.skyhanni.utils.GenericWrapper;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
+import at.hannibal2.skyhanni.utils.SimpleTimeMark;
 import com.google.gson.annotations.Expose;
 
 import java.util.ArrayList;
@@ -20,16 +23,16 @@ public class PlayerSpecificStorage {
     public Boolean useRomanNumerals = true;
 
     @Expose
+    public Boolean multipleProfiles = false;
+
+    @Expose
     public Integer gardenCommunityUpgrade = -1;
 
     @Expose
-    public long nextCityProjectParticipationTime = 0L;
+    public SimpleTimeMark nextCityProjectParticipationTime = GenericWrapper.getSimpleTimeMark(SimpleTimeMark.farPast()).getIt();
 
     @Expose
-    public String currentAccountUpgrade = null;
-
-    @Expose
-    public long nextAccountUpgradeCompletionTime = -1L;
+    public UpgradeReminder.CommunityShopUpgrade communityShopAccountUpgrade = null;
 
     @Expose
     public List<String> guildMembers = new ArrayList<>();

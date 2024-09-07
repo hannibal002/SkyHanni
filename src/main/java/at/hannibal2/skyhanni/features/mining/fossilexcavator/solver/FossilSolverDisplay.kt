@@ -11,6 +11,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -25,6 +27,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object FossilSolverDisplay {
 
     private val config get() = SkyHanniMod.feature.mining.fossilExcavator.solver
@@ -32,11 +35,11 @@ object FossilSolverDisplay {
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
     private val chargesRemainingPattern by patternGroup.pattern(
         "chargesremaining",
-        "Chisel Charges Remaining: (?<charges>\\d+)"
+        "Chisel Charges Remaining: (?<charges>\\d+)",
     )
     private val fossilProgressPattern by patternGroup.pattern(
         "fossilprogress",
-        "Fossil Excavation Progress: (?<progress>[\\d.]+%)"
+        "Fossil Excavation Progress: (?<progress>[\\d.]+%)",
     )
 
     private val inExcavatorMenu get() = FossilExcavatorAPI.inExcavatorMenu
@@ -154,14 +157,14 @@ object FossilSolverDisplay {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
         if (slotToClick == null) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex == slotToClick) {
-                slot highlight LorenzColor.GREEN
+                slot highlight LorenzColor.GREEN.toColor().addAlpha(90)
             }
         }
     }

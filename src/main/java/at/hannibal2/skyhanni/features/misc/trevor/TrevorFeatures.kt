@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.TrevorTheTrapperConfig.TrackerEntry
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -12,9 +13,8 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -26,14 +26,15 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -46,19 +47,20 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object TrevorFeatures {
     private val patternGroup = RepoPattern.group("misc.trevor")
     private val trapperPattern by patternGroup.pattern(
         "trapper",
-        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*)."
+        "\\[NPC] Trevor: You can find your (?<rarity>.*) animal near the (?<location>.*).",
     )
     private val talbotPatternAbove by patternGroup.pattern(
         "above",
-        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!"
+        "The target is around (?<height>.*) blocks above, at a (?<angle>.*) degrees angle!",
     )
     private val talbotPatternBelow by patternGroup.pattern(
         "below",
-        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!"
+        "The target is around (?<height>.*) blocks below, at a (?<angle>.*) degrees angle!",
     )
     private val talbotPatternAt by patternGroup.pattern(
         "at",
@@ -66,27 +68,27 @@ object TrevorFeatures {
     )
     private val locationPattern by patternGroup.pattern(
         "zone",
-        "Location: (?<zone>.*)"
+        "Location: (?<zone>.*)",
     )
     private val mobDiedPattern by patternGroup.pattern(
         "mob.died",
-        "§aReturn to the Trapper soon to get a new animal to hunt!"
+        "§aReturn to the Trapper soon to get a new animal to hunt!",
     )
     private val startDialoguePattern by patternGroup.pattern(
         "start.dialogue",
-        "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task."
+        "[NPC] Trevor: You will have 10 minutes to find the mob from when you accept the task.",
     )
     private val outOfTimePattern by patternGroup.pattern(
         "outoftime",
-        "You ran out of time and the animal disappeared!"
+        "You ran out of time and the animal disappeared!",
     )
     private val clickOptionPattern by patternGroup.pattern(
         "clickoption",
-        "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]"
+        "Click an option: §r§a§l\\[YES]§r§7 - §r§c§l\\[NO]",
     )
     private val areaTrappersDenPattern by patternGroup.pattern(
         "area.trappersden",
-        "Trapper's Den"
+        "Trapper's Den",
     )
 
     private var timeUntilNextReady = 0
@@ -109,11 +111,12 @@ object TrevorFeatures {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onFarmingIsland()) return
-        if (!config.trapperSolver) return
         updateTrapper()
         TrevorTracker.update()
         TrevorTracker.calculatePeltsPerHour()
-        if (questActive) TrevorSolver.findMob()
+        if (config.trapperSolver && questActive) {
+            TrevorSolver.findMob()
+        }
     }
 
     @SubscribeEvent
@@ -141,7 +144,7 @@ object TrevorFeatures {
         }
 
         trapperPattern.matchMatcher(formattedMessage) {
-            timeUntilNextReady = if (GardenCropSpeed.finneganPerkActive()) 16 else 21
+            timeUntilNextReady = if (Perk.PELT_POCALYPSE.isActive) 16 else 21
             currentStatus = TrapperStatus.ACTIVE
             currentLabel = "§cActive Quest"
             trapperReady = false
@@ -170,7 +173,7 @@ object TrevorFeatures {
         }
 
         clickOptionPattern.findMatcher(event.message) {
-            event.chatComponent.siblings.forEach { sibling ->
+            for (sibling in event.chatComponent.siblings) {
                 if (sibling.chatStyle.chatClickEvent != null && sibling.chatStyle.chatClickEvent.value.contains("YES")) {
                     lastChatPromptTime = SimpleTimeMark.now()
                     lastChatPrompt = sibling.chatStyle.chatClickEvent.value.substringAfter(" ")
@@ -190,7 +193,7 @@ object TrevorFeatures {
 
         config.trapperCooldownPos.renderString(
             "${currentStatus.colorCode}Trapper Cooldown: $cooldownMessage",
-            posLabel = "Trapper Cooldown GUI"
+            posLabel = "Trapper Cooldown GUI",
         )
     }
 
@@ -213,6 +216,7 @@ object TrevorFeatures {
         var found = false
         var active = false
         val previousLocation = TrevorSolver.mobLocation
+        // TODO work wioth trapper widget, widget api, repo patterns, when not found, warn in chat and dont update
         for (line in TabListData.getTabList()) {
             val formattedLine = line.removeColor().drop(1)
             if (formattedLine.startsWith("Time Left: ")) {
@@ -228,8 +232,7 @@ object TrevorFeatures {
             }
             locationPattern.matchMatcher(formattedLine) {
                 val zone = group("zone")
-                TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == zone }
-                    ?: TrapperMobArea.NONE
+                TrevorSolver.mobLocation = TrapperMobArea.entries.firstOrNull { it.location == zone } ?: TrapperMobArea.NONE
                 found = true
             }
         }
@@ -251,8 +254,7 @@ object TrevorFeatures {
         var entityTrapper = EntityUtils.getEntityByID(trapperID)
         if (entityTrapper !is EntityLivingBase) entityTrapper = EntityUtils.getEntityByID(backupTrapperID)
         if (entityTrapper is EntityLivingBase && config.trapperTalkCooldown) {
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color)
-            { config.trapperTalkCooldown }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entityTrapper, currentStatus.color) { config.trapperTalkCooldown }
             entityTrapper.getLorenzVec().let {
                 if (it.distanceToPlayer() < 15) {
                     event.drawString(it.add(y = 2.23), currentLabel)
@@ -311,7 +313,7 @@ object TrevorFeatures {
         if (!config.trapperTalkCooldown) return
         val entity = event.entity
         if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

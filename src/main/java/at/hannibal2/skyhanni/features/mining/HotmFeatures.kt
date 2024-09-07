@@ -4,14 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HotmFeatures {
+@SkyHanniModule
+object HotmFeatures {
 
-    val config get() = SkyHanniMod.feature.mining.hotm
+    private val config get() = SkyHanniMod.feature.mining.hotm
 
     fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory
 
@@ -35,7 +37,7 @@ class HotmFeatures {
 
     private fun handleLevelStackSize(event: RenderItemTipEvent) {
         if (!config.levelStackSize) return
-        HotmData.entries.firstOrNull() {
+        HotmData.entries.firstOrNull {
             event.stack == it.slot?.stack
         }?.let {
             event.stackTip = if (it.activeLevel == 0 || it.activeLevel == it.maxLevel) "" else
