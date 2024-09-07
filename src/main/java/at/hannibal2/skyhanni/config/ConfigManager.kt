@@ -40,7 +40,6 @@ import java.nio.file.StandardCopyOption
 import java.util.EnumMap
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
-import kotlin.reflect.KMutableProperty1
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (LorenzUtils.isBetaVersion()) {
@@ -67,8 +66,7 @@ class ConfigManager {
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
         require(value.javaClass == type.clazz)
-        @Suppress("UNCHECKED_CAST")
-        (type.property as KMutableProperty0<Any>).set(value)
+        @Suppress("UNCHECKED_CAST") (type.property as KMutableProperty0<Any>).set(value)
         (jsonHolder as MutableMap<ConfigFileType, Any>)[type] = value
     }
 
@@ -97,8 +95,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (LorenzEvent.isInGuardedEventHandler)
-                throw e
+            if (LorenzEvent.isInGuardedEventHandler) throw e
         }
     }
 
