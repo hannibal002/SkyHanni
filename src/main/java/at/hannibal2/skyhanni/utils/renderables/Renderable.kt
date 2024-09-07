@@ -53,7 +53,11 @@ interface Renderable {
     val horizontalAlign: HorizontalAlignment
     val verticalAlign: VerticalAlignment
     fun isHovered(posX: Int, posY: Int) = currentRenderPassMousePosition?.let { (x, y) ->
-        x in (posX..posX + width) && y in (posY..posY + height) // TODO: adjust for variable height?
+        x in (posX..posX + width) && y in (posY..posY + height)
+    } ?: false
+
+    fun isBoxHovered(posX: Int, width: Int, posY: Int, height: Int) = currentRenderPassMousePosition?.let { (x, y) ->
+        x in (posX..posX + width) && y in (posY..posY + height)
     } ?: false
 
     /**
@@ -535,11 +539,12 @@ interface Renderable {
          * @param onUpdateSize function that is called if the size changes (since the search text can get bigger than [content])
          * @param textInput The text input, can be external or internal
          * @param shouldRenderTopElseBottom true == Renders on top, false == Renders at the Bottom
+         * @param hideIfNoText hides text box if no input is given
          * @param ySpacing space between the search and [content]
          * @param onHover is triggered if [content] or the text box is hovered
          * @param bypassChecks bypass the [shouldAllowLink] logic
          * @param condition condition to being able to input / [onHover] to trigger
-         * @param scale textscale of the textbox
+         * @param scale text scale of the textbox
          * @param color color of the textbox
          * @param key event key for the [textInput] to register the event, needs clearing if [textInput] is external, default = 0
          */
@@ -549,6 +554,7 @@ interface Renderable {
             onUpdateSize: (Renderable) -> Unit,
             textInput: TextInput = TextInput(),
             shouldRenderTopElseBottom: Boolean = true,
+            hideIfNoText: Boolean = true,
             ySpacing: Int = 0,
             onHover: (TextInput) -> Unit = {},
             bypassChecks: Boolean = false,
@@ -557,8 +563,11 @@ interface Renderable {
             color: Color = Color.WHITE,
             key: Int = 0,
         ) = object : Renderable {
+
+            val textBoxHeight = (9 * scale).toInt() + 1
+
             override var width: Int = content.width
-            override val height: Int = content.height + ySpacing + (9 * scale).toInt() + 1
+            override val height: Int = content.height + ySpacing + textBoxHeight
             override val horizontalAlign = content.horizontalAlign
             override val verticalAlign = content.verticalAlign
 
@@ -581,20 +590,33 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 if (shouldRenderTopElseBottom) {
-                    RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    if (!(hideIfNoText && textInput.textBox.isEmpty())) {
+                        RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    }
                     GlStateManager.translate(0f, (ySpacing + 10).toFloat(), 0f)
                 }
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
                     textInput.makeActive()
                     textInput.handle()
+                    val yOff: Int
+                    if (shouldRenderTopElseBottom) {
+                        yOff = 0
+                    } else {
+                        yOff = content.height + ySpacing
+                    }
+                    if (isBoxHovered(posX, width, posY + yOff, textBoxHeight) && (-99).isKeyClicked()) {
+                        textInput.clear()
+                    }
                 } else {
                     textInput.disable()
                 }
                 content.render(posX, posY)
                 if (!shouldRenderTopElseBottom) {
                     GlStateManager.translate(0f, (ySpacing).toFloat(), 0f)
-                    RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    if (!(hideIfNoText && textInput.textBox.isEmpty())) {
+                        RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    }
                     GlStateManager.translate(0f, -(ySpacing).toFloat(), 0f)
                 } else {
                     GlStateManager.translate(0f, -(ySpacing + 10).toFloat(), 0f)
