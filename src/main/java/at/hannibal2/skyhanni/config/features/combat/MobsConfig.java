@@ -96,7 +96,7 @@ public class MobsConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showArachneKillTimer = true;
+    public boolean arachneKillTimer = true;
 
     @Expose
     @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")
