@@ -519,8 +519,8 @@ object ChatFilter {
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
-        config.parkour && message.isPresent("parkour") -> "parkour"
-        config.teleport_pads && message.isPresent("teleport_pads") -> "teleport_pads"
+        config.hideParkour && message.isPresent("parkour") -> "parkour"
+        config.hideTeleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
