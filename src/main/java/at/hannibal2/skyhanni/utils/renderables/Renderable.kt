@@ -593,7 +593,7 @@ interface Renderable {
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
                         RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
-                    GlStateManager.translate(0f, (ySpacing + 10).toFloat(), 0f)
+                    GlStateManager.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
                 }
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
                     onHover(textInput)
@@ -611,15 +611,16 @@ interface Renderable {
                 } else {
                     textInput.disable()
                 }
-                content.render(posX, posY)
                 if (!shouldRenderTopElseBottom) {
+                    content.render(posX, posY)
                     GlStateManager.translate(0f, (ySpacing).toFloat(), 0f)
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {
                         RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     }
                     GlStateManager.translate(0f, -(ySpacing).toFloat(), 0f)
                 } else {
-                    GlStateManager.translate(0f, -(ySpacing + 10).toFloat(), 0f)
+                    content.render(posX, posY + textBoxHeight + ySpacing)
+                    GlStateManager.translate(0f, -(ySpacing + textBoxHeight).toFloat(), 0f)
                 }
             }
 
