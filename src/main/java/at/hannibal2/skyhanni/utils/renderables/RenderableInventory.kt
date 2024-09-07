@@ -92,7 +92,7 @@ object RenderableInventory {
                             item,
                             scale,
                             0,
-                            0
+                            0,
                         )
                     } ?: Renderable.placeholder((16 * scale).toInt(), (16 * scale).toInt())).also { index++ }
                 } else Renderable.placeholder(0, 0)

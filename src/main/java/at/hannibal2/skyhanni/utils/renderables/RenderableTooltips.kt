@@ -35,7 +35,6 @@ object RenderableTooltips {
         borderColor: LorenzColor? = null,
         snapsToTopIfToLong: Boolean = true,
         spacedTitle: Boolean = false
-
     ) {
         tooltip = DeferredTooltip(tips, stack, borderColor, snapsToTopIfToLong, spacedTitle)
     }

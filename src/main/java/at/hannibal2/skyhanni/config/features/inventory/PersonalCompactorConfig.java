@@ -11,7 +11,7 @@ import org.lwjgl.input.Keyboard;
 public class PersonalCompactorConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "Enable showing what items are inside your personal compactor/deletor.")
+    @ConfigOption(name = "Enabled", desc = "Enable showing what items are inside your personal compactor/deletor.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
