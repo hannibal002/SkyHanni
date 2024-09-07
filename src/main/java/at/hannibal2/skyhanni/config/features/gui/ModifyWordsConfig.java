@@ -10,12 +10,12 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ModifyWordsConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enables replacing all instances of a word or phrase with another word or phrase.")
+    @ConfigOption(name = "Enabled", desc = "Enable replacing all instances of a word or phrase with another word or phrase.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
 
-    @ConfigOption(name = "Open Config", desc = "Opens the menu to setup the visual words.\n§eCommand: /shwords")
+    @ConfigOption(name = "Open Config", desc = "Open the menu to setup the visual words.\n§eCommand: /shwords")
     @ConfigEditorButton(buttonText = "Open")
     public Runnable open = Commands::openVisualWords;
 

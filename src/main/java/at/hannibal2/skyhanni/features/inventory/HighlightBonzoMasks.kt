@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -23,6 +24,7 @@ import kotlin.time.Duration.Companion.seconds
 /**
  * @author Linnea Gräf
  */
+@SkyHanniModule
 object HighlightBonzoMasks {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities

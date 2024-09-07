@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -14,21 +15,20 @@ import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
-class MovementSpeedDisplay {
+@SkyHanniModule
+object MovementSpeedDisplay {
 
     private val config get() = SkyHanniMod.feature.misc
 
     private var display = ""
     private val soulsandSpeeds = mutableListOf<Double>()
 
-    companion object {
-        /**
-         * This speed value represents the movement speed in blocks per second.
-         * This has nothing to do with the speed stat.
-         */
-        var speed = 0.0
-        var usingSoulsandSpeed = false
-    }
+    /**
+     * This speed value represents the movement speed in blocks per second.
+     * This has nothing to do with the speed stat.
+     */
+    var speed = 0.0
+    var usingSoulsandSpeed = false
 
     init {
         // TODO use LorenzTickEvent

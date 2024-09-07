@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.events.DataWatcherUpdatedEvent
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DataWatcherAPI {
+@SkyHanniModule
+object DataWatcherAPI {
 
     private val DATA_VALUE_CUSTOM_NAME = 2
 

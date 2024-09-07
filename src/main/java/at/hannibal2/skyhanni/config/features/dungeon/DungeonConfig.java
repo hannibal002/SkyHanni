@@ -12,9 +12,8 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Clicked Blocks", desc = "Highlight levers, chests, and Wither Essence when clicked in Dungeons.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean highlightClickedBlocks = false;
+    @Accordion
+    public HighlightClickedBlocksConfig clickedBlocks = new HighlightClickedBlocksConfig();
 
     @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
@@ -42,7 +41,7 @@ public class DungeonConfig {
     public CleanEndConfig cleanEnd = new CleanEndConfig();
 
     @Expose
-    @ConfigOption(name = "Boss Damage Splash", desc = "Hides damage splashes while inside the boss room (fixes a Skytils feature).")
+    @ConfigOption(name = "Boss Damage Splash", desc = "Hide damage splashes while inside the boss room (fixes a Skytils feature).")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean damageSplashBoss = false;
@@ -61,11 +60,16 @@ public class DungeonConfig {
 
     @Expose
     @ConfigOption(name = "Architect Notifier",
-        desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed. " +
+        desc = "Notifies you to use the Architect in Dungeons when a puzzle is failed.\n" +
             "§cOnly works when having enough §5Architect First Drafts §cin the sack.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean architectNotifier = true;
+
+    @Expose
+    @ConfigOption(name = "Object Highlighter", desc = "Highlights various things in Dungeons.")
+    @Accordion
+    public ObjectHighlighterConfig objectHighlighter = new ObjectHighlighterConfig();
 
     @Expose
     @ConfigOption(name = "Object Hider", desc = "Hide various things in Dungeons.")
@@ -116,7 +120,7 @@ public class DungeonConfig {
     public DungeonChestConfig chest = new DungeonChestConfig();
 
     @Expose
-    @ConfigOption(name = "Croesus Chest", desc = "Adds a visual highlight to the Croesus inventory that " +
+    @ConfigOption(name = "Croesus Chest", desc = "Add a visual highlight to the Croesus inventory that " +
         "shows unopened chests.") // TODO move( , "dungeon.croesusUnopenedChestTracker" ,"dungeon.chest.showUnopened" )
     @ConfigEditorBoolean
     @FeatureToggle

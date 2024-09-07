@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
@@ -14,7 +15,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class BazaarOpenPriceWebsite {
+@SkyHanniModule
+object BazaarOpenPriceWebsite {
 
     private val config get() = SkyHanniMod.feature.inventory.bazaar
     private var lastClick = SimpleTimeMark.farPast()
@@ -47,7 +49,7 @@ class BazaarOpenPriceWebsite {
         val lastItem = BazaarApi.currentlyOpenedProduct ?: return
 
         if (event.slotId == 22) {
-            event.isCanceled = true
+            event.cancel()
             if (lastClick.passedSince() > 0.3.seconds) {
                 val name = getSkyBlockBzName(lastItem)
                 OSUtils.openBrowser("https://www.skyblock.bz/product/$name")

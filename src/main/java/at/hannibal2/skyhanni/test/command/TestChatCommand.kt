@@ -47,7 +47,8 @@ object TestChatCommand {
                     return
                 }
             else ChatComponentText(text.replace("&", "§"))
-        if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
+        // TODO add additional hide parameter
+//         if (!isHidden) ChatUtils.chat("Testing message: §7${component.formattedText}", prefixColor = "§a")
         test(component, isHidden)
     }
 
@@ -56,16 +57,14 @@ object TestChatCommand {
         val event = LorenzChatEvent(message, componentText)
         event.postAndCatch()
 
+        if (isHidden) return
+
         if (event.blockedReason != "") {
-            if (!isHidden) {
-                ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
-            }
+            ChatUtils.chat("§cChat blocked: ${event.blockedReason}")
         } else {
             val finalMessage = event.chatComponent
             if (finalMessage.formattedText.stripHypixelMessage() != message) {
-                if (!isHidden) {
-                    ChatUtils.chat("§eChat modified!")
-                }
+                ChatUtils.chat("§eChat modified!")
             }
             ChatUtils.chat(finalMessage)
         }
