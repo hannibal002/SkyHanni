@@ -4,16 +4,14 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import net.minecraft.block.BlockLiquid
-import net.minecraft.block.material.Material
 
 object BlockFluidRendererHook {
     private val config get() = SkyHanniMod.feature.fishing.lavaReplacement
 
     @JvmStatic
-    fun replaceLava(block: BlockLiquid): Material {
-        if (!LorenzUtils.inSkyBlock || !config.enabled) return block.material
-        if (config.onlyInCrimsonIsle && !IslandType.CRIMSON_ISLE.isInIsland()) return block.material
-        return Material.water
+    fun replaceLava(): Boolean {
+        if (!LorenzUtils.inSkyBlock || !config.enabled) return false
+        if (config.onlyInCrimsonIsle && !IslandType.CRIMSON_ISLE.isInIsland()) return false
+        return true
     }
 }
