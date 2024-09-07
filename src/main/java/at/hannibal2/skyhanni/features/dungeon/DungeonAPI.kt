@@ -1,9 +1,13 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
@@ -14,6 +18,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.BlockUtils
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -30,6 +36,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -58,6 +65,7 @@ object DungeonAPI {
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
+    private const val WITHER_ESSENCE_TEXTURE = "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
 
     /**
      * REGEX-TEST: Time Elapsed: §a01m 17s
@@ -353,5 +361,28 @@ object DungeonAPI {
         companion object {
             fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
         }
+    }
+
+
+    @SubscribeEvent
+    fun onBlockClick(event: BlockClickEvent) {
+        if (!inDungeon() || event.clickType != ClickType.RIGHT_CLICK) return
+
+        val position = event.position
+        val blockType: ClickedBlockType = when (position.getBlockAt()) {
+            Blocks.chest -> ClickedBlockType.CHEST
+            Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
+            Blocks.lever -> ClickedBlockType.LEVER
+            Blocks.skull -> {
+                val blockTexture = BlockUtils.getTextureFromSkull(position.toBlockPos())
+                if (blockTexture == WITHER_ESSENCE_TEXTURE) {
+                    ClickedBlockType.WITHER_ESSENCE
+                } else {
+                    return
+                }
+            }
+            else -> return
+        }
+        DungeonBlockClickEvent(position, blockType).post()
     }
 }
