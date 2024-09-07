@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.model
 
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.insert
@@ -73,7 +74,11 @@ class TextInput {
 
         fun onGuiInput(ci: CallbackInfo) {
             if (activeInstance != null) {
-                ci.cancel()
+                if (Keyboard.KEY_ESCAPE.isKeyHeld()) {
+                    disable()
+                } else {
+                    ci.cancel()
+                }
                 return
             }
         }
