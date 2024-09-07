@@ -81,10 +81,9 @@ object ForgeGfs {
 
         for (i in CollectionUtils.takeColumn(0, 53, 0, 4)) {
             val currentItem = event.container.getSlot(i).stack
-            val amount = currentItem.stackSize
             val currItemInternalName = currentItem.getInternalNameOrNull() ?: continue
             if (SackAPI.sackListInternalNames.contains(currItemInternalName.asString())) {
-                itemMap.addOrPut(currItemInternalName, amount)
+                itemMap.addOrPut(currItemInternalName, currentItem.stackSize)
             }
         }
 
