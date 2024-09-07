@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
@@ -168,6 +169,16 @@ object NEUItems {
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+
+    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
+        val internalName = hypixelId.replace(':', '-')
+        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+    }
+
+    fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
+        getInternalNameFromHypixelIdOrNull(hypixelId)
+            ?: error("hypixel item id does not match internal name: $hypixelId")
+
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
