@@ -54,8 +54,4 @@ object MiscFeatures {
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "mobs", "combat.mobs")
     }
-
-    fun goToLimbo() {
-        ChatUtils.sendMessageToServer("§")
-    }
 }

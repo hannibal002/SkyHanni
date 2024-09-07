@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.test.PriceSource
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
@@ -27,23 +28,30 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
     companion object {
-
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
 
-    fun addCoins(coins: Int) {
-        addItem(SKYBLOCK_COIN, coins)
-    }
-
-    fun addItem(internalName: NEUInternalName, amount: Int) {
+    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
         modify {
-            it.additem(internalName, amount)
+            it.addItem(internalName, amount, command)
         }
-        getSharedTracker()?.let {
-            val hidden = it.get(DisplayMode.TOTAL).items[internalName]!!.hidden
-            it.get(DisplayMode.SESSION).items[internalName]!!.hidden = hidden
+        getSharedTracker()?.let { sharedData ->
+            sharedData.get(DisplayMode.TOTAL).items[internalName]?.let { data ->
+                sharedData.get(DisplayMode.SESSION).items[internalName]!!.hidden = data.hidden
+            }
         }
 
+        if (command) {
+            TrackerManager.commandEditTrackerSuccess = true
+            val displayName = internalName.itemName
+            if (amount > 0) {
+                ChatUtils.chat("Manually added to $name: §r$displayName §7(${amount}x§7)")
+            } else {
+                ChatUtils.chat("Manually removed from $name: §r$displayName §7(${-amount}x§7)")
+            }
+            return
+        }
+        // TODO move the function to common
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
@@ -55,14 +63,14 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
     fun addPriceFromButton(lists: MutableList<List<Any>>) {
         if (isInventoryOpen()) {
-            lists.addSelector<PriceSource>(
+            lists.addSelector<ItemPriceSource>(
                 "",
-                getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
+                getName = { type -> type.sellName },
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = PriceFromEntry.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update()
-                }
+                },
             )
         }
     }
@@ -140,7 +148,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                     }
                     update()
 
-                }
+                },
             ) else Renderable.string(displayName)
 
             lists.addAsSingletonList(renderable)
@@ -172,6 +180,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
         add("§eControl + Click to remove this item!")
+
+        add("")
+        add("§7Use §e/shedittracker ${internalName.readableInternalName} <amount>")
+        add("§7to edit the number.")
+        add("§7Use negative numbers to remove items.")
+
         if (SkyHanniMod.feature.dev.debug.enabled) {
             add("")
             add("§7${internalName}")
