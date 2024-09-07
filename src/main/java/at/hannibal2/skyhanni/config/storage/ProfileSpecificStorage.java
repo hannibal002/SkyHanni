@@ -674,6 +674,9 @@ public class ProfileSpecificStorage {
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
 
     @Expose
+    @Nullable
+    public Integer abiphoneContactAmount = null;
+
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
     public static class HoppityEventStats {

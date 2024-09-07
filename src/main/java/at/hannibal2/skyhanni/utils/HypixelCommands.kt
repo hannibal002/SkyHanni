@@ -136,6 +136,11 @@ object HypixelCommands {
         send("pq $quality")
     }
 
+    // Changes the speed of rancher boots in garden
+    fun setMaxSpeed() {
+        send("setmaxspeed")
+    }
+
     fun showRng(major: String? = null, minor: String? = null) = when {
         major == null || minor == null -> send("rng")
         else -> send("rng $major $minor")
