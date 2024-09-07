@@ -52,6 +52,17 @@ fun Renderable.toSearchable(searchText: String? = null) = Searchable(this, searc
 fun Searchable.toRenderable() = renderable
 fun List<Searchable>.toRenderable() = map { it.toRenderable() }
 fun List<Searchable>.toMap() = associate { it.renderable to it.string }
+fun List<Searchable>.buildSearchBox(): Renderable {
+    val textInput = TextInput()
+    val key = 0
+    return Renderable.searchBox(
+        Renderable.verticalSearchableContainer(toMap(), textInput = textInput, key = key + 1),
+        "Search: ",
+        onUpdateSize = { println("onUpdateSize") },
+        textInput = textInput,
+        key = key,
+    )
+}
 
 interface Renderable {
 
@@ -542,7 +553,7 @@ interface Renderable {
          * @param key event key for the [textInput] to register the event, needs clearing if [textInput] is external, default = 0
          */
         fun searchBox(
-            lines: List<Searchable>,
+            content: Renderable,
             searchPrefix: String,
             onUpdateSize: (Renderable) -> Unit,
             textInput: TextInput = TextInput(),
@@ -556,7 +567,6 @@ interface Renderable {
             color: Color = Color.WHITE,
             key: Int = 0,
         ) = object : Renderable {
-            val content: Renderable = verticalSearchableContainer(lines.toMap(), textInput = textInput, key = key + 1)
             val textBoxHeight = (9 * scale).toInt() + 1
             override var width: Int = content.width
             override val height: Int = content.height + ySpacing + textBoxHeight
