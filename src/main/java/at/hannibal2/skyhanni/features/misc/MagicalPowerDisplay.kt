@@ -35,7 +35,7 @@ object MagicalPowerDisplay {
     private val hegemonyArtifact = "HEGEMONY_ARTIFACT".asInternalName()
     private val riftPrism = "RIFT_PRISM".asInternalName()
 
-    /*
+    /**
     * REGEX-TEST: Accessory Bag
     * REGEX-TEST: Accessory Bag (1/75)
     * REGEX-TEST: Accessory Bag (909/394294)
@@ -45,12 +45,12 @@ object MagicalPowerDisplay {
     * */
     private val acceptedInvPattern by RepoPattern.pattern(
         "inv.acceptable",
-        """^(Accessory Bag(?: \(\d+/\d+\))?|Auctions Browser|Manage Auctions|Auctions: ".*"?)$""",
+        "^(Accessory Bag(?: \\(\\d+\\/\\d+\\))?|Auctions Browser|Manage Auctions|Auctions: \".*\"?)$",
     )
 
     private val abiphoneGroup = RepoPattern.group("data.abiphone")
 
-    /*
+    /**
     * REGEX-TEST: Abiphone X Plus
     * REGEX-TEST: Abiphone X Plus Special Edition
     * REGEX-TEST: Abiphone XI Ultra Style
@@ -64,14 +64,14 @@ object MagicalPowerDisplay {
         "Abiphone .*",
     )
 
-    /*
+    /**
     * REGEX-TEST: Your contacts: 0/0
     * REGEX-TEST: Your contacts: 1/75
     * REGEX-TEST: Your contacts: 52/60
     * */
     private val yourContactPattern by abiphoneGroup.pattern(
         "contacts",
-        """"Your contacts: (?<contacts>\d+)/\d+""",
+        "Your contacts: (?<contacts>\\d+)\\/\\d+",
     )
 
     @SubscribeEvent
