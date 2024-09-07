@@ -19,6 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MarkedPlayerManager {
+
     val config get() = SkyHanniMod.feature.gui.markedPlayers
 
     private val playerNamesToMark = mutableListOf<String>()
@@ -62,7 +63,7 @@ object MarkedPlayerManager {
         }
     }
 
-    private fun refreshColours() =
+    private fun refreshColors() =
         markedPlayers.forEach {
             it.value.setColor()
         }
@@ -103,7 +104,7 @@ object MarkedPlayerManager {
                 playerNamesToMark.remove(name)
             }
         }
-        config.entityColor.onToggle(::refreshColours)
+        config.entityColor.onToggle(::refreshColors)
     }
 
     @SubscribeEvent

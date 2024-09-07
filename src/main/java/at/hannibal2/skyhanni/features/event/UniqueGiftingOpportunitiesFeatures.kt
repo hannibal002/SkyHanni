@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
@@ -22,6 +23,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
@@ -73,16 +75,16 @@ object UniqueGiftingOpportunitiesFeatures {
         analyzeArmorStand(entity)
     }
 
-    @SubscribeEvent
-    fun onEntityJoinWorld(event: EntityEnterWorldEvent) {
+    @HandleEvent
+    fun onEntityJoinWorld(event: EntityEnterWorldEvent<Entity>) {
         playerColor(event)
         val entity = event.entity as? EntityArmorStand ?: return
         analyzeArmorStand(entity)
     }
 
-    private fun playerColor(event: EntityEnterWorldEvent) {
+    private fun playerColor(event: EntityEnterWorldEvent<Entity>) {
         if (event.entity is EntityOtherPlayerMP) {
-            val entity = event.entity as EntityOtherPlayerMP
+            val entity = event.entity
             if (entity.isNPC() || isIronman(entity) || isBingo(entity)) return
 
             RenderLivingEntityHelper.setEntityColor(

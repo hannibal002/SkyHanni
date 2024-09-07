@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.fixedRateTimer
 
@@ -32,7 +33,7 @@ object TpsCounter {
     init {
         // TODO use SecondPassedEvent + passedSince
         fixedRateTimer(name = "skyhanni-tps-counter-seconds", period = 1000L) {
-            if (!isEnabled()) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
             if (packetsFromLastSecond == 0) return@fixedRateTimer
 
             if (ignoreFirstTicks > 0) {
@@ -62,13 +63,21 @@ object TpsCounter {
         }
         // TODO use DelayedRun
         fixedRateTimer(name = "skyhanni-tps-counter-ticks", period = 50L) {
-            if (!isEnabled()) return@fixedRateTimer
+            if (!LorenzUtils.inSkyBlock) return@fixedRateTimer
 
             if (hasPacketReceived) {
                 hasPacketReceived = false
                 packetsFromLastSecond++
             }
         }
+    }
+
+    fun tpsCommand() {
+        if (display.isEmpty()) {
+            ChatUtils.chat("§cNo tps data available, make sure you have the setting on.")
+            return
+        }
+        ChatUtils.chat(display)
     }
 
     @SubscribeEvent
@@ -79,9 +88,9 @@ object TpsCounter {
         display = ""
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
-        if (!config.tpsDisplay) return
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         hasPacketReceived = true
     }
 

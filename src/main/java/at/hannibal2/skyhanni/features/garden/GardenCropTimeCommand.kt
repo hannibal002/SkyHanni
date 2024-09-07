@@ -9,7 +9,8 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLongOrUserError
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
+import kotlin.time.Duration.Companion.seconds
 
 object GardenCropTimeCommand {
 
@@ -41,7 +42,7 @@ object GardenCropTimeCommand {
             val internalName = entry.key
             val itemName = internalName.itemName
             if (itemName.removeColor().lowercase().contains(searchName)) {
-                val (baseId, baseAmount) = NEUItems.getMultiplier(internalName)
+                val (baseId, baseAmount) = NEUItems.getPrimitiveMultiplier(internalName)
                 val baseName = baseId.itemName
                 val crop = CropType.getByName(baseName.removeColor())
 
@@ -56,9 +57,9 @@ object GardenCropTimeCommand {
                 if (speed == null) {
                     map["$text §cNo speed data!"] = -1
                 } else {
-                    val missingTimeSeconds = fullAmount / speed
-                    val duration = TimeUtils.formatDuration(missingTimeSeconds * 1000)
-                    map["$text §b$duration"] = missingTimeSeconds
+                    val missingTime = (fullAmount / speed).seconds
+                    val duration = missingTime.format()
+                    map["$text §b$duration"] = missingTime.inWholeSeconds
                 }
             }
         }

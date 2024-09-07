@@ -79,7 +79,7 @@ object AuctionHouseOpenPriceWebsite {
         if (!isEnabled()) return
         displayItem ?: return
         if (event.slotId != 8) return
-        event.isCanceled = true
+        event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
             val url = "https://sky.coflnet.com/api/mod/open/$searchTerm"
             OSUtils.openBrowser(url)

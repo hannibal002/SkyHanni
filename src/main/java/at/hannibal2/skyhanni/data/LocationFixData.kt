@@ -22,9 +22,9 @@ object LocationFixData {
         locationFixes.clear()
 
         for (fix in data.locationFixes.values) {
-            val island = IslandType.getByName(fix.island_name)
+            val island = IslandType.getByName(fix.islandName)
             val area = fix.a.axisAlignedTo(fix.b)
-            val realLocation = fix.real_location
+            val realLocation = fix.realLocation
 
             locationFixes.add(LocationFix(island, area, realLocation))
         }

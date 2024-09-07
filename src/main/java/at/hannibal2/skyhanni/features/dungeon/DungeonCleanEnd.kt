@@ -23,9 +23,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+
+    /**
+     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
+     * REGEX-TEST: §f                        §r§cThe Catacombs §r§8- §r§eFloor VI
+     * REGEX-TEST: §f                §r§cMaster Mode Catacombs §r§8- §r§eFloor II
+     */
     private val catacombsPattern by RepoPattern.pattern(
         "dungeon.end.chests.spawned",
-        "(?:§f)?( *)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
+        "(?:§f)?( *)§r§c(Master Mode )?The Catacombs §r§8- §r§eFloor (.*)",
     )
 
     private var bossDone = false
@@ -106,20 +112,20 @@ object DungeonCleanEnd {
             return
         }
 
-        event.isCanceled = true
+        event.cancel()
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (shouldBlock()) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (shouldBlock() && !chestsSpawned && event.soundName.startsWith("note.")) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

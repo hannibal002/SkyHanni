@@ -20,13 +20,13 @@ object ParticleHider {
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         val distanceToPlayer = event.distanceToPlayer
         if (SkyHanniMod.feature.misc.particleHiders.hideFarParticles && distanceToPlayer > 40 && !inM7Boss()) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
         val type = event.type
         if (SkyHanniMod.feature.misc.particleHiders.hideCloseRedstoneParticles && type == EnumParticleTypes.REDSTONE && distanceToPlayer < 2) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
@@ -34,7 +34,7 @@ object ParticleHider {
             for (entity in EntityUtils.getEntities<EntitySmallFireball>()) {
                 val distance = entity.getLorenzVec().distance(event.location)
                 if (distance < 5) {
-                    event.isCanceled = true
+                    event.cancel()
                     return
                 }
             }

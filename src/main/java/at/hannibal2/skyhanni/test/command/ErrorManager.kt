@@ -49,6 +49,8 @@ object ErrorManager {
         "at at.hannibal2.skyhanni.config.commands.Commands\$createCommand\$1.processCommand",
         "at at.hannibal2.skyhanni.test.command.ErrorManager.logError",
         "at at.hannibal2.skyhanni.events.LorenzEvent.postAndCatch",
+        "at at.hannibal2.skyhanni.api.event.SkyHanniEvent.post",
+        "at at.hannibal2.skyhanni.api.event.EventHandler.post",
         "at net.minecraft.launchwrapper.",
     )
 
@@ -72,10 +74,12 @@ object ErrorManager {
             errorMessages[errorId]
         }
         val name = if (fullErrorMessage) "Full error" else "Error"
-        ChatUtils.chat(errorMessage?.let {
-            OSUtils.copyToClipboard(it)
-            "$name copied into the clipboard, please report it on the SkyHanni discord!"
-        } ?: "Error id not found!")
+        ChatUtils.chat(
+            errorMessage?.let {
+                OSUtils.copyToClipboard(it)
+                "$name copied into the clipboard, please report it on the SkyHanni discord!"
+            } ?: "Error id not found!",
+        )
     }
 
     fun logErrorStateWithData(
@@ -85,6 +89,7 @@ object ErrorManager {
         ignoreErrorCache: Boolean = false,
         noStackTrace: Boolean = false,
         betaOnly: Boolean = false,
+        condition: () -> Boolean = { true },
     ) {
         logError(
             IllegalStateException(internalMessage),
@@ -93,6 +98,7 @@ object ErrorManager {
             noStackTrace,
             *extraData,
             betaOnly = betaOnly,
+            condition = condition,
         )
     }
 
@@ -114,6 +120,7 @@ object ErrorManager {
         noStackTrace: Boolean,
         vararg extraData: Pair<String, Any?>,
         betaOnly: Boolean = false,
+        condition: () -> Boolean = { true },
     ) {
         if (betaOnly && !LorenzUtils.isBetaVersion()) return
         if (!ignoreErrorCache) {
@@ -123,6 +130,7 @@ object ErrorManager {
             if (pair in cache) return
             cache.add(pair)
         }
+        if (!condition()) return
 
         Error(message, throwable).printStackTrace()
         Minecraft.getMinecraft().thePlayer ?: return
@@ -148,10 +156,9 @@ object ErrorManager {
 
         ChatUtils.clickableChat(
             "§c[SkyHanni-${SkyHanniMod.version}]: $message§c. Click here to copy the error into the clipboard.",
-            onClick = {
-                copyError(randomId)
-            },
-            prefix = false
+            onClick = { copyError(randomId) },
+            "§eClick to copy!",
+            prefix = false,
         )
     }
 
