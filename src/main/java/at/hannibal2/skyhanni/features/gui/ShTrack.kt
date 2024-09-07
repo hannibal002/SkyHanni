@@ -272,9 +272,18 @@ object ShTrack {
     private var display: Renderable = Renderable.placeholder(0, 0)
 
     @SubscribeEvent
-    fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+    fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent) {
         if (scheduledUpdate) {
-            display = Renderable.table(tracker.map { it.line })
+            display = Renderable.verticalEditTable(
+                tracker.map { it.line },
+                onHover = {},
+                onClick = {},
+                onDrop = { a, b ->
+                    tracker.move(a, b)
+                    updateDisplay()
+                },
+            )
+            scheduledUpdate = false
         }
         config.position.renderRenderable(display, posLabel = "Tracker")
     }
@@ -373,4 +382,10 @@ object ShTrack {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
 
+}
+
+private fun <E> MutableList<E>.move(from: Int, to: Int) {
+    val element = this[from]
+    this.removeAt(from)
+    add(to, element)
 }
