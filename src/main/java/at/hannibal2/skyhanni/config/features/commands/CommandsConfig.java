@@ -18,6 +18,11 @@ public class CommandsConfig {
     @Expose
     public BetterWikiCommandConfig betterWiki = new BetterWikiCommandConfig();
 
+    @ConfigOption(name = "Reverse Party Transfer", desc = "")
+    @Accordion
+    @Expose
+    public ReversePartyTransferConfig reversePT = new ReversePartyTransferConfig();
+
     @ConfigOption(name = "Party Commands", desc = "Shortens party commands and allows tab-completing for them. " +
         "\n§eCommands: /pt, /pp, /pko, /pk, /pd §7(SkyBlock command §e/pt §7to check your play time will still work)")
     @Expose

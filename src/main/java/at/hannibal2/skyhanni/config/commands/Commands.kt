@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
@@ -63,6 +64,7 @@ import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
@@ -337,7 +339,7 @@ object Commands {
         ) { LimboTimeTracker.printStats() }
         registerCommand(
             "shlanedetection",
-            "Detect a farming lane in garden",
+            "Detect a farming lane in the Garden",
         ) { FarmingLaneCreator.commandLaneDetection() }
         registerCommand(
             "shignore",
@@ -355,6 +357,10 @@ object Commands {
             "shcolors",
             "Prints a list of all Minecraft color & formatting codes in chat.",
         ) { ColorFormattingHelper.printColorCodeList() }
+        registerCommand(
+            "shtps",
+            "Informs in chat about the server ticks per second (TPS)."
+        ) { TpsCounter.tpsCommand() }
     }
 
     private fun usersBugFix() {
@@ -433,6 +439,10 @@ object Commands {
             "shresetpunchcard",
             "Resets the Rift Punchcard Artifact player list.",
         ) { PunchcardHighlight.clearList() }
+        registerCommand(
+            "shedittracker",
+            "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.",
+        ) { TrackerManager.commandEditTracker(it) }
     }
 
     private fun developersDebugFeatures() {
@@ -470,7 +480,10 @@ object Commands {
             "shtestisland",
             "Sets the current skyblock island for testing purposes.",
         ) { SkyBlockIslandTest.onCommand(it) }
-        registerCommand("shdebugprice", "Debug different price sources for an item.") { ItemPriceUtils.debugItemPrice(it) }
+        registerCommand(
+            "shdebugprice",
+            "Debug different price sources for an item."
+        ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
             "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update.",
@@ -604,6 +617,7 @@ object Commands {
         registerCommand("pt", "Transfer the party to another party member") { PartyCommands.transfer(it) }
         registerCommand("pp", "Promote a specific party member") { PartyCommands.promote(it) }
         registerCommand("pd", "Disbands the party") { PartyCommands.disband() }
+        registerCommand("rpt", "Reverse transfer party to the previous leader") { PartyCommands.reverseTransfer() }
     }
 
     @JvmStatic

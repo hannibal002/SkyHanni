@@ -1008,6 +1008,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Prints a list of all Minecraft color and formatting codes in chat.
 + Added Remind command. - ThatGravyBoat & Zickles (https://github.com/hannibal002/SkyHanni/pull/1708)
     + Use `/shremind <time> <note>` to set reminders for your future self.
++ Added /shtps command. - saga (https://github.com/hannibal002/SkyHanni/pull/1961)
+    + Informs in chat about the server's ticks per second (TPS).
++ Added command `/shedittracker <item name> <amount>`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2448)
+    + Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.
+    + Use a negative amount to remove items.
 
 </details>
 <details open><summary>
@@ -1249,6 +1254,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
       + Requires Soulflow to be enabled in Hypixel settings: /tab -> Profile Widget -> Show Soulflow.
 + No Bits Available Warning. - Empa (https://github.com/hannibal002/SkyHanni/pull/1286)
     + Warns when you run out of available bits to generate.
++ Added Display for Bits on Cookie buy. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2265)
+    + Shows the Bits you would gain.
+    + Can show the change for the available Bits.
+    + Also shows the time more clearly (or adds it if not present).
 + Link from HUD elements to config options. - nea (https://github.com/hannibal002/SkyHanni/pull/1383)
     + Simply right-click a HUD element in the HUD editor to jump to its associated options.
     + Does not yet work on every GUI element. Wait for the missing elements in the following betas.
@@ -1261,6 +1270,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Option to highlight Zealots holding Chests in a different color. - Luna (https://github.com/hannibal002/SkyHanni/pull/1347)
 + Allow party members to request allinvite to be turned on. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1464)
     + Say !allinv in party chat for them to enable all invite.
++ Added Reverse Party Leader. - Jordyrat (https://github.com/hannibal002/SkyHanni/pull/1712)
+    + Reverse party transfer via clickable chat message or via the `/rpt` command.
+    + Configurable party chat message after transferring.
 + Added Hide Far Entities. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/1064)
     + Can perhaps increase FPS for some users by 5% to 150%.
     + Options to change the distance and number of mobs to always show.
@@ -1302,6 +1314,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Editable XP Bar. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/1944)
     + Enabled moving and scaling of the XP bar in the SkyHanni GUI Editor.
 + Show dye hex code as the actual color in the item lore. - nopo (https://github.com/hannibal002/SkyHanni/pull/2321)
++ Added a notification when you join a server you have joined previously. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2046)
 
 </details>
 <details open><summary>

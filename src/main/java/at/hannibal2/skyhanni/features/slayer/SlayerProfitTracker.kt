@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.slayer
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerProfitTrackerItemsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -46,7 +47,7 @@ object SlayerProfitTracker {
      */
     private val autoSlayerBankPattern by RepoPattern.pattern(
         "slayer.autoslayer.bank.chat",
-        "§7Took (?<coins>.+) coins from your bank for auto-slayer\\.\\.\\."
+        "§7Took (?<coins>.+) coins from your bank for auto-slayer\\.\\.\\.",
     )
 
     class Data : ItemTrackerData() {
@@ -78,7 +79,7 @@ object SlayerProfitTracker {
             val mobKillCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7Killing mobs gives you coins (more with scavenger).",
-                "§7You got §6$mobKillCoinsFormat coins §7that way."
+                "§7You got §6$mobKillCoinsFormat coins §7that way.",
             )
         }
     }
@@ -104,7 +105,7 @@ object SlayerProfitTracker {
         if (!isEnabled()) return
         val coins = event.coins
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && SlayerAPI.isInCorrectArea) {
-            getTracker()?.addCoins(coins.toInt())
+            tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
         if (event.reason == PurseChangeCause.LOSE_SLAYER_QUEST_STARTED) {
             addSlayerCosts(coins)
@@ -133,7 +134,7 @@ object SlayerProfitTracker {
         return trackers.getOrPut(itemLogCategory) {
             val getStorage: (ProfileSpecificStorage) -> Data = {
                 it.slayerProfitData.getOrPut(
-                    itemLogCategory
+                    itemLogCategory,
                 ) { Data() }
             }
             SkyHanniItemTracker("$itemLogCategory Profit Tracker", { Data() }, getStorage) { drawDisplay(it) }
@@ -153,15 +154,16 @@ object SlayerProfitTracker {
         if (!SlayerAPI.isInCorrectArea) return
         if (!SlayerAPI.hasActiveSlayerQuest()) return
 
-        val internalName = event.internalName
-        val amount = event.amount
+        tryAddItem(event.internalName, event.amount, event.source == ItemAddManager.Source.COMMAND)
+    }
 
-        if (!isAllowedItem(internalName)) {
+    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+        if (!isAllowedItem(internalName) && internalName != NEUInternalName.SKYBLOCK_COIN) {
             ChatUtils.debug("Ignored non-slayer item pickup: '$internalName' '$itemLogCategory'")
             return
         }
 
-        getTracker()?.addItem(internalName, amount)
+        getTracker()?.addItem(internalName, amount, command)
     }
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean {
@@ -176,12 +178,12 @@ object SlayerProfitTracker {
         var profit = tracker.drawItems(data, { true }, this)
         val slayerSpawnCost = data.slayerSpawnCost
         if (slayerSpawnCost != 0L) {
-            val mobKillCoinsFormat = slayerSpawnCost.shortFormat()
+            val slayerSpawnCostFormat = slayerSpawnCost.shortFormat()
             addAsSingletonList(
                 Renderable.hoverTips(
-                    " §7Slayer Spawn Costs: §c$mobKillCoinsFormat",
-                    listOf("§7You paid §c$mobKillCoinsFormat §7in total", "§7for starting the slayer quests.")
-                )
+                    " §7Slayer Spawn Costs: §c$slayerSpawnCostFormat",
+                    listOf("§7You paid §c$slayerSpawnCostFormat §7in total", "§7for starting the slayer quests."),
+                ),
             )
             profit += slayerSpawnCost
         }
@@ -190,8 +192,8 @@ object SlayerProfitTracker {
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Bosses killed: §e${slayerCompletedCount.addSeparators()}",
-                listOf("§7You killed the $itemLogCategory boss", "§e${slayerCompletedCount.addSeparators()} §7times.")
-            )
+                listOf("§7You killed the $itemLogCategory boss", "§e${slayerCompletedCount.addSeparators()} §7times."),
+            ),
         )
 
         addAsSingletonList(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
@@ -204,7 +206,7 @@ object SlayerProfitTracker {
         val text = " §6Mob kill coins§7: §6$mobKillCoinsFormat"
         val lore = listOf(
             "§7Killing mobs gives you coins (more with scavenger)",
-            "§7You got §e$mobKillCoinsFormat §7coins in total this way"
+            "§7You got §e$mobKillCoinsFormat §7coins in total this way",
         )
 
         text to lore

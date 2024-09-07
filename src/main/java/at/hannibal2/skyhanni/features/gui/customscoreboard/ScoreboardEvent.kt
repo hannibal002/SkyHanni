@@ -558,6 +558,7 @@ private fun getEssenceShowWhen(): Boolean = SbPattern.essencePattern.anyMatches(
 
 private fun getQueueLines(): List<String> =
     listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queueTierPattern.matches(it) }) +
         (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
 
 private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getSbLines())
