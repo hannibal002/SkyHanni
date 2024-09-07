@@ -25,9 +25,7 @@ public class HoppityCallWarningConfig {
         name = "Accept Call Hotkey",
         desc = "Accept the call from hoppity by pressing this keybind."
     )
-    @ConfigEditorKeybind(
-        defaultKey = Keyboard.KEY_NONE
-    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int acceptHotkey = Keyboard.KEY_NONE;
 
     @Expose
