@@ -79,6 +79,7 @@ object CompactExperimentRewards {
             val reward = group("reward")
 
             gainedRewards.add(reward)
+            // TODO check price and only block when below x coins (user option)
             event.blockedReason = "COMPACT_REWARDS"
 
             DelayedRun.runDelayed(100.milliseconds) {
