@@ -8,13 +8,15 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SlayerConfig {
 
     @Expose
-    @Category(name = "Endermen", desc = "Endermen Slayer Feature")
+    @Category(name = "Enderman", desc = "Enderman Slayer Feature")
     @Accordion
+    // TODO rename to "enderman"
     public EndermanConfig endermen = new EndermanConfig();
 
     @Expose
@@ -57,6 +59,11 @@ public class SlayerConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean slayerMinibossLine = false;
+
+    @Expose
+    @ConfigOption(name = "Line to Miniboss Width", desc = "The width of the line pointing to every Slayer Mini-Boss around you.")
+    @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+    public int slayerMinibossLineWidth = 3;
 
     @Expose
     @ConfigOption(name = "Hide Mob Names", desc = "Hide the name of the mobs you need to kill in order for the Slayer boss to spawn. Exclude mobs that are damaged, corrupted, runic or semi rare.")

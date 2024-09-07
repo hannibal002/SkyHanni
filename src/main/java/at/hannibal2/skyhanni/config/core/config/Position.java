@@ -48,6 +48,9 @@ public class Position {
     @Expose
     private boolean centerY;
 
+    @Expose
+    private boolean ignoreCustomScale = false;
+
     public transient Field linkField;
 
     private boolean clicked = false;
@@ -94,7 +97,13 @@ public class Position {
         this.center = other.isCenter();
     }
 
+    public Position setIgnoreCustomScale(boolean ignoreCustomScale) {
+        this.ignoreCustomScale = ignoreCustomScale;
+        return this;
+    }
+
     public float getEffectiveScale() {
+        if (ignoreCustomScale) return 1F;
         return Math.max(Math.min(getScale() * SkyHanniMod.feature.gui.globalScale, 10F), 0.1F);
     }
 
@@ -117,6 +126,11 @@ public class Position {
 
     public int getRawY() {
         return y;
+    }
+
+    public void moveTo(int x, int y) {
+        this.x = x;
+        this.y = y;
     }
 
     public void setClicked(boolean state) {

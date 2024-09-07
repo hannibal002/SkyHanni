@@ -55,7 +55,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+).*",
+        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
     ),
     SB_LEVEL(
         // language=RegExp
@@ -207,7 +207,7 @@ enum class TabWidget(
     ),
     DRAGON(
         // language=RegExp
-        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)])\\)",
+        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)]*)\\)",
     ),
     VOLCANO(
         // language=RegExp
