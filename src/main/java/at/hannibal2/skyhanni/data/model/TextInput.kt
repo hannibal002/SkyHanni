@@ -74,8 +74,11 @@ class TextInput {
 
         fun onGuiInput(ci: CallbackInfo) {
             if (activeInstance != null) {
-                Keyboard.KEY_ESCAPE.isKeyHeld()
-                ci.cancel()
+                if (Keyboard.KEY_ESCAPE.isKeyHeld()) {
+                    disable()
+                } else {
+                    ci.cancel()
+                }
                 return
             }
         }
