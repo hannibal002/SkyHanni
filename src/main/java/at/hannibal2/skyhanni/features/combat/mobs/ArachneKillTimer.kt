@@ -21,18 +21,31 @@ object ArachneKillTimer {
     private val config get() = SkyHanniMod.feature.combat.mobs
 
     private val patternGroup = RepoPattern.group("chat.arachne")
+
+    /**
+     * REGEX-TEST: §c[BOSS] Arachne§r§f: A befitting welcome!
+     */
     private val arachneCallingSpawnedPattern by patternGroup.pattern(
         "calling.spawned",
         "§c\\[BOSS] Arachne§r§f: A befitting welcome!"
     )
+    /**
+     * REGEX-TEST: §c[BOSS] Arachne§r§f: With your sacrifice.
+     */
     private val arachneCrystalSpawnedPattern by patternGroup.pattern(
         "crystal.spawned",
         "§c\\[BOSS] Arachne§r§f: With your sacrifice."
     )
+    /**
+     * REGEX-TEST: §f                              §r§6§lARACHNE DOWN!
+     */
     private val arachneDeathPattern by patternGroup.pattern(
         "dead",
         "§f.*§r§6§lARACHNE DOWN!"
     )
+    /**
+     * REGEX-TEST: §f                 §r§eYour Damage: §r§a1,155,000 §r§7(Position #1)
+     */
     private val arachneDamagePattern by patternGroup.pattern(
         "damage",
         "§f +§r§eYour Damage: §r§a[0-9,]+ §r§7\\(Position #[0-9,]+\\)"
