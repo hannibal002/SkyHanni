@@ -29,7 +29,7 @@ object DungeonSecretChime {
     @JvmStatic
     fun playSound() {
         with(config) {
-            SoundUtils.createSound(name, pitch, 100f)
+            SoundUtils.createSound(soundName, soundPitch, 100f)
                 .playSound()
         }
     }

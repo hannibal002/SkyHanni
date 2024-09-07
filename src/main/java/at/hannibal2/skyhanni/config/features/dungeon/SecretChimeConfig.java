@@ -20,18 +20,16 @@ public class SecretChimeConfig {
     @Expose
     @ConfigOption(name = "Secret Chime Sound", desc = "The sound played for the secret chime.")
     @ConfigEditorText
-    public String name = "random.orb";
+    public String soundName  = "random.orb";
 
     @Expose
     @ConfigOption(name = "Pitch", desc = "The pitch of the secret chime sound.")
     @ConfigEditorSlider(minValue = 0.5f, maxValue = 2.0f, minStep = 0.1f)
-    public float pitch = 1.0f;
+    public float soundPitch = 1.0f;
 
-
-    @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds.")
+    @ConfigOption(name = "Sounds", desc = "Click to open the list of available sounds. \n§l§cWarning: Clicking this will open a webpage in your browser.")
     @ConfigEditorButton(buttonText = "OPEN")
-    public Runnable sounds = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
-
+    public Runnable soundsListURL = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
 
     @ConfigOption(name = "Play Sound", desc = "Plays current secret chime sound.")
     @ConfigEditorButton(buttonText = "Play")
