@@ -20,16 +20,13 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.multiplayer.WorldClient
-import net.minecraft.client.resources.DefaultPlayerSkin
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraft.item.ItemStack
 import net.minecraft.potion.Potion
-import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.client.event.RenderLivingEvent
 
@@ -41,15 +38,14 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object EntityUtils {
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
         debugRightEntity: Boolean = false,
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
-    ): Boolean {
-        return getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
-    }
+    ): Boolean = getNameTagWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity) != null
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
@@ -68,6 +64,7 @@ object EntityUtils {
         it.getNameAsString().contains(contains)
     }
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
@@ -76,6 +73,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
@@ -107,9 +105,10 @@ object EntityUtils {
         return worldObj.getEntitiesWithinAABB(clazz, alignedBB)
     }
 
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasBossHealth(health: Int): Boolean = this.hasMaxHealth(health, true)
 
-    // TODO remove baseMaxHealth
+    @Deprecated("Old. Instead use entity detection feature instead.")
     fun EntityLivingBase.hasMaxHealth(health: Int, boss: Boolean = false, maxHealth: Int = baseMaxHealth): Boolean {
         val derpyMultiplier = if (LorenzUtils.isDerpy) 2 else 1
         if (maxHealth == health * derpyMultiplier) return true
@@ -246,28 +245,6 @@ object EntityUtils {
     fun EntityLivingBase.isRunicAndCorrupt() = baseMaxHealth == health.toInt().derpy() * 3 * 4
 
     fun Entity.cleanName() = this.getNameAsString().removeColor()
-
-    /**
-     * @return a fake player with the same skin as the real player
-     */
-    fun getFakePlayer(): EntityOtherPlayerMP {
-        val mc = Minecraft.getMinecraft()
-        val player = mc.thePlayer!!
-        return object : EntityOtherPlayerMP(
-            mc.theWorld,
-            player.gameProfile,
-        ) {
-            override fun getLocationSkin() =
-                player.getLocationSkin() ?: DefaultPlayerSkin.getDefaultSkin(player.uniqueID)
-
-            override fun getTeam() = object : ScorePlayerTeam(null, null) {
-                override fun getNameTagVisibility() = EnumVisible.NEVER
-            }
-
-            override fun isWearing(part: EnumPlayerModelParts): Boolean =
-                player.isWearing(part) && part != EnumPlayerModelParts.CAPE
-        }
-    }
 }
 
 //#if FORGE

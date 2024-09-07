@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -155,6 +157,20 @@ object ExcavatorProfitTracker {
     }
 
     @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled()) return
+
+        val internalName = event.internalName
+        if (event.source == ItemAddManager.Source.COMMAND) {
+            tryAddItem(internalName, event.amount, command = true)
+        }
+    }
+
+    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+        tracker.addItem(internalName, amount, command)
+    }
+
+    @SubscribeEvent
     fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!isEnabled()) return
         for ((name, amount) in event.loot) {
@@ -185,11 +201,11 @@ object ExcavatorProfitTracker {
 
         val internalName = NEUInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
-            ChatUtils.debug("no price for exavator profit: '$name'")
+            ChatUtils.debug("no price for excavator profit: '$name'")
             return
         }
         // TODO use primitive item stacks in trackers
-        tracker.addItem(internalName, amount)
+        tryAddItem(internalName, amount, command = false)
     }
 
     @SubscribeEvent

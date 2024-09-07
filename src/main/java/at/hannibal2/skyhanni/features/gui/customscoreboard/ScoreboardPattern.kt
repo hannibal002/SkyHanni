@@ -386,6 +386,14 @@ object ScoreboardPattern {
         "queued",
         "Queued:.*",
     )
+
+    /**
+     * REGEX-TEST: Tier: §eFloor VI
+     */
+    val queueTierPattern by miscSb.pattern(
+        "queuetier",
+        "Tier: §e.*",
+    )
     val queuePositionPattern by miscSb.pattern(
         "queueposition",
         "Position: (?:§.)*#\\d+ (?:§.)*Since: (?:§.)*.*",
@@ -501,12 +509,12 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §3§lCatch a Fish
-     * REGEX-TEST: §6§lFruit Diggin§6§lg
-     * REGEX-TEST: §c§lZombie Shoot§c§lout
+     * REGEX-TEST: §6§lFruit Digging
+     * REGEX-TEST: §c§lZombie Shootout
      */
     val carnivalTasksPattern by carnivalSb.pattern(
         "tasks",
-        "§.§l(?:Catch a Fish|Fruit Diggin|Zombie Shoot)(?:§.§l(?:g|out))?",
+        "§.§l(?:Catch a Fish|Fruit Digging|Zombie Shootout)",
     )
 
     /**
