@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -17,13 +17,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    drawDisplay: (Data) -> List<Renderable>,
+    drawDisplay: (Data) -> List<Searchable>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
     companion object {
@@ -60,9 +62,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addPriceFromButton(lists: MutableList<Renderable>) {
+    fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addSelector<ItemPriceSource>(
+            lists.addSearchableSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.sellName },
                 isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
@@ -77,7 +79,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     fun drawItems(
         data: Data,
         filter: (NEUInternalName) -> Boolean,
-        lists: MutableList<Renderable>,
+        lists: MutableList<Searchable>,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NEUInternalName, Long>()
@@ -117,8 +119,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
+            val name = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             var displayName = if (hidden) {
-                "§8§m" + cleanName.removeColor(keepFormatting = true).replace("§r", "")
+                "§8§m$name"
             } else cleanName
             displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
 
@@ -149,10 +152,10 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 },
             ) else Renderable.string(displayName)
 
-            lists.add(renderable)
+            lists.add(renderable.toSearchable(name))
         }
         if (hiddenItemTexts.size > 0) {
-            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts)
+            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
             lists.add(text)
         }
 
@@ -190,7 +193,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
+    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Searchable {
         val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
@@ -201,6 +204,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         } else emptyList()
 
         val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        return Renderable.hoverTips(text, tips)
+        return Renderable.hoverTips(text, tips).toSearchable()
     }
 }

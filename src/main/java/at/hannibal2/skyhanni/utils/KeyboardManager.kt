@@ -23,7 +23,7 @@ object KeyboardManager {
     private var lastClickedMouseButton = -1
 
     // A mac-only key, represents Windows key on windows (but different key code)
-    private fun isCommandKeyDown() = Keyboard.KEY_LMETA.isKeyHeld() || Keyboard.KEY_RMETA.isKeyHeld()
+    private fun isCommandKeyDown() = Keyboard.KEY_LMETA.isKeyHeld() || Keyboard.KEY_ESCAPE.isKeyHeld()
 
     // Windows: Alt key Mac: Option key
     private fun isMenuKeyDown() = Keyboard.KEY_LMENU.isKeyHeld() || Keyboard.KEY_RMENU.isKeyHeld()

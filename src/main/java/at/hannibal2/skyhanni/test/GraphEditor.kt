@@ -185,6 +185,7 @@ object GraphEditor {
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
+
         config.namedNodesList.renderRenderables(
             buildList {
                 val list = getNodeNames()

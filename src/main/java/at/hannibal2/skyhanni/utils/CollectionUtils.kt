@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import java.util.Collections
@@ -276,6 +278,16 @@ object CollectionUtils {
         add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
+    // TODO add cache
+    fun MutableList<Searchable>.addSearchString(
+        text: String,
+        searchText: String? = null,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
+    }
+
     // TODO add internal name support, and caching
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
@@ -303,13 +315,22 @@ object CollectionUtils {
         add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
     }
 
+    inline fun <reified T : Enum<T>> MutableList<Searchable>.addSearchableSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) {
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)).toSearchable())
+    }
+
     // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
-    ) = buildList {
+    ) = buildList<Renderable> {
         addString(prefix)
         for (entry in enumValues<T>()) {
             val display = getName(entry)

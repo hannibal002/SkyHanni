@@ -14,13 +14,13 @@ import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -84,11 +84,11 @@ object ArmorDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<Renderable> = buildList {
-        addString("§7Armor Drop Tracker:")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§7Armor Drop Tracker:")
         for ((drop, amount) in data.drops.sortedDesc()) {
             val dropName = drop.dropName
-            addString(" §7- §e${amount.addSeparators()}x $dropName")
+            addSearchString(" §7- §e${amount.addSeparators()}x $dropName", dropName)
         }
     }
 
