@@ -75,7 +75,7 @@ object RenderableTooltips {
         RenderHelper.disableStandardItemLighting()
         GlStateManager.enableDepth()
 
-        val zLevel = 300f
+        val zLevel = 400f
         GlStateManager.translate(tooltipX.toFloat(), tooltipY.toFloat(), zLevel)
 
         RenderUtils.drawGradientRect(

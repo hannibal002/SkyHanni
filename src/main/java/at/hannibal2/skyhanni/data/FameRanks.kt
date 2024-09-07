@@ -15,7 +15,7 @@ object FameRanks {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ranks = event.getConstant<FameRankJson>("FameRank")
-        fameRanks = ranks.fame_rank.values.map { FameRank(it.name, it.fame_required, it.bits_multiplier, it.votes) }
+        fameRanks = ranks.fameRank.values.map { FameRank(it.name, it.fameRequired, it.bitsMultiplier, it.votes) }
             .associateBy { it.name }
     }
 }

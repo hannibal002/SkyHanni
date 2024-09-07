@@ -35,7 +35,7 @@ object FireVeilWandParticles {
         if (config.display == DisplayEntry.PARTICLES) return
         if (lastClick.passedSince() > 5.5.seconds) return
         if (event.type == EnumParticleTypes.FLAME && event.speed == 0.55f) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

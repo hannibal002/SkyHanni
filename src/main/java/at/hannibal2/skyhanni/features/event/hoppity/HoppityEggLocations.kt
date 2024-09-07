@@ -38,6 +38,10 @@ object HoppityEggLocations {
     val islandCollectedLocations
         get() = collectedEggStorage[LorenzUtils.skyBlockIsland]?.toSet() ?: emptySet()
 
+    fun getEggsIn(islandType: IslandType): Set<LorenzVec> {
+        return collectedEggStorage[islandType] ?: emptySet()
+    }
+
     fun hasCollectedEgg(location: LorenzVec): Boolean = islandCollectedLocations.contains(location)
 
     @SubscribeEvent

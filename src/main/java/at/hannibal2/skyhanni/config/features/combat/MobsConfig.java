@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MobsConfig {
@@ -64,10 +65,15 @@ public class MobsConfig {
     public boolean lineToArachne = false;
 
     @Expose
+    @ConfigOption(name = "Line to Arachne Width", desc = "The width of the line pointing to where Arachne is at.")
+    @ConfigEditorSlider(minStep = 1, minValue = 1, maxValue = 10)
+    public int lineToArachneWidth = 5;
+
+    @Expose
     @ConfigOption(
         name = "Area Boss Timer",
-        desc = "Show a timer when Area Bosses respawn. " +
-            "§cMay take 20-30 seconds to calibrate correctly."
+        desc = "Show a timer when Area Bosses respawn.\n" +
+            "§eMay take 20 - 30 seconds to calibrate correctly."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -76,8 +82,8 @@ public class MobsConfig {
     @Expose
     @ConfigOption(
         name = "Arachne Spawn Timer",
-        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long " +
-            "until the boss will spawn. §cTimer may be 1-2 seconds off."
+        desc = "Show a timer when Arachne fragments or crystals are placed to indicate how long until the boss will spawn. " +
+            "§eTimer may be 1 - 2 seconds off."
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -90,7 +96,7 @@ public class MobsConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean showArachneKillTimer = true;
+    public boolean arachneKillTimer = true;
 
     @Expose
     @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")

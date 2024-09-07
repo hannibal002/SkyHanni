@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -12,8 +14,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -37,14 +39,15 @@ object PestProfitTracker {
      */
     private val pestRareDropPattern by patternGroup.pattern(
         "raredrop",
-        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)"
+        "§6§l(?:RARE|PET) DROP! (?:§r)?(?<item>.+) §6\\(§6\\+.*☘\\)",
     )
 
     private var lastPestKillTime = SimpleTimeMark.farPast()
     private val tracker = SkyHanniItemTracker(
         "Pest Profit Tracker",
         { Data() },
-        { it.garden.pestProfitTracker }) { drawDisplay(it) }
+        { it.garden.pestProfitTracker },
+    ) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -56,22 +59,32 @@ object PestProfitTracker {
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop rate: §c$dropRate."
+                "§7Your drop rate: §c$dropRate.",
             )
         }
 
         override fun getCoinName(item: TrackedItem) = "§6Pest Kill Coins"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val pestsCoinsFormat = NumberUtil.format(item.totalAmount)
+            val pestsCoinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7Killing pests gives you coins.",
-                "§7You got §6$pestsCoinsFormat coins §7that way."
+                "§7You got §6$pestsCoinsFormat coins §7that way.",
             )
         }
 
         @Expose
         var totalPestsKills = 0L
+    }
+
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled()) return
+
+        val internalName = event.internalName
+        if (event.source == ItemAddManager.Source.COMMAND) {
+            tryAddItem(internalName, event.amount, command = true)
+        }
     }
 
     @SubscribeEvent
@@ -81,16 +94,20 @@ object PestProfitTracker {
             val amount = group("amount").toInt()
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            tracker.addItem(internalName, amount)
+            tryAddItem(internalName, amount, command = false)
             addKill()
             if (config.hideChat) event.blockedReason = "pest_drop"
         }
         pestRareDropPattern.matchMatcher(event.message) {
             val internalName = NEUInternalName.fromItemNameOrNull(group("item")) ?: return
 
-            tracker.addItem(internalName, 1)
+            tryAddItem(internalName, 1, command = false)
             // pests always have guaranteed loot, therefore there's no need to add kill here
         }
+    }
+
+    private fun tryAddItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
+        tracker.addItem(internalName, amount, command)
     }
 
     private fun addKill() {
@@ -108,8 +125,8 @@ object PestProfitTracker {
         addAsSingletonList(
             Renderable.hoverTips(
                 "§7Pests killed: §e${pestsKilled.addSeparators()}",
-                listOf("§7You killed pests §e${pestsKilled.addSeparators()} §7times.")
-            )
+                listOf("§7You killed pests §e${pestsKilled.addSeparators()} §7times."),
+            ),
         )
         addAsSingletonList(tracker.addTotalProfit(profit, data.totalPestsKills, "kill"))
 
@@ -131,7 +148,7 @@ object PestProfitTracker {
         val coins = event.coins
         if (coins > 1000) return
         if (event.reason == PurseChangeCause.GAIN_MOB_KILL && lastPestKillTime.passedSince() < 2.seconds) {
-            tracker.addCoins(coins.toInt())
+            tryAddItem(NEUInternalName.SKYBLOCK_COIN, coins.toInt(), command = false)
         }
     }
 

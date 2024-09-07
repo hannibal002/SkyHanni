@@ -23,11 +23,11 @@ object GardenCropMilestones {
     private val patternGroup = RepoPattern.group("data.garden.milestone")
     private val cropPattern by patternGroup.pattern(
         "crop",
-        "§7Harvest §f(?<name>.*) §7on .*"
+        "§7Harvest §f(?<name>.*) §7on .*",
     )
     val totalPattern by patternGroup.pattern(
         "total",
-        "§7Total: §a(?<name>.*)"
+        "§7Total: §a(?<name>.*)",
     )
 
     private val config get() = GardenAPI.config.cropMilestones
@@ -67,9 +67,10 @@ object GardenCropMilestones {
                 add("    §r§7§8+§d2 SkyHanni User Luck")
         }
 
+        val cropName = crop.cropName
         val messages = listOf(
             "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
-            "  §r§b§lGARDEN MILESTONE §3${crop.cropName} §8$oldLevel➜§3$newLevel§r",
+            "  §r§b§lGARDEN MILESTONE §3$cropName §8$oldLevel➜§3$newLevel§r",
             if (goalReached)
                 listOf(
                     "",
@@ -80,13 +81,16 @@ object GardenCropMilestones {
                 "",
             "  §r§a§lREWARDS§r",
             rewards.joinToString("\n"),
-            "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r"
+            "§r§3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬§r",
         )
 
         chat(messages.joinToString("\n"), false)
 
-        if (goalReached)
-            chat("§e§lYou have reached your milestone goal of §b§l${customGoalLevel} §e§lin the §b§l${crop.cropName} §e§lcrop!", false)
+        val message = "§e§lYou have reached your milestone goal of §b§l$customGoalLevel " +
+            "§e§lin the §b§l$cropName §e§lcrop!"
+        if (goalReached) {
+            chat(message, false)
+        }
 
         SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
     }
@@ -181,6 +185,6 @@ object GardenCropMilestones {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        cropMilestoneData = event.getConstant<GardenJson>("Garden").crop_milestones
+        cropMilestoneData = event.getConstant<GardenJson>("Garden").cropMilestones
     }
 }

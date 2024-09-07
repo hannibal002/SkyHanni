@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -88,8 +89,9 @@ object CollectionAPI {
 
     @SubscribeEvent
     fun onItemAdd(event: ItemAddEvent) {
+        if (event.source == ItemAddManager.Source.COMMAND) return
         val internalName = event.internalName
-        val (_, amount) = NEUItems.getMultiplier(internalName)
+        val amount = NEUItems.getPrimitiveMultiplier(internalName).amount
         if (amount > 1) return
 
         // TODO add support for replenish (higher collection than actual items in inv)

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -49,19 +48,19 @@ object BitsAPI {
         }
 
     var cookieBuffTime: SimpleTimeMark?
-        get() = profileStorage?.boosterCookieExpiryTime?.asTimeMark()
+        get() = profileStorage?.boosterCookieExpiryTime
         private set(value) {
-            profileStorage?.boosterCookieExpiryTime = value?.toMillis()
+            profileStorage?.boosterCookieExpiryTime = value
         }
 
-    private const val defaultcookiebits = 4800
+    private const val defaultCookieBits = 4800
 
     private val bitsDataGroup = RepoPattern.group("data.bits")
 
     // Scoreboard patterns
     val bitsScoreboardPattern by bitsDataGroup.pattern(
         "scoreboard",
-        "^Bits: §b(?<amount>[\\d,.]+).*$"
+        "^Bits: §b(?<amount>[\\d,.]+).*$",
     )
 
     // Chat patterns
@@ -69,17 +68,17 @@ object BitsAPI {
 
     private val bitsFromFameRankUpChatPattern by bitsChatGroup.pattern(
         "rankup.bits",
-        "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!"
+        "§eYou gained §3(?<amount>.*) Bits Available §ecompounded from all your §epreviously eaten §6cookies§e! Click here to open §6cookie menu§e!",
     )
 
     private val fameRankUpPattern by bitsChatGroup.pattern(
         "rankup.rank",
-        "[§\\w\\s]+FAME RANK UP (?:§.)+(?<rank>.*)"
+        "[§\\w\\s]+FAME RANK UP (?:§.)+(?<rank>.*)",
     )
 
     private val boosterCookieAte by bitsChatGroup.pattern(
         "boostercookieate",
-        "§eYou consumed a §6Booster Cookie§e!.*"
+        "§eYou consumed a §6Booster Cookie§e!.*",
     )
 
     // GUI patterns
@@ -87,12 +86,12 @@ object BitsAPI {
 
     private val bitsAvailableMenuPattern by bitsGuiGroup.pattern(
         "availablemenu",
-        "§7Bits Available: §b(?<toClaim>[\\d,]+)(§3.+)?"
+        "§7Bits Available: §b(?<toClaim>[\\d,]+)(§3.+)?",
     )
 
     private val fameRankSbMenuPattern by bitsGuiGroup.pattern(
         "sbmenufamerank",
-        "§7Your rank: §e(?<rank>.*)"
+        "§7Your rank: §e(?<rank>.*)",
     )
 
     /**
@@ -100,53 +99,53 @@ object BitsAPI {
      */
     private val cookieDurationPattern by bitsGuiGroup.pattern(
         "cookieduration",
-        "\\s*§7Duration: §a(?<time>.*)"
+        "\\s*§7Duration: §a(?<time>.*)",
     )
 
     private val noCookieActiveSBMenuPattern by bitsGuiGroup.pattern(
         "sbmenunocookieactive",
-        " §7Status: §cNot active!"
+        " §7Status: §cNot active!",
     )
 
     private val noCookieActiveCookieMenuPattern by bitsGuiGroup.pattern(
         "cookiemenucookieactive",
-        "(§7§cYou do not currently have a|§cBooster Cookie active!)"
+        "(§7§cYou do not currently have a|§cBooster Cookie active!)",
     )
 
     private val fameRankCommunityShopPattern by bitsGuiGroup.pattern(
         "communityshopfamerank",
-        "§7Fame Rank: §e(?<rank>.*)"
+        "§7Fame Rank: §e(?<rank>.*)",
     )
 
     private val bitsGuiNamePattern by bitsGuiGroup.pattern(
         "mainmenuname",
-        "^SkyBlock Menu$"
+        "^SkyBlock Menu$",
     )
 
     private val cookieGuiStackPattern by bitsGuiGroup.pattern(
         "mainmenustack",
-        "^§6Booster Cookie$"
+        "^§6Booster Cookie$",
     )
 
     private val bitsStackPattern by bitsGuiGroup.pattern(
         "bitsstack",
-        "§bBits"
+        "§bBits",
     )
 
     private val fameRankGuiNamePattern by bitsGuiGroup.pattern(
         "famerankmenuname",
-        "^(Community Shop|Booster Cookie)$"
+        "^(Community Shop|Booster Cookie)$",
     )
 
     private val fameRankGuiStackPattern by bitsGuiGroup.pattern(
         "famerankmenustack",
-        "^(§aCommunity Shop|§eFame Rank)$"
+        "^(§aCommunity Shop|§eFame Rank)$",
     )
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
-        for (line in event.newList) {
+        for (line in event.scoreboard) {
             val message = line.trimWhiteSpace().removeResets()
 
             bitsScoreboardPattern.matchMatcher(message) {
@@ -188,14 +187,14 @@ object BitsAPI {
                     "FameRank $rank not found",
                     "Rank" to rank,
                     "Message" to message,
-                    "FameRanks" to FameRanks.fameRanks
+                    "FameRanks" to FameRanks.fameRanks,
                 )
 
             return
         }
 
         boosterCookieAte.matchMatcher(message) {
-            bitsAvailable += (defaultcookiebits * (currentFameRank?.bitsMultiplier ?: return)).toInt()
+            bitsAvailable += bitsPerCookie()
             val cookieTime = cookieBuffTime
             cookieBuffTime = if (cookieTime == null) SimpleTimeMark.now() + 4.days else cookieTime + 4.days
             sendBitsAvailableGainedEvent()
@@ -203,6 +202,8 @@ object BitsAPI {
             return
         }
     }
+
+    fun bitsPerCookie(): Int = (defaultCookieBits * (currentFameRank?.bitsMultiplier ?: 1.0)).toInt()
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
@@ -259,7 +260,7 @@ object BitsAPI {
                             "FameRank $rank not found",
                             "Rank" to rank,
                             "Lore" to fameRankStack.getLore(),
-                            "FameRanks" to FameRanks.fameRanks
+                            "FameRanks" to FameRanks.fameRanks,
                         )
 
                     continue@line
@@ -274,7 +275,7 @@ object BitsAPI {
                             "FameRank $rank not found",
                             "Rank" to rank,
                             "Lore" to fameRankStack.getLore(),
-                            "FameRanks" to FameRanks.fameRanks
+                            "FameRanks" to FameRanks.fameRanks,
                         )
 
                     continue@line
@@ -308,7 +309,9 @@ object BitsAPI {
 
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
-    private fun sendBitsGainEvent(difference: Int) = BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+    private fun sendBitsGainEvent(difference: Int) =
+        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+
     private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
     private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
 

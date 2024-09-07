@@ -30,6 +30,7 @@ object ParkourWaypointSaver {
         if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return
+        if (SkyHanniMod.feature.dev.devTool.graph.enabled) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
         when (event.keyCode) {

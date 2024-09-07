@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+import java.awt.Color
 
 internal object RenderableUtils {
 
@@ -48,25 +50,45 @@ internal object RenderableUtils {
         else -> 0
     }
 
-    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int) {
+    fun Renderable.renderXYAligned(posX: Int, posY: Int, xSpace: Int, ySpace: Int): Pair<Int, Int> {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         GlStateManager.translate(xOffset.toFloat(), yOffset.toFloat(), 0f)
         this.render(posX + xOffset, posY + yOffset)
         GlStateManager.translate(-xOffset.toFloat(), -yOffset.toFloat(), 0f)
+        return xOffset to yOffset
     }
 
-    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int) {
+    fun Renderable.renderXAligned(posX: Int, posY: Int, xSpace: Int): Int {
         val xOffset = calculateAlignmentXOffset(this, xSpace)
         GlStateManager.translate(xOffset.toFloat(), 0f, 0f)
         this.render(posX + xOffset, posY)
         GlStateManager.translate(-xOffset.toFloat(), 0f, 0f)
+        return xOffset
     }
 
-    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int) {
+    fun Renderable.renderYAligned(posX: Int, posY: Int, ySpace: Int): Int {
         val yOffset = calculateAlignmentYOffset(this, ySpace)
         GlStateManager.translate(0f, yOffset.toFloat(), 0f)
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
+        return yOffset
     }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
+        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+        GlStateManager.translate(1.0, 1.0, 0.0)
+        GlStateManager.scale(scale, scale, 1.0)
+        fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
+        GlStateManager.scale(inverseScale, inverseScale, 1.0)
+        GlStateManager.translate(-1.0, -1.0, 0.0)
+    }
+}
+
+internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
+    override val width = content.width
+    override val height = content.height
+    override val horizontalAlign = content.horizontalAlign
+    override val verticalAlign = content.verticalAlign
 }

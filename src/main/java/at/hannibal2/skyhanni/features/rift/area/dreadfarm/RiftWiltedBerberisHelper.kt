@@ -71,13 +71,13 @@ object RiftWiltedBerberisHelper {
 
         if (event.type != EnumParticleTypes.FIREWORKS_SPARK) {
             if (config.hideparticles && berberis != null) {
-                event.isCanceled = true
+                event.cancel()
             }
             return
         }
 
         if (config.hideparticles) {
-            event.isCanceled = true
+            event.cancel()
         }
 
         if (berberis == null) {
