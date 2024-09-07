@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfi
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
 import at.hannibal2.skyhanni.data.ToolTipData
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
@@ -435,12 +436,7 @@ interface Renderable {
             val inverseScale = 1 / scale
 
             override fun render(posX: Int, posY: Int) {
-                val fontRenderer = Minecraft.getMinecraft().fontRendererObj
-                GlStateManager.translate(1.0, 1.0, 0.0)
-                GlStateManager.scale(scale, scale, 1.0)
-                fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
-                GlStateManager.scale(inverseScale, inverseScale, 1.0)
-                GlStateManager.translate(-1.0, -1.0, 0.0)
+                RenderableUtils.renderString(text, scale, color, inverseScale)
             }
         }
 
@@ -532,6 +528,79 @@ interface Renderable {
                     }
                 }
             }
+        }
+
+        /**
+         * @param searchPrefix text that is static in front of the textbox
+         * @param onUpdateSize function that is called if the size changes (since the search text can get bigger than [content])
+         * @param textInput The text input, can be external or internal
+         * @param shouldRenderTopElseBottom true == Renders on top, false == Renders at the Bottom
+         * @param ySpacing space between the search and [content]
+         * @param onHover is triggered if [content] or the text box is hovered
+         * @param bypassChecks bypass the [shouldAllowLink] logic
+         * @param condition condition to being able to input / [onHover] to trigger
+         * @param scale textscale of the textbox
+         * @param color color of the textbox
+         * @param key event key for the [textInput] to register the event, needs clearing if [textInput] is external, default = 0
+         */
+        fun searchBox(
+            content: Renderable,
+            searchPrefix: String,
+            onUpdateSize: (Renderable) -> Unit,
+            textInput: TextInput = TextInput(),
+            shouldRenderTopElseBottom: Boolean = true,
+            ySpacing: Int = 0,
+            onHover: (TextInput) -> Unit = {},
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            scale: Double = 1.0,
+            color: Color = Color.WHITE,
+            key: Int = 0,
+        ) = object : Renderable {
+            override var width: Int = content.width
+            override val height: Int = content.height + ySpacing + (9 * scale).toInt() + 1
+            override val horizontalAlign = content.horizontalAlign
+            override val verticalAlign = content.verticalAlign
+
+            val searchWidth get() = (Minecraft.getMinecraft().fontRendererObj.getStringWidth(searchPrefix + textInput.editTextWithAlwaysCarriage()) * scale).toInt() + 1
+
+            init {
+                textInput.registerToEvent(key) {
+                    val searchWidth = searchWidth
+                    if (searchWidth > width) {
+                        width = searchWidth
+                        onUpdateSize(this)
+                    } else {
+                        if (width > content.width) {
+                            width = maxOf(content.width, searchWidth)
+                            onUpdateSize(this)
+                        }
+                    }
+                }
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                if (shouldRenderTopElseBottom) {
+                    RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    GlStateManager.translate(0f, (ySpacing + 10).toFloat(), 0f)
+                }
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    onHover(textInput)
+                    textInput.makeActive()
+                    textInput.handle()
+                } else {
+                    textInput.disable()
+                }
+                content.render(posX, posY)
+                if (!shouldRenderTopElseBottom) {
+                    GlStateManager.translate(0f, (ySpacing).toFloat(), 0f)
+                    RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
+                    GlStateManager.translate(0f, -(ySpacing).toFloat(), 0f)
+                } else {
+                    GlStateManager.translate(0f, -(ySpacing + 10).toFloat(), 0f)
+                }
+            }
+
         }
 
         fun progressBar(
