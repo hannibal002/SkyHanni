@@ -180,7 +180,6 @@ object RepoPatternTest {
             ),
         )
 
-        val unused0 = group.getUnusedPatterns()
         val isRemoteWorking = group.getUnusedPatterns().isEmpty() && list[0].pattern() == remoteValue1 && list[1].pattern() == remoteValue2
 
         assert(isRemoteWorking)
