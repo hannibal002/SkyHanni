@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.collectWhile
 import at.hannibal2.skyhanni.utils.CollectionUtils.consumeWhile
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
@@ -134,11 +135,13 @@ object HoppityCollectionStats {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isEnabled()) return
+        if (!(LorenzUtils.inSkyBlock)) return
         if (!pagePattern.matches(event.inventoryName)) return
 
         inInventory = true
-        display = buildDisplay(event)
+        if (config.hoppityCollectionStats) {
+            display = buildDisplay(event)
+        }
     }
 
     @SubscribeEvent
@@ -150,6 +153,7 @@ object HoppityCollectionStats {
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory) return
+        if (!config.hoppityCollectionStats) return
 
         config.hoppityStatsPosition.renderRenderables(
             display,
@@ -217,7 +221,7 @@ object HoppityCollectionStats {
         val foundRabbitCount = getFoundRabbitsFromHypixel(event)
 
         if (loggedRabbitCount < foundRabbitCount) {
-            newList.add(Renderable.string(""))
+            newList.addString("")
             newList.add(
                 Renderable.wrappedString(
                     "§cPlease Scroll through \n" + "§call pages!",
@@ -366,8 +370,6 @@ object HoppityCollectionStats {
     }
 
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.hoppityCollectionStats
 
     enum class RabbitCollectionRarity(
         val displayName: String,
