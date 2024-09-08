@@ -165,7 +165,7 @@ object Commands {
     }
 
     private fun usersMain() {
-        registerCommand("sh", "Opens the main SkyHanni config", listOf("skyhanni")) { openMainMenu }
+        registerCommand("sh", "Opens the main SkyHanni config", listOf("skyhanni"), openMainMenu)
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { HelpCommand.onCommand(it, commands) }
         registerCommand0(
