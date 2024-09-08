@@ -5,10 +5,10 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
-public class CraftRoomConfig {
+public class CraftingRoomConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show an holographic version of the mob on your side of the room.")
+    @ConfigOption(name = "Enabled", desc = "Show an holographic version of the mob on your side of the craft room.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -24,7 +24,7 @@ public class CraftRoomConfig {
     public boolean showHealth = true;
 
     @Expose
-    @ConfigOption(name = "Hide Players", desc = "Hide players in the room.")
+    @ConfigOption(name = "Hide Players", desc = "Hide other players in the room.")
     @ConfigEditorBoolean
     public boolean hidePlayers = true;
 

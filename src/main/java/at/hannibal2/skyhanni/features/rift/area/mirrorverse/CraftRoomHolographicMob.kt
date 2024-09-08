@@ -26,7 +26,7 @@ import kotlin.math.abs
 @SkyHanniModule
 object CraftRoomHolographicMob {
 
-    private val config get() = SkyHanniMod.feature.rift.area.mirrorverse.craftRoom
+    private val config get() = SkyHanniMod.feature.rift.area.mirrorverse.craftingRoom
     private val craftRoomArea = AxisAlignedBB(
         -108.0, 58.0, -106.0,
         -117.0, 51.0, -128.0,
@@ -49,50 +49,49 @@ object CraftRoomHolographicMob {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
-        EntityUtils.getEntitiesNearby<EntityLivingBase>(LocationUtils.playerLocation(), 25.0).forEach { theMob ->
-            if (theMob !is EntityPlayer) {
-                val mobLoc = theMob.getLorenzVec()
-                if (craftRoomArea.isInside(mobLoc)) {
-                    val mobPos = theMob.getLorenzVec()
-                    val wallZ = -116.5
-                    val dist = abs(mobPos.z - wallZ)
-                    val holographicMobPos = mobPos.add(z = dist * 2)
-                    val mobName = theMob.displayName.formattedText
-                    val mobHp = theMob.health
-                    val displayString = buildString {
-                        if (config.showName) {
-                            append("§a$mobName ")
-                        }
-                        if (config.showHealth) {
-                            append("§c$mobHp♥")
-                        }
-                    }.trim()
 
-                    entityToHolographicEntity[theMob::class.java]?.let { mob ->
-                        val instance = mob.instance(holographicMobPos, -theMob.rotationYaw)
+        for (theMob in EntityUtils.getEntitiesNearby<EntityLivingBase>(LocationUtils.playerLocation(), 25.0)) {
+            if (theMob is EntityPlayer) continue
 
-                        instance.isChild = theMob.isChild
+            if (!craftRoomArea.isInside(theMob.getLorenzVec())) continue
 
-                        HolographicEntities.renderHolographicEntity(instance, event.partialTicks)
-
-                        if (displayString.isNotEmpty()) {
-                            event.drawString(holographicMobPos.add(y = theMob.eyeHeight + .5), displayString)
-                        }
-
-                        entitiesList = entitiesList.editCopy { add(instance) }
-                    }
+            val mobPos = theMob.getLorenzVec()
+            val wallZ = -116.5
+            val dist = abs(mobPos.z - wallZ)
+            val holographicMobPos = mobPos.add(z = dist * 2)
+            val displayString = buildString {
+                val mobName = theMob.displayName.formattedText
+                if (config.showName) {
+                    append("§a$mobName ")
                 }
+                if (config.showHealth) {
+                    append("§c${theMob.health}♥")
+                }
+            }.trim()
+
+            val mob = entityToHolographicEntity[theMob::class.java] ?: continue
+
+            val instance = mob.instance(holographicMobPos, -theMob.rotationYaw)
+
+            instance.isChild = theMob.isChild
+
+            HolographicEntities.renderHolographicEntity(instance, event.partialTicks)
+
+            if (displayString.isNotEmpty()) {
+                event.drawString(holographicMobPos.add(y = theMob.eyeHeight + .5), displayString)
             }
+
+            entitiesList = entitiesList.editCopy { add(instance) }
         }
     }
 
     @SubscribeEvent(receiveCanceled = true)
     fun onPlayerRender(event: CheckRenderEntityEvent<*>) {
-        if (RiftAPI.inRift() && config.hidePlayers) {
-            val entity = event.entity
-            if (entity is EntityOtherPlayerMP && craftRoomArea.isInside(entity.getLorenzVec())) {
-                event.cancel()
-            }
+        if (!RiftAPI.inRift() || !config.hidePlayers) return
+
+        val entity = event.entity
+        if (entity is EntityOtherPlayerMP && craftRoomArea.isInside(entity.getLorenzVec())) {
+            event.cancel()
         }
     }
 
