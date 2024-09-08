@@ -236,7 +236,7 @@ object CakeTracker {
                 Renderable.string(if (end != 0) "§fYears $colorCode$start§f-$colorCode$end" else "§fYear $colorCode$start")
             return if (displayType == CakeTrackerDisplayType.MISSING_CAKES) Renderable.link(
                 stringRenderable,
-                { HypixelCommands.ahs("New Year Cake (Year $start)") },
+                { HypixelCommands.auctionHouseSearch("New Year Cake (Year $start)") },
             ) else stringRenderable
         }
     }

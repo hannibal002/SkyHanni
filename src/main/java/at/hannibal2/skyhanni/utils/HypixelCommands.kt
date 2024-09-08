@@ -150,7 +150,7 @@ object HypixelCommands {
         send("chatprompt $prompt")
     }
 
-    fun ahs(query: String) {
+    fun auctionHouseSearch(query: String) {
         send("ahs $query")
     }
         
