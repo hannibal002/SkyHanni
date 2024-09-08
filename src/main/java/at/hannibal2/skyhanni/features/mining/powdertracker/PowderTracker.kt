@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
 import at.hannibal2.skyhanni.data.BossbarData
-import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -215,8 +214,8 @@ object PowderTracker {
         if (lastChestPicked.passedSince() > 5.seconds) return
         tracker.modify {
             val reward = when (event.powder) {
-                HotmAPI.Powder.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
-                HotmAPI.Powder.MITHRIL -> PowderChestReward.MITHRIL_POWDER
+                HotmAPI.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
+                HotmAPI.PowderType.MITHRIL -> PowderChestReward.MITHRIL_POWDER
                 else -> return@modify
             }
             it.rewards.addOrPut(reward, event.amount)
