@@ -33,7 +33,7 @@ object UltraRareBookAlert {
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
 
-    private val patternGroup = RepoPattern.group("data.enchanting")
+    private val patternGroup = RepoPattern.group("enchanting.experiments.ultrararebookalert")
     val ultraRarePattern by patternGroup.pattern(
         "inventory.experimentstable.ultrarare",
         "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX",
@@ -55,7 +55,7 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!isEnabled(InventoryUtils.openInventoryName())) return
+        if (!isEnabled()) return
         if (lastNotificationTime.passedSince() > 5.seconds) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 
@@ -75,7 +75,7 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (!isEnabled(event.inventoryName)) return
+        if (!isEnabled()) return
         if (enchantsFound) return
 
         for (lore in event.inventoryItems.map { it.value.getLore() }) {
@@ -97,9 +97,9 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(52, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
+        event.move(57, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
     }
 
-    private fun isEnabled(inventoryName: String) =
+    private fun isEnabled() =
         config.ultraRareBookAlert && LorenzUtils.inSkyBlock && InventoryUtils.getCurrentExperiment() != null
 }

@@ -91,6 +91,12 @@ public class ExperimentationTableConfig {
     @FeatureToggle
     public boolean ultraRareBookAlert = false;
 
+    @Expose
+    @ConfigOption(name = "Guardian Reminder", desc = "Sends a warning when opening the Experimentation Table without a §9§lGuardian Pet §7equipped.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean guardianReminder = false;
+
     public enum ExperimentMessages {
         DONE("§eYou claimed the §dSuperpairs §erewards!"),
         EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),

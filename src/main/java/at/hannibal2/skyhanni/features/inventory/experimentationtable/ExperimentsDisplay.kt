@@ -42,7 +42,7 @@ object ExperimentsDisplay {
     private var currentExperiment = Experiments.NONE
     private var instantFind = 0
 
-    private val patternGroup = RepoPattern.group("enchanting.experiments")
+    private val patternGroup = RepoPattern.group("enchanting.experiments.display")
     private val powerUpPattern by patternGroup.pattern(
         "powerups",
         "Gained \\+\\d Clicks?|Instant Find|\\+\\S* XP",

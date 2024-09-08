@@ -1,6 +1,7 @@
-package at.hannibal2.skyhanni.features.inventory.experiments
+package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -28,11 +29,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GuardianReminder {
 
-    private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private var lastInventoryOpen = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
-    private val patternGroup = RepoPattern.group("data.enchanting.inventory.experimentstable")
+    private val patternGroup = RepoPattern.group("enchanting.experiments.guardianreminder")
     private val inventoryNamePattern by patternGroup.pattern(
         "mainmenu",
         "Experimentation Table",
@@ -89,6 +90,11 @@ object GuardianReminder {
 
         GlStateManager.translate(0f, 150f, -500f)
         GlStateManager.popMatrix()
+    }
+
+    @SubscribeEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(57, "inventory.helper.enchanting.guardianReminder", "inventory.experimentationTable.guardianReminder")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.guardianReminder
