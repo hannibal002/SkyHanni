@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -15,6 +16,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -33,7 +35,6 @@ object IslandAreas {
     private var nodes = mapOf<GraphNode, Double>()
     private var paths = mapOf<GraphNode, Graph>()
     private var display = listOf<Renderable>()
-    private var targetName = ""
     private var targetNode: GraphNode? = null
     private var currentAreaName = ""
 
@@ -41,7 +42,7 @@ object IslandAreas {
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         nodes = emptyMap()
         display = emptyList()
-        targetName = ""
+        targetNode = null
     }
 
     fun noteMoved() {
@@ -117,7 +118,7 @@ object IslandAreas {
             val tag = node.getAreaTag() ?: continue
 
             val name = node.name ?: continue
-            val isTarget = name == targetName
+            val isTarget = node == targetNode
             val color = if (isTarget) LorenzColor.GOLD else tag.color
 
             // trying to find a faster path to the existing target
@@ -140,7 +141,8 @@ object IslandAreas {
                 }
             }
 
-            val text = "${coloredName}§7: §e${difference.round(1)}$suffix"
+            val distance = difference.round(1)
+            val text = "${coloredName}§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {
                 foundCurrentArea = true
@@ -148,7 +150,7 @@ object IslandAreas {
                 val inAnArea = name != "no_area"
                 if (config.pathfinder.includeCurrentArea) {
                     if (inAnArea) {
-                        addString("§eCurrent area: $text")
+                        addString("§eCurrent area: $coloredName")
                     } else {
                         addString("§cNot in an area!")
                     }
@@ -168,10 +170,22 @@ object IslandAreas {
 
             add(
                 Renderable.clickAndHover(
-                    text, tips = emptyList(),
+                    text,
+                    tips = buildList {
+                        add(tag.color.getChatColor() + node.name)
+                        add("§7Type: ${tag.displayName}")
+                        add("§7Distance: §e$distance blocks")
+                        add("")
+                        if (node == targetNode) {
+                            add("§aPath Finder points to this!")
+                            add("")
+                            add("§eClick to disable!")
+                        } else {
+                            add("§eClick to find a path!")
+                        }
+                    },
                     onClick = {
-                        if (node.name == targetName) {
-                            targetName = ""
+                        if (node == targetNode) {
                             targetNode = null
                             IslandGraphs.stop()
                         } else {
@@ -193,8 +207,17 @@ object IslandAreas {
             if (name == "no_area") continue
             val position = node.position
             val color = node.getAreaTag()?.color?.getChatColor() ?: ""
-            if (!position.canBeSeen(30.0)) return
+            if (!position.canBeSeen(40.0)) return
             event.drawDynamicText(position, color + name, 1.5)
+        }
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        ConditionalUtils.onToggle(config.pathfinder.color) {
+            targetNode?.let {
+                setTarget(it)
+            }
         }
     }
 
@@ -206,13 +229,12 @@ object IslandAreas {
     }
 
     private fun setTarget(node: GraphNode) {
-        targetName = node.name ?: return
         targetNode = node
-        val color = config.pathfinder.color.toChromaColor()
+        val color = config.pathfinder.color.get().toChromaColor()
         IslandGraphs.find(
             node.position, color,
             onFound = {
-                targetName = ""
+                targetNode = null
                 update()
             },
         )

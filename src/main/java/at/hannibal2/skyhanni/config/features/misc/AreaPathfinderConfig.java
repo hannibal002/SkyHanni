@@ -7,6 +7,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class AreaPathfinderConfig {
 
@@ -32,7 +33,7 @@ public class AreaPathfinderConfig {
         desc = "Change the color of the path."
     )
     @ConfigEditorColour
-    public String color = "0:245:85:255:85";
+    public Property<String> color = Property.of("0:245:85:255:85");
 
     @Expose
     @ConfigLink(owner = AreaPathfinderConfig.class, field = "enabled")
