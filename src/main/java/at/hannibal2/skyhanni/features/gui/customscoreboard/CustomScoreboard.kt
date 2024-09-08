@@ -12,17 +12,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.AlignmentConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ArrowConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.BackgroundConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.ChunkedStatsConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.CustomScoreboardConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.EventsConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.InformationFilteringConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MaxwellConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MayorConfig
-import at.hannibal2.skyhanni.config.features.gui.customscoreboard.PartyConfig
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -32,9 +21,8 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Footer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTitle
 import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -173,7 +161,7 @@ object CustomScoreboard {
     }
 
     private fun addAllNonSkyBlockLines() = buildList {
-        addAll(Title.getLines())
+        addAll(ScoreboardElementTitle.getLines())
         addAll(ScoreboardData.sidebarLinesFormatted.map { it.align() })
     }
 

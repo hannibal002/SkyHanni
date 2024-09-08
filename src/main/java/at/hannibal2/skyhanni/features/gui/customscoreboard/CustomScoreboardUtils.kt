@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.DisplayConfig
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PurseAPI
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.displayConfig
@@ -16,9 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import at.hannibal2.skyhanni.utils.TabListData
 import java.util.regex.Pattern
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 object CustomScoreboardUtils {
 
@@ -45,7 +42,7 @@ object CustomScoreboardUtils {
 
     internal fun formatStringNum(string: String) = formatNumber(string.formatDouble())
 
-    internal fun getMotes() = getGroup(SbPattern.motesPattern, getSbLines(), "motes") ?: "0"
+    internal fun getMotes() = getGroup(ScoreboardPattern.motesPattern, getSbLines(), "motes") ?: "0"
 
     internal fun getSoulflow() = TabWidget.SOULFLOW.matchMatcherFirstLine { group("amount") } ?: "0"
 
@@ -63,15 +60,15 @@ object CustomScoreboardUtils {
         "§b${getBits()}§7/§b${getBitsAvailable()}"
     } else "§b${getBits()}"
 
-    internal fun getCopper() = getGroup(SbPattern.copperPattern, getSbLines(), "copper") ?: "0"
+    internal fun getCopper() = getGroup(ScoreboardPattern.copperPattern, getSbLines(), "copper") ?: "0"
 
     internal fun getGems() = TabWidget.GEMS.matchMatcherFirstLine { group("gems") } ?: "0"
 
-    internal fun getHeat() = getGroup(SbPattern.heatPattern, getSbLines(), "heat")
+    internal fun getHeat() = getGroup(ScoreboardPattern.heatPattern, getSbLines(), "heat")
 
-    internal fun getNorthStars() = getGroup(SbPattern.northstarsPattern, getSbLines(), "northStars") ?: "0"
+    internal fun getNorthStars() = getGroup(ScoreboardPattern.northstarsPattern, getSbLines(), "northStars") ?: "0"
 
-    internal fun getTimeSymbol() = getGroup(SbPattern.timePattern, getSbLines(), "symbol") ?: ""
+    internal fun getTimeSymbol() = getGroup(ScoreboardPattern.timePattern, getSbLines(), "symbol") ?: ""
 
     internal fun getTablistEvent() = TabWidget.EVENT.matchMatcherFirstLine { groupOrNull("color") + group("event") }
 
