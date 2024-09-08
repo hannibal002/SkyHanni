@@ -483,7 +483,7 @@ interface Renderable {
         }
 
         fun searchableTable(
-            map: Map<List<Renderable>, String?>,
+            map: Map<List<Renderable?>, String?>,
             textInput: TextInput,
             key: Int,
             xPadding: Int = 1,
@@ -1044,7 +1044,7 @@ interface Renderable {
         }
 
         fun scrollTable(
-            content: List<List<Renderable>>,
+            content: List<List<Renderable?>>,
             height: Int,
             scrollValue: ScrollValue = ScrollValue(),
             velocity: Double = 2.0,
