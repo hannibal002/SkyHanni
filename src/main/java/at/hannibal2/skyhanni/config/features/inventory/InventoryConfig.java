@@ -78,6 +78,11 @@ public class InventoryConfig {
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Compactor Overlay", desc = "Overlay for the Personal Compactor and Deletor.")
+    @Accordion
+    public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
+
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
@@ -121,6 +126,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Page Scrolling", desc = "")
     @Accordion
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
+
+    @Expose
+    @ConfigOption(name = "Magical Power Display", desc = "")
+    @Accordion
+    public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
