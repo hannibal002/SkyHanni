@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import java.io.File
 
 /**
@@ -86,9 +87,14 @@ import java.io.File
 object IslandGraphs {
     var currentIslandGraph: Graph? = null
 
+    val existsForThisIsland get() = currentIslandGraph != null
+
     var closedNote: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
+    private var color = Color.WHITE
+    private var showGoalExact = false
+    private var onFound: () -> Unit = {}
     private var goal: GraphNode? = null
         set(value) {
             prevGoal = field
@@ -150,6 +156,7 @@ object IslandGraphs {
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
+                onFound()
                 reset()
                 return
             }
@@ -182,12 +189,21 @@ object IslandGraphs {
     }
 
     private fun onNewNote() {
+        // TODO create an event
         IslandAreas.noteMoved()
     }
 
-    fun find(location: LorenzVec) {
+    fun stop() {
+        currentTarget = null
+        goal = null
+        path = null
+    }
+
+    fun find(location: LorenzVec, color: Color = LorenzColor.WHITE.toColor(), onFound: () -> Unit = {}, showGoalExact: Boolean = false) {
         reset()
         currentTarget = location
+        this.color = color
+        this.onFound = onFound
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
     }
@@ -199,17 +215,18 @@ object IslandGraphs {
         val graph = path.first
         event.draw3DPathWithWaypoint(
             graph,
-            LorenzColor.WHITE.toColor(),
+            color,
             6,
             true,
             bezierPoint = 2.0,
             textSize = 1.0,
         )
-        val a = graph.graph.last().position
-        val b = currentTarget ?: return
-        event.draw3DLine(a.add(0.5, 0.5, 0.5), b.add(0.5, 0.5, 0.5), LorenzColor.WHITE.toColor(), 4, true)
+        val lastNode = graph.graph.last().position
+        val targetLocation = currentTarget ?: return
+        event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
 
-        // TODO add option default disabled
-        event.drawWaypointFilled(b, LorenzColor.WHITE.toColor())
+        if (showGoalExact) {
+            event.drawWaypointFilled(targetLocation, color)
+        }
     }
 }

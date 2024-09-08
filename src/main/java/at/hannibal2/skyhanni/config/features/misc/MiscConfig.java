@@ -42,8 +42,8 @@ public class MiscConfig {
     public StrandedConfig stranded = new StrandedConfig();
 
     @Expose
-    @Category(name = "Area Overview", desc = "Helps navigate through the areas on an island.")
-    public AreaOverviewConfig areaOverview = new AreaOverviewConfig();
+    @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
+    public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
