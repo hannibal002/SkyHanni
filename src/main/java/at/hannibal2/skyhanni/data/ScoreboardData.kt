@@ -6,7 +6,10 @@ import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.lastColorCode
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
@@ -22,13 +25,7 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() = grabObjectiveTitle()
-
-    fun grabObjectiveTitle(): String {
-        val scoreboard = Minecraft.getMinecraft().theWorld?.scoreboard ?: return ""
-        val objective = scoreboard.getObjectiveInDisplaySlot(1) ?: return ""
-        return objective.displayName
-    }
+    val objectiveTitle: String get() = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName ?: ""
 
     private var dirty = false
 
@@ -39,16 +36,32 @@ object ScoreboardData {
             val start = split[0]
             var end = if (split.size > 1) split[1] else ""
 
+            /**
+             * If the line is split into two parts, we need to remove the color code prefixes from the end part
+             * to prevent the color from being applied to the start of `end`, which would cause the color to be
+             * duplicated in the final output.
+             *
+             * This fucks up different Regex checks if not working correctly, like here:
+             * ```
+             * Pattern: '§8- (§.)+[\w\s]+Dragon§a [\w,.]+§.❤'
+             * Lines: - '§8- §c§aApex Dra§agon§a 486M§c❤'
+             *        - '§8- §c§6Flame Dr§6agon§a 460M§c❤'
+             * ```
+             */
             val lastColor = start.lastColorCode() ?: ""
 
-            // Determine the longest prefix of "end" that matches any suffix of "lastColor"
+            // Generate the list of color suffixes
             val colorSuffixes = generateSequence(lastColor) { it.dropLast(2) }
                 .takeWhile { it.isNotEmpty() }
-                .toList()
+                .toMutableList()
 
-            val matchingPrefix = colorSuffixes.find { end.startsWith(it) } ?: ""
-            if (matchingPrefix.isNotEmpty()) {
-                end = end.removePrefix(matchingPrefix)
+            // Iterate through the colorSuffixes to remove matching prefixes from 'end'
+            for (suffix in colorSuffixes.toList()) {
+                if (end.startsWith(suffix)) {
+                    end = end.removePrefix(suffix)
+                    colorSuffixes.remove(suffix)
+                    break
+                }
             }
 
             add(start + end)
@@ -60,19 +73,41 @@ object ScoreboardData {
         if (event.packet is S3CPacketUpdateScore) {
             if (event.packet.objectiveName == "update") {
                 dirty = true
+                monitor()
             }
         }
         if (event.packet is S3EPacketTeams) {
             if (event.packet.name.startsWith("team_")) {
                 dirty = true
+                monitor()
             }
         }
+    }
+
+    private var monitor = false
+    private var lastMonitorState = emptyList<String>()
+    private var lastChangeTime = SimpleTimeMark.farPast()
+
+    private fun monitor() {
+        if (!monitor) return
+        val currentList = fetchScoreboardLines()
+        if (lastMonitorState != currentList) {
+            val time = lastChangeTime.passedSince()
+            lastChangeTime = SimpleTimeMark.now()
+            println("Scoreboard Monitor: (new change after ${time.format(showMilliSeconds = true)})")
+            for (s in currentList) {
+                println("'$s'")
+            }
+        }
+        lastMonitorState = currentList
+        println(" ")
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onTick(event: LorenzTickEvent) {
         if (!dirty) return
         dirty = false
+        monitor()
 
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }
@@ -87,6 +122,13 @@ object ScoreboardData {
             ScoreboardUpdateEvent(new).postAndCatch()
             sidebarLinesFormatted = new
         }
+    }
+
+    fun toggleMonitor() {
+        monitor = !monitor
+        val action = if (monitor) "Enabled" else "Disabled"
+        ChatUtils.chat("$action scoreboard monitoring in the console.")
+
     }
 
     private fun cleanSB(scoreboard: String): String {
