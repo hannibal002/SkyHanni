@@ -577,7 +577,12 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
         getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
-            .formatted(dayAndMonthElement = false, yearElement = false, timeFormat24h = config.display.skyblockTime24hFormat) +
+            .formatted(
+                dayAndMonthElement = false,
+                yearElement = false,
+                timeFormat24h = config.display.skyblockTime24hFormat,
+                exactMinutes = config.display.skyblockTimeExactMinutes,
+            ) +
             " $symbol" to HorizontalAlignment.LEFT,
     )
 }
@@ -726,7 +731,7 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes = HotmAPI.Powder.values()
+    val powderTypes = HotmAPI.PowderType.values()
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
         return listOf("<hidden>" to HorizontalAlignment.LEFT)
     }
