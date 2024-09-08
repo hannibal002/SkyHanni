@@ -167,8 +167,7 @@ object Commands {
     }
 
     private fun usersMain() {
-        registerCommand("sh", "Opens the main SkyHanni config") { openMainMenu }
-        registerCommand("skyhanni", "Opens the main SkyHanni config") { openMainMenu }
+        registerCommand("sh", "Opens the main SkyHanni config", listOf("skyhanni"), openMainMenu)
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { HelpCommand.onCommand(it, commands) }
         registerCommand0(
@@ -662,8 +661,7 @@ object Commands {
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA &&
-            (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
