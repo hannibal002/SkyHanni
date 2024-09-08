@@ -370,7 +370,7 @@ object ItemUtils {
             getAttributeFromShard()?.let {
                 return it.getAttributeName()
             }
-            return getInternalName().itemName
+            return getInternalNameOrNull()?.itemName ?: "<null>"
         }
 
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {

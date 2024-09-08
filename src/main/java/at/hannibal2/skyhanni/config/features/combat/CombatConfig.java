@@ -27,6 +27,7 @@ public class CombatConfig {
     @Expose
     @ConfigOption(name = "Armor Stack Display", desc = "")
     @Accordion
+    // TODO rename to armor stack display
     public StackDisplayConfig stackDisplayConfig = new StackDisplayConfig();
 
     @Expose
