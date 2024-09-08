@@ -204,6 +204,7 @@ object IslandGraphs {
         currentTarget = location
         this.color = color
         this.onFound = onFound
+        this.showGoalExact = showGoalExact
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
     }
