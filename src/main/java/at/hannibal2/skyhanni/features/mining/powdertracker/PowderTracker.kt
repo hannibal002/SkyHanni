@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig.PowderDisplayEntry
 import at.hannibal2.skyhanni.data.BossbarData
@@ -12,8 +14,10 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.mining.PowderGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -23,6 +27,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -32,6 +37,7 @@ import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object PowderTracker {
@@ -192,16 +198,28 @@ object PowderTracker {
         }
 
         for (reward in PowderChestReward.entries) {
+            if (reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) return
             reward.chatPattern.matchMatcher(msg) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
-                    var amount = groupOrNull("amount")?.formatLong() ?: 1
-                    if ((reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) && doublePowder) {
-                        amount *= 2
-                    }
+                    val amount = groupOrNull("amount")?.formatLong() ?: 1
                     it.rewards[reward] = count + amount
                 }
             }
+        }
+        tracker.update()
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
+    fun onPowderGain(event: PowderGainEvent) {
+        if (lastChestPicked.passedSince() > 5.seconds) return
+        tracker.modify {
+            val reward = when (event.powder) {
+                HotmAPI.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
+                HotmAPI.PowderType.MITHRIL -> PowderChestReward.MITHRIL_POWDER
+                else -> return@modify
+            }
+            it.rewards.addOrPut(reward, event.amount)
         }
         tracker.update()
     }
@@ -266,10 +284,10 @@ object PowderTracker {
         }
     }
 
-    private fun formatDisplay(map: List<List<Any>>) = buildList<List<Any>> {
+    private fun formatDisplay(map: List<Renderable>) = buildList<Renderable> {
         if (map.isEmpty()) return@buildList
 
-        addAsSingletonList("§b§lPowder Tracker")
+        addString("§b§lPowder Tracker")
 
         for (index in config.textFormat.get()) {
             // TODO, change functionality to use enum rather than ordinals
@@ -277,7 +295,7 @@ object PowderTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
+    private fun drawDisplay(data: Data): List<Renderable> = buildList {
         calculate(data, gemstoneInfo, PowderChestReward.GEMSTONE_POWDER)
         calculate(data, mithrilInfo, PowderChestReward.MITHRIL_POWDER)
         calculate(data, diamondEssenceInfo, PowderChestReward.DIAMOND_ESSENCE)
@@ -286,20 +304,20 @@ object PowderTracker {
         calculateHardStone(data)
 
         val chestPerHour = format(chestInfo.perHour)
-        addAsSingletonList("§d${data.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
-        addAsSingletonList("§bDouble Powder: ${if (doublePowder) "§aActive! §7($powderTimer)" else "§cInactive!"}")
+        addString("§d${data.totalChestPicked.addSeparators()} Total Chests Picked §7($chestPerHour/h)")
+        addString("§bDouble Powder: ${if (doublePowder) "§aActive! §7($powderTimer)" else "§cInactive!"}")
 
         val entries = PowderChestReward.entries
         val rewards = data.rewards
         addPerHour(rewards, entries[0], mithrilInfo)
         addPerHour(rewards, entries[1], gemstoneInfo)
-        addAsSingletonList("")
+        addString("")
         addPerHour(rewards, entries[46], diamondEssenceInfo)
         addPerHour(rewards, entries[47], goldEssenceInfo)
-        addAsSingletonList("")
+        addString("")
         val hardStonePerHour = format(hardStoneInfo.perHour)
-        addAsSingletonList("§b${data.totalHardStoneCompacted.addSeparators()} §fHard Stone §bCompacted §7($hardStonePerHour/h)")
-        addAsSingletonList("")
+        addString("§b${data.totalHardStoneCompacted.addSeparators()} §fHard Stone §bCompacted §7($hardStonePerHour/h)")
+        addString("")
         for ((gem, color) in gemstones) {
             var totalGemstone = 0L
 
@@ -316,38 +334,38 @@ object PowderTracker {
             }
 
             val (flawless, fine, flawed, rough) = convert(totalGemstone)
-            addAsSingletonList("§5${flawless}§7-§9${fine}§7-§a${flawed}§f-${rough} $color$gem Gemstone")
+            addString("§5${flawless}§7-§9${fine}§7-§a${flawed}§f-${rough} $color$gem Gemstone")
         }
 
         var totalParts = 0L
         for (reward in entries.subList(26, 32)) { // robots part
             val count = rewards.getOrDefault(reward, 0)
             totalParts += count
-            addAsSingletonList("§b${count.addSeparators()} ${reward.displayName}")
+            addString("§b${count.addSeparators()} ${reward.displayName}")
         }
-        addAsSingletonList("§b${totalParts.addSeparators()} §9Total Robot Parts")
+        addString("§b${totalParts.addSeparators()} §9Total Robot Parts")
 
         val goblinEgg = rewards.getOrDefault(PowderChestReward.GOBLIN_EGG, 0)
         val greenEgg = rewards.getOrDefault(PowderChestReward.GREEN_GOBLIN_EGG, 0)
         val redEgg = rewards.getOrDefault(PowderChestReward.RED_GOBLIN_EGG, 0)
         val yellowEgg = rewards.getOrDefault(PowderChestReward.YELLOW_GOBLIN_EGG, 0)
         val blueEgg = rewards.getOrDefault(PowderChestReward.BLUE_GOBLIN_EGG, 0)
-        addAsSingletonList("§3$blueEgg§7-§c$redEgg§7-§e$yellowEgg§f-§a$greenEgg§f-§9$goblinEgg §fGoblin Egg")
+        addString("§3$blueEgg§7-§c$redEgg§7-§e$yellowEgg§f-§a$greenEgg§f-§9$goblinEgg §fGoblin Egg")
 
         for (reward in entries.subList(37, 46)) {
             val count = rewards.getOrDefault(reward, 0).addSeparators()
-            addAsSingletonList("§b$count ${reward.displayName}")
+            addString("§b$count ${reward.displayName}")
         }
     }
 
-    private fun MutableList<List<Any>>.addPerHour(
+    private fun MutableList<Renderable>.addPerHour(
         map: Map<PowderChestReward, Long>,
         reward: PowderChestReward,
         info: ResourceInfo,
     ) {
         val mithrilCount = map.getOrDefault(reward, 0).addSeparators()
         val mithrilPerHour = format(info.perHour)
-        addAsSingletonList("§b$mithrilCount ${reward.displayName} §7($mithrilPerHour/h)")
+        addString("§b$mithrilCount ${reward.displayName} §7($mithrilPerHour/h)")
     }
 
     private fun format(e: Double): String = if (e < 0) "0" else e.toInt().addSeparators()

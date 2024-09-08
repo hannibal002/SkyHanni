@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -148,18 +149,18 @@ object ChocolateFactoryStrayTracker {
         tracker.modify { it.goldenTypesCaught.addOrPut(typeCaught, amount) }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
+    private fun drawDisplay(data: Data): List<Renderable> = buildList {
         val extraChocMs = data.straysExtraChocMs.values.sum().milliseconds
         val formattedExtraTime = extraChocMs.let { if (it == 0.milliseconds) "0s" else it.format() }
 
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§6§lStray Tracker",
                 tips = listOf("§a+§b${formattedExtraTime} §afrom strays§7"),
             ),
         )
         rarityFormatMap.keys.forEach { rarity ->
-            extractHoverableOfRarity(rarity, data)?.let { addAsSingletonList(it) }
+            extractHoverableOfRarity(rarity, data)?.let { add(it) }
         }
     }
 
