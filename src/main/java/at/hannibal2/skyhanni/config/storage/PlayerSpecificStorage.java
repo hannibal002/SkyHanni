@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.storage;
 
+import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.utils.GenericWrapper;
@@ -77,5 +78,21 @@ public class PlayerSpecificStorage {
 
         @Expose
         public float userLuck = 0f;
+    }
+
+    @Expose
+    public TabList tabList = new TabList();
+
+    public static class TabList {
+
+        @Expose
+        public TabProfile globaleTabProfile = new TabProfile();
+
+        @Expose
+        public Map<IslandType, TabProfile> tabSetting = new HashMap<>();
+
+        public static class TabProfile {
+
+        }
     }
 }
