@@ -1,19 +1,27 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.common.collect.Lists
+import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
+import io.github.moulberry.notenoughupdates.util.NotificationHandler
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -21,13 +29,17 @@ import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
 import net.minecraftforge.common.util.Constants
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
+@SkyHanniModule
 object ItemUtils {
 
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
+
+    private val missingRepoItems = mutableSetOf<String>()
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
@@ -43,15 +55,25 @@ object ItemUtils {
         return list
     }
 
-    // TODO change else janni is sad
-    fun isCoopSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any {
-            it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    var ItemStack.extraAttributes: NBTTagCompound
+        get() = this.tagCompound?.getCompoundTag("ExtraAttributes") ?: NBTTagCompound()
+        set(value) {
+            val tag = this.tagCompound ?: NBTTagCompound().also { tagCompound = it }
+            tag.setTag("ExtraAttributes", value)
         }
 
+    fun ItemStack.overrideId(id: String): ItemStack {
+        extraAttributes = extraAttributes.apply { setString("id", id) }
+        return this
+    }
+
     // TODO change else janni is sad
-    fun isSoulBound(stack: ItemStack): Boolean =
-        stack.getLore().any { it == "§8§l* §8Soulbound §8§l*" }
+    fun ItemStack.isCoopSoulBound(): Boolean = getLore().any {
+        it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    }
+
+    // TODO change else janni is sad
+    fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
 
     fun isRecombobulated(stack: ItemStack) = stack.isRecombobulated()
 
@@ -59,8 +81,7 @@ object ItemUtils {
 
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
-        val player = Minecraft.getMinecraft().thePlayer
-            ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
+        val player = Minecraft.getMinecraft().thePlayer ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
 
         for (slot in player.openContainer.inventorySlots) {
             if (slot.hasStack) {
@@ -72,23 +93,6 @@ object ItemUtils {
             list.add(player.inventory.itemStack)
         }
         return list
-    }
-
-    fun hasAttributes(stack: ItemStack): Boolean {
-        if (stack.hasTagCompound()) {
-            val tagCompound = stack.tagCompound
-            if (tagCompound.hasKey("ExtraAttributes")) {
-                val extraAttributes = tagCompound.getCompoundTag("ExtraAttributes")
-                try {
-                    val json = GsonBuilder().create().fromJson(extraAttributes.toString(), JsonObject::class.java)
-                    if (json.has("attributes")) {
-                        return true
-                    }
-                } catch (_: Exception) {
-                }
-            }
-        }
-        return false
     }
 
     fun ItemStack.getInternalName() = getInternalNameOrNull() ?: NEUInternalName.NONE
@@ -132,8 +136,8 @@ object ItemUtils {
         if (tagCompound == null) return null
         val nbt = tagCompound
         if (!nbt.hasKey("SkullOwner")) return null
-        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
-            .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
+            .getCompoundTagAt(0).getString("Value")
     }
 
     fun ItemStack.getSkullOwner(): String? {
@@ -184,6 +188,15 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
+    private val itemCategoryRepoCheckPattern by RepoPattern.pattern(
+        "itemcategory.repocheck",
+        ItemCategory.entries.joinToString(separator = "|") { it.name },
+    )
+    private val rarityCategoryRepoCheckPattern by RepoPattern.pattern(
+        "rarity.repocheck",
+        LorenzRarity.entries.joinToString(separator = "|") { it.name },
+    )
+
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val cleanName = this.cleanName()
 
@@ -193,8 +206,7 @@ object ItemUtils {
 
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                group("itemCategory").replace(" ", "_") to
-                    group("rarity").replace(" ", "_")
+                group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
             val itemCategory = getItemCategory(category, name, cleanName)
@@ -209,6 +221,8 @@ object ItemUtils {
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             }
             if (itemRarity == null) {
@@ -218,7 +232,10 @@ object ItemUtils {
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern result" to rarity,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
             }
 
@@ -270,8 +287,7 @@ object ItemUtils {
         return data.itemRarity
     }
 
-    private fun itemRarityLastCheck(data: CachedItemData) =
-        data.itemRarityLastCheck.passedSince() > 10.seconds
+    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     /**
      * Use when comparing the name (e.g. regex), not for showing to the user
@@ -279,7 +295,7 @@ object ItemUtils {
      */
     var ItemStack.name: String
         get() = this.displayName ?: ErrorManager.skyHanniError(
-            "Could not get name if ItemStack",
+            "Could not get name of ItemStack",
             "itemStack" to this,
             "displayName" to displayName,
             "internal name" to getInternalNameOrNull(),
@@ -292,11 +308,11 @@ object ItemUtils {
 
     private val itemAmountCache = mutableMapOf<String, Pair<String, Int>>()
 
+    private val bookPattern = "(?<name>.* [IVX]+) Book".toPattern()
+
     fun readItemAmount(originalInput: String): Pair<String, Int>? {
-        // This workaround fixes 'Tubto Cacti I Book'
-        val input = (if (originalInput.endsWith(" Book")) {
-            originalInput.replace(" Book", "")
-        } else originalInput).removeResets()
+        // This workaround fixes 'Turbo Cacti I Book'
+        val input = (bookPattern.matchMatcher(originalInput) { group("name") } ?: originalInput).removeResets()
 
         if (itemAmountCache.containsKey(input)) {
             return itemAmountCache[input]!!
@@ -340,7 +356,7 @@ object ItemUtils {
                 "internal name" to pet.getInternalName(),
                 "item name" to name,
                 "rarity id" to rarityId,
-                "inventory name" to InventoryUtils.openInventoryName()
+                "inventory name" to InventoryUtils.openInventoryName(),
             )
         }
         return rarity
@@ -350,7 +366,18 @@ object ItemUtils {
 
     // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
     val ItemStack.itemName: String
-        get() = getInternalName().itemName
+        get() {
+            getAttributeFromShard()?.let {
+                return it.getAttributeName()
+            }
+            return getInternalNameOrNull()?.itemName ?: "<null>"
+        }
+
+    fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
+        if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
+        val attributes = getAttributes() ?: return null
+        return attributes.firstOrNull()
+    }
 
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
@@ -359,6 +386,9 @@ object ItemUtils {
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
     val NEUInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
+
+    val NEUInternalName.readableInternalName: String
+        get() = asString().replace("_", " ").lowercase()
 
     private fun NEUInternalName.grabItemName(): String {
         if (this == NEUInternalName.WISP_POTION) {
@@ -375,7 +405,11 @@ object ItemUtils {
         }
 
         val itemStack = getItemStackOrNull()
-        val name = itemStack?.name ?: error("Could not find item name for $this")
+        val name = itemStack?.name ?: run {
+            val name = toString()
+            addMissingRepoItem(name, "Could not find item name for $name")
+            return "§c$name"
+        }
 
         // show enchanted book name
         if (itemStack.getItemCategoryOrNull() == ItemCategory.ENCHANTED_BOOK) {
@@ -383,6 +417,11 @@ object ItemUtils {
         }
         if (name.endsWith("Enchanted Book Bundle")) {
             return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
+        }
+
+        // obfuscated trophy fish
+        if (name.contains("§kObfuscated")) {
+            return name.replace("§kObfuscated", "Obfuscated")
         }
 
         // hide pet level
@@ -409,5 +448,58 @@ object ItemUtils {
             }
         }
         return list
+    }
+
+    fun neededItems(recipe: NeuRecipe): Map<NEUInternalName, Int> {
+        val neededItems = mutableMapOf<NEUInternalName, Int>()
+        for (ingredient in recipe.ingredients) {
+            val material = ingredient.internalItemId.asInternalName()
+            val amount = ingredient.count.toInt()
+            neededItems.addOrPut(material, amount)
+        }
+        return neededItems
+    }
+
+    fun NeuRecipe.getRecipePrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ): Double = neededItems(this).map {
+        it.key.getPrice(priceSource, pastRecipes) * it.value
+    }.sum()
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Missing Repo Items")
+
+        if (missingRepoItems.isNotEmpty()) {
+            event.addData {
+                add("Detected ${missingRepoItems.size} missing items:")
+                for (itemName in missingRepoItems) {
+                    add(" - $itemName")
+                }
+            }
+        } else {
+            event.addIrrelevant("No Repo Item fails detected.")
+        }
+    }
+
+    fun addMissingRepoItem(name: String, message: String) {
+        if (!missingRepoItems.add(name)) return
+        ChatUtils.debug(message)
+//         showRepoWarning()
+    }
+
+    // Running NEU's function `Utils.showOutdatedRepoNotification()` caused a NoSuchMethodError in dev env.
+    // Therefore we run NotificationHandler.displayNotification directly
+    private fun showRepoWarning() {
+        NotificationHandler.displayNotification(
+            Lists.newArrayList(
+                "§c§lMissing repo data",
+                "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
+                "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
+                "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
+            ),
+            true, true,
+        )
     }
 }
