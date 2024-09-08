@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -117,18 +117,18 @@ object PestProfitTracker {
         lastPestKillTime = SimpleTimeMark.now()
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lPest Profit Tracker")
+    private fun drawDisplay(data: Data): List<Renderable> = buildList {
+        addString("§e§lPest Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
         val pestsKilled = data.totalPestsKills
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§7Pests killed: §e${pestsKilled.addSeparators()}",
                 listOf("§7You killed pests §e${pestsKilled.addSeparators()} §7times."),
             ),
         )
-        addAsSingletonList(tracker.addTotalProfit(profit, data.totalPestsKills, "kill"))
+        add(tracker.addTotalProfit(profit, data.totalPestsKills, "kill"))
 
         tracker.addPriceFromButton(this)
     }

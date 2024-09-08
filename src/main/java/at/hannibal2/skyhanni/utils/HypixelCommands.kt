@@ -153,6 +153,10 @@ object HypixelCommands {
     fun ahs(query: String) {
         send("ahs $query")
     }
+        
+    fun callback(uuid: String) {
+        send("cb $uuid")
+    }
 
     private fun send(command: String) {
         @Suppress("DEPRECATION")

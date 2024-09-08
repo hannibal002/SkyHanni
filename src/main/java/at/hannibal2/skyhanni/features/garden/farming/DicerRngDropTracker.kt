@@ -120,13 +120,13 @@ object DicerRngDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList {
+    private fun drawDisplay(data: Data) = buildList<Renderable> {
         val cropInHand = cropInHand ?: return@buildList
 
         val topLine = mutableListOf<Renderable>()
         topLine.add(Renderable.itemStack(cropInHand.icon))
         topLine.add(Renderable.string("§7Dicer Tracker:"))
-        add(listOf(Renderable.horizontalContainer(topLine)))
+        add(Renderable.horizontalContainer(topLine))
 
         val items = data.drops[cropInHand] ?: return@buildList
         val list = mutableListOf<Renderable>()
@@ -143,7 +143,7 @@ object DicerRngDropTracker {
                 list.add(Renderable.string(" §7- §e${amount.addSeparators()}x §$colorCode$displayName"))
             }
         }
-        add(listOf(Renderable.verticalContainer(list)))
+        add(Renderable.verticalContainer(list))
     }
 
     private var cropInHand: CropType? = null

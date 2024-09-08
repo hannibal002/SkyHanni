@@ -19,7 +19,7 @@ object SuperpairsClicksAlert {
     private var roundsNeeded = -1
     private val roundsNeededRegex = Regex("""(?:Chain|Series) of (\d+):""")
     private val currentRoundRegex = Regex("""Round: (\d+)""")
-    private val targetInventoryNames = arrayOf("Chronomatron", "c")
+    private val targetInventoryNames = arrayOf("Chronomatron", "Ultrasequencer")
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {

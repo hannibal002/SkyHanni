@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -104,8 +105,8 @@ object FrozenTreasureTracker {
         icePerHour = (icePerSecond.average() * 3600).toInt()
     }
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
-        val newList = mutableListOf<List<Any>>()
+    private fun formatDisplay(map: List<Renderable>): List<Renderable> {
+        val newList = mutableListOf<Renderable>()
         for (index in config.textFormat) {
             // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
@@ -136,20 +137,20 @@ object FrozenTreasureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList {
         calculateIce(data)
-        addAsSingletonList("§e§lFrozen Treasure Tracker")
-        addAsSingletonList("§6${formatNumber(data.treasuresMined)} Treasures Mined")
-        addAsSingletonList("§3${formatNumber(estimatedIce)} Total Ice")
-        addAsSingletonList("§3${formatNumber(icePerHour)} Ice/hr")
-        addAsSingletonList("§8${formatNumber(data.compactProcs)} Compact Procs")
-        addAsSingletonList("")
+        addString("§e§lFrozen Treasure Tracker")
+        addString("§6${formatNumber(data.treasuresMined)} Treasures Mined")
+        addString("§3${formatNumber(estimatedIce)} Total Ice")
+        addString("§3${formatNumber(icePerHour)} Ice/hr")
+        addString("§8${formatNumber(data.compactProcs)} Compact Procs")
+        addString("")
 
         for (treasure in FrozenTreasure.entries) {
             val count = (data.treasureCount[treasure] ?: 0) * if (config.showAsDrops) treasure.defaultAmount else 1
-            addAsSingletonList("§b${formatNumber(count)} ${treasure.displayName}")
+            addString("§b${formatNumber(count)} ${treasure.displayName}")
         }
-        addAsSingletonList("")
+        addString("")
     }
 
     fun formatNumber(amount: Number): String {

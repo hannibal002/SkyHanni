@@ -538,7 +538,7 @@ public class ProfileSpecificStorage {
         public HotmTree hotmTree = new HotmTree();
 
         @Expose
-        public Map<HotmAPI.Powder, PowderStorage> powder = new HashMap<>();
+        public Map<HotmAPI.PowderType, PowderStorage> powder = new HashMap<>();
 
         public static class PowderStorage {
 
