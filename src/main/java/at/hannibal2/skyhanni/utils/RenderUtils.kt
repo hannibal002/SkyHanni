@@ -1698,7 +1698,7 @@ object RenderUtils {
     fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
         // if radius is 0 then just draw a normal textured rect
         if (radius <= 0) {
-            GuiRenderUtils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter = filter)
+            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
             return
         }
 
@@ -1717,7 +1717,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
 
-        GuiRenderUtils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter = filter)
+        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()

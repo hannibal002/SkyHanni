@@ -354,6 +354,20 @@ object GuiRenderUtils {
         }
     }
 
+    fun drawTexturedRect(
+        x: Int,
+        y: Int,
+        width: Int,
+        height: Int,
+        uMin: Float = 0f,
+        uMax: Float = 1f,
+        vMin: Float = 0f,
+        vMax: Float = 1f,
+        filter: Int = GL11.GL_NEAREST,
+    ) {
+        drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), uMin, uMax, vMin, vMax, filter)
+    }
+
     // Taken from NEU
     fun drawTexturedRect(
         x: Float,

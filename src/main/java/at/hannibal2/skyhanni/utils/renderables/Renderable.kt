@@ -1105,18 +1105,9 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
+
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(
-                    0f,
-                    0f,
-                    width.toFloat(),
-                    height.toFloat(),
-                    uMin,
-                    uMax,
-                    vMin,
-                    vMax,
-                    GL11.GL_NEAREST
-                )
+                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
                 GlStateManager.translate(padding.toFloat(), padding.toFloat(), 0f)
@@ -1145,17 +1136,7 @@ interface Renderable {
             override fun render(posX: Int, posY: Int) {
                 Minecraft.getMinecraft().textureManager.bindTexture(texture)
                 GlStateManager.color(1f, 1f, 1f, alpha / 255f)
-                Utils.drawTexturedRect(
-                    0f,
-                    0f,
-                    width.toFloat(),
-                    height.toFloat(),
-                    uMin,
-                    uMax,
-                    vMin,
-                    vMax,
-                    GL11.GL_NEAREST
-                )
+                GuiRenderUtils.drawTexturedRect(0, 0, width, height, uMin, uMax, vMin, vMax)
                 GlStateManager.color(1f, 1f, 1f, 1f)
             }
         }
