@@ -93,7 +93,6 @@ object GraphEditor {
 
     private var inTutorialMode = false
 
-
     private val textBox = TextInput()
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
@@ -106,6 +105,7 @@ object GraphEditor {
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
     val scrollValue = ScrollValue()
+    val textInput = TextInput()
     var nodesDisplay = emptyList<Searchable>()
     var lastUpdate = SimpleTimeMark.farPast()
 
@@ -190,6 +190,7 @@ object GraphEditor {
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
+
         config.namedNodesList.renderRenderables(
             buildList {
                 val list = getNodeNames()
@@ -197,7 +198,7 @@ object GraphEditor {
                 addString("§eGraph Nodes: $size")
                 val height = (size * 10).coerceAtMost(150)
                 if (list.isNotEmpty()) {
-                    add(list.buildSearchableScrollable(height, scrollValue = scrollValue, velocity = 10.0))
+                    add(list.buildSearchableScrollable(height, textInput, scrollValue, velocity = 10.0))
                 }
             },
             posLabel = "Graph Nodes List",

@@ -988,7 +988,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            private var list = content.keys
+            private var list = filterList()
             override val width = list.maxOf { it.width }
             override val height = height
             override val horizontalAlign = horizontalAlign
@@ -997,12 +997,22 @@ interface Renderable {
             init {
                 textInput.registerToEvent(key) {
                     // null = ignored, never filtered
-                    list = content.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys
+                    list = filterList()
                     scroll = createScroll()
                 }
             }
 
-            private val virtualHeight = list.sumOf { it.height }
+            private fun filterList(): Set<Renderable> {
+                val keys = content.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys
+                if (keys.isEmpty()) {
+                    return setOf(Renderable.string("§cNo search results!"))
+                } else {
+                    return keys
+                }
+            }
+
+            // correct
+            private val virtualHeight get() = list.sumOf { it.height }
 
             private var scroll = createScroll()
 
@@ -1151,7 +1161,7 @@ interface Renderable {
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
-            private val virtualHeight = yOffsets.last() - yPadding
+            private val virtualHeight get() = yOffsets.last() - yPadding
 
             private val end get() = scroll.asInt() + height - yPadding - 1
 

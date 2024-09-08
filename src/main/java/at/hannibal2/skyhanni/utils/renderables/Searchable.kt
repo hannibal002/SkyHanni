@@ -24,10 +24,10 @@ fun List<Searchable>.buildSearchBox(): Renderable {
 
 fun List<Searchable>.buildSearchableScrollable(
     height: Int,
+    textInput: TextInput,
     scrollValue: ScrollValue = ScrollValue(),
     velocity: Double = 2.0,
 ): Renderable {
-    val textInput = TextInput()
     val key = 0
     return Renderable.searchBox(
         Renderable.searchableScrollList(
