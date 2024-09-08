@@ -43,7 +43,10 @@ object MinisterInCalendar {
         if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         val minister = MayorAPI.currentMinister ?: return
 
-        ministerItemStack = "${minister.name}_MAYOR_MONSTER".asInternalName().getItemStack()
+        val itemStack = "${minister.name}_MAYOR_MONSTER".asInternalName().getItemStack()
+        val ministerColor = MayorAPI.mayorNameToColorCode(minister.mayorName)
+
+        ministerItemStack = changeItem(ministerColor, minister, itemStack)
     }
 
     @SubscribeEvent
@@ -58,10 +61,7 @@ object MinisterInCalendar {
         if (!isEnabled()) return
         if (event.inventory !is ContainerLocalMenu || event.slot != MINISTER_SLOT) return
         if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
-        val minister = MayorAPI.currentMinister ?: return
-        val item = ministerItemStack ?: return
-        val ministerColor = MayorAPI.mayorNameToColorCode(minister.mayorName)
-        event.replace(changeItem(ministerColor, minister, item))
+        event.replace(ministerItemStack ?: return)
     }
 
     private fun changeItem(
