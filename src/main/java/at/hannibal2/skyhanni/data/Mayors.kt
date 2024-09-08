@@ -135,10 +135,9 @@ enum class Mayor(
 
             val perks = perksJson.mapNotNull { perkJson ->
                 val perk = Perk.entries.firstOrNull { it.perkName == perkJson.renameIfFoxyExtraEventPerkFound() }
-                if (perk != null) {
-                    perk.description = perkJson.description
+                perk?.also {
+                    it.description = perkJson.description
                 }
-                perk
             }
 
             mayor.addPerks(perks)

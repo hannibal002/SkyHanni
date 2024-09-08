@@ -2,7 +2,9 @@ package at.hannibal2.skyhanni.utils.renderables
 
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+import java.awt.Color
 
 internal object RenderableUtils {
 
@@ -77,6 +79,16 @@ internal object RenderableUtils {
         this.render(posX, posY + yOffset)
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
         return yOffset
+    }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
+        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+        GlStateManager.translate(1.0, 1.0, 0.0)
+        GlStateManager.scale(scale, scale, 1.0)
+        fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
+        GlStateManager.scale(inverseScale, inverseScale, 1.0)
+        GlStateManager.translate(-1.0, -1.0, 0.0)
     }
 }
 

@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
@@ -440,6 +441,10 @@ object Commands {
             "shresetpunchcard",
             "Resets the Rift Punchcard Artifact player list.",
         ) { PunchcardHighlight.clearList() }
+        registerCommand(
+            "shedittracker",
+            "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.",
+        ) { TrackerManager.commandEditTracker(it) }
     }
 
     private fun developersDebugFeatures() {

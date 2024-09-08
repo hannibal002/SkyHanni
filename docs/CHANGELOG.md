@@ -65,6 +65,9 @@
     + Configurable party chat message after transferring.
 + Added /shtps command. - saga (https://github.com/hannibal002/SkyHanni/pull/1961)
     + Informs in chat about the server's ticks per second (TPS).
++ Added command `/shedittracker <item name> <amount>`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2448)
+    + Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.
+    + Use a negative amount to remove items.
 
 #### Misc Features
 
@@ -91,6 +94,7 @@
 + Added margin customization to the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
 + Added an opacity slider for the Custom Background Image in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
 + Added an Undo message when auto alignment inCustom Scoreboard gets disabled. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2402)
++ Added an option to show SkyBlock time on the custom scoreboard rounded to 10 minutes, similar to the vanilla scoreboard. - Luna (https://github.com/hannibal002/SkyHanni/pull/2443)
 
 #### Inventory Improvements
 
@@ -102,6 +106,7 @@
     + Now works with NEU's inventories, such as `/pv` and storage overlay.
 + Added exceptions to the enchant parser. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2254)
     + Stonk and non-mining tools with Efficiency 5 use the maximum enchant color.
++ Added a short cooldown between Experimentation Table Guardian Pet chat warnings. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2459)
 
 #### Chat Improvements
 
@@ -145,6 +150,10 @@
 + Added a chat option to disable a Patcher setting that breaks SkyHanni's line from the center of the player to something else. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2387)
     + E.g. Diana guesses, Slayer Mini Bosses, etc.
 
+#### Bingo Fixes
+
++ Fixed "show bingo rank number" feature toggle not functioning. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2445)
+
 #### Inventory Fixes
 
 + Fixed ItemCategory errors being sent even though we already have a fix. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2392)
@@ -154,6 +163,8 @@
 + Fixed Guardian Reminder Experimentation Table not working with autopet rules. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2430)
 + Fixed SkyHanni Global Scale affecting Custom Wardrobe. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2420)
 + Fixed /show displaying an incorrect number of enchants. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2435)
++ Fixed Armor Hider hiding armor inside the Custom Wardrobe. - Empa (https://github.com/hannibal002/SkyHanni/pull/2449)
++ Fixed detection of El Dorado and Stray Hordes in the Chocolate Factory. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2450)
 
 #### Mining Fixes
 
@@ -162,6 +173,7 @@
 + Fixed a compatibility issue in Fossil Solver with resource packs like Hypixel+. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2409)
 + Fixed Powder for 10 Levels overflowing over the max level. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2422)
 + Fixed Glacite Tunnel Maps repeatedly showing the last commission goal even when there is no new commission. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2432)
++ Fixed Mineshaft Pity Counter not working with some ore types. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2436)
 
 #### Scoreboard Fixes
 
@@ -176,6 +188,9 @@
 + Fixed rounded rectangles not working with a scale less than 1. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2404)
     + E.g. Custom Scoreboard Background.
 + Fixed rare Custom Scoreboard errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2411)
++ Fixed Minister not resetting after the election closed. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2467)
++ Fixed Custom Scoreboard errors while doing Carnival activities. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2455)
++ Fixed Custom Scoreboard error while in a Dungeon Queue. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2441)
 
 #### Hoppity Fixes
 
@@ -190,10 +205,27 @@
 + Updated Derpy's extra tax perk to use the correct name. - Luna (https://github.com/hannibal002/SkyHanni/pull/2393)
 + Fixed Christmas presents in the Hypixel lobby being visible outside of December. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2396)
 + Fixed the mod crashing on startup when the game directory path contains a "!". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2427)
++ Fixed chat formatting for coin drops in profit trackers (Diana, Slayer, Fishing, Pest). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2444)
++ Fixed Last Server Time Slider not functioning. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2440)
 
 #### Chat Fixes
 
 + Fixed an error with Patcher Coordinate Detection from chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2410)
++ Fixed ultimate enchants not showing in `/show`. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2465)
+
+####  Commands Fixes
+
++ Fixed the command `/shtps` printing nothing if the TPS display was currently showing nothing. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2446)
+
+#### Dungeon Fixes
+
++ Fixed disabled SkyHanni features causing compatibility issues with other Dungeon Party Finder mods. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2470)
++ Fixed dungeon completion detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2456)
+    + This also fixes the Croesus reroll detection breaking.
+
+#### Crimson Isle Fixes
+
++ Fixed the reputation helper not updating after a sack update. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2439)
 
 ### Technical Details
 
@@ -208,6 +240,13 @@
 + Fixed Sound Errors in the console. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2431)
 + Added /shdebugscoreboard to monitor scoreboard changes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2412)
     + Prints the raw scoreboard lines in the console after each update, with the time since the last update.
++ Added split and dissolve features for the graph editor. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2466)
++ Added ghost position feature to the graph editor, useful for editing nodes that are in the air. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2461)
++ Added tags to the graph editor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2464)
++ Changed graph node editor behavior. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2451)
+    + WASD node movement now reflects the player's look direction.
+    + Nodes are only deleted when they are selected/active.
+    + Allows creating nodes much closer to each other.
 
 ## Version 0.26
 

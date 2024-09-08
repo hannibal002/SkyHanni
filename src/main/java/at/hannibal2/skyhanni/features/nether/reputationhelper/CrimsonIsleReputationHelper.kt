@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
@@ -86,6 +87,11 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
             kuudraBossHelper.loadData(it)
             questHelper.load(it)
         }
+    }
+
+    @SubscribeEvent
+    fun onSackChange(event: SackChangeEvent) {
+        dirty = true
     }
 
     @SubscribeEvent
