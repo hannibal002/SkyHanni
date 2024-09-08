@@ -105,12 +105,15 @@ object TimeUtils {
         yearElement: Boolean = true,
         hoursAndMinutesElement: Boolean = true,
         timeFormat24h: Boolean = false,
+        exactMinutes: Boolean = true,
     ): String {
         val hour = if (timeFormat24h) this.hour else (this.hour + 11) % 12 + 1
         val timeOfDay = if (!timeFormat24h) {
             if (this.hour > 11) "pm" else "am"
         } else ""
-        val minute = this.minute.toString().padStart(2, '0')
+        val minute = this.minute.let {
+            if (exactMinutes) it else it - (it % 10)
+        }.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
         val day = this.day
         val daySuffix = SkyBlockTime.daySuffix(day)

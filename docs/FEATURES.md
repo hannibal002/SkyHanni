@@ -1010,6 +1010,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Use `/shremind <time> <note>` to set reminders for your future self.
 + Added /shtps command. - saga (https://github.com/hannibal002/SkyHanni/pull/1961)
     + Informs in chat about the server's ticks per second (TPS).
++ Added command `/shedittracker <item name> <amount>`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2448)
+    + Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.
+    + Use a negative amount to remove items.
 
 </details>
 <details open><summary>

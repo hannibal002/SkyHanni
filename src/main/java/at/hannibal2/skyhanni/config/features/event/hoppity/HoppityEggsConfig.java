@@ -15,6 +15,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class HoppityEggsConfig {
 
     @Expose
+    @ConfigOption(name = "Hoppity Abiphone Calls", desc = "")
+    @Accordion
+    public HoppityCallWarningConfig hoppityCallWarning = new HoppityCallWarningConfig();
+
+    @Expose
     @ConfigOption(name = "Event Summary", desc = "")
     @Accordion
     public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();

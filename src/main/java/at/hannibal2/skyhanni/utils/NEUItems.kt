@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -167,6 +168,16 @@ object NEUItems {
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+
+    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
+        val internalName = hypixelId.replace(':', '-')
+        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+    }
+
+    fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
+        getInternalNameFromHypixelIdOrNull(hypixelId)
+            ?: error("hypixel item id does not match internal name: $hypixelId")
+
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
@@ -331,7 +342,7 @@ object NEUItems {
             val id = current.first
             return if (current.second > 1) {
                 val child = getPrimitiveMultiplier(id, tryCount + 1)
-                val result = child.multiply(current.second)
+                val result = child * current.second
                 multiplierCache[internalName] = result
                 result
             } else {
