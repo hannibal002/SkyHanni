@@ -12,16 +12,16 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsDryStreakDisplay.experimentInventoriesPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -49,7 +49,6 @@ object ExperimentsProfitTracker {
         { it.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
-    private var inExperiment = false
     private var inExperimentationTable = false
     private var lastExperimentTime = SimpleTimeMark.farPast()
     private var lastSplashes = mutableListOf<ItemStack>()
@@ -155,7 +154,7 @@ object ExperimentsProfitTracker {
             }
 
             val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
-            if (!experienceBottlePattern.matches(group("reward"))) tracker.addItem(internalName, 1)
+            if (!experienceBottlePattern.matches(group("reward"))) tracker.addItem(internalName, 1, false)
             return
         }
 
@@ -225,16 +224,16 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lExperiments Profit Tracker")
+    private fun drawDisplay(data: Data): List<Renderable> = buildList {
+        addString("§e§lExperiments Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this) + data.startCost
 
         val experimentsDone = data.experimentsDone
-        addAsSingletonList("")
-        addAsSingletonList("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+        addString("")
+        addString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
         val startCostFormat = data.startCost.absoluteValue.shortFormat()
         val bitCostFormat = data.bitCost.shortFormat()
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§eTotal Cost: §c-$startCostFormat§e/§b-$bitCostFormat",
                 listOf(
@@ -243,8 +242,8 @@ object ExperimentsProfitTracker {
                 ),
             ),
         )
-        addAsSingletonList(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
-        addAsSingletonList("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
+        add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
+        addString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
 
         tracker.addPriceFromButton(this)
     }
@@ -287,13 +286,13 @@ object ExperimentsProfitTracker {
             if (lastInInv == 0) {
                 currentBottlesInInventory[internalName] = 0
                 lastBottlesInInventory[internalName] = amount
-                if (addToTracker && lastExperimentTime.passedSince() <= 3.seconds) tracker.addItem(internalName, amount)
+                if (addToTracker && lastExperimentTime.passedSince() <= 3.seconds) tracker.addItem(internalName, amount, false)
                 continue
             }
 
             currentBottlesInInventory[internalName] = 0
             lastBottlesInInventory[internalName] = amount
-            if (addToTracker) tracker.addItem(internalName, amount - lastInInv)
+            if (addToTracker) tracker.addItem(internalName, amount - lastInInv, false)
         }
     }
 
