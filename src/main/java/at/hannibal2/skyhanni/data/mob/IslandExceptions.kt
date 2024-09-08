@@ -121,7 +121,7 @@ object IslandExceptions {
         armorStand: EntityArmorStand?,
         nextEntity: EntityLivingBase?,
     ) = when {
-        baseEntity is EntitySlime && armorStand?.name == "§f§lCOLLECT!" ->
+        baseEntity is EntitySlime && MobFilter.heavyPearlPattern.matches(armorStand?.name) ->
             MobData.MobResult.found(
                 MobFactories.special(baseEntity, "Heavy Pearl"),
             )

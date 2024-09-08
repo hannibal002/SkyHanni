@@ -512,4 +512,13 @@ object StringUtils {
     fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.isValidUuid(): Boolean {
+        return try {
+            UUID.fromString(this)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
 }

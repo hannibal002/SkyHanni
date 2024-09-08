@@ -307,6 +307,10 @@ enum class TabWidget(
         // language=RegExp
         "Scrap: (?:§.)*(?<amount>\\d)(?:§.)*/(?:§.)*\\d",
     ),
+    EVENT_TRACKERS(
+        // language=RegExp
+        "§e§lEvent Trackers:",
+    )
 
     ;
 
