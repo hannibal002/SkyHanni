@@ -739,7 +739,7 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes = HotmAPI.Powder.values()
+    val powderTypes = HotmAPI.PowderType.values()
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
         return listOf("<hidden>" to HorizontalAlignment.LEFT)
     }
