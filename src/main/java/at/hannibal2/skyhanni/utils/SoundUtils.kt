@@ -19,8 +19,8 @@ object SoundUtils {
     val centuryActiveTimerAlert by lazy { createSound("skyhanni:centurytimer.active", 1f) }
 
     fun ISound.playSound() {
-        Minecraft.getMinecraft().addScheduledTask {
-            if (Minecraft.getMinecraft().soundHandler.isSoundPlaying(this)) return@addScheduledTask
+        DelayedRun.onThread.execute {
+            if (Minecraft.getMinecraft().soundHandler.isSoundPlaying(this)) return@execute
             val gameSettings = Minecraft.getMinecraft().gameSettings
             val oldLevel = gameSettings.getSoundLevel(SoundCategory.PLAYERS)
             if (!SkyHanniMod.feature.misc.maintainGameVolume) {
@@ -33,7 +33,7 @@ object SoundUtils {
                     e.message?.let {
                         if (it.startsWith("value already present:")) {
                             println("SkyHanni Sound error: $it")
-                            return@addScheduledTask
+                            return@execute
                         }
                     }
                 }

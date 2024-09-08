@@ -90,6 +90,15 @@ public class MobsConfig {
     public boolean showArachneSpawnTimer = true;
 
     @Expose
+    @ConfigOption(
+        name = "Arachne Kill Timer", desc = "Shows how long it took to kill Arachne after the fight ends. " +
+        "§cDoes not show if you were not in the Sanctuary when it spawned."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean arachneKillTimer = true;
+
+    @Expose
     @ConfigOption(name = "Enderman TP Hider", desc = "Stops the Enderman Teleportation animation.")
     @ConfigEditorBoolean
     @FeatureToggle

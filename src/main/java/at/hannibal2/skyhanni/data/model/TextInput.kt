@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.insert
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import org.lwjgl.input.Keyboard
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 
 class TextInput {
@@ -23,14 +24,33 @@ class TextInput {
         }
     }.replace("(?<!§.\\|)§(?!.\\|§.)".toRegex(), "&&")
 
+    fun editTextWithAlwaysCarriage() = textBox.let {
+        with(carriage) {
+            if (this == null) it.plus('|')
+            else it.insert(this, '|')
+        }
+    }.replace("§", "&&")
+
     fun finalText() = textBox.replace("&&", "§")
 
-    fun makeActive() = Companion.activate(this)
-    fun disable() = Companion.disable()
+    fun makeActive() = if (!isActive) Companion.activate(this) else Unit
+    fun disable() = if (isActive) Companion.disable() else Unit
     fun handle() = Companion.handleTextInput()
     fun clear() {
         textBox = ""
         carriage = null
+    }
+
+    val isActive get() = Companion.activeInstance == this
+
+    private val updateEvents = mutableMapOf<Int, (TextInput) -> Unit>()
+
+    fun registerToEvent(key: Int, event: (TextInput) -> Unit) {
+        updateEvents[key] = event
+    }
+
+    fun removeFromEvent(key: Int) {
+        updateEvents.remove(key)
     }
 
     companion object {
@@ -52,6 +72,17 @@ class TextInput {
             }
         }
 
+        fun onGuiInput(ci: CallbackInfo) {
+            if (activeInstance != null) {
+                if (Keyboard.KEY_ESCAPE.isKeyHeld()) {
+                    disable()
+                } else {
+                    ci.cancel()
+                }
+                return
+            }
+        }
+
         private var timeSinceKeyEvent = 0L
 
         private var carriage
@@ -66,6 +97,13 @@ class TextInput {
                 activeInstance?.textBox = value
             }
 
+        private fun updated() {
+            with(activeInstance) {
+                if (this == null) return
+                this.updateEvents.forEach { (_, it) -> it(this) }
+            }
+        }
+
         private fun handleTextInput() {
             if (KeyboardManager.isCopyingKeysDown()) {
                 OSUtils.copyToClipboard(textBox)
@@ -74,6 +112,7 @@ class TextInput {
             if (KeyboardManager.isPastingKeysDown()) {
                 runBlocking {
                     textBox = OSUtils.readFromClipboard() ?: return@runBlocking
+                    updated()
                 }
                 return
             }
@@ -97,6 +136,7 @@ class TextInput {
                 } else {
                     textBox.dropLast(1)
                 }
+                updated()
                 return
             }
 
@@ -123,6 +163,7 @@ class TextInput {
                     textBox + char
                 }
             }
+            updated()
         }
 
         private fun moveCarriageRight(carriage: Int) = carriage + 1
