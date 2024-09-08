@@ -93,6 +93,7 @@ object GraphEditor {
 
     private var inTutorialMode = false
 
+
     private val textBox = TextInput()
 
     private val nodeColor = LorenzColor.BLUE.addOpacity(200)
