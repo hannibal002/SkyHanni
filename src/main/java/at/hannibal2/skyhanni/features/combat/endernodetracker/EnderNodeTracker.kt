@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -211,36 +212,36 @@ object EnderNodeTracker {
         else -> null
     }
 
-    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<Renderable> {
         val lootProfit = getLootProfit(data)
 
-        addAsSingletonList("§5§lEnder Node Tracker")
-        addAsSingletonList("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
-        addAsSingletonList("§6${lootProfit.values.sum().shortFormat()} Coins made")
-        addAsSingletonList(" ")
-        addAsSingletonList("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest")
+        addString("§5§lEnder Node Tracker")
+        addString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
+        addString("§6${lootProfit.values.sum().shortFormat()} Coins made")
+        addString(" ")
+        addString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest")
 
         for (item in EnderNode.entries.subList(0, 11)) {
             val count = (data.lootCount[item] ?: 0).addSeparators()
             val profit = (lootProfit[item] ?: 0.0).shortFormat()
-            addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
+            addString("§b$count ${item.displayName} §7(§6$profit§7)")
         }
-        addAsSingletonList(" ")
+        addString(" ")
 
         val totalEnderArmor = calculateEnderArmor(data)
-        addAsSingletonList(
+        addString(
             "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
                 "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)"
         )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (data.lootCount[item] ?: 0).addSeparators()
             val profit = (lootProfit[item] ?: 0.0).shortFormat()
-            addAsSingletonList("§b$count ${item.displayName} §7(§6$profit§7)")
+            addString("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         // enderman pet rarities
         val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
         val profit = EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
-        addAsSingletonList("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
+        addString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
     private fun calculateEnderArmor(storage: Data) =
@@ -248,10 +249,10 @@ object EnderNodeTracker {
             .map { it.value }
             .sum()
 
-    private fun formatDisplay(map: List<List<Any>>): List<List<Any>> {
+    private fun formatDisplay(map: List<Renderable>): List<Renderable> {
         if (!ProfileStorageData.loaded) return emptyList()
 
-        val newList = mutableListOf<List<Any>>()
+        val newList = mutableListOf<Renderable>()
         for (index in config.textFormat.get()) {
             // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
