@@ -48,8 +48,9 @@ public class MiscConfig {
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
-    @ConfigOption(name = "Potion Effects", desc = "")
+    @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
+    // TODO rename nonGodPotEffect
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
 
     @Expose
