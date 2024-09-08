@@ -998,12 +998,15 @@ interface Renderable {
                 textInput.registerToEvent(key) {
                     // null = ignored, never filtered
                     list = content.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys
+                    scroll = createScroll()
                 }
             }
 
             private val virtualHeight = list.sumOf { it.height }
 
-            private val scroll = ScrollInput.Companion.Vertical(
+            private var scroll = createScroll()
+
+            private fun createScroll() = ScrollInput.Companion.Vertical(
                 scrollValue,
                 0,
                 virtualHeight - height,
@@ -1153,13 +1156,18 @@ interface Renderable {
             private val end get() = scroll.asInt() + height - yPadding - 1
 
             init {
+                val header = map.keys.first().takeIf { hasHeader }
                 textInput.registerToEvent(key) {
                     // null = ignored, never filtered
-                    content = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+                    content =
+                        map.filter { it.key == header || it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+                    scroll = createScroll()
                 }
             }
 
-            private val scroll = ScrollInput.Companion.Vertical(
+            private var scroll = createScroll()
+
+            private fun createScroll() = ScrollInput.Companion.Vertical(
                 scrollValue,
                 if (hasHeader) yOffsets[1] else 0,
                 virtualHeight - height,
@@ -1176,7 +1184,7 @@ interface Renderable {
                 if (hasHeader) {
                     for ((index, renderable) in content[0].withIndex()) {
                         GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
-                        renderable?.renderXYAligned(
+                        renderable.renderXYAligned(
                             posX + xOffsets[index],
                             posY + renderY,
                             xOffsets[index + 1] - xOffsets[index],
@@ -1331,7 +1339,7 @@ interface Renderable {
                     uMax,
                     vMin,
                     vMax,
-                    GL11.GL_NEAREST
+                    GL11.GL_NEAREST,
                 )
                 GlStateManager.color(1f, 1f, 1f, 1f)
 
@@ -1370,7 +1378,7 @@ interface Renderable {
                     uMax,
                     vMin,
                     vMax,
-                    GL11.GL_NEAREST
+                    GL11.GL_NEAREST,
                 )
                 GlStateManager.color(1f, 1f, 1f, 1f)
             }
