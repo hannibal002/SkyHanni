@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -85,7 +86,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             display = getSharedTracker()?.let {
                 val get = it.get(getDisplayMode())
                 val rawList = drawDisplay(get)
-                buildFinalDisplay(rawList, , displayModeToggleable)
+                buildFinalDisplay(rawList, displayModeToggleable)
             } ?: emptyList()
             dirty = false
         }
@@ -97,12 +98,12 @@ open class SkyHanniTracker<Data : TrackerData>(
         dirty = true
     }
 
-    private fun buildFinalDisplay(rawList: List<List<Any>>, displayModeToggleable: Boolean) = rawList.toMutableList().also {
+    private fun buildFinalDisplay(rawList: List<Renderable>, displayModeToggleable: Boolean) = rawList.toMutableList().also {
         if (it.isEmpty()) return@also
         if (inventoryOpen && displayModeToggleable) {
             it.add(1, buildDisplayModeView())
             if (getDisplayMode() == DisplayMode.SESSION) {
-                it.addAsSingletonList(buildSessionResetButton())
+                it.add(buildSessionResetButton())
             }
         }
     }
