@@ -79,6 +79,7 @@ object GraphEditor {
                 activeNode?.name?.let {
                     textBox.textBox = it
                 }
+
                 textBox.makeActive()
             } else {
                 textBox.clear()
@@ -87,6 +88,7 @@ object GraphEditor {
         }
 
     private var inTutorialMode = false
+
 
     private val textBox = TextInput()
 

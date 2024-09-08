@@ -5,14 +5,15 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -99,8 +100,8 @@ object MythologicalCreatureTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§7Mythological Creature Tracker:")
+    private fun drawDisplay(data: Data): List<Renderable> = buildList {
+        addString("§7Mythological Creature Tracker:")
         val total = data.count.sumAllValues()
         for ((creatureType, amount) in data.count.entries.sortedByDescending { it.value }) {
             val percentageSuffix = if (config.showPercentage.get()) {
@@ -108,10 +109,10 @@ object MythologicalCreatureTracker {
                 " §7$percentage"
             } else ""
 
-            addAsSingletonList(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
+            addString(" §7- §e${amount.addSeparators()} ${creatureType.displayName}$percentageSuffix")
         }
-        addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
-        addAsSingletonList(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
+        addString(" §7- §e${total.addSeparators()} §7Total Mythological Creatures")
+        addString(" §7- §e${data.creaturesSinceLastInquisitor.addSeparators()} §7Creatures since last Minos Inquisitor")
     }
 
     @SubscribeEvent
