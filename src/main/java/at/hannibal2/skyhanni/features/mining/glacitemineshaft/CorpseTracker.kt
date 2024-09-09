@@ -6,14 +6,14 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -72,8 +72,8 @@ object CorpseTracker {
         }
     }
 
-    private fun drawDisplay(bucketData: BucketData): List<List<Any>> = buildList {
-        addAsSingletonList("§b§lGlacite Corpse Profit Tracker")
+    private fun drawDisplay(bucketData: BucketData): List<Renderable> = buildList {
+        addString("§b§lGlacite Corpse Profit Tracker")
         addAll(tracker.addBucketSelectors(bucketData, "Corpse Type"))
 
         var profit = tracker.drawItems(bucketData, { true }, this)
@@ -103,7 +103,7 @@ object CorpseTracker {
             if (totalKeyCount > 0) {
                 val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.itemName else "§eCorpse Keys"
                 val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
-                addAsSingletonList(
+                add(
                     if (applicableKeys.count() == 1) Renderable.string(keyFormat)
                     else Renderable.hoverTips(
                         keyFormat,
@@ -112,7 +112,7 @@ object CorpseTracker {
                 )
             }
 
-            addAsSingletonList(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
+            add(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
         }
 
         tracker.addPriceFromButton(this)
