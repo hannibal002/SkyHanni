@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -34,26 +33,11 @@ object GuardianReminder {
     private var lastWarn = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
-    private val patternGroup = RepoPattern.group("enchanting.experiments.guardianreminder")
-    private val inventoryNamePattern by patternGroup.pattern(
-        "mainmenu",
-        "Experimentation Table",
-    )
-
-    /**
-     * REGEX-TEST: §dGuardian
-     * REGEX-TEST: §9Guardian§e
-     */
-    private val petNamePattern by patternGroup.pattern(
-        "guardianpet",
-        "§[956d]Guardian.*",
-    )
-
     @SubscribeEvent
     fun onInventory(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (!inventoryNamePattern.matches(event.inventoryName)) return
-        if (petNamePattern.matches(PetAPI.currentPet)) return
+        if (event.inventoryName != "Experimentation Table") return
+        if (ExperimentationTableAPI.petNamePattern.matches(PetAPI.currentPet)) return
 
         lastInventoryOpen = SimpleTimeMark.now()
 
@@ -70,7 +54,7 @@ object GuardianReminder {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (!inventoryNamePattern.matches(InventoryUtils.openInventoryName())) return
+        if (InventoryUtils.openInventoryName() != "Experimentation Table") return
         if (lastInventoryOpen.passedSince() > 2.seconds) return
         val gui = Minecraft.getMinecraft().currentScreen as? GuiContainer ?: return
 

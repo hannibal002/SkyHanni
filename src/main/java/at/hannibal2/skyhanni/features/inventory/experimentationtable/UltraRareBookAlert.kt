@@ -5,10 +5,11 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.bookPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.ultraRarePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils.createSound
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
@@ -32,16 +32,6 @@ object UltraRareBookAlert {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
     private val dragonSound by lazy { createSound("mob.enderdragon.growl", 1f) }
-
-    private val patternGroup = RepoPattern.group("enchanting.experiments.ultrararebookalert")
-    val ultraRarePattern by patternGroup.pattern(
-        "inventory.experimentstable.ultrarare",
-        "§d§kXX§5 ULTRA-RARE BOOK! §d§kXX",
-    )
-    val bookPattern by patternGroup.pattern(
-        "inventory.experimentstable.book",
-        "§9(?<enchant>.*)",
-    )
 
     private var enchantsFound = false
 
@@ -101,5 +91,5 @@ object UltraRareBookAlert {
     }
 
     private fun isEnabled() =
-        config.ultraRareBookAlert && LorenzUtils.inSkyBlock && InventoryUtils.getCurrentExperiment() != null
+        LorenzUtils.inSkyBlock && config.ultraRareBookAlert && ExperimentationTableAPI.getCurrentExperiment() != null
 }

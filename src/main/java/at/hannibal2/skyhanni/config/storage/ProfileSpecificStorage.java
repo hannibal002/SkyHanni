@@ -65,18 +65,24 @@ public class ProfileSpecificStorage {
     public String currentPet = "";
 
     @Expose
-    public ExperimentsDryStreakStorage dryStreakStorage = new ExperimentsDryStreakStorage();
+    public ExperimentationStorage experimentationStorage = new ExperimentationStorage();
 
-    public static class ExperimentsDryStreakStorage {
-        @Expose
-        public int attemptsSince = 0;
+    public static class ExperimentationStorage {
 
         @Expose
-        public int xpSince = 0;
+        public ExperimentsDryStreakStorage dryStreakStorage = new ExperimentsDryStreakStorage();
+
+        public static class ExperimentsDryStreakStorage {
+            @Expose
+            public int attemptsSince = 0;
+
+            @Expose
+            public int xpSince = 0;
+        }
+
+        @Expose
+        public ExperimentsProfitTracker.Data experimentsProfitTracker = new ExperimentsProfitTracker.Data();
     }
-
-    @Expose
-    public ExperimentsProfitTracker.Data experimentsProfitTracker = new ExperimentsProfitTracker.Data();
 
     @Expose
     public ChocolateFactoryStorage chocolateFactory = new ChocolateFactoryStorage();

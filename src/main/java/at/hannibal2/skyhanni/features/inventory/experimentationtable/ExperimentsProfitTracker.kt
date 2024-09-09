@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.inventory.ExperimentationTableConfig.ExperimentMessages
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -10,7 +9,12 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsDryStreakDisplay.experimentInventoriesPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottlePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentsDropPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.inventoriesPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableEnums.ExperimentMessages
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -29,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
@@ -46,7 +49,7 @@ object ExperimentsProfitTracker {
     private val tracker = SkyHanniItemTracker(
         "Experiments Profit Tracker",
         { Data() },
-        { it.experimentsProfitTracker },
+        { it.experimentationStorage.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
     private var inExperimentationTable = false
@@ -55,42 +58,6 @@ object ExperimentsProfitTracker {
     private var lastSplashTime = SimpleTimeMark.farPast()
     private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
     private var currentBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
-
-    private val patternGroup = RepoPattern.group("enchanting.experiments.profittracker")
-
-    /**
-     * REGEX-TEST:  +Smite VII
-     * REGEX-TEST:  +42,000 Enchanting Exp
-     */
-    private val experimentsDropPattern by patternGroup.pattern(
-        "drop",
-        "^ \\+(?<reward>.*)\$",
-    )
-
-    /**
-     * REGEX-TEST: 131k Enchanting Exp
-     * REGEX-TEST: 42,000 Enchanting Exp
-     */
-    private val enchantingExpPattern by patternGroup.pattern(
-        "exp",
-        "(?<amount>\\d+|\\d+,\\d+)k? Enchanting Exp",
-    )
-
-    /**
-     * REGEX-TEST: Titanic Experience Bottle
-     */
-    private val experienceBottlePattern by patternGroup.pattern(
-        "xpbottle",
-        "(?:Titanic |Grand |\\b)Experience Bottle",
-    )
-
-    /**
-     * REGEX-TEST: ☕ You renewed the experiment table! (1/3)
-     */
-    private val experimentRenewPattern by patternGroup.pattern(
-        "renew",
-        "^☕ You renewed the experiment table! \\((?<current>\\d)/3\\)$",
-    )
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -180,7 +147,7 @@ object ExperimentsProfitTracker {
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
-        if (experimentInventoriesPattern.matches(event.inventoryName)) {
+        if (inventoriesPattern.matches(event.inventoryName)) {
             inExperimentationTable = true
             if (lastSplashTime.passedSince() < 30.seconds) {
                 var startCostTemp = 0
@@ -209,7 +176,7 @@ object ExperimentsProfitTracker {
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
-        if (InventoryUtils.getCurrentExperiment() != null) {
+        if (ExperimentationTableAPI.getCurrentExperiment() != null) {
             lastExperimentTime = SimpleTimeMark.now()
             tracker.modify {
                 it.experimentsDone++
@@ -298,5 +265,5 @@ object ExperimentsProfitTracker {
 
     fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
-    fun isEnabled() = config.enabled && LorenzUtils.inSkyBlock
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
