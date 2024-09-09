@@ -1,7 +1,10 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
@@ -83,6 +86,36 @@ internal object RenderableUtils {
         fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
         GlStateManager.scale(inverseScale, inverseScale, 1.0)
         GlStateManager.translate(-1.0, -1.0, 0.0)
+    }
+
+    // TODO move to RenderableUtils
+    inline fun MutableList<Searchable>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                ChatUtils.lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(
+            Renderable.horizontalContainer(
+                buildList {
+                    addString(prefix)
+                    addString("§a[")
+                    if (tips.isEmpty()) {
+                        add(Renderable.link("§e$getName", false, onClick))
+                    } else {
+                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                    }
+                    addString("§a]")
+                },
+            ).toSearchable(),
+        )
     }
 }
 

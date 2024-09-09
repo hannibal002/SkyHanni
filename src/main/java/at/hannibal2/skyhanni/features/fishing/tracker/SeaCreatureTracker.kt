@@ -9,15 +9,15 @@ import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -71,8 +71,8 @@ object SeaCreatureTracker {
         return map
     }
 
-    private fun drawDisplay(data: Data): List<Renderable> = buildList {
-        addString("§7Sea Creature Tracker:")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§7Sea Creature Tracker:")
 
         val filter: (String) -> Boolean = addCategories(data)
         val realAmount = data.amount.filter { filter(it.key) }
@@ -94,12 +94,12 @@ object SeaCreatureTracker {
                 " §7$percentage"
             } else ""
 
-            addString(" §7- §e${amount.addSeparators()} $displayName$percentageSuffix")
+            addSearchString(" §7- §e${amount.addSeparators()} $displayName$percentageSuffix", displayName)
         }
-        addString(" §7- §e${total.addSeparators()} §7Total Sea Creatures")
+        addSearchString(" §7- §e${total.addSeparators()} §7Total Sea Creatures")
     }
 
-    private fun MutableList<Renderable>.addCategories(data: Data): (String) -> Boolean {
+    private fun MutableList<Searchable>.addCategories(data: Data): (String) -> Boolean {
         val amounts = getCurrentCategories(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {

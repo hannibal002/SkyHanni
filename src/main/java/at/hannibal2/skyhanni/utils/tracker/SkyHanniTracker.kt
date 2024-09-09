@@ -13,6 +13,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -22,8 +24,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
-    // TODO change to renderable
-    private val drawDisplay: (Data) -> List<Renderable>,
+    private val drawDisplay: (Data) -> List<Searchable>,
 ) {
 
     private var inventoryOpen = false
@@ -83,9 +84,9 @@ open class SkyHanniTracker<Data : TrackerData>(
 
         if (dirty || TrackerManager.dirty) {
             display = getSharedTracker()?.let {
-                val get = it.get(getDisplayMode())
-                val rawList = drawDisplay(get)
-                buildFinalDisplay(rawList)
+                val data = it.get(getDisplayMode())
+                val searchables = drawDisplay(data)
+                buildFinalDisplay(searchables.buildSearchBox())
             } ?: emptyList()
             dirty = false
         }
@@ -97,13 +98,14 @@ open class SkyHanniTracker<Data : TrackerData>(
         dirty = true
     }
 
-    private fun buildFinalDisplay(rawList: List<Renderable>) = rawList.toMutableList().also {
-        if (it.isEmpty()) return@also
+    private fun buildFinalDisplay(searchBox: Renderable) = buildList {
+        add(searchBox)
+        if (isEmpty()) return@buildList
         if (inventoryOpen) {
-            it.add(1, buildDisplayModeView())
+            add(buildDisplayModeView())
         }
         if (inventoryOpen && getDisplayMode() == DisplayMode.SESSION) {
-            it.add(buildSessionResetButton())
+            add(buildSessionResetButton())
         }
     }
 
