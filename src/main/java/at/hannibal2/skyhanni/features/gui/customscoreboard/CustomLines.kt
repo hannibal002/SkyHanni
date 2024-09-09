@@ -1,35 +1,35 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Area
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Bits
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.BitsAvailable
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Date
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Island
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Pitch
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Purse
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Time
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.XCoord
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.YCoord
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Yaw
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.Year
-import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ZCoord
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementArea
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementBits
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementBitsAvailable
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementDate
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementIsland
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementPitch
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementPurse
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementTime
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementXCoord
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementYCoord
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementYaw
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementYear
+import at.hannibal2.skyhanni.features.gui.customscoreboard.replacements.ScoreboardReplacementZCoord
 
 object CustomLines {
 
     internal val replacements = listOf(
-        XCoord,
-        YCoord,
-        ZCoord,
-        Yaw,
-        Pitch,
-        Purse,
-        Bits,
-        BitsAvailable,
-        Island,
-        Area,
-        Date,
-        Year,
-        Time,
+        ScoreboardReplacementXCoord,
+        ScoreboardReplacementYCoord,
+        ScoreboardReplacementZCoord,
+        ScoreboardReplacementYaw,
+        ScoreboardReplacementPitch,
+        ScoreboardReplacementPurse,
+        ScoreboardReplacementBits,
+        ScoreboardReplacementBitsAvailable,
+        ScoreboardReplacementIsland,
+        ScoreboardReplacementArea,
+        ScoreboardReplacementDate,
+        ScoreboardReplacementYear,
+        ScoreboardReplacementTime,
     )
 
     internal fun String.handleCustomLine(): List<String> = this.replace("&&", "§").replaceWithReplacements()
