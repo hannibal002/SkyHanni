@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -152,6 +153,8 @@ object TunnelsMaps {
 
     private val ROYAL_PIGEON by lazy { "ROYAL_PIGEON".asInternalName() }
 
+    private var isCommission = false
+
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
@@ -180,7 +183,14 @@ object TunnelsMaps {
         }.toMap()
         if (config.autoCommission) {
             clickTranslate.values.firstOrNull()?.let {
+                isCommission = true
                 setActiveAndGoal(it)
+            } ?: run {
+                if (isCommission) {
+                    active = ""
+                    clearPath()
+                    isCommission = false
+                }
             }
         }
     }
@@ -198,6 +208,7 @@ object TunnelsMaps {
         if (!isEnabled()) return
         if (event.clickedButton != 1) return
         clickTranslate[event.slotId]?.let {
+            isCommission = true
             setActiveAndGoal(it)
         }
     }
@@ -274,16 +285,17 @@ object TunnelsMaps {
                             ),
                         )
                     } else {
-                        add(Renderable.string(""))
+                        addString("")
                     }
                 }
             } else {
-                add(Renderable.string(""))
-                add(Renderable.string(""))
+                addString("")
+                addString("")
             }
             addAll(locationDisplay)
         }
-        config.position.renderRenderables(display, posLabel = "TunnelsMaps")
+        config.position.renderRenderables(display, posLabel = "Tunnels Maps")
+
     }
 
     private fun generateLocationsDisplay() = buildList {
@@ -361,6 +373,7 @@ object TunnelsMaps {
     }
 
     private fun guiSetActive(it: String): () -> Unit = {
+        isCommission = false
         setActiveAndGoal(it)
     }
 

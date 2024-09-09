@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import java.util.regex.Pattern
@@ -18,10 +19,7 @@ object UnknownLinesHandler {
     fun handleUnknownLines() {
         val sidebarLines = CustomScoreboard.activeLines
 
-        var unknownLines = sidebarLines
-            .map { it.removeResets() }
-            .filter { it.isNotBlank() }
-            .filter { it.trim().length > 3 }
+        var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
         /**
          * Remove known lines with patterns
@@ -119,12 +117,15 @@ object UnknownLinesHandler {
             SbPattern.riftHotdogEatenPattern,
             SbPattern.mineshaftNotStartedPattern,
             SbPattern.queuePattern,
+            SbPattern.queueTierPattern,
             SbPattern.queuePositionPattern,
             SbPattern.fortunateFreezingBonusPattern,
             SbPattern.riftAveikxPattern,
             SbPattern.riftHayEatenPattern,
             SbPattern.fossilDustPattern,
             SbPattern.cluesPattern,
+            SbPattern.barryProtestorsQuestlinePattern,
+            SbPattern.barryProtestorsHandledPattern,
             SbPattern.carnivalPattern,
             SbPattern.carnivalTasksPattern,
             SbPattern.carnivalTokensPattern,
@@ -211,7 +212,9 @@ object UnknownLinesHandler {
         unknownLines = unknownLines.filter { it !in unknownLinesSet }
 
         unknownLines.forEach {
-            ChatUtils.debug("Unknown Scoreboard line: '$it'")
+            if (LorenzUtils.inSkyBlock) {
+                ChatUtils.debug("Unknown Scoreboard line: '$it'")
+            }
             unknownLinesSet.add(it)
         }
     }
