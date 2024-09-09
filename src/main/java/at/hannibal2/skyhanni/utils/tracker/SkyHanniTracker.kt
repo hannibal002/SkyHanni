@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -105,7 +104,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (inventoryOpen && displayModeToggleable) {
             add(buildDisplayModeView())
             if (getDisplayMode() == DisplayMode.SESSION) {
-                it.add(buildSessionResetButton())
+                add(buildSessionResetButton())
             }
         }
     }
