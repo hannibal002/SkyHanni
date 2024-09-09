@@ -568,8 +568,10 @@ interface Renderable {
 
             val textBoxHeight = (9 * scale).toInt() + 1
 
+            val isTextBoxEmpty get() = textInput.textBox.isEmpty()
+
             override var width: Int = content.width
-            override val height: Int = content.height + ySpacing + textBoxHeight
+            override var height: Int = content.height + if (hideIfNoText && isTextBoxEmpty) 0 else (ySpacing + textBoxHeight)
             override val horizontalAlign = content.horizontalAlign
             override val verticalAlign = content.verticalAlign
 
@@ -577,24 +579,39 @@ interface Renderable {
 
             init {
                 textInput.registerToEvent(key) {
+                    var shouldUpdate = false
+                    if (hideIfNoText) {
+                        if (isTextBoxEmpty) {
+                            if (height != content.height) {
+                                height = content.height
+                                shouldUpdate = true
+                            }
+                        } else {
+                            if (height == content.height) {
+                                height = content.height + ySpacing + textBoxHeight
+                                shouldUpdate = true
+                            }
+                        }
+                    }
                     val searchWidth = searchWidth
                     if (searchWidth > width) {
                         width = searchWidth
-                        onUpdateSize(this)
+                        shouldUpdate = true
                     } else {
                         if (width > content.width) {
                             width = maxOf(content.width, searchWidth)
-                            onUpdateSize(this)
+                            shouldUpdate = true
                         }
+                    }
+                    if (shouldUpdate) {
+                        onUpdateSize(this)
                     }
                 }
             }
 
             override fun render(posX: Int, posY: Int) {
-                if (shouldRenderTopElseBottom) {
-                    if (!(hideIfNoText && textInput.textBox.isEmpty())) {
-                        RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
-                    }
+                if (shouldRenderTopElseBottom && !(hideIfNoText && isTextBoxEmpty)) {
+                    RenderableUtils.renderString(searchPrefix + textInput.editText(), scale, color)
                     GlStateManager.translate(0f, (ySpacing + textBoxHeight).toFloat(), 0f)
                 }
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
@@ -613,7 +630,9 @@ interface Renderable {
                 } else {
                     textInput.disable()
                 }
-                if (!shouldRenderTopElseBottom) {
+                if (hideIfNoText && isTextBoxEmpty) {
+                    content.render(posX, posY)
+                } else if (!shouldRenderTopElseBottom) {
                     content.render(posX, posY)
                     GlStateManager.translate(0f, (ySpacing).toFloat(), 0f)
                     if (!(hideIfNoText && textInput.textBox.isEmpty())) {

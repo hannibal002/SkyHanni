@@ -5,14 +5,13 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -24,7 +23,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    drawDisplay: (Data) -> List<List<Any>>,
+    drawDisplay: (Data) -> List<Renderable>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
     companion object {
@@ -61,7 +60,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addPriceFromButton(lists: MutableList<List<Any>>) {
+    fun addPriceFromButton(lists: MutableList<Renderable>) {
         if (isInventoryOpen()) {
             lists.addSelector<ItemPriceSource>(
                 "",
@@ -78,7 +77,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     fun drawItems(
         data: Data,
         filter: (NEUInternalName) -> Boolean,
-        lists: MutableList<List<Any>>,
+        lists: MutableList<Renderable>,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NEUInternalName, Long>()
@@ -86,8 +85,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (!filter(internalName)) continue
 
             val amount = itemProfit.totalAmount
-            val pricePer =
-                if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
+            val pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
             val price = (pricePer * amount).toLong()
             val hidden = itemProfit.hidden
 
@@ -151,11 +149,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 },
             ) else Renderable.string(displayName)
 
-            lists.addAsSingletonList(renderable)
+            lists.add(renderable)
         }
         if (hiddenItemTexts.size > 0) {
             val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts)
-            lists.addAsSingletonList(text)
+            lists.add(text)
         }
 
         return profit
