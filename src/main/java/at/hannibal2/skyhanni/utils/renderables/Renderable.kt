@@ -1024,10 +1024,8 @@ interface Renderable {
 
             private fun filterList(): Set<Renderable> {
                 val keys = content.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys
-                if (keys.isEmpty()) {
-                    return setOf(Renderable.string("§cNo search results!"))
-                } else {
-                    return keys
+                return keys.ifEmpty {
+                    setOf(string("§cNo search results!"))
                 }
             }
 
