@@ -106,9 +106,9 @@ object GraphEditor {
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
-    val scrollValue = ScrollValue()
-    val textInput = TextInput()
-    var nodesDisplay = emptyList<Searchable>()
+    private val scrollValue = ScrollValue()
+    private val textInput = TextInput()
+    private var nodesDisplay = emptyList<Searchable>()
     var lastUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)

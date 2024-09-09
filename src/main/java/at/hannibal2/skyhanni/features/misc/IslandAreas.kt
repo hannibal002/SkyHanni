@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -13,7 +14,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -23,8 +24,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,14 +38,15 @@ object IslandAreas {
 
     private var nodes = mapOf<GraphNode, Double>()
     private var paths = mapOf<GraphNode, Graph>()
-    private var display = listOf<Renderable>()
+    private var display: Renderable? = null
     private var targetNode: GraphNode? = null
     private var currentAreaName = ""
+    private val textInput = TextInput()
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         nodes = emptyMap()
-        display = emptyList()
+        display = null
         targetNode = null
     }
 
@@ -87,7 +92,7 @@ object IslandAreas {
     }
 
     private fun update() {
-        display = buildDisplay()
+        display = buildDisplay().buildSearchBox(textInput)
     }
 
     @SubscribeEvent
@@ -96,7 +101,9 @@ object IslandAreas {
         if (!config.pathfinder.enabled) return
         if (!config.pathfinder.showAlways) return
 
-        config.pathfinder.position.renderRenderables(display, posLabel = "Island Areas")
+        display?.let {
+            config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
+        }
     }
 
     @SubscribeEvent
@@ -104,10 +111,12 @@ object IslandAreas {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
 
-        config.pathfinder.position.renderRenderables(display, posLabel = "Island Areas")
+        display?.let {
+            config.pathfinder.position.renderRenderable(it, posLabel = "Island Areas")
+        }
     }
 
-    private fun buildDisplay() = buildList<Renderable> {
+    private fun buildDisplay() = buildList<Searchable> {
         val closedNote = IslandGraphs.closedNote ?: return@buildList
         val playerDiff = closedNote.position.distanceToPlayer()
 
@@ -150,9 +159,9 @@ object IslandAreas {
                 val inAnArea = name != "no_area"
                 if (config.pathfinder.includeCurrentArea) {
                     if (inAnArea) {
-                        addString("§eCurrent area: $coloredName")
+                        addSearchString("§eCurrent area: $coloredName")
                     } else {
-                        addString("§cNot in an area!")
+                        addSearchString("§cNot in an area!")
                     }
                 }
                 if (name != currentAreaName) {
@@ -162,7 +171,7 @@ object IslandAreas {
                     currentAreaName = name
                 }
 
-                addString("§eAreas nearby:")
+                addSearchString("§eAreas nearby:")
                 continue
             }
 
@@ -192,7 +201,7 @@ object IslandAreas {
                             setTarget(node)
                         }
                     },
-                ),
+                ).toSearchable(name),
             )
         }
     }

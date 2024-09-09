@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
@@ -33,6 +34,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var dirty = false
+    private val textInput = TextInput()
 
     companion object {
 
@@ -86,7 +88,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             display = getSharedTracker()?.let {
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
-                buildFinalDisplay(searchables.buildSearchBox())
+                buildFinalDisplay(searchables.buildSearchBox(textInput))
             } ?: emptyList()
             dirty = false
         }
