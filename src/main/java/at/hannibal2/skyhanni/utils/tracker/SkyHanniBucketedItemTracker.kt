@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -15,13 +15,15 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
     name: String,
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
-    drawDisplay: (BucketedData) -> List<Renderable>,
+    drawDisplay: (BucketedData) -> List<Searchable>,
 ) : SkyHanniTracker<BucketedData>(name, createNewSession, getStorage, drawDisplay) {
 
     companion object {
@@ -50,9 +52,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         }
     }
 
-    fun addPriceFromButton(lists: MutableList<Renderable>) {
+    fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addSelector<ItemPriceSource>(
+            lists.addSearchableSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.sellName },
                 isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
@@ -64,34 +66,30 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         }
     }
 
-    fun addBucketSelectors(data: BucketedData, sourceString: String = "") = buildList {
+    inline fun <reified F : Enum<F>> addBucketSelectorsReified(
+        lists: MutableList<Searchable>,
+        data: BucketedData,
+        sourceString: String = "",
+    ) {
         if (isInventoryOpen()) {
-            addAll(
-                listOf(
-                    Renderable.string("§7${if (sourceString != "") sourceString else "Item Source"}: "),
-                    Renderable.optionalLink(
-                        if (data.getSelectedBucket() == null) "§a§l[§r§aAll§r§a§l]" else "§e[All]",
-                        { data.selectBucket(null); update(); },
-                    ) { data.getSelectedBucket() != null },
-                ),
+            val sourceStringPrefix = sourceString.takeIf { it.isNotEmpty() } ?: "Item Source"
+            lists.addSearchableSelector<F>(
+                sourceStringPrefix,
+                getName = { bucket -> bucket.toString() },
+                isCurrent = { data.getSelectedBucket() == it },
+                onChange = {
+                    @Suppress("UNCHECKED_CAST")
+                    data.selectBucket(it as E?)
+                    update()
+                },
             )
-            data.getPoppedBuckets().chunked(3).forEach { bucketChunk ->
-                addAll(
-                    bucketChunk.map {
-                        Renderable.optionalLink(
-                            if (data.getSelectedBucket() == it) "§a§l[§r$it§r§a§l] " else "§e[§r$it§e] ",
-                            { data.selectBucket(it); update(); },
-                        ) { data.getSelectedBucket() != it }
-                    },
-                )
-            }
         }
     }
 
     fun drawItems(
         data: BucketedData,
         filter: (NEUInternalName) -> Boolean,
-        lists: MutableList<Renderable>,
+        lists: MutableList<Searchable>,
     ): Double {
         var profit = 0.0
         val dataItems = data.getItemsProp()
@@ -165,10 +163,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                 },
             ) else Renderable.string(displayName)
 
-            lists.add(renderable)
+            lists.add(renderable.toSearchable(name))
         }
         if (hiddenItemTexts.size > 0) {
-            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts)
+            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
             lists.add(text)
         }
 
@@ -200,7 +198,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         }
     }
 
-    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
+    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Searchable {
         val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
@@ -211,6 +209,6 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         } else emptyList()
 
         val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        return Renderable.hoverTips(text, tips)
+        return Renderable.hoverTips(text, tips).toSearchable()
     }
 }

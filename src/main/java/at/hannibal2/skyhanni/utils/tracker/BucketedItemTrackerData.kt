@@ -54,11 +54,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     private var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
     private fun getBucket(bucket: E): MutableMap<NEUInternalName, TrackedItem> = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
-    fun getPoppedBuckets(): MutableList<E> = (bucketedItems.toMutableMap().filter { it.value.isNotEmpty() }.keys).toMutableList()
+    private fun getPoppedBuckets(): MutableList<E> = (bucketedItems.toMutableMap().filter { it.value.isNotEmpty() }.keys).toMutableList()
     fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let { getBucket(it) } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
-    fun selectBucket(type: E?) {
-        selectedBucket = type; }
+    fun selectBucket(type: E?) { selectedBucket = type; }
 
     private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {
         val flatMap: MutableMap<NEUInternalName, TrackedItem> = HashMap()

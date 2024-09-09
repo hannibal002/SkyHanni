@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -17,6 +17,8 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
@@ -72,9 +74,9 @@ object CorpseTracker {
         }
     }
 
-    private fun drawDisplay(bucketData: BucketData): List<Renderable> = buildList {
-        addString("§b§lGlacite Corpse Profit Tracker")
-        addAll(tracker.addBucketSelectors(bucketData, "Corpse Type"))
+    private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
+        addSearchString("§b§lGlacite Corpse Profit Tracker")
+        tracker.addBucketSelectorsReified<CorpseType>(this, bucketData, "Corpse Type")
 
         var profit = tracker.drawItems(bucketData, { true }, this)
 
@@ -104,11 +106,11 @@ object CorpseTracker {
                 val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.itemName else "§eCorpse Keys"
                 val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
                 add(
-                    if (applicableKeys.count() == 1) Renderable.string(keyFormat)
+                    if (applicableKeys.count() == 1) Renderable.string(keyFormat).toSearchable()
                     else Renderable.hoverTips(
                         keyFormat,
                         keyCostStrings,
-                    ),
+                    ).toSearchable(),
                 )
             }
 
