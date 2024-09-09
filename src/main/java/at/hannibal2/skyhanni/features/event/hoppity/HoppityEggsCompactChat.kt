@@ -45,9 +45,7 @@ object HoppityEggsCompactChat {
     }
 
     private fun sendCompact() {
-        if (hoppityEggChat.isNotEmpty()) {
-            ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
-        }
+        ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
         resetCompactData()
     }
 
