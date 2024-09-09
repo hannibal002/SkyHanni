@@ -33,7 +33,7 @@ public class CrimsonIsleConfig {
     public boolean minibossRespawnTimer = false;
 
     @Expose
-    @ConfigLink(owner = CrimsonIsleConfig.class, field = "minibossTimer")
+    @ConfigLink(owner = CrimsonIsleConfig.class, field = "minibossRespawnTimer")
     public Position minibossTimerPosition = new Position(20, 50);
 
     @Expose
