@@ -28,11 +28,6 @@ public class TitleAndFooterConfig {
     @Expose
     @ConfigOption(name = "Use Custom Title Outside SkyBlock", desc = "Use a custom title outside of SkyBlock.")
     @ConfigEditorBoolean
-    public boolean useCustomTitle = true;
-
-    @Expose
-    @ConfigOption(name = "Use Custom Title Outside SkyBlock", desc = "Use a custom title outside of SkyBlock.")
-    @ConfigEditorBoolean
     public boolean useCustomTitleOutsideSkyBlock = false;
 
     @Expose

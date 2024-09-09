@@ -18,6 +18,8 @@ object ScoreboardEventRift : ScoreboardEvent() {
         ScoreboardPattern.riftAveikxPattern,
         ScoreboardPattern.riftHayEatenPattern,
         ScoreboardPattern.cluesPattern,
+        ScoreboardPattern.barryProtestorsQuestlinePattern,
+        ScoreboardPattern.barryProtestorsHandledPattern,
     )
 
     override fun getDisplay() = patterns.allMatches(getSbLines())

@@ -264,5 +264,6 @@ object UnknownLinesHandler {
                 }
                 unknownLinesSet.add(it)
             }
+        }
     }
 }
