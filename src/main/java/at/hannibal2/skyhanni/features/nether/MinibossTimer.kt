@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.nether.MinibossTimer.MiniBoss.Companion.isSpawned
+import at.hannibal2.skyhanni.features.nether.MinibossTimer.MiniBoss.Companion.isSpawningSoon
 import at.hannibal2.skyhanni.features.nether.MinibossTimer.MiniBoss.Companion.isTimerKnown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -84,7 +86,7 @@ object MinibossTimer {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val renderable = display ?: drawDisplay()
-        config.minibossTimerPosition.renderRenderables(listOf(renderable), posLabel = "Miniboss Timer")
+        config.minibossTimerPosition.renderRenderable(renderable, posLabel = "Miniboss Timer")
     }
 
     @SubscribeEvent
@@ -153,15 +155,18 @@ object MinibossTimer {
                 buildString {
                     append("§b${it.displayName}: ")
                     if (it.isSpawned()) append("§aSPAWNED!")
-                    if (timer != null && timer.isInPast() && timer.passedSince() < 10.seconds) append("§6Soon!")
-                    else if (it.isTimerKnown()) append("§e${it.timer?.timeUntil()?.format()}")
-                    else if (possibleTimer != null) {
-                        val (start, end) = possibleTimer
-                        if (start.timeUntil().isNegative()) append("§e~Now - ")
-                        else append("§e~${start.timeUntil().format()} - ")
-                        if (end.timeUntil().isNegative()) append("§eNow")
-                        else append("§e${end.timeUntil().format()}")
-                    } else append("§cUnknown")
+                    else when {
+                        it.isSpawningSoon() -> append("§6Soon!")
+                        it.isTimerKnown() -> append("§e${timer?.timeUntil()?.format()}")
+                        possibleTimer != null -> {
+                            val (start, end) = possibleTimer
+                            if (start.timeUntil().isNegative()) append("§e~Now - ")
+                            else append("§e~${start.timeUntil().format()} - ")
+                            if (end.timeUntil().isNegative()) append("§eNow")
+                            else append("§e${end.timeUntil().format()}")
+                        }
+                        else -> append("§cUnknown")
+                    }
                 },
             )
         }
@@ -245,6 +250,12 @@ object MinibossTimer {
             fun MiniBoss.isTimerKnown(): Boolean {
                 val timer = timer ?: return false
                 return timer.passedSince() < 2.minutes + 5.seconds
+            }
+
+            fun MiniBoss.isSpawningSoon(): Boolean {
+                if (spawned == true) return false
+                val timer = timer ?: return false
+                return timer.passedSince() in 0.seconds..10.seconds
             }
 
             fun MiniBoss.isSpawned(): Boolean {
