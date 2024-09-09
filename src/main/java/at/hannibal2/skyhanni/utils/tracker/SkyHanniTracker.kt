@@ -7,13 +7,14 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -23,14 +24,13 @@ open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
-    // TODO change to renderable
-    private val drawDisplay: (Data) -> List<List<Any>>,
+    private val drawDisplay: (Data) -> List<Searchable>,
 ) {
 
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
-    private var display = emptyList<List<Any>>()
+    private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var dirty = false
 
@@ -84,25 +84,28 @@ open class SkyHanniTracker<Data : TrackerData>(
 
         if (dirty || TrackerManager.dirty) {
             display = getSharedTracker()?.let {
-                buildFinalDisplay(drawDisplay(it.get(getDisplayMode())))
+                val data = it.get(getDisplayMode())
+                val searchables = drawDisplay(data)
+                buildFinalDisplay(searchables.buildSearchBox())
             } ?: emptyList()
             dirty = false
         }
 
-        position.renderStringsAndItems(display, posLabel = name)
+        position.renderRenderables(display, posLabel = name)
     }
 
     fun update() {
         dirty = true
     }
 
-    private fun buildFinalDisplay(rawList: List<List<Any>>) = rawList.toMutableList().also {
-        if (it.isEmpty()) return@also
+    private fun buildFinalDisplay(searchBox: Renderable) = buildList {
+        add(searchBox)
+        if (isEmpty()) return@buildList
         if (inventoryOpen) {
-            it.add(1, buildDisplayModeView())
+            add(buildDisplayModeView())
         }
         if (inventoryOpen && getDisplayMode() == DisplayMode.SESSION) {
-            it.addAsSingletonList(buildSessionResetButton())
+            add(buildSessionResetButton())
         }
     }
 
@@ -121,15 +124,17 @@ open class SkyHanniTracker<Data : TrackerData>(
         },
     )
 
-    private fun buildDisplayModeView() = LorenzUtils.buildSelector<DisplayMode>(
-        "§7Display Mode: ",
-        getName = { type -> type.displayName },
-        isCurrent = { it == getDisplayMode() },
-        onChange = {
-            displayMode = it
-            storedTrackers[name] = it
-            update()
-        },
+    private fun buildDisplayModeView() = Renderable.horizontalContainer(
+        CollectionUtils.buildSelector<DisplayMode>(
+            "§7Display Mode: ",
+            getName = { type -> type.displayName },
+            isCurrent = { it == getDisplayMode() },
+            onChange = {
+                displayMode = it
+                storedTrackers[name] = it
+                update()
+            },
+        ),
     )
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
