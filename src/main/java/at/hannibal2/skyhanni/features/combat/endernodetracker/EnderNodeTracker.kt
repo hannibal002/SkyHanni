@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -212,36 +212,35 @@ object EnderNodeTracker {
         else -> null
     }
 
-    private fun drawDisplay(data: Data) = buildList<Renderable> {
+    private fun drawDisplay(data: Data) = buildList<Searchable> {
         val lootProfit = getLootProfit(data)
 
-        addString("§5§lEnder Node Tracker")
-        addString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
-        addString("§6${lootProfit.values.sum().shortFormat()} Coins made")
-        addString(" ")
-        addString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest")
+        addSearchString("§5§lEnder Node Tracker")
+        addSearchString("§d${data.totalNodesMined.addSeparators()} Ender Nodes mined")
+        addSearchString("§6${lootProfit.values.sum().shortFormat()} Coins made")
+        addSearchString(" ")
+        addSearchString("§b${data.totalEndermiteNests.addSeparators()} §cEndermite Nest", "Endermite Nest")
 
         for (item in EnderNode.entries.subList(0, 11)) {
             val count = (data.lootCount[item] ?: 0).addSeparators()
             val profit = (lootProfit[item] ?: 0.0).shortFormat()
-            addString("§b$count ${item.displayName} §7(§6$profit§7)")
+            addSearchString("§b$count ${item.displayName} §7(§6$profit§7)", item.displayName)
         }
-        addString(" ")
+        addSearchString(" ")
 
         val totalEnderArmor = calculateEnderArmor(data)
-        addString(
-            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " +
-                "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)"
+        addSearchString(
+            "§b${totalEnderArmor.addSeparators()} §5Ender Armor " + "§7(§6${(totalEnderArmor * 10_000).shortFormat()}§7)"
         )
         for (item in EnderNode.entries.subList(11, 16)) {
             val count = (data.lootCount[item] ?: 0).addSeparators()
             val profit = (lootProfit[item] ?: 0.0).shortFormat()
-            addString("§b$count ${item.displayName} §7(§6$profit§7)")
+            addSearchString("§b$count ${item.displayName} §7(§6$profit§7)")
         }
         // enderman pet rarities
         val (c, u, r, e, l) = EnderNode.entries.subList(16, 21).map { (data.lootCount[it] ?: 0).addSeparators() }
         val profit = EnderNode.entries.subList(16, 21).sumOf { lootProfit[it] ?: 0.0 }.shortFormat()
-        addString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
+        addSearchString("§f$c§7-§a$u§7-§9$r§7-§5$e§7-§6$l §fEnderman Pet §7(§6$profit§7)")
     }
 
     private fun calculateEnderArmor(storage: Data) =
@@ -249,10 +248,10 @@ object EnderNodeTracker {
             .map { it.value }
             .sum()
 
-    private fun formatDisplay(map: List<Renderable>): List<Renderable> {
+    private fun formatDisplay(map: List<Searchable>): List<Searchable> {
         if (!ProfileStorageData.loaded) return emptyList()
 
-        val newList = mutableListOf<Renderable>()
+        val newList = mutableListOf<Searchable>()
         for (index in config.textFormat.get()) {
             // TODO, change functionality to use enum rather than ordinals
             newList.add(map[index.ordinal])
