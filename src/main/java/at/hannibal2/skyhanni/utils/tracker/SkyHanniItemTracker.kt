@@ -1,17 +1,17 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.PriceFromEntry
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.test.PriceSource
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -23,27 +23,34 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    drawDisplay: (Data) -> List<List<Any>>,
+    drawDisplay: (Data) -> List<Renderable>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
 
     companion object {
-
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
 
-    fun addCoins(coins: Int) {
-        addItem(SKYBLOCK_COIN, coins)
-    }
-
-    fun addItem(internalName: NEUInternalName, amount: Int) {
+    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
         modify {
-            it.additem(internalName, amount)
+            it.addItem(internalName, amount, command)
         }
-        getSharedTracker()?.let {
-            val hidden = it.get(DisplayMode.TOTAL).items[internalName]!!.hidden
-            it.get(DisplayMode.SESSION).items[internalName]!!.hidden = hidden
+        getSharedTracker()?.let { sharedData ->
+            sharedData.get(DisplayMode.TOTAL).items[internalName]?.let { data ->
+                sharedData.get(DisplayMode.SESSION).items[internalName]!!.hidden = data.hidden
+            }
         }
 
+        if (command) {
+            TrackerManager.commandEditTrackerSuccess = true
+            val displayName = internalName.itemName
+            if (amount > 0) {
+                ChatUtils.chat("Manually added to $name: §r$displayName §7(${amount}x§7)")
+            } else {
+                ChatUtils.chat("Manually removed from $name: §r$displayName §7(${-amount}x§7)")
+            }
+            return
+        }
+        // TODO move the function to common
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
@@ -53,16 +60,16 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addPriceFromButton(lists: MutableList<List<Any>>) {
+    fun addPriceFromButton(lists: MutableList<Renderable>) {
         if (isInventoryOpen()) {
-            lists.addSelector<PriceSource>(
+            lists.addSelector<ItemPriceSource>(
                 "",
-                getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
+                getName = { type -> type.sellName },
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = PriceFromEntry.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update()
-                }
+                },
             )
         }
     }
@@ -70,7 +77,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     fun drawItems(
         data: Data,
         filter: (NEUInternalName) -> Boolean,
-        lists: MutableList<List<Any>>,
+        lists: MutableList<Renderable>,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NEUInternalName, Long>()
@@ -78,8 +85,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (!filter(internalName)) continue
 
             val amount = itemProfit.totalAmount
-            val pricePer =
-                if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
+            val pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
             val price = (pricePer * amount).toLong()
             val hidden = itemProfit.hidden
 
@@ -140,14 +146,14 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                     }
                     update()
 
-                }
+                },
             ) else Renderable.string(displayName)
 
-            lists.addAsSingletonList(renderable)
+            lists.add(renderable)
         }
         if (hiddenItemTexts.size > 0) {
             val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts)
-            lists.addAsSingletonList(text)
+            lists.add(text)
         }
 
         return profit
@@ -172,6 +178,12 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         add("§eClick to " + (if (hidden) "show" else "hide") + "!")
         add("§eControl + Click to remove this item!")
+
+        add("")
+        add("§7Use §e/shedittracker ${internalName.readableInternalName} <amount>")
+        add("§7to edit the number.")
+        add("§7Use negative numbers to remove items.")
+
         if (SkyHanniMod.feature.dev.debug.enabled) {
             add("")
             add("§7${internalName}")

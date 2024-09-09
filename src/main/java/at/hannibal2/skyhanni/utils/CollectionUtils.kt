@@ -143,6 +143,11 @@ object CollectionUtils {
         return newList
     }
 
+    inline fun <reified T, reified K : MutableList<T>> K.transformAt(index: Int, transform: T.() -> T): K {
+        this[index] = transform(this[index])
+        return this
+    }
+
     /**
      * This does not work inside a [buildList] block
      */
@@ -171,6 +176,7 @@ object CollectionUtils {
         add(Collections.singletonList(text))
     }
 
+    // TODO move to RenderableUtils
     fun MutableList<List<Renderable>>.addSingleString(text: String) {
         add(Collections.singletonList(Renderable.string(text)))
     }
@@ -283,10 +289,15 @@ object CollectionUtils {
         add(Renderable.itemStack(itemStack, scale = scale))
     }
 
+    fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
+        generateSequence(start) { it + 1 }.map { (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn }
+            .takeWhile { it <= end }
+
     fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
         addItemStack(internalName.getItemStack())
     }
 
+    // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
         prefix: String,
         getName: (T) -> String,
@@ -296,6 +307,7 @@ object CollectionUtils {
         add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
     }
 
+    // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
@@ -320,6 +332,7 @@ object CollectionUtils {
         }
     }
 
+    // TODO move to RenderableUtils
     inline fun MutableList<Renderable>.addButton(
         prefix: String,
         getName: String,
@@ -349,6 +362,7 @@ object CollectionUtils {
         )
     }
 
+    // TODO move to RenderableUtils
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
         if (this.isEmpty()) return xSpace
         val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)
@@ -423,5 +437,15 @@ object CollectionUtils {
 
     fun <K, V : Any> Map<K?, V>.filterNotNullKeys(): Map<K, V> {
         return filterKeys { it != null } as Map<K, V>
+    }
+
+    /**
+     * Inserts the element at the index or appends it to the end if out of bounds of the list.
+     *
+     * @param index index to insert at, or append if >= size
+     * @param element element to insert or add
+     */
+    fun <E> MutableList<E>.addOrInsert(index: Int, element: E) {
+        if (index < size) add(index, element) else add(element)
     }
 }
