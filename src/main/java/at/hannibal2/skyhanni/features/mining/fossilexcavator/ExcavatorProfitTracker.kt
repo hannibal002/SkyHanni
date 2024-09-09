@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -19,6 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
@@ -73,8 +75,8 @@ object ExcavatorProfitTracker {
 
     private val scrapItem get() = FossilExcavatorAPI.scrapItem
 
-    private fun drawDisplay(data: Data): List<Renderable> = buildList {
-        addString("§e§lFossil Excavation Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lFossil Excavation Profit Tracker")
         var profit = tracker.drawItems(data, { true }, this)
 
         val timesExcavated = data.timesExcavated
@@ -82,7 +84,7 @@ object ExcavatorProfitTracker {
             Renderable.hoverTips(
                 "§7Times excavated: §e${timesExcavated.addSeparators()}",
                 listOf("§7You excavated §e${timesExcavated.addSeparators()} §7times."),
-            ),
+            ).toSearchable(),
         )
 
         profit = addScrap(timesExcavated, profit)
@@ -98,7 +100,7 @@ object ExcavatorProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    private fun MutableList<Renderable>.addFossilDust(
+    private fun MutableList<Searchable>.addFossilDust(
         fossilDustGained: Long,
         profit: Double,
     ): Double {
@@ -116,12 +118,12 @@ object ExcavatorProfitTracker {
                     "",
                     "§7Price Per Fossil Dust: §6${pricePer.shortFormat()}",
                 ),
-            ),
+            ).toSearchable("Fossil Dust"),
         )
         return profit + fossilDustPrice
     }
 
-    private fun MutableList<Renderable>.addGlacitePowder(data: Data) {
+    private fun MutableList<Searchable>.addGlacitePowder(data: Data) {
         val glacitePowderGained = data.glacitePowderGained
         if (glacitePowderGained <= 0) return
         add(
@@ -131,11 +133,11 @@ object ExcavatorProfitTracker {
                     "§7No real profit,",
                     "§7but still nice to see! Right?",
                 ),
-            ),
+            ).toSearchable("Glacite Powder"),
         )
     }
 
-    private fun MutableList<Renderable>.addScrap(
+    private fun MutableList<Searchable>.addScrap(
         timesExcavated: Long,
         profit: Double,
     ): Double {
@@ -151,7 +153,7 @@ object ExcavatorProfitTracker {
                     "§7for all §e$timesExcavated $name",
                     "§7you have used.",
                 ),
-            ),
+            ).toSearchable("Scrap"),
         )
         return profit - scrapPrice
     }

@@ -99,8 +99,7 @@ interface Renderable {
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
-        ): Renderable =
-            link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
+        ): Renderable = link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
 
         fun link(
             renderable: Renderable,
@@ -164,9 +163,7 @@ interface Renderable {
             override val verticalAlign = render.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() &&
-                    shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()
-                ) {
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()) {
                     onClick()
                 }
                 render.render(posX, posY)
@@ -185,11 +182,8 @@ interface Renderable {
             override val verticalAlign = render.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() &&
-                    shouldAllowLink(true, bypassChecks)
-                ) for ((button, onClick) in click) {
-                    if ((button - 100).isKeyClicked())
-                        onClick()
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) for ((button, onClick) in click) {
+                    if ((button - 100).isKeyClicked()) onClick()
                 }
                 render.render(posX, posY)
             }
@@ -265,16 +259,8 @@ interface Renderable {
                 openGui.let { it.startsWith("gg.skytils.vigilance.gui.") || it.startsWith("gg.skytils.skytilsmod.gui.") }
             val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
-            val result = isGuiScreen &&
-                isGuiPositionEditor &&
-                inMenu &&
-                isNotInSignAndOnSlot &&
-                isConfigScreen &&
-                !isInNeuPv &&
-                !isInSkytilsPv &&
-                !neuFocus &&
-                !isInSkytilsSettings &&
-                !isInNeuSettings
+            val result =
+                isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkytilsPv && !neuFocus && !isInSkytilsSettings && !isInNeuSettings
 
             if (debug) {
                 if (!result) {
@@ -374,20 +360,19 @@ interface Renderable {
             rescaleSkulls: Boolean = true,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
-        ) =
-            hoverTips(
-                itemStack(
-                    item,
-                    scale,
-                    xSpacing,
-                    ySpacing,
-                    rescaleSkulls,
-                    horizontalAlign = horizontalAlign,
-                    verticalAlign = verticalAlign,
-                ),
-                item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
-                stack = item,
-            )
+        ) = hoverTips(
+            itemStack(
+                item,
+                scale,
+                xSpacing,
+                ySpacing,
+                rescaleSkulls,
+                horizontalAlign = horizontalAlign,
+                verticalAlign = verticalAlign,
+            ),
+            item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+            stack = item,
+        )
 
         fun itemStack(
             item: ItemStack,
@@ -497,11 +482,57 @@ interface Renderable {
             }
         }
 
+        fun searchableTable(
+            map: Map<List<Renderable?>, String?>,
+            textInput: TextInput,
+            key: Int,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            useEmptySpace: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            var content = map.keys.toList()
+            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            override val width = xOffsets.last() - xPadding
+            override val height = yOffsets.last() - yPadding
+
+            val emptySpaceX = if (useEmptySpace) 0 else xPadding
+            val emptySpaceY = if (useEmptySpace) 0 else yPadding
+
+            init {
+                textInput.registerToEvent(key) {
+                    // null = ignored, never filtered
+                    content = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+                }
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                for ((rowIndex, row) in content.withIndex()) {
+                    for ((index, renderable) in row.withIndex()) {
+                        GlStateManager.pushMatrix()
+                        GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
+                        renderable?.renderXYAligned(
+                            posX + xOffsets[index],
+                            posY + yOffsets[rowIndex],
+                            xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
+                        )
+                        GlStateManager.popMatrix()
+                    }
+                }
+            }
+        }
+
         /**
          * @param content the list of rows the table should render
          */
         fun table(
-            content: List<List<Renderable?>>,
+            content: List<List<Renderable>>,
             xPadding: Int = 1,
             yPadding: Int = 0,
             useEmptySpace: Boolean = false,
@@ -565,7 +596,6 @@ interface Renderable {
             color: Color = Color.WHITE,
             key: Int = 0,
         ) = object : Renderable {
-
             val textBoxHeight = (9 * scale).toInt() + 1
 
             val isTextBoxEmpty get() = textInput.textBox.isEmpty()
@@ -879,6 +909,39 @@ interface Renderable {
             }
         }
 
+        fun verticalSearchableContainer(
+            content: Map<Renderable, String?>,
+            spacing: Int = 0,
+            textInput: TextInput,
+            key: Int,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            var renderables = filterList(content, textInput.textBox)
+
+            override val width = renderables.maxOfOrNull { it.width } ?: 0
+            override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            init {
+                textInput.registerToEvent(key) {
+                    // null = ignored, never filtered
+                    renderables = filterList(content, textInput.textBox)
+                }
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                var yOffset = posY
+                renderables.forEach {
+                    it.renderXAligned(posX, yOffset, width)
+                    yOffset += it.height + spacing
+                    GlStateManager.translate(0f, (it.height + spacing).toFloat(), 0f)
+                }
+                GlStateManager.translate(0f, -height.toFloat() - spacing.toFloat(), 0f)
+            }
+        }
+
         fun scrollList(
             list: List<Renderable>,
             height: Int,
@@ -931,6 +994,83 @@ interface Renderable {
                 }
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
+        }
+
+        fun searchableScrollList(
+            content: Map<Renderable, String?>,
+            height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
+            velocity: Double = 2.0,
+            button: Int? = null,
+            textInput: TextInput,
+            key: Int,
+            bypassChecks: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+            private var list = filterList(content, textInput.textBox)
+            override val width = list.maxOf { it.width }
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            init {
+                textInput.registerToEvent(key) {
+                    // null = ignored, never filtered
+                    list = filterList(content, textInput.textBox)
+                    scroll = createScroll()
+                }
+            }
+
+            // correct
+            private val virtualHeight get() = list.sumOf { it.height }
+
+            private var scroll = createScroll()
+
+            private fun createScroll() = ScrollInput.Companion.Vertical(
+                scrollValue,
+                0,
+                virtualHeight - height,
+                velocity,
+                button,
+            )
+
+            private val end get() = scroll.asInt() + height
+
+            override fun render(posX: Int, posY: Int) {
+                scroll.update(
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                )
+
+                var renderY = 0
+                var virtualY = 0
+                var found = false
+                for (renderable in list) {
+                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
+                        renderable.renderXAligned(posX, posY + renderY, width)
+                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
+                        renderY += renderable.height
+                        found = true
+                    } else if (found) {
+                        found = false
+                        if (renderY + renderable.height <= height) {
+                            renderable.renderXAligned(posX, posY + renderY, width)
+                        }
+                        continue
+                    }
+                    virtualY += renderable.height
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+            }
+        }
+
+        private fun filterList(content: Map<Renderable, String?>, textBox: String): Set<Renderable> {
+            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) ?: true }
+            val set = map.keys.toMutableSet()
+            if (map.filter { it.value != null }.isEmpty()) {
+                set.add(string("§cNo search results!"))
+            }
+            return set
         }
 
         fun scrollTable(
@@ -988,17 +1128,14 @@ interface Renderable {
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                val range =
-                    yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }
-                        .takeIf { it > 0 }
-                        ?: yOffsets.size) - 1
+                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                    ?: yOffsets.size) - 1
 
-                val range2 =
-                    if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
-                        range.first..range.last() + 1
-                    } else {
-                        range
-                    }
+                val range2 = if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
+                    range.first..range.last() + 1
+                } else {
+                    range
+                }
 
                 for (rowIndex in range2) {
                     for ((index, renderable) in content[rowIndex].withIndex()) {
@@ -1242,10 +1379,8 @@ interface Renderable {
                 GlStateManager.color(1f, 1f, 1f, 1f)
                 if (color != null) RenderLivingEntityHelper.setEntityColor(player, color, colorCondition)
                 val mouse = currentRenderPassMousePosition ?: return
-                val mouseXRelativeToPlayer =
-                    if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
-                val mouseYRelativeToPlayer =
-                    if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
+                val mouseXRelativeToPlayer = if (followMouse) (posX + playerX - mouse.first).toFloat() else eyesX
+                val mouseYRelativeToPlayer = if (followMouse) (posY + playerY - mouse.second - 1.62 * entityScale).toFloat() else eyesY
                 GlStateManager.translate(0f, 0f, 100f)
                 drawEntityOnScreen(
                     playerX,
