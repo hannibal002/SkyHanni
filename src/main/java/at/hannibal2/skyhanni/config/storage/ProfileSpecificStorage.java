@@ -673,6 +673,7 @@ public class ProfileSpecificStorage {
     @Nullable
     public Integer abiphoneContactAmount = null;
 
+    @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
     public static class HoppityEventStats {
