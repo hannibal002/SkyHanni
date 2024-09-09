@@ -56,26 +56,3 @@ fun Map<List<Renderable>, String?>.buildSearchableTable(): Renderable {
         key = key,
     )
 }
-
-fun Map<List<Renderable>, String?>.buildSearchableScrollableTable(
-    height: Int,
-    scrollValue: ScrollValue = ScrollValue(),
-    velocity: Double = 2.0,
-): Renderable {
-    val textInput = TextInput()
-    val key = 0
-    return Renderable.searchBox(
-        Renderable.searchableScrollTable(
-            toMap(),
-            textInput = textInput,
-            key = key + 1,
-            height = height,
-            scrollValue = scrollValue,
-            velocity = velocity,
-        ),
-        searchPrefix,
-        onUpdateSize = { println("onUpdateSize") },
-        textInput = textInput,
-        key = key,
-    )
-}
