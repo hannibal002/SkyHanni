@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -647,8 +648,14 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
+        public Map<Integer, DianaProfitTracker.Data> dianaProfitTrackerPerElectionSeason = new HashMap<>();
+
+        @Expose
         // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
+
+        @Expose
+        public Map<Integer, MythologicalCreatureTracker.Data> mythologicalMobTrackerPerElectionSeason = new HashMap<>();
     }
 
     @Expose

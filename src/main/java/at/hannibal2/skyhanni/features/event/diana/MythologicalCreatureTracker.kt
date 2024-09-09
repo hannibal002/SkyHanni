@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MayorAPI.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -54,7 +56,11 @@ object MythologicalCreatureTracker {
     )
 
     private val tracker =
-        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker }) { drawDisplay(it) }
+        SkyHanniTracker(
+            "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
+            SkyHanniTracker.DisplayMode.MAYOR to
+                { it.diana.mythologicalMobTrackerPerElectionSeason.getOrPut(SkyBlockTime.now().getElectionYear(), ::Data) },
+        ) { drawDisplay(it) }
 
     class Data : TrackerData() {
 

@@ -334,9 +334,17 @@ object CollectionUtils {
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
+    ) = buildSelector(prefix, getName, isCurrent, onChange, enumValues<T>())
+
+    inline fun <T> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+        universe: Array<T>
     ) = buildList<Renderable> {
         addString(prefix)
-        for (entry in enumValues<T>()) {
+        for (entry in universe) {
             val display = getName(entry)
             if (isCurrent(entry)) {
                 addString("§a[$display]")
