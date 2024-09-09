@@ -24,6 +24,9 @@ import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MaxwellConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.MayorConfig
 import at.hannibal2.skyhanni.config.features.gui.customscoreboard.PartyConfig
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
@@ -80,7 +83,7 @@ object CustomScoreboard {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
-        val render = if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) cache
+        val render = if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) cache
         else display
 
         val textRenderable = Renderable.verticalContainer(
@@ -240,7 +243,7 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) dirty = true
+            if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
@@ -278,7 +281,8 @@ object CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
+    private fun isEnabled() =
+        (LorenzUtils.inSkyBlock || (OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
 
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 }

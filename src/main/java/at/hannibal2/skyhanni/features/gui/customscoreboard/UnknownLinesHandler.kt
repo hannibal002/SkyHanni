@@ -167,6 +167,8 @@ object UnknownLinesHandler {
                 riftHayEatenPattern,
                 fossilDustPattern,
                 cluesPattern,
+                barryProtestorsQuestlinePattern,
+                barryProtestorsHandledPattern,
                 carnivalPattern,
                 carnivalTasksPattern,
                 carnivalTokensPattern,
@@ -257,9 +259,10 @@ object UnknownLinesHandler {
 
             unknownLines.forEach {
                 pastUnknownLines += it
-                ChatUtils.debug("Unknown Scoreboard line: '$it'")
+                if (LorenzUtils.inSkyBlock) {
+                    ChatUtils.debug("Unknown Scoreboard line: '$it'")
+                }
                 unknownLinesSet.add(it)
             }
-        }
     }
 }

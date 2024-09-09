@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -19,6 +19,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -117,18 +119,18 @@ object PestProfitTracker {
         lastPestKillTime = SimpleTimeMark.now()
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lPest Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lPest Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
         val pestsKilled = data.totalPestsKills
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§7Pests killed: §e${pestsKilled.addSeparators()}",
                 listOf("§7You killed pests §e${pestsKilled.addSeparators()} §7times."),
-            ),
+            ).toSearchable(),
         )
-        addAsSingletonList(tracker.addTotalProfit(profit, data.totalPestsKills, "kill"))
+        add(tracker.addTotalProfit(profit, data.totalPestsKills, "kill"))
 
         tracker.addPriceFromButton(this)
     }
