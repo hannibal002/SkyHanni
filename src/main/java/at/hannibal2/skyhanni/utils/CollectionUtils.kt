@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.enchantment.Enchantment
 import net.minecraft.item.ItemStack
 import java.util.Collections
@@ -180,6 +182,7 @@ object CollectionUtils {
         add(Collections.singletonList(text))
     }
 
+    // TODO move to RenderableUtils
     fun MutableList<List<Renderable>>.addSingleString(text: String) {
         add(Collections.singletonList(Renderable.string(text)))
     }
@@ -281,6 +284,16 @@ object CollectionUtils {
         add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign))
     }
 
+    // TODO add cache
+    fun MutableList<Searchable>.addSearchString(
+        text: String,
+        searchText: String? = null,
+        horizontalAlign: RenderUtils.HorizontalAlignment = RenderUtils.HorizontalAlignment.LEFT,
+        verticalAlign: RenderUtils.VerticalAlignment = RenderUtils.VerticalAlignment.CENTER,
+    ) {
+        add(Renderable.string(text, horizontalAlign = horizontalAlign, verticalAlign = verticalAlign).toSearchable(searchText))
+    }
+
     // TODO add internal name support, and caching
     fun MutableList<Renderable>.addItemStack(
         itemStack: ItemStack,
@@ -302,6 +315,7 @@ object CollectionUtils {
         addItemStack(internalName.getItemStack())
     }
 
+    // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
         prefix: String,
         getName: (T) -> String,
@@ -311,12 +325,22 @@ object CollectionUtils {
         add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
     }
 
+    inline fun <reified T : Enum<T>> MutableList<Searchable>.addSearchableSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+    ) {
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)).toSearchable())
+    }
+
+    // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
-    ) = buildList {
+    ) = buildList<Renderable> {
         addString(prefix)
         for (entry in enumValues<T>()) {
             val display = getName(entry)
@@ -335,6 +359,7 @@ object CollectionUtils {
         }
     }
 
+    // TODO move to RenderableUtils
     inline fun MutableList<Renderable>.addButton(
         prefix: String,
         getName: String,
@@ -364,6 +389,7 @@ object CollectionUtils {
         )
     }
 
+    // TODO move to RenderableUtils
     fun Collection<Collection<Renderable>>.tableStretchXPadding(xSpace: Int): Int {
         if (this.isEmpty()) return xSpace
         val off = RenderableUtils.calculateTableXOffsets(this as List<List<Renderable?>>, 0)

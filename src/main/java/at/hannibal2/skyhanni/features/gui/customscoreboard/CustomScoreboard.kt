@@ -32,12 +32,11 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Footer
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.Title
-import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardLine.Companion.align
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTitle
+import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeIfNotEmpty
@@ -81,8 +80,9 @@ object CustomScoreboard {
         if (!isEnabled()) return
         if (display.isEmpty()) return
 
-        val render = if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) cache
-        else display
+        val render =
+            if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) cache
+            else display
 
         val textRenderable = Renderable.verticalContainer(
             render.map { Renderable.string(it.display, horizontalAlign = it.alignment) },
@@ -174,7 +174,7 @@ object CustomScoreboard {
     }
 
     private fun addAllNonSkyBlockLines() = buildList {
-        addAll(Title.getLines())
+        addAll(ScoreboardElementTitle.getLines())
         addAll(ScoreboardData.sidebarLinesFormatted.map { it.align() })
     }
 
@@ -241,7 +241,7 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) dirty = true
+            if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
@@ -279,7 +279,8 @@ object CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected()) && config.enabled.get()
+    private fun isEnabled() =
+        (LorenzUtils.inSkyBlock || (OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
 
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 }

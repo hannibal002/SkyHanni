@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
@@ -33,6 +34,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -79,6 +83,7 @@ object GraphEditor {
                 activeNode?.name?.let {
                     textBox.textBox = it
                 }
+
                 textBox.makeActive()
             } else {
                 textBox.clear()
@@ -100,7 +105,8 @@ object GraphEditor {
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
     val scrollValue = ScrollValue()
-    var nodesDisplay = emptyList<Renderable>()
+    val textInput = TextInput()
+    var nodesDisplay = emptyList<Searchable>()
     var lastUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -183,6 +189,8 @@ object GraphEditor {
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
+
+
         config.namedNodesList.renderRenderables(
             buildList {
                 val list = getNodeNames()
@@ -190,14 +198,14 @@ object GraphEditor {
                 addString("§eGraph Nodes: $size")
                 val height = (size * 10).coerceAtMost(150)
                 if (list.isNotEmpty()) {
-                    add(Renderable.scrollList(list, height, scrollValue = scrollValue, velocity = 10.0))
+                    add(list.buildSearchableScrollable(height, textInput, scrollValue, velocity = 10.0))
                 }
             },
             posLabel = "Graph Nodes List",
         )
     }
 
-    private fun getNodeNames(): List<Renderable> {
+    private fun getNodeNames(): List<Searchable> {
         if (lastUpdate.passedSince() > 250.milliseconds) {
             updateNodeNames()
         }
@@ -214,16 +222,16 @@ object GraphEditor {
         nodesDisplay = drawTagNames(node)
     }
 
-    private fun drawTagNames(node: GraphingNode): List<Renderable> = buildList {
-        addString("§eChange tag for node '${node.name}§e'")
-        addString("")
+    private fun drawTagNames(node: GraphingNode): List<Searchable> = buildList {
+        addSearchString("§eChange tag for node '${node.name}§e'")
+        addSearchString("")
 
         for (tag in GraphNodeTag.entries) {
             val state = if (tag in node.tags) "§aYES" else "§cNO"
             val name = state + " §r" + tag.displayName
             add(createTagName(name, tag, node))
         }
-        addString("")
+        addSearchString("")
         add(
             Renderable.clickAndHover(
                 "§cGo Back!",
@@ -231,11 +239,11 @@ object GraphEditor {
                 onClick = {
                     updateNodeNames()
                 },
-            ),
+            ).toSearchable(),
         )
     }
 
-private fun createTagName(
+    private fun createTagName(
         name: String,
         tag: GraphNodeTag,
         node: GraphingNode,
@@ -255,9 +263,9 @@ private fun createTagName(
             }
             updateTagView(node)
         },
-    )
+    ).toSearchable(name)
 
-    private fun drawNodeNames(): List<Renderable> = buildList {
+    private fun drawNodeNames(): List<Searchable> = buildList {
         for ((node, distance: Double) in nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
             val name = node.name?.takeIf { !it.isBlank() } ?: continue
             val color = if (node == activeNode) "§a" else "§7"
@@ -276,11 +284,11 @@ private fun createTagName(
         }
     }
 
-    private fun MutableList<Renderable>.createNodeTextLine(
+    private fun MutableList<Searchable>.createNodeTextLine(
         text: String,
         name: String,
         node: GraphingNode,
-    ): Renderable = Renderable.clickAndHover(
+    ): Searchable = Renderable.clickAndHover(
         text,
         tips = buildList {
             add("Node '$name'")
@@ -306,7 +314,7 @@ private fun createTagName(
                 updateNodeNames()
             }
         },
-    )
+    ).toSearchable(name)
 
     private fun feedBackInTutorial(text: String) {
         if (inTutorialMode) {
@@ -386,8 +394,7 @@ private fun createTagName(
         }
     }
 
-    private fun chatAtDisable() =
-        ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.", ::commandIn)
+    private fun chatAtDisable() = ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.", ::commandIn)
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
@@ -536,11 +543,9 @@ private fun createTagName(
         if (config.showsStats) {
             val length = edges.sumOf { it.node1.position.distance(it.node2.position) }.toInt().addSeparators()
             ChatUtils.chat(
-                "§lStats\n" +
-                    "§eNamed Nodes: ${nodes.count { it.name != null }.addSeparators()}\n" +
-                    "§eNodes: ${nodes.size.addSeparators()}\n" +
-                    "§eEdges: ${edges.size.addSeparators()}\n" +
-                    "§eLength: $length",
+                "§lStats\n" + "§eNamed Nodes: ${
+                    nodes.count { it.name != null }.addSeparators()
+                }\n" + "§eNodes: ${nodes.size.addSeparators()}\n" + "§eEdges: ${edges.size.addSeparators()}\n" + "§eLength: $length",
             )
         }
     }
@@ -617,15 +622,14 @@ private fun createTagName(
         ).let { e -> edges.indexOfFirst { it == e }.takeIf { it != -1 } }
         else null
 
-    private fun addEdge(node1: GraphingNode?, node2: GraphingNode?) =
-        if (node1 != null && node2 != null && node1 != node2) {
-            val edge = GraphingEdge(node1, node2)
-            if (edge.isInEdge(activeNode)) {
-                checkDissolve()
-                selectedEdge = findEdgeBetweenActiveAndClosed()
-            }
-            edges.add(edge)
-        } else false
+    private fun addEdge(node1: GraphingNode?, node2: GraphingNode?) = if (node1 != null && node2 != null && node1 != node2) {
+        val edge = GraphingEdge(node1, node2)
+        if (edge.isInEdge(activeNode)) {
+            checkDissolve()
+            selectedEdge = findEdgeBetweenActiveAndClosed()
+        }
+        edges.add(edge)
+    } else false
 
     /** Has a side effect on the graphing graph, since it runs [prune] on the graphing graph*/
     private fun compileGraph(): Graph {
@@ -746,8 +750,7 @@ private class GraphingEdge(val node1: GraphingNode, val node2: GraphingNode) {
 
         other as GraphingEdge
 
-        return (this.node1 == other.node1 && this.node2 == other.node2) ||
-            (this.node1 == other.node2 && this.node2 == other.node1)
+        return (this.node1 == other.node1 && this.node2 == other.node2) || (this.node1 == other.node2 && this.node2 == other.node1)
     }
 
     override fun hashCode(): Int {

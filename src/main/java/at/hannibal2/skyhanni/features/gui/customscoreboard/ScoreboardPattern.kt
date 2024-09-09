@@ -491,6 +491,23 @@ object ScoreboardPattern {
         "Clues: §.\\d+/\\d+",
     )
 
+    /**
+     * REGEX-TEST: §eFirst Up
+     * REGEX-TEST: Find and talk with Barry
+     */
+    val barryProtestorsQuestlinePattern by riftSb.pattern(
+        "protestors.quest",
+        "§eFirst Up|Find and talk with Barry",
+    )
+
+    /**
+     * REGEX-TEST: Protestors handled: §b5/7
+     */
+    val barryProtestorsHandledPattern by riftSb.pattern(
+        "protestors.handled",
+        "Protestors handled: §b\\d+\\/\\d+",
+    )
+
     private val carnivalSb = scoreboardGroup.group("carnival")
 
     /**

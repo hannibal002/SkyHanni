@@ -276,6 +276,12 @@ public class InventoryConfig {
     public boolean stonkOfStonkPrice = true;
 
     @Expose
+    @ConfigOption(name = "Minister in Calendar", desc = "Show the Minister with their perk in the Calendar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ministerInCalendar = true;
+
+    @Expose
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
     @ConfigEditorBoolean
     @FeatureToggle
