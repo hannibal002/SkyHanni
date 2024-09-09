@@ -74,7 +74,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         if (isInventoryOpen()) {
             val sourceStringPrefix = sourceString.takeIf { it.isNotEmpty() } ?: "Item Source"
             lists.addSearchableSelector<F>(
-                sourceStringPrefix,
+                "$sourceStringPrefix ",
                 getName = { bucket -> bucket.toString() },
                 isCurrent = { data.getSelectedBucket() == it },
                 onChange = {
