@@ -189,9 +189,9 @@ object SackDisplay {
 
         list.addSelector<SortType>(" ",
             getName = { type -> type.shortName },
-            isCurrent = { it.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
+            isCurrent = { it?.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
             onChange = {
-                config.sortingType = SortingTypeEntry.entries[it.ordinal] // todo avoid ordinals
+                config.sortingType = it?.let { SortingTypeEntry.entries[it.ordinal] } // todo avoid ordinals
                 update(false)
             })
 
@@ -209,9 +209,9 @@ object SackDisplay {
         if (config.showPrice) {
             list.addSelector<ItemPriceSource>(" ",
                 getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+                isCurrent = { it?.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = it?.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
                     update(false)
                 })
             list.addButton(

@@ -302,37 +302,53 @@ object CollectionUtils {
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
+        isCurrent: (T?) -> Boolean,
+        crossinline onChange: (T?) -> Unit,
+        withNullOption: Boolean = false
     ) {
-        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange, withNullOption)))
     }
 
     inline fun <reified T : Enum<T>> MutableList<Searchable>.addSearchableSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
+        isCurrent: (T?) -> Boolean,
+        crossinline onChange: (T?) -> Unit,
+        withNullOption: Boolean = false
     ) {
-        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)).toSearchable())
+        add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange, withNullOption)).toSearchable())
     }
 
     // TODO move to RenderableUtils
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
-    ) = buildSelector(prefix, getName, isCurrent, onChange, enumValues<T>())
+        isCurrent: (T?) -> Boolean,
+        crossinline onChange: (T?) -> Unit,
+        withNullOption: Boolean = false
+    ) = buildSelector(prefix, getName, isCurrent, onChange, enumValues<T>(), withNullOption)
 
     inline fun <T> buildSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T) -> Boolean,
-        crossinline onChange: (T) -> Unit,
+        isCurrent: (T?) -> Boolean,
+        crossinline onChange: (T?) -> Unit,
         universe: Array<T>,
+        withNullOption: Boolean = false
     ) = buildList<Renderable> {
         addString(prefix)
+        if (withNullOption) {
+            if (isCurrent(null)) addString("§a[§7None§a]")
+            else {
+                addString("§e[")
+                add(
+                    Renderable.link("§7None") {
+                        onChange(null)
+                    },
+                )
+                addString("§e]")
+            }
+        }
         for (entry in universe) {
             val display = getName(entry)
             if (isCurrent(entry)) {
