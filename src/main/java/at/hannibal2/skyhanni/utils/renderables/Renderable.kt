@@ -917,7 +917,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            var renderables = content.keys
+            var renderables = filterList(content, textInput.textBox)
 
             override val width = renderables.maxOfOrNull { it.width } ?: 0
             override val height = renderables.sumOf { it.height } + spacing * (renderables.size - 1)
@@ -927,7 +927,7 @@ interface Renderable {
             init {
                 textInput.registerToEvent(key) {
                     // null = ignored, never filtered
-                    renderables = content.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys
+                    renderables = filterList(content, textInput.textBox)
                 }
             }
 
@@ -1008,7 +1008,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            private var list = filterList()
+            private var list = filterList(content, textInput.textBox)
             override val width = list.maxOf { it.width }
             override val height = height
             override val horizontalAlign = horizontalAlign
@@ -1017,15 +1017,8 @@ interface Renderable {
             init {
                 textInput.registerToEvent(key) {
                     // null = ignored, never filtered
-                    list = filterList()
+                    list = filterList(content, textInput.textBox)
                     scroll = createScroll()
-                }
-            }
-
-            private fun filterList(): Set<Renderable> {
-                val keys = content.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys
-                return keys.ifEmpty {
-                    setOf(string("§cNo search results!"))
                 }
             }
 
@@ -1069,6 +1062,15 @@ interface Renderable {
                 }
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
+        }
+
+        private fun filterList(content: Map<Renderable, String?>, textBox: String): Set<Renderable> {
+            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) ?: true }
+            val set = map.keys.toMutableSet()
+            if (map.filter { it.value != null }.isEmpty()) {
+                set.add(string("§cNo search results!"))
+            }
+            return set
         }
 
         fun scrollTable(
