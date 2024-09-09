@@ -9,13 +9,11 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundP
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 typealias RarityType = HoppityEggsConfig.CompactRarityTypes
@@ -43,11 +41,7 @@ object HoppityEggsCompactChat {
         if (lastDuplicateAmount != null) {
             this.duplicate = true
         }
-        if (hoppityEggChat.size == 3) {
-            DelayedRun.runDelayed(200.milliseconds) {
-                sendCompact()
-            }
-        }
+        if (hoppityEggChat.size == 3) sendCompact()
     }
 
     private fun sendCompact() {
