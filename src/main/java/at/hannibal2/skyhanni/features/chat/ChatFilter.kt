@@ -407,7 +407,7 @@ object ChatFilter {
 
     /**
      * REGEX-TEST: §aStarted parkour cocoa!
-     * REGEX-TEST: §aFinished parkour cocoa in 12:34.567
+     * REGEX-TEST: §aFinished parkour cocoa in 12:34.567!
      * REGEX-TEST: §aReached checkpoint #4 for parkour cocoa!
      * REGEX-TEST: §4Wrong checkpoint for parkour cocoa!
      * REGEX-TEST: §4You haven't reached all checkpoints for parkour cocoa!
@@ -420,23 +420,18 @@ object ChatFilter {
         "§4You haven't reached all checkpoints for parkour (.*)!".toPattern(),
     )
 
-    /**
-     * REGEX-TEST: §4Cancelled parkour! You cannot fly.
-     * REGEX-TEST: §4Cancelled parkour! You cannot use item abilities.
-     * REGEX-TEST: §4Cancelled parkour!
-     */
     private val parkourCancelMessages = listOf(
         "§4Cancelled parkour! You cannot fly.",
         "§4Cancelled parkour! You cannot use item abilities.",
         "§4Cancelled parkour!",
     )
-
-    // §r§aWarped from the tppadone §r§ato the tppadtwo§r§a!
+    /**
+    * REGEX-TEST: §r§aWarped from the tp_pad_one §r§ato the tp_pad_two§r§a!
+    */
     private val teleportPadPatterns = listOf(
         "§aWarped from the (.*) §r§ato the (.*)§r§a!".toPattern(),
     )
 
-    // §r§4This Teleport Pad does not have a destination set!
     private val teleportPadMessages = listOf(
         "§4This Teleport Pad does not have a destination set!"
     )
