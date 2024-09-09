@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.features.nether.MinibossTimer.MiniBoss.Companion.isSpawned
+import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isSpawned
 import at.hannibal2.skyhanni.features.nether.MinibossTimer.MiniBoss.Companion.isSpawningSoon
-import at.hannibal2.skyhanni.features.nether.MinibossTimer.MiniBoss.Companion.isTimerKnown
+import at.hannibal2.skyhanni.features.nether.CrimsonMinibossRespawnTimer.MiniBoss.Companion.isTimerKnown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isInside
@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object MinibossTimer {
+object CrimsonMinibossRespawnTimer {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
 
@@ -44,7 +44,7 @@ object MinibossTimer {
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn",
-        "§c§lBEWARE - (?<name>.+) Is Spawning\\."
+        "§c§lBEWARE - (?<name>.+) Is Spawning\\.",
     )
 
     /**
@@ -52,7 +52,7 @@ object MinibossTimer {
      */
     private val downPattern by patternGroup.pattern(
         "down",
-        "§f\\s*§r§6§l(?<name>.+) DOWN!"
+        "§f\\s*§r§6§l(?<name>.+) DOWN!",
     )
 
     private var currentAreaBoss: MiniBoss? = null
@@ -65,9 +65,9 @@ object MinibossTimer {
         val message = event.message
         downPattern.matchMatcher(message) {
             val miniBoss = MiniBoss.fromName(group("name")) ?: return
-            miniBoss.timer = SimpleTimeMark.now() + 2.minutes
+            miniBoss.nextSpawnTime = SimpleTimeMark.now() + 2.minutes
             miniBoss.spawned = false
-            miniBoss.possibleTimer = null
+            miniBoss.possibleSpawnTime = null
             miniBoss.foundBeacon = null
             update()
             return
@@ -75,7 +75,7 @@ object MinibossTimer {
         spawnPattern.matchMatcher(message) {
             val miniBoss = MiniBoss.fromName(group("name")) ?: return
             miniBoss.spawned = true
-            miniBoss.possibleTimer = null
+            miniBoss.possibleSpawnTime = null
             miniBoss.foundBeacon = null
             update()
             return
@@ -99,8 +99,8 @@ object MinibossTimer {
     private fun updateArea() {
         MiniBoss.entries.forEach {
             if (it.lastSeenArea.passedSince() > 2.minutes) {
-                it.timer = null
-                it.possibleTimer = null
+                it.nextSpawnTime = null
+                it.possibleSpawnTime = null
                 it.foundBeacon = null
                 it.spawned = null
             }
@@ -108,7 +108,8 @@ object MinibossTimer {
         currentAreaBoss = MiniBoss.entries.firstOrNull {
             it.area.isPlayerInside()
         }
-        currentAreaBoss?.lastSeenArea = SimpleTimeMark.now()
+        val now = SimpleTimeMark.now()
+        currentAreaBoss?.lastSeenArea = now
         val boss = currentAreaBoss ?: return
         if (boss.isTimerKnown()) return
 
@@ -118,28 +119,29 @@ object MinibossTimer {
         if (isBossInArea) {
             boss.spawned = true
             boss.foundBeacon = null
-            boss.possibleTimer = null
+            boss.possibleSpawnTime = null
             return
-        } else boss.spawned = false
+        }
+        boss.spawned = false
 
         val isThereBeacon = EntityUtils.getAllTileEntities().filter { it is TileEntityBeacon }.any {
             boss.area.isInside(it.pos.toLorenzVec())
         }
         if (boss.foundBeacon == true && !isThereBeacon) {
             boss.foundBeacon = false
-            boss.possibleTimer = null
-            boss.timer = SimpleTimeMark.now() + 1.minutes
+            boss.possibleSpawnTime = null
+            boss.nextSpawnTime = now + 1.minutes
             return
         }
-        if (boss.possibleTimer != null) return
+        if (boss.possibleSpawnTime != null) return
         if (isThereBeacon && boss.foundBeacon == null) {
             boss.foundBeacon = true
-            boss.possibleTimer = SimpleTimeMark.now() + 1.minutes to SimpleTimeMark.now() + 2.minutes
+            boss.possibleSpawnTime = now + 1.minutes to now + 2.minutes
             return
         }
         if (!isThereBeacon && boss.foundBeacon == null) {
             boss.foundBeacon = false
-            boss.possibleTimer = SimpleTimeMark.now() to SimpleTimeMark.now() + 1.minutes
+            boss.possibleSpawnTime = now to now + 1.minutes
         }
     }
 
@@ -149,8 +151,8 @@ object MinibossTimer {
 
     private fun drawDisplay(): Renderable {
         val lines = MiniBoss.entries.map {
-            val timer = it.timer
-            val possibleTimer = it.possibleTimer
+            val timer = it.nextSpawnTime
+            val possibleTimer = it.possibleSpawnTime
             Renderable.string(
                 buildString {
                     append("§b${it.displayName}: ")
@@ -176,8 +178,8 @@ object MinibossTimer {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         MiniBoss.entries.forEach {
-            it.timer = null
-            it.possibleTimer = null
+            it.nextSpawnTime = null
+            it.possibleSpawnTime = null
             it.foundBeacon = null
             it.spawned = null
             it.lastSeenArea = SimpleTimeMark.farPast()
@@ -197,10 +199,11 @@ object MinibossTimer {
             MiniBoss.entries.forEach {
                 add("")
                 add(it.displayName)
-                add("   Timer ${it.timer?.timeUntil()?.format()}")
+                add("   Timer ${it.nextSpawnTime?.timeUntil()?.format()}")
                 add(
-                    "   Possible Timer ${it.possibleTimer?.first?.timeUntil()?.format()} - " +
-                        "${it.possibleTimer?.second?.timeUntil()?.format()}"
+                    "   Possible Timer ${it.possibleSpawnTime?.first?.timeUntil()?.format()} - " + "${
+                        it.possibleSpawnTime?.second?.timeUntil()?.format()
+                    }",
                 )
                 add("   Found Beacon ${it.foundBeacon}")
                 add("   Spawned ${it.spawned}")
@@ -212,31 +215,31 @@ object MinibossTimer {
     enum class MiniBoss(
         val displayName: String,
         val area: AxisAlignedBB,
-        var timer: SimpleTimeMark? = null,
-        var possibleTimer: Pair<SimpleTimeMark, SimpleTimeMark>? = null,
+        var nextSpawnTime: SimpleTimeMark? = null,
+        var possibleSpawnTime: Pair<SimpleTimeMark, SimpleTimeMark>? = null,
         var foundBeacon: Boolean? = null,
         var spawned: Boolean? = null,
-        var lastSeenArea: SimpleTimeMark = SimpleTimeMark.farPast()
+        var lastSeenArea: SimpleTimeMark = SimpleTimeMark.farPast(),
     ) {
         BLADESOUL(
             "Bladesoul",
-            LorenzVec(-330, 80, -486).axisAlignedTo(LorenzVec(-257, 107, -545))
+            LorenzVec(-330, 80, -486).axisAlignedTo(LorenzVec(-257, 107, -545)),
         ),
         MAGE_OUTLAW(
             "Mage Outlaw",
-            LorenzVec(-200, 98, -843).axisAlignedTo(LorenzVec(-162, 116, -878))
+            LorenzVec(-200, 98, -843).axisAlignedTo(LorenzVec(-162, 116, -878)),
         ),
         BARBARIAN_DUKE_X(
             "Barbarian Duke X",
-            LorenzVec(-550, 101, -890).axisAlignedTo(LorenzVec(-522, 131, -918))
+            LorenzVec(-550, 101, -890).axisAlignedTo(LorenzVec(-522, 131, -918)),
         ),
         ASHFANG(
             "Ashfang",
-            LorenzVec(-462, 155, -1035).axisAlignedTo(LorenzVec(-507, 131, -955))
+            LorenzVec(-462, 155, -1035).axisAlignedTo(LorenzVec(-507, 131, -955)),
         ),
         MAGMA_BOSS(
             "Magma Boss",
-            LorenzVec(-318, 59, -751).axisAlignedTo(LorenzVec(-442, 90, -851))
+            LorenzVec(-318, 59, -751).axisAlignedTo(LorenzVec(-442, 90, -851)),
         ),
         ;
 
@@ -248,7 +251,7 @@ object MinibossTimer {
             }
 
             fun MiniBoss.isTimerKnown(): Boolean {
-                val timer = timer ?: return false
+                val timer = nextSpawnTime ?: return false
                 return timer.passedSince() < 2.minutes + 5.seconds
             }
 
@@ -260,12 +263,12 @@ object MinibossTimer {
 
             fun MiniBoss.isSpawned(): Boolean {
                 if (spawned == true) return true
-                val timer = timer ?: return false
+                val timer = nextSpawnTime ?: return false
                 return (timer.passedSince() - 2.minutes) in 0.seconds..20.seconds
             }
         }
     }
 
-    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.minibossTimer
+    private fun isEnabled() = IslandType.CRIMSON_ISLE.isInIsland() && config.minibossRespawnTimer
 
 }
