@@ -58,9 +58,6 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     private fun getPoppedBuckets(): MutableList<E> = (bucketedItems.toMutableMap().filter { it.value.isNotEmpty() }.keys).toMutableList()
     fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let { getBucket(it) } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
-    private fun selectBucket(type: E?) {
-        selectedBucket = type;
-    }
 
     fun selectNextSequentialBucket() {
         @Suppress("UNCHECKED_CAST")
@@ -69,18 +66,14 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
                 (type as? Class<E>)?.enumConstants
             } ?: throw IllegalStateException("Unable to retrieve enum constants for E")
 
-        // If selectedBucket is null, start with the first enum[0]
-        if (selectedBucket == null) {
-            selectBucket(enumValues.first()) // Start with the first enum value
-            return
-        }
-
         // Move to the next ordinal, or wrap to null if at the last value
-        val currentOrdinal = selectedBucket!!.ordinal
-        val nextOrdinal = currentOrdinal + 1
-
-        if (nextOrdinal >= enumValues.size) selectBucket(null) // Wrap to null if at the last value
-        else selectBucket(enumValues[nextOrdinal]) // Move to the next enum value
+        val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
+        selectedBucket = when {
+            selectedBucket == null -> enumValues.first() // If selectedBucket is null, start with the first enum
+            nextOrdinal != null && nextOrdinal >= enumValues.size -> null // Wrap to null if we've reached the end
+            nextOrdinal != null -> enumValues[nextOrdinal] // Move to the next enum value
+            else -> selectedBucket // Fallback, shouldn't happen
+        }
     }
 
 
