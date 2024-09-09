@@ -201,7 +201,7 @@ object InquisitorWaypointShare {
         lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
-            ChatUtils.debug("Trying to send inquisitor via chat, vut no inquis is nearby.")
+            ChatUtils.debug("Trying to send inquisitor via chat, but no Inquisitor is nearby.")
             return
         }
 
