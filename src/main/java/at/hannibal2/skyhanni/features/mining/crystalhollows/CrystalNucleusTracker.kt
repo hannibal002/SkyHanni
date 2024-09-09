@@ -10,15 +10,17 @@ import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.robotParts
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
@@ -63,7 +65,7 @@ object CrystalNucleusTracker {
             // Gemstone and Mithril Powder
             if (itemName.contains(" Powder")) continue
             NEUInternalName.fromItemNameOrNull(itemName)?.let {
-                tracker.addItem(it, amount)
+                tracker.addItem(it, amount, false)
             }
         }
     }
@@ -74,8 +76,8 @@ object CrystalNucleusTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lCrystal Nucleus Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lCrystal Nucleus Profit Tracker")
         var profit = tracker.drawItems(data, { true }, this)
 
         val runsCompleted = data.runsCompleted
@@ -84,11 +86,11 @@ object CrystalNucleusTracker {
             val jungleKeyCost = "JUNGLE_KEY".asInternalName().getPrice() * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
-            addAsSingletonList(
+            add(
                 Renderable.hoverTips(
                     " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
-                    listOf("§7You lost §c$jungleKeyCostFormat §7of total profit", "§7due to §5Jungle Keys§7.")
-                )
+                    listOf("§7You lost §c$jungleKeyCostFormat §7of total profit", "§7due to §5Jungle Keys§7."),
+                ).toSearchable(),
             )
 
             var robotPartsCost = 0.0
@@ -96,21 +98,21 @@ object CrystalNucleusTracker {
             robotPartsCost *= runsCompleted
             profit -= robotPartsCost
             val robotPartsCostFormat = robotPartsCost.shortFormat()
-            addAsSingletonList(
+            add(
                 Renderable.hoverTips(
                     " §7${runsCompleted * 6}x §9Robot Parts§7: §c-$robotPartsCostFormat",
-                    listOf("§7You lost §c$robotPartsCostFormat §7of total profit", "§7due to §9Robot Parts§7.")
-                )
+                    listOf("§7You lost §c$robotPartsCostFormat §7of total profit", "§7due to §9Robot Parts§7."),
+                ).toSearchable(),
             )
 
-            addAsSingletonList(
+            add(
                 Renderable.hoverTips(
                     "§7Runs completed: §e${runsCompleted.addSeparators()}",
                     listOf("§7You completed §e${runsCompleted.addSeparators()} §7Crystal Nucleus Runs."),
-                ),
+                ).toSearchable(),
             )
 
-            addAsSingletonList(tracker.addTotalProfit(profit, data.runsCompleted, "run"))
+            add(tracker.addTotalProfit(profit, data.runsCompleted, "run"))
         }
 
         tracker.addPriceFromButton(this)
