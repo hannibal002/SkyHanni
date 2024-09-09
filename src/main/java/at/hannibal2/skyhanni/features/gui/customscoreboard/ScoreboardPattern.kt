@@ -511,7 +511,7 @@ object ScoreboardPattern {
      */
     val barryProtestorsHandledPattern by riftSb.pattern(
         "protestors.handled",
-        "Protestors handled: §b\\d+/\\d+",
+        "Protestors handled: §b\\d+\\/\\d+",
     )
 
     private val carnivalSb = scoreboardGroup.group("carnival")
