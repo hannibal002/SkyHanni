@@ -51,8 +51,8 @@ object CorpseTracker {
             )
         }
 
-        override fun getCoinName(item: TrackedItem) = "<no coins>"
-        override fun getCoinDescription(item: TrackedItem): List<String> = listOf("<no coins>")
+        override fun getCoinName(bucket: CorpseType?, item: TrackedItem) = "<no coins>"
+        override fun getCoinDescription(bucket: CorpseType?, item: TrackedItem): List<String> = listOf("<no coins>")
 
         @Expose
         var corpsesLooted: MutableMap<CorpseType, Long> = EnumMap(CorpseType::class.java)
@@ -75,47 +75,46 @@ object CorpseTracker {
     }
 
     private fun drawDisplay(bucketData: BucketData): List<Searchable> = buildList {
-        addSearchString("§b§lGlacite Corpse Profit Tracker")
-        tracker.addBucketSelectorsReified<CorpseType>(this, bucketData, "Corpse Type")
+        addSearchString("§b§lMineshaft Corpse Profit Tracker")
+        tracker.addBucketSelector(this, bucketData, "Corpse Type")
+
+        if (bucketData.getCorpseCount() == 0L) return@buildList
 
         var profit = tracker.drawItems(bucketData, { true }, this)
-
-        if (bucketData.getCorpseCount() > 0) {
-            val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) }
-                ?: enumValues<CorpseType>().toList().filter { bucketData.corpsesLooted[it] != null }
-            var totalKeyCost = 0.0
-            var totalKeyCount = 0
-            val keyCostStrings = buildList {
-                applicableKeys.forEach { keyData ->
-                    keyData.key?.let { key ->
-                        val keyName = key.itemName
-                        val price = key.getPrice()
-                        val count = bucketData.corpsesLooted[keyData] ?: 0
-                        val totalPrice = price * count
-                        if (totalPrice > 0) {
-                            profit -= totalPrice
-                            totalKeyCost += totalPrice
-                            totalKeyCount += count.toInt()
-                            add("§7${count}x $keyName§7: §c-${totalPrice.shortFormat()}")
-                        }
+        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) }
+            ?: enumValues<CorpseType>().toList().filter { bucketData.corpsesLooted[it] != null }
+        var totalKeyCost = 0.0
+        var totalKeyCount = 0
+        val keyCostStrings = buildList {
+            applicableKeys.forEach { keyData ->
+                keyData.key?.let { key ->
+                    val keyName = key.itemName
+                    val price = key.getPrice()
+                    val count = bucketData.corpsesLooted[keyData] ?: 0
+                    val totalPrice = price * count
+                    if (totalPrice > 0) {
+                        profit -= totalPrice
+                        totalKeyCost += totalPrice
+                        totalKeyCount += count.toInt()
+                        add("§7${count}x $keyName§7: §c-${totalPrice.shortFormat()}")
                     }
                 }
             }
-
-            if (totalKeyCount > 0) {
-                val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.itemName else "§eCorpse Keys"
-                val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
-                add(
-                    if (applicableKeys.count() == 1) Renderable.string(keyFormat).toSearchable()
-                    else Renderable.hoverTips(
-                        keyFormat,
-                        keyCostStrings,
-                    ).toSearchable(),
-                )
-            }
-
-            add(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
         }
+
+        if (totalKeyCount > 0) {
+            val specificKeyFormat = if (applicableKeys.count() == 1) applicableKeys.first().key!!.itemName else "§eCorpse Keys"
+            val keyFormat = "§7${totalKeyCount}x $specificKeyFormat§7: §c-${totalKeyCost.shortFormat()}"
+            add(
+                if (applicableKeys.count() == 1) Renderable.string(keyFormat).toSearchable()
+                else Renderable.hoverTips(
+                    keyFormat,
+                    keyCostStrings,
+                ).toSearchable(),
+            )
+        }
+
+        add(tracker.addTotalProfit(profit, bucketData.getCorpseCount(), "loot"))
 
         tracker.addPriceFromButton(this)
     }

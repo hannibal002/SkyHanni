@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
@@ -59,30 +60,27 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                 getName = { type -> type.sellName },
                 isCurrent = { it?.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceSource = it?.let {ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
+                    config.priceSource = it?.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
                     update()
                 },
             )
         }
     }
 
-    inline fun <reified F : Enum<F>> addBucketSelectorsReified(
+    fun addBucketSelector(
         lists: MutableList<Searchable>,
         data: BucketedData,
-        sourceString: String = "",
+        sourceStringPrefix: String,
+        nullBucketLabel: String = "All",
     ) {
         if (isInventoryOpen()) {
-            val sourceStringPrefix = sourceString.takeIf { it.isNotEmpty() } ?: "Item Source"
-            lists.addSearchableSelector<F>(
-                "$sourceStringPrefix ",
-                getName = { bucket -> bucket.toString() },
-                isCurrent = { data.getSelectedBucket() == it },
+            lists.addButton(
+                prefix = "§7$sourceStringPrefix: ",
+                getName = data.getSelectedBucket()?.toString() ?: nullBucketLabel,
                 onChange = {
-                    @Suppress("UNCHECKED_CAST")
-                    data.selectBucket(it as E?)
+                    data.selectNextSequentialBucket()
                     update()
                 },
-                withNullOption = true
             )
         }
     }
@@ -122,7 +120,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             val displayAmount = if (internalName == SKYBLOCK_COIN) itemProfit.timesGained else amount
 
             val cleanName = if (internalName == SKYBLOCK_COIN) {
-                data.getCoinName(itemProfit)
+                data.getCoinName(data.getSelectedBucket(), itemProfit)
             } else {
                 internalName.itemName
             }
@@ -182,7 +180,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         internalName: NEUInternalName,
     ) = buildList {
         if (internalName == SKYBLOCK_COIN) {
-            addAll(data.getCoinDescription(item))
+            addAll(data.getCoinDescription(data.getSelectedBucket(), item))
         } else {
             addAll(data.getDescription(item.timesGained))
         }
