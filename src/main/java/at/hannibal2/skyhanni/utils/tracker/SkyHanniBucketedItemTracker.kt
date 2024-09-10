@@ -98,8 +98,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             if (!filter(internalName)) continue
 
             val amount = itemProfit.totalAmount
-            val pricePer =
-                if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
+            val pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
             val price = (pricePer * amount).toLong()
             val hidden = itemProfit.hidden
 
