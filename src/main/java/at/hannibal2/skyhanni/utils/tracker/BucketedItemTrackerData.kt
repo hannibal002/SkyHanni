@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
@@ -51,6 +52,18 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         }
     }
 
+    private val buckets: Array<E> by lazy {
+        @Suppress("UNCHECKED_CAST")
+        selectedBucket?.javaClass?.enumConstants
+            ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
+                (type as? Class<E>)?.enumConstants
+            } ?: ErrorManager.skyHanniError(
+                "Unable to retrieve enum constants for E in BucketedItemTrackerData",
+                "selectedBucket" to selectedBucket,
+                "dataClass" to this.javaClass.superclass.name,
+            )
+    }
+
     private var selectedBucket: E? = null
     private var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 
@@ -58,24 +71,16 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
     private fun getPoppedBuckets(): MutableList<E> = (bucketedItems.toMutableMap().filter { it.value.isNotEmpty() }.keys).toMutableList()
     fun getItemsProp(): MutableMap<NEUInternalName, TrackedItem> = getSelectedBucket()?.let { getBucket(it) } ?: flattenBuckets()
     fun getSelectedBucket() = selectedBucket
-
     fun selectNextSequentialBucket() {
-        @Suppress("UNCHECKED_CAST")
-        val enumValues: Array<E> = selectedBucket?.javaClass?.enumConstants
-            ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
-                (type as? Class<E>)?.enumConstants
-            } ?: throw IllegalStateException("Unable to retrieve enum constants for E")
-
         // Move to the next ordinal, or wrap to null if at the last value
         val nextOrdinal = selectedBucket?.let { it.ordinal + 1 } // Only calculate if selectedBucket is non-null
         selectedBucket = when {
-            selectedBucket == null -> enumValues.first() // If selectedBucket is null, start with the first enum
-            nextOrdinal != null && nextOrdinal >= enumValues.size -> null // Wrap to null if we've reached the end
-            nextOrdinal != null -> enumValues[nextOrdinal] // Move to the next enum value
+            selectedBucket == null -> buckets.first() // If selectedBucket is null, start with the first enum
+            nextOrdinal != null && nextOrdinal >= buckets.size -> null // Wrap to null if we've reached the end
+            nextOrdinal != null -> buckets[nextOrdinal] // Move to the next enum value
             else -> selectedBucket // Fallback, shouldn't happen
         }
     }
-
 
     private fun flattenBuckets(): MutableMap<NEUInternalName, TrackedItem> {
         val flatMap: MutableMap<NEUInternalName, TrackedItem> = HashMap()
