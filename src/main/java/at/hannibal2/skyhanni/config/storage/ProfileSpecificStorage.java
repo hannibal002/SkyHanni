@@ -647,8 +647,14 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
+        public Map<Integer, DianaProfitTracker.Data> dianaProfitTrackerPerElectionSeason = new HashMap<>();
+
+        @Expose
         // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
+
+        @Expose
+        public Map<Integer, MythologicalCreatureTracker.Data> mythologicalMobTrackerPerElectionSeason = new HashMap<>();
     }
 
     @Expose

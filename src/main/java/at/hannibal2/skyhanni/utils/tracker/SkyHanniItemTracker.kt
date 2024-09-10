@@ -25,8 +25,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
+    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
     drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
+) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
 
     companion object {
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
@@ -37,9 +38,8 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             it.addItem(internalName, amount, command)
         }
         getSharedTracker()?.let { sharedData ->
-            sharedData.get(DisplayMode.TOTAL).items[internalName]?.let { data ->
-                sharedData.get(DisplayMode.SESSION).items[internalName]!!.hidden = data.hidden
-            }
+            val isHidden = sharedData.get(DisplayMode.TOTAL).items[internalName]?.hidden
+            if (isHidden != null) sharedData.modify { it.items[internalName]?.hidden = isHidden }
         }
 
         if (command) {
