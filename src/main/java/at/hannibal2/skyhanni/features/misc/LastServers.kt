@@ -20,15 +20,19 @@ object LastServers {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (!isEnabled() || HypixelData.serverId == lastServerId) return
+        if (!isEnabled()) return
 
         val id = HypixelData.serverId ?: return
+        // Update the time of the current server if the player is still on the same server.
+        // This is necessary because the player can be on the same server for a long time.
+        // And if the player leaves the server and joins it again, it still warns the player.
+        lastServers[id] = SimpleTimeMark.now()
+
         lastServers.entries.removeIf { it.value.passedSince() > config.warnTime.seconds }
         lastServers[id]?.passedSince()?.let {
             ChatUtils.chat("§7You already joined this server §b${it.format()}§7 ago.")
         }
         ChatUtils.debug("Adding $id to last servers.")
-        lastServers[id] = SimpleTimeMark.now()
         lastServerId = id
     }
 
