@@ -12,6 +12,8 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
@@ -61,7 +63,7 @@ object CustomScoreboard {
         if (display.isEmpty()) return
 
         val render =
-            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
+            if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
                 cache
             } else {
                 display
@@ -128,7 +130,7 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        UnknownLinesHandler.handleUnknownLines()
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
     }
 
     @SubscribeEvent
@@ -150,12 +152,27 @@ object CustomScoreboard {
     internal val informationFilteringConfig get() = config.informationFiltering
     internal val backgroundConfig get() = config.background
 
-    private fun createLines() = buildList<ScoreboardElementType> {
+    private fun createLines() = when {
+        !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()
+        !displayConfig.useCustomLines -> addDefaultSkyBlockLines()
+        else -> addCustomSkyBlockLines()
+    }
+
+    private fun addAllNonSkyBlockLines() = buildList {
+        addAll(ScoreboardElement.TITLE.getVisiblePair())
+        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
+    }
+
+    private fun addDefaultSkyBlockLines() = buildList {
+        add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
+    }
+
+    private fun addCustomSkyBlockLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
             val lines = element.getVisiblePair()
             if (lines.isEmpty()) continue
 
-            // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
                 lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
@@ -163,13 +180,11 @@ object CustomScoreboard {
                 continue
             }
 
-            // Adds empty lines
             if (lines.first().first == "<empty>") {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
 
-            // Does not display this line
             if (lines.any { it.first == "<hidden>" }) {
                 continue
             }
@@ -205,7 +220,11 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+        ConditionalUtils.onToggle(
+            config.enabled,
+            displayConfig.hideVanillaScoreboard,
+            SkyHanniMod.feature.misc.showOutsideSB,
+        ) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
@@ -213,7 +232,7 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock) dirty = true
+            if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
@@ -235,7 +254,9 @@ object CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isEnabled() =
+        (LorenzUtils.inSkyBlock || (OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
+
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent
@@ -326,6 +347,13 @@ object CustomScoreboard {
             val array = element.asJsonArray
             array.add(JsonPrimitive(ScoreboardEvent.NEW_YEAR.name))
             array
+        }
+        event.move(
+            57,
+            "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
+            "$displayPrefix.titleAndFooter.useCustomTitle",
+        ) {
+            JsonPrimitive(!it.asBoolean)
         }
     }
 }

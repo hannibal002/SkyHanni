@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -63,17 +64,18 @@ object MayorAPI {
     /**
      * REGEX-TEST: Calendar and Events
      */
-    private val calendarGuiPattern by group.pattern(
+    val calendarGuiPattern by group.pattern(
         "calendar.gui",
         "Calendar and Events",
     )
 
     /**
      * REGEX-TEST: §dMayor Jerry
+     * REGEX-TEST: §cMayor Aatrox
      */
-    private val jerryHeadPattern by group.pattern(
-        "jerry.head",
-        "§dMayor Jerry",
+    private val mayorHeadPattern by group.pattern(
+        "mayor.head",
+        "§.Mayor (?<name>.*)",
     )
 
     /**
@@ -152,6 +154,7 @@ object MayorAPI {
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
             currentMayor = Mayor.UNKNOWN
+            currentMinister = null
         }
     }
 
@@ -161,7 +164,11 @@ object MayorAPI {
 
         if (!calendarGuiPattern.matches(event.inventoryName)) return
 
-        val stack: ItemStack = event.inventoryItems.values.firstOrNull { jerryHeadPattern.matches(it.displayName) } ?: return
+        val stack: ItemStack = event.inventoryItems.values.firstOrNull {
+            mayorHeadPattern.matchMatcher(it.displayName) {
+                group("name") == "Jerry"
+            } ?: false
+        } ?: return
 
         val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }) ?: return
         // This is the first Perk of the Perkpocalypse Mayor
@@ -247,7 +254,7 @@ object MayorAPI {
         event.addIrrelevant {
             add("Current Mayor: ${currentMayor?.name ?: "Unknown"}")
             add("Active Perks: ${currentMayor?.activePerks}")
-            add("Last Update: $lastUpdate (${lastUpdate.passedSince()} ago)")
+            add("Last Update: ${lastUpdate.formattedDate("EEEE, MMM d h:mm a")} (${lastUpdate.passedSince()} ago)")
             add("Time Till Next Mayor: ${nextMayorTimestamp.timeUntil()}")
             add("Current Minister: ${currentMinister?.name ?: "Unknown"}")
             add("Current Minister Perk: ${currentMinister?.activePerks}")

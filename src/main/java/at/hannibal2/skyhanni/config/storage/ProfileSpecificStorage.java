@@ -534,7 +534,7 @@ public class ProfileSpecificStorage {
         public HotmTree hotmTree = new HotmTree();
 
         @Expose
-        public Map<HotmAPI.Powder, PowderStorage> powder = new HashMap<>();
+        public Map<HotmAPI.PowderType, PowderStorage> powder = new HashMap<>();
 
         public static class PowderStorage {
 
@@ -668,6 +668,10 @@ public class ProfileSpecificStorage {
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
+
+    @Expose
+    @Nullable
+    public Integer abiphoneContactAmount = null;
 
     @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();

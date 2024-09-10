@@ -550,6 +550,8 @@ private fun getRiftLines() = getSbLines().filter { line ->
         || SbPattern.riftAveikxPattern.matches(line)
         || SbPattern.riftHayEatenPattern.matches(line)
         || SbPattern.cluesPattern.matches(line)
+        || SbPattern.barryProtestorsQuestlinePattern.matches(line)
+        || SbPattern.barryProtestorsHandledPattern.matches(line)
 }
 
 private fun getEssenceLines(): List<String> = listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
@@ -558,6 +560,7 @@ private fun getEssenceShowWhen(): Boolean = SbPattern.essencePattern.anyMatches(
 
 private fun getQueueLines(): List<String> =
     listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queueTierPattern.matches(it) }) +
         (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
 
 private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getSbLines())
