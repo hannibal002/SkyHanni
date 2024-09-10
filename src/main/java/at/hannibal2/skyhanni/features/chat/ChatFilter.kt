@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -421,6 +422,11 @@ object ChatFilter {
         "§4You haven't reached all checkpoints for parkour (.*)!".toPattern(),
     )
 
+    /**
+     * REGEX-TEST: §4Cancelled parkour! You cannot fly.
+     * REGEX-TEST: §4Cancelled parkour! You cannot use item abilities.
+     * REGEX-TEST: §4Cancelled parkour!
+     */
     private val parkourCancelMessages = listOf(
         "§4Cancelled parkour! You cannot fly.",
         "§4Cancelled parkour! You cannot use item abilities.",
@@ -428,15 +434,15 @@ object ChatFilter {
     )
 
     /**
-    ** REGEX-TEST: §r§aWarped from the tpPadOne §r§ato the tpPadTwo§r§a!
-    */
+     ** REGEX-TEST: §r§aWarped from the tpPadOne §r§ato the tpPadTwo§r§a!
+     */
     private val teleportPadPatterns = listOf(
         "§aWarped from the (.*) §r§ato the (.*)§r§a!".toPattern(),
     )
 
     // §r§4This Teleport Pad does not have a destination set!
     private val teleportPadMessages = listOf(
-        "§4This Teleport Pad does not have a destination set!"
+        "§4This Teleport Pad does not have a destination set!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
