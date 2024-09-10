@@ -336,7 +336,7 @@ object CollectionUtils {
         for (entry in universe) {
             val display = getName(entry)
             if (isCurrent(entry)) {
-                addString("§a[$display]")
+                addString("§a[$display§a]")
             } else {
                 addString("§e[")
                 add(
