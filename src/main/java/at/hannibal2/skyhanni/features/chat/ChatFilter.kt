@@ -458,8 +458,8 @@ object ChatFilter {
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
         "achievement_get" to achievementGetPatterns,
-        "parkour" to parkourPatterns,
-        "teleport_pads" to teleportPadPatterns,
+        "hideParkour" to parkourPatterns,
+        "hideTeleportPads" to teleportPadPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(

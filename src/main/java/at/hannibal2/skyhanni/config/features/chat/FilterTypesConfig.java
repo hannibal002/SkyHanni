@@ -112,16 +112,16 @@ public class FilterTypesConfig {
     public boolean hideAlphaAchievements = false;
 
     @Expose
-    @ConfigOption(name = "Parkour", desc = "Hide parkour messages.")
+    @ConfigOption(name = "Hide Parkour", desc = "Hide parkour messages.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean parkour = false;
+    public boolean hideParkour = false;
 
     @Expose
-    @ConfigOption(name = "Teleport pads", desc = "Hide annoying messages from teleport pads.")
+    @ConfigOption(name = "Hide Teleport pads", desc = "Hide annoying messages from teleport pads.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean teleport_pads = false;
+    public boolean hideTeleportPads = false;
 
     //TODO remove
     @Expose
