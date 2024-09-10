@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
@@ -35,10 +37,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -65,13 +70,11 @@ object GoldenFishTimer {
         "§9The §r§6Golden Fish §r§9swims back beneath the lava\\.\\.\\.",
     )
 
-    private val interactPatternsList = listOf(interactPattern, weakPattern)
-
     private val timeOut = 10.seconds
     private val despawnTime = 1.minutes
     private val maxRodTime = 3.minutes
     private val minimumSpawnTime = 15.minutes
-    private val MAX_INTERACTIONS = 3
+    private const val MAX_INTERACTIONS = 3
 
     private var lastFishEntity = SimpleTimeMark.farPast()
     private var lastChatMessage = SimpleTimeMark.farPast()
@@ -82,30 +85,23 @@ object GoldenFishTimer {
     private var goldenFishDespawnTimer = SimpleTimeMark.farFuture()
     private var timePossibleSpawn = SimpleTimeMark.farFuture()
 
-    private var possibleEntities = TimeLimitedSet<EntityLivingBase>(1.seconds) { checkGoldenFish(it) }
-
-    private var isFishing = false
+    private val isFishing get() = FishingAPI.isFishing() || lastRodThrowTime.passedSince() < maxRodTime
     private var hasLavaRodInInventory = false
 
     private fun checkGoldenFish(entity: EntityLivingBase) {
-        if (isGoldenFishActive()) return
-        if (entity.inventory.none { it?.getSkullTexture() == goldenFishSkullTexture }) return
+        if (entity.inventory.none { it?.getSkullTexture() == GOLDEN_FISH_SKULL_TEXTURE }) return
         possibleGoldenFishEntity = entity
-        if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
-            entity,
-            LorenzColor.GREEN.toColor().withAlpha(100),
-        ) { interactions == MAX_INTERACTIONS }
         lastFishEntity = SimpleTimeMark.now()
         handle()
     }
 
-    private val goldenFishSkullTexture =
-        "ewogICJ0aW1lc3RhbXAiIDogMTY0MzgzMTA2MDE5OCwKICAicHJvZmlsZUlkIiA6ICJiN2ZkYmU2N2NkMDA0NjgzYjlmYTllM2UxNzczODI1NCIsCiAgInByb2ZpbGVOYW1lIiA6ICJDVUNGTDE0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzEyMGNmM2MwYTQwZmM2N2UwZTVmZTBjNDZiMGFlNDA5YWM3MTAzMGE3NjU2ZGExN2IxMWVkMDAxNjQ1ODg4ZmUiCiAgICB9CiAgfQp9=="
+    private const val GOLDEN_FISH_SKULL_TEXTURE =
+        "ewogICJ0aW1lc3RhbXAiIDogMTY0MzgzMTA2MDE5OCwKICAicHJvZmlsZUlkIiA6ICJiN2ZkYmU2N2NkMDA0NjgzYjlmYTllM2UxNzczODI1NCIsCiAgInByb2ZpbGVOYW1lIiA6ICJDVUNGTDE0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzEyMGNmM2MwYTQwZmM2N2UwZTVmZTBjNDZiMGFlNDA5YWM3MTAzMGE3NjU2ZGExN2IxMWVkMDAxNjQ1ODg4ZmUiCiAgICB9CiAgfQp9"
     private val goldenFishSkullItem by lazy {
         ItemUtils.createSkull(
             displayName = "§6Golden Fish",
             uuid = "b7fdbe67cd004683b9fa9e3e17738254",
-            value = goldenFishSkullTexture,
+            value = GOLDEN_FISH_SKULL_TEXTURE,
         )
     }
     private var interactions = 0
@@ -126,9 +122,18 @@ object GoldenFishTimer {
             handle()
             return
         }
-        if (interactPatternsList.any { it.matches(event.message) }) {
+        if (interactPattern.matches(event.message)) {
             goldenFishDespawnTimer = SimpleTimeMark.now() + despawnTime
             interactions++
+            return
+        }
+        if (weakPattern.matches(event.message)) {
+            goldenFishDespawnTimer = SimpleTimeMark.now() + despawnTime
+            val entity = confirmedGoldenFishEntity ?: return
+            if (config.highlight) RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity,
+                LorenzColor.GREEN.toColor().withAlpha(100)
+            ) { true }
             return
         }
         if (despawnPattern.matches(event.message)) {
@@ -154,7 +159,7 @@ object GoldenFishTimer {
         val location = event.exactLocation(entity).add(y = 2.5)
         if (location.distanceToPlayer() > 20) return
         event.drawString(location.add(y = 0.5), "§b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}", false)
-        if (interactions == MAX_INTERACTIONS) event.drawString(location.add(y = 0.25), "§cPULL", false)
+        if (interactions >= MAX_INTERACTIONS) event.drawString(location.add(y = 0.25), "§cPULL", false)
         event.drawString(location, "§6Golden Fish §a($interactions/$MAX_INTERACTIONS)", false)
     }
 
@@ -182,26 +187,26 @@ object GoldenFishTimer {
             add("§6§lGolden Fish Timer")
             if (!isGoldenFishActive()) {
                 if (lastGoldenFishTime.isFarPast()) add("§7Last Golden Fish: §cNone this session")
-                else add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().format()}")
+                else add("§7Last Golden Fish: §b${lastGoldenFishTime.passedSince().formatTime()}")
                 if (lastRodThrowTime.isFarPast()) add("§7Last Row Throw: §cNone yet")
                 else add(
-                    "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().format()} " +
-                        "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().format()})",
+                    "§7Last Rod Throw: §b${lastRodThrowTime.passedSince().formatTime()} " +
+                        "§3(${(lastRodThrowTime + maxRodTime + 1.seconds).timeUntil().formatTime()})",
                 )
                 if (timePossibleSpawn.isFarFuture()) add("§7Can spawn in: §cUnknown")
                 else if (timePossibleSpawn.isInFuture()) add(
                     "§7Can spawn in: §b${
-                        (timePossibleSpawn + 1.seconds).timeUntil().format()
+                        (timePossibleSpawn + 1.seconds).timeUntil().formatTime()
                     }",
                 )
                 else {
-                    add("§7Can spawn since: §b${timePossibleSpawn.passedSince().format()}")
+                    add("§7Can spawn since: §b${timePossibleSpawn.passedSince().formatTime()}")
                     val chance = timePossibleSpawn.passedSince().inWholeSeconds.toDouble() / 5.minutes.inWholeSeconds
                     add("§7Chance: §b${LorenzUtils.formatPercentage(chance.coerceAtMost(1.0))}")
                 }
             } else {
                 add("§7Interactions: §b$interactions/$MAX_INTERACTIONS")
-                add("§7Despawn in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().format()}")
+                add("§7Despawn in: §b${(goldenFishDespawnTimer + 1.seconds).timeUntil().formatTime()}")
             }
         }
 
@@ -217,10 +222,6 @@ object GoldenFishTimer {
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
-
-        if (FishingAPI.isFishing()) {
-            isFishing = true
-        }
         hasLavaRodInInventory = InventoryUtils.containsInLowerInventory { it.getInternalNameOrNull()?.isLavaRod() == true }
 
         if (!isActive()) return
@@ -229,7 +230,7 @@ object GoldenFishTimer {
             timePossibleSpawn = SimpleTimeMark.farFuture()
             lastRodThrowTime = SimpleTimeMark.farPast()
         }
-        if ((lastRodThrowTime + maxRodTime).timeUntil() < config.throwRodWarningTime.seconds) {
+        if (!lastRodThrowTime.isFarPast() && (lastRodThrowTime + maxRodTime).timeUntil() < config.throwRodWarningTime.seconds) {
             rodWarning()
         }
 
@@ -270,9 +271,10 @@ object GoldenFishTimer {
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isActive()) return
         if (isGoldenFishActive()) return
-        val entity = event.entity
-        if (entity.distanceToPlayer() > 25) return
-        possibleEntities.add(entity)
+        val entity = event.entity as? EntityArmorStand ?: return
+        entity.inventory.forEach { it?.getSkullTexture()?.let { texture -> println(texture) } }
+
+        DelayedRun.runDelayed(1.seconds) { checkGoldenFish(entity) }
     }
 
     @SubscribeEvent
@@ -286,6 +288,29 @@ object GoldenFishTimer {
         interactions = 0
         display = listOf()
         removeGoldenFish()
+    }
+
+    @SubscribeEvent
+    fun onDebugData(event: DebugDataCollectEvent) {
+        event.title("Golden Fish Timer")
+        if (!isEnabled()) {
+            event.addIrrelevant("Not Enabled")
+        } else {
+            event.addIrrelevant {
+                add("lastChatMessage: ${lastChatMessage.passedSince().format()}")
+                add("lastFishEntity: ${lastFishEntity.passedSince().format()}")
+                add("lastGoldenFishTime: ${lastGoldenFishTime.passedSince().format()}")
+                add("lastRodThrowTime: ${lastRodThrowTime.passedSince().format()}")
+                add("goldenFishDespawnTimer: ${goldenFishDespawnTimer.timeUntil().format()}")
+                add("timePossibleSpawn: ${timePossibleSpawn.timeUntil().format()}")
+                add("interactions: $interactions")
+                add("goingDownInit: $goingDownInit")
+                add("goingDownPost: $goingDownPost")
+                add("hasWarnedRod: $hasWarnedRod")
+                add("possibleGoldenFishEntity: $possibleGoldenFishEntity")
+                add("confirmedGoldenFishEntity: $confirmedGoldenFishEntity")
+            }
+        }
     }
 
     private fun removeGoldenFish() {
@@ -307,6 +332,8 @@ object GoldenFishTimer {
         possibleGoldenFishEntity = null
         goldenFishDespawnTimer = SimpleTimeMark.now() + despawnTime
     }
+
+    private fun Duration.formatTime() = format(showMilliSeconds = false, showSmallerUnits = true)
 
     private fun isGoldenFishActive() = confirmedGoldenFishEntity != null
 
