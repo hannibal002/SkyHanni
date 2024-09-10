@@ -311,8 +311,8 @@ object CollectionUtils {
     inline fun <reified T : Enum<T>> MutableList<Searchable>.addSearchableSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T?) -> Boolean,
-        crossinline onChange: (T?) -> Unit,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
     ) {
         add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)).toSearchable())
     }
