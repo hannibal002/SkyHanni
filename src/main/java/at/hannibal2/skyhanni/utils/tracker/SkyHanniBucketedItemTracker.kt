@@ -25,7 +25,8 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
-) : SkyHanniTracker<BucketedData>(name, createNewSession, getStorage, drawDisplay) {
+    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> BucketedData>,
+) : SkyHanniTracker<BucketedData>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
 
     companion object {
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN

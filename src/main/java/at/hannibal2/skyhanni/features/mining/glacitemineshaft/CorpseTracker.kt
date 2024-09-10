@@ -34,7 +34,8 @@ object CorpseTracker {
         "Corpse Tracker",
         { BucketData() },
         { it.mining.mineshaft.corpseProfitTracker },
-    ) { drawDisplay(it) }
+        { drawDisplay(it) }
+    )
 
     class BucketData : BucketedItemTrackerData<CorpseType>() {
         override fun resetItems() {
