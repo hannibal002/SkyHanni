@@ -186,17 +186,21 @@ object MayorAPI {
         jerryExtraMayor = jerryMayor to expireTime
     }
 
+    fun SkyBlockTime.getElectionYear(): Int {
+        var mayorYear = year
+
+        // Check if this year's election has not happened yet
+        if (month < ELECTION_END_MONTH || (day < ELECTION_END_DAY && month == ELECTION_END_MONTH)) {
+            // If so, the current mayor is still from last year's election
+            mayorYear--
+        }
+        return mayorYear
+    }
+
     private fun calculateNextMayorTime(): SimpleTimeMark {
         val now = SkyBlockTime.now()
-        var mayorYear = now.year
 
-        // Check if either the month is already over or the day after 27th in the third month
-        if (now.month > ELECTION_END_MONTH || (now.day >= ELECTION_END_DAY && now.month == ELECTION_END_MONTH)) {
-            // If so, the next mayor will be in the next year
-            mayorYear++
-        }
-
-        return SkyBlockTime(mayorYear, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
+        return SkyBlockTime(now.getElectionYear() + 1, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
     }
 
     private fun getTimeTillNextMayor() {

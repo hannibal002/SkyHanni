@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -409,7 +410,7 @@ object ChatFilter {
 
     /**
      * REGEX-TEST: §aStarted parkour cocoa!
-     * REGEX-TEST: §aFinished parkour cocoa in 12:34.567
+     * REGEX-TEST: §aFinished parkour cocoa in 12:34.567!
      * REGEX-TEST: §aReached checkpoint #4 for parkour cocoa!
      * REGEX-TEST: §4Wrong checkpoint for parkour cocoa!
      * REGEX-TEST: §4You haven't reached all checkpoints for parkour cocoa!
@@ -433,14 +434,16 @@ object ChatFilter {
         "§4Cancelled parkour!",
     )
 
-    // §r§aWarped from the tppadone §r§ato the tppadtwo§r§a!
+    /**
+     ** REGEX-TEST: §r§aWarped from the tpPadOne §r§ato the tpPadTwo§r§a!
+     */
     private val teleportPadPatterns = listOf(
         "§aWarped from the (.*) §r§ato the (.*)§r§a!".toPattern(),
     )
 
     // §r§4This Teleport Pad does not have a destination set!
     private val teleportPadMessages = listOf(
-        "§4This Teleport Pad does not have a destination set!"
+        "§4This Teleport Pad does not have a destination set!",
     )
 
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
@@ -522,8 +525,8 @@ object ChatFilter {
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
-        config.hideParkour && message.isPresent("parkour") -> "parkour"
-        config.hideTeleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
+        config.parkour && message.isPresent("parkour") -> "parkour"
+        config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 

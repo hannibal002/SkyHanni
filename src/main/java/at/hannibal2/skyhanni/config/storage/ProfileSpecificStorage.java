@@ -34,6 +34,7 @@ import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
@@ -565,6 +566,9 @@ public class ProfileSpecificStorage {
 
             @Expose
             public List<MineshaftPityDisplay.PityData> blocksBroken = new ArrayList<>();
+
+            @Expose
+            public CorpseTracker.BucketData corpseProfitTracker = new CorpseTracker.BucketData();
         }
 
         @Expose
@@ -651,8 +655,14 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
+        public Map<Integer, DianaProfitTracker.Data> dianaProfitTrackerPerElectionSeason = new HashMap<>();
+
+        @Expose
         // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
+
+        @Expose
+        public Map<Integer, MythologicalCreatureTracker.Data> mythologicalMobTrackerPerElectionSeason = new HashMap<>();
     }
 
     @Expose
@@ -677,6 +687,7 @@ public class ProfileSpecificStorage {
     @Nullable
     public Integer abiphoneContactAmount = null;
 
+    @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
     public static class HoppityEventStats {
