@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableEnums.ExperimentMessages
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -33,6 +33,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
@@ -191,13 +193,13 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<Renderable> = buildList {
-        addString("§e§lExperiments Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lExperiments Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this) + data.startCost
 
         val experimentsDone = data.experimentsDone
-        addString("")
-        addString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
+        addSearchString("")
+        addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
         val startCostFormat = data.startCost.absoluteValue.shortFormat()
         val bitCostFormat = data.bitCost.shortFormat()
         add(
@@ -207,10 +209,10 @@ object ExperimentsProfitTracker {
                     "§7You paid §c$startCostFormat §7coins and", "§b$bitCostFormat §7bits for starting",
                     "§7experiments.",
                 ),
-            ),
+            ).toSearchable(),
         )
         add(tracker.addTotalProfit(profit, data.experimentsDone, "experiment"))
-        addString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
+        addSearchString("§eTotal Enchanting Exp: §b${data.xpGained.shortFormat()}")
 
         tracker.addPriceFromButton(this)
     }
