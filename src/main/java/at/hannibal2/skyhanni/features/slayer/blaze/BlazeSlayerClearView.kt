@@ -7,11 +7,13 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.projectile.EntityFireball
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BlazeSlayerClearView {
+@SkyHanniModule
+object BlazeSlayerClearView {
 
     private var nearBlaze = false
 
@@ -38,7 +40,7 @@ class BlazeSlayerClearView {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isEnabled()) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -47,7 +49,7 @@ class BlazeSlayerClearView {
         if (isEnabled()) {
             val entity = event.entity
             if (entity is EntityFireball) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

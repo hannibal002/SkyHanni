@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -18,7 +19,8 @@ import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
 
-class TimeFeatures {
+@SkyHanniModule
+object TimeFeatures {
 
     private val config get() = SkyHanniMod.feature.gui
     private val winterConfig get() = SkyHanniMod.feature.event.winter
@@ -26,7 +28,7 @@ class TimeFeatures {
     private val timeFormat24h = SimpleDateFormat("HH:mm:ss")
     private val timeFormat12h = SimpleDateFormat("hh:mm:ss a")
 
-    private val startOfNextYear = RecalculatingValue(1.seconds) {
+    private val startOfNextYear by RecalculatingValue(1.seconds) {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
     }
 
@@ -42,7 +44,7 @@ class TimeFeatures {
 
         if (winterConfig.islandCloseTime && IslandType.WINTER.isInIsland()) {
             if (WinterAPI.isDecember()) return
-            val timeTillNextYear = startOfNextYear.getValue().timeUntil()
+            val timeTillNextYear = startOfNextYear.timeUntil()
             val alreadyInNextYear = timeTillNextYear > 5.days
             val text = if (alreadyInNextYear) {
                 "§fJerry's Workshop §cis closing!"

@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.mob.MobData.Companion.logger
 import at.hannibal2.skyhanni.data.mob.MobFilter.isDisplayNPC
 import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -18,7 +20,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.refreshReference
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.EntityLivingBase
@@ -31,17 +32,15 @@ import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import net.minecraftforge.fml.common.network.FMLNetworkEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
-private const val MAX_RETRIES = 20 * 5
+@SkyHanniModule
+object MobDetection {
 
-class MobDetection {
-
-    /* Unsupported "Mobs"
+    /* Unsupported Entities
         Nicked Players
-        Odanate
+        Odonata
         Silk Worm
         Fairy (in Dungeon)
         Totem of Corruption
@@ -53,24 +52,11 @@ class MobDetection {
         Zee
      */
 
+    private const val MAX_RETRIES = 20 * 5
+
     private val forceReset get() = !SkyHanniMod.feature.dev.mobDebug.enable
 
     private var shouldClear: AtomicBoolean = AtomicBoolean(false)
-
-    init {
-        MobFilter.bossMobNameFilter
-        MobFilter.mobNameFilter
-        MobFilter.dojoFilter
-        MobFilter.summonFilter
-        MobFilter.dungeonNameFilter
-        MobFilter.petCareNamePattern
-        MobFilter.slayerNameFilter
-        MobFilter.summonOwnerPattern
-        MobFilter.wokeSleepingGolemPattern
-        MobFilter.jerryPattern
-        MobFilter.jerryMagmaCubePattern
-        MobUtils.defaultArmorStandName
-    }
 
     private fun mobDetectionReset() {
         MobData.currentMobs.map {
@@ -85,7 +71,6 @@ class MobDetection {
             shouldClear.set(false)
         }
         if (!LorenzUtils.inSkyBlock) return
-        if (event.isMod(2)) return
 
         makeEntityReferenceUpdate()
 
@@ -96,8 +81,10 @@ class MobDetection {
         MobData.previousEntityLiving.clear()
         MobData.previousEntityLiving.addAll(MobData.currentEntityLiving)
         MobData.currentEntityLiving.clear()
-        MobData.currentEntityLiving.addAll(EntityUtils.getEntities<EntityLivingBase>()
-            .filter { it !is EntityArmorStand && it !is EntityPlayerSP })
+        MobData.currentEntityLiving.addAll(
+            EntityUtils.getEntities<EntityLivingBase>()
+                .filter { it !is EntityArmorStand && it !is EntityPlayerSP },
+        )
 
         if (forceReset) {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
@@ -105,6 +92,8 @@ class MobDetection {
 
         (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
         (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
+
+        MobData.notSeenMobs.removeIf(::canBeSeen)
 
         if (forceReset) {
             mobDetectionReset() // Ensure that all mobs are cleared 100%
@@ -129,7 +118,20 @@ class MobDetection {
     private fun getRetry(entity: EntityLivingBase) = MobData.retries[entity.entityId]
 
     /** @return always true */
-    private fun mobDetectionError(string: String) = logger.log(string).let { true }
+    private fun mobDetectionError(string: String) = MobData.logger.log(string).let { true }
+
+    private fun canBeSeen(mob: Mob): Boolean {
+        val isVisible = !mob.isInvisible() && mob.canBeSeen()
+        if (isVisible) when (mob.mobType) {
+            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        }
+        return isVisible
+    }
 
     /**@return a false means that it should try again (later)*/
     private fun entitySpawn(entity: EntityLivingBase, roughType: Mob.Type): Boolean {
@@ -149,7 +151,7 @@ class MobDetection {
                             Mob.Type.SUMMON -> MobEvent.Spawn.Summon(mob)
 
                             Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.Spawn.SkyblockMob(
-                                mob
+                                mob,
                             )
 
                             Mob.Type.SPECIAL -> MobEvent.Spawn.Special(mob)
@@ -263,7 +265,7 @@ class MobDetection {
 
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
-                logger.log(
+                MobData.logger.log(
                     "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
                         + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
                         + "\n Position: ${retry.entity.getLorenzVec()}\n "
@@ -271,7 +273,7 @@ class MobDetection {
                         entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
                     }\n"
                         + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
-                        "}"
+                        "}",
                 )
                 // Uncomment this to make it closed a loop
                 // iterator.remove()
@@ -308,8 +310,8 @@ class MobDetection {
         return true
     }
 
-    @SubscribeEvent
-    fun onEntitySpawnPacket(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent
+    fun onEntitySpawnPacket(event: PacketReceivedEvent) {
         when (val packet = event.packet) {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
@@ -330,8 +332,8 @@ class MobDetection {
         allEntitiesViaPacketId.add(id)
     }
 
-    @SubscribeEvent
-    fun onDisconnect(event: FMLNetworkEvent.ClientDisconnectionFromServerEvent) {
+    @HandleEvent
+    fun onDisconnect(event: ClientDisconnectEvent) {
         shouldClear.set(true)
     }
 

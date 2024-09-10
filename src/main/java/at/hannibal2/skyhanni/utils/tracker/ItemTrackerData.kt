@@ -24,12 +24,17 @@ abstract class ItemTrackerData : TrackerData() {
         resetItems()
     }
 
-    fun additem(internalName: NEUInternalName, stackSize: Int) {
+    fun addItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
         val item = items.getOrPut(internalName) { TrackedItem() }
 
-        item.timesGained++
-        item.totalAmount += stackSize
+        if (!command) {
+            item.timesGained++
+        }
+        item.totalAmount += amount
         item.lastTimeUpdated = SimpleTimeMark.now()
+        if (command && item.totalAmount <= 0) {
+            items.remove(internalName)
+        }
     }
 
     @Expose

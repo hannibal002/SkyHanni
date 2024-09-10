@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -9,7 +10,8 @@ import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
 
-class FixNEUHeavyPearls {
+@SkyHanniModule
+object FixNEUHeavyPearls {
 
     private val config get() = SkyHanniMod.feature.misc
     private val heavyPearl = "HEAVY_PEARL".asInternalName()
@@ -27,5 +29,5 @@ class FixNEUHeavyPearls {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.fixNeuHeavyPearls
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.fixNeuHeavyPearls
 }

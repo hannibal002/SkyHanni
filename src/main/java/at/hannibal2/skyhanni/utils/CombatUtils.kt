@@ -113,10 +113,10 @@ object CombatUtils {
     /**
      * Taken from NotEnoughUpdates
      */
-    fun interp(now: Float, last: Float, lastupdate: Long): Float {
+    fun interp(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
         if (last >= 0 && last != now) {
-            var factor = (System.currentTimeMillis() - lastupdate) / 1000f
+            var factor = (System.currentTimeMillis() - lastUpdate) / 1000f
             factor = LerpUtils.clampZeroOne(factor)
             interp = last + (now - last) * factor
         }

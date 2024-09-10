@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConfigUtils
@@ -26,6 +27,7 @@ import java.util.regex.Matcher
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object AdvancedPlayerList {
 
     val tabPlayerData = mutableMapOf<String, PlayerData>()
@@ -34,12 +36,12 @@ object AdvancedPlayerList {
 
     private val levelPattern by RepoPattern.pattern(
         "misc.compacttablist.advanced.level",
-        ".*\\[(?<level>.*)] §r(?<name>.*)"
+        ".*\\[(?<level>.*)] §r(?<name>.*)",
     )
 
-    private var playerDatas = mutableMapOf<String, PlayerData>()
+    private var playerData = mutableMapOf<String, PlayerData>()
 
-    fun createTabLine(text: String, type: TabStringType) = playerDatas[text]?.let {
+    fun createTabLine(text: String, type: TabStringType) = playerData[text]?.let {
         TabLine(text, type, createCustomName(it))
     } ?: TabLine(text, type)
 
@@ -88,7 +90,7 @@ object AdvancedPlayerList {
                 currentData[line] = it
             }
         }
-        playerDatas = currentData
+        playerData = currentData
         val prepare = currentData.entries
 
         val sorted = when (config.playerSortOrder) {
@@ -125,7 +127,7 @@ object AdvancedPlayerList {
         }
         newList.addAll(newPlayerList)
 
-        val rest = original.drop(playerDatas.size + extraTitles + 1)
+        val rest = original.drop(playerData.size + extraTitles + 1)
         newList.addAll(rest)
         return newList
     }
@@ -191,7 +193,9 @@ object AdvancedPlayerList {
         } else ""
 
         var suffix = if (config.hideEmblem) {
-            if (data.ironman) "§7♲" else data.bingoLevel?.let { BingoAPI.getBingoIcon(it) } ?: ""
+            if (data.ironman) "§7♲" else data.bingoLevel?.let {
+                BingoAPI.getBingoIcon(if (config.showBingoRankNumber) it else -1)
+            } ?: ""
         } else data.nameSuffix
 
         if (config.markSpecialPersons) {
@@ -218,7 +222,7 @@ object AdvancedPlayerList {
         LorenzUtils.getPlayerName() == name -> SocialIcon.ME
         MarkedPlayerManager.isMarkedPlayer(name) -> SocialIcon.MARKED
         PartyAPI.partyMembers.contains(name) -> SocialIcon.PARTY
-        FriendAPI.getAllFriends().any { it.name.contains(name) } -> SocialIcon.FRIEND
+        FriendAPI.getAllFriends().any { it.name.equals(name, ignoreCase = true) } -> SocialIcon.FRIEND
         GuildAPI.isInGuild(name) -> SocialIcon.GUILD
         else -> SocialIcon.OTHER
     }

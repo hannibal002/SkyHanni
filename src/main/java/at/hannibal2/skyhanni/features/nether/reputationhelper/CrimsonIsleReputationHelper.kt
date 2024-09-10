@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.features.nether.RescueMissionWaypoints
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
@@ -22,10 +23,13 @@ import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -44,6 +48,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     private var display = emptyList<List<Any>>()
     private var dirty = true
+    var tabListQuestsMissing = false
 
     /**
      *  c - Barbarian Not Accepted
@@ -53,7 +58,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
      */
     val tabListQuestPattern by RepoPattern.pattern(
         "crimson.reputation.tablist",
-        " §r§[cdea].*"
+        " §r§[cdea].*",
     )
 
     init {
@@ -88,9 +93,14 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
     }
 
     @SubscribeEvent
+    fun onSackChange(event: SackChangeEvent) {
+        dirty = true
+    }
+
+    @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!dirty && display.isEmpty()) {
             dirty = true
         }
@@ -100,17 +110,16 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
 
         if (event.repeatSeconds(3)) {
-            TabListData.getTabList()
-                .filter { it.contains("Reputation:") }
-                .forEach {
-                    factionType = if (it.contains("Mage")) {
-                        FactionType.MAGE
-                    } else if (it.contains("Barbarian")) {
-                        FactionType.BARBARIAN
-                    } else {
-                        FactionType.NONE
-                    }
+            val list = TabListData.getTabList().filter { it.contains("Reputation:") }
+            for (line in list) {
+                factionType = if (line.contains("Mage")) {
+                    FactionType.MAGE
+                } else if (line.contains("Barbarian")) {
+                    FactionType.BARBARIAN
+                } else {
+                    FactionType.NONE
                 }
+            }
         }
     }
 
@@ -127,27 +136,43 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         // TODO test
         if (factionType == FactionType.NONE) return
 
-        newList.addAsSingletonList("Reputation Helper:")
-        questHelper.render(newList)
-        miniBossHelper.render(newList)
-        kuudraBossHelper.render(newList)
+        newList.addAsSingletonList("§e§lReputation Helper")
+        if (tabListQuestsMissing) {
+            newList.addAsSingletonList("§cFaction Quests Widget not found!")
+            newList.addAsSingletonList("§7Open §e/tab §7and enable it!")
+        } else {
+            questHelper.render(newList)
+            miniBossHelper.render(newList)
+            kuudraBossHelper.render(newList)
+        }
+
 
         display = newList
     }
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.enabled) return
+        if (!config.enabled.get()) return
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
 
-        if (config.useHotkey && !config.hotkey.isKeyHeld()) {
+        if (config.useHotkey && !isHotkeyHeld()) {
             return
         }
 
         config.position.renderStringsAndItems(
             display,
-            posLabel = "Crimson Isle Reputation Helper"
+            posLabel = "Crimson Isle Reputation Helper",
         )
+    }
+
+    fun isHotkeyHeld(): Boolean {
+        val isAllowedGui = Minecraft.getMinecraft().currentScreen.let {
+            it == null || it is GuiInventory
+        }
+        if (!isAllowedGui) return false
+        if (NEUItems.neuHasFocus()) return false
+
+        return config.hotkey.isKeyHeld()
     }
 
     @SubscribeEvent
@@ -190,7 +215,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     fun showLocations() = when (config.showLocation) {
         ShowLocationEntry.ALWAYS -> true
-        ShowLocationEntry.ONLY_HOTKEY -> config.hotkey.isKeyHeld()
+        ShowLocationEntry.ONLY_HOTKEY -> isHotkeyHeld()
         else -> false
     }
 }

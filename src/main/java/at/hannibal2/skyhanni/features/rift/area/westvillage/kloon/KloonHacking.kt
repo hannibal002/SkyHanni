@@ -10,31 +10,33 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class KloonHacking {
+@SkyHanniModule
+object KloonHacking {
 
     private val config get() = RiftAPI.config.area.westVillage.hacking
 
-    private val colourPattern by RepoPattern.pattern(
-        "rift.area.westvillage.kloon.colour",
-        "You've set the color of this terminal to (?<colour>.*)!"
+    private val colorPattern by RepoPattern.pattern(
+        "rift.area.westvillage.kloon.color",
+        "You've set the color of this terminal to (?<color>.*)!"
     )
 
     private var wearingHelmet = false
     private var inTerminalInventory = false
-    private var inColourInventory = false
+    private var inColorInventory = false
     private val correctButtons = mutableListOf<String>()
     private var nearestTerminal: KloonTerminal? = null
 
@@ -51,7 +53,7 @@ class KloonHacking {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inTerminalInventory = false
-        inColourInventory = false
+        inColorInventory = false
         nearestTerminal = null
         if (!RiftAPI.inRift()) return
         if (!config.solver) return
@@ -65,14 +67,14 @@ class KloonHacking {
             }
         }
         if (event.inventoryName == "Hacked Terminal Color Picker") {
-            inColourInventory = true
+            inColorInventory = true
         }
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inTerminalInventory = false
-        inColourInventory = false
+        inColorInventory = false
     }
 
     @SubscribeEvent
@@ -95,11 +97,11 @@ class KloonHacking {
                 }
             }
         }
-        if (inColourInventory) {
+        if (inColorInventory) {
             if (!config.colour) return
-            val targetColour = nearestTerminal ?: getNearestTerminal()
+            val targetColor = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slot.stack.getLore().any { it.contains(targetColour?.name ?: "") }) {
+                if (slot.stack.getLore().any { it.contains(targetColor?.name ?: "") }) {
                     slot highlight LorenzColor.GREEN
                 }
             }
@@ -129,10 +131,10 @@ class KloonHacking {
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
-        colourPattern.matchMatcher(event.message.removeColor()) {
+        colorPattern.matchMatcher(event.message.removeColor()) {
             val storage = ProfileStorageData.profileSpecific?.rift ?: return
-            val colour = group("colour")
-            val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == colour } ?: return
+            val color = group("color")
+            val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == color } ?: return
             if (completedTerminal != nearestTerminal) return
             storage.completedKloonTerminals.add(completedTerminal)
         }

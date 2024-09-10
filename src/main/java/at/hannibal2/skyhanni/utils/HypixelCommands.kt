@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+
 object HypixelCommands {
     fun skyblock() {
         send("skyblock")
@@ -7,6 +10,10 @@ object HypixelCommands {
 
     fun bazaar(searchTerm: String) {
         send("bz $searchTerm")
+    }
+
+    fun auctionSearch(searchTerm: String) {
+        send("ahs $searchTerm")
     }
 
     fun playtime() {
@@ -38,7 +45,7 @@ object HypixelCommands {
     }
 
     fun teleportToPlot(plotName: String) {
-        send("tptoplot $plotName")
+        send("plottp $plotName")
     }
 
     fun gardenLevels() {
@@ -50,7 +57,7 @@ object HypixelCommands {
     }
 
     fun getFromSacks(itemName: String, amount: Int) {
-        send("gfs $itemName $amount")
+        GetFromSackAPI.getFromSack(itemName.asInternalName(), amount)
     }
 
     fun widget() {
@@ -59,6 +66,10 @@ object HypixelCommands {
 
     fun chocolateFactory() {
         send("cf")
+    }
+
+    fun pet() {
+        send("pet")
     }
 
     fun openBaker() {
@@ -125,6 +136,11 @@ object HypixelCommands {
         send("pq $quality")
     }
 
+    // Changes the speed of rancher boots in garden
+    fun setMaxSpeed() {
+        send("setmaxspeed")
+    }
+
     fun showRng(major: String? = null, minor: String? = null) = when {
         major == null || minor == null -> send("rng")
         else -> send("rng $major $minor")
@@ -132,6 +148,10 @@ object HypixelCommands {
 
     fun chatPrompt(prompt: String) {
         send("chatprompt $prompt")
+    }
+
+    fun callback(uuid: String) {
+        send("cb $uuid")
     }
 
     private fun send(command: String) {
