@@ -458,8 +458,8 @@ object ChatFilter {
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
         "achievement_get" to achievementGetPatterns,
-        "hideParkour" to parkourPatterns,
-        "hideTeleportPads" to teleportPadPatterns,
+        "parkour" to parkourPatterns,
+        "teleport_Pads" to teleportPadPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -515,7 +515,7 @@ object ChatFilter {
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
         config.parkour && message.isPresent("parkour") -> "parkour"
-        config.teleport_pads && message.isPresent("teleport_pads") -> "teleport_pads"
+        config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 
