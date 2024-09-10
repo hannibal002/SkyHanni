@@ -302,8 +302,8 @@ object CollectionUtils {
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T?) -> Boolean,
-        crossinline onChange: (T?) -> Unit,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
     ) {
         add(Renderable.horizontalContainer(buildSelector<T>(prefix, getName, isCurrent, onChange)))
     }
@@ -321,17 +321,17 @@ object CollectionUtils {
     inline fun <reified T : Enum<T>> buildSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T?) -> Boolean,
-        crossinline onChange: (T?) -> Unit,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
     ) = buildSelector(prefix, getName, isCurrent, onChange, enumValues<T>())
 
     inline fun <T> buildSelector(
         prefix: String,
         getName: (T) -> String,
-        isCurrent: (T?) -> Boolean,
-        crossinline onChange: (T?) -> Unit,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
         universe: Array<T>,
-    ) = buildList {
+    ) = buildList<Renderable> {
         addString(prefix)
         for (entry in universe) {
             val display = getName(entry)
