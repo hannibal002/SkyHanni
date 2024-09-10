@@ -55,12 +55,14 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
     )
 
-    private val tracker =
-        SkyHanniTracker(
-            "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
-            SkyHanniTracker.DisplayMode.MAYOR to
-                { it.diana.mythologicalMobTrackerPerElectionSeason.getOrPut(SkyBlockTime.now().getElectionYear(), ::Data) },
-        ) { drawDisplay(it) }
+    private val tracker = SkyHanniTracker(
+        "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
+        SkyHanniTracker.DisplayMode.MAYOR to {
+            it.diana.mythologicalMobTrackerPerElectionSeason.getOrPut(
+                SkyBlockTime.now().getElectionYear(), ::Data,
+            )
+        },
+    ) { drawDisplay(it) }
 
     class Data : TrackerData() {
 

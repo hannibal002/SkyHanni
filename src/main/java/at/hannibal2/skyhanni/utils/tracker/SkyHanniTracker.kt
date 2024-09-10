@@ -64,7 +64,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-        val sharedTracker = getSharedTracker()?: return
+        val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify(mode, modifyFunction)
         update()
     }
@@ -135,13 +135,17 @@ open class SkyHanniTracker<Data : TrackerData>(
                 storedTrackers[name] = it
                 update()
             },
-            universe = availableTrackers
+            universe = availableTrackers,
         ),
     )
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
-        SharedTracker(mapOf(DisplayMode.TOTAL to ps.getTotal(), DisplayMode.SESSION to ps.getCurrentSession())
-                          + extraDisplayModes.mapValues { it.value(ps) })
+        SharedTracker(
+            mapOf(
+                DisplayMode.TOTAL to ps.getTotal(),
+                DisplayMode.SESSION to ps.getCurrentSession(),
+            ) + extraDisplayModes.mapValues { it.value(ps) },
+        )
     }
 
     private fun ProfileSpecificStorage.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
@@ -180,11 +184,12 @@ open class SkyHanniTracker<Data : TrackerData>(
             entries.values.forEach(modifyFunction)
         }
 
-        fun get(displayMode: DisplayMode) = entries[displayMode]
-            ?: ErrorManager.skyHanniError("Unregistered display mode accessed on tracker",
-                                          "tracker" to name,
-                                          "displayMode" to displayMode,
-                                          "availableModes" to entries.keys)
+        fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.skyHanniError(
+            "Unregistered display mode accessed on tracker",
+            "tracker" to name,
+            "displayMode" to displayMode,
+            "availableModes" to entries.keys,
+        )
     }
 
     enum class DisplayMode(val displayName: String) {

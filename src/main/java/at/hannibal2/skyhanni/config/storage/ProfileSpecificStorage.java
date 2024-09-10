@@ -44,7 +44,6 @@ import at.hannibal2.skyhanni.utils.LorenzRarity;
 import at.hannibal2.skyhanni.utils.LorenzVec;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
 import at.hannibal2.skyhanni.utils.SimpleTimeMark;
-import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;

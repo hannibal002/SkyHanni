@@ -50,8 +50,11 @@ object DianaProfitTracker {
         "Diana Profit Tracker",
         { Data() },
         { it.diana.dianaProfitTracker },
-        SkyHanniTracker.DisplayMode.MAYOR to { it.diana.dianaProfitTrackerPerElectionSeason.getOrPut(
-            SkyBlockTime.now().getElectionYear(), ::Data) },
+        SkyHanniTracker.DisplayMode.MAYOR to {
+            it.diana.dianaProfitTrackerPerElectionSeason.getOrPut(
+                SkyBlockTime.now().getElectionYear(), ::Data,
+            )
+        },
     ) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {

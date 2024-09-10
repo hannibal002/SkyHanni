@@ -39,8 +39,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
         getSharedTracker()?.let { sharedData ->
             val isHidden = sharedData.get(DisplayMode.TOTAL).items[internalName]?.hidden
-            if (isHidden != null)
-                sharedData.modify { it.items[internalName]?.hidden = isHidden }
+            if (isHidden != null) sharedData.modify { it.items[internalName]?.hidden = isHidden }
         }
 
         if (command) {
