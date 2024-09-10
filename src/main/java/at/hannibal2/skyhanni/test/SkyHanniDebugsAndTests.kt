@@ -497,7 +497,7 @@ object SkyHanniDebugsAndTests {
             event.toolTip.add("Item name: no item.")
             return
         }
-        val name = internalName.itemName
+        val name = itemStack.itemName
         event.toolTip.add("Item name: '$name§7'")
     }
 

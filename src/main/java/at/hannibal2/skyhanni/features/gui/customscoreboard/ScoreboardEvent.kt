@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent.VOTING
@@ -28,9 +27,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as 
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
-private fun getSbLines(): List<String> {
-    return ScoreboardData.sidebarLinesFormatted
-}
+private fun getSbLines(): List<String> = CustomScoreboard.activeLines
 
 enum class ScoreboardEvent(
     private val displayLine: () -> List<String>,
@@ -553,6 +550,8 @@ private fun getRiftLines() = getSbLines().filter { line ->
         || SbPattern.riftAveikxPattern.matches(line)
         || SbPattern.riftHayEatenPattern.matches(line)
         || SbPattern.cluesPattern.matches(line)
+        || SbPattern.barryProtestorsQuestlinePattern.matches(line)
+        || SbPattern.barryProtestorsHandledPattern.matches(line)
 }
 
 private fun getEssenceLines(): List<String> = listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
@@ -561,6 +560,7 @@ private fun getEssenceShowWhen(): Boolean = SbPattern.essencePattern.anyMatches(
 
 private fun getQueueLines(): List<String> =
     listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queueTierPattern.matches(it) }) +
         (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
 
 private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getSbLines())

@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
+import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
@@ -425,13 +426,15 @@ object ChatFilter {
         "§4Cancelled parkour! You cannot use item abilities.",
         "§4Cancelled parkour!",
     )
+
     /**
-    * REGEX-TEST: §r§aWarped from the tp_pad_one §r§ato the tp_pad_two§r§a!
+    ** REGEX-TEST: §r§aWarped from the tpPadOne §r§ato the tpPadTwo§r§a!
     */
     private val teleportPadPatterns = listOf(
         "§aWarped from the (.*) §r§ato the (.*)§r§a!".toPattern(),
     )
 
+    // §r§4This Teleport Pad does not have a destination set!
     private val teleportPadMessages = listOf(
         "§4This Teleport Pad does not have a destination set!"
     )
@@ -459,7 +462,7 @@ object ChatFilter {
         "fairy" to fairyPatterns,
         "achievement_get" to achievementGetPatterns,
         "parkour" to parkourPatterns,
-        "teleport_Pads" to teleportPadPatterns,
+        "teleport_pads" to teleportPadPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -535,6 +538,7 @@ object ChatFilter {
         dungeonConfig.soloClass && DungeonAPI.inDungeon() && message.isPresent("solo_class") -> "solo_class"
         dungeonConfig.soloStats && DungeonAPI.inDungeon() && message.isPresent("solo_stats") -> "solo_stats"
         dungeonConfig.fairy && DungeonAPI.inDungeon() && message.isPresent("fairy") -> "fairy"
+        config.gardenNoPest && GardenAPI.inGarden() && PestFinder.noPestsChatPattern.matches(message) -> "garden_pest"
 
         else -> null
     }
