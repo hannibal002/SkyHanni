@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
+import at.hannibal2.skyhanni.utils.LocationUtils.isAtTopOfNest
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
@@ -121,7 +122,7 @@ enum class ScoreboardEvent(
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
-        ::getBroodmotherShowWhen,
+        ::isAtTopOfNest,
         "§4Broodmother§7: §eDormant",
     ),
     MINING_EVENTS(
@@ -440,8 +441,6 @@ private fun getSoonEventShowWhen(): Boolean =
 
 private fun getBroodmotherLines(): List<String> =
     listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
-
-private fun getBroodmotherShowWhen(): Boolean = getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
 
 private fun getMiningEventsLines() = buildList {
     // Wind
