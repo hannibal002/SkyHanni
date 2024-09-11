@@ -1,8 +1,4 @@
-import at.skyhanni.sharedvariables.MinecraftVersion
-import at.skyhanni.sharedvariables.MultiVersionStage
-import at.skyhanni.sharedvariables.ProjectTarget
-import at.skyhanni.sharedvariables.SHVersionInfo
-import at.skyhanni.sharedvariables.versionString
+import at.skyhanni.sharedvariables.*
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -41,9 +37,6 @@ repositories {
     maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
     maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
     maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
-
-    // only for the rare cases when maven.deftu.xyz is offline
-    maven("https://repo.polyfrost.org/releases")
 }
 
 // Toolchains:
