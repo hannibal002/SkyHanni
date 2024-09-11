@@ -221,4 +221,14 @@ public class ChocolateFactoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean mythicRabbitRequirement = false;
+
+    @Expose
+    @ConfigOption(name = "Stray Tracker", desc = "Track stray rabbits found in the Chocolate Factory menu.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean strayRabbitTracker = true;
+
+    @Expose
+    @ConfigLink(owner = ChocolateFactoryConfig.class, field = "strayRabbitTracker")
+    public Position strayRabbitTrackerPosition = new Position(300, 300, false, true);
 }

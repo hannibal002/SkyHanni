@@ -151,6 +151,8 @@ object SkyBlockItemModifierUtils {
             }.sortedBy { it.first }
         }
 
+    fun ItemStack.hasAttributes() = getAttributes() != null
+
     fun ItemStack.getReforgeName() = getAttributeString("modifier")?.let {
         when {
             it == "pitchin" -> "pitchin_koi"
@@ -167,6 +169,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.hasEtherwarp() = getAttributeBoolean("ethermerge")
 
     fun ItemStack.hasWoodSingularity() = getAttributeBoolean("wood_singularity_count")
+
+    fun ItemStack.hasDivanPowderCoating() = getAttributeBoolean("divan_powder_coating")
 
     fun ItemStack.hasArtOfWar() = getAttributeBoolean("art_of_war_count")
 
@@ -186,6 +190,8 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getEdition() = getAttributeInt("edition")
 
     fun ItemStack.getNewYearCake() = getAttributeInt("new_years_cake")
+
+    fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
 
     fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
         ?.takeIf { it.hasKey("enchantments") }
@@ -249,7 +255,7 @@ object SkyBlockItemModifierUtils {
         list
     }
 
-    private fun ItemStack.getAttributeString(label: String) =
+    fun ItemStack.getAttributeString(label: String) =
         getExtraAttributes()?.getString(label)?.takeUnless { it.isBlank() }
 
     private fun ItemStack.getAttributeInt(label: String) =
@@ -258,9 +264,11 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeLong(label: String) =
         getExtraAttributes()?.getLong(label)?.takeUnless { it == 0L }
 
-    private fun ItemStack.getAttributeBoolean(label: String): Boolean {
-        return getExtraAttributes()?.getBoolean(label) ?: false
-    }
+    private fun ItemStack.getAttributeBoolean(label: String) =
+        getExtraAttributes()?.getBoolean(label) ?: false
+
+    private fun ItemStack.getAttributeByte(label: String) =
+        getExtraAttributes()?.getByte(label) ?: 0
 
     fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
 

@@ -116,10 +116,17 @@ class Mob(
 
     private var highlightColor: Color? = null
 
-    /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
-    fun highlight(color: Color) {
-        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
-        internalHighlight()
+    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
+     * If [color] is set to null it removes a highlight*/
+    fun highlight(color: Color?) {
+        if (color == highlightColor) return
+        if (color == null) {
+            internalRemoveColor()
+            highlightColor = null
+        } else {
+            highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+            internalHighlight()
+        }
     }
 
     private fun internalHighlight() {
@@ -166,8 +173,10 @@ class Mob(
     }
 
     private fun makeRelativeBoundingBox() =
-        (baseEntity.entityBoundingBox.union(extraEntities.filter { it !is EntityArmorStand }
-            .mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+        (baseEntity.entityBoundingBox.union(
+            extraEntities.filter { it !is EntityArmorStand }
+                .mapNotNull { it.entityBoundingBox },
+        ))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +

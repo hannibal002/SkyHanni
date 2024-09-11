@@ -74,6 +74,11 @@ public class InventoryConfig {
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Compactor Overlay", desc = "Overlay for the Personal Compactor and Deletor.")
+    @Accordion
+    public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
+
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
@@ -119,6 +124,11 @@ public class InventoryConfig {
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
 
     @Expose
+    @ConfigOption(name = "Magical Power Display", desc = "")
+    @Accordion
+    public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(
@@ -146,9 +156,10 @@ public class InventoryConfig {
         BOTTLE_OF_JYRRE("§bBottle Of Jyrre", 15),
         DARK_CACAO_TRUFFLE("§bDark Cacao Truffle"),
         EDITION_NUMBER("§bEdition Number", 16),
+        ENCHANTING_EXP("§bEnchanting EXP (Superpairs)"),
         BINGO_GOAL_RANK("§bBingo Goal Rank"),
         SKYBLOCK_LEVEL("§bSkyblock Level"),
-        BESTIARY_LEVEL("§bBestiary Level")
+        BESTIARY_LEVEL("§bBestiary Level"),
         ;
 
         private final String str;
@@ -257,4 +268,22 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean timeHeldInLore = false;
+
+    @Expose
+    @ConfigOption(name = "Stonk of Stonk Price", desc = "Show Price per Stonk when taking the minimum bid in Stonks Auction (Richard).")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean stonkOfStonkPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Minister in Calendar", desc = "Show the Minister with their perk in the Calendar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ministerInCalendar = true;
+
+    @Expose
+    @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hexAsColorInLore = true;
 }

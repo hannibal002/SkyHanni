@@ -1,25 +1,22 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.data.ClickType
-import at.hannibal2.skyhanni.events.BlockClickEvent
+import at.hannibal2.skyhanni.data.ClickedBlockType
+import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BlockUtils
-import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -28,39 +25,34 @@ import kotlin.time.Duration.Companion.seconds
 object DungeonHighlightClickedBlocks {
 
     private val config get() = SkyHanniMod.feature.dungeon.clickedBlocks
-    private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
 
     private val patternGroup = RepoPattern.group("dungeons.highlightclickedblock")
     private val leverPattern by patternGroup.pattern(
         "lever",
-        "§cYou hear the sound of something opening\\.\\.\\.",
+        "§cYou hear the sound of something opening...",
     )
     private val lockedPattern by patternGroup.pattern(
         "locked",
         "§cThat chest is locked!",
     )
-    private const val WATER_ROOM_ID = "-60,-60"
-    private const val WITHER_ESSENCE_TEXTURE =
-        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
 
+    private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
     private var colorIndex = 0
-    private val allowedColors by lazy {
-        val ignoredColors = listOf(
-            LorenzColor.BLACK,
-            LorenzColor.WHITE,
-            LorenzColor.CHROMA,
-            LorenzColor.GRAY,
-            LorenzColor.DARK_GRAY,
-        )
-        LorenzColor.entries.filter { it !in ignoredColors }
-    }
+    private val undesirableColors = listOf(
+        LorenzColor.BLACK,
+        LorenzColor.WHITE,
+        LorenzColor.CHROMA,
+        LorenzColor.GRAY,
+        LorenzColor.DARK_GRAY,
+    )
+    private val randomColors = LorenzColor.entries.filter { it !in undesirableColors }
 
-    private fun getRandomColor(): Color {
-        colorIndex = (colorIndex + 1) % allowedColors.size
-        return allowedColors[colorIndex].toColor()
+    private fun getRandomColor(): LorenzColor {
+        var id = colorIndex + 1
+        if (id == randomColors.size) id = 0
+        colorIndex = id
+        return randomColors[colorIndex]
     }
-
-    private val inWaterRoom by RecalculatingValue(1.seconds) { DungeonAPI.getRoomID() == WATER_ROOM_ID }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -71,44 +63,31 @@ object DungeonHighlightClickedBlocks {
         }
 
         if (lockedPattern.matches(event.message)) {
-            blocks.lastOrNull { it.value.isChest }?.value?.color = config.lockedChestColor.toChromaColor()
+            blocks.lastOrNull { it.value.displayText.contains("Chest") }?.value?.color = config.lockedChestColor.toChromaColor()
         }
     }
 
-    @SubscribeEvent
-    fun onBlockClick(event: BlockClickEvent) {
+    @HandleEvent
+    fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
-        val position = event.position
+        val isWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
+        if (isWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
-        val type = when (position.getBlockAt()) {
-            Blocks.chest -> ClickedBlockType.CHEST
-            Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
-            Blocks.lever -> {
-                if (inWaterRoom) return
-                ClickedBlockType.LEVER
-            }
+        val type = event.blockType
 
-            Blocks.skull -> {
-                if (BlockUtils.getTextureFromSkull(position) != WITHER_ESSENCE_TEXTURE) return
-                ClickedBlockType.WITHER_ESSENCE
-            }
-            else -> return
-        }
+        val color = if (config.randomColor) getRandomColor().toColor() else getBlockProperties(type).color.toChromaColor()
+        val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + getBlockProperties(type).name
+        blocks[event.position] = ClickedBlock(displayText, color)
 
-        val color = if (config.randomColor) getRandomColor() else type.color()
-        val displayText = ExtendedChatColor(color.rgb, false).toString() + "Clicked " + type.display
-        blocks[position] = ClickedBlock(displayText, color, type.isChest)
     }
 
-    private enum class ClickedBlockType(val display: String, val color: () -> Color) {
-        LEVER("Lever", { config.leverColor.toChromaColor() }),
-        CHEST("Chest", { config.chestColor.toChromaColor() }),
-        TRAPPED_CHEST("Trapped Chest", { config.trappedChestColor.toChromaColor() }),
-        WITHER_ESSENCE("Wither Essence", { config.witherEssenceColor.toChromaColor() }),
-        ;
-
-        val isChest get() = this == CHEST || this == TRAPPED_CHEST
+    private fun getBlockProperties(type: ClickedBlockType): BlockProperties {
+        return when (type) {
+            ClickedBlockType.LEVER -> BlockProperties("Lever", config.leverColor)
+            ClickedBlockType.CHEST -> BlockProperties("Chest", config.chestColor)
+            ClickedBlockType.TRAPPED_CHEST -> BlockProperties("Trapped Chest", config.trappedChestColor)
+            ClickedBlockType.WITHER_ESSENCE -> BlockProperties("Wither Essence", config.witherEssenceColor)
+        }
     }
 
     @SubscribeEvent
@@ -125,11 +104,12 @@ object DungeonHighlightClickedBlocks {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(52, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
+        event.move(56, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }
 
-    private class ClickedBlock(val displayText: String, var color: Color, val isChest: Boolean)
+    class ClickedBlock(val displayText: String, var color: Color)
+    class BlockProperties(val name: String, val color: String)
 
-    private fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
+    fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
 
 }
