@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -17,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
@@ -25,6 +23,7 @@ import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object CarnivalZombieShootout {
@@ -69,11 +68,11 @@ object CarnivalZombieShootout {
         }
 
         val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
-                if (zombie.health <= 0) return@mapNotNull null
-                val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
-                val type = toType(armor) ?: return@mapNotNull null
-                zombie to type
-            }.toMap()
+            if (zombie.health <= 0) return@mapNotNull null
+            val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
+            val type = toType(armor) ?: return@mapNotNull null
+            zombie to type
+        }.toMap()
 
         val drawZombies = when (config.highestOnly) {
             false -> nearbyZombies
@@ -83,15 +82,14 @@ object CarnivalZombieShootout {
             }
         }
 
-        drawZombies.forEach { (zombie, type) ->
-            val entity = EntityUtils.getEntityByID(zombie.entityId) ?: return@forEach
-            val color = type.color
+        for ((zombie, type) in drawZombies) {
+            val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
 
             event.drawHitbox(
                 entity.entityBoundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
-                3,
-                color,
-                false,
+                lineWidth = 3,
+                type.color,
+                depth = false,
             )
         }
     }
@@ -102,10 +100,10 @@ object CarnivalZombieShootout {
 
         lantern?.let { (_, time) ->
             val lamp = ItemStack(Blocks.redstone_lamp)
-            val timer = (6 - (SimpleTimeMark.now() - time).inPartialSeconds).round(1)
+            val timer = 6.seconds - (SimpleTimeMark.now() - time)
             val prefix = when (timer) {
-                in 4.0..6.0 -> "§a"
-                in 2.0..4.0 -> "§e"
+                in 4.seconds..6.seconds -> "§a"
+                in 2.seconds..4.seconds -> "§e"
                 else -> "§c"
             }
 
@@ -114,7 +112,7 @@ object CarnivalZombieShootout {
                     Renderable.itemStack(lamp),
                     Renderable.string("§6Disappears in $prefix${timer}s"),
                 ),
-                1,
+                spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,
             )
 
