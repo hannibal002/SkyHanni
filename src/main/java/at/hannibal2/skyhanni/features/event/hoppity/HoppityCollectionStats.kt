@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -184,7 +184,7 @@ object HoppityCollectionStats {
             display = buildDisplay(event)
         }
 
-        if (!config.highlightRabbits.isEmpty()) {
+        if (config.highlightRabbits.isNotEmpty()) {
             for ((_, stack) in event.inventoryItems) filterRabbitToHighlight(stack)
         }
     }
@@ -376,7 +376,7 @@ object HoppityCollectionStats {
     // used to make sure that mod data is synchronized with Hypixel
     private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int {
         return event.inventoryItems.firstNotNullOf {
-            it.value.getLore().matchFirst(rabbitsFoundPattern) {
+            rabbitsFoundPattern.firstMatcher(it.value.getLore()) {
                 group("current").formatInt()
             }
         }
@@ -419,7 +419,7 @@ object HoppityCollectionStats {
 
             if (!found) continue
 
-            val duplicates = itemLore.matchFirst(duplicatesFoundPattern) {
+            val duplicates = duplicatesFoundPattern.firstMatcher(itemLore) {
                 group("duplicates").formatInt()
             } ?: 0
 
