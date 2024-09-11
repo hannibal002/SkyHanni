@@ -63,7 +63,7 @@ object SlayerMiniBossFeatures {
             event.drawLineToEye(
                 mob.getLorenzVec().up(),
                 LorenzColor.AQUA.toColor(),
-                3,
+                config.slayerMinibossLineWidth,
                 true,
             )
         }

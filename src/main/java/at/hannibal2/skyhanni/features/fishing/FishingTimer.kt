@@ -125,7 +125,7 @@ object FishingTimer {
     private fun handle() {
         if (lastSeaCreatureFished.passedSince() > 2.seconds) return
         val name = lastNameFished ?: return
-        val mobs = recentMobs.filter { it.name == name && it !in mobDespawnTime }
+        val mobs = recentMobs.toSet().filter { it.name == name && it !in mobDespawnTime }
             .sortedBy { it.baseEntity.distanceToPlayer() }
             .take(mobsToFind).ifEmpty { return }
         mobsToFind -= mobs.size
@@ -165,9 +165,7 @@ object FishingTimer {
     }
 
     private fun updateInfo() {
-        currentCount = mobDespawnTime.entries.sumOf {
-            1 + it.key.extraEntities.size
-        }
+        currentCount = mobDespawnTime.size
         startTime = mobDespawnTime.maxByOrNull { it.value.passedSince() }?.value ?: SimpleTimeMark.farPast()
         display = createDisplay()
     }

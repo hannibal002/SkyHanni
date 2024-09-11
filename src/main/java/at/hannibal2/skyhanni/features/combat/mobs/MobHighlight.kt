@@ -123,7 +123,7 @@ object MobHighlight {
         event.drawLineToEye(
             arachne.getLorenzVec().up(),
             LorenzColor.RED.toColor(),
-            5,
+            config.lineToArachneWidth,
             true,
         )
     }
