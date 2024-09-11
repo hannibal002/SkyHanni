@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class LastServersConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Receive notifications when you rejoin a server you have previously joined.")
+    @ConfigOption(name = "Enabled", desc = "Receive notifications when you rejoin a server you were in previously.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;

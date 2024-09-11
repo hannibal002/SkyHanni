@@ -41,9 +41,6 @@ repositories {
     maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
     maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
     maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
-
-    // only for the rare cases when maven.deftu.xyz is offline
-    maven("https://repo.polyfrost.org/releases")
 }
 
 // Toolchains:
