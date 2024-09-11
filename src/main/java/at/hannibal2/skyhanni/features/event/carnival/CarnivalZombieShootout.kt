@@ -98,26 +98,26 @@ object CarnivalZombieShootout {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !started || !config.lanternTimer) return
 
-        lantern?.let { (_, time) ->
-            val lamp = ItemStack(Blocks.redstone_lamp)
-            val timer = 6.seconds - (SimpleTimeMark.now() - time)
-            val prefix = when (timer) {
-                in 4.seconds..6.seconds -> "§a"
-                in 2.seconds..4.seconds -> "§e"
-                else -> "§c"
-            }
+        val time = lantern?.second ?: return
 
-            val content = Renderable.horizontalContainer(
-                listOf(
-                    Renderable.itemStack(lamp),
-                    Renderable.string("§6Disappears in $prefix${timer}s"),
-                ),
-                spacing = 1,
-                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-            )
-
-            config.lanternPosition.renderRenderables(listOf(content), posLabel = "Lantern Timer")
+        val lamp = ItemStack(Blocks.redstone_lamp)
+        val timer = 6.seconds - (SimpleTimeMark.now() - time)
+        val prefix = when (timer) {
+            in 4.seconds..6.seconds -> "§a"
+            in 2.seconds..4.seconds -> "§e"
+            else -> "§c"
         }
+
+        val content = Renderable.horizontalContainer(
+            listOf(
+                Renderable.itemStack(lamp),
+                Renderable.string("§6Disappears in $prefix${timer}s"),
+            ),
+            spacing = 1,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        )
+
+        config.lanternPosition.renderRenderables(listOf(content), posLabel = "Lantern Timer")
     }
 
     @SubscribeEvent
