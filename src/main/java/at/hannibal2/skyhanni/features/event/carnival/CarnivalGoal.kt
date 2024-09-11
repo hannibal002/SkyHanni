@@ -162,6 +162,7 @@ enum class CarnivalGoal(
 
         private val completePattern by repoGroup.pattern("complete", "§a§lCOMPLETE")
 
+        // TODO discuss if rernaming the variable to "dirty" is better
         private var shouldUpdateDisplay = true
 
         private fun getEntry(item: Item, lore: List<String>): CarnivalGoal? =
@@ -192,10 +193,9 @@ enum class CarnivalGoal(
             if (!isEnabled()) return
             if (shouldUpdateDisplay) {
                 display = buildList {
-                    addAll(GoalType.FRUIT_DIGGING.fullDisplay)
-                    addAll(GoalType.CATCH_A_FISH.fullDisplay)
-                    addAll(GoalType.ZOMBIE_SHOOTOUT.fullDisplay)
+                    GoalType.entries.map { it.fullDisplay }.forEach { list -> addAll(list) }
                 }
+                shouldUpdateDisplay = false
             }
             config.goalsPosition.renderRenderables(display, posLabel = "Carnival Goals")
         }
