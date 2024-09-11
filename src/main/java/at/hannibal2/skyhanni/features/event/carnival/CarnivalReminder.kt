@@ -47,7 +47,7 @@ object CarnivalReminder {
      */
     private val alreadyClaimedPattern by repoGroup.pattern(
         "already",
-        "§e[NPC] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.",
+        "§e\\[NPC\\] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.",
     )
 
     @SubscribeEvent
