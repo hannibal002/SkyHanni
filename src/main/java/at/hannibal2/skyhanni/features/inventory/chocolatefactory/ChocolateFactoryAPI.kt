@@ -80,7 +80,19 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
-    var chocolateMilestones = TreeSet<Long>()
+    var chocolateMilestones = TreeSet(
+        listOf(
+            50_000_000_000L,
+            100_000_000_000L,
+            150_000_000_000L,
+            200_000_000_000L,
+            300_000_000_000L,
+            400_000_000_000L,
+            500_000_000_000L,
+            600_000_000_000L,
+            700_000_000_000L,
+        ),
+    )
 
     private var maxPrestige = 5
 
