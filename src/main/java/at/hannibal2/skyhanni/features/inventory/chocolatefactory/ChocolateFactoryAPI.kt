@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
@@ -80,7 +80,17 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
-    var maxMilestoneChocolate = 700_000_000_000L
+    var chocolateMilestones = listOf(
+        50_000_000_000L,
+        100_000_000_000L,
+        150_000_000_000L,
+        200_000_000_000L,
+        300_000_000_000L,
+        400_000_000_000L,
+        500_000_000_000L,
+        600_000_000_000L,
+        700_000_000_000L,
+    )
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -142,7 +152,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
-        maxMilestoneChocolate = data.maxMilestoneChocolate
+        chocolateMilestones = data.chocolateMilestones
         specialRabbitTextures = data.specialRabbits
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
@@ -189,6 +199,11 @@ object ChocolateFactoryAPI {
             else "$upgradeName $nextLevel"
         }
 
+    fun getNextMilestoneChocolate(amount: Long): Long {
+        ChatUtils.debug("amount: $amount, milestones: ${chocolateMilestones.forEach { ChatUtils.debug(it.toString()) }}")
+        ChatUtils.debug("firstOrNull: ${chocolateMilestones.firstOrNull { it > amount }}")
+        return chocolateMilestones.firstOrNull { it > amount } ?: 0
+    }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
