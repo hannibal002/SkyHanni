@@ -116,7 +116,7 @@ object ChocolateFactoryStats {
                 val allTime = ChocolateAmount.ALL_TIME.chocolate()
                 val nextChocolateMilestone = ChocolateFactoryAPI.getNextMilestoneChocolate(allTime)
                 val amountUntilNextMilestone = nextChocolateMilestone - allTime
-                val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(amountUntilNextMilestone)
+                val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(nextChocolateMilestone)
 
                 if (amountUntilNextMilestone >= 0) {
                     put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Next Milestone: $maxMilestoneEstimate")

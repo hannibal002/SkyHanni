@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -200,8 +199,6 @@ object ChocolateFactoryAPI {
         }
 
     fun getNextMilestoneChocolate(amount: Long): Long {
-        ChatUtils.debug("amount: $amount, milestones: ${chocolateMilestones.forEach { ChatUtils.debug(it.toString()) }}")
-        ChatUtils.debug("firstOrNull: ${chocolateMilestones.firstOrNull { it > amount }}")
         return chocolateMilestones.firstOrNull { it > amount } ?: 0
     }
 
