@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -142,7 +143,7 @@ enum class CarnivalGoal(
                 storage?.carnivalYear = year
             }
             storage?.goals?.set(this, value)
-            shouldUpdateDisplay = true
+            dirty = true
         }
 
     @SkyHanniModule
@@ -162,11 +163,15 @@ enum class CarnivalGoal(
 
         private val completePattern by repoGroup.pattern("complete", "§a§lCOMPLETE")
 
-        // TODO discuss if rernaming the variable to "dirty" is better
-        private var shouldUpdateDisplay = true
+        private var dirty = true
 
         private fun getEntry(item: Item, lore: List<String>): CarnivalGoal? =
             entries.filter { it.type.item == item }.firstOrNull { it.lorePattern.matches(lore.firstOrNull()) }
+
+        @SubscribeEvent
+        fun onProfileJoin(event: ProfileJoinEvent) {
+            dirty = true
+        }
 
         @SubscribeEvent
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
@@ -191,11 +196,11 @@ enum class CarnivalGoal(
         @SubscribeEvent
         fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
-            if (shouldUpdateDisplay) {
+            if (dirty) {
                 display = buildList {
                     GoalType.entries.map { it.fullDisplay }.forEach { list -> addAll(list) }
                 }
-                shouldUpdateDisplay = false
+                dirty = false
             }
             config.goalsPosition.renderRenderables(display, posLabel = "Carnival Goals")
         }

@@ -61,6 +61,7 @@ object CarnivalReminder {
         claimedToday = false
         if (!isEnabled()) return
         nextCheckTime = 30.0.seconds.fromNow()
+        checkDate()
         check()
     }
 
@@ -72,14 +73,16 @@ object CarnivalReminder {
         lastClaimedDay = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
     }
 
+    private fun checkDate() {
+        val currentDay = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
+        val lastClaimedDay = lastClaimedDay
+
+        claimedToday = !(lastClaimedDay == null || currentDay.isAfter(lastClaimedDay))
+    }
+
     fun check() {
         if (claimedToday) {
-            val currentDay = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
-            val lastClaimedDay = lastClaimedDay
-
-            if (lastClaimedDay == null || currentDay.isAfter(lastClaimedDay)) {
-                claimedToday = false
-            }
+            checkDate()
         } else if (!ReminderUtils.isBusy()) {
             ChatUtils.clickToActionOrDisable(
                 "Carnival Tickets are ready to be claimed!",
