@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.R
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.TrophyFishQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.quest.UnknownQuest
 import at.hannibal2.skyhanni.features.nether.reputationhelper.miniboss.CrimsonMiniBoss
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -42,6 +41,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -65,7 +65,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
      */
     val minibossAmountPattern by RepoPattern.pattern(
         "crimson.reputationhelper.quest.minibossamount",
-        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!"
+        "(?:§7Kill the §c.+ §7|.*)miniboss §a(?<amount>\\d) §7times?!",
     )
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
@@ -87,11 +87,11 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     @SubscribeEvent
-    fun onTabListWidgetUpdate(event: WidgetUpdateEvent) {
-        if (event.isWidget(TabWidget.FACTION_QUESTS)) {
-            if (!isEnabled()) return
-            questLoader.loadFromTabList()
-        }
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
+        if (!isEnabled()) return
+
+        questLoader.loadFromTabList()
     }
 
     @SubscribeEvent
@@ -211,7 +211,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
     }
 
     private fun Quest.needsTownBoardLocation(): Boolean = state.let { state ->
-        state == QuestState.READY_TO_COLLECT || state == QuestState.NOT_ACCEPTED ||
+        state == QuestState.READY_TO_COLLECT ||
+            state == QuestState.NOT_ACCEPTED ||
             (this is RescueMissionQuest && state == QuestState.ACCEPTED)
     }
 

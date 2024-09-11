@@ -7,19 +7,19 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class XPHourFormattingConfig {
 
     @Expose
-    @ConfigOption(name = "XP/h", desc = "XP Per Hour line.\n" +
+    @ConfigOption(name = "XP/h", desc = "XP per Hour line.\n" +
         "§e%value% §7is replaced with one of the text below.")
     @ConfigEditorText
     public String base = "  &6XP/h: &b%value%";
 
     @Expose
-    @ConfigOption(name = "No Data", desc = "XP Per Hour line.\n§e%value% §7is replaced with\nEstimated amount of combat xp you gain per hour.")
+    @ConfigOption(name = "No Data", desc = "XP per Hour line.\n" +
+        "§e%value% §7is replaced with estimated amount of Combat XP you gain per hour.")
     @ConfigEditorText
     public String noData = "&bN/A";
 
     @Expose
-    @ConfigOption(name = "Paused", desc = "Text displayed next to the time \n" +
-        "when you are doing nothing for a given amount of seconds")
+    @ConfigOption(name = "Paused", desc = "Text displayed next to the time when paused.")
     @ConfigEditorText
     public String paused = "&c(PAUSED)";
 }

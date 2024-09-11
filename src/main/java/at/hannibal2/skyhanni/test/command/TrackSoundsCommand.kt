@@ -48,7 +48,7 @@ object TrackSoundsCommand {
         if (isRecording) {
             ChatUtils.userError(
                 "Still tracking sounds, wait for the other tracking to complete before starting a new one, " +
-                    "or type §e/shtracksounds end §cto end it prematurely"
+                    "or type §e/shtracksounds end §cto end it prematurely",
             )
             return
         }
@@ -70,10 +70,9 @@ object TrackSoundsCommand {
 
         val soundsToDisplay = sounds.takeWhile { startTime.passedSince() - it.first < 3.seconds }
 
-        display = soundsToDisplay
-            .take(10).reversed().map {
-                Renderable.string("§3" + it.second.soundName + " §8p:" + it.second.pitch + " §7v:" + it.second.volume)
-            }
+        display = soundsToDisplay.take(10).reversed().map {
+            Renderable.string("§3" + it.second.soundName + " §8p:" + it.second.pitch + " §7v:" + it.second.volume)
+        }
         worldSounds = soundsToDisplay.map { it.second }.groupBy { it.location }
 
         // The function must run after cutOffTime has passed to ensure thread safety
@@ -104,7 +103,7 @@ object TrackSoundsCommand {
     @SubscribeEvent
     fun onWorldRender(event: LorenzRenderWorldEvent) {
         if (cutOffTime.isInPast()) return
-        worldSounds.forEach { (key, value) ->
+        for ((key, value) in worldSounds) {
             if (value.size != 1) {
                 event.drawDynamicText(key, "§e${value.size} sounds", 0.8)
 
@@ -125,7 +124,7 @@ object TrackSoundsCommand {
                 event.drawDynamicText(
                     key.up(-0.2),
                     "§7P: §e${sound.pitch.round(2)} §7V: $volumeColor${sound.volume.round(2)}",
-                    scaleMultiplier = 0.8
+                    scaleMultiplier = 0.8,
                 )
             }
         }

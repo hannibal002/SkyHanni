@@ -18,11 +18,12 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Collections
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object KingTalismanHelper {
@@ -91,7 +92,7 @@ object KingTalismanHelper {
 
     private fun checkOffset() {
         val king = EntityUtils.getEntitiesNearby<EntityArmorStand>(LorenzVec(129.6, 196.0, 196.7), 2.0)
-            .filter { it.name.startsWith("§6§lKing ") }.firstOrNull() ?: return
+            .firstOrNull { it.name.startsWith("§6§lKing ") } ?: return
         val foundKing = kingPattern.matchMatcher(king.name) {
             group("name")
         } ?: return
@@ -140,10 +141,11 @@ object KingTalismanHelper {
                 val current = king == currentKing
 
                 val missingTimeFormat = if (current) {
-                    val time = TimeUtils.formatDuration(timeUntil - 1000 * 60 * 20 * (kingCircles.size - 1))
+                    val changedTime = timeUntil - 1000 * 60 * 20 * (kingCircles.size - 1)
+                    val time = changedTime.milliseconds.format(maxUnits = 2)
                     "§7(§b$time remaining§7)"
                 } else {
-                    val time = TimeUtils.formatDuration(timeUntil, maxUnits = 2)
+                    val time = timeUntil.milliseconds.format(maxUnits = 2)
                     "§7(§bin $time§7)"
                 }
 
@@ -164,7 +166,7 @@ object KingTalismanHelper {
         val storage = storage ?: error("profileSpecific is null")
         val kingsTalkedTo = storage.kingsTalkedTo
         val (nextKing, until) = getKingTimes().filter { it.key !in kingsTalkedTo }.sorted().firstNotNullOf { it }
-        val time = TimeUtils.formatDuration(until, maxUnits = 2)
+        val time = until.milliseconds.format(maxUnits = 2)
 
         return "§cNext missing king: §7$nextKing §7(§bin $time§7)"
     }

@@ -82,7 +82,7 @@ object MinionXp {
         }
 
         return if (storage != null) {
-            storage.xpList.forEach { (type, amount) ->
+            for ((type, amount) in storage.xpList) {
                 xpTotal.compute(type) { _, currentAmount -> (currentAmount ?: 0.0) + amount }
             }
             false
@@ -96,12 +96,14 @@ object MinionXp {
 
     private fun handleItems(inventoryItems: Map<Int, ItemStack>, isMinion: Boolean): EnumMap<SkillType, Double> {
         val xpTotal = EnumMap<SkillType, Double>(SkillType::class.java)
-        inventoryItems.filter {
-            it.value.getLore().isNotEmpty() && (!isMinion || it.key in listWithMissingName.flatten())
-        }.forEach { (_, itemStack) ->
-            val item = toPrimitiveItemStack(itemStack)
+        val list = inventoryItems.filter {
+            it.value.getLore().isNotEmpty() &&
+                (!isMinion || it.key in listWithMissingName.flatten())
+        }.values
+            .map { toPrimitiveItemStack(it) }
+        for (item in list) {
             val name = item.internalName
-            val xp = xpInfoMap[name] ?: return@forEach
+            val xp = xpInfoMap[name] ?: continue
 
             // TODO add wisdom and temporary skill exp (Events) to calculation
             val baseXp = xp.amount * item.amount

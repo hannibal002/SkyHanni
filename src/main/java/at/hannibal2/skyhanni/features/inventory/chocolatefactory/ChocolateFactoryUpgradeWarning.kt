@@ -44,11 +44,11 @@ object ChocolateFactoryUpgradeWarning {
             SoundUtils.playBeepSound()
         }
         if (ChocolateFactoryAPI.inChocolateFactory) return
-        ChatUtils.clickableChat(
+        ChatUtils.clickToActionOrDisable(
             "You have a Chocolate factory upgrade available to purchase!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            }
+            config::upgradeWarning,
+            actionName = "open Chocolate Factory",
+            action = { HypixelCommands.chocolateFactory() },
         )
     }
 
