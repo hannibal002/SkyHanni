@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.chat.Text
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
@@ -131,6 +130,6 @@ class EventHandler<T : SkyHanniEvent> private constructor(val name: String, priv
         val invoker: Consumer<Any>,
         val options: HandleEvent,
         val generic: Class<*>?,
-        val onlyOnIslandTypes: Set<IslandType> = options.onlyOnIsland.toSet(),
+        val onlyOnIslandTypes: Set<IslandType> = options.onlyOnIslands.toSet(),
     )
 }

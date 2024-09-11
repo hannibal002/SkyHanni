@@ -90,7 +90,7 @@ object GardenAPI {
         "BINGHOE",
     )
 
-    @HandleEvent(onlyOnIsland = [IslandType.GARDEN])
+    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
     fun onSendPacket(event: PacketSentEvent) {
         if (event.packet !is C09PacketHeldItemChange) return
         checkItemInHand()
