@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -79,17 +80,8 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
-    var chocolateMilestones = listOf(
-        50_000_000_000L,
-        100_000_000_000L,
-        150_000_000_000L,
-        200_000_000_000L,
-        300_000_000_000L,
-        400_000_000_000L,
-        500_000_000_000L,
-        600_000_000_000L,
-        700_000_000_000L,
-    )
+    var chocolateMilestones = TreeSet<Long>()
+
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -199,7 +191,7 @@ object ChocolateFactoryAPI {
         }
 
     fun getNextMilestoneChocolate(amount: Long): Long {
-        return chocolateMilestones.firstOrNull { it > amount } ?: 0
+        return chocolateMilestones.higher(amount) ?: 0
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
