@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.events.LorenzWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.filterNotNullKeys
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -195,6 +197,11 @@ object TunnelsMaps {
     }
 
     @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        clickTranslate = mapOf()
+    }
+
+    @SubscribeEvent
     fun onRenderItemTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         clickTranslate[event.slot.slotIndex]?.let {
@@ -284,12 +291,12 @@ object TunnelsMaps {
                             ),
                         )
                     } else {
-                        add(Renderable.string(""))
+                        addString("")
                     }
                 }
             } else {
-                add(Renderable.string(""))
-                add(Renderable.string(""))
+                addString("")
+                addString("")
             }
             addAll(locationDisplay)
         }
