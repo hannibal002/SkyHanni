@@ -27,7 +27,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
-object ZombieShootout {
+object CarnivalZombieShootout {
 
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
@@ -68,14 +68,12 @@ object ZombieShootout {
             event.drawWaypointFilled(it.first, Color.RED, minimumAlpha = 1.0f)
         }
 
-        val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0)
-            .mapNotNull { zombie ->
+        val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
                 if (zombie.health <= 0) return@mapNotNull null
                 val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
                 val type = toType(armor) ?: return@mapNotNull null
                 zombie to type
-            }
-            .toMap()
+            }.toMap()
 
         val drawZombies = when (config.highestOnly) {
             false -> nearbyZombies
@@ -144,13 +142,14 @@ object ZombieShootout {
 
         val message = event.message.removeColor()
 
-        if (startPattern.matches(message)) started = true
-        else if (endPattern.matches(message)) started = false
+        if (startPattern.matches(message)) {
+            started = true
+        } else if (endPattern.matches(message)) {
+            started = false
+        }
     }
 
-    private fun toType(item: ItemStack) =
-        ZombieType.entries.find { it.helmet == item.displayName }
+    private fun toType(item: ItemStack) = ZombieType.entries.find { it.helmet == item.displayName }
 
-    private fun isEnabled() =
-        config.enabled && LorenzUtils.skyBlockArea == "Carnival"
+    private fun isEnabled() = config.enabled && LorenzUtils.skyBlockArea == "Carnival"
 }
