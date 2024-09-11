@@ -42,7 +42,7 @@ object CarnivalZombieShootout {
      */
     private val startPattern by patternGroup.pattern(
         "shootout.start",
-        "^\\[NPC] Carnival Cowboy: Good luck, pal!$",
+        "\\[NPC] Carnival Cowboy: Good luck, pal!",
     )
 
     /**
