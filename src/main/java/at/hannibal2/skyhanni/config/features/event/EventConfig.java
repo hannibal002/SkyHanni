@@ -54,7 +54,7 @@ public class EventConfig {
     public LobbyWaypointsConfig lobbyWaypoints = new LobbyWaypointsConfig();
 
     @Expose
-    @Category(name = "Carnival", desc = "Features for the Carnival")
+    @Category(name = "The Carnival", desc = "Features for games at §eThe Carnival §7when §bFoxy §7is Mayor.")
     public CarnivalConfig carnival = new CarnivalConfig();
 
 }
