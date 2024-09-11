@@ -370,7 +370,7 @@ object DungeonAPI {
             Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
             Blocks.lever -> ClickedBlockType.LEVER
             Blocks.skull -> {
-                val blockTexture = BlockUtils.getTextureFromSkull(position.toBlockPos())
+                val blockTexture = BlockUtils.getTextureFromSkull(position)
                 if (blockTexture == WITHER_ESSENCE_TEXTURE) {
                     ClickedBlockType.WITHER_ESSENCE
                 } else {
