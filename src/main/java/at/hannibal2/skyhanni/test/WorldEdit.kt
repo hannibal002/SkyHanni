@@ -126,7 +126,7 @@ object WorldEdit {
             }
 
             "right", "pos2" -> {
-                leftPos = LocationUtils.playerLocation().toBlockPos()
+                rightPos = LocationUtils.playerLocation().toBlockPos()
                 ChatUtils.chat("Set right pos.")
             }
 

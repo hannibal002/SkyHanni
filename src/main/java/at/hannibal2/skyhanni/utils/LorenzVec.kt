@@ -121,7 +121,7 @@ data class LorenzVec(
         }
     }
 
-    fun toCleanString(): String = "$x $y $z"
+    fun toCleanString(separator: String = ", "): String = listOf(x, y, z).joinToString(separator)
 
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(this.lengthSquared())
@@ -214,6 +214,10 @@ data class LorenzVec(
     fun distanceToLine(startPos: LorenzVec, endPos: LorenzVec): Double {
         return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
+
+    fun middle(other: LorenzVec): LorenzVec = this.plus(other.minus(this) / 2)
+
+    private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
     companion object {
 

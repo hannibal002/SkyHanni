@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.CollectionAPI
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BESTIARY_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BINGO_GOAL_RANK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.BOTTLE_OF_JYRRE
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.COLLECTION_LEVEL
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_HEAD_FLOOR_NUMBER
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.DUNGEON_POTION_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.EDITION_NUMBER
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.ENCHANTING_EXP
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.KUUDRA_KEY
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.LARVA_HOOK
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.MASTER_SKULL_TIER
@@ -21,6 +23,7 @@ import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumbe
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.PET_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.RANCHERS_BOOTS_SPEED
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKILL_LEVEL
+import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.SKYBLOCK_LEVEL
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.VACUUM_GARDEN
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -39,10 +42,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSeconds
@@ -65,23 +68,45 @@ object ItemDisplayOverlayFeatures {
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
     private val masterSkullPattern by patternGroup.pattern(
         "masterskull",
-        "(.*)Master Skull - Tier ."
+        "(.*)Master Skull - Tier .",
     )
     private val gardenVacuumPatterm by patternGroup.pattern(
         "vacuum",
-        "§7Vacuum Bag: §6(?<amount>\\d*) Pests?"
+        "§7Vacuum Bag: §6(?<amount>\\d*) Pests?",
     )
     private val harvestPattern by patternGroup.pattern(
         "harvest",
-        "§7§7You may harvest §6(?<amount>.).*"
+        "§7§7You may harvest §6(?<amount>.).*",
     )
     private val dungeonPotionPattern by patternGroup.pattern(
         "dungeonpotion",
-        "Dungeon (?<level>.*) Potion"
+        "Dungeon (?<level>.*) Potion",
     )
     private val bingoGoalRankPattern by patternGroup.pattern(
         "bingogoalrank",
-        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to"
+        "(§.)*You were the (§.)*(?<rank>[\\w]+)(?<ordinal>(st|nd|rd|th)) (§.)*to",
+    )
+
+    /**
+     * REGEX-TEST: §7Your SkyBlock Level: §8[§a156§8]
+     * REGEX-TEST: §7Your SkyBlock Level: §8[§5399§8]
+     */
+    private val skyblockLevelPattern by patternGroup.pattern(
+        "skyblocklevel",
+        "§7Your SkyBlock Level: §8\\[(?<level>§.\\d+)§8]",
+    )
+    private val bestiaryStackPattern by patternGroup.pattern(
+        "bestiarystack",
+        "§7Progress to Tier (?<tier>[\\dIVXC]+): §b[\\d.]+%",
+    )
+
+    /**
+     * REGEX-TEST: 5k Enchanting Exp
+     * REGEX-TEST: 5.5k Enchanting Exp
+     */
+    private val enchantingExpPattern by patternGroup.pattern(
+        "enchantingexp",
+        "(?<exp>.*)k Enchanting Exp",
     )
 
     @SubscribeEvent
@@ -226,7 +251,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnVacuum(lore)) {
+        if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
             lore.matchFirst(gardenVacuumPatterm) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
@@ -263,15 +288,44 @@ object ItemDisplayOverlayFeatures {
         if (BINGO_GOAL_RANK.isSelected() && chestName == "Bingo Card" && lore.lastOrNull() == "§aGOAL REACHED") {
             lore.matchFirst(bingoGoalRankPattern) {
                 val rank = group("rank").formatLong()
-                if (rank < 10000) return "§6${NumberUtil.format(rank)}"
+                if (rank < 10000) return "§6${rank.shortFormat()}"
+            }
+        }
+
+        if (SKYBLOCK_LEVEL.isSelected() && chestName == "SkyBlock Menu" && itemName == "SkyBlock Leveling") {
+            lore.matchFirst(skyblockLevelPattern) {
+                return group("level")
+            }
+        }
+
+        if (BESTIARY_LEVEL.isSelected() && (chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")) && lore.any { it.contains("Deaths: ") }) {
+            lore.matchFirst(bestiaryStackPattern) {
+                val tier = (group("tier").romanToDecimalIfNecessary() - 1)
+                return tier.toString()
+            } ?: run {
+                val tier = itemName.split(" ")
+
+                return tier.last().romanToDecimalIfNecessary().toString()
+            }
+        }
+
+        if (ENCHANTING_EXP.isSelected() && chestName.startsWith("Superpairs")) {
+            enchantingExpPattern.matchMatcher(item.cleanName()) {
+                val exp = group("exp").formatLong()
+                return "§b${exp.shortFormat()}"
             }
         }
 
         return null
     }
 
-    private fun isOwnVacuum(lore: List<String>) =
-        lore.none { it.contains("Click to trade!") || it.contains("Starting bid:") || it.contains("Buy it now:") }
+    fun isOwnItem(lore: List<String>) =
+        lore.none {
+            it.contains("Click to trade!") ||
+                it.contains("Starting bid:") ||
+                it.contains("Buy it now:") ||
+                it.contains("Click to inspect")
+        }
 
     var done = false
 

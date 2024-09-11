@@ -11,7 +11,7 @@ data class EventWaypoint(
 
 fun loadEventWaypoints(waypoints: Map<String, List<EventWaypointData>>): Map<String, MutableSet<EventWaypoint>> {
     return buildMap {
-        waypoints.forEach { lobby ->
+        for (lobby in waypoints) {
             val set = mutableSetOf<EventWaypoint>()
             lobby.value.forEach { waypoint -> set.add(EventWaypoint(waypoint.name, waypoint.position)) }
             this[lobby.key] = set

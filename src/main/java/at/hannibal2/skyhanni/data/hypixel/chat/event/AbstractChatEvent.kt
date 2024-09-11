@@ -10,6 +10,6 @@ open class AbstractChatEvent(
     var chatComponent: IChatComponent,
     var blockedReason: String? = null,
 ) : LorenzEvent() {
-    val message by lazy { messageComponent.getText() }
+    val message by lazy { messageComponent.getText().removePrefix("§r") }
     val author by lazy { authorComponent.getText() }
 }

@@ -249,9 +249,9 @@ class ComponentSpan internal constructor(
     fun intoComponent(): IChatComponent {
         val parent = ChatComponentText("")
         parent.chatStyle = ChatStyle()
-        sampleSlicedComponents().forEach {
-            val copy = ChatComponentText(it.first.unformattedTextForChat.substring(it.second, it.third))
-            copy.chatStyle = it.first.chatStyle.createDeepCopy()
+        for ((component, start, end) in sampleSlicedComponents()) {
+            val copy = ChatComponentText(component.unformattedTextForChat.substring(start, end))
+            copy.chatStyle = component.chatStyle.createDeepCopy()
             parent.appendSibling(copy)
         }
         return parent
