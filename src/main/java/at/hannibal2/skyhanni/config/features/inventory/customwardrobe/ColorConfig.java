@@ -1,10 +1,16 @@
 package at.hannibal2.skyhanni.config.features.inventory.customwardrobe;
 
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeReset;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ColorConfig {
+
+    @ConfigOption(name = "Reset to Default", desc = "Reset all custom wardrobe color settings to the default.")
+    @ConfigEditorButton(buttonText = "Reset")
+    public Runnable resetColor = CustomWardrobeReset::resetColor;
 
     @Expose
     @ConfigOption(name = "Background", desc = "Color of the GUI background.")

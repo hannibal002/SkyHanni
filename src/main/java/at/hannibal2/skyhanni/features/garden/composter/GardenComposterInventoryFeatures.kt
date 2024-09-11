@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
@@ -57,25 +57,18 @@ object GardenComposterInventoryFeatures {
                     )
                     continue
                 }
-                val internalName = NEUInternalName.fromItemNameOrNull(itemName) ?: run {
-                    ErrorManager.logErrorStateWithData(
-                        "Error reading internal name for item: $itemName",
-                        "could not find internal name for",
-                        "itemName" to itemName
-                    )
-                    continue
-                }
+                val internalName = NEUInternalName.fromItemName(itemName)
                 val lowestBin = internalName.getPrice()
                 val price = lowestBin * amount
                 fullPrice += price
-                val format = NumberUtil.format(price)
+                val format = price.shortFormat()
                 list[i] = list[i] + " §7(§6$format§7)"
                 amountItems++
             }
         }
 
         if (amountItems > 1) {
-            val format = NumberUtil.format(fullPrice)
+            val format = fullPrice.shortFormat()
             list[indexFullCost] = list[indexFullCost] + " §7(§6$format§7)"
         }
     }

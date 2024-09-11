@@ -43,7 +43,7 @@ object SlayerMiniBossFeatures {
                 event.exactPlayerEyeLocation(),
                 mob.baseEntity.getLorenzVec().up(1.0),
                 LorenzColor.AQUA.toColor(),
-                3,
+                config.slayerMinibossLineWidth,
                 true,
             )
         }
