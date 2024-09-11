@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -79,14 +80,14 @@ object CarnivalReminder {
             if (lastClaimedDay == null || currentDay.isAfter(lastClaimedDay)) {
                 claimedToday = false
             }
-        } else {
-            ChatUtils.clickableChat(
+        } else if (!ReminderUtils.isBusy()) {
+            ChatUtils.clickToActionOrDisable(
                 "Carnival Tickets are ready to be claimed!",
-                {
-                    HypixelCommands.warp("carnival")
-                },
+                config::reminderDailyTickets,
                 "/warp carnival",
-            )
+            ) {
+                HypixelCommands.warp("carnival")
+            }
             nextCheckTime = 5.0.minutes.fromNow()
         }
     }
