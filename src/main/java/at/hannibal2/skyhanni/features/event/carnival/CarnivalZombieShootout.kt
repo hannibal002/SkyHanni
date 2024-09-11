@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -117,7 +117,7 @@ object CarnivalZombieShootout {
             verticalAlign = RenderUtils.VerticalAlignment.CENTER,
         )
 
-        config.lanternPosition.renderRenderables(listOf(content), posLabel = "Lantern Timer")
+        config.lanternPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
     @SubscribeEvent
