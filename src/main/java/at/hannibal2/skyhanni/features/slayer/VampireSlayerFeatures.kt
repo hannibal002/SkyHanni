@@ -198,7 +198,7 @@ object VampireSlayerFeatures {
         return toChromaColor().withAlpha(config.withAlpha)
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent(onlyOnIslands = [IslandType.THE_RIFT])
     fun onEntityClick(event: EntityClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.LEFT_CLICK) return

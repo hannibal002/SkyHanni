@@ -72,12 +72,4 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         }
         return true
     }
-
-    private class Listener(
-        val name: String,
-        val invoker: Consumer<Any>,
-        val options: HandleEvent,
-        val generic: Class<*>?,
-        val onlyOnIslandTypes: Set<IslandType> = options.onlyOnIslands.toSet(),
-    )
 }

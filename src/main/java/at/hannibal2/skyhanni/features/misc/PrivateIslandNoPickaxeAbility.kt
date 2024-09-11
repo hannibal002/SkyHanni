@@ -14,7 +14,7 @@ object PrivateIslandNoPickaxeAbility {
 
     private val config get() = SkyHanniMod.feature.mining
 
-    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    @HandleEvent(onlyOnIslands = [IslandType.PRIVATE_ISLAND])
     fun onClick(event: WorldClickEvent) {
         if (!config.privateIslandNoPickaxeAbility) return
         if (event.clickType != ClickType.RIGHT_CLICK) return

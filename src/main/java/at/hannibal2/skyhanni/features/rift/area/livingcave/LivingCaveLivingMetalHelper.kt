@@ -24,7 +24,7 @@ object LivingCaveLivingMetalHelper {
     private var pair: Pair<LorenzVec, LorenzVec>? = null
     private var startTime = 0L
 
-    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    @HandleEvent(onlyOnIslands = [IslandType.THE_RIFT])
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.clickType == ClickType.LEFT_CLICK) {

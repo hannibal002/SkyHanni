@@ -356,7 +356,7 @@ object GriffinBurrowHelper {
         event.move(2, "diana", "event.diana")
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    @HandleEvent(onlyOnIslands = [IslandType.HUB])
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 

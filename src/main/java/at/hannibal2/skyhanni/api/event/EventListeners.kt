@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.data.IslandType
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
@@ -60,5 +61,11 @@ class EventListeners private constructor(val name: String, private val isGeneric
 
     fun getListeners(): List<Listener> = listeners
 
-    class Listener(val name: String, val invoker: Consumer<Any>, val options: HandleEvent, val generic: Class<*>?)
+    class Listener(
+        val name: String,
+        val invoker: Consumer<Any>,
+        val options: HandleEvent,
+        val generic: Class<*>?,
+        val onlyOnIslandTypes: Set<IslandType> = options.onlyOnIslands.toSet(),
+    )
 }

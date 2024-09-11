@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
@@ -169,9 +170,8 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIslands = [IslandType.THE_RIFT])
     fun onPunch(event: EntityClickEvent) {
-        if (!RiftAPI.inRift()) return
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return
         if (entity.isNPC()) return
