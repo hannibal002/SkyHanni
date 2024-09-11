@@ -11,8 +11,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawHitbox
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -30,8 +32,14 @@ object CarnivalZombieShootout {
 
     private val config get() = SkyHanniMod.feature.event.carnival.zombieShootout
 
-    private var display = emptyList<Renderable>()
-    private var lantern: Pair<LorenzVec, SimpleTimeMark>? = null
+    private data class Lamp(var pos: LorenzVec, var time: SimpleTimeMark)
+    private data class Updates(var zombie: SimpleTimeMark, var content: SimpleTimeMark)
+
+    private var lastUpdate = Updates(SimpleTimeMark.farPast(), SimpleTimeMark.farPast())
+
+    private var content = Renderable.horizontalContainer(listOf())
+    private var drawZombies = mapOf<EntityZombie, ZombieType>()
+    private var lamp: Lamp? = null
     private var started = false
 
     private val patternGroup = RepoPattern.group("event.carnival")
@@ -49,7 +57,7 @@ object CarnivalZombieShootout {
      */
     private val endPattern by patternGroup.pattern(
         "shootout.end",
-        "^ {29}Zombie Shootout\$",
+        " {29}Zombie Shootout",
     )
 
     enum class ZombieType(val points: Int, val helmet: String, val color: Color) {
@@ -61,25 +69,25 @@ object CarnivalZombieShootout {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled() || !started || !config.coloredHitboxes) return
+        if (!isEnabled() || !started || (!config.coloredHitboxes && !config.coloredLines)) return
 
-        lantern?.let {
-            event.drawWaypointFilled(it.first, Color.RED, minimumAlpha = 1.0f)
+        lamp?.let {
+            if (config.coloredLines) event.draw3DLine(event.exactPlayerEyeLocation(), it.pos.add(0.0, 0.5, 0.0), Color.RED, 3, false)
+            if (config.coloredHitboxes) event.drawWaypointFilled(it.pos, Color.RED, minimumAlpha = 1.0f)
         }
 
-        val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
-            if (zombie.health <= 0) return@mapNotNull null
-            val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
-            val type = toType(armor) ?: return@mapNotNull null
-            zombie to type
-        }.toMap()
+        if (!config.coloredHitboxes) return
 
-        val drawZombies = when (config.highestOnly) {
-            false -> nearbyZombies
-            true -> {
-                val drawType = nearbyZombies.values.maxByOrNull { it.points } ?: return
-                nearbyZombies.filterValues { it == drawType }
-            }
+        if (lastUpdate.zombie.passedSince() >= 0.25.seconds) {
+            val nearbyZombies = EntityUtils.getEntitiesNextToPlayer<EntityZombie>(50.0).mapNotNull { zombie ->
+                if (zombie.health <= 0) return@mapNotNull null
+                val armor = zombie.getCurrentArmor(3) ?: return@mapNotNull null
+                val type = toType(armor) ?: return@mapNotNull null
+                zombie to type
+            }.toMap()
+
+            drawZombies = nearbyZombies.filterValues { it == nearbyZombies.values.maxByOrNull { it.points } }
+            lastUpdate.zombie = SimpleTimeMark.now()
         }
 
         for ((zombie, type) in drawZombies) {
@@ -96,9 +104,9 @@ object CarnivalZombieShootout {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !started || !config.lanternTimer) return
+        if (!isEnabled() || !started || !config.lampTimer) return
 
-        val time = lantern?.second ?: return
+        val time = lamp?.time ?: return
 
         val lamp = ItemStack(Blocks.redstone_lamp)
         val timer = 6.seconds - (SimpleTimeMark.now() - time)
@@ -108,16 +116,19 @@ object CarnivalZombieShootout {
             else -> "§c"
         }
 
-        val content = Renderable.horizontalContainer(
-            listOf(
-                Renderable.itemStack(lamp),
-                Renderable.string("§6Disappears in $prefix${timer}s"),
-            ),
-            spacing = 1,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        )
+        if (lastUpdate.content.passedSince() >= 0.1.seconds) {
+            content = Renderable.horizontalContainer(
+                listOf(
+                    Renderable.itemStack(lamp),
+                    Renderable.string("§6Disappears in $prefix${timer}"),
+                ),
+                spacing = 1,
+                verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            )
+            lastUpdate.content = SimpleTimeMark.now()
+        }
 
-        config.lanternPosition.renderRenderable(content, posLabel = "Lantern Timer")
+        config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
     @SubscribeEvent
@@ -127,10 +138,10 @@ object CarnivalZombieShootout {
         val old = event.old
         val new = event.new
 
-        lantern = when {
-            old == "redstone_lamp" && new == "lit_redstone_lamp" -> event.location to SimpleTimeMark.now()
+        lamp = when {
+            old == "redstone_lamp" && new == "lit_redstone_lamp" -> Lamp(event.location, SimpleTimeMark.now())
             old == "lit_redstone_lamp" && new == "redstone_lamp" -> null
-            else -> lantern
+            else -> lamp
         }
     }
 
