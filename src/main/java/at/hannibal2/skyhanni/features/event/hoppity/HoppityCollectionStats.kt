@@ -123,7 +123,7 @@ object HoppityCollectionStats {
      */
     private val strayRabbit by RepoPattern.pattern(
         "rabbit.requirement.stray",
-        "§7§7Obtained by finding the §aStray Rabbit"
+        "§7§7Obtained by finding the §aStray Rabbit",
     )
 
     /**
@@ -162,12 +162,12 @@ object HoppityCollectionStats {
 
     var inInventory = false
 
-    var highlightConfigMap: Map<Pair<Pattern, RabbitTypes>, LorenzColor> = mapOf(
+    private var highlightConfigMap: Map<Pair<Pattern, RabbitTypes>, LorenzColor> = mapOf(
         factoryMilestone to RabbitTypes.FACTORY to LorenzColor.YELLOW,
         requirementMet to RabbitTypes.MET to LorenzColor.GREEN,
         requirementNotMet to RabbitTypes.NOT_MET to LorenzColor.RED,
         shopMilestone to RabbitTypes.SHOP to LorenzColor.GOLD,
-        strayRabbit to RabbitTypes.STRAYS to LorenzColor.DARK_AQUA
+        strayRabbit to RabbitTypes.STRAYS to LorenzColor.DARK_AQUA,
     )
 
     @SubscribeEvent
@@ -204,8 +204,7 @@ object HoppityCollectionStats {
 
         // cache rabbits until collection is closed
         for ((patternToRabbit, highlightColor) in highlightConfigMap) {
-            if (patternToRabbit.first.anyMatches(lore) &&
-                config.highlightRabbits.contains(patternToRabbit.second)) {
+            if (patternToRabbit.first.anyMatches(lore) && config.highlightRabbits.contains(patternToRabbit.second)) {
                 highlightMap[stack.displayName] = highlightColor
                 break
             }
@@ -241,8 +240,8 @@ object HoppityCollectionStats {
             val name = slot.stack.displayName
 
             if (name.isEmpty()) continue
-            if (highlightMap.containsKey(name)) {
-                slot highlight highlightMap[name]!!
+            highlightMap[name]?.let {
+                slot highlight it
             }
         }
     }
@@ -251,9 +250,10 @@ object HoppityCollectionStats {
         if (!config.showLocationRequirementsRabbitsInHoppityStats) return
         val missingLocationRabbits = locationRabbitRequirements.values.filter { !it.hasMetRequirements() }
 
-        val tips = locationRabbitRequirements.map {
-            it.key + " §7(§e" + it.value.locationName + "§7): " + (if (it.value.hasMetRequirements()) "§a" else "§c") +
-                it.value.foundCount + "§7/§a" + it.value.requiredCount
+        val tips = locationRabbitRequirements.map { (name, rabbit) ->
+            "$name §7(§e${rabbit.locationName}§7): ${
+                if (rabbit.hasMetRequirements()) "§a" else "§c"
+            }${rabbit.foundCount}§7/§a${rabbit.requiredCount}"
         }
 
         newList.add(
@@ -426,7 +426,6 @@ object HoppityCollectionStats {
             loggedRabbits[itemName] = duplicates + 1
         }
     }
-
 
     // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
     fun clearSavedRabbits() {
