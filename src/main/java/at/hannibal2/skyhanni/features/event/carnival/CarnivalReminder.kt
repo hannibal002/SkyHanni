@@ -23,16 +23,17 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CarnivalReminder {
 
-    private val config get() = SkyHanniMod.feature.event.carnival.reminderDailyTickets
+    private val config get() = SkyHanniMod.feature.event.carnival
+    private val storage get() = ProfileStorageData.profileSpecific?.carnival
 
-    private var cooldown = SimpleTimeMark.farFuture()
+    private var nextCheckTime = SimpleTimeMark.farFuture()
 
     private var claimedToday = false
 
-    private var storage
-        get() = ProfileStorageData.profileSpecific?.carnival?.lastClaimedDay
+    private var lastClaimedDay
+        get() = storage?.lastClaimedDay
         set(value) {
-            ProfileStorageData.profileSpecific?.carnival?.lastClaimedDay = value
+            storage?.lastClaimedDay = value
         }
 
     private val repoGroup = RepoPattern.group("carnival.tickets")
@@ -50,7 +51,7 @@ object CarnivalReminder {
 
     @SubscribeEvent
     fun onSecondPassedEvent(event: SecondPassedEvent) {
-        if (!isEnabled() || !cooldown.isInPast()) return
+        if (!isEnabled() || nextCheckTime.isInFuture()) return
         check()
     }
 
@@ -58,7 +59,7 @@ object CarnivalReminder {
     fun onProfileJoin(event: ProfileJoinEvent) {
         claimedToday = false
         if (!isEnabled()) return
-        cooldown = 30.0.seconds.fromNow()
+        nextCheckTime = 30.0.seconds.fromNow()
         check()
     }
 
@@ -67,19 +68,18 @@ object CarnivalReminder {
         if (!isEnabled() && !claimedToday) return
         if (!ticketClaimedPattern.matches(event.message) && !alreadyClaimedPattern.matches(event.message)) return
         claimedToday = true
-        storage = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
+        lastClaimedDay = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
     }
 
     fun check() {
         if (claimedToday) {
             val currentDay = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
-            val stored = storage
+            val lastClaimedDay = lastClaimedDay
 
-            if (stored == null || currentDay.isAfter(stored)) {
+            if (lastClaimedDay == null || currentDay.isAfter(lastClaimedDay)) {
                 claimedToday = false
             }
-        }
-        if (!claimedToday) {
+        } else {
             ChatUtils.clickableChat(
                 "Carnival Tickets are ready to be claimed!",
                 {
@@ -87,9 +87,9 @@ object CarnivalReminder {
                 },
                 "/warp carnival",
             )
-            cooldown = 5.0.minutes.fromNow()
+            nextCheckTime = 5.0.minutes.fromNow()
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config && Perk.CHIVALROUS_CARNIVAL.isActive
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.reminderDailyTickets && Perk.CHIVALROUS_CARNIVAL.isActive
 }
