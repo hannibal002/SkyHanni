@@ -33,7 +33,7 @@ public class PetConfig {
     @Expose
     @ConfigOption(name = "Pet Nametag", desc = "")
     @Accordion
-    public PetNametagConfig petNametag = new PetNametagConfig();
+    public PetNametagConfig nametag = new PetNametagConfig();
 
     @Expose
     @ConfigOption(name = "Hide Autopet Messages", desc = "Hide the autopet messages from chat.\n" +

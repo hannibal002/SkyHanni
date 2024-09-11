@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object PetNametag {
 
-    private val config get() = SkyHanniMod.feature.misc.pets.petNametag
+    private val config get() = SkyHanniMod.feature.misc.pets.nametag
 
     /**
      * REGEX-TEST: §8[§7Lv99§8] Ammonite
@@ -23,7 +23,7 @@ object PetNametag {
      */
     private val petNametagPattern by RepoPattern.pattern(
         "pet.nametag",
-        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<pet>[\\w\\s]+)(?<skin>§. ✦)?"
+        "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<pet>[\\w\\s]+)(?<skin>§. ✦)?",
     )
 
     @SubscribeEvent
