@@ -129,19 +129,19 @@ enum class CarnivalGoal(
     private var isReached: Boolean
         get() {
             val year = SkyBlockTime.now().year
-            if (year != ProfileStorageData.profileSpecific?.carnival?.carnivalYear) {
-                ProfileStorageData.profileSpecific?.carnival?.goals?.clear()
-                ProfileStorageData.profileSpecific?.carnival?.carnivalYear = year
+            if (year != storage?.carnivalYear) {
+                storage?.goals?.clear()
+                storage?.carnivalYear = year
             }
-            return ProfileStorageData.profileSpecific?.carnival?.goals?.get(this) ?: false
+            return storage?.goals?.get(this) ?: false
         }
         set(value) {
             val year = SkyBlockTime.now().year
-            if (year != ProfileStorageData.profileSpecific?.carnival?.carnivalYear) {
-                ProfileStorageData.profileSpecific?.carnival?.goals?.clear()
-                ProfileStorageData.profileSpecific?.carnival?.carnivalYear = year
+            if (year != storage?.carnivalYear) {
+                storage?.goals?.clear()
+                storage?.carnivalYear = year
             }
-            ProfileStorageData.profileSpecific?.carnival?.goals?.set(this, value)
+            storage?.goals?.set(this, value)
             shouldUpdateDisplay = true
         }
 
@@ -156,6 +156,7 @@ enum class CarnivalGoal(
         }
 
         private val config get() = SkyHanniMod.feature.event.carnival
+        private val storage get() = ProfileStorageData.profileSpecific?.carnival
 
         private val inventoryPattern by repoGroup.pattern("inventory", "Carnival Goals")
 
@@ -163,19 +164,18 @@ enum class CarnivalGoal(
 
         private var shouldUpdateDisplay = true
 
-        private fun getEntry(item: ItemStack): CarnivalGoal? {
-            val lore = item.getLore()
-            return entries.filter { it.type.item == item.item }.firstOrNull { it.lorePattern.matches(lore.firstOrNull()) }
-        }
+        private fun getEntry(item: Item, lore: List<String>): CarnivalGoal? =
+            entries.filter { it.type.item == item }.firstOrNull { it.lorePattern.matches(lore.firstOrNull()) }
 
         @SubscribeEvent
         fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             if (!inventoryPattern.matches(event.inventoryName)) return
-            for (it in event.inventoryItems.values) {
-                val entry = getEntry(it) ?: continue
-                val lastLine = it.getLore().last()
-                entry.isReached = completePattern.matches(lastLine)
+            for (stack in event.inventoryItems.values) {
+                val lore = stack.getLore()
+                val goal = getEntry(stack.item, lore) ?: continue
+                val lastLine = lore.last()
+                goal.isReached = completePattern.matches(lastLine)
             }
         }
 
@@ -197,10 +197,7 @@ enum class CarnivalGoal(
                     addAll(GoalType.ZOMBIE_SHOOTOUT.fullDisplay)
                 }
             }
-            config.goalsPosition.renderRenderables(
-                display,
-                posLabel = "Carnival Goals",
-            )
+            config.goalsPosition.renderRenderables(display, posLabel = "Carnival Goals")
         }
 
         fun isEnabled() =
