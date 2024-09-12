@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
@@ -126,7 +127,7 @@ object UnknownLinesHandler {
                 reformingPattern,
                 bossHealthPattern,
                 bossHealthBarPattern,
-                broodmotherPattern,
+                SpidersDenAPI.broodmotherPattern,
                 bossHPPattern,
                 bossDamagePattern,
                 slayerQuestPattern,
