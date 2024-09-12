@@ -101,7 +101,6 @@ object MobDetection {
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
-        watchdog()
         if (shouldClear.get()) { // Needs to work outside skyblock since it needs clearing when leaving skyblock and joining limbo
             mobDetectionReset()
             shouldClear.set(false)
