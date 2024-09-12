@@ -198,7 +198,6 @@ object GraphEditor {
                 val list = getNodeNames()
                 val size = list.size
                 addString("§eGraph Nodes: $size")
-//                 val height = (size * 10).coerceAtMost(150)
                 val height = (size * 10).coerceAtMost(250)
                 if (list.isNotEmpty()) {
                     add(list.buildSearchableScrollable(height, textInput, scrollValue, velocity = 10.0))
@@ -541,8 +540,9 @@ object GraphEditor {
             return
         }
         val compileGraph = compileGraph()
-        // TODO add option
-        IslandGraphs.setNewGraph(compileGraph)
+        if (config.useAsIslandArea) {
+            IslandGraphs.setNewGraph(compileGraph)
+        }
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
