@@ -15,28 +15,22 @@ import kotlin.math.ceil
 object CollectionUtils {
 
     inline fun <reified T : Queue<E>, reified E> T.drainForEach(action: (E) -> Unit): T {
-        while (true)
-            action(this.poll() ?: break)
+        while (true) action(this.poll() ?: break)
         return this
     }
 
     inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        for (i in 1..amount)
-            this.poll() ?: break
+        for (i in 1..amount) this.poll() ?: break
         return this
     }
 
-    inline fun <reified E, reified K, reified L : MutableCollection<K>>
-        Queue<E>.drainTo(list: L, action: (E) -> K): L {
-        while (true)
-            list.add(action(this.poll() ?: break))
+    inline fun <reified E, reified K, reified L : MutableCollection<K>> Queue<E>.drainTo(list: L, action: (E) -> K): L {
+        while (true) list.add(action(this.poll() ?: break))
         return list
     }
 
-    inline fun <reified E, reified L : MutableCollection<E>>
-        Queue<E>.drainTo(list: L): L {
-        while (true)
-            list.add(this.poll() ?: break)
+    inline fun <reified E, reified L : MutableCollection<E>> Queue<E>.drainTo(list: L): L {
+        while (true) list.add(this.poll() ?: break)
         return list
     }
 
@@ -159,11 +153,9 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
-    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) =
-        toMutableMap().also { function(it) }.toMap()
+    fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
-    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) =
-        toMutableList().also { function(it) }.toList()
+    fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {
         val entry = entries.find(matcher)
@@ -175,8 +167,7 @@ object CollectionUtils {
         return this
     }
 
-    operator fun IntRange.contains(range: IntRange): Boolean =
-        range.first in this && range.last in this
+    operator fun IntRange.contains(range: IntRange): Boolean = range.first in this && range.last in this
 
     fun <E> MutableList<List<E>>.addAsSingletonList(text: E) {
         add(Collections.singletonList(text))
@@ -266,12 +257,10 @@ object CollectionUtils {
     } else false
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? =
-        takeIf { null !in this } as? Iterable<T>
+    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = takeIf { null !in this } as? Iterable<T>
 
     @Suppress("UNCHECKED_CAST")
-    fun <T> List<T?>.takeIfAllNotNull(): List<T>? =
-        takeIf { null !in this } as? List<T>
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
 
@@ -340,12 +329,20 @@ object CollectionUtils {
         getName: (T) -> String,
         isCurrent: (T) -> Boolean,
         crossinline onChange: (T) -> Unit,
+    ) = buildSelector(prefix, getName, isCurrent, onChange, enumValues<T>())
+
+    inline fun <T> buildSelector(
+        prefix: String,
+        getName: (T) -> String,
+        isCurrent: (T) -> Boolean,
+        crossinline onChange: (T) -> Unit,
+        universe: Array<T>,
     ) = buildList<Renderable> {
         addString(prefix)
-        for (entry in enumValues<T>()) {
+        for (entry in universe) {
             val display = getName(entry)
             if (isCurrent(entry)) {
-                addString("§a[$display]")
+                addString("§a[$display§a]")
             } else {
                 addString("§e[")
                 add(
