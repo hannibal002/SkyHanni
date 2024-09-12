@@ -195,7 +195,7 @@ enum class TabWidget(
     ),
     BROODMOTHER(
         // language=RegExp
-        "Broodmother: (?:§.)*(?<time>.*)",
+        "Broodmother: (?:§.)*(?<stage>.*)",
     ),
     EYES_PLACED(
         // language=RegExp
