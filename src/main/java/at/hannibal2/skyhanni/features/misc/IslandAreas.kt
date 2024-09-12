@@ -246,6 +246,7 @@ object IslandAreas {
                 targetNode = null
                 update()
             },
+            condition = { config.pathfinder.enabled },
         )
     }
 

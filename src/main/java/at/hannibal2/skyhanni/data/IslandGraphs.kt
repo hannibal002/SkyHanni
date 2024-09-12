@@ -103,6 +103,7 @@ object IslandGraphs {
     private var prevGoal: GraphNode? = null
 
     private var path: Pair<Graph, Double>? = null
+    private var condition: () -> Boolean = { true }
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -154,11 +155,14 @@ object IslandGraphs {
 
         val graph = currentIslandGraph ?: return
 
+
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
                 onFound()
                 reset()
-                return
+            }
+            if (!condition()) {
+                reset()
             }
         }
 
@@ -199,12 +203,19 @@ object IslandGraphs {
         path = null
     }
 
-    fun find(location: LorenzVec, color: Color = LorenzColor.WHITE.toColor(), onFound: () -> Unit = {}, showGoalExact: Boolean = false) {
+    fun find(
+        location: LorenzVec,
+        color: Color = LorenzColor.WHITE.toColor(),
+        onFound: () -> Unit = {},
+        showGoalExact: Boolean = false,
+        condition: () -> Boolean = { true },
+    ) {
         reset()
         currentTarget = location
         this.color = color
         this.onFound = onFound
         this.showGoalExact = showGoalExact
+        this.condition = condition
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
     }
