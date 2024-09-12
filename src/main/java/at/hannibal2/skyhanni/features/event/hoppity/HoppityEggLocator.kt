@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -321,6 +322,18 @@ object HoppityEggLocator {
             add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
             add("Current Egg Type: ${currentEggType ?: "None"}")
             add("Current Egg Note: ${currentEggNote ?: "None"}")
+        }
+    }
+
+    fun testPathfind(args: Array<String>) {
+        val target = args[0].formatInt()
+        HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
+            for ((i, location) in it.values.withIndex()) {
+                if (i == target) {
+                    IslandGraphs.find(location)
+                    return
+                }
+            }
         }
     }
 }

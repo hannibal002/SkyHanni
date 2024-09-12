@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
@@ -48,7 +47,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -133,18 +131,6 @@ object SkyHanniDebugsAndTests {
 
     fun testCommand(args: Array<String>) {
 
-        val nr = args[0].formatInt()
-
-        HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
-            var i = 0
-            for (value in it.values) {
-                if (i == nr) {
-                    IslandGraphs.find(value)
-                    return
-                }
-                i++
-            }
-        }
 
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
