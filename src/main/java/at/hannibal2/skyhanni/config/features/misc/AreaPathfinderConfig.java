@@ -25,7 +25,7 @@ public class AreaPathfinderConfig {
     @Expose
     @ConfigOption(name = "Current Area", desc = "Show the name of the current area at the top of the list")
     @ConfigEditorBoolean
-    public boolean includeCurrentArea = false;
+    public Property<Boolean> includeCurrentArea = Property.of(false);
 
     @Expose
     @ConfigOption(

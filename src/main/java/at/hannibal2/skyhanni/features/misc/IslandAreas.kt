@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -29,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,8 +53,11 @@ object IslandAreas {
     }
 
     fun noteMoved() {
-        if (!isEnabled()) return
+        updateNodes()
+    }
 
+    private fun updateNodes() {
+        if (!isEnabled()) return
         val graph = IslandGraphs.currentIslandGraph ?: return
         val closedNote = IslandGraphs.closedNote ?: return
 
@@ -81,17 +86,29 @@ object IslandAreas {
         nodes = finalNodes
     }
 
+    var hasMoved = false
+
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandGraphs.existsForThisIsland) return
 
-        if (event.isMod(2)) {
-            update()
+        if (event.isMod(2) && hasMoved) {
+            hasMoved = false
+            updatePosition()
         }
     }
 
-    private fun update() {
+    @SubscribeEvent
+    fun onPlayerMove(event: EntityMoveEvent) {
+        if (isEnabled()) {
+            if (event.entity == Minecraft.getMinecraft().thePlayer) {
+                hasMoved = true
+            }
+        }
+    }
+
+    private fun updatePosition() {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
@@ -157,7 +174,7 @@ object IslandAreas {
                 foundCurrentArea = true
 
                 val inAnArea = name != "no_area"
-                if (config.pathfinder.includeCurrentArea) {
+                if (config.pathfinder.includeCurrentArea.get()) {
                     if (inAnArea) {
                         addSearchString("§eCurrent area: $coloredName")
                     } else {
@@ -197,6 +214,7 @@ object IslandAreas {
                         if (node == targetNode) {
                             targetNode = null
                             IslandGraphs.stop()
+                            updatePosition()
                         } else {
                             setTarget(node)
                         }
@@ -228,6 +246,10 @@ object IslandAreas {
                 setTarget(it)
             }
         }
+        ConditionalUtils.onToggle(config.pathfinder.color, config.pathfinder.includeCurrentArea) {
+            updateNodes()
+            updatePosition()
+        }
     }
 
     private val allAreas = listOf(GraphNodeTag.AREA, GraphNodeTag.SMALL_AREA)
@@ -244,10 +266,11 @@ object IslandAreas {
             node.position, color,
             onFound = {
                 targetNode = null
-                update()
+                updatePosition()
             },
             condition = { config.pathfinder.enabled },
         )
+        hasMoved = true
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.let { it.pathfinder.enabled || it.enterTitle || it.inWorld }
