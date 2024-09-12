@@ -87,7 +87,7 @@ object CarnivalReminder {
             ChatUtils.clickToActionOrDisable(
                 "Carnival Tickets are ready to be claimed!",
                 config::reminderDailyTickets,
-                "/warp carnival",
+                "warp to The Carnival",
             ) {
                 HypixelCommands.warp("carnival")
             }
