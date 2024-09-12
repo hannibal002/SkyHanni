@@ -15,9 +15,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import scala.util.Either
-import scala.util.Left
-import scala.util.Right
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -34,7 +31,7 @@ object ExperimentsDisplay {
     data class Item(val index: Int, val name: String)
     data class ItemPair(val first: Item, val second: Item)
 
-    private var found = mutableMapOf<Either<Item, ItemPair>, String>()
+    private var found = mutableMapOf<Pair<Item?, ItemPair?>, String>()
 
     private var toCheck = mutableListOf<Pair<Int, Int>>()
     private var lastClicked = mutableListOf<Pair<Int, Int>>()
@@ -285,14 +282,14 @@ object ExperimentsDisplay {
             (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
     }
 
-    private fun left(it: Either<Item, ItemPair>) =
-        it.left().get()
+    private fun left(it: Pair<Item?, ItemPair?>): Item =
+        it.first ?: Item(-1, "")
 
-    private fun right(it: Either<Item, ItemPair>) =
-        it.right().get()
+    private fun right(it: Pair<Item?, ItemPair?>): ItemPair =
+        it.second ?: ItemPair(Item(-1, ""), Item(-1, ""))
 
-    private fun toEither(it: Any): Either<Item, ItemPair> =
-        if (it is Item) Left(it) else Right(it as ItemPair)
+    private fun toEither(it: Any): Pair<Item?, ItemPair?> =
+        if (it is Item) it to null else null to it as ItemPair
 
     private fun isEnabled() =
         LorenzUtils.inSkyBlock && config.display && ExperimentationTableAPI.getCurrentExperiment() != null
