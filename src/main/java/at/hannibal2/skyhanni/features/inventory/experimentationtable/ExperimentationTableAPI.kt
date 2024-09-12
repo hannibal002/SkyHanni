@@ -61,6 +61,14 @@ object ExperimentationTableAPI {
     )
 
     /**
+     * REGEX-TEST: You claimed the Superpairs rewards!
+     */
+    val claimMessagePattern by patternGroup.pattern(
+        "claim",
+        "You claimed the \\S+ rewards!"
+    )
+
+    /**
      * REGEX-TEST: 131k Enchanting Exp
      * REGEX-TEST: 42,000 Enchanting Exp
      */

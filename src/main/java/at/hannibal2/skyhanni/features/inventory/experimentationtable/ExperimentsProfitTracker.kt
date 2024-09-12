@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottlePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
@@ -100,7 +101,7 @@ object ExperimentsProfitTracker {
         if (!isEnabled() || lastExperimentTime.passedSince() > 3.seconds) return
 
         val message = event.message.removeColor()
-        if (message == "You claimed the Superpairs rewards!" && ExperimentMessages.DONE.isSelected())
+        if (claimMessagePattern.matches(message) && ExperimentMessages.DONE.isSelected())
             event.blockedReason = "CLAIM_MESSAGE"
 
         experimentsDropPattern.matchMatcher(message) {
@@ -109,8 +110,7 @@ object ExperimentsProfitTracker {
             event.blockedReason = when {
                 enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
                 experienceBottlePattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-                reward == "Metaphysical Serum" && ExperimentMessages.SERUM.isSelected() -> "SERUM_DROP"
-                reward == "Experiment The Fish" && ExperimentMessages.FISH.isSelected() -> "FISH_DROP"
+                listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
                 ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
                 else -> ""
             }

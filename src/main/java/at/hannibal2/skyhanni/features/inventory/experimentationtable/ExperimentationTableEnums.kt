@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 object ExperimentationTableEnums {
 
     enum class ExperimentMessages(private val str: String) {
-        DONE("§eYou claimed the §dSuperpairs §erewards!"),
+        DONE("§eYou claimed the §dSuperpairs §erewards! §8(§7Claim§8)"),
         EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
         ENCHANTMENTS("§8 +§9Smite VII §8(§7Enchantment Drops§8)"),
         BOTTLES("§8 +§9Titanic Experience Bottle §8(§7Bottle Drops§8)"),
-        SERUM("§8 +§5Metaphysical Serum"),
-        FISH("§8 +§cExperiment The Fish");
+        MISC("§8 +§5Metaphysical Serum §8(§7Misc Drops§8)")
+        ;
 
         override fun toString(): String {
             return str
