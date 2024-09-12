@@ -47,8 +47,8 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object CustomScoreboard {
 
-    private var display = listOf<ScoreboardLine>()
-    private var cache = listOf<ScoreboardLine>()
+    private var display: Renderable? = null
+    private var cache: Renderable? = null
 
     private var currentIslandEntries = listOf<ScoreboardElement>()
     var currentIslandEvents = listOf<ScoreboardEvent>()
@@ -66,22 +66,16 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (display.isEmpty()) return
+        display ?: return
 
         val render =
-            if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) cache
+            if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache != null) cache
             else display
 
-        val textRenderable = Renderable.verticalContainer(
-            render.map { Renderable.string(it.display, horizontalAlign = it.alignment) },
-            displayConfig.lineSpacing - 10,
-            horizontalAlign = HorizontalAlignment.CENTER,
-            verticalAlign = VerticalAlignment.CENTER,
-        )
+        render ?: return
 
-        val finalRenderable = RenderBackground.addBackground(textRenderable)
-
-        RenderBackground.updatePosition(finalRenderable)
+        // We want to update the background every time, so we can have a smooth transition when using chroma as the color
+        val finalRenderable = RenderBackground.addBackground(render)
 
         config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
     }
@@ -126,9 +120,9 @@ object CustomScoreboard {
 
         // Creating the lines
         if (event.isMod(5) || dirty) {
-            display = createLines().removeEmptyLinesFromEdges()
+            display = createLines().removeEmptyLinesFromEdges().createRenderable()
             if (TabListData.fullyLoaded) {
-                cache = display.toList()
+                cache = display
             }
         }
 
@@ -141,7 +135,6 @@ object CustomScoreboard {
         mostRecentLines = event.scoreboard
         lastScoreboardUpdate = SimpleTimeMark.now()
     }
-
 
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display
@@ -187,6 +180,13 @@ object CustomScoreboard {
             addAll(lines)
         }
     }
+
+    private fun List<ScoreboardLine>.createRenderable() = Renderable.verticalContainer(
+        map { Renderable.string(it.display, horizontalAlign = it.alignment) },
+        displayConfig.lineSpacing - 10,
+        horizontalAlign = HorizontalAlignment.CENTER,
+        verticalAlign = VerticalAlignment.CENTER,
+    )
 
     private fun List<ScoreboardLine>.removeEmptyLinesFromEdges(): List<ScoreboardLine> =
         takeIf { !informationFilteringConfig.hideEmptyLinesAtTopAndBottom }
