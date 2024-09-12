@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -21,7 +22,8 @@ import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class GardenVisitorSupercraft {
+@SkyHanniModule
+object GardenVisitorSupercraft {
 
     private val isSupercraftEnabled get() = VisitorAPI.config.shoppingList.showSuperCraft
 
@@ -72,7 +74,7 @@ class GardenVisitorSupercraft {
     private fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
+            .firstOrNull { !it.allIngredients().first().internalItemId.contains("PEST") }
             ?.allIngredients() ?: return
         val ingredientReqs = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
@@ -105,7 +107,7 @@ class GardenVisitorSupercraft {
         if (!hasIngredients) return
 
         if (event.slotId != 31) return
-        event.isCanceled = true
+        event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
             HypixelCommands.recipe(lastSuperCraftMaterial)
             lastClick = SimpleTimeMark.now()

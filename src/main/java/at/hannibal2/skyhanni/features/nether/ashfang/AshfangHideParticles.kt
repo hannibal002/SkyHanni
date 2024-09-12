@@ -7,13 +7,15 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AshfangHideParticles {
+@SkyHanniModule
+object AshfangHideParticles {
 
     private var nearAshfang = false
 
@@ -27,7 +29,7 @@ class AshfangHideParticles {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (isEnabled()) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 
@@ -42,7 +44,7 @@ class AshfangHideParticles {
                 val name = stack.name
                 if (name == "§aFairy Souls") continue
                 if (name == "Glowstone") {
-                    event.isCanceled = true
+                    event.cancel()
                 }
             }
         }

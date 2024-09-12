@@ -34,7 +34,7 @@ object MiscFeatures {
             EnumParticleTypes.EXPLOSION_LARGE,
             EnumParticleTypes.EXPLOSION_HUGE,
             EnumParticleTypes.EXPLOSION_NORMAL,
-            -> event.isCanceled = true
+            -> event.cancel()
 
             else -> {}
         }
@@ -53,9 +53,5 @@ object MiscFeatures {
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "mobs", "combat.mobs")
-    }
-
-    fun goToLimbo() {
-        ChatUtils.sendMessageToServer("§")
     }
 }

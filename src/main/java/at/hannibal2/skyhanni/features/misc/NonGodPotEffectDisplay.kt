@@ -1,17 +1,19 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -20,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -27,13 +30,13 @@ import at.hannibal2.skyhanni.utils.TimeUtils.timerColor
 import at.hannibal2.skyhanni.utils.Timer
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.network.play.server.S47PacketPlayerListHeaderFooter
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class NonGodPotEffectDisplay {
+@SkyHanniModule
+object NonGodPotEffectDisplay {
 
     private val config get() = SkyHanniMod.feature.misc.potionEffect
     private var checkFooter = false
@@ -78,7 +81,7 @@ class NonGodPotEffectDisplay {
 
     private val effectsCountPattern by RepoPattern.pattern(
         "misc.nongodpot.effects",
-        "§7You have §e(?<name>\\d+) §7non-god effects\\."
+        "§7You have §e(?<name>\\d+) §7non-god effects\\.",
     )
     private var totalEffectsCount = 0
 
@@ -179,7 +182,19 @@ class NonGodPotEffectDisplay {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 
-        update()
+        if (config.nonGodPotEffectDisplay) update()
+
+        val effectWarning = config.expireWarning
+        val effectSound = config.expireSound
+
+        if (!effectWarning && !effectSound) return
+
+        effectDuration.sorted().forEach { (effect, time) ->
+            if (time.remaining.inWholeSeconds != config.expireWarnTime.toLong()) return
+
+            if (effectWarning) LorenzUtils.sendTitle(effect.tabListName, 3.seconds)
+            if (effectSound) repeat(5) { playPlingSound() }
+        }
     }
 
     @SubscribeEvent
@@ -197,29 +212,26 @@ class NonGodPotEffectDisplay {
             for (effect in NonGodPotEffect.entries) {
                 if (!name.contains(effect.inventoryItemName)) continue
                 for (line in stack.getLore()) {
-                    if (line.contains("Remaining") &&
-                        line != "§7Time Remaining: §aCompleted!" &&
-                        !line.contains("Remaining Uses")
-                    ) {
-                        val duration = try {
-                            TimeUtils.getDuration(line.split("§f")[1])
-                        } catch (e: IndexOutOfBoundsException) {
-                            ErrorManager.logErrorWithData(
-                                e, "Error while reading Non God-Potion effects from tab list",
-                                "line" to line
-                            )
-                            continue
-                        }
-                        effectDuration[effect] = Timer(duration)
-                        update()
+                    if (!line.contains("Remaining") || line == "§7Time Remaining: §aCompleted!" || line.contains("Remaining Uses")) continue
+                    val duration = try {
+                        TimeUtils.getDuration(line.split("§f")[1])
+                    } catch (e: IndexOutOfBoundsException) {
+                        ErrorManager.logErrorWithData(
+                            e, "Error while reading Non God-Potion effects from tab list",
+                            "line" to line,
+                        )
+                        continue
                     }
+                    effectDuration[effect] = Timer(duration)
+                    update()
                 }
             }
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+    // TODO use TablistFooterUpdateEvent instead
+    @HandleEvent(onlyOnSkyblock = true, priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         val packet = event.packet
         if (!checkFooter) return
         if (packet is S47PacketPlayerListHeaderFooter) {
@@ -255,13 +267,13 @@ class NonGodPotEffectDisplay {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!isEnabled() || !config.nonGodPotEffectDisplay) return
         if (RiftAPI.inRift()) return
 
         config.nonGodPotEffectPos.renderStrings(
             display,
             extraSpace = 3,
-            posLabel = "Non God Pot Effects"
+            posLabel = "Non God Pot Effects",
         )
     }
 
@@ -272,6 +284,5 @@ class NonGodPotEffectDisplay {
         event.move(3, "misc.nonGodPotEffectPos", "misc.potionEffect.nonGodPotEffectPos")
     }
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.nonGodPotEffectDisplay && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
+    private fun isEnabled() = LorenzUtils.inSkyBlock && !DungeonAPI.inDungeon() && !LorenzUtils.inKuudraFight
 }

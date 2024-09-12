@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.Companion.getBazaarData
-import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarDataHolder
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
@@ -16,8 +14,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import com.google.gson.JsonPrimitive
 import com.google.gson.TypeAdapter
@@ -41,10 +41,16 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.client.renderer.RenderHelper
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull as getPriceOrNullNew
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull as getRawCraftCostOrNullNew
 
 @SkyHanniModule
 object NEUItems {
@@ -53,35 +59,39 @@ object NEUItems {
     private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
     private val recipesCache = mutableMapOf<NEUInternalName, Set<NeuRecipe>>()
     private val ingredientsCache = mutableMapOf<NeuRecipe, Set<Ingredient>>()
+    private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
 
     private val hypixelApiGson by lazy {
         BaseGsonBuilder.gson()
-            .registerTypeAdapter(HypixelApiTrophyFish::class.java, object : TypeAdapter<HypixelApiTrophyFish>() {
-                override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
+            .registerTypeAdapter(
+                HypixelApiTrophyFish::class.java,
+                object : TypeAdapter<HypixelApiTrophyFish>() {
+                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
-                override fun read(reader: JsonReader): HypixelApiTrophyFish {
-                    val trophyFish = mutableMapOf<String, Int>()
-                    var totalCaught = 0
-                    reader.beginObject()
-                    while (reader.hasNext()) {
-                        val key = reader.nextName()
-                        if (key == "total_caught") {
-                            totalCaught = reader.nextInt()
-                            continue
-                        }
-                        if (reader.peek() == JsonToken.NUMBER) {
-                            val valueAsString = reader.nextString()
-                            if (valueAsString.isInt()) {
-                                trophyFish[key] = valueAsString.toInt()
+                    override fun read(reader: JsonReader): HypixelApiTrophyFish {
+                        val trophyFish = mutableMapOf<String, Int>()
+                        var totalCaught = 0
+                        reader.beginObject()
+                        while (reader.hasNext()) {
+                            val key = reader.nextName()
+                            if (key == "total_caught") {
+                                totalCaught = reader.nextInt()
                                 continue
                             }
+                            if (reader.peek() == JsonToken.NUMBER) {
+                                val valueAsString = reader.nextString()
+                                if (valueAsString.isInt()) {
+                                    trophyFish[key] = valueAsString.toInt()
+                                    continue
+                                }
+                            }
+                            reader.skipValue()
                         }
-                        reader.skipValue()
+                        reader.endObject()
+                        return HypixelApiTrophyFish(totalCaught, trophyFish)
                     }
-                    reader.endObject()
-                    return HypixelApiTrophyFish(totalCaught, trophyFish)
-                }
-            }.nullSafe())
+                }.nullSafe(),
+            )
             .create()
     }
 
@@ -93,7 +103,7 @@ object NEUItems {
         Utils.createItemStack(
             ItemStack(Blocks.barrier).item,
             "§cMissing Repo Item",
-            "§cYour NEU repo seems to be out of date"
+            "§cYour NEU repo seems to be out of date",
         )
     }
 
@@ -118,7 +128,7 @@ object NEUItems {
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
                 e, "Error reading hypixel player api data",
-                "data" to apiData
+                "data" to apiData,
             )
         }
     }
@@ -128,14 +138,20 @@ object NEUItems {
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
+
+            // we ignore all builder blocks from the item name -> internal name cache
+            // because builder blocks can have the same display name as normal items.
+            if (rawInternalName.startsWith("BUILDER_")) continue
+
             val internalName = rawInternalName.asInternalName()
 
-            // TODO remove one of them once neu is consistent
+            // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
+            name = name.removePrefix("§f§f§7[lvl {lvl}] ")
             name = name.removePrefix("§7[lvl 1➡100] ")
 
             if (name.contains("[lvl 1➡100]")) {
-                if (LorenzUtils.isInDevEnvironment()) {
+                if (PlatformUtils.isDevEnvironment) {
                     error("wrong name: '$name'")
                 }
                 println("wrong name: '$name'")
@@ -154,44 +170,40 @@ object NEUItems {
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
 
-    fun NEUInternalName.getPrice(useSellingPrice: Boolean = false) = getPriceOrNull(useSellingPrice) ?: -1.0
-
-    fun NEUInternalName.getNpcPrice() = getNpcPriceOrNull() ?: -1.0
-
-    fun NEUInternalName.getNpcPriceOrNull(): Double? {
-        if (this == NEUInternalName.WISP_POTION) {
-            return 20_000.0
-        }
-        return BazaarDataHolder.getNpcPrice(this)
+    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
+        val internalName = hypixelId.replace(':', '-')
+        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
     }
+
+    fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
+        getInternalNameFromHypixelIdOrNull(hypixelId)
+            ?: error("hypixel item id does not match internal name: $hypixelId")
+
+
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getPrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ): Double = getPriceNew(priceSource, pastRecipes)
+
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getNpcPrice(): Double = getNpcPriceNew()
+
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getNpcPriceOrNull(): Double? = getNpcPriceOrNullNew()
 
     fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).asInternalName()
 
-    fun NEUInternalName.getPriceOrNull(useSellingPrice: Boolean = false): Double? {
-        if (this == NEUInternalName.WISP_POTION) {
-            return 20_000.0
-        }
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getPriceOrNull(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<NeuRecipe> = emptyList(),
+    ): Double? = this.getPriceOrNullNew(priceSource, pastRecipes)
 
-        getBazaarData()?.let {
-            return if (useSellingPrice) it.sellOfferPrice else it.instantBuyPrice
-        }
-
-        val result = manager.auctionManager.getLowestBin(asString())
-        if (result != -1L) return result.toDouble()
-
-        if (equals("JACK_O_LANTERN")) {
-            return "PUMPKIN".asInternalName().getPrice(useSellingPrice) + 1
-        }
-        if (equals("GOLDEN_CARROT")) {
-            // 6.8 for some players
-            return 7.0 // NPC price
-        }
-
-        return getNpcPriceOrNull() ?: getRawCraftCostOrNull()
-    }
-
-    fun NEUInternalName.getRawCraftCostOrNull(): Double? = manager.auctionManager.getCraftCost(asString())?.craftCost
+    @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
+    fun NEUInternalName.getRawCraftCostOrNull(pastRecipes: List<NeuRecipe> = emptyList()): Double? =
+        getRawCraftCostOrNullNew(ItemPriceSource.BAZAAR_INSTANT_BUY, pastRecipes)
 
     fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
@@ -201,21 +213,17 @@ object NEUItems {
 
     fun NEUInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
-            getPriceOrNull() ?: return@run fallbackItem
+            getPriceOrNullNew() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
-            ErrorManager.logErrorWithData(
-                IllegalStateException("Something went wrong!"),
-                "Encountered an error getting the item for §7$this§c. " +
-                    "This may be because your NEU repo is outdated. Please ask in the SkyHanni " +
-                    "Discord if this is the case.",
-                "Item name" to this.asString(),
-                "repo commit" to manager.latestRepoCommit
-            )
+
+            val name = this.toString()
+            ItemUtils.addMissingRepoItem(name, "Could not create item stack for $name")
             fallbackItem
         }
 
-    fun isVanillaItem(item: ItemStack): Boolean =
-        manager.auctionManager.isVanillaItem(item.getInternalName().asString())
+    fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
+
+    fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
 
     const val itemFontSize = 2.0 / 3.0
 
@@ -223,7 +231,7 @@ object NEUItems {
         x: Float,
         y: Float,
         scaleMultiplier: Double = itemFontSize,
-        rescaleSkulls: Boolean = true
+        rescaleSkulls: Boolean = true,
     ) {
         val item = checkBlinkItem()
         val isSkull = rescaleSkulls && item.item === Items.skull
@@ -279,10 +287,15 @@ object NEUItems {
 
     fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
-    @Deprecated("outdated", ReplaceWith("NEUItems.getPrimitiveMultiplier(internalName, tryCount)"))
-    fun getMultiplier(internalName: NEUInternalName, tryCount: Int = 0): Pair<NEUInternalName, Int> {
-        val (name, amount) = getPrimitiveMultiplier(internalName, tryCount)
-        return Pair(name, amount)
+    fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
+        itemIdCache[item]?.let {
+            return it
+        }
+        val result = allNeuRepoItems()
+            .filter { Item.getByNameOrId(it.value.get("itemid").asString) == item }
+            .keys.map { it.asInternalName() }
+        itemIdCache[item] = result
+        return result
     }
 
     fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
@@ -291,7 +304,7 @@ object NEUItems {
             ErrorManager.logErrorStateWithData(
                 "Could not load recipe data.",
                 "Failed to find item multiplier",
-                "internalName" to internalName
+                "internalName" to internalName,
             )
             return internalName.makePrimitiveStack()
         }
@@ -330,7 +343,7 @@ object NEUItems {
             val id = current.first
             return if (current.second > 1) {
                 val child = getPrimitiveMultiplier(id, tryCount + 1)
-                val result = child.multiply(current.second)
+                val result = child * current.second
                 multiplierCache[internalName] = result
                 result
             } else {
@@ -354,7 +367,9 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
-        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled.getValue()) return true
+        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
+        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
+        if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
         if (NEUOverlay.searchBarHasFocus) return true
 
         return false

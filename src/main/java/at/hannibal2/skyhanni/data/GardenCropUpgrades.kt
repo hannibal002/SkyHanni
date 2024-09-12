@@ -20,11 +20,11 @@ object GardenCropUpgrades {
     private val patternGroup = RepoPattern.group("garden.cropupgrades")
     private val tierPattern by patternGroup.pattern(
         "tier",
-        "§7Current Tier: §.(?<level>\\d)§7/§a9"
+        "§7Current Tier: §.(?<level>\\d)§7/§a9",
     )
     private val chatUpgradePattern by patternGroup.pattern(
         "chatupgrade",
-        "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)"
+        "\\s+§r§6§lCROP UPGRADE §e(?<crop>[\\w ]+)§7 #(?<tier>\\d)",
     )
 
     private val cropUpgrades: MutableMap<CropType, Int>? get() = GardenAPI.storage?.cropUpgrades

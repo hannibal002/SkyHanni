@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
@@ -14,7 +15,8 @@ import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class TubulatorParkour {
+@SkyHanniModule
+object TubulatorParkour {
 
     private val config get() = RiftAPI.config.area.mirrorverse.tubulatorConfig
     private var parkourHelper: ParkourHelper? = null
@@ -39,7 +41,7 @@ class TubulatorParkour {
 
         parkourHelper?.let {
             if (it.inParkour()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
