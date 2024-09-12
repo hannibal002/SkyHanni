@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 object ExperimentationTableEnums {
+
     enum class ExperimentMessages(private val str: String) {
         DONE("§eYou claimed the §dSuperpairs §erewards!"),
         EXPERIENCE("§8 +§3141k Experience §8(§7Experience Drops§8)"),
@@ -28,5 +29,4 @@ object ExperimentationTableEnums {
             return nameString
         }
     }
-
 }

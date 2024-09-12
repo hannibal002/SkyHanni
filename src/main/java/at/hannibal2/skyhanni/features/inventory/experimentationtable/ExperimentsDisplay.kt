@@ -15,6 +15,9 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import scala.util.Either
+import scala.util.Left
+import scala.util.Right
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -28,13 +31,11 @@ object ExperimentsDisplay {
     private var uncoveredItems = mutableListOf<Pair<Int, String>>()
     private var possiblePairs = 0
 
-    data class ItemPair(val first: Pair<Int, String>, val second: Pair<Int, String>)
+    data class Item(val index: Int, val name: String)
+    data class ItemPair(val first: Item, val second: Item)
 
-    private var foundNormals = mutableMapOf<Int, String>()
-    private var foundMatches = mutableListOf<ItemPair>()
-    private var foundPairs = mutableListOf<ItemPair>()
-    private var foundPowerUps = mutableMapOf<Int, String>()
-    private var foundExperiences = mutableListOf<Pair<String, Int>>()
+    private var found = mutableMapOf<Either<Item, ItemPair>, String>()
+
     private var toCheck = mutableListOf<Pair<Int, Int>>()
     private var lastClicked = mutableListOf<Pair<Int, Int>>()
     private var lastClick = SimpleTimeMark.farPast()
@@ -52,11 +53,7 @@ object ExperimentsDisplay {
         uncoveredItems.clear()
         possiblePairs = 0
 
-        foundNormals.clear()
-        foundMatches.clear()
-        foundPairs.clear()
-        foundPowerUps.clear()
-        foundExperiences.clear()
+        found.clear()
         toCheck.clear()
         lastClicked.clear()
         lastClick = SimpleTimeMark.farPast()
@@ -106,7 +103,6 @@ object ExperimentsDisplay {
 
             val reward = convertToReward(itemNow)
             if (uncoveredItems.none { it.first == slot }) uncoveredItems.add(Pair(slot, reward))
-            if (foundExperiences.none { it.first == reward }) foundExperiences.add(Pair(reward, itemNow.itemDamage))
 
             when {
                 isPowerUp(reward) -> handlePowerUp(slot, reward)
@@ -130,7 +126,9 @@ object ExperimentsDisplay {
     }
 
     private fun handlePowerUp(slot: Int, reward: String) {
-        foundPowerUps[slot] = reward
+        val item = toEither(Item(slot, reward))
+
+        found[item] = "Powerup"
         possiblePairs--
         lastClicked.removeIf { it.first == slot }
         uncoveredAt -= 1
@@ -149,7 +147,7 @@ object ExperimentsDisplay {
 
         when {
             instantFind >= 1 -> {
-                handleFoundPair(slot, reward, lastSlotClicked.first, lastItemName)
+                handleFoundPair(slot, reward, lastSlotClicked.first)
                 instantFind -= 1
                 lastClicked.add(-1 to uncoveredAt)
                 uncoveredAt += 1
@@ -159,11 +157,10 @@ object ExperimentsDisplay {
                 slot,
                 reward,
                 lastSlotClicked.first,
-                lastItemName,
             )
 
             hasFoundMatch(slot, reward) -> handleFoundMatch(slot, reward)
-            else -> handleNormalReward(slot, reward, lastItem)
+            else -> handleNormalReward(slot, reward)
         }
 
     }
@@ -172,51 +169,73 @@ object ExperimentsDisplay {
         slot: Int,
         reward: String,
         lastSlotClicked: Int,
-        lastItemName: String,
     ) {
-        foundPairs.add(ItemPair(Pair(slot, reward), Pair(lastSlotClicked, lastItemName)))
-        foundMatches.removeAll { it.first.second == reward }
-        foundNormals.entries.removeIf { it.key == slot || it.key == lastSlotClicked }
+        val pair = toEither(ItemPair(Item(slot, reward), Item(lastSlotClicked, reward)))
+
+        found[pair] = "Pair"
+        found.entries.removeIf {
+            it.value == "Match"
+                && right(it.key).first.name == reward
+        }
+        found.entries.removeIf {
+            it.value == "Normal"
+                && (left(it.key).index == slot || left(it.key).index == lastSlotClicked)
+        }
     }
 
     private fun handleFoundMatch(slot: Int, reward: String) {
         val match = uncoveredItems.find { it.second == reward }?.first ?: return
-        foundMatches.add(ItemPair(Pair(slot, reward), Pair(match, reward)))
-        foundNormals.entries.removeIf { it.key == slot || it.key == match }
+        val pair = toEither(ItemPair(Item(slot, reward), Item(match, reward)))
+
+        found[pair] = "Match"
+        found.entries.removeIf {
+            it.value == "Normal"
+                && (left(it.key).index == slot || left(it.key).index == match)
+        }
     }
 
-    private fun handleNormalReward(slot: Int, reward: String, item: ItemStack) {
-        if (foundMatches.none { it.first.second == reward } &&
-            foundPairs.none { it.first.second == reward } &&
-            foundExperiences.count { it.first == reward && it.second == item.itemDamage } <= 1) foundNormals[slot] = reward
+    private fun handleNormalReward(slot: Int, reward: String) {
+        val item = toEither(Item(slot, reward))
+
+        if (found.none {
+                listOf("Match", "Pair").contains(it.value)
+                    && (right(it.key).first.index == slot || right(it.key).second.index == slot)
+            } && found.none { it.value == "Normal" && left(it.key).index == slot }
+        ) found[item] = "Normal"
     }
 
     private fun calculatePossiblePairs() =
-        ((currentExperiment.gridSize - 2) / 2) - foundPairs.size - foundMatches.size - foundNormals.size
+        ((currentExperiment.gridSize - 2) / 2) - found.filter { listOf("Pair", "Match", "Normal").contains(it.value) }.size
 
     private fun drawDisplay() = buildList {
         add("§6Experimentation Data")
         add("")
-        if (foundPairs.isNotEmpty()) add("§2Found")
-        for (pair in foundPairs) {
-            val prefix = determinePrefix(foundPairs.indexOf(pair), foundPairs.lastIndex)
-            add(" $prefix §a${pair.first.second}")
+
+        val pairs = found.entries.filter { it.value == "Pair" }
+        val matches = found.entries.filter { it.value == "Match" }
+        val powerups = found.entries.filter { it.value == "Powerup" }
+        val normals = found.entries.filter { it.value == "Normal" }
+
+        if (pairs.isNotEmpty()) add("§2Found")
+        for (pair in pairs) {
+            val prefix = determinePrefix(pairs.indexOf(pair), pairs.lastIndex)
+            add(" $prefix §a${right(pair.key).first.name}")
         }
-        if (foundMatches.isNotEmpty()) add("§eMatched")
-        for (pair in foundMatches) {
-            val prefix = determinePrefix(foundMatches.indexOf(pair), foundMatches.lastIndex)
-            add(" $prefix §e${pair.first.second}")
+        if (matches.isNotEmpty()) add("§eMatched")
+        for (match in matches) {
+            val prefix = determinePrefix(matches.indexOf(match), matches.lastIndex)
+            add(" $prefix §e${right(match.key).first.name}")
         }
-        if (foundPowerUps.isNotEmpty()) add("§bPowerUp")
-        for (power in foundPowerUps) {
+        if (powerups.isNotEmpty()) add("§bPowerUp")
+        for (powerup in powerups) {
             val prefix =
-                determinePrefix(foundPowerUps.entries.indexOf(power), foundPowerUps.size - 1)
-            add(" $prefix §b${power.value}")
+                determinePrefix(powerups.indexOf(powerup), powerups.size - 1)
+            add(" $prefix §b${left(powerup.key).name}")
         }
         val toAdd = mutableListOf<String>()
         if (possiblePairs >= 1) toAdd.add("§ePairs - $possiblePairs")
-        if (2 - foundPowerUps.size >= 1) toAdd.add("§bPowerUps - ${2 - foundPowerUps.size}")
-        if (foundNormals.isNotEmpty()) toAdd.add("§7Normals - ${foundNormals.size}")
+        if (2 - powerups.size >= 1) toAdd.add("§bPowerUps - ${2 - powerups.size}")
+        if (normals.isNotEmpty()) toAdd.add("§7Normals - ${normals.size}")
 
         if (toAdd.isNotEmpty()) {
             add("")
@@ -240,8 +259,10 @@ object ExperimentsDisplay {
 
     private fun hasFoundMatch(itemSlot: Int, reward: String) =
         uncoveredItems.any { (slot, name) -> slot != itemSlot && name == reward } &&
-            foundMatches.none { it.first.second == reward } &&
-            foundPairs.none { it.first.second == reward }
+            found.none {
+                listOf("Pair", "Match").contains(it.value)
+                    && (right(it.key).first.index == itemSlot || right(it.key).second.index == itemSlot)
+            }
 
     private fun isPowerUp(reward: String) =
         ExperimentationTableAPI.powerUpPattern.matches(reward)
@@ -263,6 +284,15 @@ object ExperimentsDisplay {
             slot >= experiment.endSlot ||
             (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
     }
+
+    private fun left(it: Either<Item, ItemPair>) =
+        it.left().get()
+
+    private fun right(it: Either<Item, ItemPair>) =
+        it.right().get()
+
+    private fun toEither(it: Any): Either<Item, ItemPair> =
+        if (it is Item) Left(it) else Right(it as ItemPair)
 
     private fun isEnabled() =
         LorenzUtils.inSkyBlock && config.display && ExperimentationTableAPI.getCurrentExperiment() != null
