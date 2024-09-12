@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
-import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI.currentMayor
@@ -137,9 +136,10 @@ object GriffinBurrowHelper {
         val newLocation = locations.minByOrNull { it.distanceToPlayer() }
         if (targetLocation != newLocation) {
             targetLocation = newLocation
-            newLocation?.let {
-                IslandGraphs.find(it)
-            }
+            // add island graphs here some day when the hub is fully added in the graph
+//             newLocation?.let {
+//                 IslandGraphs.find(it)
+//             }
         }
 
         if (config.burrowNearestWarp) {

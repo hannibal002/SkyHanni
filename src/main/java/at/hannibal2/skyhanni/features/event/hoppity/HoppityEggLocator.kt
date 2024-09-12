@@ -271,10 +271,12 @@ object HoppityEggLocator {
     }
 
     private fun trySendingGraph() {
-        // TODO add option
-        possibleEggLocations.firstOrNull()?.let {
-            IslandGraphs.find(it)
-        }
+        if (!config.showPathFinder) return
+        val location = possibleEggLocations.firstOrNull() ?: return
+
+        val color = config.waypointColor.toChromaColor()
+
+        IslandGraphs.find(location, color)
     }
 
     fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
