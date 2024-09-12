@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -406,6 +407,44 @@ object ChatFilter {
         "§e§k.§a>> {3}§aAchievement Unlocked: .* {3}<<§e§k.".toPattern(),
     )
 
+    /**
+     * REGEX-TEST: §aStarted parkour cocoa!
+     * REGEX-TEST: §aFinished parkour cocoa in 12:34.567!
+     * REGEX-TEST: §aReached checkpoint #4 for parkour cocoa!
+     * REGEX-TEST: §4Wrong checkpoint for parkour cocoa!
+     * REGEX-TEST: §4You haven't reached all checkpoints for parkour cocoa!
+     */
+    private val parkourPatterns = listOf(
+        "§aStarted parkour (.*)!".toPattern(),
+        "§aFinished parkour (.*) in (.*)!".toPattern(),
+        "§aReached checkpoint #(.*) for parkour (.*)!".toPattern(),
+        "§4Wrong checkpoint for parkour (.*)!".toPattern(),
+        "§4You haven't reached all checkpoints for parkour (.*)!".toPattern(),
+    )
+
+    /**
+     * REGEX-TEST: §4Cancelled parkour! You cannot fly.
+     * REGEX-TEST: §4Cancelled parkour! You cannot use item abilities.
+     * REGEX-TEST: §4Cancelled parkour!
+     */
+    private val parkourCancelMessages = listOf(
+        "§4Cancelled parkour! You cannot fly.",
+        "§4Cancelled parkour! You cannot use item abilities.",
+        "§4Cancelled parkour!",
+    )
+
+    /**
+     ** REGEX-TEST: §r§aWarped from the tpPadOne §r§ato the tpPadTwo§r§a!
+     */
+    private val teleportPadPatterns = listOf(
+        "§aWarped from the (.*) §r§ato the (.*)§r§a!".toPattern(),
+    )
+
+    // §r§4This Teleport Pad does not have a destination set!
+    private val teleportPadMessages = listOf(
+        "§4This Teleport Pad does not have a destination set!",
+    )
+
     private val patternsMap: Map<String, List<Pattern>> = mapOf(
         "lobby" to lobbyPatterns,
         "warping" to warpingPatterns,
@@ -428,6 +467,8 @@ object ChatFilter {
         "solo_stats" to soloStatsPatterns,
         "fairy" to fairyPatterns,
         "achievement_get" to achievementGetPatterns,
+        "parkour" to parkourPatterns,
+        "teleport_pads" to teleportPadPatterns,
     )
 
     private val messagesMap: Map<String, List<String>> = mapOf(
@@ -447,10 +488,14 @@ object ChatFilter {
         "fire_sale" to fireSaleMessages,
         "event" to eventMessage,
         "skymall" to skymallMessages,
+        "parkour" to parkourCancelMessages,
+        "teleport_pads" to teleportPadMessages,
     )
+
     private val messagesContainsMap: Map<String, List<String>> = mapOf(
         "lobby" to lobbyMessagesContains,
     )
+
     private val messagesStartsWithMap: Map<String, List<String>> = mapOf(
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith,
@@ -478,6 +523,8 @@ object ChatFilter {
         config.guildExp && message.isPresent("guild_exp") -> "guild_exp"
         config.killCombo && message.isPresent("kill_combo") -> "kill_combo"
         config.profileJoin && message.isPresent("profile_join") -> "profile_join"
+        config.parkour && message.isPresent("parkour") -> "parkour"
+        config.teleportPads && message.isPresent("teleport_pads") -> "teleport_pads"
 
         config.hideAlphaAchievements && HypixelData.hypixelAlpha && message.isPresent("achievement_get") -> "achievement_get"
 

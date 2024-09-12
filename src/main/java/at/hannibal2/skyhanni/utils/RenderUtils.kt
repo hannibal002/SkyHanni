@@ -1611,6 +1611,27 @@ object RenderUtils {
         GlStateManager.enableCull()
     }
 
+    fun LorenzRenderWorldEvent.drawHitbox(
+        boundingBox: AxisAlignedBB,
+        lineWidth: Int,
+        color: Color,
+        depth: Boolean,
+    ) {
+        val cornersTop = boundingBox.getCorners(boundingBox.maxY)
+        val cornersBottom = boundingBox.getCorners(boundingBox.minY)
+
+        // Draw lines for the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersTop[i], cornersTop[(i + 1) % 4], color, lineWidth, depth)
+            this.draw3DLine(cornersBottom[i], cornersBottom[(i + 1) % 4], color, lineWidth, depth)
+        }
+
+        // Draw lines connecting the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersBottom[i], cornersTop[i], color, lineWidth, depth)
+        }
+    }
+
     fun chromaColor(
         timeTillRepeat: Duration,
         offset: Float = 0f,

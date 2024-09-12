@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
+import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -82,6 +83,7 @@ object ChocolateFactoryAPI {
     var maxRabbits = 395
 
     var maxMilestoneChocolate = 700_000_000_000L
+    var chocolateMilestones = TreeSet<Long>()
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -155,7 +157,7 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
-        maxMilestoneChocolate = data.maxMilestoneChocolate
+        chocolateMilestones = data.chocolateMilestones
         specialRabbitTextures = data.specialRabbits
 
         upgradeCostFormulaConstants = data.upgradeCostFormulaConstants
@@ -196,23 +198,24 @@ object ChocolateFactoryAPI {
         }
     }
 
-    fun getNextLevelName(stack: ItemStack): String? =
-        upgradeLorePattern.firstMatcher(stack.getLore()) {
-            val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
-                groupOrNull("employee")
-            } else groupOrNull("upgradename")
-            val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
-            if (upgradeName == null || nextLevel == null) null
-            else "$upgradeName $nextLevel"
-        }
+    fun getNextLevelName(stack: ItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
+        val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
+            groupOrNull("employee")
+        } else groupOrNull("upgradename")
+        val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
+        if (upgradeName == null || nextLevel == null) null
+        else "$upgradeName $nextLevel"
+    }
 
+    fun getNextMilestoneChocolate(amount: Long): Long {
+        return chocolateMilestones.higher(amount) ?: 0
+    }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 
-    fun timeTowerChargeDuration() =
-        if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
+    fun timeTowerChargeDuration() = if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
 
     fun timeTowerMultiplier(): Double {
         var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1

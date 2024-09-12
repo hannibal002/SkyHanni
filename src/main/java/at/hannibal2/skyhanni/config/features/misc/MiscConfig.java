@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,8 +49,9 @@ public class MiscConfig {
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
-    @ConfigOption(name = "Potion Effects", desc = "")
+    @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
+    // TODO rename nonGodPotEffect
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
 
     @Expose
@@ -120,7 +122,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
+    public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
@@ -313,6 +315,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gfsPiggyBank = true;
 
     @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
