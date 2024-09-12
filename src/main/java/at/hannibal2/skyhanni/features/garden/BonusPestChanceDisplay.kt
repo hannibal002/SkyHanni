@@ -1,52 +1,55 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
-import at.hannibal2.skyhanni.utils.StringUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BonusPestChanceDisplay {
 
-    private val config get() = GardenAPI.config.bonusPestChanceDisplay
+    private val config get() = GardenAPI.config.bonusPestChance
 
-    private val patternGroup = RepoPattern.group("garden.pestbonuschancedisplay")
+    private val patternGroup = RepoPattern.group("garden.bonuspestchance")
+
+    /**
+     * REGEX-TEST:  §r§7§mBonus Pest Chance: ൠ70
+     * REGEX-TEST:  Bonus Pest Chance: §r§2ൠ70
+     */
     private val bonusPestChancePattern by patternGroup.pattern(
-        "tablist.bonus",
-        " Bonus Pest Chance: §r§2ൠ(?<bonus>\\d+)"
+        "widget",
+        "\\s+(?:§.)*?(?<disabled>§m)?Bonus Pest Chance: (?:§.)*ൠ(?<amount>[\\d,.]+)"
     )
-    private val bonusPestChanceStatusPattern by patternGroup.pattern(
-        "tablist.status",
-        " §r§7§mBonus Pest Chance: ൠ(?<bonus>\\d+)"
-    )
-
-    private var display = emptyList<List<Any>>()
-
-    private var tabPestBonus: Int = 0
-    private var tabPestBonusStatus: Boolean = false
+    private var display: String? = null
 
     @SubscribeEvent
-    fun onProfileJoin(event: ProfileJoinEvent) {
-        display = emptyList()
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        display = null
     }
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
+        if (!event.isWidget(TabWidget.STATS)) return
         if (!GardenAPI.inGarden()) return
-        event.tabList.firstNotNullOfOrNull {
-            bonusPestChanceStatusPattern.matchMatcher(it) {
-                tabPestBonusStatus = true
-                tabPestBonus = group("bonus").toInt()
-            }
-            bonusPestChancePattern.matchMatcher(it) {
-                tabPestBonusStatus = false
-                tabPestBonus = group("bonus").toInt()
+        event.widget.lines.forEach { line ->
+            bonusPestChancePattern.matchMatcher(line) {
+                val disabled = groupOrNull("disabled") != null
+                val amount = group("amount").formatInt()
+
+                display = buildString {
+                    append("§2ൠ Bonus Pest Chance ")
+                    if (disabled) append("§c§m") else append("§f")
+                    append("$amount%")
+                    if (disabled) append("§r §cDISABLED")
+                }
+                return
             }
         }
     }
@@ -54,25 +57,8 @@ object BonusPestChanceDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (GardenAPI.hideExtraGuis()) return
-        if (GardenAPI.toolInHand == null) return
-        config.pos.renderStringsAndItems(display, posLabel = "Bonus Pest Chance")
+        config.position.renderString(display, posLabel = "Bonus Pest Chance")
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!event.isMod(5)) return
-
-        val updatedDisplay = mutableListOf<List<Any>>()
-        updatedDisplay.addAsSingletonList("§fBonus Pest Chance§7: §2ൠ$tabPestBonus")
-        if (tabPestBonusStatus) {
-            updatedDisplay.addAsSingletonList("§fEnabled: §cFalse")
-        } else {
-            updatedDisplay.addAsSingletonList("§fEnabled: §aTrue")
-        }
-
-        display = updatedDisplay
-    }
-
-    private fun isEnabled(): Boolean = GardenAPI.inGarden() && config.display
+    private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !GardenAPI.hideExtraGuis() && !GardenAPI.hasFarmingToolInHand()
 }

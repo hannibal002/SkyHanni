@@ -144,7 +144,7 @@ public class GardenConfig {
     @Expose
     @ConfigOption(name = "Bonus Pest Chance Display", desc = "")
     @Accordion
-    public BonusPestChanceConfig bonusPestChanceDisplay = new BonusPestChanceConfig();
+    public BonusPestChanceConfig bonusPestChance = new BonusPestChanceConfig();
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

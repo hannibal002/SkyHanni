@@ -15,9 +15,9 @@ public class BonusPestChanceConfig {
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean display = false;
+    public boolean enabled = false;
 
     @Expose
-    @ConfigLink(owner = BonusPestChanceConfig.class, field = "display")
-    public Position pos = new Position(5, -115, false, true);
+    @ConfigLink(owner = BonusPestChanceConfig.class, field = "enabled")
+    public Position position = new Position(5, -115, false, true);
 }
