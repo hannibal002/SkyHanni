@@ -80,20 +80,7 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
-    var chocolateMilestones = TreeSet(
-        listOf(
-            50_000_000_000L,
-            100_000_000_000L,
-            150_000_000_000L,
-            200_000_000_000L,
-            300_000_000_000L,
-            400_000_000_000L,
-            500_000_000_000L,
-            600_000_000_000L,
-            700_000_000_000L,
-        ),
-    )
-
+    var chocolateMilestones = TreeSet<Long>()
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -192,15 +179,14 @@ object ChocolateFactoryAPI {
         }
     }
 
-    fun getNextLevelName(stack: ItemStack): String? =
-        upgradeLorePattern.firstMatcher(stack.getLore()) {
-            val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
-                groupOrNull("employee")
-            } else groupOrNull("upgradename")
-            val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
-            if (upgradeName == null || nextLevel == null) null
-            else "$upgradeName $nextLevel"
-        }
+    fun getNextLevelName(stack: ItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
+        val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
+            groupOrNull("employee")
+        } else groupOrNull("upgradename")
+        val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
+        if (upgradeName == null || nextLevel == null) null
+        else "$upgradeName $nextLevel"
+    }
 
     fun getNextMilestoneChocolate(amount: Long): Long {
         return chocolateMilestones.higher(amount) ?: 0
@@ -210,8 +196,7 @@ object ChocolateFactoryAPI {
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 
-    fun timeTowerChargeDuration() =
-        if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
+    fun timeTowerChargeDuration() = if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
 
     fun timeTowerMultiplier(): Double {
         var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1
