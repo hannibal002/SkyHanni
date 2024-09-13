@@ -62,7 +62,6 @@ import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
-import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
