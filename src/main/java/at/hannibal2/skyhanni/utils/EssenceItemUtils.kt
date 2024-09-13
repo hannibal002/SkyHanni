@@ -22,8 +22,6 @@ object EssenceItemUtils {
             OSUtils.copyToClipboard(it)
         }
         this.itemPrices = reformatData(unformattedData)
-
-        println("result: ${itemPrices.size}")
     }
 
     fun NEUInternalName.getEssencePrices(): Map<Int, EssenceUpgradePrice>? = itemPrices[this]
