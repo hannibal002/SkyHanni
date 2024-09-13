@@ -51,6 +51,11 @@ public class GardenConfig {
     public FarmingLaneConfig farmingLane = new FarmingLaneConfig();
 
     @Expose
+    @ConfigOption(name = "Farming Tracker", desc = "")
+    @Accordion
+    public TrackingConfig tracking = new TrackingConfig();
+
+    @Expose
     @ConfigOption(name = "Garden Level", desc = "")
     @Accordion
     public GardenLevelConfig gardenLevels = new GardenLevelConfig();

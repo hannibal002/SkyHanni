@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.skyhanni.features.garden.tracking.FarmingTracker
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -72,6 +73,11 @@ class SkyHanniMod {
         Runtime.getRuntime().addShutdownHook(
             Thread { configManager.saveConfig(ConfigFileType.FEATURES, "shutdown-hook") },
         )
+        if (feature.garden.tracking.tracking) {
+            Runtime.getRuntime().addShutdownHook(
+                Thread { FarmingTracker.prepareAndSendEmbed("Offline") },
+            )
+        }
         repo = RepoManager(ConfigManager.configDirectory)
         loadModule(repo)
         try {
