@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.HighlightRabbitTypes;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -190,28 +191,6 @@ public class ChocolateFactoryConfig {
         HighlightRabbitTypes.SHOP,
         HighlightRabbitTypes.STRAYS
     ));
-
-    public enum HighlightRabbitTypes {
-
-        ABI("§2Abi"),
-        FACTORY("§eFactory Milestones"),
-        MET("§aRequirement Met"),
-        NOT_MET("§cRequirement not met."),
-        SHOP("§6Shop Milestones"),
-        STRAYS("§3Stray rabbits"),
-        ;
-
-        private final String str;
-
-        HighlightRabbitTypes(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
 
     @Expose
     @ConfigOption(

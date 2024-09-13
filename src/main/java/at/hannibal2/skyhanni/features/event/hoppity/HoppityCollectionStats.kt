@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
-import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -36,8 +35,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
-
-typealias RabbitTypes = ChocolateFactoryConfig.HighlightRabbitTypes
 
 @SkyHanniModule
 object HoppityCollectionStats {
@@ -138,6 +135,23 @@ object HoppityCollectionStats {
     private val loggedRabbits
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
 
+    enum class HighlightRabbitTypes (
+        val rabbitType: String,
+        val color: LorenzColor,
+    ) {
+        ABI("§2Abi", LorenzColor.DARK_GREEN),
+        FACTORY("§eFactory Milestones", LorenzColor.YELLOW),
+        MET("§aRequirement Met", LorenzColor.GREEN),
+        NOT_MET("§cRequirement Not Met.", LorenzColor.RED),
+        SHOP("§6Shop Milestones", LorenzColor.GOLD),
+        STRAYS("§3Stray Rabbits", LorenzColor.DARK_AQUA),
+        ;
+
+        override fun toString(): String {
+            return rabbitType
+        }
+    }
+
     @KSerializable
     data class LocationRabbit(
         val locationName: String,
@@ -162,12 +176,12 @@ object HoppityCollectionStats {
 
     var inInventory = false
 
-    private var highlightConfigMap: Map<Pair<Pattern, RabbitTypes>, LorenzColor> = mapOf(
-        factoryMilestone to RabbitTypes.FACTORY to LorenzColor.YELLOW,
-        requirementMet to RabbitTypes.MET to LorenzColor.GREEN,
-        requirementNotMet to RabbitTypes.NOT_MET to LorenzColor.RED,
-        shopMilestone to RabbitTypes.SHOP to LorenzColor.GOLD,
-        strayRabbit to RabbitTypes.STRAYS to LorenzColor.DARK_AQUA,
+    var highlightConfigMap: Map<Pattern, HighlightRabbitTypes> = mapOf(
+        factoryMilestone to HighlightRabbitTypes.FACTORY,
+        requirementMet to HighlightRabbitTypes.MET,
+        requirementNotMet to HighlightRabbitTypes.NOT_MET,
+        shopMilestone to HighlightRabbitTypes.SHOP,
+        strayRabbit to HighlightRabbitTypes.STRAYS
     )
 
     @SubscribeEvent
@@ -197,15 +211,15 @@ object HoppityCollectionStats {
 
         if (highlightMap.containsKey(stack.displayName)) return
 
-        if (stack.displayName == "§aAbi") {
-            highlightMap[stack.displayName] = LorenzColor.DARK_GREEN
+        if (stack.displayName == "§aAbi" && config.highlightRabbits.contains(HighlightRabbitTypes.ABI)) {
+            highlightMap[stack.displayName] = HighlightRabbitTypes.ABI.color
             return
         }
 
         // cache rabbits until collection is closed
-        for ((patternToRabbit, highlightColor) in highlightConfigMap) {
-            if (patternToRabbit.first.anyMatches(lore) && config.highlightRabbits.contains(patternToRabbit.second)) {
-                highlightMap[stack.displayName] = highlightColor
+        for ((pattern, rabbitType) in highlightConfigMap) {
+            if (pattern.anyMatches(lore) && config.highlightRabbits.contains(rabbitType)) {
+                highlightMap[stack.displayName] = rabbitType.color
                 break
             }
         }
