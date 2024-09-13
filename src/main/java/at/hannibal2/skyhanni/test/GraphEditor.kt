@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
@@ -39,6 +40,7 @@ import at.hannibal2.skyhanni.utils.renderables.buildSearchableScrollable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
+import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
@@ -104,12 +106,12 @@ object GraphEditor {
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
-    val scrollValue = ScrollValue()
-    val textInput = TextInput()
-    var nodesDisplay = emptyList<Searchable>()
+    private val scrollValue = ScrollValue()
+    private val textInput = TextInput()
+    private var nodesDisplay = emptyList<Searchable>()
     var lastUpdate = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
@@ -196,7 +198,7 @@ object GraphEditor {
                 val list = getNodeNames()
                 val size = list.size
                 addString("§eGraph Nodes: $size")
-                val height = (size * 10).coerceAtMost(150)
+                val height = (size * 10).coerceAtMost(250)
                 if (list.isNotEmpty()) {
                     add(list.buildSearchableScrollable(height, textInput, scrollValue, velocity = 10.0))
                 }
@@ -537,7 +539,11 @@ object GraphEditor {
             ChatUtils.chat("Copied nothing since the graph is empty.")
             return
         }
-        val json = compileGraph().toJson()
+        val compileGraph = compileGraph()
+        if (config.useAsIslandArea) {
+            IslandGraphs.setNewGraph(compileGraph)
+        }
+        val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
         ChatUtils.chat("Copied Graph to Clipboard.")
         if (config.showsStats) {

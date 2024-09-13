@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
+import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
@@ -157,6 +159,22 @@ public class ProfileSpecificStorage {
 
         @Expose
         public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
+    }
+
+    @Expose
+    public CarnivalStorage carnival = new CarnivalStorage();
+
+    public static class CarnivalStorage {
+
+        @Expose
+        @Nullable
+        public java.time.LocalDate lastClaimedDay = null;
+
+        @Expose
+        public int carnivalYear = 0;
+
+        @Expose
+        public Map<CarnivalGoal, Boolean> goals = new HashMap<>();
     }
 
     @Expose
@@ -568,6 +586,9 @@ public class ProfileSpecificStorage {
 
             @Expose
             public List<MineshaftPityDisplay.PityData> blocksBroken = new ArrayList<>();
+
+            @Expose
+            public CorpseTracker.BucketData corpseProfitTracker = new CorpseTracker.BucketData();
         }
     }
 
@@ -651,8 +672,14 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
+        public Map<Integer, DianaProfitTracker.Data> dianaProfitTrackerPerElectionSeason = new HashMap<>();
+
+        @Expose
         // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
+
+        @Expose
+        public Map<Integer, MythologicalCreatureTracker.Data> mythologicalMobTrackerPerElectionSeason = new HashMap<>();
     }
 
     @Expose
@@ -677,6 +704,7 @@ public class ProfileSpecificStorage {
     @Nullable
     public Integer abiphoneContactAmount = null;
 
+    @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
     public static class HoppityEventStats {
