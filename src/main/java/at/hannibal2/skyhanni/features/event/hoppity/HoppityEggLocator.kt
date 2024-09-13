@@ -277,7 +277,7 @@ object HoppityEggLocator {
 
         val color = config.waypointColor.toChromaColor()
 
-        IslandGraphs.find(location, color, condition = { config.showPathFinder })
+        IslandGraphs.pathFind(location, color, condition = { config.showPathFinder })
     }
 
     fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
@@ -330,7 +330,7 @@ object HoppityEggLocator {
         HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
             for ((i, location) in it.values.withIndex()) {
                 if (i == target) {
-                    IslandGraphs.find(location)
+                    IslandGraphs.pathFind(location)
                     return
                 }
             }

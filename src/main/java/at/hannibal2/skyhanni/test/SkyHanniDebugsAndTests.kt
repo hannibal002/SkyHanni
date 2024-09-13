@@ -124,7 +124,7 @@ object SkyHanniDebugsAndTests {
         val location = LorenzVec(x, y, z)
         testLocation = location
         if (args.getOrNull(3) == "pathfind") {
-            IslandGraphs.find(location)
+            IslandGraphs.pathFind(location)
         }
         ChatUtils.chat("set test waypoint")
     }

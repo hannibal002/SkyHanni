@@ -202,7 +202,7 @@ object IslandGraphs {
         fastestPath = null
     }
 
-    fun find(
+    fun pathFind(
         location: LorenzVec,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},

@@ -275,7 +275,7 @@ object IslandAreas {
     private fun setTarget(node: GraphNode) {
         targetNode = node
         val color = config.pathfinder.color.get().toChromaColor()
-        IslandGraphs.find(
+        IslandGraphs.pathFind(
             node.position, color,
             onFound = {
                 targetNode = null
