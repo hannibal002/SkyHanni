@@ -50,6 +50,7 @@ object IslandAreas {
         nodes = emptyMap()
         display = null
         targetNode = null
+        hasMoved = true
     }
 
     fun noteMoved() {
@@ -64,7 +65,7 @@ object IslandAreas {
         val paths = mutableMapOf<GraphNode, Graph>()
 
         val map = mutableMapOf<GraphNode, Double>()
-        for (graphNode in graph.graph) {
+        for (graphNode in graph.nodes) {
             if (graphNode.getAreaTag() == null) continue
             val (path, distance) = graph.findShortestPathAsGraphWithDistance(closedNote, graphNode)
             paths[graphNode] = path
@@ -138,13 +139,15 @@ object IslandAreas {
         val playerDiff = closedNote.position.distanceToPlayer()
 
         var foundCurrentArea = false
+        var foundAreas = 0
 
         for ((node, diff) in nodes) {
             val difference = diff + playerDiff
             val tag = node.getAreaTag() ?: continue
 
             val name = node.name ?: continue
-            val isTarget = node == targetNode
+            // can not compare nodes directly. By using names, we also accept other nodes
+            val isTarget = node.name == targetNode?.name
             val color = if (isTarget) LorenzColor.GOLD else tag.color
 
             // trying to find a faster path to the existing target
@@ -156,7 +159,7 @@ object IslandAreas {
 
             var suffix = ""
             paths[node]?.let { path ->
-                val passedAreas = path.graph.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
+                val passedAreas = path.nodes.filter { it.getAreaTag() != null }.map { it.name }.distinct().toMutableList()
                 passedAreas.remove(name)
                 passedAreas.remove(null)
                 passedAreas.remove("null")
@@ -178,7 +181,7 @@ object IslandAreas {
                     if (inAnArea) {
                         addSearchString("§eCurrent area: $coloredName")
                     } else {
-                        addSearchString("§cNot in an area!")
+                        addSearchString("§7Not in an area.")
                     }
                 }
                 if (name != currentAreaName) {
@@ -193,6 +196,7 @@ object IslandAreas {
             }
 
             if (name == "no_area") continue
+            foundAreas++
 
             add(
                 Renderable.clickAndHover(
@@ -221,6 +225,15 @@ object IslandAreas {
                     },
                 ).toSearchable(name),
             )
+        }
+        if (foundAreas == 0) {
+            val islandName = LorenzUtils.skyBlockIsland.displayName
+            if (foundCurrentArea) {
+                addSearchString("§cThere is only one area in $islandName,")
+                addSearchString("§cnothing else to navigate to!")
+            } else {
+                addSearchString("§cThere is no $islandName area data avaliable yet!")
+            }
         }
     }
 

@@ -12,29 +12,29 @@ import java.util.PriorityQueue
 
 @JvmInline
 value class Graph(
-    @Expose val graph: List<GraphNode>,
+    @Expose val nodes: List<GraphNode>,
 ) : List<GraphNode> {
     override val size
-        get() = graph.size
+        get() = nodes.size
 
-    override fun contains(element: GraphNode) = graph.contains(element)
+    override fun contains(element: GraphNode) = nodes.contains(element)
 
-    override fun containsAll(elements: Collection<GraphNode>) = graph.containsAll(elements)
+    override fun containsAll(elements: Collection<GraphNode>) = nodes.containsAll(elements)
 
-    override fun get(index: Int) = graph.get(index)
+    override fun get(index: Int) = nodes.get(index)
 
-    override fun isEmpty() = graph.isEmpty()
+    override fun isEmpty() = nodes.isEmpty()
 
-    override fun indexOf(element: GraphNode) = graph.indexOf(element)
+    override fun indexOf(element: GraphNode) = nodes.indexOf(element)
 
-    override fun iterator(): Iterator<GraphNode> = graph.iterator()
-    override fun listIterator() = graph.listIterator()
+    override fun iterator(): Iterator<GraphNode> = nodes.iterator()
+    override fun listIterator() = nodes.listIterator()
 
-    override fun listIterator(index: Int) = graph.listIterator(index)
+    override fun listIterator(index: Int) = nodes.listIterator(index)
 
-    override fun subList(fromIndex: Int, toIndex: Int) = graph.subList(fromIndex, toIndex)
+    override fun subList(fromIndex: Int, toIndex: Int) = nodes.subList(fromIndex, toIndex)
 
-    override fun lastIndexOf(element: GraphNode) = graph.lastIndexOf(element)
+    override fun lastIndexOf(element: GraphNode) = nodes.lastIndexOf(element)
 
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(

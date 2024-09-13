@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -24,15 +26,14 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
+import kotlin.math.abs
 
 /**
  * TODO
- *
  * benefits of every island graphs:
  * global:
- * 	hoppity eggs rabbit
  * 	NEU's fairy souls
- * 	point of interests/areas
+ * 	point of interest
  * 	slayer area
  * 	NEU's NPC's
  * 	races (end, park, winter, dungeon hub)
@@ -66,21 +67,10 @@ import java.io.File
  *  intro tutorials with elle
  *
  * graph todo:
- * 	create category for nodes
- * 	better detection of cloesest node
  * 	fix rename not using tick but input event we have (+ create the input event in the first place)
  * 	toggle distance to node by node path lengh, instead of eye of sight lenght
  * 	press test button again to enable "true test mode", with graph math and hiding other stuff
  * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
- * 	add support for /shtestwaypoint
- *
- * done
- * 	create selection block, instead of using the player location in the other node features
- *
- *
- * area features:
- * 	show list of only areas, most cloesest to you
- * 	also show entry/exit signs while passing through
  */
 
 @SkyHanniModule
@@ -102,7 +92,7 @@ object IslandGraphs {
         }
     private var prevGoal: GraphNode? = null
 
-    private var path: Pair<Graph, Double>? = null
+    private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
 
     @SubscribeEvent
@@ -145,7 +135,7 @@ object IslandGraphs {
         closedNote = null
         currentTarget = null
         goal = null
-        path = null
+        fastestPath = null
     }
 
     @SubscribeEvent
@@ -154,7 +144,6 @@ object IslandGraphs {
         val prevClosed = closedNote
 
         val graph = currentIslandGraph ?: return
-
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
@@ -166,7 +155,9 @@ object IslandGraphs {
             }
         }
 
-        val newClosest = graph.minBy { it.position.distanceSqToPlayer() }
+        val newClosest = if (SkyHanniDebugsAndTests.c == 0.0) {
+            graph.minBy { it.position.distanceSqToPlayer() }
+        } else null
         if (closedNote == newClosest) return
         closedNote = newClosest
         onNewNote()
@@ -185,11 +176,19 @@ object IslandGraphs {
             val firstPath = first.neighbours[second] ?: 0.0
             val around = nodeDistance + firstPath
             if (direct < around) {
-                this.path = Graph(path.drop(1)) to (distance - firstPath + direct)
+                setFastestPath(Graph(path.drop(1)) to (distance - firstPath + direct))
                 return
             }
         }
-        this.path = path to (distance + nodeDistance)
+        setFastestPath(path to (distance + nodeDistance))
+    }
+
+    private fun setFastestPath(path: Pair<Graph, Double>) {
+        fastestPath = path.takeIf { it.first.isNotEmpty() }?.first
+
+        fastestPath?.let {
+            fastestPath = Graph(cutByMaxDistance(it.nodes, 3.0))
+        }
     }
 
     private fun onNewNote() {
@@ -200,7 +199,7 @@ object IslandGraphs {
     fun stop() {
         currentTarget = null
         goal = null
-        path = null
+        fastestPath = null
     }
 
     fun find(
@@ -223,8 +222,11 @@ object IslandGraphs {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        val path = path?.takeIf { it.first.isNotEmpty() } ?: return
-        val graph = path.first
+        val path = fastestPath ?: return
+
+        var graph = path
+        graph = skipNodes(graph) ?: graph
+
         event.draw3DPathWithWaypoint(
             graph,
             color,
@@ -233,12 +235,86 @@ object IslandGraphs {
             bezierPoint = 2.0,
             textSize = 1.0,
         )
-        val lastNode = graph.graph.last().position
+        val lastNode = graph.nodes.last().position
         val targetLocation = currentTarget ?: return
         event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
 
         if (showGoalExact) {
             event.drawWaypointFilled(targetLocation, color)
         }
+    }
+
+    // TODO move into new utils class
+    private fun cutByMaxDistance(nodes: List<GraphNode>, maxDistance: Double): List<GraphNode> {
+        var index = nodes.size * 10
+        val locations = mutableListOf<LorenzVec>()
+        var first = true
+        for (node in nodes) {
+            if (first) {
+                first = false
+            } else {
+                var lastPosition = locations.last()
+                val currentPosition = node.position
+                val vector = (currentPosition - lastPosition).normalize()
+                var distance = lastPosition.distance(currentPosition)
+                while (distance > maxDistance) {
+                    distance -= maxDistance
+                    val nextStepDistance = if (distance < maxDistance / 2) {
+                        (maxDistance + distance) / 2
+                        break
+                    } else maxDistance
+                    val newPosition = lastPosition + (vector * (nextStepDistance))
+                    locations.add(newPosition)
+                    lastPosition = newPosition
+                }
+            }
+            locations.add(node.position)
+        }
+
+        return locations.map { GraphNode(index++, it) }
+    }
+
+    // trying to find a faster node-path, if the future nodes are in line of sight and gratly beneift the current path
+    private fun skipNodes(graph: Graph): Graph? {
+        val closedNode = closedNote ?: return null
+
+        val playerEyeLocation = LocationUtils.playerEyeLocation()
+        val playerY = playerEyeLocation.y - 1
+
+        val distanceToPlayer = closedNode.position.distanceToPlayer()
+        val skipNodeDistance = distanceToPlayer > 8
+        val maxSkipDistance = if (skipNodeDistance) 50.0 else 20.0
+
+        val nodes = graph.nodes
+        val potentialSkip =
+            nodes.lastOrNull { it.position.canBeSeen(maxSkipDistance, -1.0) && abs(it.position.y - playerY) <= 2 }
+                ?: return null
+
+        val angleSkip = if (potentialSkip == nodes.first()) {
+            false
+        } else {
+            val v1 = potentialSkip.position - playerEyeLocation
+            val v2 = nodes.first().position - playerEyeLocation
+            val v = v1.angleInRad(v2)
+            v > 1
+        }
+
+        if (!skipNodeDistance && !angleSkip) return null
+
+        val list = mutableListOf<GraphNode>()
+        list.add(potentialSkip)
+
+        var passed = false
+        for (node in nodes) {
+            if (passed) {
+                list.add(node)
+            } else {
+                if (node == potentialSkip) {
+                    passed = true
+                }
+            }
+        }
+
+        return Graph(list)
     }
 }
