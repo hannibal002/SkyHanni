@@ -49,9 +49,9 @@
 
 #### The Carnival Features
 
-+ Added a Reminder to claim Carnival Tickets. - Thunderbalde73 (https://github.com/hannibal002/SkyHanni/pull/2498)
-+ Added display for Carnival Goals. - Thunderbalde73 (https://github.com/hannibal002/SkyHanni/pull/2498)
-+ Added a feature to double-click the Carnival NPC to start the game without clicking in the chat. - Thunderbalde73 (https://github.com/hannibal002/SkyHanni/pull/2498)
++ Added a Reminder to claim Carnival Tickets. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2498)
++ Added display for Carnival Goals. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2498)
++ Added a feature to double-click the Carnival NPC to start the game without clicking in the chat. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2498)
 + Added Zombie Shootout QoL improvements for the Carnival. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2497)
     + Colored hitboxes.
     + Lamp timer + line.
