@@ -39,8 +39,8 @@ enum class GraphNodeTag(
     // Rift
     RIFT_ENIGMA("rift_enigma", LorenzColor.DARK_PURPLE, "Enigma Soul", "Enigma Souls in the rift.", onlyIsland = IslandType.THE_RIFT),
     RIFT_EYE("rift_eye", LorenzColor.DARK_RED, "Rift Eye", "An Eye in the rift to teleport to.", onlyIsland = IslandType.THE_RIFT),
-    RIFT_MONTEZUMA("rift_montezuma", LorenzColor.GRAY, "Montezuma Soul Piece", "A piece of the Montezuma Soul."),
-    RIFT_EFFIGY("rift_effigy", LorenzColor.RED, "Blood Effigies", "Locations of the Blood Effigies."),
+    RIFT_MONTEZUMA("rift_montezuma", LorenzColor.GRAY, "Montezuma Soul Piece", "A piece of the Montezuma Soul.", onlyIsland = IslandType.THE_RIFT),
+    RIFT_EFFIGY("rift_effigy", LorenzColor.RED, "Blood Effigies", "Locations of the Blood Effigies.", onlyIsland = IslandType.THE_RIFT),
 
     // Spider's Den
     SPIDER_RELIC("SPIDER_RELIC", LorenzColor.DARK_PURPLE, "Spider's Relic", "An relic in the Spider's Den.", onlyIsland = IslandType.SPIDER_DEN),

@@ -68,6 +68,7 @@ import kotlin.math.abs
  *  area mini bosses
  *  daily quests
  *  intro tutorials with elle
+ *  fishing spots
  *
  * graph todo:
  * 	fix rename not using tick but input event we have (+ create the input event in the first place)
