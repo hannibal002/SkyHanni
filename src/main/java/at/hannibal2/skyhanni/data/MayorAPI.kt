@@ -98,8 +98,8 @@ object MayorAPI {
     private var lastUpdate = SimpleTimeMark.farPast()
     private var dispatcher = Dispatchers.IO
 
-    private var rawMayorData: MayorJson? = null
-    var candidates = mapOf<Int, MayorCandidate>()
+    var rawMayorData: MayorJson? = null
+    private var candidates = mapOf<Int, MayorCandidate>()
 
     var nextMayorTimestamp = SimpleTimeMark.farPast()
         private set

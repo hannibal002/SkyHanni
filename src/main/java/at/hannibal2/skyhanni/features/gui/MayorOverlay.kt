@@ -24,7 +24,7 @@ enum class MayorOverlay(private val configLine: String, private val display: () 
                     pair.value?.let {
                         Renderable.hoverTips(
                             Renderable.string(pair.key),
-                            listOf(it),
+                            listOf(Renderable.wrappedString(it, 200)),
                         )
                     } ?: Renderable.string(pair.key)
                 },
@@ -44,7 +44,7 @@ enum class MayorOverlay(private val configLine: String, private val display: () 
                     pair.value?.let {
                         Renderable.hoverTips(
                             Renderable.string(pair.key),
-                            listOf(it),
+                            listOf(Renderable.wrappedString(it, 200)),
                         )
                     } ?: Renderable.string(pair.key)
                 },
@@ -54,9 +54,9 @@ enum class MayorOverlay(private val configLine: String, private val display: () 
     CANDIDATES(
         "Candidates",
         {
+            val candidates = MayorAPI.rawMayorData?.current?.candidates ?: emptyList()
             Renderable.verticalContainer(
-                MayorAPI.candidates.map {
-                    val mayor = it.value
+                candidates.map { mayor ->
                     val candidateColor = MayorAPI.mayorNameToColorCode(mayor.name)
                     Renderable.verticalContainer(
                         buildMap {
@@ -69,7 +69,7 @@ enum class MayorOverlay(private val configLine: String, private val display: () 
                             pair.value?.let {
                                 Renderable.hoverTips(
                                     Renderable.string(pair.key),
-                                    listOf(it),
+                                    listOf(Renderable.wrappedString(it, 200)),
                                 )
                             } ?: Renderable.string(pair.key)
                         },
