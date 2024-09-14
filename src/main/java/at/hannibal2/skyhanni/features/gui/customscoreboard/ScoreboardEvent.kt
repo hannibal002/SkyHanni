@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.combat.SpidersDenAPI.isAtTopOfNest
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
@@ -124,7 +125,7 @@ enum class ScoreboardEvent(
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
-        ::getBroodmotherShowWhen,
+        ::isAtTopOfNest,
         "§4Broodmother§7: §eDormant",
     ),
     MINING_EVENTS(
@@ -481,8 +482,6 @@ private fun getSoonEventShowWhen(): Boolean =
 private fun getBroodmotherLines(): List<String> =
     listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
 
-private fun getBroodmotherShowWhen(): Boolean = getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
-
 private fun getMiningEventsLines() = buildList {
     // Wind
     if (getSbLines().any { SbPattern.windCompassPattern.matches(it) }
@@ -590,6 +589,8 @@ private fun getRiftLines() = getSbLines().filter { line ->
         || SbPattern.riftAveikxPattern.matches(line)
         || SbPattern.riftHayEatenPattern.matches(line)
         || SbPattern.cluesPattern.matches(line)
+        || SbPattern.barryProtestorsQuestlinePattern.matches(line)
+        || SbPattern.barryProtestorsHandledPattern.matches(line)
 }
 
 private fun getEssenceLines(): List<String> = listOf(getSbLines().first { SbPattern.essencePattern.matches(it) })
@@ -598,6 +599,7 @@ private fun getEssenceShowWhen(): Boolean = SbPattern.essencePattern.anyMatches(
 
 private fun getQueueLines(): List<String> =
     listOf(getSbLines().first { SbPattern.queuePattern.matches(it) }) +
+        (getSbLines().first { SbPattern.queueTierPattern.matches(it) }) +
         (getSbLines().first { SbPattern.queuePositionPattern.matches(it) })
 
 private fun getQueueShowWhen(): Boolean = SbPattern.queuePattern.anyMatches(getSbLines())

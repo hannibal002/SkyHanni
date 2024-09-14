@@ -15,6 +15,11 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class HoppityEggsConfig {
 
     @Expose
+    @ConfigOption(name = "Hoppity Abiphone Calls", desc = "")
+    @Accordion
+    public HoppityCallWarningConfig hoppityCallWarning = new HoppityCallWarningConfig();
+
+    @Expose
     @ConfigOption(name = "Event Summary", desc = "")
     @Accordion
     public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();
@@ -44,6 +49,12 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showLine = false;
+
+    @Expose
+    @ConfigOption(name = "Show Path Finder", desc = "Show a pathfind to the next hoppity egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showPathFinder = false;
 
     @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +

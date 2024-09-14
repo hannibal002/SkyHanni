@@ -16,6 +16,11 @@ public class DungeonConfig {
     public HighlightClickedBlocksConfig clickedBlocks = new HighlightClickedBlocksConfig();
 
     @Expose
+    @ConfigOption(name = "Secret Chime", desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons.")
+    @Accordion
+    public SecretChimeConfig secretChime = new SecretChimeConfig();
+
+    @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
