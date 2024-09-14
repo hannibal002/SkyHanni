@@ -113,15 +113,16 @@ object ChocolateFactoryStats {
             )
 
             if (ChocolateFactoryAPI.isMaxPrestige()) {
-                val chocolateUntilMaxMilestone = ChocolateFactoryAPI.maxMilestoneChocolate
-                val amountUntilMaxMilestone = chocolateUntilMaxMilestone - ChocolateAmount.ALL_TIME.chocolate()
-                val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(chocolateUntilMaxMilestone)
+                val allTime = ChocolateAmount.ALL_TIME.chocolate()
+                val nextChocolateMilestone = ChocolateFactoryAPI.getNextMilestoneChocolate(allTime)
+                val amountUntilNextMilestone = nextChocolateMilestone - allTime
+                val maxMilestoneEstimate = ChocolateAmount.ALL_TIME.formattedTimeUntilGoal(nextChocolateMilestone)
 
-                if (amountUntilMaxMilestone >= 0) {
-                    put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Max Milestone: $maxMilestoneEstimate")
+                if (amountUntilNextMilestone >= 0) {
+                    put(ChocolateFactoryStat.TIME_TO_PRESTIGE, "§eTime To Next Milestone: $maxMilestoneEstimate")
                     put(
                         ChocolateFactoryStat.CHOCOLATE_UNTIL_PRESTIGE,
-                        "§eChocolate To Max Milestone: §6${amountUntilMaxMilestone.addSeparators()}",
+                        "§eChocolate To Next Milestone: §6${amountUntilNextMilestone.addSeparators()}",
                     )
                 }
             } else {
