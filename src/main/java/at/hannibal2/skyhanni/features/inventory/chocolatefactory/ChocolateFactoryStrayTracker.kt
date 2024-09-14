@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -23,6 +22,8 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -148,22 +149,22 @@ object ChocolateFactoryStrayTracker {
         tracker.modify { it.goldenTypesCaught.addOrPut(typeCaught, amount) }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
         val extraChocMs = data.straysExtraChocMs.values.sum().milliseconds
         val formattedExtraTime = extraChocMs.let { if (it == 0.milliseconds) "0s" else it.format() }
 
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§6§lStray Tracker",
                 tips = listOf("§a+§b${formattedExtraTime} §afrom strays§7"),
-            ),
+            ).toSearchable(),
         )
         rarityFormatMap.keys.forEach { rarity ->
-            extractHoverableOfRarity(rarity, data)?.let { addAsSingletonList(it) }
+            extractHoverableOfRarity(rarity, data)?.let { add(it) }
         }
     }
 
-    private fun extractHoverableOfRarity(rarity: String, data: Data): Renderable? {
+    private fun extractHoverableOfRarity(rarity: String, data: Data): Searchable? {
         val caughtOfRarity = data.straysCaught[rarity]
         val caughtString = caughtOfRarity?.toString() ?: return null
 
@@ -174,11 +175,12 @@ object ChocolateFactoryStrayTracker {
         val lineHeader = "$colorCode${rarity.substring(0, 1).uppercase()}${rarity.substring(1)}§7: §r$colorCode"
         val lineFormat = "${lineHeader}${caughtString}"
 
-        return rarityExtraChocMs?.let {
+        val renderable = rarityExtraChocMs?.let {
             val tip =
                 "§a+§b$extraChocFormat §afrom $colorCode$rarity strays§7${if (rarity == "legendary") extractGoldenTypesCaught(data) else ""}"
             Renderable.hoverTips(Renderable.string(lineFormat), tips = tip.split("\n"))
         } ?: Renderable.string(lineFormat)
+        return renderable.toSearchable(rarity)
     }
 
     private fun extractGoldenTypesCaught(data: Data): String {

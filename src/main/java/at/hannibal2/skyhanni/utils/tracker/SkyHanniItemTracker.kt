@@ -5,27 +5,29 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.readableInternalName
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
 class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    drawDisplay: (Data) -> List<List<Any>>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, drawDisplay) {
+    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    drawDisplay: (Data) -> List<Searchable>,
+) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
 
     companion object {
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
@@ -36,9 +38,8 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             it.addItem(internalName, amount, command)
         }
         getSharedTracker()?.let { sharedData ->
-            sharedData.get(DisplayMode.TOTAL).items[internalName]?.let { data ->
-                sharedData.get(DisplayMode.SESSION).items[internalName]!!.hidden = data.hidden
-            }
+            val isHidden = sharedData.get(DisplayMode.TOTAL).items[internalName]?.hidden
+            if (isHidden != null) sharedData.modify { it.items[internalName]?.hidden = isHidden }
         }
 
         if (command) {
@@ -61,9 +62,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addPriceFromButton(lists: MutableList<List<Any>>) {
+    fun addPriceFromButton(lists: MutableList<Searchable>) {
         if (isInventoryOpen()) {
-            lists.addSelector<ItemPriceSource>(
+            lists.addSearchableSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.sellName },
                 isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
@@ -78,7 +79,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
     fun drawItems(
         data: Data,
         filter: (NEUInternalName) -> Boolean,
-        lists: MutableList<List<Any>>,
+        lists: MutableList<Searchable>,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NEUInternalName, Long>()
@@ -86,8 +87,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (!filter(internalName)) continue
 
             val amount = itemProfit.totalAmount
-            val pricePer =
-                if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
+            val pricePer = if (internalName == SKYBLOCK_COIN) 1.0 else data.getCustomPricePer(internalName)
             val price = (pricePer * amount).toLong()
             val hidden = itemProfit.hidden
 
@@ -119,8 +119,9 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
             val newDrop = itemProfit.lastTimeUpdated.passedSince() < 10.seconds && config.showRecentDrops
             val numberColor = if (newDrop) "§a§l" else "§7"
 
+            val name = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             var displayName = if (hidden) {
-                "§8§m" + cleanName.removeColor(keepFormatting = true).replace("§r", "")
+                "§8§m$name"
             } else cleanName
             displayName = " $numberColor${displayAmount.addSeparators()}x $displayName§7: §6$priceFormat"
 
@@ -151,11 +152,11 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
                 },
             ) else Renderable.string(displayName)
 
-            lists.addAsSingletonList(renderable)
+            lists.add(renderable.toSearchable(name))
         }
         if (hiddenItemTexts.size > 0) {
-            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts)
-            lists.addAsSingletonList(text)
+            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
+            lists.add(text)
         }
 
         return profit
@@ -192,7 +193,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         }
     }
 
-    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Renderable {
+    fun addTotalProfit(profit: Double, totalAmount: Long, action: String): Searchable {
         val profitFormat = profit.toLong().addSeparators()
         val profitPrefix = if (profit < 0) "§c" else "§6"
 
@@ -203,6 +204,6 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
         } else emptyList()
 
         val text = "§eTotal Profit: $profitPrefix$profitFormat coins"
-        return Renderable.hoverTips(text, tips)
+        return Renderable.hoverTips(text, tips).toSearchable()
     }
 }

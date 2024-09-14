@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.MayorAPI.getElectionYear
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -9,7 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -18,10 +19,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -45,6 +50,11 @@ object DianaProfitTracker {
         "Diana Profit Tracker",
         { Data() },
         { it.diana.dianaProfitTracker },
+        SkyHanniTracker.DisplayMode.MAYOR to {
+            it.diana.dianaProfitTrackerPerElectionSeason.getOrPut(
+                SkyBlockTime.now().getElectionYear(), ::Data,
+            )
+        },
     ) { drawDisplay(it) }
 
     class Data : ItemTrackerData() {
@@ -77,20 +87,20 @@ object DianaProfitTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lDiana Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lDiana Profit Tracker")
 
         val profit = tracker.drawItems(data, { true }, this)
 
         val treasureCoins = data.burrowsDug
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§7Burrows dug: §e${treasureCoins.addSeparators()}",
                 listOf("§7You dug out griffin burrows §e${treasureCoins.addSeparators()} §7times."),
-            ),
+            ).toSearchable(),
         )
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
+        add(tracker.addTotalProfit(profit, data.burrowsDug, "burrow"))
 
         tracker.addPriceFromButton(this)
     }
