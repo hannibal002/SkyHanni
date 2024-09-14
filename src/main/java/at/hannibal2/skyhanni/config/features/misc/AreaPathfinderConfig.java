@@ -37,5 +37,5 @@ public class AreaPathfinderConfig {
 
     @Expose
     @ConfigLink(owner = AreaPathfinderConfig.class, field = "enabled")
-    public Position position = new Position(20, 20);
+    public Position position = new Position(-350, 100);
 }
