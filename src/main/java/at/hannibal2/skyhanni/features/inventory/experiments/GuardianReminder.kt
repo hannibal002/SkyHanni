@@ -30,6 +30,7 @@ object GuardianReminder {
 
     private val config get() = SkyHanniMod.feature.inventory.helper.enchanting
     private var lastInventoryOpen = SimpleTimeMark.farPast()
+    private var lastWarn = SimpleTimeMark.farPast()
     private var lastErrorSound = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("data.enchanting.inventory.experimentstable")
@@ -37,9 +38,14 @@ object GuardianReminder {
         "mainmenu",
         "Experimentation Table",
     )
+
+    /**
+     * REGEX-TEST: §dGuardian
+     * REGEX-TEST: §9Guardian§e
+     */
     private val petNamePattern by patternGroup.pattern(
         "guardianpet",
-        "§[956d]Guardian",
+        "§[956d]Guardian.*",
     )
 
     @SubscribeEvent
@@ -49,13 +55,14 @@ object GuardianReminder {
         if (petNamePattern.matches(PetAPI.currentPet)) return
 
         lastInventoryOpen = SimpleTimeMark.now()
+
+        if (lastWarn.passedSince() < 5.seconds) return
+        lastWarn = SimpleTimeMark.now()
         ChatUtils.clickToActionOrDisable(
             "Use a §9§lGuardian Pet §efor more Exp in the Experimentation Table.",
-            option = config::guardianReminder,
+            config::guardianReminder,
             actionName = "open pets menu",
-            action = {
-                HypixelCommands.pet()
-            },
+            action = { HypixelCommands.pet() },
         )
     }
 

@@ -164,7 +164,8 @@ object MiningAPI {
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
-        if (event.newState.block != Blocks.air) return
+        if (event.newState.block.let { it != Blocks.air && it != Blocks.bedrock }) return
+        if (event.oldState.block.let { it == Blocks.air || it == Blocks.bedrock }) return
         if (event.oldState.block == Blocks.air) return
         val pos = event.location
         if (pos.distanceToPlayer() > 7) return

@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
@@ -35,9 +35,14 @@ object CurrentPetDisplay {
         "chat.despawn",
         "§aYou despawned your §r.*§r§a!"
     )
+
+    /**
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Griffin§4 ✦§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Elephant§e! §a§lVIEW RULE
+     */
     private val chatPetRulePattern by patternGroup.pattern(
         "chat.rule",
-        "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)! §a§lVIEW RULE"
+        "§cAutopet §eequipped your §7\\[Lvl .*] (?<pet>.*)§e! §a§lVIEW RULE"
     )
 
     @SubscribeEvent

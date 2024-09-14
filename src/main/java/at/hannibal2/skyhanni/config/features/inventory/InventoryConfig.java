@@ -74,6 +74,11 @@ public class InventoryConfig {
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
 
     @Expose
+    @ConfigOption(name = "Personal Compactor Overlay", desc = "Overlay for the Personal Compactor and Deletor.")
+    @Accordion
+    public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
+
+    @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
     @Accordion
     public RngMeterConfig rngMeter = new RngMeterConfig();
@@ -117,6 +122,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Page Scrolling", desc = "")
     @Accordion
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
+
+    @Expose
+    @ConfigOption(name = "Magical Power Display", desc = "")
+    @Accordion
+    public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
@@ -264,6 +274,12 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean stonkOfStonkPrice = true;
+
+    @Expose
+    @ConfigOption(name = "Minister in Calendar", desc = "Show the Minister with their perk in the Calendar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ministerInCalendar = true;
 
     @Expose
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
