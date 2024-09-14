@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.config.features.garden.composter.ComposterConfig;
 import at.hannibal2.skyhanni.config.features.garden.cropmilestones.CropMilestonesConfig;
 import at.hannibal2.skyhanni.config.features.garden.laneswitch.FarmingLaneConfig;
 import at.hannibal2.skyhanni.config.features.garden.optimalspeed.OptimalSpeedConfig;
-import at.hannibal2.skyhanni.config.features.garden.pests.BonusPestChanceConfig;
 import at.hannibal2.skyhanni.config.features.garden.pests.PestsConfig;
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig;
 import com.google.gson.annotations.Expose;
@@ -142,9 +141,17 @@ public class GardenConfig {
     public AtmosphericFilterDisplayConfig atmosphericFilterDisplay = new AtmosphericFilterDisplayConfig();
 
     @Expose
-    @ConfigOption(name = "Bonus Pest Chance Display", desc = "")
-    @Accordion
-    public BonusPestChanceConfig bonusPestChance = new BonusPestChanceConfig();
+    @ConfigOption(
+        name = "Bonus Chance Display",
+        desc = "Displays your bonus pest chance and if it is enabled or not."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean pestChanceDisplay = false;
+
+    @Expose
+    @ConfigLink(owner = GardenConfig.class, field = "pestChanceDisplay")
+    public Position pestChanceDisplayPosition = new Position(5, -115, false, true);
 
     @Expose
     @ConfigOption(name = "Plot Price", desc = "Show the price of the plot in coins when inside the Configure Plots inventory.")

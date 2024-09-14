@@ -15,7 +15,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object BonusPestChanceDisplay {
 
-    private val config get() = GardenAPI.config.bonusPestChance
+    private val config get() = GardenAPI.config
 
     private val patternGroup = RepoPattern.group("garden.bonuspestchance")
 
@@ -57,8 +57,8 @@ object BonusPestChanceDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.position.renderString(display, posLabel = "Bonus Pest Chance")
+        config.pestChanceDisplayPosition.renderString(display, posLabel = "Bonus Pest Chance")
     }
 
-    private fun isEnabled() = GardenAPI.inGarden() && config.enabled && !GardenAPI.hideExtraGuis() && !GardenAPI.hasFarmingToolInHand()
+    private fun isEnabled() = GardenAPI.inGarden() && config.pestChanceDisplay && !GardenAPI.hideExtraGuis()
 }
