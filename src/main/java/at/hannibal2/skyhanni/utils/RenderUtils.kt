@@ -1269,6 +1269,7 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
+        showNoteNames: Boolean = false
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
@@ -1290,8 +1291,10 @@ object RenderUtils {
                 bezierPoint,
             )
         }
-        path.filter { it.name?.isNotEmpty() == true }.forEach {
-            this.drawDynamicText(it.position, it.name!!, textSize)
+        if (showNoteNames) {
+            path.filter { it.name?.isNotEmpty() == true }.forEach {
+                this.drawDynamicText(it.position, it.name!!, textSize)
+            }
         }
         val last = path.last()
         drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
@@ -1609,6 +1612,27 @@ object RenderUtils {
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
         GlStateManager.enableCull()
+    }
+
+    fun LorenzRenderWorldEvent.drawHitbox(
+        boundingBox: AxisAlignedBB,
+        lineWidth: Int,
+        color: Color,
+        depth: Boolean,
+    ) {
+        val cornersTop = boundingBox.getCorners(boundingBox.maxY)
+        val cornersBottom = boundingBox.getCorners(boundingBox.minY)
+
+        // Draw lines for the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersTop[i], cornersTop[(i + 1) % 4], color, lineWidth, depth)
+            this.draw3DLine(cornersBottom[i], cornersBottom[(i + 1) % 4], color, lineWidth, depth)
+        }
+
+        // Draw lines connecting the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersBottom[i], cornersTop[i], color, lineWidth, depth)
+        }
     }
 
     fun chromaColor(

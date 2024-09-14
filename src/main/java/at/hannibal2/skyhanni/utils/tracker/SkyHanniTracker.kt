@@ -5,7 +5,9 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.TrackerManager
+import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -24,15 +26,18 @@ open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
+    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
     private val drawDisplay: (Data) -> List<Searchable>,
 ) {
 
+    private val extraDisplayModes = extraStorage.toMap()
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var dirty = false
+    private val textInput = TextInput()
 
     companion object {
 
@@ -61,12 +66,8 @@ open class SkyHanniTracker<Data : TrackerData>(
     }
 
     fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
-        val storage = ProfileStorageData.profileSpecific ?: return
-        val data: Data = when (mode) {
-            DisplayMode.TOTAL -> storage.getTotal()
-            DisplayMode.SESSION -> storage.getCurrentSession()
-        }
-        modifyFunction(data)
+        val sharedTracker = getSharedTracker() ?: return
+        sharedTracker.modify(mode, modifyFunction)
         update()
     }
 
@@ -86,7 +87,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             display = getSharedTracker()?.let {
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
-                buildFinalDisplay(searchables.buildSearchBox())
+                buildFinalDisplay(searchables.buildSearchBox(textInput))
             } ?: emptyList()
             dirty = false
         }
@@ -124,6 +125,8 @@ open class SkyHanniTracker<Data : TrackerData>(
         },
     )
 
+    private val availableTrackers = arrayOf(DisplayMode.TOTAL, DisplayMode.SESSION) + extraDisplayModes.keys
+
     private fun buildDisplayModeView() = Renderable.horizontalContainer(
         CollectionUtils.buildSelector<DisplayMode>(
             "§7Display Mode: ",
@@ -134,11 +137,17 @@ open class SkyHanniTracker<Data : TrackerData>(
                 storedTrackers[name] = it
                 update()
             },
+            universe = availableTrackers,
         ),
     )
 
-    protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let {
-        SharedTracker(it.getTotal(), it.getCurrentSession())
+    protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
+        SharedTracker(
+            mapOf(
+                DisplayMode.TOTAL to ps.getTotal(),
+                DisplayMode.SESSION to ps.getCurrentSession(),
+            ) + extraDisplayModes.mapValues { it.value(ps) },
+        )
     }
 
     private fun ProfileSpecificStorage.getCurrentSession() = currentSessions.getOrPut(this) { createNewSession() }
@@ -165,22 +174,30 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    class SharedTracker<Data : TrackerData>(private val total: Data, private val currentSession: Data) {
+    inner class SharedTracker<Data : TrackerData>(
+        private val entries: Map<DisplayMode, Data>,
+    ) {
+
+        fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+            get(mode).let(modifyFunction)
+        }
 
         fun modify(modifyFunction: (Data) -> Unit) {
-            modifyFunction(total)
-            modifyFunction(currentSession)
+            entries.values.forEach(modifyFunction)
         }
 
-        fun get(displayMode: DisplayMode) = when (displayMode) {
-            DisplayMode.TOTAL -> total
-            DisplayMode.SESSION -> currentSession
-        }
+        fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.skyHanniError(
+            "Unregistered display mode accessed on tracker",
+            "tracker" to name,
+            "displayMode" to displayMode,
+            "availableModes" to entries.keys,
+        )
     }
 
     enum class DisplayMode(val displayName: String) {
         TOTAL("Total"),
         SESSION("This Session"),
+        MAYOR("This Mayor"),
         ;
     }
 
