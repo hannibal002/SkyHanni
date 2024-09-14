@@ -126,6 +126,8 @@ object HoppityEggsManager {
     private var warningActive = false
     private var lastWarnTime = SimpleTimeMark.farPast()
 
+    var latestWaypointOnclick: () -> Unit = {}
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         lastMeal = null
@@ -202,6 +204,12 @@ object HoppityEggsManager {
             )
         }
 
+    fun getLatestWaypointOnclick(): () -> Unit {
+        val onClick = latestWaypointOnclick
+        latestWaypointOnclick = {}
+        return onClick
+    }
+
     fun shareWaypointPrompt() {
         if (!config.sharedWaypoints) return
         val meal = lastMeal ?: return
@@ -211,16 +219,16 @@ object HoppityEggsManager {
 
         val currentLocation = LocationUtils.playerLocation()
         DelayedRun.runNextTick {
-            val onClick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) }
-            if (!HoppityEggsCompactChat.clickableCompact(onClick)) {
-                ChatUtils.clickableChat(
-                    "Click here to share the location of this chocolate egg with the server!",
-                    onClick = onClick,
-                    "§eClick to share!",
-                    expireAt = 30.seconds.fromNow(),
-                    oneTimeClick = true,
-                )
-            }
+            latestWaypointOnclick = { HoppityEggsShared.shareNearbyEggLocation(currentLocation, meal, note) }
+            if (config.compactChat) return@runNextTick
+            ChatUtils.clickableChat(
+                "Click here to share the location of this chocolate egg with the server!",
+                onClick = latestWaypointOnclick,
+                "§eClick to share!",
+                expireAt = 30.seconds.fromNow(),
+                oneTimeClick = true,
+            )
+            latestWaypointOnclick = {}
         }
     }
 

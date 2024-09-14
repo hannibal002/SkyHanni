@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
@@ -9,11 +10,13 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundP
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 typealias RarityType = HoppityEggsConfig.CompactRarityTypes
@@ -30,22 +33,20 @@ object HoppityEggsCompactChat {
     private var lastDuplicateAmount: Long? = null
     private var rabbitBought = false
     private val config get() = ChocolateFactoryAPI.config
+    private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
 
     fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
-        lastDuplicateAmount?.let {
-            this.lastDuplicateAmount = it
-        }
+        lastDuplicateAmount?.let { this.lastDuplicateAmount = it }
+        this.duplicate = (lastDuplicateAmount != null)
         if (!HoppityEggsManager.config.compactChat) return
         event.blockedReason = "compact_hoppity"
         hoppityEggChat.add(event.message)
-        if (lastDuplicateAmount != null) {
-            this.duplicate = true
-        }
         if (hoppityEggChat.size == 3) sendCompact()
     }
 
     private fun sendCompact() {
-        ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
+        if (eventConfig.sharedWaypoints) DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getLatestWaypointOnclick()) }
+        else ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
         resetCompactData()
     }
 
@@ -83,6 +84,22 @@ object HoppityEggsCompactChat {
             "$mealNameFormatted! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
         } else "?"
     }
+
+    private fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.isNotEmpty() && !rabbitBought && lastChatMeal != null &&
+        HoppityEggType.resettingEntries.contains(lastChatMeal)
+    ) {
+        val hover = hoppityEggChat.joinToString("\n") + " \n§eClick here to share the location of this chocolate egg with the server!"
+        hoppityEggChat.clear()
+        ChatUtils.clickableChat(
+            createCompactMessage(),
+            hover = hover,
+            onClick = onClick,
+            expireAt = 30.seconds.fromNow(),
+            oneTimeClick = true,
+            prefix = false,
+        )
+        true
+    } else false
 
     fun handleChat(event: LorenzChatEvent) {
         eggFoundPatterns.forEach {
@@ -130,20 +147,4 @@ object HoppityEggsCompactChat {
             compactChat(event)
         }
     }
-
-    fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.isNotEmpty() && !rabbitBought && lastChatMeal != null &&
-        HoppityEggType.resettingEntries.contains(lastChatMeal)
-    ) {
-        val hover = hoppityEggChat.joinToString("\n") + " \n§eClick here to share the location of this chocolate egg with the server!"
-        hoppityEggChat.clear()
-        ChatUtils.clickableChat(
-            createCompactMessage(),
-            hover = hover,
-            onClick = onClick,
-            expireAt = 30.seconds.fromNow(),
-            oneTimeClick = true,
-            prefix = false,
-        )
-        true
-    } else false
 }
