@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GraphEditor.distanceSqToPlayer
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -24,9 +23,10 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GraphNodeEditor {
 
-    private val scrollValue = ScrollValue()
+    private val scrollValueNodes = ScrollValue()
+    private val scrollValueTags = ScrollValue()
     private val textInput = TextInput()
-    private var nodesDisplay = emptyList<Searchable>()
+    private var nodesDisplay = emptyList<Renderable>()
     private var lastUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -35,20 +35,12 @@ object GraphNodeEditor {
 
 
         config.namedNodesList.renderRenderables(
-            buildList {
-                val list = getNodeNames()
-                val size = list.size
-                addString("§eGraph Nodes: $size")
-                val height = (size * 10).coerceAtMost(250)
-                if (list.isNotEmpty()) {
-                    add(list.buildSearchableScrollable(height, textInput, scrollValue, velocity = 10.0))
-                }
-            },
+            getNodeNames(),
             posLabel = "Graph Nodes List",
         )
     }
 
-    private fun getNodeNames(): List<Searchable> {
+    private fun getNodeNames(): List<Renderable> {
         if (lastUpdate.passedSince() > 250.milliseconds) {
             updateNodeNames()
         }
@@ -57,24 +49,40 @@ object GraphNodeEditor {
 
     private fun updateNodeNames() {
         lastUpdate = SimpleTimeMark.now()
-        nodesDisplay = drawNodeNames()
+        nodesDisplay = buildList {
+            val list = drawNodeNames()
+            val size = list.size
+            addString("§eGraph Nodes: $size")
+            val height = (size * 10).coerceAtMost(250)
+            if (list.isNotEmpty()) {
+                add(list.buildSearchableScrollable(height, textInput, scrollValueNodes, velocity = 10.0))
+            }
+        }
     }
 
     private fun updateTagView(node: GraphingNode) {
         lastUpdate = SimpleTimeMark.now() + 60.seconds
-        nodesDisplay = drawTagNames(node)
+        nodesDisplay = buildList {
+            val list = drawTagNames(node)
+            val size = list.size
+            addString("§eGraph Nodes: $size")
+            val height = (size * 10).coerceAtMost(250)
+            if (list.isNotEmpty()) {
+                add(Renderable.scrollList(list, height, scrollValueTags, velocity = 10.0))
+            }
+        }
     }
 
-    private fun drawTagNames(node: GraphingNode): List<Searchable> = buildList {
-        addSearchString("§eChange tag for node '${node.name}§e'")
-        addSearchString("")
+    private fun drawTagNames(node: GraphingNode): List<Renderable> = buildList {
+        addString("§eChange tag for node '${node.name}§e'")
+        addString("")
 
         for (tag in GraphNodeTag.entries) {
             val state = if (tag in node.tags) "§aYES" else "§cNO"
             val name = state + " §r" + tag.displayName
             add(createTagName(name, tag, node))
         }
-        addSearchString("")
+        addString("")
         add(
             Renderable.clickAndHover(
                 "§cGo Back!",
@@ -82,7 +90,7 @@ object GraphNodeEditor {
                 onClick = {
                     updateNodeNames()
                 },
-            ).toSearchable(),
+            ),
         )
     }
 
@@ -106,18 +114,18 @@ object GraphNodeEditor {
             }
             updateTagView(node)
         },
-    ).toSearchable(name)
+    )
 
     private fun drawNodeNames(): List<Searchable> = buildList {
         for ((node, distance: Double) in GraphEditor.nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
             val name = node.name?.takeIf { !it.isBlank() } ?: continue
             val color = if (node == GraphEditor.activeNode) "§a" else "§7"
             val distanceFormat = sqrt(distance).toInt().addSeparators()
-            val tagText = node.tags.let {
-                if (it.isEmpty()) {
+            val tagText = node.tags.let { tags ->
+                if (tags.isEmpty()) {
                     " §cNo tag§r"
                 } else {
-                    val text = node.tags.map { it.internalName }.joinToString(", ")
+                    val text = node.tags.joinToString(", ") { it.internalName }
                     " §f($text)"
                 }
             }
@@ -127,7 +135,7 @@ object GraphNodeEditor {
         }
     }
 
-    private fun MutableList<Searchable>.createNodeTextLine(
+    private fun createNodeTextLine(
         text: String,
         name: String,
         node: GraphingNode,
