@@ -137,6 +137,7 @@ enum class Mayor(
                 val perk = Perk.entries.firstOrNull { it.perkName == perkJson.renameIfFoxyExtraEventPerkFound() }
                 perk?.also {
                     it.description = perkJson.description
+                    it.minister = perkJson.minister
                 }
             }
 
@@ -234,10 +235,13 @@ enum class Perk(val perkName: String) {
 
     var isActive = false
     var description = "§cDescription failed to load from the API."
+    var minister = false
 
     override fun toString(): String = "$perkName: $description"
 
     companion object {
         fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
+
+        fun MayorPerk.toPerk(): Perk? = getPerkFromName(this.name)
     }
 }
