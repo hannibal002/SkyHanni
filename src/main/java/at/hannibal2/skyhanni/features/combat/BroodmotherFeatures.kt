@@ -60,9 +60,7 @@ object BroodmotherFeatures {
     private fun onStageUpdate() {
         ChatUtils.debug("New Broodmother stage: $currentStage")
 
-        if (lastStage == null) {
-            if (onServerJoin()) return
-        }
+        if (lastStage == null && onServerJoin()) return
 
         // ignore Hypixel bug where the stage may temporarily revert to Imminent after the Broodmother's death
         if (currentStage == StageEntry.IMMINENT && lastStage == StageEntry.ALIVE) return
@@ -72,22 +70,24 @@ object BroodmotherFeatures {
             return
         }
 
-        val timeUntilSpawn = currentStage?.minutes?.minutes
-        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn!!
-
         if (currentStage == StageEntry.IMMINENT && config.imminentWarning) {
             playImminentWarning()
             return
         }
 
-        if (config.stages.contains(currentStage) && lastStage != null) {
-            if (currentStage == StageEntry.SLAIN) {
-                onBroodmotherSlain()
-            } else {
-                val pluralize = StringUtils.pluralize(timeUntilSpawn.toInt(DurationUnit.MINUTES), "minute")
-                ChatUtils.chat(
-                    "Broodmother: $lastStage §e-> $currentStage§e. §b${timeUntilSpawn.inWholeMinutes} $pluralize §euntil it spawns!"
-                )
+        if (lastStage != null) {
+            val timeUntilSpawn = currentStage?.minutes?.minutes
+            broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn!!
+
+            if (config.stages.contains(currentStage)) {
+                if (currentStage == StageEntry.SLAIN) {
+                    onBroodmotherSlain()
+                } else {
+                    val pluralize = StringUtils.pluralize(timeUntilSpawn.toInt(DurationUnit.MINUTES), "minute")
+                    ChatUtils.chat(
+                        "Broodmother: $lastStage §e-> $currentStage§e. §b${timeUntilSpawn.inWholeMinutes} $pluralize §euntil it spawns!"
+                    )
+                }
             }
         }
     }
