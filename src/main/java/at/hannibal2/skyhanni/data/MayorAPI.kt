@@ -99,7 +99,7 @@ object MayorAPI {
     private var dispatcher = Dispatchers.IO
 
     private var rawMayorData: MayorJson? = null
-    private var candidates = mapOf<Int, MayorCandidate>()
+    var candidates = mapOf<Int, MayorCandidate>()
 
     var nextMayorTimestamp = SimpleTimeMark.farPast()
         private set
