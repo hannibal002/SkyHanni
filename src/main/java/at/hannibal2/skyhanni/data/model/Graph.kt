@@ -7,34 +7,34 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonElement
 import com.google.gson.annotations.Expose
+import com.google.gson.stream.JsonToken
 import java.util.PriorityQueue
 
 @JvmInline
 value class Graph(
-    @Expose
-    val graph: List<GraphNode>,
+    @Expose val nodes: List<GraphNode>,
 ) : List<GraphNode> {
     override val size
-        get() = graph.size
+        get() = nodes.size
 
-    override fun contains(element: GraphNode) = graph.contains(element)
+    override fun contains(element: GraphNode) = nodes.contains(element)
 
-    override fun containsAll(elements: Collection<GraphNode>) = graph.containsAll(elements)
+    override fun containsAll(elements: Collection<GraphNode>) = nodes.containsAll(elements)
 
-    override fun get(index: Int) = graph.get(index)
+    override fun get(index: Int) = nodes.get(index)
 
-    override fun isEmpty() = graph.isEmpty()
+    override fun isEmpty() = nodes.isEmpty()
 
-    override fun indexOf(element: GraphNode) = graph.indexOf(element)
+    override fun indexOf(element: GraphNode) = nodes.indexOf(element)
 
-    override fun iterator(): Iterator<GraphNode> = graph.iterator()
-    override fun listIterator() = graph.listIterator()
+    override fun iterator(): Iterator<GraphNode> = nodes.iterator()
+    override fun listIterator() = nodes.listIterator()
 
-    override fun listIterator(index: Int) = graph.listIterator(index)
+    override fun listIterator(index: Int) = nodes.listIterator(index)
 
-    override fun subList(fromIndex: Int, toIndex: Int) = graph.subList(fromIndex, toIndex)
+    override fun subList(fromIndex: Int, toIndex: Int) = nodes.subList(fromIndex, toIndex)
 
-    override fun lastIndexOf(element: GraphNode) = graph.lastIndexOf(element)
+    override fun lastIndexOf(element: GraphNode) = nodes.lastIndexOf(element)
 
     companion object {
         val gson = GsonBuilder().setPrettyPrinting().registerTypeAdapter<Graph>(
@@ -42,17 +42,30 @@ value class Graph(
                 out.beginObject()
                 value.forEach {
                     out.name(it.id.toString()).beginObject()
+
                     out.name("Position").value(with(it.position) { "$x:$y:$z" })
-                    if (it.name != null) {
-                        out.name("Name").value(it.name)
+
+                    it.name?.let {
+                        out.name("Name").value(it)
                     }
+
+                    it.tagNames?.takeIf { it.isNotEmpty() }?.let {
+                        out.name("Tags")
+                        out.beginArray()
+                        for (tagName in it) {
+                            out.value(tagName)
+                        }
+                        out.endArray()
+                    }
+
                     out.name("Neighbours")
                     out.beginObject()
-                    it.neighbours.forEach { (node, weight) ->
+                    for ((node, weight) in it.neighbours) {
                         val id = node.id.toString()
                         out.name(id).value(weight.round(2))
                     }
                     out.endObject()
+
                     out.endObject()
                 }
                 out.endObject()
@@ -66,8 +79,13 @@ value class Graph(
                     reader.beginObject()
                     var position: LorenzVec? = null
                     var name: String? = null
+                    var tags: List<String>? = null
                     var neighbors = mutableListOf<Pair<Int, Double>>()
                     while (reader.hasNext()) {
+                        if (reader.peek() != JsonToken.NAME) {
+                            reader.skipValue()
+                            continue
+                        }
                         when (reader.nextName()) {
                             "Position" -> {
                                 position = reader.nextString().split(":").let { parts ->
@@ -89,9 +107,19 @@ value class Graph(
                                 name = reader.nextString()
                             }
 
+                            "Tags" -> {
+                                tags = mutableListOf()
+                                reader.beginArray()
+                                while (reader.hasNext()) {
+                                    val tagName = reader.nextString()
+                                    tags.add(tagName)
+                                }
+                                reader.endArray()
+                            }
+
                         }
                     }
-                    val node = GraphNode(id, position!!, name)
+                    val node = GraphNode(id, position!!, name, tags)
                     list.add(node)
                     neighbourMap[node] = neighbors
                     reader.endObject()
@@ -111,7 +139,12 @@ value class Graph(
     }
 }
 
-class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null) {
+// The node object that gets parsed from/to json
+class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String>? = null) {
+
+    val tags: List<GraphNodeTag> by lazy {
+        tagNames?.mapNotNull { GraphNodeTag.byId(it) } ?: emptyList()
+    }
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */
     lateinit var neighbours: Map<GraphNode, Double>
@@ -132,8 +165,7 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null) 
     }
 }
 
-fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph =
-    this.findShortestPathAsGraphWithDistance(start, end).first
+fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph = this.findShortestPathAsGraphWithDistance(start, end).first
 
 fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode): Pair<Graph, Double> {
     val distances = mutableMapOf<GraphNode, Double>()
@@ -174,11 +206,9 @@ fun Graph.findShortestPathAsGraphWithDistance(start: GraphNode, end: GraphNode):
     ) to distances[end]!!
 }
 
-fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> =
-    this.findShortestPathAsGraph(start, end).toPositionsList()
+fun Graph.findShortestPath(start: GraphNode, end: GraphNode): List<LorenzVec> = this.findShortestPathAsGraph(start, end).toPositionsList()
 
-fun Graph.findShortestDistance(start: GraphNode, end: GraphNode): Double =
-    this.findShortestPathAsGraphWithDistance(start, end).second
+fun Graph.findShortestDistance(start: GraphNode, end: GraphNode): Double = this.findShortestPathAsGraphWithDistance(start, end).second
 
 fun Graph.toPositionsList() = this.map { it.position }
 
