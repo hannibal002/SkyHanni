@@ -64,7 +64,7 @@ object CarnivalZombieShootout {
         LEATHER(30, "Leather Cap", Color(165, 42, 42)), //Brown
         IRON(50, "Iron Helmet", Color(192, 192, 192)), //Silver
         GOLD(80, "Golden Helmet", Color(255, 215, 0)), //Gold
-        DIAMOND(120, "Diamond Helmet", Color(185, 242, 255)) //Diamond
+        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) //Diamond
     }
 
     @SubscribeEvent
