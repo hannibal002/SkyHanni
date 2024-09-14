@@ -74,13 +74,13 @@ data class LorenzVec(
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * v"))
     fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
 
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
@@ -214,6 +214,10 @@ data class LorenzVec(
     fun distanceToLine(startPos: LorenzVec, endPos: LorenzVec): Double {
         return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
+
+    fun middle(other: LorenzVec): LorenzVec = this.plus(other.minus(this) / 2)
+
+    private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
     companion object {
 

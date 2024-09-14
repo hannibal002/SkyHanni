@@ -87,6 +87,11 @@ public class GUIConfig {
     public TextBoxConfig customTextBox = new TextBoxConfig();
 
     @Expose
+    @ConfigOption(name = "Tab Widget", desc = "")
+    @Accordion
+    public TabWidgetConfig tabWidget = new TabWidgetConfig();
+
+    @Expose
     @ConfigOption(name = "In-Game Date", desc = "")
     @Accordion
     public InGameDateConfig inGameDate = new InGameDateConfig();
