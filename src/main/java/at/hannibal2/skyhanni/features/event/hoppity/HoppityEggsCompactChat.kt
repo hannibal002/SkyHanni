@@ -45,9 +45,12 @@ object HoppityEggsCompactChat {
     }
 
     private fun sendCompact() {
-        if (eventConfig.sharedWaypoints) DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick()) }
-        else ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
-        resetCompactData()
+        if (lastChatMeal.let { HoppityEggType.resettingEntries.contains(it) } && !rabbitBought && eventConfig.sharedWaypoints) {
+            DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick()) }
+        } else {
+            ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
+            resetCompactData()
+        }
     }
 
     private fun resetCompactData() {
@@ -85,9 +88,7 @@ object HoppityEggsCompactChat {
         } else "?"
     }
 
-    private fun clickableCompact(onClick: () -> Unit): Boolean = if (hoppityEggChat.isNotEmpty() && !rabbitBought && lastChatMeal != null &&
-        HoppityEggType.resettingEntries.contains(lastChatMeal)
-    ) {
+    private fun clickableCompact(onClick: () -> Unit) {
         val hover = hoppityEggChat.joinToString("\n") + " \n§eClick here to share the location of this chocolate egg with the server!"
         hoppityEggChat.clear()
         ChatUtils.clickableChat(
@@ -98,8 +99,7 @@ object HoppityEggsCompactChat {
             oneTimeClick = true,
             prefix = false,
         )
-        true
-    } else false
+    }
 
     fun handleChat(event: LorenzChatEvent) {
         eggFoundPatterns.forEach {
