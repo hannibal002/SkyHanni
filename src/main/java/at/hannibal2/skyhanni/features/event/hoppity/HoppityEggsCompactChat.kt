@@ -45,7 +45,7 @@ object HoppityEggsCompactChat {
     }
 
     private fun sendCompact() {
-        if (eventConfig.sharedWaypoints) DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getLatestWaypointOnclick()) }
+        if (eventConfig.sharedWaypoints) DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick()) }
         else ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
         resetCompactData()
     }

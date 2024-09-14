@@ -126,7 +126,7 @@ object HoppityEggsManager {
     private var warningActive = false
     private var lastWarnTime = SimpleTimeMark.farPast()
 
-    var latestWaypointOnclick: () -> Unit = {}
+    private var latestWaypointOnclick: () -> Unit = {}
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -204,7 +204,7 @@ object HoppityEggsManager {
             )
         }
 
-    fun getLatestWaypointOnclick(): () -> Unit {
+    fun getAndDisposeWaypointOnclick(): () -> Unit {
         val onClick = latestWaypointOnclick
         latestWaypointOnclick = {}
         return onClick
