@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -99,15 +100,20 @@ object GraphEditor {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
-        ghostPosition?.let {
-            event.drawWaypointFilled(
-                it,
-                if (activeNode == null) Color.RED else Color.GRAY,
-                seeThroughBlocks = seeThroughBlocks,
-                minimumAlpha = 0.2f,
-                inverseAlphaScale = true,
-            )
-        }
+        drawGhostPosition(event)
+    }
+
+    private fun drawGhostPosition(event: LorenzRenderWorldEvent) {
+        val ghostPosition = ghostPosition ?: return
+        if (ghostPosition.distanceToPlayer() >= config.maxNodeDistance) return
+
+        event.drawWaypointFilled(
+            ghostPosition,
+            if (activeNode == null) Color.RED else Color.GRAY,
+            seeThroughBlocks = seeThroughBlocks,
+            minimumAlpha = 0.2f,
+            inverseAlphaScale = true,
+        )
     }
 
     @SubscribeEvent
@@ -186,6 +192,7 @@ object GraphEditor {
     }
 
     private fun LorenzRenderWorldEvent.drawNode(node: GraphingNode) {
+        if (node.position.distanceToPlayer() > config.maxNodeDistance) return
         this.drawWaypointFilled(
             node.position,
             node.getNodeColor(),
@@ -221,17 +228,20 @@ object GraphEditor {
         )
     }
 
-    private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) = this.draw3DLine_nea(
-        edge.node1.position.add(0.5, 0.5, 0.5),
-        edge.node2.position.add(0.5, 0.5, 0.5),
-        when {
-            selectedEdge == edge -> edgeSelectedColor
-            edge in highlightedEdges -> edgeDijkstraColor
-            else -> edgeColor
-        },
-        7,
-        !seeThroughBlocks,
-    )
+    private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) {
+        if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
+        this.draw3DLine_nea(
+            edge.node1.position.add(0.5, 0.5, 0.5),
+            edge.node2.position.add(0.5, 0.5, 0.5),
+            when {
+                selectedEdge == edge -> edgeSelectedColor
+                edge in highlightedEdges -> edgeDijkstraColor
+                else -> edgeColor
+            },
+            7,
+            !seeThroughBlocks,
+        )
+    }
 
     private fun GraphingNode.getNodeColor() = when (this) {
         activeNode -> if (this == closedNode) ColorUtils.blendRGB(activeColor, closedColor, 0.5) else activeColor
