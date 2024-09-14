@@ -1,8 +1,15 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.utils.LorenzColor
 
-enum class GraphNodeTag(val internalName: String, val color: LorenzColor, val cleanName: String, val description: String) {
+enum class GraphNodeTag(
+    val internalName: String,
+    val color: LorenzColor,
+    val cleanName: String,
+    val description: String,
+    val onlyIsland: IslandType? = null,
+) {
     DEV("dev", LorenzColor.WHITE, "Dev", "Intentionally marked as dev."), // E.g. Spawn points, todos, etc
 
     // Everywhere
@@ -20,25 +27,28 @@ enum class GraphNodeTag(val internalName: String, val color: LorenzColor, val cl
     // hoppity
 
     // Hub
-    HUB_12_STARTER("starter_npc", LorenzColor.WHITE, "Starter NPC", "One of the 12 starter NPC's you need to talk to."),
+    HUB_12_STARTER(
+        "starter_npc", LorenzColor.WHITE, "Starter NPC", "One of the 12 starter NPC's you need to talk to.",
+        onlyIsland = IslandType.HUB,
+    ),
     // diana
 
     // Farming Islands: Pelts
 //     FARMING_CROP("farming_crop", LorenzColor.WHITE, "Farming Crop", "A spot where you can break crops on farming islands."),
 
     // Rift
-    RIFT_ENIGMA("rift_enigma", LorenzColor.DARK_PURPLE, "Enigma Soul", "Enigma Souls in the rift."),
-    RIFT_EYE("rift_eye", LorenzColor.DARK_RED, "Rift Eye", "An Eye in the rift to teleport to."),
+    RIFT_ENIGMA("rift_enigma", LorenzColor.DARK_PURPLE, "Enigma Soul", "Enigma Souls in the rift.", onlyIsland = IslandType.THE_RIFT),
+    RIFT_EYE("rift_eye", LorenzColor.DARK_RED, "Rift Eye", "An Eye in the rift to teleport to.", onlyIsland = IslandType.THE_RIFT),
 
     // Spider's Den
-    SPIDER_RELIC("SPIDER_RELIC", LorenzColor.DARK_PURPLE, "Spider's Relic", "An relic in the Spider's Den."),
+    SPIDER_RELIC("SPIDER_RELIC", LorenzColor.DARK_PURPLE, "Spider's Relic", "An relic in the Spider's Den.", onlyIsland = IslandType.SPIDER_DEN),
 
     // Dwarven Mines
-    MINES_EMISSARY("mines_emissary", LorenzColor.GOLD, "Mines Emissary", "A Emissary from the king."),
+    MINES_EMISSARY("mines_emissary", LorenzColor.GOLD, "Mines Emissary", "A Emissary from the king.", onlyIsland = IslandType.DWARVEN_MINES),
     // commission areas
 
     // Crimson Isles
-    CRIMSON_MINIBOSS("crimson_miniboss", LorenzColor.RED, "Crimson Miniboss", "Mini bosses in Crimson Isle."),
+    CRIMSON_MINIBOSS("crimson_miniboss", LorenzColor.RED, "Crimson Miniboss", "Mini bosses in Crimson Isle.", onlyIsland = IslandType.CRIMSON_ISLE),
 
     ;
 

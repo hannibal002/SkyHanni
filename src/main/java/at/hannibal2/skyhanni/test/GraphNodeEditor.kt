@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -77,7 +78,7 @@ object GraphNodeEditor {
         addString("§eChange tag for node '${node.name}§e'")
         addString("")
 
-        for (tag in GraphNodeTag.entries) {
+        for (tag in GraphNodeTag.entries.filter { it in node.tags || checkIsland(it) }) {
             val state = if (tag in node.tags) "§aYES" else "§cNO"
             val name = state + " §r" + tag.displayName
             add(createTagName(name, tag, node))
@@ -93,6 +94,10 @@ object GraphNodeEditor {
             ),
         )
     }
+
+    private fun checkIsland(tag: GraphNodeTag): Boolean = tag.onlyIsland?.let {
+        it == LorenzUtils.skyBlockIsland
+    } ?: true
 
     private fun createTagName(
         name: String,
