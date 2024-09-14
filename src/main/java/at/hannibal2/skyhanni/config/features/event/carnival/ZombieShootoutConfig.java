@@ -21,14 +21,19 @@ public class ZombieShootoutConfig {
     public boolean coloredHitboxes = true;
 
     @Expose
-    @ConfigOption(name = "Highest Only", desc = "Only draw colored hitboxes for the highest scoring zombies.")
+    @ConfigOption(name = "Zombie Timer", desc = "Displays a timer above the heads of the zombies.")
+    @ConfigEditorBoolean
+    public boolean zombieTimer = true;
+
+    @Expose
+    @ConfigOption(name = "Highest Only", desc = "Only draw colored hitboxes/timers for the highest scoring zombies.")
     @ConfigEditorBoolean
     public boolean highestOnly = false;
 
     @Expose
     @ConfigOption(name = "Colored Line", desc = "Display a colored line to lamps.")
     @ConfigEditorBoolean
-    public boolean coloredLines = true;
+    public boolean coloredLine = true;
 
     @Expose
     @ConfigOption(name = "Lamp Timer", desc = "Show time until current lamp disappears.")
