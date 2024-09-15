@@ -16,10 +16,9 @@ public class EnigmaSoulConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Show Path Finder", desc = "Show a pathfind to the Enigma Soul.")
+    @ConfigOption(name = "Show Path Finder", desc = "Additionally show a pathfind to the Enigma Soul.")
     @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean showPathFinder = false;
+    public boolean showPathFinder = true;
 
     @ConfigOption(
         name = "§aRift Guide",
