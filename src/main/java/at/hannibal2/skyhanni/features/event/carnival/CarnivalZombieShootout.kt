@@ -87,13 +87,15 @@ object CarnivalZombieShootout {
 
                 if (!exceeded) {
                     val entity = EntityUtils.getEntityByID(zombie.entity.entityId) ?: continue
+                    val isSmall = (entity as? EntityZombie)?.isChild ?: false
 
                     val timer = lifetime - time.passedSince()
                     val skips = lifetime / 3
                     val prefix = determinePrefix(timer, lifetime, lifetime - skips, lifetime - skips * 2)
+                    val height = if (isSmall) entity.height / 2 else entity.height
 
                     event.drawString(
-                        entity.getLorenzVec().add(0.0, entity.height.plus(0.5), 0.0),
+                        entity.getLorenzVec().add(0.0, height.plus(0.5), 0.0),
                         "$prefix$timer",
                     )
                 } else {
