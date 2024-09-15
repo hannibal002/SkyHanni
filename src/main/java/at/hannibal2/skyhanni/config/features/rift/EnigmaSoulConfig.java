@@ -15,6 +15,12 @@ public class EnigmaSoulConfig {
     @FeatureToggle
     public boolean enabled = true;
 
+    @Expose
+    @ConfigOption(name = "Show Path Finder", desc = "Show a pathfind to the Enigma Soul.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showPathFinder = false;
+
     @ConfigOption(
         name = "§aRift Guide",
         desc = "Type §e/riftguide §7in chat or navigate through the SkyBlock Menu to open the §aRift Guide§7. " +
