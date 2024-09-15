@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
-import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -38,34 +37,10 @@ object HoppityEggsManager {
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§dnear the Diamond Essence Shop§r§d!
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!
      */
-    private val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val eggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "egg.found",
         "§d§lHOPPITY'S HUNT §r§dYou found a §r§.Chocolate (?<meal>\\w+) Egg §r§d(?<note>.*)§r§d!",
-    )
-
-    /**
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!
-     */
-    private val sideDishEggFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "sidedish.found",
-        "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§l(?<meal>.*) §r§6Egg §r§din the Chocolate Factory§r§d!",
-    )
-
-    /**
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!
-     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!
-     */
-    private val milestoneRabbitFoundPattern by ChocolateFactoryAPI.patternGroup.pattern(
-        "milestone.claimed",
-        "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§l(?<meal>[\\w ]+) Rabbit §r§din the Chocolate Factory§r§d!",
-    )
-
-    val eggFoundPatterns: List<Pattern> = listOf(
-        eggFoundPattern,
-        sideDishEggFoundPattern,
-        milestoneRabbitFoundPattern,
     )
 
     /**

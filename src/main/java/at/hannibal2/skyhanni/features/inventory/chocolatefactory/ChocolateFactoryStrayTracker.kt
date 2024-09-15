@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -269,27 +272,17 @@ object ChocolateFactoryStrayTracker {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        val index = event.slot?.slotIndex ?: return
-        if (index == -999) return
-        if (claimedStraysSlots.contains(index)) return
-
-        val clickedStack = InventoryUtils.getItemsInOpenChest()
-            .find { it.slotNumber == event.slot.slotNumber && it.hasStack }
-            ?.stack ?: return
-        val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
-        if (!nameText.equals("§6§lGolden Rabbit §8- §aSide Dish")) return
-
-        HoppityAPI.fireSideDishMessage()
-        if (!isEnabled()) return
-
-        claimedStraysSlots.add(index)
-        incrementGoldenType("sidedish")
-        incrementRarity("legendary", 0)
-        DelayedRun.runDelayed(1.seconds) {
-            claimedStraysSlots.remove(claimedStraysSlots.indexOf(index))
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        if (!isEnabled() || event.type != HoppityEggType.SIDE_DISH) return
+        event.slotIndex?.let {
+            claimedStraysSlots.add(it)
+            DelayedRun.runDelayed(1.seconds) {
+                claimedStraysSlots.remove(claimedStraysSlots.indexOf(it))
+            }
         }
+        incrementRarity("legendary", 0)
+        incrementGoldenType("sidedish")
     }
 
     @SubscribeEvent

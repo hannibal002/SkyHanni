@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPatterns
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -103,13 +105,30 @@ object HoppityEggsCompactChat {
         )
     }
 
-    fun handleChat(event: LorenzChatEvent) {
-        eggFoundPatterns.forEach {
-            it.matchMatcher(event.message) {
-                resetCompactData()
-                lastChatMeal = getEggType(event)
-                compactChat(event)
+    @HandleEvent
+    fun onRabbitFound(event: RabbitFoundEvent) {
+        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.eggType)) return
+        lastChatMeal = event.eggType
+        hoppityEggChat.add(
+            when(event.eggType) {
+                SIDE_DISH ->
+                    "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!"
+                CHOCOLATE_FACTORY_MILESTONE ->
+                    "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+                CHOCOLATE_SHOP_MILESTONE ->
+                    "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+                else ->
+                    "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type?"
             }
+        )
+        if (hoppityEggChat.size == 3) sendCompact()
+    }
+
+    fun handleChat(event: LorenzChatEvent) {
+        eggFoundPattern.matchMatcher(event.message) {
+            resetCompactData()
+            lastChatMeal = getEggType(event)
+            compactChat(event)
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
