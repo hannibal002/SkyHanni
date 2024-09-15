@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.milestoneEntries
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
@@ -51,6 +52,7 @@ object HoppityEggsCompactChat {
     private fun sendCompact() {
         if (lastChatMeal.let { HoppityEggType.resettingEntries.contains(it) } && eventConfig.sharedWaypoints) {
             DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick()) }
+            resetCompactData()
         } else {
             ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
             resetCompactData()
@@ -139,15 +141,6 @@ object HoppityEggsCompactChat {
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
-            // The only cases where "You found ..." will come in with more than 1 message,
-            // or empty for hoppityEggChat, is where the rabbit was purchased from hoppity,
-            // In the case of buying, we want to reset variables to a clean state during this capture,
-            // as the important capture for the purchased message is the final message in
-            // the chain; "You found [rabbit]" -> "Dupe/New Rabbit" -> "You bought [rabbit]"
-            if ((hoppityEggChat.isEmpty() || hoppityEggChat.size > 1)) {
-                resetCompactData()
-            }
-
             lastName = group("name")
             lastRarity = group("rarity")
             compactChat(event)

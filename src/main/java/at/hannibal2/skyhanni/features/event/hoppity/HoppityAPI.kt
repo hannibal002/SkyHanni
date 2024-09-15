@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggTyp
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.milestoneEntries
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -125,15 +126,6 @@ object HoppityAPI {
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
-            // The only cases where "You found ..." will come in with more than 1 message,
-            // or empty for hoppityEggChat, is where the rabbit was purchased from hoppity,
-            // In the case of buying, we want to reset variables to a clean state during this capture,
-            // as the important capture for the purchased message is the final message in
-            // the chain; "You found [rabbit]" -> "Dupe/New Rabbit" -> "You bought [rabbit]"
-            if ((hoppityEggChat.isEmpty() || hoppityEggChat.size > 1)) {
-                resetChatData()
-            }
-
             lastName = group("name")
             lastRarity = group("rarity")
             attemptFire(event)
