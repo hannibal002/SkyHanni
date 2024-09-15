@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -189,14 +190,15 @@ object HoppityCollectionStats {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!config.rarityDyeRecolor || !pagePattern.matches(event.inventory.name)) return
-        val item = event.originalItem
-        // The "base" missing rabbits are Gray Dye (minecraft:dye with metadata 8)
-        if (item.getMinecraftId().toString() != "minecraft:dye" || item.metadata != 8) return
+        if (!pagePattern.matches(event.inventory.name)) return
+        val itemStack = event.originalItem
 
-        val rarity = HoppityAPI.rarityByRabbit(item.displayName)
+        // The "base" missing rabbits are Gray Dye (minecraft:dye with metadata 8)
+        if (itemStack.getMinecraftId().toString() != "minecraft:dye") return
+
+        val rarity = HoppityAPI.rarityByRabbit(itemStack.displayName)
         // Add NBT for the dye color itself
-        val newItemStack = ItemStack(Items.dye, 1, when (rarity) {
+        val newItemStack = if (config.rarityDyeRecolor) ItemStack(Items.dye, 1, when (rarity) {
             LorenzRarity.COMMON -> 7  // Light gray dye
             LorenzRarity.UNCOMMON -> 10 // Lime dye
             LorenzRarity.RARE -> 4 // Lapis lazuli
@@ -206,10 +208,43 @@ object HoppityCollectionStats {
             LorenzRarity.DIVINE -> 12 // Light blue dye
             LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
             else -> return
-        })
-        newItemStack.setLore(item.getLore())
-        newItemStack.setStackDisplayName(item.displayName)
+        }) else ItemStack(Items.dye, 8)
+
+        newItemStack.setLore(buildDescriptiveMilestoneLore(itemStack))
+        newItemStack.setStackDisplayName(itemStack.displayName)
         event.replace(newItemStack)
+    }
+
+    private fun buildDescriptiveMilestoneLore(itemStack: ItemStack): List<String> {
+        val existingLore = itemStack.getLore().toMutableList()
+        var replaceIndex: Int? = null
+        var milestoneType: HoppityEggType = HoppityEggType.BREAKFAST
+
+        if (factoryMilestone.anyMatches(existingLore)) {
+            milestoneType = HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
+            replaceIndex = existingLore.indexOfFirst { loreMatch -> factoryMilestone.matches(loreMatch) }
+        } else if (shopMilestone.anyMatches(existingLore)) {
+            milestoneType = HoppityEggType.CHOCOLATE_SHOP_MILESTONE
+            replaceIndex = existingLore.indexOfFirst { loreMatch -> shopMilestone.matches(loreMatch) }
+        }
+
+        replaceIndex?.let {
+            ChocolateFactoryAPI.milestoneByRabbit(itemStack.displayName)?.let {
+                val displayAmount = it.amount.shortFormat()
+                val operationFormat = when(milestoneType) {
+                    HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "reaching"
+                    HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -> "spending"
+                    else -> "" // Never happens
+                }
+
+                //List indexing is weird
+                existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount"
+                existingLore[replaceIndex] = "§7all-time §6Chocolate."
+                return existingLore
+            }
+        }
+
+        return existingLore
     }
 
     @SubscribeEvent
