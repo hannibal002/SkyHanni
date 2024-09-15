@@ -98,17 +98,19 @@ object HoppityAPI {
 
         sideDishNamePattern.matchMatcher(nameText) { EggFoundEvent(SIDE_DISH, index).post() }
         milestoneNamePattern.matchMatcher(nameText) {
-            clickedStack.getLore().also { lore ->
-                if (!lore.any { it == "§eClick to claim!" }) return
-                allTimeLorePattern.firstMatcher(lore) { EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post() }
-                shopLorePattern.firstMatcher(lore) { EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post() }
+            clickedStack.getLore().let {
+                if (!it.any { line -> line == "§eClick to claim!" }) return
+                allTimeLorePattern.firstMatcher(it) {
+                    EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
+                    lastChatMeal = CHOCOLATE_FACTORY_MILESTONE
+                }
+                shopLorePattern.firstMatcher(it) {
+                    EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
+                    lastChatMeal = CHOCOLATE_SHOP_MILESTONE
+                }
             }
         }
     }
-
-    // Yes I realize I'm firing these events 20 lines above this...
-    @HandleEvent
-    fun onEggFound(event: EggFoundEvent) { lastChatMeal = event.type }
 
     fun handleChat(event: LorenzChatEvent) {
         eggFoundPattern.matchMatcher(event.message) {

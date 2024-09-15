@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
@@ -106,6 +107,11 @@ object HoppityEggsCompactChat {
             oneTimeClick = true,
             prefix = false,
         )
+    }
+
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        lastChatMeal = lastChatMeal ?: event.type
     }
 
     @HandleEvent
