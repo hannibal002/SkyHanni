@@ -1,8 +1,6 @@
 package at.hannibal2.skyhanni.data.jsonobjects.repo
 
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityAPI
-import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import com.google.gson.annotations.Expose
 import java.util.TreeSet
