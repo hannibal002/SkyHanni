@@ -52,7 +52,7 @@ object ExperimentsProfitTracker {
     private val tracker = SkyHanniItemTracker(
         "Experiments Profit Tracker",
         { Data() },
-        { it.experimentationStorage.experimentsProfitTracker },
+        { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
     private var inExperimentationTable = false

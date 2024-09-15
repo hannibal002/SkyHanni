@@ -24,8 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object ExperimentsDryStreakDisplay {
 
-    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.dryStreakConfig
-    private val storage get() = ProfileStorageData.profileSpecific?.experimentationStorage?.dryStreakStorage
+    private val config get() = SkyHanniMod.feature.inventory.experimentationTable.dryStreak
+    private val storage get() = ProfileStorageData.profileSpecific?.experimentation?.dryStreak
 
     private var display = emptyList<String>()
 

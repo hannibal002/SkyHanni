@@ -18,7 +18,7 @@ public class ExperimentationTableConfig {
     @Expose
     @ConfigOption(name = "Dry-Streak Display", desc = "")
     @Accordion
-    public ExperimentsDryStreakConfig dryStreakConfig = new ExperimentsDryStreakConfig();
+    public ExperimentsDryStreakConfig dryStreak = new ExperimentsDryStreakConfig();
 
     @Expose
     @ConfigOption(name = "Display", desc = "Shows a display with useful information while doing experiments.")

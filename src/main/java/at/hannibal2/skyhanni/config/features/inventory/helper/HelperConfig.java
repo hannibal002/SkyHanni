@@ -56,5 +56,4 @@ public class HelperConfig {
     @ConfigOption(name = "Reforge Helper", desc = "")
     @Accordion
     public ReforgeHelperConfig reforge = new ReforgeHelperConfig();
-
 }

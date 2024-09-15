@@ -67,12 +67,12 @@ public class ProfileSpecificStorage {
     public String currentPet = "";
 
     @Expose
-    public ExperimentationStorage experimentationStorage = new ExperimentationStorage();
+    public ExperimentationStorage experimentation = new ExperimentationStorage();
 
     public static class ExperimentationStorage {
 
         @Expose
-        public ExperimentsDryStreakStorage dryStreakStorage = new ExperimentsDryStreakStorage();
+        public ExperimentsDryStreakStorage dryStreak = new ExperimentsDryStreakStorage();
 
         public static class ExperimentsDryStreakStorage {
             @Expose
