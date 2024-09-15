@@ -135,8 +135,8 @@ object HoppityCollectionStats {
     private val loggedRabbits
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
 
-    enum class HighlightRabbitTypes (
-        val rabbitType: String,
+    enum class HighlightRabbitTypes(
+        private val displayName: String,
         val color: LorenzColor,
     ) {
         ABI("§2Abi", LorenzColor.DARK_GREEN),
@@ -147,9 +147,7 @@ object HoppityCollectionStats {
         STRAYS("§3Stray Rabbits", LorenzColor.DARK_AQUA),
         ;
 
-        override fun toString(): String {
-            return rabbitType
-        }
+        override fun toString(): String = displayName
     }
 
     @KSerializable
@@ -176,12 +174,12 @@ object HoppityCollectionStats {
 
     var inInventory = false
 
-    var highlightConfigMap: Map<Pattern, HighlightRabbitTypes> = mapOf(
+    private val highlightConfigMap: Map<Pattern, HighlightRabbitTypes> = mapOf(
         factoryMilestone to HighlightRabbitTypes.FACTORY,
         requirementMet to HighlightRabbitTypes.MET,
         requirementNotMet to HighlightRabbitTypes.NOT_MET,
         shopMilestone to HighlightRabbitTypes.SHOP,
-        strayRabbit to HighlightRabbitTypes.STRAYS
+        strayRabbit to HighlightRabbitTypes.STRAYS,
     )
 
     @SubscribeEvent
