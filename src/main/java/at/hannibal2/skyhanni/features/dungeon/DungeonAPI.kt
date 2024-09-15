@@ -16,10 +16,12 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -210,6 +212,7 @@ object DungeonAPI {
                 }
             }
         }
+
     }
 
     @SubscribeEvent
@@ -344,6 +347,13 @@ object DungeonAPI {
         HEALER("Healer"),
         MAGE("Mage"),
         TANK("Tank"),
+        UNKNOWN("Unknown");
+
+        companion object {
+            fun getByClassName(className: String): DungeonClass? {
+                return entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
+            }
+        }
     }
 
     enum class DungeonChest(val inventory: String) {
@@ -359,6 +369,7 @@ object DungeonAPI {
             fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
         }
     }
+
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
@@ -381,5 +392,47 @@ object DungeonAPI {
             else -> return
         }
         DungeonBlockClickEvent(position, blockType).post()
+    }
+
+    data class TeamMember(
+        val username: String,
+        val dungeonClass: DungeonClass = DungeonClass.UNKNOWN,
+        val classLevel: Int = 0,
+        val playerDead: Boolean = false
+    )
+
+    private val playerTeamClasses: MutableList<TeamMember> = mutableListOf()
+
+    fun getPlayerInfo(username: String): TeamMember =
+        playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
+
+    private val playerClassRegex = Regex(
+        """\[\d+\] (\w+)[^\(\]]*\((Archer|Mage|Berserk|Tank|Healer|DEAD)(?:\s*([IVXLCDM]+)?)?\)"""
+    )
+
+    @SubscribeEvent
+    fun onTabUpdate(event: TabListUpdateEvent) {
+        if (!inDungeon() && !started) return
+
+        val updatedTeamMembers = playerClassRegex.findAll(event.tabList.toString().removeColor())
+            .map { match ->
+                val (username, dungeonClassName, classLevel) = match.destructured
+                val playerDead = dungeonClassName == "DEAD"
+                val oldPlayerData = getPlayerInfo(username)
+                val dungeonClass = if (playerDead) oldPlayerData.dungeonClass
+                else DungeonClass.getByClassName(dungeonClassName) ?: oldPlayerData.dungeonClass
+
+                TeamMember(
+                    username = username,
+                    dungeonClass = dungeonClass,
+                    classLevel = classLevel.romanToDecimalIfNecessary(),
+                    playerDead = playerDead
+                )
+            }.toList()
+
+        playerTeamClasses.apply {
+            clear()
+            addAll(updatedTeamMembers)
+        }
     }
 }
