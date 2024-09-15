@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
@@ -31,13 +32,14 @@ object HoppityEggsCompactChat {
     private var newRabbit = false
     private var lastChatMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
-    private var rabbitBought = false
     private val config get() = ChocolateFactoryAPI.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
 
     fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
-        lastDuplicateAmount?.let { this.lastDuplicateAmount = it }
-        this.duplicate = (lastDuplicateAmount != null)
+        lastDuplicateAmount?.let {
+            this.lastDuplicateAmount = it
+            this.duplicate = true
+        }
         if (!HoppityEggsManager.config.compactChat) return
         event.blockedReason = "compact_hoppity"
         hoppityEggChat.add(event.message)
@@ -45,7 +47,7 @@ object HoppityEggsCompactChat {
     }
 
     private fun sendCompact() {
-        if (lastChatMeal.let { HoppityEggType.resettingEntries.contains(it) } && !rabbitBought && eventConfig.sharedWaypoints) {
+        if (lastChatMeal.let { HoppityEggType.resettingEntries.contains(it) } && eventConfig.sharedWaypoints) {
             DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick()) }
         } else {
             ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
@@ -62,15 +64,15 @@ object HoppityEggsCompactChat {
         this.lastProfit = ""
         this.lastChatMeal = null
         this.lastDuplicateAmount = null
-        this.rabbitBought = false
     }
 
     private fun createCompactMessage(): String {
-        val mealName = lastChatMeal?.coloredName ?: ""
-        val mealNameFormatted = if (rabbitBought) "§aBought Rabbit"
-        else if (lastChatMeal == SIDE_DISH) "§6§lSide Dish §r§6Egg"
-        else if (lastChatMeal == CHOCOLATE_SHOP_MILESTONE || lastChatMeal == CHOCOLATE_FACTORY_MILESTONE) "§6§lMilestone Rabbit"
-        else "$mealName Egg"
+        val mealNameFormat = when(lastChatMeal) {
+            BOUGHT -> "§aBought Rabbit"
+            SIDE_DISH -> "§6§lSide Dish §r§6Egg"
+            CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
+            else -> "${lastChatMeal?.coloredName ?: ""} Egg"
+        }
 
         val rarityConfig = HoppityEggsManager.config.rarityInCompact
         return if (duplicate) {
@@ -81,10 +83,10 @@ object HoppityEggsCompactChat {
 
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormatted! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
-            "$mealNameFormatted! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
+            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
         } else "?"
     }
 
@@ -112,7 +114,7 @@ object HoppityEggsCompactChat {
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
-                rabbitBought = true
+                lastChatMeal = BOUGHT
                 compactChat(event)
             }
         }
