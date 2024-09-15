@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
+import net.minecraft.util.AxisAlignedBB
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
@@ -95,9 +96,21 @@ object CarnivalZombieShootout {
 
         for ((zombie, type) in drawZombies) {
             val entity = EntityUtils.getEntityByID(zombie.entityId) ?: continue
+            val isSmall = (entity as? EntityZombie)?.isChild ?: false
+
+            val boundingBox = entity.entityBoundingBox.let {
+                if (isSmall) {
+                    val widthScale = 0.5
+                    val heightScale = 0.85
+                    val newMin = it.minX + (it.maxX - it.minX) * (1 - widthScale) / 2
+                    val newMax = it.maxX - (it.maxX - it.minX) * (1 - widthScale) / 2
+                    val newHeight = it.minY + (it.maxY - it.minY) * heightScale / 1.75
+                    AxisAlignedBB(newMin, it.minY, it.minZ, newMax, newHeight, it.maxZ)
+                } else it
+            }.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0)
 
             event.drawHitbox(
-                entity.entityBoundingBox.expand(0.1, 0.05, 0.0).offset(0.0, 0.05, 0.0),
+                boundingBox,
                 lineWidth = 3,
                 type.color,
                 depth = false,
