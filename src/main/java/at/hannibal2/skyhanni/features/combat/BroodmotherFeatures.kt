@@ -75,20 +75,18 @@ object BroodmotherFeatures {
             return
         }
 
-        if (lastStage != null) {
-            val timeUntilSpawn = currentStage?.minutes?.minutes
-            broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn!!
+        val lastStage = lastStage ?: return
+        val timeUntilSpawn = currentStage?.minutes?.minutes ?: return
+        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn
 
-            if (config.stages.contains(currentStage)) {
-                if (currentStage == StageEntry.SLAIN) {
-                    onBroodmotherSlain()
-                } else {
-                    val pluralize = StringUtils.pluralize(timeUntilSpawn.toInt(DurationUnit.MINUTES), "minute")
-                    ChatUtils.chat(
-                        "Broodmother: $lastStage §e-> $currentStage§e. §b${timeUntilSpawn.inWholeMinutes} $pluralize §euntil it spawns!"
-                    )
-                }
-            }
+        if (currentStage !in config.stages) return
+        if (currentStage == StageEntry.SLAIN) {
+            onBroodmotherSlain()
+        } else {
+            val pluralize = StringUtils.pluralize(timeUntilSpawn.toInt(DurationUnit.MINUTES), "minute")
+            ChatUtils.chat(
+                "Broodmother: $lastStage §e-> $currentStage§e. §b${timeUntilSpawn.inWholeMinutes} $pluralize §euntil it spawns!"
+            )
         }
     }
 
