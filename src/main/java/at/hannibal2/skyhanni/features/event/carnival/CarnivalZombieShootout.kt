@@ -69,7 +69,7 @@ object CarnivalZombieShootout {
         LEATHER(30, "Leather Cap", Color(165, 42, 42), 8.seconds), //Brown
         IRON(50, "Iron Helmet", Color(192, 192, 192), 7.seconds), //Silver
         GOLD(80, "Golden Helmet", Color(255, 215, 0), 6.seconds), //Gold
-        DIAMOND(120, "Diamond Helmet", Color(185, 242, 255), 5.seconds) //Diamond
+        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250), 5.seconds) //Diamond
     }
 
     @SubscribeEvent
@@ -204,7 +204,7 @@ object CarnivalZombieShootout {
         }
 
         if (config.zombieTimer) {
-            nearbyZombies.forEach { zombie ->
+            for (zombie in nearbyZombies) {
                 zombieTimes.putIfAbsent(zombie, SimpleTimeMark.now())
             }
         }
