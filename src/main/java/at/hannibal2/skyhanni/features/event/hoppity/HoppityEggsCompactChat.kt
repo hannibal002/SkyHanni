@@ -50,8 +50,10 @@ object HoppityEggsCompactChat {
 
     private fun sendCompact() {
         if (lastChatMeal.let { HoppityEggType.resettingEntries.contains(it) } && eventConfig.sharedWaypoints) {
-            DelayedRun.runDelayed(5.milliseconds) { clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick()) }
-            resetCompactData()
+            DelayedRun.runDelayed(5.milliseconds) {
+                clickableCompact(HoppityEggsManager.getAndDisposeWaypointOnclick())
+                resetCompactData()
+            }
         } else {
             ChatUtils.hoverableChat(createCompactMessage(), hover = hoppityEggChat, prefix = false)
             resetCompactData()
