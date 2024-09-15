@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.features.inventory.chocolatefactory;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats.HighlightRabbitTypes;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStats.ChocolateFactoryStat;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
@@ -174,18 +175,22 @@ public class ChocolateFactoryConfig {
     public boolean hoppityMenuShortcut = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Requirement Rabbits", desc = "Highlight rabbits that have requirements.\n" +
-        "§cRed: Requirement not met.\n" +
-        "§aGreen: Requirement met.")
+    @ConfigOption(name = "Highlight Found Rabbits", desc = "Highlight rabbits that have already been found.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean highlightRabbitsWithRequirement = false;
+    public boolean highlightFoundRabbits = false;
 
     @Expose
-    @ConfigOption(name = "Only Requirement Not Met", desc = "Only highlight the rabbits you don't have the requirement for.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean onlyHighlightRequirementNotMet = true;
+    @ConfigOption(name = "Highlight Rabbits", desc = "Highlight specific rabbit types in Hoppity's Collection.")
+    @ConfigEditorDraggableList
+    public List<HighlightRabbitTypes> highlightRabbits = new ArrayList<>(Arrays.asList(
+        HighlightRabbitTypes.ABI,
+        HighlightRabbitTypes.FACTORY,
+        HighlightRabbitTypes.MET,
+        HighlightRabbitTypes.NOT_MET,
+        HighlightRabbitTypes.SHOP,
+        HighlightRabbitTypes.STRAYS
+    ));
 
     @Expose
     @ConfigOption(
