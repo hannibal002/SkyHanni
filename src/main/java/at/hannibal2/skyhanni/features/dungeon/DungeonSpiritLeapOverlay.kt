@@ -98,7 +98,7 @@ object DungeonSpiritLeapOverlay {
             listOf(
                 Renderable.wrappedString(username, width = (containerWidth * 0.2).toInt(), scale = scaleFactor + 1.5),
                 Renderable.placeholder(0, (containerHeight * 0.03).toInt()),
-                Renderable.wrappedString(classInfo, width = (containerWidth * 0.2).toInt(), scale = (scaleFactor * 0.9) + 1.2)
+                Renderable.wrappedString(classInfo, width = (containerWidth * 0.2).toInt(), scale = (scaleFactor * 0.9) + 1.1)
             ),
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER
