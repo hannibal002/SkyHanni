@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
+import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
@@ -178,6 +179,22 @@ public class ProfileSpecificStorage {
 
         @Expose
         public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
+    }
+
+    @Expose
+    public CarnivalStorage carnival = new CarnivalStorage();
+
+    public static class CarnivalStorage {
+
+        @Expose
+        @Nullable
+        public java.time.LocalDate lastClaimedDay = null;
+
+        @Expose
+        public int carnivalYear = 0;
+
+        @Expose
+        public Map<CarnivalGoal, Boolean> goals = new HashMap<>();
     }
 
     @Expose
