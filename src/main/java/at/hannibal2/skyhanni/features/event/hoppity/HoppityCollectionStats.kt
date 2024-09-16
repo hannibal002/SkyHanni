@@ -24,15 +24,17 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
-import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.regex.Pattern
 
 @SkyHanniModule
 object HoppityCollectionStats {
@@ -98,6 +100,30 @@ object HoppityCollectionStats {
     )
 
     /**
+     * REGEX-TEST: §6Factory Milestones§7.
+     */
+    private val factoryMilestone by RepoPattern.pattern(
+        "rabbit.requirement.factory",
+        "§6Factory Milestones§7.",
+    )
+
+    /**
+     * REGEX-TEST: §6Shop Milestones§7.
+     */
+    private val shopMilestone by RepoPattern.pattern(
+        "rabbit.requirement.shop",
+        "§6Shop Milestones§7.",
+    )
+
+    /**
+     * REGEX-TEST: §7§7Obtained by finding the §aStray Rabbit
+     */
+    private val strayRabbit by RepoPattern.pattern(
+        "rabbit.requirement.stray",
+        "§7§7Obtained by finding the §aStray Rabbit",
+    )
+
+    /**
      * REGEX-TEST: Find 15 unique egg locations in the Deep Caverns.
      */
     private val locationRequirementDescription by patternGroup.pattern(
@@ -108,6 +134,21 @@ object HoppityCollectionStats {
     private var display = emptyList<Renderable>()
     private val loggedRabbits
         get() = ProfileStorageData.profileSpecific?.chocolateFactory?.rabbitCounts ?: mutableMapOf()
+
+    enum class HighlightRabbitTypes(
+        private val displayName: String,
+        val color: LorenzColor,
+    ) {
+        ABI("§2Abi", LorenzColor.DARK_GREEN),
+        FACTORY("§eFactory Milestones", LorenzColor.YELLOW),
+        MET("§aRequirement Met", LorenzColor.GREEN),
+        NOT_MET("§cRequirement Not Met.", LorenzColor.RED),
+        SHOP("§6Shop Milestones", LorenzColor.GOLD),
+        STRAYS("§3Stray Rabbits", LorenzColor.DARK_AQUA),
+        ;
+
+        override fun toString(): String = displayName
+    }
 
     @KSerializable
     data class LocationRabbit(
@@ -133,16 +174,56 @@ object HoppityCollectionStats {
 
     var inInventory = false
 
+    private val highlightConfigMap: Map<Pattern, HighlightRabbitTypes> = mapOf(
+        factoryMilestone to HighlightRabbitTypes.FACTORY,
+        requirementMet to HighlightRabbitTypes.MET,
+        requirementNotMet to HighlightRabbitTypes.NOT_MET,
+        shopMilestone to HighlightRabbitTypes.SHOP,
+        strayRabbit to HighlightRabbitTypes.STRAYS,
+    )
+
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
-        if (!pagePattern.matches(event.inventoryName)) return
+        if (!pagePattern.matches(event.inventoryName)) {
+            // Clear highlight cache in case options are toggled
+            highlightMap.clear()
+            return
+        }
 
         inInventory = true
         if (config.hoppityCollectionStats) {
             display = buildDisplay(event)
         }
+
+        if (config.highlightRabbits.isNotEmpty()) {
+            for ((_, stack) in event.inventoryItems) filterRabbitToHighlight(stack)
+        }
     }
+
+    private fun filterRabbitToHighlight(stack: ItemStack) {
+        val lore = stack.getLore()
+
+        if (lore.isEmpty()) return
+        if (!rabbitNotFoundPattern.anyMatches(lore) && !config.highlightFoundRabbits) return
+
+        if (highlightMap.containsKey(stack.displayName)) return
+
+        if (stack.displayName == "§aAbi" && config.highlightRabbits.contains(HighlightRabbitTypes.ABI)) {
+            highlightMap[stack.displayName] = HighlightRabbitTypes.ABI.color
+            return
+        }
+
+        // cache rabbits until collection is closed
+        for ((pattern, rabbitType) in highlightConfigMap) {
+            if (pattern.anyMatches(lore) && config.highlightRabbits.contains(rabbitType)) {
+                highlightMap[stack.displayName] = rabbitType.color
+                break
+            }
+        }
+    }
+
+    private var highlightMap = mutableMapOf<String, LorenzColor>()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -162,22 +243,17 @@ object HoppityCollectionStats {
         )
     }
 
-    // TODO cache with inventory update event
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
-        if (!config.highlightRabbitsWithRequirement) return
         if (!inInventory) return
+        if (config.highlightRabbits.isEmpty()) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            val lore = slot.stack.getLore()
-            if (lore.any { requirementMet.find(it) } && !config.onlyHighlightRequirementNotMet)
-                slot highlight LorenzColor.GREEN
-            if (lore.any { requirementNotMet.find(it) }) {
-                val found = !rabbitNotFoundPattern.anyMatches(lore)
-                // Hypixel allows purchasing Rabbits from Hoppity NPC even when the requirement is not yet met.
-                if (!found) {
-                    slot highlight LorenzColor.RED
-                }
+            val name = slot.stack.displayName
+
+            if (name.isEmpty()) continue
+            highlightMap[name]?.let {
+                slot highlight it
             }
         }
     }
@@ -186,9 +262,10 @@ object HoppityCollectionStats {
         if (!config.showLocationRequirementsRabbitsInHoppityStats) return
         val missingLocationRabbits = locationRabbitRequirements.values.filter { !it.hasMetRequirements() }
 
-        val tips = locationRabbitRequirements.map {
-            it.key + " §7(§e" + it.value.locationName + "§7): " + (if (it.value.hasMetRequirements()) "§a" else "§c") +
-                it.value.foundCount + "§7/§a" + it.value.requiredCount
+        val tips = locationRabbitRequirements.map { (name, rabbit) ->
+            "$name §7(§e${rabbit.locationName}§7): ${
+                if (rabbit.hasMetRequirements()) "§a" else "§c"
+            }${rabbit.foundCount}§7/§a${rabbit.requiredCount}"
         }
 
         newList.add(
@@ -311,7 +388,7 @@ object HoppityCollectionStats {
     // used to make sure that mod data is synchronized with Hypixel
     private fun getFoundRabbitsFromHypixel(event: InventoryFullyOpenedEvent): Int {
         return event.inventoryItems.firstNotNullOf {
-            it.value.getLore().matchFirst(rabbitsFoundPattern) {
+            rabbitsFoundPattern.firstMatcher(it.value.getLore()) {
                 group("current").formatInt()
             }
         }
@@ -354,7 +431,7 @@ object HoppityCollectionStats {
 
             if (!found) continue
 
-            val duplicates = itemLore.matchFirst(duplicatesFoundPattern) {
+            val duplicates = duplicatesFoundPattern.firstMatcher(itemLore) {
                 group("duplicates").formatInt()
             } ?: 0
 
@@ -365,8 +442,7 @@ object HoppityCollectionStats {
     fun getDivineRabbitCount(): Int {
         return loggedRabbits.filter { HoppityCollectionData.getRarity(it.key) == RabbitCollectionRarity.DIVINE && it.value > 0}.size
     }
-
-
+    
     // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
     fun clearSavedRabbits() {
         loggedRabbits.clear()
