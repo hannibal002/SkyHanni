@@ -3,10 +3,13 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickedBlockType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -14,17 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DungeonSecretChime {
     private val config get() = SkyHanniMod.feature.dungeon.secretChime
-    private val secretItems = listOf(
-        "DUNGEON_TRAP",
-        "TRAINING_WEIGHTS",
-        "SPIRIT_LEAP",
-        "INFLATABLE_JERRY",
-        "DUNGEON_CHEST_KEY",
-        "TREASURE_TALISMAN",
-        "DEFUSE_KIT",
-        // IDK THE NAME
-        "POTION_HEALING;8",
-    )
+    private var dungeonSecretItems = listOf<NEUInternalName>()
 
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
@@ -50,9 +43,15 @@ object DungeonSecretChime {
 
     @SubscribeEvent
     fun onSecretItemPickup(event: ItemAddEvent) {
-        if (isEnabled() && event.internalName.asString() in secretItems) {
+        if (isEnabled() && event.internalName in dungeonSecretItems) {
             playSound()
         }
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<ItemsJson>("Items")
+        dungeonSecretItems = data.dungeonSecretItems
     }
 
     fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
