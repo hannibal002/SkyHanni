@@ -103,10 +103,12 @@ object HoppityAPI {
                 allTimeLorePattern.firstMatcher(it) {
                     EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
                     lastChatMeal = CHOCOLATE_FACTORY_MILESTONE
+                    attemptFire()
                 }
                 shopLorePattern.firstMatcher(it) {
                     EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
                     lastChatMeal = CHOCOLATE_SHOP_MILESTONE
+                    attemptFire()
                 }
             }
         }
@@ -142,12 +144,12 @@ object HoppityAPI {
         }
     }
 
-    fun attemptFire(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
+    fun attemptFire(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
             this.lastDuplicateAmount = it
             this.duplicate = true
         }
-        hoppityEggChat.add(event.message)
+        event?.message?.let { hoppityEggChat.add(it) }
         val lastChatMeal = lastChatMeal ?: return
         if (hoppityEggChat.size == 3) {
             RabbitFoundEvent(lastChatMeal, duplicate, lastName, lastDuplicateAmount ?: 0).post()
