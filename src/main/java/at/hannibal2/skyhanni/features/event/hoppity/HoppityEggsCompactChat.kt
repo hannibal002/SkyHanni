@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
-import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
@@ -38,14 +37,16 @@ object HoppityEggsCompactChat {
     private val config get() = ChocolateFactoryAPI.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
 
-    fun compactChat(event: LorenzChatEvent, lastDuplicateAmount: Long? = null) {
+    fun compactChat(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
+        if (!HoppityEggsManager.config.compactChat) return
         lastDuplicateAmount?.let {
             this.lastDuplicateAmount = it
             this.duplicate = true
         }
-        if (!HoppityEggsManager.config.compactChat) return
-        event.blockedReason = "compact_hoppity"
-        hoppityEggChat.add(event.message)
+        event?.let {
+            it.blockedReason = "compact_hoppity"
+            hoppityEggChat.add(it.message)
+        }
         if (hoppityEggChat.size == 3) sendCompact()
     }
 
@@ -73,7 +74,7 @@ object HoppityEggsCompactChat {
     }
 
     private fun createCompactMessage(): String {
-        val mealNameFormat = when(lastChatMeal) {
+        val mealNameFormat = when (lastChatMeal) {
             BOUGHT -> "§aBought Rabbit"
             SIDE_DISH -> "§6§lSide Dish §r§6Egg"
             CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
@@ -111,24 +112,22 @@ object HoppityEggsCompactChat {
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
-        lastChatMeal = lastChatMeal ?: event.type
-    }
-
-    @HandleEvent
-    fun onRabbitFound(event: RabbitFoundEvent) {
-        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.eggType)) return
-        lastChatMeal = event.eggType
+        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.type)) return
+        lastChatMeal = event.type
         hoppityEggChat.add(
-            when(event.eggType) {
+            when (event.type) {
                 SIDE_DISH ->
                     "§d§lHOPPITY'S HUNT §r§dYou found a §r§6§lSide Dish §r§6Egg §r§din the Chocolate Factory§r§d!"
+
                 CHOCOLATE_FACTORY_MILESTONE ->
                     "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lChocolate Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+
                 CHOCOLATE_SHOP_MILESTONE ->
                     "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+
                 else ->
                     "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type?"
-            }
+            },
         )
         if (hoppityEggChat.size == 3) sendCompact()
     }
