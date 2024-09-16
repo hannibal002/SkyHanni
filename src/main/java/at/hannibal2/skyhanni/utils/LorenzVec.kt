@@ -74,13 +74,13 @@ data class LorenzVec(
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * v"))
     fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
 
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
