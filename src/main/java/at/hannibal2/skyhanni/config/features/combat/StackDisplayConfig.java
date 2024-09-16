@@ -15,6 +15,12 @@ public class StackDisplayConfig {
     public boolean enabled = false;
 
     @Expose
+    @ConfigOption(name = "Armor Stacks Decay Timer", desc = "Shows a decay timer for armor after gaining stacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean stacksDecayTimer = true;
+
+    @Expose
     @ConfigLink(owner = StackDisplayConfig.class, field = "enabled")
     public Position position = new Position(480, -210, 1.9f);
 }
