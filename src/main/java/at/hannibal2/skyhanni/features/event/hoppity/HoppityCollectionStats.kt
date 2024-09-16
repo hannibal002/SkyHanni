@@ -189,7 +189,6 @@ object HoppityCollectionStats {
         strayRabbit to HighlightRabbitTypes.STRAYS,
     )
 
-    private var unfixedMissingRabbitsSlots = mutableListOf<Int>()
     private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean {
         return stack.getMinecraftId().toString() == "minecraft:dye" && (
             stack.metadata == 8 || stack.getLore().any { it.lowercase().contains("milestone") }
@@ -198,8 +197,8 @@ object HoppityCollectionStats {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!pagePattern.matches(event.inventory.name) || unfixedMissingRabbitsSlots.isEmpty()) return
-        if (!unfixedMissingRabbitsSlots.contains(event.slot)) return
+        if (!pagePattern.matches(event.inventory.name)) return
+        if (!missingRabbitStackNeedsFix(event.originalItem)) return
 
         val itemStack = event.originalItem
         val rarity = HoppityAPI.rarityByRabbit(itemStack.displayName)
@@ -219,7 +218,6 @@ object HoppityCollectionStats {
         newItemStack.setLore(buildDescriptiveMilestoneLore(itemStack))
         newItemStack.setStackDisplayName(itemStack.displayName)
         event.replace(newItemStack)
-        unfixedMissingRabbitsSlots.remove(event.slot)
     }
 
     private fun buildDescriptiveMilestoneLore(itemStack: ItemStack): List<String> {
@@ -255,16 +253,6 @@ object HoppityCollectionStats {
     }
 
     @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
-        if (!pagePattern.matches(event.inventoryName)) return
-        if (event.inventoryItems.isEmpty()) return
-
-        unfixedMissingRabbitsSlots = event.inventoryItems.filter {
-            missingRabbitStackNeedsFix(it.value)
-        }.keys.toMutableList()
-    }
-
-    @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
         if (!pagePattern.matches(event.inventoryName)) {
@@ -272,10 +260,6 @@ object HoppityCollectionStats {
             highlightMap.clear()
             return
         }
-
-        unfixedMissingRabbitsSlots = event.inventoryItems.filter {
-            missingRabbitStackNeedsFix(it.value)
-        }.keys.toMutableList()
 
         inInventory = true
         if (config.hoppityCollectionStats) {
