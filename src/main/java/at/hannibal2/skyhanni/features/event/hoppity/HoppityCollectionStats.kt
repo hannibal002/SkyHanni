@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -188,14 +189,19 @@ object HoppityCollectionStats {
         strayRabbit to HighlightRabbitTypes.STRAYS,
     )
 
+    private var unfixedMissingRabbitsSlots = mutableListOf<Int>()
+    private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean {
+        return stack.getMinecraftId().toString() == "minecraft:dye" && (
+            stack.metadata == 8 || stack.getLore().any { it.lowercase().contains("milestone") }
+        )
+    }
+
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!pagePattern.matches(event.inventory.name)) return
+        if (!pagePattern.matches(event.inventory.name) || unfixedMissingRabbitsSlots.isEmpty()) return
+        if (!unfixedMissingRabbitsSlots.contains(event.slot)) return
+
         val itemStack = event.originalItem
-
-        // The "base" missing rabbits are Gray Dye (minecraft:dye with metadata 8)
-        if (itemStack.getMinecraftId().toString() != "minecraft:dye") return
-
         val rarity = HoppityAPI.rarityByRabbit(itemStack.displayName)
         // Add NBT for the dye color itself
         val newItemStack = if (config.rarityDyeRecolor) ItemStack(Items.dye, 1, when (rarity) {
@@ -213,6 +219,7 @@ object HoppityCollectionStats {
         newItemStack.setLore(buildDescriptiveMilestoneLore(itemStack))
         newItemStack.setStackDisplayName(itemStack.displayName)
         event.replace(newItemStack)
+        unfixedMissingRabbitsSlots.remove(event.slot)
     }
 
     private fun buildDescriptiveMilestoneLore(itemStack: ItemStack): List<String> {
@@ -248,6 +255,16 @@ object HoppityCollectionStats {
     }
 
     @SubscribeEvent
+    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+        if (!pagePattern.matches(event.inventoryName)) return
+        if (event.inventoryItems.isEmpty()) return
+
+        unfixedMissingRabbitsSlots = event.inventoryItems.filter {
+            missingRabbitStackNeedsFix(it.value)
+        }.keys.toMutableList()
+    }
+
+    @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!(LorenzUtils.inSkyBlock)) return
         if (!pagePattern.matches(event.inventoryName)) {
@@ -255,6 +272,10 @@ object HoppityCollectionStats {
             highlightMap.clear()
             return
         }
+
+        unfixedMissingRabbitsSlots = event.inventoryItems.filter {
+            missingRabbitStackNeedsFix(it.value)
+        }.keys.toMutableList()
 
         inInventory = true
         if (config.hoppityCollectionStats) {
