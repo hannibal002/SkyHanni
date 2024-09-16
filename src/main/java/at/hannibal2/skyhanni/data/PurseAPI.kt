@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.million
@@ -19,11 +19,11 @@ object PurseAPI {
     private val patternGroup = RepoPattern.group("data.purse")
     val coinsPattern by patternGroup.pattern(
         "coins",
-        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$"
+        "(§.)*(Piggy|Purse): §6(?<coins>[\\d,.]+)( ?(§.)*\\([+-](?<earned>[\\d,.]+)\\)?|.*)?$",
     )
     val piggyPattern by patternGroup.pattern(
         "piggy",
-        "Piggy: (?<coins>.*)"
+        "Piggy: (?<coins>.*)",
     )
 
     private var inventoryCloseTime = SimpleTimeMark.farPast()
@@ -36,8 +36,8 @@ object PurseAPI {
     }
 
     @SubscribeEvent
-    fun onScoreboardChange(event: ScoreboardChangeEvent) {
-        event.newList.matchFirst(coinsPattern) {
+    fun onScoreboardChange(event: ScoreboardUpdateEvent) {
+        event.scoreboard.matchFirst(coinsPattern) {
             val newPurse = group("coins").formatDouble()
             val diff = newPurse - currentPurse
             if (diff == 0.0) return
@@ -54,6 +54,7 @@ object PurseAPI {
                 return PurseChangeCause.GAIN_TALISMAN_OF_COINS
             }
 
+            // TODO relic of coins support
             if (diff == 15.million || diff == 100.million) {
                 return PurseChangeCause.GAIN_DICE_ROLL
             }

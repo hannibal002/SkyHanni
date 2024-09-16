@@ -120,13 +120,7 @@ object GardenCropMilestoneDisplay {
                 val addedCounter = (counter - old).toInt()
                 FarmingWeightDisplay.addCrop(crop, addedCounter)
                 update()
-                // Farming Simulator: There is a 25% chance for Mathematical Hoes and the Cultivating Enchantment to count twice.
-                // 0.8 = 1 / 1.25
-                crop.setCounter(
-                    crop.getCounter() + if (GardenCropSpeed.finneganPerkActive()) {
-                        (addedCounter.toDouble() * 0.8).toInt()
-                    } else addedCounter
-                )
+                crop.setCounter(crop.getCounter() + addedCounter)
             }
             cultivatingData[crop] = counter
         } catch (e: Throwable) {
@@ -237,16 +231,7 @@ object GardenCropMilestoneDisplay {
         }
 
         if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext &&
-                nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
-            ) {
-                GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
-                lastWarnedLevel = currentTier
-            }
-        }
-
-        if (overflowConfig.chat) {
-            if (currentTier >= 46 && currentTier == previousNext &&
+            if (currentTier > 46 && currentTier == previousNext &&
                 nextRealTier == currentTier + 1 && lastWarnedLevel != currentTier
             ) {
                 GardenCropMilestones.onOverflowLevelUp(crop, currentTier - 1, nextRealTier - 1)
@@ -319,7 +304,7 @@ object GardenCropMilestoneDisplay {
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
         lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(buildList {
             addCropIconRenderable(mushroom)
-            addString("§7Mushroom Tier $nextTier")
+            addString("§7Mushroom Milestone $nextTier")
         })
 
         lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.string("§e$haveFormat§8/§e$needFormat")
@@ -338,7 +323,7 @@ object GardenCropMilestoneDisplay {
         val percentageFormat = LorenzUtils.formatPercentage(have.toDouble() / need.toDouble())
         lineMap[MushroomTextEntry.PERCENTAGE] = Renderable.string("§7Percentage: §e$percentageFormat")
 
-        if (currentTier >= 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
+        if (currentTier > 46 && currentTier == previousMushNext && nextTier == currentTier + 1 && lastMushWarnedLevel != currentTier) {
             GardenCropMilestones.onOverflowLevelUp(mushroom, currentTier - 1, nextTier - 1)
             lastMushWarnedLevel = currentTier
         }

@@ -888,7 +888,7 @@ object DamageIndicatorManager {
         } else {
             if (entityData != null && isEnabled() && config.hideVanillaNametag && entityData.isConfigEnabled()) {
                 val name = entity.name
-                if (name.contains("Plaesmaflux")) return
+                if (name.contains("Plasmaflux")) return
                 if (name.contains("Overflux")) return
                 if (name.contains("Mana Flux")) return
                 if (name.contains("Radiant")) return

@@ -75,9 +75,8 @@ object APIUtil {
                             if (showApiErrors && apiName == "Hypixel API") {
                                 ChatUtils.clickableChat(
                                     "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
-                                    onClick = {
-                                        toggleApiErrorMessages()
-                                    }
+                                    onClick = { toggleApiErrorMessages() },
+                                    "§eClick to run /shtogglehypixelapierrors!"
                                 )
                             }
                             ErrorManager.skyHanniError(
@@ -186,6 +185,7 @@ object APIUtil {
         return BufferedReader(InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8))
     }
 
+    // TODO remove command, use clickable chat message instead
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
         ChatUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
