@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.NumberFormat
 import java.util.TreeMap
 import kotlin.math.pow
-import kotlin.math.roundToInt
 
 object NumberUtil {
 
@@ -79,13 +78,12 @@ object NumberUtil {
      * @author jpdymond
      */
     fun Double.roundTo(precision: Int): Double {
-        val scale = 10.0.pow(precision).toInt()
-        return (this * scale).roundToInt().toDouble() / scale
+        val scale = 10.0.pow(precision)
+        return kotlin.math.round(scale) / scale
     }
 
     fun Float.roundTo(precision: Int): Float {
-        val scale = 10.0.pow(precision).toInt()
-        return (this * scale).roundToInt().toFloat() / scale
+        return toDouble().roundTo(precision).toFloat()
     }
 
     @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
@@ -109,7 +107,7 @@ object NumberUtil {
         return this.toString() + this.ordinal()
     }
 
-    fun Number.addSeparators() = NumberFormat.getNumberInstance().format(this)
+    fun Number.addSeparators(): String = NumberFormat.getNumberInstance().format(this)
 
     fun String.romanToDecimalIfNecessary() = toIntOrNull() ?: romanToDecimal()
 
