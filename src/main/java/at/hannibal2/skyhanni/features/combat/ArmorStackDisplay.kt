@@ -26,7 +26,7 @@ object ArmorStackDisplay {
         stackSymbol = stackPattern.findMatcher(actionBarText) { group("symbol") } ?: ""
         stackCount = (stackPattern.findMatcher(actionBarText) { group("stack") } ?: "0").toInt()
 
-        val updatedActionBarText = actionBarText.replace(Regex("\\s*$stackPattern"), "").trim()
+        val updatedActionBarText = actionBarText.replace(Regex("\\$stackPattern?"), "").trim()
         event.changeActionBar(updatedActionBarText)
     }
 
