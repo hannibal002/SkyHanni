@@ -48,12 +48,7 @@ object MiningAPI {
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7.",
     )
 
-    private data class MinedBlock(
-        val ore: OreBlock,
-        var confirmed: Boolean,
-        val time: SimpleTimeMark = SimpleTimeMark.now(),
-        val isFirst: Boolean = false,
-    )
+    private data class MinedBlock(val ore: OreBlock, var confirmed: Boolean, val time: SimpleTimeMark = SimpleTimeMark.now())
 
     private var lastInitSound = SimpleTimeMark.farPast()
 
