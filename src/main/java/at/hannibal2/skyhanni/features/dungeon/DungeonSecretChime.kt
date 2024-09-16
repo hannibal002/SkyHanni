@@ -23,7 +23,7 @@ object DungeonSecretChime {
         "TREASURE_TALISMAN",
         "DEFUSE_KIT",
         // IDK THE NAME
-        "Splash Potion",
+        "POTION_HEALING;8",
     )
 
     @HandleEvent
