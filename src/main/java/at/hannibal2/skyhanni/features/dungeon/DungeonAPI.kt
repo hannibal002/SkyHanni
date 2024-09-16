@@ -420,11 +420,12 @@ object DungeonAPI {
                 val oldPlayerData = getPlayerInfo(username)
                 val dungeonClass = if (playerDead) oldPlayerData.dungeonClass
                 else DungeonClass.getByClassName(dungeonClassName) ?: oldPlayerData.dungeonClass
+                val dungeonClassLevel = if (playerDead) oldPlayerData.classLevel else classLevel.romanToDecimalIfNecessary()
 
                 TeamMember(
                     username = username,
                     dungeonClass = dungeonClass,
-                    classLevel = classLevel.romanToDecimalIfNecessary(),
+                    classLevel = dungeonClassLevel,
                     playerDead = playerDead
                 )
             }.toList()
