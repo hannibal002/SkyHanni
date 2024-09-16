@@ -147,7 +147,6 @@ object MiningAPI {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName !in allowedSoundNames) return
-        println("Sound: ${event.soundName} ${event.pitch} ${event.location.roundLocationToBlock().toCleanString()}")
         if (waitingForInitSound) {
             if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
