@@ -165,19 +165,21 @@ object MiningAPI {
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
-        val oldBlock = event.oldState.block
-        val newBlock = event.newState.block
+        val oldState = event.oldState
+        val newState = event.newState
+        val oldBlock = oldState.block
+        val newBlock = newState.block
 
-        if (event.oldState == event.newState) return
+        if (oldState == newState) return
         if (oldBlock == Blocks.air || oldBlock == Blocks.bedrock) return
-        if (newBlock != Blocks.air && newBlock != Blocks.bedrock && !isTitanium(event.newState)) return
+        if (newBlock != Blocks.air && newBlock != Blocks.bedrock && !isTitanium(newState)) return
 
         val pos = event.location
         if (pos.distanceToPlayer() > 7) return
 
         if (lastInitSound.passedSince() > 100.milliseconds) return
 
-        val ore = OreBlock.getByStateOrNull(event.oldState) ?: return
+        val ore = OreBlock.getByStateOrNull(oldState) ?: return
 
         if (initBlockPos == pos) {
             surroundingMinedBlocks += MinedBlock(ore, true) to pos
