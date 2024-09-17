@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
@@ -82,8 +83,8 @@ object CorpseTracker {
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
         var profit = tracker.drawItems(bucketData, { true }, this)
-        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) }
-            ?: enumValues<CorpseType>().toList().filter { bucketData.corpsesLooted[it] != null }
+        val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let { listOf(it) } ?: enumValues<CorpseType>().toList()
+            .filter { bucketData.corpsesLooted[it] != null }
         var totalKeyCost = 0.0
         var totalKeyCount = 0
         val keyCostStrings = buildList {
@@ -138,5 +139,5 @@ object CorpseTracker {
     }
 
     fun isEnabled() =
-        config.enabled && IslandType.DWARVEN_MINES.isInIsland() && (!config.onlyInMineshaft || IslandType.MINESHAFT.isInIsland())
+        LorenzUtils.inSkyBlock && config.enabled && (IslandType.MINESHAFT.isInIsland() || (!config.onlyInMineshaft && MiningAPI.inGlacialTunnels()))
 }
