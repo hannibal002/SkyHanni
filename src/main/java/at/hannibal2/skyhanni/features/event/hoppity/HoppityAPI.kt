@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -21,7 +23,9 @@ import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -86,6 +90,26 @@ object HoppityAPI {
         "milestone.shop",
         "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
     )
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    fun onTick(event: SecondPassedEvent) {
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        InventoryUtils.getItemsInOpenChest().filter {
+            it.stack.hasDisplayName() &&
+            it.stack.getMinecraftId().toString() == "minecraft:skull" &&
+            it.stack.getLore().isNotEmpty()
+        }.forEach {
+            ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
+                ChocolateFactoryStrayTracker.handleStrayClicked(it)
+                val rabbit = groupOrNull("name") ?: return@matchMatcher
+                when(rabbit.removeColor()) {
+                    "Fish the Rabbit" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber).post()
+                    "El Dorado" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber).post()
+                    else -> return@matchMatcher
+                }
+            }
+        }
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {

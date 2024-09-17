@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -124,6 +125,13 @@ object HoppityEggsCompactChat {
 
                 CHOCOLATE_SHOP_MILESTONE ->
                     "§d§lHOPPITY'S HUNT §r§dYou claimed a §r§6§lShop Milestone Rabbit §r§din the Chocolate Factory§r§d!"
+
+                STRAY -> {
+                    "§d§lHOPPITY'S HUNT §r§dYou found a §r§aStray Rabbit§r§d!".also {
+                        // If it was an El Dorado dupe stray, we don't want hanging data
+                        DelayedRun.runDelayed(300.milliseconds) { resetCompactData() }
+                    }
+                }
 
                 else ->
                     "§d§lHOPPITY'S HUNT §r§7Unknown Egg Type?"
