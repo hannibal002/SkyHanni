@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent.SlotClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableEnums.Experiment
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -91,12 +90,11 @@ object ExperimentsDisplay {
         currentExperiment = ExperimentationTableAPI.getCurrentExperiment() ?: return listOf()
         if (check.isEmpty()) return drawDisplay()
 
-        check.forEachIndexed { _, (slot, uncovered) ->
+        for ((slot, uncovered) in check) {
             val itemNow = InventoryUtils.getItemAtSlotIndex(slot) ?: return drawDisplay()
             val itemName = itemNow.displayName.removeColor()
 
-            if (isWaiting(itemName) || isOutOfBounds(slot, currentExperiment))
-                return drawDisplay()
+            if (isWaiting(itemName) || isOutOfBounds(slot, currentExperiment)) return drawDisplay()
 
             val reward = convertToReward(itemNow)
             if (uncoveredItems.none { it.first == slot }) uncoveredItems.add(Pair(slot, reward))
@@ -134,8 +132,8 @@ object ExperimentsDisplay {
 
     private fun handleReward(slot: Int, uncovered: Int, reward: String) {
         val lastSlotClicked =
-            if (instantFind == 0 && lastClicked.none { it.first == -1 && it.second == uncovered - 1 } && lastClicked.size != 1)
-                lastClicked.find { it.second == uncovered - 1 } ?: return else lastClicked.find { it.second == uncovered } ?: return
+            if (instantFind == 0 && lastClicked.none { it.first == -1 && it.second == uncovered - 1 } && lastClicked.size != 1) lastClicked.find { it.second == uncovered - 1 }
+                ?: return else lastClicked.find { it.second == uncovered } ?: return
 
         val lastItem = InventoryUtils.getItemAtSlotIndex(lastSlotClicked.first) ?: return
         val lastItemName = convertToReward(lastItem)
@@ -171,12 +169,10 @@ object ExperimentsDisplay {
 
         found[pair] = "Pair"
         found.entries.removeIf {
-            it.value == "Match"
-                && right(it.key).first.name == reward
+            it.value == "Match" && right(it.key).first.name == reward
         }
         found.entries.removeIf {
-            it.value == "Normal"
-                && (left(it.key).index == slot || left(it.key).index == lastSlotClicked)
+            it.value == "Normal" && (left(it.key).index == slot || left(it.key).index == lastSlotClicked)
         }
     }
 
@@ -186,8 +182,7 @@ object ExperimentsDisplay {
 
         found[pair] = "Match"
         found.entries.removeIf {
-            it.value == "Normal"
-                && (left(it.key).index == slot || left(it.key).index == match)
+            it.value == "Normal" && (left(it.key).index == slot || left(it.key).index == match)
         }
     }
 
@@ -195,10 +190,8 @@ object ExperimentsDisplay {
         val item = toEither(Item(slot, reward))
 
         if (found.none {
-                listOf("Match", "Pair").contains(it.value)
-                    && (right(it.key).first.index == slot || right(it.key).second.index == slot)
-            } && found.none { it.value == "Normal" && left(it.key).index == slot }
-        ) found[item] = "Normal"
+                listOf("Match", "Pair").contains(it.value) && (right(it.key).first.index == slot || right(it.key).second.index == slot)
+            } && found.none { it.value == "Normal" && left(it.key).index == slot }) found[item] = "Normal"
     }
 
     private fun calculatePossiblePairs() =
@@ -225,8 +218,7 @@ object ExperimentsDisplay {
         }
         if (powerups.isNotEmpty()) add("§bPowerUp")
         for (powerup in powerups) {
-            val prefix =
-                determinePrefix(powerups.indexOf(powerup), powerups.size - 1)
+            val prefix = determinePrefix(powerups.indexOf(powerup), powerups.size - 1)
             add(" $prefix §b${left(powerup.key).name}")
         }
         val toAdd = mutableListOf<String>()
@@ -241,9 +233,8 @@ object ExperimentsDisplay {
         for (string in toAdd) if (string != toAdd.last()) add(" ├ $string") else add(" └ $string")
     }
 
-    private fun convertToReward(item: ItemStack) =
-        if (item.displayName.removeColor() == "Enchanted Book") item.getLore()[2].removeColor()
-        else item.displayName.removeColor()
+    private fun convertToReward(item: ItemStack) = if (item.displayName.removeColor() == "Enchanted Book") item.getLore()[2].removeColor()
+    else item.displayName.removeColor()
 
     private fun determinePrefix(index: Int, lastIndex: Int) = if (index == lastIndex) "└" else "├"
 
@@ -255,42 +246,30 @@ object ExperimentsDisplay {
     ) = firstSlot != secondSlot && firstName == secondName
 
     private fun hasFoundMatch(itemSlot: Int, reward: String) =
-        uncoveredItems.any { (slot, name) -> slot != itemSlot && name == reward } &&
-            found.none {
-                listOf("Pair", "Match").contains(it.value)
-                    && (right(it.key).first.index == itemSlot || right(it.key).second.index == itemSlot)
-            }
+        uncoveredItems.any { (slot, name) -> slot != itemSlot && name == reward } && found.none {
+            listOf("Pair", "Match").contains(it.value) && (right(it.key).first.index == itemSlot || right(it.key).second.index == itemSlot)
+        }
 
-    private fun isPowerUp(reward: String) =
-        ExperimentationTableAPI.powerUpPattern.matches(reward)
+    private fun isPowerUp(reward: String) = ExperimentationTableAPI.powerUpPattern.matches(reward)
 
-    private fun isReward(reward: String) =
-        ExperimentationTableAPI.rewardPattern.matches(reward)
+    private fun isReward(reward: String) = ExperimentationTableAPI.rewardPattern.matches(reward)
 
     private fun isWaiting(itemName: String) =
-        listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!")
-            .contains(itemName)
+        listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!").contains(itemName)
 
     private fun clicksSinceSeparator(list: MutableList<Pair<Int, Int>>): Int {
         val lastIndex = list.indexOfLast { it.first == -1 }
         return if (lastIndex != -1) list.size - 1 - lastIndex else -1
     }
 
-    private fun isOutOfBounds(slot: Int, experiment: Experiment): Boolean {
-        return slot <= experiment.startSlot ||
-            slot >= experiment.endSlot ||
-            (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
-    }
+    private fun isOutOfBounds(slot: Int, experiment: Experiment): Boolean =
+        slot <= experiment.startSlot || slot >= experiment.endSlot || (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
-    private fun left(it: Pair<Item?, ItemPair?>): Item =
-        it.first ?: Item(-1, "")
+    private fun left(it: Pair<Item?, ItemPair?>): Item = it.first ?: Item(-1, "")
 
-    private fun right(it: Pair<Item?, ItemPair?>): ItemPair =
-        it.second ?: ItemPair(Item(-1, ""), Item(-1, ""))
+    private fun right(it: Pair<Item?, ItemPair?>): ItemPair = it.second ?: ItemPair(Item(-1, ""), Item(-1, ""))
 
-    private fun toEither(it: Any): Pair<Item?, ItemPair?> =
-        if (it is Item) it to null else null to it as ItemPair
+    private fun toEither(it: Any): Pair<Item?, ItemPair?> = if (it is Item) it to null else null to it as ItemPair
 
-    private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.display && ExperimentationTableAPI.getCurrentExperiment() != null
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.display && ExperimentationTableAPI.getCurrentExperiment() != null
 }

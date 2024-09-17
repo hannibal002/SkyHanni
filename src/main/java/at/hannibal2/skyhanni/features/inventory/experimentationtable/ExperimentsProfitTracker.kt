@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentsDropPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.inventoriesPattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableEnums.ExperimentMessages
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -242,10 +241,7 @@ object ExperimentsProfitTracker {
             if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
             currentBottlesInInventory.addOrPut(internalName, item.stackSize)
         }
-        for (bottleType in currentBottlesInInventory) {
-            val internalName = bottleType.key
-            val amount = bottleType.value
-
+        for ((internalName, amount) in currentBottlesInInventory) {
             val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
             if (lastInInv >= amount) {
                 currentBottlesInInventory[internalName] = 0
@@ -265,7 +261,7 @@ object ExperimentsProfitTracker {
         }
     }
 
-    fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
+    private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }

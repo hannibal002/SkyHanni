@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableEnums.Experiment
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern

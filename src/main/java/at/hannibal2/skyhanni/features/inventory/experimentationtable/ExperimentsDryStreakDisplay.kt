@@ -37,7 +37,7 @@ object ExperimentsDryStreakDisplay {
         if (!ExperimentationTableAPI.inventoriesPattern.matches(InventoryUtils.openInventoryName())) return
 
         display = drawDisplay()
-        config.dryStreakDisplayPosition.renderStrings(
+        config.position.renderStrings(
             display,
             posLabel = "Dry Streak Display",
         )
