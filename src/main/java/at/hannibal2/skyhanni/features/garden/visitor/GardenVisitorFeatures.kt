@@ -87,7 +87,7 @@ object GardenVisitorFeatures {
      */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
-        ".* §r§ehas arrived on your §r§[b|a]Garden§r§e!",
+        ".* §r§ehas arrived on your §r§[ba]Garden§r§e!",
     )
     private val copperPattern by patternGroup.pattern(
         "copper",
