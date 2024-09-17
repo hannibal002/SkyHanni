@@ -354,11 +354,11 @@ object ScoreboardPattern {
     )
     val dojoChallengePattern by miscSb.pattern(
         "dojochallenge",
-        "(?:§.)*Challenge: (?:§.)*(?<challenge>[\\w ]+)",
+        "(?:§.)*Challenge: (?:§.)*(?<challenge>.+)",
     )
     val dojoDifficultyPattern by miscSb.pattern(
         "dojodifficulty",
-        "(?:§.)*Difficulty: (?:§.)*(?<difficulty>[\\w ]+)",
+        "(?:§.)*Difficulty: (?:§.)*(?<difficulty>.+)",
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
@@ -375,7 +375,7 @@ object ScoreboardPattern {
     )
     val objectivePattern by miscSb.pattern(
         "objective",
-        "?:(§.)*(?:Objective|Quest).*",
+        "(?:§.)*(?:Objective|Quest).*",
     )
     val queuePattern by miscSb.pattern(
         "queued",
