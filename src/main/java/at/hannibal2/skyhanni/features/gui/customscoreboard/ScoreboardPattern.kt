@@ -275,8 +275,13 @@ object ScoreboardPattern {
         "^§7Kill goblins!$",
     )
     val remainingGoblinPattern by miningSb.pattern(
-        "remaininggoblin", "^Remaining: §a\\d+ goblins$",
+        "remaininggoblin", "^Remaining: §a\\d+ goblins?$",
     )
+
+    /**
+     * REGEX-TEST: Remaining: §a1 goblin
+     * REGEX-TEST: Remaining: §a2 goblins
+     */
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$",
     )
@@ -303,9 +308,13 @@ object ScoreboardPattern {
         "magmaboss",
         "^§7Boss: §[c6e]\\d{1,3}%$",
     )
+
+    /**
+     * REGEX-TEST: §7Damage Soaked:§629,446 §e(+271
+     */
     val damageSoakedPattern by combatSb.pattern(
         "damagesoaked",
-        "^§7Damage Soaked:",
+        "^§7Damage Soaked:.*",
     )
     val killMagmasPattern by combatSb.pattern(
         "killmagmas",
