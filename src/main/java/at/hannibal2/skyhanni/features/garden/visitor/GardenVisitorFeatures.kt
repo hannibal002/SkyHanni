@@ -80,9 +80,14 @@ object GardenVisitorFeatures {
     private var display = emptyList<List<Any>>()
 
     private val patternGroup = RepoPattern.group("garden.visitor")
+
+    /**
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
+     * REGEC-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
+     */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
-        ".* §r§ehas arrived on your §r§bGarden§r§e!",
+        ".* §r§ehas arrived on your §r§[b|a]Garden§r§e!",
     )
     private val copperPattern by patternGroup.pattern(
         "copper",

@@ -74,7 +74,7 @@ object GardenPlotAPI {
     )
     private val portableWasherPattern by patternGroup.pattern(
         "spray.cleared.portablewasher",
-        "§9§lSPLASH! §r§6Your §r§bGarden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
+        "§9§lSPLASH! §r§6Your §r§[b|a]Garden §r§6was cleared of all active §r§aSprayonator §r§6effects!"
     )
 
     var plots = listOf<Plot>()
