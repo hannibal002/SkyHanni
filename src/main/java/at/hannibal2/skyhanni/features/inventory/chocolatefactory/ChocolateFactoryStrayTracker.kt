@@ -52,7 +52,7 @@ object ChocolateFactoryStrayTracker {
      */
     val strayCaughtPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.caught",
-        "^§[a-f0-9].* §d§lCAUGHT!",
+        "^(?:§.)*(?<name>.*) §d§lCAUGHT!",
     )
 
     /**
