@@ -212,7 +212,7 @@ object ChocolateFactoryStrayTracker {
         // Fish the Rabbit
         fishTheRabbitPattern.matchMatcher(loreLine) {
             //Also fairly sure that Fish maxes out at Rare, but...
-            val rarity = HoppityAPI.rarityByRabbit(group("rabbit")) ?: return@matchMatcher
+            val rarity = HoppityAPI.rarityByRabbit(group("color")) ?: return@matchMatcher
             incrementRarity(rarity, group("amount").formatLong())
         }
 
