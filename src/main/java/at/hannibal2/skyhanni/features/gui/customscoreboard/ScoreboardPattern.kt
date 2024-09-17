@@ -274,14 +274,14 @@ object ScoreboardPattern {
         "uselessgoblin",
         "^§7Kill goblins!$",
     )
-    val remainingGoblinPattern by miningSb.pattern(
-        "remaininggoblin", "^Remaining: §a\\d+ goblins?$",
-    )
 
     /**
      * REGEX-TEST: Remaining: §a1 goblin
      * REGEX-TEST: Remaining: §a2 goblins
      */
+    val remainingGoblinPattern by miningSb.pattern(
+        "remaininggoblin", "^Remaining: §a\\d+ goblins?$",
+    )
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$",
     )
