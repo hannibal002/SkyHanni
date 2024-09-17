@@ -237,8 +237,8 @@ object HoppityCollectionStats {
             ChocolateFactoryAPI.milestoneByRabbit(itemStack.displayName)?.let {
                 val displayAmount = it.amount.shortFormat()
                 val operationFormat = when(milestoneType) {
-                    HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "reaching"
-                    HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -> "spending"
+                    HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "spending"
+                    HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -> "reaching"
                     else -> "" // Never happens
                 }
 
