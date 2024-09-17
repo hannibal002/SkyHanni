@@ -83,7 +83,7 @@ object GardenVisitorFeatures {
 
     /**
      * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
-     * REGEC-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
      */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
