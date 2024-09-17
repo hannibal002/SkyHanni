@@ -75,7 +75,7 @@ object ReforgeAPI {
         fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) = when (type) {
             ReforgeType.SWORD -> setOf(
                 ItemCategory.SWORD,
-                ItemCategory.GAUNTLET,
+                ItemCategory.PICKAXE_AND_SWORD,
                 ItemCategory.LONGSWORD,
                 ItemCategory.FISHING_WEAPON,
             ).contains(itemCategory)
@@ -98,7 +98,7 @@ object ReforgeAPI {
             ReforgeType.PICKAXE ->
                 itemCategory == ItemCategory.PICKAXE ||
                     itemCategory == ItemCategory.DRILL ||
-                    itemCategory == ItemCategory.GAUNTLET
+                    itemCategory == ItemCategory.PICKAXE_AND_SWORD
 
             ReforgeType.EQUIPMENT -> setOf(
                 ItemCategory.CLOAK,
@@ -111,7 +111,7 @@ object ReforgeAPI {
             ReforgeType.ROD -> itemCategory == ItemCategory.FISHING_ROD || itemCategory == ItemCategory.FISHING_WEAPON
             ReforgeType.SWORD_AND_ROD -> setOf(
                 ItemCategory.SWORD,
-                ItemCategory.GAUNTLET,
+                ItemCategory.PICKAXE_AND_SWORD,
                 ItemCategory.LONGSWORD,
                 ItemCategory.FISHING_ROD,
                 ItemCategory.FISHING_WEAPON,
