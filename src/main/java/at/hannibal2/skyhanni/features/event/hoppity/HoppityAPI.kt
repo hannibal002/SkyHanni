@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FAC
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -28,6 +29,7 @@ import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import tv.twitch.chat.Chat
 
 @SkyHanniModule
 object HoppityAPI {
@@ -101,8 +103,7 @@ object HoppityAPI {
         }.forEach {
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
-                val rabbit = groupOrNull("name") ?: return@matchMatcher
-                when(rabbit.removeColor()) {
+                when(groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber).post()
                     "El Dorado" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber).post()
                     else -> return@matchMatcher
