@@ -103,4 +103,9 @@ public class GraphConfig {
     @ConfigOption(name = "Shows Stats", desc = "Show funny extra statistics on save. May lag the game a bit.")
     @ConfigEditorBoolean
     public boolean showsStats = true;
+
+    @Expose
+    @ConfigOption(name = "Use as Island Area", desc = "When saving, use the current edited graph as temporary island area for the current island.")
+    @ConfigEditorBoolean
+    public boolean useAsIslandArea = false;
 }

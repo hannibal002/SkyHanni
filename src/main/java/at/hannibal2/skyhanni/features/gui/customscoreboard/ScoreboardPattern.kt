@@ -354,23 +354,28 @@ object ScoreboardPattern {
     )
     val dojoChallengePattern by miscSb.pattern(
         "dojochallenge",
-        "(?:§.)*Challenge: (?:§.)*(?<challenge>.+)",
+        "(?:§.)*Challenge: (?:§.)*(?<challenge>[\\w ]+)",
     )
     val dojoDifficultyPattern by miscSb.pattern(
         "dojodifficulty",
-        "(?:§.)*Difficulty: (?:§.)*(?<difficulty>.+)",
+        "(?:§.)*Difficulty: (?:§.)*(?<difficulty>[\\w ]+)",
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
-        "(?:§.)*Points: (?:§.)*[\\w.]+ ?(?:§7\\(§.*§7\\))?",
+        "(?:§.)*Points: (?:§.)*[\\w.]+.*",
     )
+
+    /**
+     * There should be a space at the end of the test, Intellij keeps removing it
+     * REGEX-TEST: Time: §a20s
+     */
     val dojoTimePattern by miscSb.pattern(
         "dojotime",
-        "(?:§.)*Time: (?:§.)*[\\w.]+(?: §7\\(§.*§7\\))?",
+        "(?:§.)*Time: (?:§.)*[\\w.]+.*",
     )
     val objectivePattern by miscSb.pattern(
         "objective",
-        "(?:§.)*(?:Objective|Quest).*",
+        "?:(§.)*(?:Objective|Quest).*",
     )
     val queuePattern by miscSb.pattern(
         "queued",

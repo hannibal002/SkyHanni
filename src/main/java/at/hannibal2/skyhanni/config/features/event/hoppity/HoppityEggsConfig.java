@@ -51,6 +51,12 @@ public class HoppityEggsConfig {
     public boolean showLine = false;
 
     @Expose
+    @ConfigOption(name = "Show Path Finder", desc = "Show a pathfind to the next hoppity egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showPathFinder = false;
+
+    @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +
         "Only works when you don't have an Egglocator in your inventory.")
     @ConfigEditorBoolean
