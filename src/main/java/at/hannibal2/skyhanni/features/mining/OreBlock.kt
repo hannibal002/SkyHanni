@@ -252,7 +252,7 @@ private fun isHighTierMithril(state: IBlockState): Boolean {
     return (state.block == Blocks.wool && state.getValue(BlockColored.COLOR) == EnumDyeColor.LIGHT_BLUE)
 }
 
-private fun isTitanium(state: IBlockState): Boolean {
+fun isTitanium(state: IBlockState): Boolean {
     return (state.block == Blocks.stone && state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.DIORITE_SMOOTH)
 }
 
