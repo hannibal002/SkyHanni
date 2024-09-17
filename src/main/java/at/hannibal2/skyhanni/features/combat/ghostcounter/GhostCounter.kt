@@ -205,7 +205,7 @@ object GhostCounter {
 
         val etaFormatting = textFormatting.etaFormatting
         val remaining: Int = when (config.showMax) {
-            true -> 250_000 - bestiaryCurrentKill
+            true -> 100_000 - bestiaryCurrentKill
             false -> killNeeded - currentKill
         }
 
@@ -459,7 +459,7 @@ object GhostCounter {
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {
                 26 -> {
                     storage?.bestiaryNextLevel = 26.0
-                    storage?.bestiaryCurrentKill = 250_000.0
+                    storage?.bestiaryCurrentKill = 100_000.0
                     storage?.bestiaryKillNeeded = 0.0
                 }
 
