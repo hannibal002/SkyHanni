@@ -5,35 +5,43 @@ import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ArmorStackDisplay {
     private val config get() = SkyHanniMod.feature.combat.stackDisplayConfig
+    private val stackPattern  by lazy { ActionBarStatsData.ARMOR_STACK.pattern }
+    private val stackRemovePattern by lazy { Regex("\\$stackPattern?") }
     private var stackCount = 0
     private var stackSymbol = ""
+    private var display = ""
 
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
-        val actionBarText = event.actionBar
-        val stackPattern = ActionBarStatsData.ARMOR_STACK.pattern
+        val actionBar = event.actionBar
 
-        stackSymbol = stackPattern.findMatcher(actionBarText) { group("symbol") } ?: ""
-        stackCount = (stackPattern.findMatcher(actionBarText) { group("stack") } ?: "0").toInt()
-
-        val updatedActionBarText = actionBarText.replace(Regex("\\$stackPattern?"), "").trim()
-        event.changeActionBar(updatedActionBarText)
+        stackPattern.findMatcher(actionBar) {
+            stackCount = group("stack").toInt()
+            stackSymbol = group("symbol")
+            display = "§6§l$stackCount$stackSymbol"
+        } ?: run {
+            stackCount = 0
+            stackSymbol = ""
+            display = ""
+        }
+        event.changeActionBar(actionBar.replace(stackRemovePattern, "").trim())
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || stackCount == 0) return
-        config.position.renderString("§6§l$stackCount$stackSymbol", posLabel = "Armor Stack Display")
+        if (!isEnabled()) return
+        config.position.renderString(display, posLabel = "Armor Stack Display")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
