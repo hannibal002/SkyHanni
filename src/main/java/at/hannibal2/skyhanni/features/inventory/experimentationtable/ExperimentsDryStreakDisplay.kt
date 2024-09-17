@@ -39,7 +39,7 @@ object ExperimentsDryStreakDisplay {
         display = drawDisplay()
         config.position.renderStrings(
             display,
-            posLabel = "Dry Streak Display",
+            posLabel = "Experimentation Table Dry Streak",
         )
     }
 

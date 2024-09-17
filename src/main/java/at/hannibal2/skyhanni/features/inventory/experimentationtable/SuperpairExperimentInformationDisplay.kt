@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
-object ExperimentsDisplay {
+object SuperpairExperimentInformationDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
 
@@ -60,10 +60,7 @@ object ExperimentsDisplay {
     @SubscribeEvent
     fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.displayPosition.renderStrings(
-            display,
-            posLabel = "Experiment Information Display",
-        )
+        config.superpairDisplayPosition.renderStrings(display, posLabel = "Sperpair Experiment Information")
         display = checkItems(toCheck)
     }
 
@@ -198,7 +195,7 @@ object ExperimentsDisplay {
         ((currentExperiment.gridSize - 2) / 2) - found.filter { listOf("Pair", "Match", "Normal").contains(it.value) }.size
 
     private fun drawDisplay() = buildList {
-        add("§6Experimentation Data")
+        add("§6Superpair Experimentation Data")
         add("")
 
         val pairs = found.entries.filter { it.value == "Pair" }
@@ -271,5 +268,5 @@ object ExperimentsDisplay {
 
     private fun toEither(it: Any): Pair<Item?, ItemPair?> = if (it is Item) it to null else null to it as ItemPair
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.display && ExperimentationTableAPI.getCurrentExperiment() != null
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.superpairDisplay && ExperimentationTableAPI.getCurrentExperiment() != null
 }

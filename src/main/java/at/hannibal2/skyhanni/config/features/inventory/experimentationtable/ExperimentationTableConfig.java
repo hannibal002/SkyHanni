@@ -21,14 +21,14 @@ public class ExperimentationTableConfig {
     public ExperimentsDryStreakConfig dryStreak = new ExperimentsDryStreakConfig();
 
     @Expose
-    @ConfigOption(name = "Display", desc = "Shows a display with useful information while doing experiments.")
+    @ConfigOption(name = "Superpair Data", desc = "Shows a display with useful information while doing the Superpair experiment.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean display = false;
+    public boolean superpairDisplay = false;
 
     @Expose
-    @ConfigLink(owner = ExperimentationTableConfig.class, field = "display")
-    public Position displayPosition = new Position(-220, 70, false, true);
+    @ConfigLink(owner = ExperimentationTableConfig.class, field = "superpairDisplay")
+    public Position superpairDisplayPosition = new Position(-220, 70, false, true);
 
     @Expose
     @ConfigOption(name = "Superpairs Clicks Alert", desc = "Display an alert when you reach the maximum clicks gained from Chronomatron or Ultrasequencer.")
