@@ -79,6 +79,7 @@ object HoppityEggsCompactChat {
             BOUGHT -> "§aBought Rabbit"
             SIDE_DISH -> "§6§lSide Dish §r§6Egg"
             CHOCOLATE_SHOP_MILESTONE, CHOCOLATE_FACTORY_MILESTONE -> "§6§lMilestone Rabbit"
+            STRAY -> "§aStray Rabbit"
             else -> "${lastChatMeal?.coloredName ?: ""} Egg"
         }
 
