@@ -87,7 +87,7 @@ object UltraRareBookAlert {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(57, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
+        event.move(58, "inventory.helper.enchanting.ultraRareBookAlert", "inventory.experimentationTable.ultraRareBookAlert")
     }
 
     private fun isEnabled() =

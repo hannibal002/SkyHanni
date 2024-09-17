@@ -82,7 +82,7 @@ object GuardianReminder {
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(57, "inventory.helper.enchanting.guardianReminder", "inventory.experimentationTable.guardianReminder")
+        event.move(58, "inventory.helper.enchanting.guardianReminder", "inventory.experimentationTable.guardianReminder")
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.guardianReminder
