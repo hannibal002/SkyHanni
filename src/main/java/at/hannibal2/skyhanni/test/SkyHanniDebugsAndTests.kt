@@ -145,35 +145,6 @@ object SkyHanniDebugsAndTests {
         SkyHanniMod.coroutineScope.launch {
             asyncTest()
         }
-
-//            val a = Thread { OSUtils.copyToClipboard("123") }
-//            val b = Thread { OSUtils.copyToClipboard("456") }
-//            a.start()
-//            b.start()
-
-//            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
-//                println("$i: '$s'")
-//            }
-
-//            val name = args[0]
-//            val pitch = args[1].toFloat()
-//            val sound = SoundUtils.createSound("note.harp", 1.35f)
-//            val sound = SoundUtils.createSound("random.orb", 11.2f)
-//            SoundUtils.createSound(name, pitch).playSound()
-
-//            a = args[0].toDouble()
-//            b = args[1].toDouble()
-//            c = args[2].toDouble()
-
-//            for (line in getPlayerTabOverlay().footer.unformattedText
-//                .split("\n")) {
-//                println("footer: '$line'")
-//            }
-//
-//
-//            for (line in TabListUtils.getTabList()) {
-//                println("tablist: '$line'")
-//            }
     }
 
     private fun asyncTest() {
@@ -185,7 +156,6 @@ object SkyHanniDebugsAndTests {
         for (node in nodes) {
             val pathToNearestArea = GraphUtils.findFastestPath(graph, node) { it.getAreaTag(ignoreConfig = true) != null }?.first
             if (pathToNearestArea == null) {
-                displayMap[node.position] = "§cNo connection to any area"
                 continue
             }
             val areaNode = pathToNearestArea.lastOrNull() ?: error("Empty path to nearest area")
@@ -216,9 +186,25 @@ object SkyHanniDebugsAndTests {
             }
         }
 
+        val clusters = GraphUtils.findDisjointClusters(graph)
+        if (clusters.size > 1) {
+            val closestCluster = clusters.minBy { it.minOf { it.position.distanceSqToPlayer() } }
+            val foreignClusters = clusters.filter { it !== closestCluster }
+            val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.position.distanceSqToPlayer() } }
+            closestForeignNodes.forEach {
+                displayMap[it.position] = "§cDisjoint node network"
+                bugs++
+            }
+            val closestForeignNode = closestForeignNodes.minBy { it.position.distanceSqToPlayer() }
+            val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
+            IslandGraphs.pathFind(closestNodeToForeignNode.position, Color.RED)
+        }
+
         println("found $bugs bugs!")
         displayOnWorld = displayMap
-        IslandGraphs.pathFind(displayMap.keys.minByOrNull { it.distanceSqToPlayer() } ?: return, Color.RED)
+        if (clusters.size <= 1) {
+            IslandGraphs.pathFind(displayMap.keys.minByOrNull { it.distanceSqToPlayer() } ?: return, Color.RED)
+        }
     }
 
     fun findNullConfig(args: Array<String>) {
