@@ -176,30 +176,29 @@ object SkyHanniDebugsAndTests {
 
     private fun asyncTest() {
         val graph = IslandGraphs.currentIslandGraph ?: return
-        println("start")
         val displayMap = mutableMapOf<LorenzVec, String>()
         val names = mutableMapOf<GraphNode, String>()
         val nodes = graph.nodes
-        val size = nodes.size
         for ((index, node) in nodes.withIndex()) {
-            val map = GraphUtils.findFastestPaths(graph, node) { it.getAreaTag() != null }.second
-            val first = map.keys.firstOrNull()
+            val map = GraphUtils.findFastestPath(graph, node) { it.getAreaTag() != null }
+            val first = map?.first?.lastOrNull()
             val name = first?.name ?: "§cnone"
-            println("done $index/$size")
-            println("node ${node.id} = $name")
-            displayMap[node.position] = name
             names[node] = name
         }
-        displayOnWorld = displayMap
 
+
+        var bugs = 0
         for ((node, name) in names) {
             for ((other, distance) in node.neighbours) {
                 if (other.getAreaTag() != null) continue
                 if (names[other] != name) {
-                    println("error at ${node.id} with ${other.id}")
+                    displayMap[node.position] = "§cArea error!"
+                    bugs++
                 }
             }
         }
+        println("found $bugs bugs!")
+        displayOnWorld = displayMap
     }
 
     fun findNullConfig(args: Array<String>) {

@@ -405,6 +405,7 @@ object GraphEditor {
         val compileGraph = compileGraph()
         if (config.useAsIslandArea) {
             IslandGraphs.setNewGraph(compileGraph)
+            SkyHanniDebugsAndTests.testCommand(emptyArray())
         }
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
