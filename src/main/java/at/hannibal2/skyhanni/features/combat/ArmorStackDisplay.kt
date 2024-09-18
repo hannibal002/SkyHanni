@@ -1,107 +1,130 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
-import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.SkillExpGainEvent
-import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.miscgui.InventoryStorageSelector
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
-import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.event.entity.player.PlayerUseItemEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import tv.twitch.chat.Chat
-import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object ArmorStackDisplay {
-    private val config get() = SkyHanniMod.feature.combat.stackDisplayConfig
+    private val config get() = SkyHanniMod.feature.combat.armorStackDisplayConfig
     private var stackCount = 0
     private var stackSymbol = ""
-    private var armorPieceCount = 0
+    private var display = emptyList<String>()
+    private var stackDecayTimeCurrent = SimpleTimeMark.farPast()
 
-    private var stackDecayTime = Duration.ZERO
+    /**
+     * REGEX-TEST: §66,171/4,422❤  §6§l10ᝐ§r     §a1,295§a❈ Defense     §b525/1,355✎ §3400ʬ
+     * REGEX-TEST: §66,171/4,422❤  §65ᝐ     §b-150 Mana (§6Wither Impact§b)     §b1,016/1,355✎ §3400ʬ
+     */
+    private val stackPattern by RepoPattern.pattern(
+        "combat.armorstack.actionbar",
+        " (?:§6|§6§l)(?<stack>\\d+)(?<symbol>[ᝐ⁑|҉Ѫ⚶])",
+    )
 
-    private var stackDecayTimeCurrent: SimpleTimeMark = SimpleTimeMark.farPast()
+    /**
+     * REGEX-TEST: §7Health: §a+205, §7Defense: §a+55, §7Intelligence: §a+125, §7Combat Wisdom: §a+0.75,  §8[§8⚔§8] §8[§8⚔§8], , §bArachno Resistance II, §7Grants §a+3❈ Defense §7against §aspiders§7., §bVeteran I, §7Grants §3+0.75☯ Combat Wisdom§7., , §6Tiered Bonus: Arcane Vision (2/4), §7Gives you the ability to see the runic, §7affinity of enemies., §7, §7Using the proper §bRune §7when casting spells, §7from §bRunic Items §7grants 1 stack of §6Arcane, §6Vision Ѫ§7., §7, §7Each §6Arcane Vision Ѫ §7stack grants you §c+2%, §c§7damage on your §bRunic Spells§7., §7, §7At §c10 §7stacks, the spells also explode on hit., §7, §7Lose 1 stack after §c4s §7of not gaining a stack., , §7§8This item can be reforged!, §6§lLEGENDARY LEGGINGS
+     */
+    private val armorStackTierBonus by RepoPattern.pattern(
+        "combat.armorstack.armor",
+        "§6Tiered Bonus: (?<type>.*) \\((?<amount>\\d)\\/4\\)"
+    )
 
     @SubscribeEvent
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
-        var actionBarText = event.actionBar
-        val stackPattern = ActionBarStatsData.ARMOR_STACK.pattern
 
-        stackSymbol = stackPattern.findMatcher(actionBarText) { group("symbol") } ?: ""
-        stackCount = (stackPattern.findMatcher(actionBarText) { group("stack") } ?: "0").toInt()
+        stackPattern.findMatcher(event.actionBar) {
+            updateStack(group("stack").toInt(), group("symbol"))
+        } ?: resetStack()
 
-        val updatedActionBarText = actionBarText.replace(Regex("\\$stackPattern?"), "").trim()
-        event.changeActionBar(updatedActionBarText)
+        if (config.armorStackDisplay) event.changeActionBar(event.actionBar.replace(Regex("$stackPattern"), "").trim())
     }
 
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        display = drawDisplay()
+    }
+
+    @SubscribeEvent
+    fun onPlaySound(event: PlaySoundEvent) {
+        if (!isEnabled() && !config.armorStackDecayTimer) return
+        if (event.soundName in listOf("tile.piston.out", "tile.piston.in") &&
+            event.pitch == 1.0f && event.volume == 3.0f) {
+            resetDecayTime()
+        }
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || stackCount == 0) return
-
-        val stackCountDisplay = "§6§l${stackCount}${stackSymbol}"
-        config.position.renderStrings(listOf(stackCountDisplay, stackDecayTimeCurrent.timeUntil().toString()), posLabel = "Armor Stack Display")
-//         config.position.renderStrings(listOf(stackCountDisplay, stackDecayTimeCurrent.timeUntil().toString(DurationUnit.SECONDS, 2),), posLabel = "Armor Stack Display")
+        if (isEnabled()) {
+            config.position.renderStrings(display, posLabel = "Armor Stack Display")
+        }
     }
 
-    @SubscribeEvent
-    fun onSecond(event: SecondPassedEvent) {
-        armorPieceCount = InventoryUtils.getArmor()
-            .count { armor -> armor != null && armor.displayName.contains(getName(stackSymbol)) }
+    private fun drawDisplay(): List<String> {
+        if (stackCount == 0) return emptyList()
 
-        stackDecayTime = when (armorPieceCount) {
+        val displayList = mutableListOf<String>()
+
+        if (config.armorStackDisplay) {
+            displayList.add("§6§l$stackCount$stackSymbol")
+        }
+
+        if (config.armorStackDecayTimer) {
+            val remainingTime = stackDecayTimeCurrent.timeUntil().coerceAtLeast(0.milliseconds)
+            val armorStackDecayDisplay = remainingTime.format(showMilliSeconds = true, showSmallerUnits = true)
+
+            if (config.armorStackDecayForMax) {
+                if (stackCount == 10) {
+                    displayList.add("§b$armorStackDecayDisplay")
+                }
+            } else {
+                val colorCode = if (stackCount == 10) "§9" else "§b"
+                displayList.add("$colorCode$armorStackDecayDisplay")
+            }
+        }
+        return displayList
+    }
+
+    private fun resetDecayTime() {
+        val armorPieceCount = InventoryUtils.getArmor()
+            .firstNotNullOfOrNull { armor ->
+                armorStackTierBonus.findMatcher(armor?.getLore().toString()) { group("amount") }?.toInt()
+            } ?: 0
+
+        val stackDecayTime = when (armorPieceCount) {
             2 -> 4000
             3 -> 7000
             4 -> 10000
             else -> 0
         }.milliseconds
-    }
-
-    private val symbolMap = mapOf(
-        "ᝐ" to "Crimson",
-        "⁑" to "Terror",
-        "Ѫ" to "Aurora",
-        "҉" to "Fervor",
-        "⚶" to "Hollow"
-    )
-
-    fun getName(symbol: String): String {
-        return symbolMap[symbol] ?: ""
-    }
-
-    @SubscribeEvent
-    fun onSoundPlay(event: PlaySoundEvent) {
-        if (event.soundName != "tile.piston.out" && event.soundName != "tile.piston.in" ) return
-        ChatUtils.chat(String.format("%s %s %.2f", event.soundName, event.volume, event.distanceToPlayer))
         stackDecayTimeCurrent = SimpleTimeMark.now() + stackDecayTime
     }
 
+    private fun resetStack() {
+        stackCount = 0
+        stackSymbol = ""
+    }
 
-//     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-    fun isEnabled() = config.enabled
+    private fun updateStack(newStackCount: Int, newStackSymbol: String) {
+        if (stackCount != newStackCount && config.armorStackDecayTimer) resetDecayTime()
+        stackCount = newStackCount
+        stackSymbol = newStackSymbol
+    }
+
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
