@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -25,6 +26,7 @@ import kotlin.time.Duration.Companion.seconds
 
 typealias RarityType = HoppityEggsConfig.CompactRarityTypes
 
+@SkyHanniModule
 object HoppityEggsCompactChat {
 
     private var hoppityEggChat = mutableListOf<String>()
