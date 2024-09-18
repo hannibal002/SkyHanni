@@ -86,9 +86,12 @@ object MineshaftPityDisplay {
     fun onOreMined(event: OreMinedEvent) {
         if (!MiningAPI.inGlacialTunnels()) return
 
-        event.originalOre.getPityBlock()?.let { it.blocksBroken++ }
+        val originalOre = event.originalOre
+        originalOre?.getPityBlock()?.let { it.blocksBroken++ }
         event.extraBlocks.toMutableMap()
-            .apply { addOrPut(event.originalOre, -1) }
+            .apply {
+                if (originalOre != null) addOrPut(originalOre, -1)
+            }
             .map { (block, amount) ->
                 block.getPityBlock()?.let { it.efficientMiner += amount }
             }
