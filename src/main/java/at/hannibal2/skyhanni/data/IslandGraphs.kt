@@ -52,6 +52,7 @@ import kotlin.math.abs
  * 	big quests
  * 	montezuma souls
  * 	blood effigies
+ * 	avoid area around enderman
  * spider:
  * 	relicts + throw spot
  * dwarven mines:
