@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -20,11 +21,13 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -79,6 +82,7 @@ object SkyHanniDebugsAndTests {
     private val debugConfig get() = config.debug
     var displayLine = ""
     var displayList = emptyList<List<Any>>()
+    var displayOnWorld = emptyMap<LorenzVec, String>()
 
     var globalRender = true
 
@@ -108,6 +112,11 @@ object SkyHanniDebugsAndTests {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Test", 1.5)
         }
+
+        for ((location, text) in displayOnWorld) {
+            event.drawDynamicText(location, text, 1.5)
+        }
+
     }
 
     fun waypoint(args: Array<String>) {
@@ -131,7 +140,9 @@ object SkyHanniDebugsAndTests {
     }
 
     fun testCommand(args: Array<String>) {
-
+        SkyHanniMod.coroutineScope.launch {
+            asyncTest()
+        }
 
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
@@ -161,6 +172,34 @@ object SkyHanniDebugsAndTests {
 //            for (line in TabListUtils.getTabList()) {
 //                println("tablist: '$line'")
 //            }
+    }
+
+    private fun asyncTest() {
+        val graph = IslandGraphs.currentIslandGraph ?: return
+        println("start")
+        val displayMap = mutableMapOf<LorenzVec, String>()
+        val names = mutableMapOf<GraphNode, String>()
+        val nodes = graph.nodes
+        val size = nodes.size
+        for ((index, node) in nodes.withIndex()) {
+            val map = GraphUtils.findFastestPaths(graph, node) { it.getAreaTag() != null }.second
+            val first = map.keys.firstOrNull()
+            val name = first?.name ?: "§cnone"
+            println("done $index/$size")
+            println("node ${node.id} = $name")
+            displayMap[node.position] = name
+            names[node] = name
+        }
+        displayOnWorld = displayMap
+
+        for ((node, name) in names) {
+            for ((other, distance) in node.neighbours) {
+                if (other.getAreaTag() != null) continue
+                if (names[other] != name) {
+                    println("error at ${node.id} with ${other.id}")
+                }
+            }
+        }
     }
 
     fun findNullConfig(args: Array<String>) {
