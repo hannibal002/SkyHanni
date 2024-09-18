@@ -50,7 +50,7 @@ value class Graph(
                         out.name("Name").value(it)
                     }
 
-                    it.tagNames?.takeIf { it.isNotEmpty() }?.let {
+                    it.tagNames.takeIf { list -> list.isNotEmpty() }?.let {
                         out.name("Tags")
                         out.beginArray()
                         for (tagName in it) {
@@ -80,8 +80,8 @@ value class Graph(
                     reader.beginObject()
                     var position: LorenzVec? = null
                     var name: String? = null
-                    var tags: List<String>? = null
-                    var neighbors = mutableListOf<Pair<Int, Double>>()
+                    var tags = emptyList<String>()
+                    val neighbors = mutableListOf<Pair<Int, Double>>()
                     while (reader.hasNext()) {
                         if (reader.peek() != JsonToken.NAME) {
                             reader.skipValue()
@@ -141,10 +141,10 @@ value class Graph(
 }
 
 // The node object that gets parsed from/to json
-class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String>? = null) {
+class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, val tagNames: List<String> = emptyList()) {
 
     val tags: List<GraphNodeTag> by lazy {
-        tagNames?.mapNotNull { GraphNodeTag.byId(it) } ?: emptyList()
+        tagNames.mapNotNull { GraphNodeTag.byId(it) }
     }
 
     /** Keys are the neighbours and value the edge weight (e.g. Distance) */

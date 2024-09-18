@@ -72,6 +72,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -176,29 +177,54 @@ object SkyHanniDebugsAndTests {
 
     private fun asyncTest() {
         val graph = IslandGraphs.currentIslandGraph ?: return
-        val displayMap = mutableMapOf<LorenzVec, String>()
-        val names = mutableMapOf<GraphNode, String>()
+        val nodesWithErrors = mutableMapOf<LorenzVec, String>()
         val nodes = graph.nodes
+
+        for (node in nodes) {
+            node.name?.let {
+                if (node.tagNames.isEmpty()) {
+                    nodesWithErrors[node.position] = "§cHas name and no tag!"
+                    println("has name and no tag: $it")
+                }
+            }
+            if (node.tagNames.isNotEmpty()) {
+                if (node.name == null) {
+                    nodesWithErrors[node.position] = "§cHas a tag and no name!"
+                    println("Has a tag and no name: ${node.tagNames}")
+                }
+            }
+        }
+
+        val nameOfClosestArea = mutableMapOf<GraphNode, String>()
         for ((index, node) in nodes.withIndex()) {
             val map = GraphUtils.findFastestPath(graph, node) { it.getAreaTag() != null }
             val first = map?.first?.lastOrNull()
             val name = first?.name ?: "§cnone"
-            names[node] = name
+            nameOfClosestArea[node] = name
         }
 
-
-        var bugs = 0
-        for ((node, name) in names) {
+        for ((node, name) in nameOfClosestArea) {
             for ((other, distance) in node.neighbours) {
                 if (other.getAreaTag() != null) continue
-                if (names[other] != name) {
-                    displayMap[node.position] = "§cArea error!"
-                    bugs++
+                if (nameOfClosestArea[other] != name) {
+                    val otherName = other.name
+                    val thisName = node.name
+                    if (node.position !in nodesWithErrors) {
+                        nodesWithErrors[node.position] = "§cArea error! ('$thisName' != '$otherName')"
+                    }
                 }
             }
         }
-        println("found $bugs bugs!")
-        displayOnWorld = displayMap
+
+        var hasUsedPathfind = false
+        for ((location, text) in nodesWithErrors) {
+            if (!hasUsedPathfind) {
+                hasUsedPathfind = true
+                IslandGraphs.pathFind(location, Color.RED)
+            }
+        }
+        println("found ${nodesWithErrors.size} bugs!")
+        displayOnWorld = nodesWithErrors
     }
 
     fun findNullConfig(args: Array<String>) {

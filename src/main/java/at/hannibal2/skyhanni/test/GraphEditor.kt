@@ -524,7 +524,7 @@ object GraphEditor {
                     it.id,
                     it.position,
                     it.name,
-                    it.tagNames?.mapNotNull { GraphNodeTag.byId(it) }?.toMutableList() ?: mutableListOf(),
+                    it.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
                 )
             },
         )
