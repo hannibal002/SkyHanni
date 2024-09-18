@@ -167,7 +167,7 @@ object SkyHanniDebugsAndTests {
             for (neighbour in node.neighbours.keys) {
                 val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
                 if (neighbouringAreaNode == areaNode) continue
-                if ((null != neighbour.getAreaTag(ignoreConfig = true)) != (null != node.getAreaTag(ignoreConfig = true))) {
+                if ((null == node.getAreaTag(ignoreConfig = true))) {
                     bugs++
                     displayMap[node.position] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
                 }
