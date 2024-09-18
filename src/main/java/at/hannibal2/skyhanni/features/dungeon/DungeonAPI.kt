@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -30,6 +31,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchAll
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -405,30 +407,37 @@ object DungeonAPI {
     fun getPlayerInfo(username: String): TeamMember =
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
-    private val playerClassRegex = Regex(
-        """\[\d+\] (\w+)[^\(\]]*\((Archer|Mage|Berserk|Tank|Healer|DEAD)(?:\s*([IVXLCDM]+)?)?\)"""
+
+    private val playerClassRegex by patternGroup.pattern(
+        "tablist.playerteam",
+        "§8\\[§.§.\\d+\\§.§.] §.§.(?<username>\\w+)[^\\(\\]]*§r§f\\(§r§d(§.§.)?(?<class>Archer|Mage|Berserk|Tank|Healer|DEAD)(?:\\s*(?<level>[IVXLCDM0]+)?§r§f)?\\)"
     )
 
     @SubscribeEvent
     fun onTabUpdate(event: TabListUpdateEvent) {
         if (!inDungeon() && !started) return
 
-        val updatedTeamMembers = playerClassRegex.findAll(event.tabList.toString().removeColor())
-            .map { match ->
-                val (username, dungeonClassName, classLevel) = match.destructured
-                val playerDead = dungeonClassName == "DEAD"
-                val oldPlayerData = getPlayerInfo(username)
-                val dungeonClass = if (playerDead) oldPlayerData.dungeonClass
-                else DungeonClass.getByClassName(dungeonClassName) ?: oldPlayerData.dungeonClass
-                val dungeonClassLevel = if (playerDead) oldPlayerData.classLevel else classLevel.romanToDecimalIfNecessary()
+        val updatedTeamMembers = mutableListOf<TeamMember>()
 
+        playerClassRegex.matchAll(event.tabList) {
+            val username = group("username")
+            val dungeonClassName = group("class")
+            val classLevel = group("level")
+            val playerDead = dungeonClassName == "DEAD"
+            val oldPlayerData = getPlayerInfo(username)
+            val dungeonClass = if (playerDead) oldPlayerData.dungeonClass
+            else DungeonClass.getByClassName(dungeonClassName) ?: oldPlayerData.dungeonClass
+            val dungeonClassLevel = if (playerDead) oldPlayerData.classLevel else classLevel.romanToDecimalIfNecessary()
+
+            updatedTeamMembers.add(
                 TeamMember(
                     username = username,
                     dungeonClass = dungeonClass,
                     classLevel = dungeonClassLevel,
                     playerDead = playerDead
                 )
-            }.toList()
+            )
+        }
 
         playerTeamClasses.apply {
             clear()

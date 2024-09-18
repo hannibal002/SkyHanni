@@ -40,12 +40,12 @@ public class SpiritLeapConfig {
     @Expose
     @ConfigOption(name = "Berserk Class Color", desc = "Set the highlight color for the Berserk class in the Spirit Leap overlay.")
     @ConfigEditorColour
-    public String berserkClassColor = "0:200:0:0:150";
+    public String berserkClassColor = defaultColor;
 
     @Expose
     @ConfigOption(name = "Tank Class Color", desc = "Set the highlight color for the Tank class in the Spirit Leap overlay.")
     @ConfigEditorColour
-    public String tankClassColor = "0:200:0:0:150";
+    public String tankClassColor = defaultColor;
 
     @Expose
     @ConfigOption(name = "Healer Class Color", desc = "Set the highlight color for the Healer class in the Spirit Leap overlay.")

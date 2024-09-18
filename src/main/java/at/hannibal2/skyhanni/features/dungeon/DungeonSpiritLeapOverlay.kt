@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -17,6 +18,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import tv.twitch.chat.Chat
 import java.awt.Color
 import kotlin.math.max
 import kotlin.math.min
@@ -83,9 +85,14 @@ object DungeonSpiritLeapOverlay {
 
     private fun createLeapItem(item: ItemStack, username: String, slotNumber: Int): Renderable {
         val player = DungeonAPI.getPlayerInfo(username)
-        val classInfo = player.dungeonClass.scoreboardName +
-            if (config.showDungeonClassLevel) " ${player.classLevel}" else "" +
-                if (player.playerDead) " (Dead)" else ""
+        val classInfo = buildString {
+            if (player.dungeonClass != DungeonAPI.DungeonClass.UNKNOWN) {
+                append(player.dungeonClass.scoreboardName)
+                if (config.showDungeonClassLevel) append(" ${player.classLevel}")
+                if (player.playerDead) append(" (Dead)")
+            }
+        }
+
         val backgroundColor = if (player.playerDead) deadTeammateColor else getClassColor(player.dungeonClass)
 
         val itemRenderable = Renderable.drawInsideRoundedRect(
