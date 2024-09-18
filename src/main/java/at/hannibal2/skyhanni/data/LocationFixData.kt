@@ -28,8 +28,10 @@ object LocationFixData {
 
             val list = locationFixes[island]
 
-            if (list == null) locationFixes[island] = listOf(LocationFix(area, realLocation))
-            else locationFixes[island] = list + LocationFix(area, realLocation)
+            val locationFix = LocationFix(area, realLocation)
+
+            if (list == null) locationFixes[island] = listOf(locationFix)
+            else locationFixes[island] = list + locationFix
         }
     }
 
