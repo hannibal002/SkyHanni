@@ -21,6 +21,12 @@ public class ArmorStackDisplayConfig {
     public boolean armorStackDisplay = false;
 
     @Expose
+    @ConfigOption(name = "Show Type of Armor Stack", desc = "Shows the armor stack type like Dominus.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean armorStackType = false;
+
+    @Expose
     @ConfigOption(name = "Stack Decay Timer", desc = "Show a decay timer after gaining a stack.")
     @ConfigEditorBoolean
     @FeatureToggle

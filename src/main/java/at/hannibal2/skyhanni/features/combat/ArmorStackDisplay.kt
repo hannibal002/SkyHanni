@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -23,6 +24,7 @@ object ArmorStackDisplay {
     private val config get() = SkyHanniMod.feature.combat.armorStackDisplayConfig
     private var stackCount = 0
     private var stackSymbol = ""
+    private var stackType = ""
     private var display = emptyList<String>()
     private var stackDecayTimeCurrent = SimpleTimeMark.farPast()
 
@@ -88,7 +90,11 @@ object ArmorStackDisplay {
         val displayList = mutableListOf<String>()
 
         if (config.armorStackDisplay) {
-            displayList.add("§6§l$stackCount$stackSymbol")
+            if (config.armorStackType) {
+                displayList.add("§6$stackType: §l$stackCount$stackSymbol")
+            } else {
+                displayList.add("§6§l$stackCount$stackSymbol")
+            }
         }
 
         if (config.armorStackDecayTimer) {
@@ -108,10 +114,12 @@ object ArmorStackDisplay {
     }
 
     private fun resetDecayTime() {
-        val armorPieceCount = InventoryUtils.getArmor()
-            .firstNotNullOfOrNull { armor ->
-                armorStackTierBonus.findMatcher(armor?.getLore().toString()) { group("amount") }?.toInt()
-            } ?: 0
+        val armorPieceCount = InventoryUtils.getArmor().firstNotNullOfOrNull { armor ->
+            val lore = armor?.getLore().toString()
+            armorStackTierBonus.findMatcher(lore) { stackType = group("type"); group("amount") }
+                ?.toInt()
+        } ?: 0
+
 
         val stackDecayTime = when (armorPieceCount) {
             2 -> 4000
