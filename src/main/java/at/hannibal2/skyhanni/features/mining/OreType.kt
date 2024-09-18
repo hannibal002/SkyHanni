@@ -7,7 +7,7 @@ import net.minecraft.block.state.IBlockState
 
 enum class OreType(
     val oreName: String,
-    internalNameString: String,
+    internalName: String,
     vararg val oreBlocks: OreBlock,
 ) {
     MITHRIL(
@@ -187,7 +187,7 @@ enum class OreType(
     ),
     ;
 
-    val internalName: NEUInternalName = internalNameString.asInternalName()
+    val internalName: NEUInternalName = internalName.asInternalName()
 
     companion object {
 
