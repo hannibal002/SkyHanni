@@ -7,12 +7,11 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -25,7 +24,8 @@ object ArmorStackDisplay {
     private var stackCount = 0
     private var stackSymbol = ""
     private var stackType = ""
-    private var display = emptyList<String>()
+    private var armorPieceCount = 0
+    private var display = ""
     private var stackDecayTimeCurrent = SimpleTimeMark.farPast()
 
     /**
@@ -57,12 +57,6 @@ object ArmorStackDisplay {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
-        display = drawDisplay()
-    }
-
-    @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() && !config.armorStackDecayTimer) return
         if (event.soundName in listOf("tile.piston.out", "tile.piston.in") &&
@@ -80,41 +74,45 @@ object ArmorStackDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isEnabled()) {
-            config.position.renderStrings(display, posLabel = "Armor Stack Display")
+            config.position.renderString(display, posLabel = "Armor Stack Display")
         }
     }
 
-    private fun drawDisplay(): List<String> {
-        if (stackCount == 0) return emptyList()
 
-        val displayList = mutableListOf<String>()
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
+        display = drawDisplay()
+    }
 
-        if (config.armorStackDisplay) {
-            if (config.armorStackType) {
-                displayList.add("§6$stackType: §l$stackCount$stackSymbol")
-            } else {
-                displayList.add("§6§l$stackCount$stackSymbol")
+    private fun drawDisplay(): String {
+        if (stackCount == 0 || armorPieceCount < 3) return ""
+
+        return buildString {
+            if (config.armorStackDisplay) {
+                append("§6")
+                if (config.armorStackType) append("$stackType: ")
+                append("§l$stackCount$stackSymbol ")
             }
-        }
 
-        if (config.armorStackDecayTimer) {
-            val remainingTime = stackDecayTimeCurrent.timeUntil().coerceAtLeast(0.milliseconds)
-            val armorStackDecayDisplay = remainingTime.format(showMilliSeconds = true, showSmallerUnits = true)
-
-            if (config.armorStackDecayForMax) {
-                if (stackCount == 10) {
-                    displayList.add("§b$armorStackDecayDisplay")
+            if (config.armorStackDecayTimer) {
+                val remainingTime = stackDecayTimeCurrent.timeUntil().coerceAtLeast(0.milliseconds)
+                val armorStackDecayDisplay = remainingTime.format(showMilliSeconds = true, showSmallerUnits = true)
+                val colorCode = when {
+                    config.maxStackOnly && stackCount == 10 -> "§b"
+                    stackCount == 10 -> "§9"
+                    else -> "§b"
                 }
-            } else {
-                val colorCode = if (stackCount == 10) "§9" else "§b"
-                displayList.add("$colorCode$armorStackDecayDisplay")
+                if (config.maxStackOnly && stackCount == 10 || !config.maxStackOnly) {
+                    append("$colorCode($armorStackDecayDisplay)")
+                }
             }
         }
-        return displayList
     }
+
 
     private fun resetDecayTime() {
-        val armorPieceCount = InventoryUtils.getArmor().firstNotNullOfOrNull { armor ->
+        armorPieceCount = InventoryUtils.getArmor().firstNotNullOfOrNull { armor ->
             val lore = armor?.getLore().toString()
             armorStackTierBonus.findMatcher(lore) { stackType = group("type"); group("amount") }
                 ?.toInt()

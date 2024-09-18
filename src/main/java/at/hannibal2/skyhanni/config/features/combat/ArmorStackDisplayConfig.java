@@ -15,13 +15,13 @@ public class ArmorStackDisplayConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Show Armor Stack", desc = "Display the number of stacks for armor pieces like Crimson, Terror, Aurora, etc.")
+    @ConfigOption(name = "Armor Stack", desc = "Display the number of stacks for armor pieces like Crimson, Terror, Aurora, etc.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armorStackDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Show Type of Armor Stack", desc = "Shows the armor stack type like Dominus.")
+    @ConfigOption(name = "Armor Stack Type", desc = "Shows the armor stack type like \"Dominus\".")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armorStackType = false;
@@ -33,12 +33,12 @@ public class ArmorStackDisplayConfig {
     public boolean armorStackDecayTimer = false;
 
     @Expose
-    @ConfigOption(name = "Show Timer for Max Stack", desc = "Show the decay timer only when the 10th stack is reached.")
+    @ConfigOption(name = "Max Stack Only", desc = "Show the decay timer only when the 10th stack is reached.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean armorStackDecayForMax = false;
+    public boolean maxStackOnly = false;
 
     @Expose
     @ConfigLink(owner = ArmorStackDisplayConfig.class, field = "enabled")
-    public Position position = new Position(480, -210, 1.9f);
+    public Position position = new Position(50, -210, 1.4f);
 }
