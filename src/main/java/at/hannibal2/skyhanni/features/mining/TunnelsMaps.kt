@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
@@ -193,6 +194,11 @@ object TunnelsMaps {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        clickTranslate = mapOf()
     }
 
     @SubscribeEvent
@@ -441,6 +447,7 @@ object TunnelsMaps {
             true,
             bezierPoint = 2.0,
             textSize = config.textSize.toDouble(),
+            showNoteNames = true,
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
@@ -517,7 +524,7 @@ object TunnelsMaps {
         goal = getNext()
     }
 
-    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Glacite Lake", "Fossil Research Center")
+    private val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     private fun isEnabled() = IslandType.DWARVEN_MINES.isInIsland() && config.enable && LorenzUtils.skyBlockArea in areas
 }

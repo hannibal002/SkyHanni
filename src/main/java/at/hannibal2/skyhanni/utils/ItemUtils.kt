@@ -138,7 +138,7 @@ object ItemUtils {
             return NEUInternalName.WISP_POTION
         }
         val internalName = NEUItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
-        return internalName?.asInternalName()
+        return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)

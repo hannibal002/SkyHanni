@@ -47,8 +47,10 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
     fun ItemStack.getDungeonStarCount() = if (isDungeonItem()) {
-        getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
+        getStarCount() ?: getAttributeInt("dungeon_item_level")
     } else null
+
+    fun ItemStack.getStarCount() = getAttributeInt("upgrade_level")
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 

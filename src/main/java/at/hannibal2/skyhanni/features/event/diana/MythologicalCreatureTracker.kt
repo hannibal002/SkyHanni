@@ -1,18 +1,22 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.MayorAPI.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
@@ -53,8 +57,14 @@ object MythologicalCreatureTracker {
         ".* §r§eYou dug out a §r§2Minos Inquisitor§r§e!",
     )
 
-    private val tracker =
-        SkyHanniTracker("Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker }) { drawDisplay(it) }
+    private val tracker = SkyHanniTracker(
+        "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
+        SkyHanniTracker.DisplayMode.MAYOR to {
+            it.diana.mythologicalMobTrackerPerElectionSeason.getOrPut(
+                SkyBlockTime.now().getElectionYear(), ::Data,
+            )
+        },
+    ) { drawDisplay(it) }
 
     class Data : TrackerData() {
 
@@ -82,19 +92,18 @@ object MythologicalCreatureTracker {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         for (creatureType in MythologicalCreatureType.entries) {
-            if (creatureType.pattern.matches(event.message)) {
-                BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
-                tracker.modify {
-                    it.count.addOrPut(creatureType, 1)
+            if (!creatureType.pattern.matches(event.message)) continue
+            BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
+            tracker.modify {
+                it.count.addOrPut(creatureType, 1)
 
-                    // TODO migrate to abstract feature in the future
-                    if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
-                        event.chatComponent = ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
-                        it.creaturesSinceLastInquisitor = 0
-                    } else it.creaturesSinceLastInquisitor++
-                }
-                if (config.hideChat) event.blockedReason = "mythological_creature_dug"
+                // TODO migrate to abstract feature in the future
+                if (creatureType == MythologicalCreatureType.MINOS_INQUISITOR) {
+                    event.chatComponent = ChatComponentText(event.message + " §e(${it.creaturesSinceLastInquisitor})")
+                    it.creaturesSinceLastInquisitor = 0
+                } else it.creaturesSinceLastInquisitor++
             }
+            if (config.hideChat) event.blockedReason = "mythological_creature_dug"
         }
     }
 
@@ -125,7 +134,13 @@ object MythologicalCreatureTracker {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.enabled) return
+        val spadeInHand = InventoryUtils.getItemInHand()?.isDianaSpade ?: false
+        if (!DianaAPI.isDoingDiana() && !spadeInHand) return
+        if (spadeInHand) {
+            tracker.firstUpdate()
+        }
 
         tracker.renderDisplay(config.position)
     }
@@ -134,5 +149,4 @@ object MythologicalCreatureTracker {
         tracker.resetCommand()
     }
 
-    private fun isEnabled() = DianaAPI.isDoingDiana() && config.enabled
 }

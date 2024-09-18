@@ -1068,7 +1068,9 @@ interface Renderable {
             val map = content.filter { it.value?.contains(textBox, ignoreCase = true) ?: true }
             val set = map.keys.toMutableSet()
             if (map.filter { it.value != null }.isEmpty()) {
-                set.add(string("§cNo search results!"))
+                if (textBox.isNotEmpty()) {
+                    set.add(string("§cNo search results!"))
+                }
             }
             return set
         }

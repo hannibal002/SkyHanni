@@ -75,27 +75,27 @@ object GhostCounter {
     private val patternGroup = RepoPattern.group("combat.ghostcounter")
     private val skillXPPattern by patternGroup.pattern(
         "skillxp",
-        "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)"
+        "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)",
     )
     private val combatSectionPattern by patternGroup.pattern(
         "combatsection",
-        ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*"
+        ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*",
     )
     private val killComboExpiredPattern by patternGroup.pattern(
         "killcomboexpired",
-        "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!"
+        "§cYour Kill Combo has expired! You reached a (?<combo>.*) Kill Combo!",
     )
     private val ghostXPPattern by patternGroup.pattern(
         "ghostxp",
-        "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)"
+        "(?<current>\\d+(?:\\.\\d+)?(?:,\\d+)?[kK]?)/(?<total>\\d+(?:\\.\\d+)?(?:,\\d+)?[kKmM]?)",
     )
     private val bestiaryPattern by patternGroup.pattern(
         "bestiary",
-        ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*"
+        ".*(?:§\\d|§\\w)+BESTIARY (?:§\\d|§\\w)+Ghost (?:§\\d|§\\w)(?<previousLevel>\\d+)➜(?:§\\d|§\\w)(?<nextLevel>\\d+).*",
     )
     private val skillLevelPattern by patternGroup.pattern(
         "skilllevel",
-        ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*"
+        ".*§e§lSkills: §r§a(?<skillName>.*) (?<skillLevel>\\d+).*",
     )
 
     private val format = NumberFormat.getInstance()
@@ -126,7 +126,7 @@ object GhostCounter {
         config.position.renderStringsAndItems(
             display,
             extraSpace = config.extraSpace,
-            posLabel = "Ghost Counter"
+            posLabel = "Ghost Counter",
         )
     }
 
@@ -204,7 +204,7 @@ object GhostCounter {
 
         val etaFormatting = textFormatting.etaFormatting
         val remaining: Int = when (config.showMax) {
-            true -> 250_000 - bestiaryCurrentKill
+            true -> 100_000 - bestiaryCurrentKill
             false -> killNeeded - currentKill
         }
 
@@ -221,7 +221,7 @@ object GhostCounter {
                             "%days%" to "days",
                             "%hours%" to "hours",
                             "%minutes%" to "minutes",
-                            "%seconds%" to "seconds"
+                            "%seconds%" to "seconds",
                         )
                         for ((format, key) in formatMap) {
                             if (etaFormatting.time.contains(format)) {
@@ -254,8 +254,7 @@ object GhostCounter {
         addAsSingletonList(textFormatting.highestKillComboFormat.formatText(Option.MAXKILLCOMBO))
         addAsSingletonList(textFormatting.skillXPGainFormat.formatText(Option.SKILLXPGAINED))
         addAsSingletonList(
-            bestiaryFormatting.base.preFormat(bestiary, nextLevel - 1, nextLevel)
-                .formatBestiary(currentKill, killNeeded)
+            bestiaryFormatting.base.preFormat(bestiary, nextLevel - 1, nextLevel).formatBestiary(currentKill, killNeeded),
         )
 
         addAsSingletonList(xpHourFormatting.base.formatText(xp))
@@ -274,7 +273,7 @@ object GhostCounter {
             Triple("Volta", Option.VOLTACOUNT.getInt(), voltaValue),
             Triple("Bag Of Cash", Option.BAGOFCASH.getInt(), 1_000_000),
             Triple("Scavenger Coins", Option.SCAVENGERCOINS.getInt(), 1),
-            Triple("Ghostly Boots", Option.GHOSTLYBOOTS.getInt(), 77_777)
+            Triple("Ghostly Boots", Option.GHOSTLYBOOTS.getInt(), 77_777),
         )
         val moneyMadeTips = buildList {
             for ((name, count, value) in priceMap) {
@@ -287,7 +286,7 @@ object GhostCounter {
         val moneyMadeWithClickableTips = Renderable.clickAndHover(
             textFormatting.moneyMadeFormat.formatText(moneyMade.addSeparators()),
             moneyMadeTips,
-            onClick = { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) }
+            onClick = { OSUtils.copyToClipboard(moneyMadeTips.joinToString("\n").removeColor()) },
         )
         addAsSingletonList(textFormatting.moneyHourFormat.formatText(final))
         addAsSingletonList(moneyMadeWithClickableTips)
@@ -326,7 +325,7 @@ object GhostCounter {
                     },
                     "§eClick to import data!",
                     prefixColor = "§6",
-                    oneTimeClick = true
+                    oneTimeClick = true,
                 )
             }
         }
@@ -364,9 +363,8 @@ object GhostCounter {
                 var parse = true
                 if (skillPercent) {
                     percent = nf.parse(group("percent")).toFloat()
-                    val level =
-                        if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance()
-                            .getSkillInfo(skillName)?.level ?: 0
+                    val level = if (currentSkill == "Combat" && currentSkillLevel != -1) currentSkillLevel else XPInformation.getInstance()
+                        .getSkillInfo(skillName)?.level ?: 0
                     if (level > 0) {
                         totalSkillXp = SkillExperience.getExpForNextLevel(level)
                         currentSkillXp = totalSkillXp * percent / 100
@@ -418,11 +416,10 @@ object GhostCounter {
                     Option.SORROWCOUNT, Option.VOLTACOUNT, Option.PLASMACOUNT, Option.GHOSTLYBOOTS -> {
                         opt.add(1.0)
                         opt.add(1.0, true)
-                        storage?.totalMF = storage?.totalMF?.plus(group("mf").substring(4).toDouble())
-                            ?: group("mf").substring(4).toDouble()
+                        storage?.totalMF =
+                            storage?.totalMF?.plus(group("mf").substring(4).toDouble()) ?: group("mf").substring(4).toDouble()
                         Option.TOTALDROPS.add(1.0)
-                        if (opt == Option.SORROWCOUNT)
-                            Option.GHOSTSINCESORROW.set(0.0)
+                        if (opt == Option.SORROWCOUNT) Option.GHOSTSINCESORROW.set(0.0)
                         update()
                     }
 
@@ -458,7 +455,7 @@ object GhostCounter {
             when (val nextLevel = if (currentLevel >= 25) 26 else currentLevel + 1) {
                 26 -> {
                     storage?.bestiaryNextLevel = 26.0
-                    storage?.bestiaryCurrentKill = 250_000.0
+                    storage?.bestiaryCurrentKill = 100_000.0
                     storage?.bestiaryKillNeeded = 0.0
                 }
 
@@ -490,8 +487,7 @@ object GhostCounter {
         val stacks = event.inventoryItems
         val ghostStack = stacks.values.find { it.displayName.contains("Ghost") } ?: return
         val bestiaryNextLevel =
-            if ("§\\wGhost".toRegex().matches(ghostStack.displayName)) 1 else ghostStack.displayName.substring(8)
-                .romanToDecimal() + 1
+            if ("§\\wGhost".toRegex().matches(ghostStack.displayName)) 1 else ghostStack.displayName.substring(8).romanToDecimal() + 1
         storage?.bestiaryNextLevel = bestiaryNextLevel.toDouble()
         var kills = 0.0
         for (line in ghostStack.getLore()) {
@@ -521,6 +517,10 @@ object GhostCounter {
         event.move(2, "ghostCounter", "combat.ghostCounter")
         event.transform(11, "combat.ghostCounter.ghostDisplayText") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, GhostDisplayEntry::class.java)
+        }
+
+        event.transform(58, "combat.ghostCounter.textFormatting.bestiaryFormatting.showMax_progress") {
+            JsonPrimitive("%currentKill%/100k (%percentNumber%%)")
         }
     }
 

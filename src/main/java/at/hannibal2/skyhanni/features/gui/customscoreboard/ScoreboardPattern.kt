@@ -274,8 +274,13 @@ object ScoreboardPattern {
         "uselessgoblin",
         "^§7Kill goblins!$",
     )
+
+    /**
+     * REGEX-TEST: Remaining: §a1 goblin
+     * REGEX-TEST: Remaining: §a2 goblins
+     */
     val remainingGoblinPattern by miningSb.pattern(
-        "remaininggoblin", "^Remaining: §a\\d+ goblins$",
+        "remaininggoblin", "^Remaining: §a\\d+ goblins?$",
     )
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$",
@@ -303,9 +308,13 @@ object ScoreboardPattern {
         "magmaboss",
         "^§7Boss: §[c6e]\\d{1,3}%$",
     )
+
+    /**
+     * REGEX-TEST: §7Damage Soaked:§629,446 §e(+271
+     */
     val damageSoakedPattern by combatSb.pattern(
         "damagesoaked",
-        "^§7Damage Soaked:",
+        "^§7Damage Soaked:.*",
     )
     val killMagmasPattern by combatSb.pattern(
         "killmagmas",
@@ -364,23 +373,28 @@ object ScoreboardPattern {
     )
     val dojoChallengePattern by miscSb.pattern(
         "dojochallenge",
-        "^(§.)*Challenge: (§.)*(?<challenge>[\\w ]+)$",
+        "(§.)*Challenge: (§.)*(?<challenge>[\\w ]+)",
     )
     val dojoDifficultyPattern by miscSb.pattern(
         "dojodifficulty",
-        "^(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)$",
+        "(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)",
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
-        "^(§.)*Points: (§.)*[\\w.]+ ?(§7\\(§.*§7\\))?\$",
+        "(§.)*Points: (§.)*[\\w.]+.*",
     )
+
+    /**
+     * There should be a space at the end of the test, Intellij keeps removing it
+     * REGEX-TEST: Time: §a20s
+     */
     val dojoTimePattern by miscSb.pattern(
         "dojotime",
-        "^(§.)*Time: (§.)*[\\w.]+( §7\\(§.*§7\\))?$",
+        "(§.)*Time: (§.)*[\\w.]+.*",
     )
     val objectivePattern by miscSb.pattern(
         "objective",
-        "^(§.)*(Objective|Quest).*",
+        "(§.)*(Objective|Quest).*",
     )
     val queuePattern by miscSb.pattern(
         "queued",

@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.combat.SpidersDenAPI.isAtTopOfNest
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent.VOTING
@@ -121,7 +122,7 @@ enum class ScoreboardEvent(
     ),
     BROODMOTHER(
         ::getBroodmotherLines,
-        ::getBroodmotherShowWhen,
+        ::isAtTopOfNest,
         "§4Broodmother§7: §eDormant",
     ),
     MINING_EVENTS(
@@ -440,8 +441,6 @@ private fun getSoonEventShowWhen(): Boolean =
 
 private fun getBroodmotherLines(): List<String> =
     listOf(getSbLines().first { SbPattern.broodmotherPattern.matches(it) })
-
-private fun getBroodmotherShowWhen(): Boolean = getSbLines().any { SbPattern.broodmotherPattern.matches(it) }
 
 private fun getMiningEventsLines() = buildList {
     // Wind
