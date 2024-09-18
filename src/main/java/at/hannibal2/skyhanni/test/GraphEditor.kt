@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -127,6 +128,7 @@ object GraphEditor {
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
             add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
+            add("§eSelect (Look): §6${KeyboardManager.getKeyName(config.selectRaycastKey)}")
             add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
             add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
             add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
@@ -345,6 +347,28 @@ object GraphEditor {
                 feedBackInTutorial("Selected new active node.")
                 closedNode
             }
+        }
+        if (config.selectRaycastKey.isKeyClicked()) {
+            val playerRay = RaycastUtils.createPlayerLookDirectionRay()
+            var minimumDistance = Double.MAX_VALUE
+            var minimumNode: GraphingNode? = null
+            for (node in nodes) {
+                val nodeCenterPosition = node.position.add(0.5, 0.5, 0.5)
+                val distance = RaycastUtils.findDistanceToRay(playerRay, nodeCenterPosition)
+                if (distance > minimumDistance) {
+                    continue
+                }
+                if (minimumDistance > 1.0) {
+                    minimumNode = node
+                    minimumDistance = distance
+                    continue
+                }
+                if (minimumNode == null || minimumNode.position.distanceSqToPlayer() > node.position.distanceSqToPlayer()) {
+                    minimumNode = node
+                    minimumDistance = distance
+                }
+            }
+            activeNode = minimumNode
         }
         if (activeNode != closedNode && config.connectKey.isKeyClicked()) {
             val edge = getEdgeIndex(activeNode, closedNode)
