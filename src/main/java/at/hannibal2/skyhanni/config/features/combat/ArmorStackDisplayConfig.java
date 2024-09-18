@@ -9,25 +9,25 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArmorStackDisplayConfig {
     @Expose
-    @ConfigOption(name = "Enable", desc = "Armor stack display.")
+    @ConfigOption(name = "Enable Display", desc = "Enable the armor stack display feature.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Armor Stack Display", desc = "Display the number of stacks on armor pieces like Crimson, Terror, Aurora etc.")
+    @ConfigOption(name = "Show Armor Stack", desc = "Display the number of stacks for armor pieces like Crimson, Terror, Aurora, etc.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armorStackDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Armor Stack Decay Timer", desc = "Shows a decay timer for armor after gaining a stack.")
+    @ConfigOption(name = "Stack Decay Timer", desc = "Show a decay timer after gaining a stack.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armorStackDecayTimer = false;
 
     @Expose
-    @ConfigOption(name = "Show Timer Only For Max Stack", desc = "Shows decay timer only for 10th stack.")
+    @ConfigOption(name = "Show Timer for Max Stack", desc = "Show the decay timer only when the 10th stack is reached.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armorStackDecayForMax = false;
