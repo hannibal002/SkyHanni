@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
-import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.distanceToExperimentationTable
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottlePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
@@ -255,5 +254,5 @@ object ExperimentsProfitTracker {
 
     private fun isEnabled() =
         LorenzUtils.inSkyBlock && config.enabled
-            && LorenzVec.getBlockBelowPlayer().distanceToExperimentationTable() <= 5.0
+            && ExperimentationTableAPI.inDistanceToTable(LorenzVec.getBlockBelowPlayer(), 5.0)
 }
