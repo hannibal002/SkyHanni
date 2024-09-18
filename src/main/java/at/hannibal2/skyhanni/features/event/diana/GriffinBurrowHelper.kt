@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.block.BlockSilverfish
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -364,11 +363,6 @@ object GriffinBurrowHelper {
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
-        val blockState = event.getBlockState
-        if (blockState == Blocks.monster_egg) {
-            val s = blockState.getValue(BlockSilverfish.VARIANT)
-            println("s: $s")
-        }
         if (!isEnabled()) return
 
         val location = event.position
