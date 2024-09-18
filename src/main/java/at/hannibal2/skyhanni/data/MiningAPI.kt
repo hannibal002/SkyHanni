@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -12,10 +13,12 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
+import at.hannibal2.skyhanni.events.skyblock.AreaChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -30,6 +33,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.awt.geom.Area
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
@@ -66,8 +70,6 @@ object MiningAPI {
     var inSpidersDen = false
 
     var currentAreaOreBlocks = setOf<OreBlock>()
-
-    private var lastSkyblockArea: String? = null
 
     private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
     private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
@@ -198,10 +200,6 @@ object MiningAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inCustomMiningIsland()) return
-
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 4.seconds) return
-        updateLocation()
-
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 20 seconds to mine a single block, congrats
@@ -212,6 +210,12 @@ object MiningAPI {
         if (lastInitSound.passedSince() < 200.milliseconds) return
         // in case the init block is not found
         resetOreEvent()
+    }
+
+    @HandleEvent
+    fun onAreaChange(event: AreaChangeEvent) {
+        if (!inCustomMiningIsland()) return
+        updateLocation()
     }
 
     private fun runEvent() {
@@ -282,11 +286,6 @@ object MiningAPI {
     }
 
     private fun updateLocation() {
-        val currentArea = LorenzUtils.skyBlockArea
-        // TODO add area change event with HypixelData.skyBlockArea instead
-        if (currentArea == lastSkyblockArea) return
-        lastSkyblockArea = currentArea
-
         inGlacite = inGlaciteArea()
         inDwarvenMines = inRegularDwarven()
         inCrystalHollows = inCrystalHollows()
