@@ -67,12 +67,13 @@ object MiningAPI {
     var inSpidersDen = false
 
     var currentAreaOreBlocks = setOf<OreBlock>()
+        private set
 
     private var lastSkyblockArea: String? = null
 
     private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
     private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
-    private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
+    private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
     var cold: Int = 0
         private set
