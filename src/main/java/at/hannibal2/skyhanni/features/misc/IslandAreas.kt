@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -54,7 +55,9 @@ object IslandAreas {
     }
 
     fun noteMoved() {
-        updateNodes()
+        SkyHanniMod.coroutineScope.launch {
+            updateNodes()
+        }
     }
 
     private fun updateNodes() {
