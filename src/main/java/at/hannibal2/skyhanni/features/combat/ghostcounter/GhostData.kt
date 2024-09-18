@@ -18,6 +18,7 @@ object GhostData {
         Option.SKILLXPGAINED to 0.0
     )
 
+    // TODO repo
     val bestiaryData = mutableMapOf<Int, Int>().apply {
         for (i in 1..25) {
             this[i] = when (i) {
