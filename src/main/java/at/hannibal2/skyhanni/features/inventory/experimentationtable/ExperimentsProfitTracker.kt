@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.distanceToExperimentationTable
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottlePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
@@ -25,6 +26,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -41,7 +43,6 @@ import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ExperimentsProfitTracker {
@@ -54,8 +55,6 @@ object ExperimentsProfitTracker {
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
-    private var inExperimentationTable = false
-    private var lastExperimentTime = SimpleTimeMark.farPast()
     private var lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
     private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
@@ -97,7 +96,7 @@ object ExperimentsProfitTracker {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!isEnabled() || lastExperimentTime.passedSince() > 3.seconds) return
+        if (!isEnabled()) return
 
         val message = event.message.removeColor()
         if (claimMessagePattern.matches(message) && ExperimentMessages.DONE.isSelected())
@@ -148,29 +147,26 @@ object ExperimentsProfitTracker {
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
+
         if (inventoriesPattern.matches(event.inventoryName)) {
-            inExperimentationTable = true
-            if (lastSplashTime.passedSince() < 30.seconds) {
-                var startCostTemp = 0
-                val iterator = lastSplashes.iterator()
-                while (iterator.hasNext()) {
-                    val item = iterator.next()
-                    val internalName = item.getInternalName()
-                    val price = internalName.getPrice()
-                    val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
-                    val maxPrice = npcPrice.coerceAtLeast(price)
-                    startCostTemp += maxPrice.round(0).toInt()
-                    iterator.remove()
-                }
-                tracker.modify {
-                    it.startCost -= startCostTemp
-                }
-                lastSplashTime = SimpleTimeMark.farPast()
+            var startCostTemp = 0
+            val iterator = lastSplashes.iterator()
+            while (iterator.hasNext()) {
+                val item = iterator.next()
+                val internalName = item.getInternalName()
+                val price = internalName.getPrice()
+                val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
+                val maxPrice = npcPrice.coerceAtLeast(price)
+                startCostTemp += maxPrice.round(0).toInt()
+                iterator.remove()
             }
+            tracker.modify {
+                it.startCost -= startCostTemp
+            }
+            lastSplashTime = SimpleTimeMark.farPast()
         }
 
-        val addToTracker = lastExperimentTime.passedSince() <= 3.seconds
-        handleExpBottles(addToTracker)
+        handleExpBottles(false)
     }
 
     @SubscribeEvent
@@ -178,16 +174,11 @@ object ExperimentsProfitTracker {
         if (!isEnabled()) return
 
         if (ExperimentationTableAPI.getCurrentExperiment() != null) {
-            lastExperimentTime = SimpleTimeMark.now()
             tracker.modify {
                 it.experimentsDone++
             }
         }
-        if (inExperimentationTable) {
-            lastExperimentTime = SimpleTimeMark.now()
-            inExperimentationTable = false
-        }
-        if (lastExperimentTime.passedSince() <= 3.seconds) {
+        if (ExperimentationTableAPI.inTable && InventoryUtils.openInventoryName() == "Superpairs Rewards") {
             handleExpBottles(true)
         }
     }
@@ -219,7 +210,6 @@ object ExperimentsProfitTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (lastExperimentTime.passedSince() > config.timeDisplayed.seconds && !inExperimentationTable) return
 
         tracker.renderDisplay(config.position)
     }
@@ -251,7 +241,7 @@ object ExperimentsProfitTracker {
             if (lastInInv == 0) {
                 currentBottlesInInventory[internalName] = 0
                 lastBottlesInInventory[internalName] = amount
-                if (addToTracker && lastExperimentTime.passedSince() <= 3.seconds) tracker.addItem(internalName, amount, false)
+                if (addToTracker) tracker.addItem(internalName, amount, false)
                 continue
             }
 
@@ -263,5 +253,7 @@ object ExperimentsProfitTracker {
 
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+    private fun isEnabled() =
+        LorenzUtils.inSkyBlock && config.enabled
+            && LorenzVec.getBlockBelowPlayer().distanceToExperimentationTable() <= 5.0
 }

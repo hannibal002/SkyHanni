@@ -1,11 +1,29 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
+import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.entity.item.EntityArmorStand
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ExperimentationTableAPI {
+
+    private val storage get() = ProfileStorageData.profileSpecific?.experimentation
+
+    val inTable get() = inventoriesPattern.matches(openInventoryName())
+
+    fun inDistanceToTable(vec: LorenzVec, max: Double): Boolean =
+        storage?.tablePos?.let { it.distance(vec) <= max } ?: false
 
     fun getCurrentExperiment(): Experiment? {
         val inventory = openInventoryName()
@@ -13,6 +31,19 @@ object ExperimentationTableAPI {
             it.nameString == inventory.substringAfter("(").substringBefore(")")
         } else null
     }
+
+    @SubscribeEvent
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
+
+        val entity = EntityUtils.getEntities<EntityArmorStand>().find { it.hasSkullTexture(experimentationTableSkull) } ?: return
+        val vec = entity.getLorenzVec()
+        if (storage?.tablePos != vec) storage?.tablePos = vec
+    }
+
+    private val experimentationTableSkull =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTUyOWF" +
+            "iYzg4MzA5NTNmNGQ5MWVkZmZmMjQ2OTVhOWY2Mjc1OGZhNGM1MWIyOWFjMjQ2YzM3NDllYWFlODliMyJ9fX0="
 
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
@@ -64,7 +95,7 @@ object ExperimentationTableAPI {
      */
     val claimMessagePattern by patternGroup.pattern(
         "claim",
-        "You claimed the \\S+ rewards!"
+        "You claimed the \\S+ rewards!",
     )
 
     /**

@@ -72,6 +72,9 @@ public class ProfileSpecificStorage {
     public static class ExperimentationStorage {
 
         @Expose
+        public LorenzVec tablePos = new LorenzVec();
+
+        @Expose
         public ExperimentsDryStreakStorage dryStreak = new ExperimentsDryStreakStorage();
 
         public static class ExperimentsDryStreakStorage {
