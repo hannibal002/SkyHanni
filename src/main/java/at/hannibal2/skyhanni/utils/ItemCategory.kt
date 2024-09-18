@@ -12,7 +12,7 @@ enum class ItemCategory {
     FISHING_WEAPON,
     FISHING_ROD,
     AXE,
-    GAUNTLET,
+    PICKAXE_AND_SWORD,
     HOE,
     PICKAXE,
     SHOVEL,
@@ -53,6 +53,10 @@ enum class ItemCategory {
     SACK,
     CHISEL,
     DYE,
+    ORE,
+    BLOCK,
+    DWARVEN_METAL,
+    GEMSTONE,
 
     NONE,
     ;
@@ -62,7 +66,7 @@ enum class ItemCategory {
         fun Collection<ItemCategory>.containsItem(stack: ItemStack?) =
             stack?.getItemCategoryOrNull()?.let { this.contains(it) } ?: false
 
-        val miningTools = listOf(PICKAXE, DRILL, GAUNTLET)
+        val miningTools = listOf(PICKAXE, DRILL, PICKAXE_AND_SWORD)
 
         val armor = setOf(HELMET, CHESTPLATE, LEGGINGS, BOOTS)
     }

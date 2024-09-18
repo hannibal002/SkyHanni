@@ -141,5 +141,5 @@ object GhostUtil {
     }
 
     private fun percent(number: Double) =
-        100.0.coerceAtMost(((number / 250_000) * 100).roundTo(4)).toString()
+        100.0.coerceAtMost(((number / 100_000) * 100).roundTo(4)).toString()
 }
