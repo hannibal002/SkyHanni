@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.senderIsSkyhanni
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -58,12 +59,16 @@ object AcceptLastPartyInvite {
     fun onMessageSendToServer(event: MessageSendToServerEvent) {
         if (!config.acceptLastInvite) return
         if (event.senderIsSkyhanni()) return
-        if (lastInviter == "") return
         if (!event.message.startsWith("/party accept", ignoreCase = true) &&
             !event.message.startsWith("/p accept", ignoreCase = true)) {
             return
         }
         event.isCanceled = true
+        if (lastInviter == "") {
+            ChatUtils.chat("There is no party invite to accept!")
+            return
+        }
         HypixelCommands.partyAccept(lastInviter)
+        lastInviter = ""
     }
 }
