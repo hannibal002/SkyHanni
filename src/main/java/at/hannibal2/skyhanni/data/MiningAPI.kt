@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -215,6 +216,11 @@ object MiningAPI {
     @HandleEvent
     fun onAreaChange(event: AreaChangeEvent) {
         if (!inCustomMiningIsland()) return
+        updateLocation()
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
         updateLocation()
     }
 
