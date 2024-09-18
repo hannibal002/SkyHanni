@@ -189,6 +189,8 @@ enum class OreType(
 
     val internalName: NEUInternalName = internalName.asInternalName()
 
+    fun isGemstone(): Boolean = this in gemstones
+
     companion object {
 
         private val gemstones = setOf(
@@ -206,8 +208,6 @@ enum class OreType(
             }
             return false
         }
-
-        fun OreType.isGemstone(): Boolean = this in gemstones
 
         fun OreBlock.getOreType(): OreType? {
             return OreType.entries.firstOrNull { this in it.oreBlocks }
