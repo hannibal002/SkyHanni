@@ -262,8 +262,8 @@ object IslandAreas {
     private val allAreas = listOf(GraphNodeTag.AREA, GraphNodeTag.SMALL_AREA)
     private val onlyLargeAreas = listOf(GraphNodeTag.AREA)
 
-    fun GraphNode.getAreaTag(): GraphNodeTag? = tags.firstOrNull {
-        it in (if (config.includeSmallAreas) allAreas else onlyLargeAreas)
+    fun GraphNode.getAreaTag(ignoreConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
+        it in (if (config.includeSmallAreas || ignoreConfig) allAreas else onlyLargeAreas)
     }
 
     private fun setTarget(node: GraphNode) {

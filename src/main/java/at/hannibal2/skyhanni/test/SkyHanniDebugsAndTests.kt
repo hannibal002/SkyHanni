@@ -23,6 +23,7 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -177,54 +178,47 @@ object SkyHanniDebugsAndTests {
 
     private fun asyncTest() {
         val graph = IslandGraphs.currentIslandGraph ?: return
-        val nodesWithErrors = mutableMapOf<LorenzVec, String>()
+        val displayMap: MutableMap<LorenzVec, String> = mutableMapOf()
         val nodes = graph.nodes
 
+        val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in nodes) {
-            node.name?.let {
-                if (node.tagNames.isEmpty()) {
-                    nodesWithErrors[node.position] = "§cHas name and no tag!"
-                    println("has name and no tag: $it")
-                }
+            val pathToNearestArea = GraphUtils.findFastestPath(graph, node) { it.getAreaTag(ignoreConfig = true) != null }?.first
+            if (pathToNearestArea == null) {
+                displayMap[node.position] = "§cNo connection to any area"
+                continue
             }
-            if (node.tagNames.isNotEmpty()) {
-                if (node.name == null) {
-                    nodesWithErrors[node.position] = "§cHas a tag and no name!"
-                    println("Has a tag and no name: ${node.tagNames}")
-                }
-            }
+            val areaNode = pathToNearestArea.lastOrNull() ?: error("Empty path to nearest area")
+            nearestArea[node] = areaNode
         }
-
-        val nameOfClosestArea = mutableMapOf<GraphNode, String>()
-        for ((index, node) in nodes.withIndex()) {
-            val map = GraphUtils.findFastestPath(graph, node) { it.getAreaTag() != null }
-            val first = map?.first?.lastOrNull()
-            val name = first?.name ?: "§cnone"
-            nameOfClosestArea[node] = name
-        }
-
-        for ((node, name) in nameOfClosestArea) {
-            for ((other, distance) in node.neighbours) {
-                if (other.getAreaTag() != null) continue
-                if (nameOfClosestArea[other] != name) {
-                    val otherName = other.name
-                    val thisName = node.name
-                    if (node.position !in nodesWithErrors) {
-                        nodesWithErrors[node.position] = "§cArea error! ('$thisName' != '$otherName')"
-                    }
+        var bugs = 0
+        for (node in nodes) {
+            val areaNode = nearestArea[node]?.name ?: continue
+            for (neighbour in node.neighbours.keys) {
+                val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
+                if (neighbouringAreaNode == areaNode) continue
+                if ((null != neighbour.getAreaTag(ignoreConfig = true)) != (null != node.getAreaTag(ignoreConfig = true))) {
+                    bugs++
+                    displayMap[node.position] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
                 }
             }
         }
-
-        var hasUsedPathfind = false
-        for ((location, text) in nodesWithErrors) {
-            if (!hasUsedPathfind) {
-                hasUsedPathfind = true
-                IslandGraphs.pathFind(location, Color.RED)
+        for (node in nodes) {
+            val nameNull = node.name.isNullOrBlank()
+            val tagsEmpty = node.tags.isEmpty()
+            if (nameNull > tagsEmpty) {
+                displayMap[node.position] = "§cMissing name despite having tags"
+                bugs++
+            }
+            if (tagsEmpty > nameNull) {
+                displayMap[node.position] = "§cMissing tags despite having name"
+                bugs++
             }
         }
-        println("found ${nodesWithErrors.size} bugs!")
-        displayOnWorld = nodesWithErrors
+
+        println("found $bugs bugs!")
+        displayOnWorld = displayMap
+        IslandGraphs.pathFind(displayMap.keys.minByOrNull { it.distanceSqToPlayer() } ?: return, Color.RED)
     }
 
     fun findNullConfig(args: Array<String>) {
