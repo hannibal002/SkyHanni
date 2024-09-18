@@ -132,8 +132,12 @@ enum class Mayor(
                 )
                 return null
             }
-            val perks = perksJson.mapNotNull { perk ->
-                Perk.entries.firstOrNull { it.perkName == perk.renameIfFoxyExtraEventPerkFound() }
+
+            val perks = perksJson.mapNotNull { perkJson ->
+                val perk = Perk.entries.firstOrNull { it.perkName == perkJson.renameIfFoxyExtraEventPerkFound() }
+                perk?.also {
+                    it.description = perkJson.description
+                }
             }
 
             mayor.addPerks(perks)
@@ -142,6 +146,7 @@ enum class Mayor(
 
         fun Mayor.addPerks(perks: List<Perk>) {
             perks.forEach { it.isActive = false }
+            activePerks.forEach { it.isActive = false }
             activePerks.clear()
             for (perk in perks.filter { perks.contains(it) }) {
                 perk.isActive = true
@@ -149,17 +154,16 @@ enum class Mayor(
             }
         }
 
-        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String? {
+        private fun MayorPerk.renameIfFoxyExtraEventPerkFound(): String {
             val foxyExtraEventPairs = mapOf(
                 "Spooky Festival" to "Extra Event (Spooky)",
                 "Mining Fiesta" to "Extra Event (Mining)",
                 "Fishing Festival" to "Extra Event (Fishing)",
             )
 
-            foxyExtraEventPattern.matchMatcher(this.description) {
-                return foxyExtraEventPairs.entries.firstOrNull { it.key == group("event") }?.value
-            }
-            return this.name
+            return foxyExtraEventPattern.matchMatcher(this.description) {
+                foxyExtraEventPairs.entries.firstOrNull { it.key == group("event") }?.value
+            } ?: this.name
         }
     }
 }
@@ -230,6 +234,9 @@ enum class Perk(val perkName: String) {
     ;
 
     var isActive = false
+    var description = "§cDescription failed to load from the API."
+
+    override fun toString(): String = "$perkName: $description"
 
     companion object {
         fun getPerkFromName(name: String): Perk? = entries.firstOrNull { it.perkName == name }
