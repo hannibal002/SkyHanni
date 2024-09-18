@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -25,12 +26,10 @@ object ExperimentationTableAPI {
     fun inDistanceToTable(vec: LorenzVec, max: Double): Boolean =
         storage?.tablePos?.let { it.distance(vec) <= max } ?: false
 
-    fun getCurrentExperiment(): Experiment? {
-        val inventory = openInventoryName()
-        return if (inventory.startsWith("Superpairs (")) Experiment.entries.find {
-            it.nameString == inventory.substringAfter("(").substringBefore(")")
-        } else null
-    }
+    fun getCurrentExperiment(): Experiment? =
+        superpairsPattern.matchMatcher(openInventoryName()) {
+            Experiment.entries.find { it.nameString == group("experiment") }
+        }
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
@@ -46,6 +45,14 @@ object ExperimentationTableAPI {
             "iYzg4MzA5NTNmNGQ5MWVkZmZmMjQ2OTVhOWY2Mjc1OGZhNGM1MWIyOWFjMjQ2YzM3NDllYWFlODliMyJ9fX0="
 
     private val patternGroup = RepoPattern.group("enchanting.experiments")
+
+    /**
+     * REGEX-TEST: Superpairs (Metaphysical)
+     */
+    private val superpairsPattern by patternGroup.pattern(
+        "superpairs",
+        "Superpairs \\((?<experiment>\\w+)\\)",
+    )
 
     /**
      * REGEX-TEST: Gained +3 Clicks
