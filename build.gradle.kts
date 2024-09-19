@@ -3,6 +3,8 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -18,6 +20,7 @@ plugins {
     kotlin("plugin.power-assert")
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.7"
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
@@ -177,10 +180,14 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
     implementation("net.hypixel:mod-api:0.3.1")
+
+    compileOnly("io.gitlab.arturbosch.detekt:detekt-api:1.23.7")
+    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
+    testImplementation("io.gitlab.arturbosch.detekt:detekt-test:1.23.7")
 }
 
 afterEvaluate {
@@ -342,4 +349,31 @@ publishing.publications {
             }
         }
     }
+}
+
+// Detekt:
+detekt {
+    buildUponDefaultConfig = true // preconfigure defaults
+    config.setFrom("$projectDir/detekt/detekt.yml") // point to your custom config defining rules to run, overwriting default behavior
+    baseline = file("$projectDir/detekt/baseline.xml") // a way of suppressing issues before introducing detekt
+    source.setFrom(
+        "$projectDir/src/main/kotlin",
+        "$projectDir/src/main/java"
+    )
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+        md.required.set(true) // simple Markdown format
+    }
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = "1.8"
+}
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = "1.8"
 }
