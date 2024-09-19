@@ -26,15 +26,14 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.indexOfFirstMatch
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.math.ceil
 import kotlin.math.pow
 
 private fun calculateCoreOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
@@ -111,7 +110,7 @@ enum class HotmData(
         "Mole",
         200,
         { level -> (level + 1.0).pow(2.17883) },
-        { level -> mapOf(HotmReward.MINING_SPREAD to 50.0 + ((level - 1) * (350/199))) },
+        { level -> mapOf(HotmReward.MINING_SPREAD to 50.0 + ((level - 1) * (350 / 199))) },
     ),
     GEM_LOVER(
         "Gem Lover",
@@ -234,7 +233,8 @@ enum class HotmData(
         { null },
         { level ->
             mapOf(
-                HotmReward.ABILITY_DURATION to 5.0 * (level * 1),
+                HotmReward.MINING_SPEED_BOOST to 200.0 + 50.0 * (level - 1),
+                HotmReward.ABILITY_DURATION to 10.0 + 5 * (level - 1),
                 HotmReward.ABILITY_COOLDOWN to 120.0,
             )
         },
@@ -256,9 +256,10 @@ enum class HotmData(
         "Sheer Force",
         3,
         { null },
-        { level -> mapOf(
-            HotmReward.ABILITY_DURATION to 20.0 + 5 * (level - 1),
-            HotmReward.MINING_SPREAD to 200.0,
+        { level ->
+            mapOf(
+                HotmReward.ABILITY_DURATION to 20.0 + 5 * (level - 1),
+                HotmReward.MINING_SPREAD to 200.0,
             )
         },
     ),
@@ -267,10 +268,11 @@ enum class HotmData(
         "Anomalous Desire",
         3,
         { null },
-        { level -> mapOf(
-            HotmReward.EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES to 30.0 + (level - 1) * 10.0,
-            HotmReward.ABILITY_COOLDOWN to 120.0 - (level - 1) * 10.0,
-            HotmReward.ABILITY_DURATION to 30.0,
+        { level ->
+            mapOf(
+                HotmReward.EXTRA_CHANCE_TRIGGER_RARE_OCCURRENCES to 30.0 + (level - 1) * 10.0,
+                HotmReward.ABILITY_COOLDOWN to 120.0 - (level - 1) * 10.0,
+                HotmReward.ABILITY_DURATION to 30.0,
             )
         },
     ),
@@ -369,7 +371,7 @@ enum class HotmData(
 
     private val guiNamePattern by patternGroup.pattern("perk.name.${name.lowercase().replace("_", "")}", "§.$guiName")
 
-    val printName = name.allLettersFirstUppercase()
+    val printName get() = name.allLettersFirstUppercase()
 
     /** Level which are actually paid with powder (does exclude [blueEgg])*/
     var rawLevel: Int
@@ -380,13 +382,13 @@ enum class HotmData(
 
     /** Level for which the effect that is present (considers [enabled] and [blueEgg])*/
     val activeLevel: Int
-        get() = if (enabled) effectivLevel else 0
+        get() = if (enabled) effectiveLevel else 0
 
     /** Level that considering [blueEgg]*/
-    val effectivLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
+    val effectiveLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
 
     val isMaxLevel: Boolean
-        get() = effectivLevel >= maxLevel // >= to account for +1 from Blue Cheese
+        get() = effectiveLevel >= maxLevel // >= to account for +1 from Blue Cheese
 
     private fun blueEgg() = if (this != CORE_OF_THE_MOUNTAIN && maxLevel != 1 && HotmAPI.isBlueEggActive) 1 else 0
 
@@ -676,7 +678,7 @@ enum class HotmData(
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
-            event.scoreboard.matchFirst(ScoreboardPattern.powderPattern) {
+            ScoreboardPattern.powderPattern.firstMatcher(event.scoreboard) {
                 val type = HotmAPI.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()
@@ -845,5 +847,4 @@ enum class HotmReward {
     FISHING_SPEED,
     SEA_CREATURE_CHANCE,
     BREAKING_POWER,
-
 }
