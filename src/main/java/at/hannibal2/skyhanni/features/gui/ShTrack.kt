@@ -118,7 +118,7 @@ object ShTrack {
         override var errorMessage: String? = null
 
         override fun post() {
-            val result: TrackingElement
+            val result: TrackingElement<*>
             when (state) {
                 StateType.ITEM -> {
                     val current: Long
@@ -179,6 +179,7 @@ object ShTrack {
             }
             result.shouldNotify = notify
             result.shouldAutoDelete = autoDelete
+            result.line = result.generateLine()
             if (!allowDupe) {
                 val index = tracker.indexOfFirst { result.similarElement(it) }
                 if (index != -1) {
@@ -202,7 +203,7 @@ object ShTrack {
         }
     }
 
-    private val tracker: MutableList<TrackingElement> = object : ArrayList<TrackingElement>() {
+    private val tracker: MutableList<TrackingElement<*>> = object : ArrayList<TrackingElement<*>>() {
 
         override fun clear() {
             forEach {
@@ -212,21 +213,21 @@ object ShTrack {
             updateDisplay()
         }
 
-        override fun addAll(elements: Collection<TrackingElement>): Boolean {
+        override fun addAll(elements: Collection<TrackingElement<*>>): Boolean {
             elements.forEach { it.atAdd() }
             val r = super.addAll(elements)
             updateDisplay()
             return r
         }
 
-        override fun removeAt(index: Int): TrackingElement {
+        override fun removeAt(index: Int): TrackingElement<*> {
             this[index].atRemove()
             val r = super.removeAt(index)
             updateDisplay()
             return r
         }
 
-        override fun set(index: Int, element: TrackingElement): TrackingElement {
+        override fun set(index: Int, element: TrackingElement<*>): TrackingElement<*> {
             this.getOrNull(index)?.atRemove()
             element.atAdd()
             val r = super.set(index, element)
@@ -234,21 +235,21 @@ object ShTrack {
             return r
         }
 
-        override fun add(element: TrackingElement): Boolean {
+        override fun add(element: TrackingElement<*>): Boolean {
             element.atAdd()
             val r = super.add(element)
             updateDisplay()
             return r
         }
 
-        override fun add(index: Int, element: TrackingElement) {
+        override fun add(index: Int, element: TrackingElement<*>) {
             element.atAdd()
             val r = super.add(index, element)
             updateDisplay()
             return r
         }
 
-        override fun addAll(index: Int, elements: Collection<TrackingElement>): Boolean {
+        override fun addAll(index: Int, elements: Collection<TrackingElement<*>>): Boolean {
             elements.forEach { it.atAdd() }
             val r = super.addAll(index, elements)
             updateDisplay()
@@ -322,11 +323,15 @@ object ShTrack {
         val includeSack: Boolean
     }
 
-    private class ItemTrackingElement(val item: NEUInternalName, var current: Long, val target: Long?, override val includeSack: Boolean) :
-        TrackingElement(), ItemTrackingInterface {
+    private class ItemTrackingElement(
+        val item: NEUInternalName,
+        override var current: Long,
+        override val target: Long?,
+        override val includeSack: Boolean,
+    ) :
+        TrackingElement<Long>(), ItemTrackingInterface {
 
-        override var line = generateLine()
-        override fun similarElement(other: TrackingElement): Boolean {
+        override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemTrackingElement) return false
             return other.item == this.item
         }
@@ -344,17 +349,11 @@ object ShTrack {
         override fun internalUpdate(amount: Number) {
             current += amount.toLong()
             if (target != null && current >= target) {
-                if (shouldNotify) {
-                    notify("${item.itemName} §adone")
-                }
-                if (shouldAutoDelete) {
-                    delete()
-                }
+                handleDone("${item.itemName} §adone")
             }
-            line = generateLine()
         }
 
-        private fun generateLine() = listOf(
+        override fun generateLine() = listOf(
             Renderable.itemStack(item.getItemStack()),
             Renderable.string(item.itemName),
             Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
@@ -365,11 +364,15 @@ object ShTrack {
         }
     }
 
-    private class ItemGroupElement(val group: ItemGroup, var current: Long, val target: Long?, override val includeSack: Boolean) :
-        TrackingElement(), ItemTrackingInterface {
+    private class ItemGroupElement(
+        val group: ItemGroup,
+        override var current: Long,
+        override val target: Long?,
+        override val includeSack: Boolean,
+    ) :
+        TrackingElement<Long>(), ItemTrackingInterface {
 
-        override var line = generateLine()
-        override fun similarElement(other: TrackingElement): Boolean {
+        override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemGroupElement) return false
             return other.group == this.group
         }
@@ -391,17 +394,11 @@ object ShTrack {
         override fun internalUpdate(amount: Number) {
             current += amount.toLong()
             if (target != null && current >= target) {
-                if (shouldNotify) {
-                    notify("${group.name} §adone")
-                }
-                if (shouldAutoDelete) {
-                    delete()
-                }
+                handleDone("${group.name} §adone")
             }
-            line = generateLine()
         }
 
-        private fun generateLine() = listOf(
+        override fun generateLine() = listOf(
             Renderable.itemStack(group.icon.getItemStack()),
             Renderable.string(group.name),
             Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
@@ -413,30 +410,23 @@ object ShTrack {
         }
     }
 
-    private class PowderTrackingElement(val type: HotmAPI.PowderType, var current: Long, val target: Long?) : TrackingElement() {
-
-        override var line = generateLine()
+    private class PowderTrackingElement(val type: HotmAPI.PowderType, override var current: Long, override val target: Long?) :
+        TrackingElement<Long>() {
 
         override fun internalUpdate(amount: Number) {
             current += amount.toLong()
             if (target != null && current >= target) {
-                if (shouldNotify) {
-                    notify("${type.displayName} §adone")
-                }
-                if (shouldAutoDelete) {
-                    delete()
-                }
+                handleDone("${type.displayName} §adone")
             }
-            line = generateLine()
         }
 
-        private fun generateLine() = listOf(
+        override fun generateLine() = listOf(
             Renderable.itemStack(type.icon),
             Renderable.string(type.displayName),
             Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
         )
 
-        override fun similarElement(other: TrackingElement): Boolean {
+        override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is PowderTrackingElement) return false
             return other.type == this.type
         }
@@ -451,15 +441,28 @@ object ShTrack {
 
     }
 
-    private abstract class TrackingElement {
+    private abstract class TrackingElement<T : Number> {
 
         var shouldNotify = false
         var shouldAutoDelete = false
 
+        abstract var current: T
+        abstract val target: T?
+
         fun update(amount: Number) {
             if (amount == 0) return
             internalUpdate(amount)
+            line = generateLine()
             updateDisplay()
+        }
+
+        fun handleDone(notify: String) {
+            if (shouldNotify) {
+                notify(notify)
+            }
+            if (shouldAutoDelete) {
+                delete()
+            }
         }
 
         fun notify(string: String) {
@@ -472,15 +475,17 @@ object ShTrack {
             tracker.remove(this)
         }
 
-        abstract fun internalUpdate(amount: Number)
+        protected abstract fun internalUpdate(amount: Number)
 
-        abstract val line: List<Renderable>
+        var line: List<Renderable> = emptyList()
 
-        abstract fun similarElement(other: TrackingElement): Boolean
+        abstract fun similarElement(other: TrackingElement<*>): Boolean
 
         abstract fun atRemove()
 
         abstract fun atAdd()
+
+        abstract fun generateLine(): List<Renderable>
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
