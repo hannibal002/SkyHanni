@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -116,17 +117,23 @@ object SkyHanniDebugsAndTests {
         if (args.isEmpty()) {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
+            IslandGraphs.stop()
         }
 
         val x = args[0].toDouble()
         val y = args[1].toDouble()
         val z = args[2].toDouble()
-        testLocation = LorenzVec(x, y, z)
+        val location = LorenzVec(x, y, z)
+        testLocation = location
+        if (args.getOrNull(3) == "pathfind") {
+            IslandGraphs.pathFind(location)
+        }
         ChatUtils.chat("set test waypoint")
     }
 
     fun testCommand(args: Array<String>) {
-        SoundUtils.playBeepSound()
+
+
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()

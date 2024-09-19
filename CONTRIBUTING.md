@@ -30,8 +30,54 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 ### Setting up IntelliJ
 
-SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**, just
-follow [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md).
+Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft, NEU, and so on should be automatically
+downloaded. If not, you might need to link the Gradle project in the Gradle tab (little elephant) on the right.
+
+<details>
+<summary>🖼️Show Gradle tab image</summary>
+
+![Gradle tab with Link Project and Gradle Settings highlighted](docs/gradle-tab.jpg)
+
+</details>
+
+If importing fails, make sure the Gradle JVM (found in the settings wheel in the Gradle tab, or by searching <kbd>Ctrl + Shift + A</kbd>
+for "Gradle JVM") is set to a Java 21 JDK. While this is not the version of Java Minecraft 1.8.9 uses, we need this version for some of our
+build tools.
+
+<details>
+<summary>🖼️Show Gradle JVM image</summary>
+
+![Gradle settings showing Java 21 being selected as JVM](docs/gradle-settings.png)
+
+</details>
+
+After all importing is done (which might take a few minutes the first time you download the project), you should find a new IntelliJ run
+configuration.
+
+<details>
+<summary>🖼️Show run configuration selection image</summary>
+
+![Where to select the run configuration](docs/minecraft-client.webp)
+
+</details>
+
+That task might work out of the box, but very likely it will not. We will need to adjust the used Java version. Since Minecraft 1.8.9 uses
+Java 1.8, we will need to adjust the used JDK for running our Mod, as well as potentially changing the argument passing style.
+
+So select an appropriate Java 1.8 JDK (preferably [DCEVM](#hot-swap), but any Java 1.8 JDK or even JRE will do) and select None as the
+argument passing style.
+
+<details>
+<summary>🖼️Show run configuration image</summary>
+
+![Run configuration settings](docs/run-configuration-settings.avif)
+
+</details>
+
+Now that we are done with that, you should be able to launch your game from your IDE with that run configuration.
+
+SkyHanni's Gradle configuration is very similar to the one used in **NotEnoughUpdates**, so if you want to look at another guide, check
+out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/CONTRIBUTING.md).
 
 ## Creating a Pull Request
 
