@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FAC
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -30,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object HoppityAPI {
 
-    private var hoppityEggChat = mutableListOf<String>()
+    private var messageCount = 0
     private var duplicate = false
     private var lastRarity = ""
     private var lastName = ""
@@ -41,7 +42,7 @@ object HoppityAPI {
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
     private fun resetChatData() {
-        this.hoppityEggChat = mutableListOf()
+        this.messageCount = 0
         this.duplicate = false
         this.newRabbit = false
         this.lastRarity = ""
@@ -170,10 +171,9 @@ object HoppityAPI {
             this.lastDuplicateAmount = it
             this.duplicate = true
         }
-        event?.message?.let { hoppityEggChat.add(it) }
+        event?.let { messageCount++; ChatUtils.chat("messageCount incremented to ${messageCount}") }
         val lastChatMeal = lastChatMeal ?: return
-        if (hoppityEggChat.size == 3) {
-            RabbitFoundEvent(lastChatMeal, duplicate, lastName, lastDuplicateAmount ?: 0).post()
-        }
+        if (messageCount != 3) return
+        RabbitFoundEvent(lastChatMeal, duplicate, lastName, lastDuplicateAmount ?: 0).post()
     }
 }
