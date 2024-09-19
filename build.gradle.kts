@@ -352,8 +352,8 @@ tasks.withType<Detekt>().configureEach {
 }
 
 tasks.withType<Detekt>().configureEach {
-    jvmTarget = "1.8"
+    jvmTarget = target.minecraftVersion.javaLanguageVersion.toString()
 }
 tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = "1.8"
+    jvmTarget = target.minecraftVersion.javaLanguageVersion.toString()
 }
