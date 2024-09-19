@@ -18,6 +18,8 @@ jobs:
         runs-on: ubuntu-latest
         name: "Build and test"
         steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Build with Gradle
                 run: ./gradlew assemble -x test --stacktrace
@@ -39,6 +41,8 @@ jobs:
         runs-on: ubuntu-latest
 
         steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Run detekt
                 run: |
@@ -69,6 +73,8 @@ jobs:
         runs-on: ubuntu-latest
         name: "Build multi version"
         steps:
+            -   name: Checkout code
+                uses: actions/checkout@v4
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Enable preprocessor
                 run: |
