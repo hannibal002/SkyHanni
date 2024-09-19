@@ -23,8 +23,8 @@ class AvoidColour(config: Config) : Rule(config) {
     )
 
     override fun visitStringTemplateExpression(expression: KtStringTemplateExpression) {
-        val text = expression.text
-        if (text.contains("colour")) {
+        val text = expression.text // Be aware .getText() returns the entire span of this template, including variable names contained within. This should be rare enough of a problem for us to not care about it.
+        if (text.contains("colour", ignoreCase = true)) {
             report(
                 CodeSmell(
                     issue,

@@ -111,7 +111,7 @@ format like "- #821" to illustrate the dependency.
 - Avoid using deprecated functions.
     - These functions are marked for removal in future versions.
     - If you're unsure why a function is deprecated or how to replace it, please ask for guidance.
-- Future JSON data objects should be made in kotlin and placed in the directory `at.hannibal2.skyhanni.data.jsonobjects`
+- Future JSON data objects should be made in kotlin and placed in the grammar `at.hannibal2.skyhanni.data.jsonobjects`
     - Config files should still be made in Java.
 - Please use the existing event system, or expand on it. Do not use Forge events.
     - (We inject the calls with Mixin)
@@ -345,7 +345,7 @@ active. To distinguish regular comments from preprocessor comments, preprocessor
 walk through what is happening here.
 
 In 1.8.9, the code remains unchanged. **Note that this means the programmer is responsible for commenting out the unused parts.
-The preprocessor will never change the `src/` directory**.
+The preprocessor will never change the `src/` grammar**.
 
 Next, the preprocessor converts the code to 1.12. 1.12 still has the `loadedEntityList` as well as the same name for the `WorldClient` and
 `Entity` classes, so nothing is changed.

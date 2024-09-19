@@ -1,0 +1,25 @@
+
+config:
+    validation: true
+
+GrammarRules:
+    AvoidColour:
+        active: true
+
+
+style:
+    MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
+        active: false
+    UnusedParameter:
+        active: true
+        ignoreAnnotated:
+            - 'SubscribeEvent'
+            - 'HandleEvent'
+    ReturnCount:
+        active: true
+#         max: 5
+        excludeGuardClauses: true
+    MaxLineLength:
+        active: true
+        maxLineLength: 140
+        excludeCommentStatements: true

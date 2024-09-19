@@ -20,31 +20,10 @@ plugins {
     kotlin("plugin.power-assert")
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
-    id("io.gitlab.arturbosch.detekt") version "1.23.7"
+    id("io.gitlab.arturbosch.detekt")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-    maven("https://maven.minecraftforge.net") {
-        metadataSources {
-            artifact() // We love missing POMs
-        }
-    }
-    maven("https://repo.spongepowered.org/maven/") // mixin
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
-        content {
-            includeGroupByRegex("(com|io)\\.github\\..*")
-        }
-    }
-    maven("https://repo.nea.moe/releases") // libautoupdate
-    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
-    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
-    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
-}
 
 // Toolchains:
 java {
@@ -185,9 +164,8 @@ dependencies {
 
     implementation("net.hypixel:mod-api:0.3.1")
 
-    compileOnly("io.gitlab.arturbosch.detekt:detekt-api:1.23.7")
-    testImplementation("io.kotest:kotest-assertions-core:5.9.1")
-    testImplementation("io.gitlab.arturbosch.detekt:detekt-test:1.23.7")
+    detektPlugins("org.notenoughupdates:detektrules:1.0.0")
+    detektPlugins(project(":detekt"))
 }
 
 afterEvaluate {
@@ -354,12 +332,13 @@ publishing.publications {
 // Detekt:
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
-    config.setFrom("$projectDir/detekt/detekt.yml") // point to your custom config defining rules to run, overwriting default behavior
-    baseline = file("$projectDir/detekt/baseline.xml") // a way of suppressing issues before introducing detekt
-    source.setFrom(
-        "$projectDir/src/main/kotlin",
-        "$projectDir/src/main/java"
-    )
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
+    baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+//     source.setFrom(
+//         "$projectDir/src/main/kotlin",
+//         "$projectDir/src/main/java"
+//     )
 }
 
 tasks.withType<Detekt>().configureEach {

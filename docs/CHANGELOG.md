@@ -349,7 +349,7 @@
 + Fixed Mayor Detection failing when Special Mayors are in office. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2389)
 + Updated Derpy's extra tax perk to use the correct name. - Luna (https://github.com/hannibal002/SkyHanni/pull/2393)
 + Fixed Christmas presents in the Hypixel lobby being visible outside of December. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2396)
-+ Fixed the mod crashing on startup when the game directory path contains a "!". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2427)
++ Fixed the mod crashing on startup when the game grammar path contains a "!". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2427)
 + Fixed chat formatting for coin drops in profit trackers (Diana, Slayer, Fishing, Pest). - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2444)
 + Fixed Last Server Time Slider not functioning. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2440)
 + Fixed warning sounds being stuttered and cutting out. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2482)
