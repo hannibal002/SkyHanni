@@ -15,20 +15,20 @@ fi
 read -r -d '' jq_command <<'EOF'
 .runs[].results[] |
 {
-    "l": .locations[].physicalLocation,
+    "full_path": .locations[].physicalLocation.artifactLocation.uri | sub("file://$(pwd)/"; ""),
+    "file_name": (.locations[].physicalLocation.artifactLocation.uri | split("/") | last),
+    "line": .locations[].physicalLocation.region.startLine,
     "level": .level,
-    "message":.message,
-    "ruleId":.ruleId
+    "message": .message.text,
+    "ruleId": .ruleId
 } |
 (
     "::" + (.level) +
-    " file=" + ( .l.artifactLocation.uri | sub("file://$(pwd)/"; ""))
-    + ",line=" + (.l.region.startLine|tostring)
-    + ",endLine=" + (.l.region.endLine|tostring)
-    + ",col=" + (.l.region.startColumn|tostring)
-    + ",endColumn=" + (.l.region.endColumn|tostring)
-    + ",title=" + (.ruleId) + "::" + (.message.text))
+    " file=" + (.full_path) +
+    "::" + (.file_name) + ":" + (.line|tostring) +
+    " - " + (.ruleId) + ": " + (.message)
+)
 EOF
 
-# Run jq command
+# Run jq command to format the output
 jq -r "$jq_command" < "$SARIF_FILE"
