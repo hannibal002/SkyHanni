@@ -15,9 +15,10 @@ style:
         ignoreAnnotated:
             - 'SubscribeEvent'
             - 'HandleEvent'
+            - 'Mod.EventHandler'
     ReturnCount:
         active: true
-#         max: 5
+        max: 4
         excludeGuardClauses: true
     MaxLineLength:
         active: true

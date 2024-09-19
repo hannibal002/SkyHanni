@@ -48,6 +48,7 @@ jobs:
                 run: |
                     ./gradlew detekt --stacktrace
             -   name: Annotate detekt failures
+                if: ${{ !cancelled() }}
                 run: |
                     read -r -d '' jq_command <<'EOF'
                     .runs[].results[] |
