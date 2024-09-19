@@ -989,6 +989,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Use /shhoppitystats for live stats.
 + Added optional warning when Hoppity calls you with a rabbit to sell. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2272)
 + Added hotkey for picking up Abiphone calls from Hoppity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2272)
++ Added a draggable list for Hoppity's Collection menu rabbit highlighting. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
+    + Factory/Shop milestones = Yellow/Gold.
+    + Stray rabbits = Dark Aqua.
+    + Abi = Dark Green.
++ Added a toggle to highlight found rabbits in Hoppity's Collection menu. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
 
 ### The Carnival
 
