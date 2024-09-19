@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -55,7 +56,40 @@ object ShTrack {
         return args.firstOrNull()?.let { 1 } ?: 0
     }
 
-    fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, NEUInternalName?> {
+    private enum class NameSource {
+        INTERNAL_NAME,
+        ITEM_NAME,
+        GROUP
+        ;
+    }
+
+    init {
+        ItemGroup("GOLD", "GOLD_INGOT" to 1, "GOLD_BLOCK" to 9, "ENCHANTED_GOLD" to 160, "ENCHANTED_GOLD_BLOCK" to 160 * 160)
+    }
+
+    class ItemGroup(val name: String, vararg items: Pair<String, Int>) {
+
+        val icon = items.first().first.asInternalName()
+
+        val items = items.associate { it.first.asInternalName() to it.second }
+
+        init {
+            entries[items.first().first.uppercase().replace(" ", "_")] = this
+        }
+
+        companion object {
+
+            private val entries = mutableMapOf<String, ItemGroup>()
+
+            fun findGroup(string: String): ItemGroup? {
+                val search = string.replace(" ", "_").uppercase()
+                return entries[search]
+            }
+        }
+    }
+
+    fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, Any?> {
+        @Suppress("ReplaceSizeZeroCheckWithIsEmpty") // A bug since the replacement does not work for iterable interface.
         if (args.count() == 0) {
             context.errorMessage = "No item specified"
             return 0 to null
@@ -64,22 +98,23 @@ object ShTrack {
 
         val namePattern = "^name:".toRegex()
         val internalPattern = "^internal:".toRegex()
+        val groupPattern = "^(?:group|collection):".toRegex()
 
-        val expectInternalElseName: Boolean? = if (namePattern.matches(first)) {
-            false
-        } else if (internalPattern.matches(first)) {
-            true
-        } else {
-            null
+        val expected = when {
+            namePattern.matches(first) -> NameSource.ITEM_NAME
+            internalPattern.matches(first) -> NameSource.INTERNAL_NAME
+            groupPattern.matches(first) -> NameSource.GROUP
+            else -> null
         }
 
         val grabbed = args.takeWhile { "[a-zA-Z:_\"';]+([:-;]\\d+)?".toPattern().matches(it) }
 
         val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
 
-        val item = when (expectInternalElseName) {
-            true -> collected.replace(internalPattern, "").replace(" ", "_").asInternalName()
-            false -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "").replace("_", " "))
+        val item: Any? = when (expected) {
+            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "").replace(" ", "_").asInternalName()
+            NameSource.ITEM_NAME -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "").replace("_", " "))
+            NameSource.GROUP -> ItemGroup.findGroup(collected)
             null -> {
                 val fromItemName = NEUInternalName.fromItemNameOrNull(collected.replace("_", " "))
                 if (fromItemName?.getItemStackOrNull() != null) {
@@ -89,13 +124,13 @@ object ShTrack {
                     if (internalName.getItemStackOrNull() != null) {
                         internalName
                     } else {
-                        null
+                        ItemGroup.findGroup(collected)
                     }
                 }
             }
         }
 
-        if (item?.getItemStackOrNull() == null) {
+        if ((item as? NEUInternalName)?.getItemStackOrNull() == null && (item as? ItemGroup) == null) {
             context.errorMessage = "Could not find a valid item for: '$collected'"
         }
 
@@ -120,7 +155,7 @@ object ShTrack {
                 }
             }
 
-        var item: NEUInternalName? = null
+        var item: Any? = null
         var targetAmount: Long? = null
         var currentAmount: Long? = null
             set(value) {
@@ -162,21 +197,46 @@ object ShTrack {
             val result: TrackingElement
             when (state) {
                 StateType.ITEM -> {
-                    val item = item ?: run {
-                        errorMessage = "No item specified"
-                        return
-                    }
-                    val current: Long = currentAmount ?: when (currentFetch) {
-                        CurrentFetch.INVENTORY -> item.getAmountInInventory().toLong()
-                        CurrentFetch.SACKS -> item.getAmountInInventory().toLong() + item.getAmountInSacks().toLong()
-                        CurrentFetch.COLLECTION -> CollectionAPI.getCollectionCounter(item) ?: run {
-                            errorMessage = "Collection amount is unknown"
-                            0L
+                    val current: Long
+                    val item = item
+                    val currentSelector: (NEUInternalName) -> Long = when (currentFetch) {
+                        CurrentFetch.INVENTORY -> {
+                            { it.getAmountInInventory().toLong() }
                         }
 
-                        else -> 0L
+                        CurrentFetch.SACKS -> {
+                            { it.getAmountInInventory().toLong() + it.getAmountInSacks().toLong() }
+                        }
+
+                        CurrentFetch.COLLECTION -> {
+                            {
+                                CollectionAPI.getCollectionCounter(it) ?: run {
+                                    errorMessage = "Collection amount is unknown"
+                                    0L
+                                }
+                            }
+                        }
+
+                        else -> {
+                            { 0L }
+                        }
                     }
-                    result = ItemTrackingElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                    when (item) {
+                        is ItemGroup -> {
+                            current = currentAmount ?: item.items.keys.sumOf(currentSelector)
+                            result = ItemGroupElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                        }
+
+                        is NEUInternalName -> {
+                            current = currentAmount ?: currentSelector(item)
+                            result = ItemTrackingElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                        }
+
+                        else -> {
+                            errorMessage = "No item specified"
+                            return
+                        }
+                    }
                 }
 
                 else -> {
@@ -267,7 +327,7 @@ object ShTrack {
         }
     }
 
-    private val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingElement>> = mutableMapOf()
+    private val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingInterface>> = mutableMapOf()
 
     private var display: Renderable = Renderable.placeholder(0, 0)
 
@@ -294,11 +354,11 @@ object ShTrack {
         if (event.source == ItemAddManager.Source.SACKS) {
             for (tracker in trackers) {
                 if (!tracker.includeSack) continue
-                tracker.update(event.amount)
+                tracker.itemChange(event.pStack)
             }
         } else {
             for (tracker in trackers) {
-                tracker.update(event.amount)
+                tracker.itemChange(event.pStack)
             }
         }
 
@@ -310,8 +370,15 @@ object ShTrack {
         scheduledUpdate = true
     }
 
-    private class ItemTrackingElement(val item: NEUInternalName, var current: Long, val target: Long?, val includeSack: Boolean) :
-        TrackingElement() {
+    private interface ItemTrackingInterface {
+
+        fun itemChange(item: PrimitiveItemStack)
+
+        val includeSack: Boolean
+    }
+
+    private class ItemTrackingElement(val item: NEUInternalName, var current: Long, val target: Long?, override val includeSack: Boolean) :
+        TrackingElement(), ItemTrackingInterface {
 
         override var line = generateLine()
         override fun similarElement(other: TrackingElement): Boolean {
@@ -346,6 +413,57 @@ object ShTrack {
             Renderable.itemStack(item.getItemStack()),
             Renderable.string(item.itemName), Renderable.string((current.toString() + target?.let { " / $it" }) ?: ""),
         )
+
+        override fun itemChange(item: PrimitiveItemStack) {
+            update(item.amount)
+        }
+    }
+
+    private class ItemGroupElement(val group: ItemGroup, var current: Long, val target: Long?, override val includeSack: Boolean) :
+        TrackingElement(), ItemTrackingInterface {
+
+        override var line = generateLine()
+        override fun similarElement(other: TrackingElement): Boolean {
+            if (other !is ItemGroupElement) return false
+            return other.group == this.group
+        }
+
+        override fun atRemove() {
+            for (item in group.items.keys) {
+                itemTrackers[item]?.remove(this)
+            }
+        }
+
+        override fun atAdd() {
+            for (item in group.items.keys) {
+                itemTrackers.compute(item) { _, v ->
+                    v?.also { it.add(this) } ?: mutableListOf(this)
+                }
+            }
+        }
+
+        override fun internalUpdate(amount: Number) {
+            current += amount.toLong()
+            if (target != null && current >= target) {
+                if (shouldNotify) {
+                    notify("${group.name} §adone")
+                }
+                if (shouldAutoDelete) {
+                    delete()
+                }
+            }
+            line = generateLine()
+        }
+
+        private fun generateLine() = listOf(
+            Renderable.itemStack(group.icon.getItemStack()),
+            Renderable.string(group.name), Renderable.string((current.toString() + target?.let { " / $it" }) ?: ""),
+        )
+
+        override fun itemChange(item: PrimitiveItemStack) {
+            val multiple = group.items[item.internalName] ?: throw IllegalStateException("You should not be here!")
+            update(item.amount * multiple)
+        }
     }
 
     private abstract class TrackingElement {
