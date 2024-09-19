@@ -403,27 +403,45 @@ object DungeonAPI {
     }
 
     private val phasePatternGroup = RepoPattern.group("dungeon.boss.message")
+    /**
+     * REGEX-TEST: §c[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\? Sadan\?!
+     */
     private val terracottaStartPattern by phasePatternGroup.pattern(
         "f6.terracotta",
         "§c\\[BOSS] Sadan§r§f: So you made it all the way here\\.\\.\\. Now you wish to defy me\\? Sadan\\?!"
     )
+    /**
+     * REGEX-TEST: §c[BOSS] Sadan§r§f: ENOUGH!
+     */
     private val giantsStartPattern by phasePatternGroup.pattern(
         "f6.giants",
         "§c\\[BOSS] Sadan§r§f: ENOUGH!"
     )
+    /**
+     * REGEX-TEST: §c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect.
+     */
     private val sadanStartPattern by phasePatternGroup.pattern(
         "f6.sadan",
         "§c\\[BOSS] Sadan§r§f: You did it\\. I understand now, you have earned my respect\\."
     )
 
+    /**
+     * REGEX-TEST: §4[BOSS] Maxor§r§c: §r§cWELL! WELL! WELL! LOOK WHO'S HERE!
+     */
     private val maxorStartPattern by phasePatternGroup.pattern(
         "f7.maxor",
         "§4\\[BOSS] Maxor§r§c: §r§cWELL! WELL! WELL! LOOK WHO'S HERE!"
     )
+    /**
+     * REGEX-TEST: §4[BOSS] Storm§r§c: §r§cPathetic Maxor, just like expected.
+     */
     private val stormStartPattern by phasePatternGroup.pattern(
         "f7.storm",
         "§4\\[BOSS] Storm§r§c: §r§cPathetic Maxor, just like expected\\."
     )
+    /**
+     * REGEX-TEST: §4[BOSS] Goldor§r§c: §r§cWho dares trespass into my domain?
+     */
     private val goldorStartPattern by phasePatternGroup.pattern(
         "f7.goldor.start",
         "§4\\[BOSS] Goldor§r§c: §r§cWho dares trespass into my domain\\?",
@@ -438,14 +456,23 @@ object DungeonAPI {
         "f7.goldor.terminalcomplete",
         "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)"
     )
+    /**
+     * REGEX-TEST: §aThe Core entrance is opening!
+     */
     private val goldor5StartPattern by phasePatternGroup.pattern(
         "f7.goldor.5",
         "§aThe Core entrance is opening!"
     )
+    /**
+     * REGEX-TEST: §4[BOSS] Necron§r§c: §r§cYou went further than any human before, congratulations.
+     */
     private val necronStartPattern by phasePatternGroup.pattern(
         "f7.necron.start",
         "§4\\[BOSS] Necron§r§c: §r§cYou went further than any human before, congratulations\\.",
     )
+    /**
+     * REGEX-TEST: §4[BOSS] Necron§r§c: §r§cAll this, for nothing...
+     */
     private val witherKingStartPattern by phasePatternGroup.pattern(
         "m7.witherking",
         "§4\\[BOSS] Necron§r§c: §r§cAll this, for nothing\\.\\.\\."
