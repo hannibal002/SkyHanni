@@ -10,15 +10,18 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyBlockAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
@@ -106,12 +109,17 @@ object IslandGraphs {
     fun onRepoReload(event: RepositoryReloadEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        reloadFromJson(LorenzUtils.skyBlockIsland)
+        loadIsland(LorenzUtils.skyBlockIsland)
     }
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        reloadFromJson(event.newIsland)
+        if (currentIslandGraph != null) return
+        if (event.newIsland ==IslandType.DWARVEN_MINES) {
+            reset()
+            return
+        }
+        loadIsland(event.newIsland)
     }
 
     @SubscribeEvent
@@ -119,8 +127,33 @@ object IslandGraphs {
         reset()
     }
 
-    private fun reloadFromJson(newIsland: IslandType) {
-        val islandName = newIsland.name
+    private var inGlaciteTunnels: Boolean? = null
+
+    @SubscribeEvent
+    fun onAreaChange(event: SkyBlockAreaChangeEvent) {
+        if (currentIslandGraph != null) return
+        // Should not happen, just as workaround still
+        if (!IslandType.DWARVEN_MINES.isInIsland()) return
+
+        val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
+
+        val now = event.newArea in areas
+        if (inGlaciteTunnels != now) {
+            inGlaciteTunnels = now
+            if (now) {
+                reloadFromJson("GLACITE_TUNNELS")
+            } else {
+                loadIsland(IslandType.DWARVEN_MINES)
+            }
+        }
+    }
+
+    private fun loadIsland(newIsland: IslandType) {
+        reloadFromJson(newIsland.name)
+    }
+
+    private fun reloadFromJson(islandName: String) {
+        ChatUtils.debug("reloadFromJson: $islandName")
         val constant = "island_graphs/$islandName"
         val name = "constants/$constant.json"
         val jsonFile = File(SkyHanniMod.repo.repoLocation, name)
@@ -139,6 +172,7 @@ object IslandGraphs {
     }
 
     private fun reset() {
+        currentIslandGraph = null
         closedNote = null
         currentTarget = null
         goal = null
@@ -294,8 +328,7 @@ object IslandGraphs {
 
         val nodes = graph.nodes
         val potentialSkip =
-            nodes.lastOrNull { it.position.canBeSeen(maxSkipDistance, -1.0) && abs(it.position.y - playerY) <= 2 }
-                ?: return null
+            nodes.lastOrNull { it.position.canBeSeen(maxSkipDistance, -1.0) && abs(it.position.y - playerY) <= 2 } ?: return null
 
         val angleSkip = if (potentialSkip == nodes.first()) {
             false

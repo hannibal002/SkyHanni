@@ -221,7 +221,7 @@ object TunnelsMaps {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        graph = event.getConstant<Graph>("TunnelsGraph", gson = Graph.gson)
+        graph = event.getConstant<Graph>("island_graphs/GLACITE_TUNNELS", gson = Graph.gson)
         possibleLocations = graph.groupBy { it.name }.filterNotNullKeys().mapValues { (_, value) ->
             value
         }
@@ -235,7 +235,12 @@ object TunnelsMaps {
                 key.contains("Fairy") -> fairy[key] = value.first()
                 newGemstonePattern.matches(key) -> newGemstone[key] = value
                 oldGemstonePattern.matches(key) -> oldGemstone[key] = value
-                else -> other[key] = value
+                else -> {
+                    // ignore node names without color codes
+                    if (key.removeColor() != key) {
+                        other[key] = value
+                    }
+                }
             }
         }
         fairySouls = fairy
