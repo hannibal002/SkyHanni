@@ -30,3 +30,12 @@ formatting:
         active: false
     MultiLineIfElse:
         active: false
+    ArgumentListWrapping: # ktlint - way too aggressive
+        active: false
+    TooManyFunctions: # ktlint - also way too aggressive by default (11 on all file types)
+        active: true
+        thresholdInFiles: 15
+        thresholdInClasses: 20
+        thresholdInInterfaces: 20
+        thresholdInObjects: 20
+        thresholdInEnums: 11
