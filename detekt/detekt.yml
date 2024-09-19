@@ -24,3 +24,9 @@ style:
         active: true
         maxLineLength: 140
         excludeCommentStatements: true
+
+formatting:
+    MaximumLineLength: # ktlint - handled by detekt
+        active: false
+    MultiLineIfElse:
+        active: false

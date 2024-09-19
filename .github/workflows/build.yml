@@ -50,6 +50,7 @@ jobs:
             -   name: Annotate detekt failures
                 if: ${{ !cancelled() }}
                 run: |
+                    find
                     read -r -d '' jq_command <<'EOF'
                     .runs[].results[] |
                     {
@@ -67,6 +68,7 @@ jobs:
                         + ",endColumn=" + (.l.region.endColumn|tostring)
                         + ",title=" + (.ruleId) + "::" + (.message.text))
                     EOF
+                    echo "$jq_command"
                     jq -r "$jq_command" < versions/1.8.9/build/reports/detekt/detekt.sarif
     
 
