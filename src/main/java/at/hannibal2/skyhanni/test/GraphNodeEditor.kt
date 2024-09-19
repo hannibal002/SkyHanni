@@ -29,11 +29,11 @@ object GraphNodeEditor {
     private val textInput = TextInput()
     private var nodesDisplay = emptyList<Renderable>()
     private var lastUpdate = SimpleTimeMark.farPast()
+    private val tagsToShow: MutableList<GraphNodeTag> = GraphNodeTag.entries.toMutableList()
 
     @SubscribeEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
-
 
         config.namedNodesList.renderRenderables(
             getNodeNames(),
@@ -52,12 +52,63 @@ object GraphNodeEditor {
         lastUpdate = SimpleTimeMark.now()
         nodesDisplay = buildList {
             val list = drawNodeNames()
-            val size = list.size
-            addString("§eGraph Nodes: $size")
-            val height = (size * 10).coerceAtMost(250)
+            val total = GraphEditor.nodes.count { it.name?.isNotBlank() ?: false }
+            val shown = list.size
+            add(
+                Renderable.clickAndHover(
+                    "§eGraph Nodes: $shown/$total",
+                    listOf("§eClick to toggle node tags!"),
+                    onClick = {
+                        updateToggleTags()
+                    },
+                ),
+            )
+            val height = (shown * 10).coerceAtMost(250)
             if (list.isNotEmpty()) {
                 add(list.buildSearchableScrollable(height, textInput, scrollValueNodes, velocity = 10.0))
             }
+        }
+    }
+
+    private fun updateToggleTags() {
+        lastUpdate = SimpleTimeMark.now() + 60.seconds
+        nodesDisplay = buildList {
+            addString("§eToggle Visible Tags")
+            for (tag in GraphNodeTag.entries) {
+                val isVisible = tag in tagsToShow
+                val nodes = GraphEditor.nodes.count { tag in it.tags }
+                val visibilityText = if (isVisible) " §aVisible" else " §7Invisible"
+                val name = " - ${tag.displayName} §8($nodes nodes) $visibilityText"
+                add(
+                    Renderable.clickAndHover(
+                        name,
+                        listOf("§eClick to " + (if (isVisible) "hide" else "show") + " nodes with this tag!"),
+                        onClick = {
+                            toggleTag(tag)
+                            updateToggleTags()
+                        },
+                    ),
+                )
+            }
+            addString("")
+            add(
+                Renderable.clickAndHover(
+                    "§cGo Back!",
+                    tips = listOf("§eClick to go back to the node list!"),
+                    onClick = {
+                        updateNodeNames()
+                    },
+                ),
+            )
+        }
+
+    }
+
+    private fun toggleTag(tag: GraphNodeTag) {
+        if (tag in tagsToShow) {
+            tagsToShow.remove(tag)
+        } else {
+            tagsToShow.add(tag)
         }
     }
 
@@ -123,7 +174,10 @@ object GraphNodeEditor {
 
     private fun drawNodeNames(): List<Searchable> = buildList {
         for ((node, distance: Double) in GraphEditor.nodes.map { it to it.position.distanceSqToPlayer() }.sortedBy { it.second }) {
-            val name = node.name?.takeIf { !it.isBlank() } ?: continue
+            if (node.tags.isNotEmpty()) {
+                if (!node.tags.any { it in tagsToShow }) continue
+            }
+            val name = node.name?.takeIf { it.isNotBlank() } ?: continue
             val color = if (node == GraphEditor.activeNode) "§a" else "§7"
             val distanceFormat = sqrt(distance).toInt().addSeparators()
             val tagText = node.tags.let { tags ->
