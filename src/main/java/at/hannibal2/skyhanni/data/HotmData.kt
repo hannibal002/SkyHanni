@@ -234,8 +234,8 @@ enum class HotmData(
         { null },
         { level ->
             mapOf(
-                HotmReward.ABILITY_DURATION to level + 1.0,
-                HotmReward.ABILITY_COOLDOWN to 10.0 + 5.0 * level,
+                HotmReward.ABILITY_DURATION to 5.0 * (level * 1),
+                HotmReward.ABILITY_COOLDOWN to 120.0,
             )
         },
     ),
