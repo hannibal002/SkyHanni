@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -26,10 +27,8 @@ object FrogMaskDisplay {
     val config get() = SkyHanniMod.feature.misc
 
     private var display = Renderable.verticalContainer(listOf())
-    private var lastChecked = 0
 
-    private var region = ""
-    private var regionUntil = SimpleTimeMark.farPast()
+    private var region: Pair<String, SimpleTimeMark> = "" to SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("misc.frogmask")
     private val activeRegionPattern by patternGroup.pattern(
@@ -42,48 +41,54 @@ object FrogMaskDisplay {
         "ICJTS0lOIiA6IHsKICAgICAgInVybCIgOiAiaHR0cDovL3RleHR1cmVzLm1pbmVjcmFmdC5uZXQvdGV4dHVyZS84NzUyMmExZWFkZjg5OTZmNDJhOGQyZTVmYjBjYTl" +
         "iZmIzYWI0ODNkM2ZiYWY2OGVmMjlhNDJkZThjZWY3NGM1IgogICAgfQogIH0KfQ"
 
+    private val frogMaskSkull = ItemUtils.createSkull(
+        "§5Frog Mask",
+        "0e9936a2-5609-385f-a5ef-ce38dfee8c91",
+        FROG_MASK_TEXTURE,
+    )
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        display = updateDisplay()
         config.frogMaskDisplayPos.renderRenderable(display, posLabel = "Frog Mask Display")
-    }
-
-    private fun updateDisplay(): Renderable {
-        val frogMaskSkull = ItemUtils.createSkull(
-            "§5Frog Mask",
-            "0e9936a2-5609-385f-a5ef-ce38dfee8c91",
-            FROG_MASK_TEXTURE,
-        )
-
-        return Renderable.horizontalContainer(
-            listOf(
-                Renderable.itemStack(frogMaskSkull),
-                Renderable.string(
-                    "§5Frog Mask§6 - §a$region §6for §e${regionUntil.timeUntil()}",
-                ),
-            ),
-            spacing = 1,
-            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        )
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         val now = SkyBlockTime.now()
-        if (!isEnabled() || lastChecked == now.day || regionUntil.isInFuture()) return
+        if (!isEnabled()) return
+
+        if (event.isMod(2)) display = if (region.first != "") updateDisplay() else Renderable.verticalContainer(listOf())
+
+        if (region.second.isInFuture()) return
 
         val helmet = InventoryUtils.getHelmet() ?: return
         if (helmet.displayName.removeColor() != "Frog Mask") return
 
         activeRegionPattern.matchMatcher(helmet.getLore()[11].removeColor()) {
-            region = group("region")
+            val nextRegion = group("region")
+            val nextRegionTime = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
 
-            regionUntil = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
-
-            lastChecked = now.day
+            region = nextRegion to nextRegionTime
         }
+    }
+
+
+    private fun updateDisplay(): Renderable {
+        val until = region.second.timeUntil()
+        val timeString = "${until.inWholeMinutes}m ${(until.inPartialSeconds % 60).toInt()}s"
+
+        return Renderable.horizontalContainer(
+            listOf(
+                Renderable.itemStack(frogMaskSkull),
+                Renderable.string(
+                    "§5Frog Mask§6 - §a${region.first} §6for §e$timeString",
+                ),
+            ),
+            spacing = 1,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+        )
     }
 
     private fun isEnabled() = config.frogMaskDisplay && LorenzUtils.skyBlockIsland == IslandType.THE_PARK
