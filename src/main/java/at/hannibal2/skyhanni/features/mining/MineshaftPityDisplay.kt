@@ -164,7 +164,7 @@ object MineshaftPityDisplay {
     // if the chance is 1/1500, it will return 1500
     private fun calculateChance(counter: Int): Double {
         val surveyorPercent = HotmData.SURVEYOR.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
-        val peakMountainPercent = HotmData.PEAK_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
+        val peakMountainPercent = HotmData.CORE_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
         val chance = counter / (1 + surveyorPercent / 100 + peakMountainPercent / 100)
         return chance
     }
