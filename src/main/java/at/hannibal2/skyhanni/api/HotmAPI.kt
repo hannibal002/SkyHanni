@@ -35,7 +35,7 @@ object HotmAPI {
 
     enum class PowderType(val displayName: String, val color: String, val icon: ItemStack) {
         MITHRIL("Mithril", "§2", ItemStack(Items.dye, 1, 10)),
-        GEMSTONE("Gemstone", "§d", ItemStack(Items.dye, 1, 5)),
+        GEMSTONE("Gemstone", "§d", ItemStack(Items.dye, 1, 9)),
         GLACITE("Glacite", "§b", ItemStack(Items.dye, 1, 6)),
 
         ;
