@@ -61,6 +61,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
     @Accordion
+    // TODO remove the suffix "config"
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
