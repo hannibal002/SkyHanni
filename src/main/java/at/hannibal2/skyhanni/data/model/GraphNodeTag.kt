@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 enum class GraphNodeTag(
     val internalName: String,
     val color: LorenzColor,
-    val cleanName: String,
+    cleanName: String,
     val description: String,
     val onlyIsland: IslandType? = null,
 ) {
@@ -17,13 +17,17 @@ enum class GraphNodeTag(
     AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area."),
     SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house."),
     POI("poi", LorenzColor.WHITE, "PoI", "Point of interest."),
-    LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
+//     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
+    TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport."),
 
     // on multiple islands
     ROMEO("romeo", LorenzColor.WHITE, "Romeo & Juliette Quest", "Blocks related to the Romeo and Juliette/Ring of Love quest line."),
     RACE("race", LorenzColor.WHITE, "Race Start/Stop", "A race start or stop point."),
-    SLAYER("slayer", LorenzColor.WHITE, "Slayer", "A Slayer area"),
+    SLAYER("slayer", LorenzColor.RED, "Slayer", "A Slayer area"),
     HOPPITY("hoppity", LorenzColor.AQUA, "Hoppity Egg", "An egg location in Hoppity's Hunt."),
+    GRIND_MOBS("grind_mobs", LorenzColor.RED, "Grind Mobs", "A spot where combat mobs spawn that can be killed."),
+    GRIND_ORES("grind_ores", LorenzColor.DARK_AQUA, "Grind Ores", "A spot where mining ores spawn that can be mines."),
+    GRIND_CROPS("grind_crops", LorenzColor.DARK_GREEN, "Grind Crops", "A spot where farming crops spawn that can be farmed."),
     // hoppity
 
     // Hub
@@ -51,6 +55,9 @@ enum class GraphNodeTag(
 
     // Crimson Isles
     CRIMSON_MINIBOSS("crimson_miniboss", LorenzColor.RED, "Crimson Miniboss", "Mini bosses in Crimson Isle.", onlyIsland = IslandType.CRIMSON_ISLE),
+
+    // The End
+    END_GOLEM("end_golem", LorenzColor.RED, "Golem Spawn", "A spot where the golem in the end spawns", onlyIsland = IslandType.THE_END),
 
     ;
 
