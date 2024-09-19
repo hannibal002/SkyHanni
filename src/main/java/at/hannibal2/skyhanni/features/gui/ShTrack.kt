@@ -12,16 +12,15 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.PowderGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CommandUtils.ItemGroup
+import at.hannibal2.skyhanni.utils.CommandUtils.itemCheck
+import at.hannibal2.skyhanni.utils.CommandUtils.numberCalculate
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUCalculator
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -58,92 +57,8 @@ object ShTrack {
 
     private fun validIfItemState(context: ContextObject) = context.state == ContextObject.StateType.ITEM
 
-    fun <T : CommandContextAwareObject> numberCalculate(args: Iterable<String>, context: T, use: (T, Long) -> Unit): Int {
-        NEUCalculator.calculateOrNull(args.firstOrNull())?.toLong()?.let { use(context, it) } ?: {
-            context.errorMessage = "Unkown number/calculation: '${args.firstOrNull()}'"
-        }
-        return args.firstOrNull()?.let { 1 } ?: 0
-    }
-
-    private enum class NameSource {
-        INTERNAL_NAME,
-        ITEM_NAME,
-        GROUP
-        ;
-    }
-
     init {
         ItemGroup("GOLD", "GOLD_INGOT" to 1, "GOLD_BLOCK" to 9, "ENCHANTED_GOLD" to 160, "ENCHANTED_GOLD_BLOCK" to 160 * 160)
-    }
-
-    class ItemGroup(val name: String, vararg items: Pair<String, Int>) {
-
-        val icon = items.first().first.asInternalName()
-
-        val items = items.associate { it.first.asInternalName() to it.second }
-
-        init {
-            entries[items.first().first.uppercase().replace(" ", "_")] = this
-        }
-
-        companion object {
-
-            private val entries = mutableMapOf<String, ItemGroup>()
-
-            fun findGroup(string: String): ItemGroup? {
-                val search = string.replace(" ", "_").uppercase()
-                return entries[search]
-            }
-        }
-    }
-
-    fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, Any?> {
-        @Suppress("ReplaceSizeZeroCheckWithIsEmpty") // A bug since the replacement does not work for iterable interface.
-        if (args.count() == 0) {
-            context.errorMessage = "No item specified"
-            return 0 to null
-        }
-        val first = args.first()
-
-        val namePattern = "^name:".toRegex()
-        val internalPattern = "^internal:".toRegex()
-        val groupPattern = "^(?:group|collection):".toRegex()
-
-        val expected = when {
-            namePattern.matches(first) -> NameSource.ITEM_NAME
-            internalPattern.matches(first) -> NameSource.INTERNAL_NAME
-            groupPattern.matches(first) -> NameSource.GROUP
-            else -> null
-        }
-
-        val grabbed = args.takeWhile { "[a-zA-Z:_\"';]+([:-;]\\d+)?".toPattern().matches(it) }
-
-        val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
-
-        val item: Any? = when (expected) {
-            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "").replace(" ", "_").asInternalName()
-            NameSource.ITEM_NAME -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "").replace("_", " "))
-            NameSource.GROUP -> ItemGroup.findGroup(collected)
-            null -> {
-                val fromItemName = NEUInternalName.fromItemNameOrNull(collected.replace("_", " "))
-                if (fromItemName?.getItemStackOrNull() != null) {
-                    fromItemName
-                } else {
-                    val internalName = collected.replace(" ", "_").asInternalName()
-                    if (internalName.getItemStackOrNull() != null) {
-                        internalName
-                    } else {
-                        ItemGroup.findGroup(collected)
-                    }
-                }
-            }
-        }
-
-        if ((item as? NEUInternalName)?.getItemStackOrNull() == null && (item as? ItemGroup) == null) {
-            context.errorMessage = "Could not find a valid item for: '$collected'"
-        }
-
-        return grabbed.size to item
     }
 
     class ContextObject : CommandContextAwareObject {
