@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -25,12 +26,12 @@ import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -55,8 +56,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.DragNDrop
+import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
+import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
@@ -112,17 +116,23 @@ object SkyHanniDebugsAndTests {
         if (args.isEmpty()) {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
+            IslandGraphs.stop()
         }
 
         val x = args[0].toDouble()
         val y = args[1].toDouble()
         val z = args[2].toDouble()
-        testLocation = LorenzVec(x, y, z)
+        val location = LorenzVec(x, y, z)
+        testLocation = location
+        if (args.getOrNull(3) == "pathfind") {
+            IslandGraphs.pathFind(location)
+        }
         ChatUtils.chat("set test waypoint")
     }
 
     fun testCommand(args: Array<String>) {
-        SoundUtils.playBeepSound()
+
+
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()
@@ -197,10 +207,9 @@ object SkyHanniDebugsAndTests {
 
     fun resetConfigCommand() {
         ChatUtils.clickableChat(
-            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to procceed.",
-            onClick = {
-                resetConfig()
-            },
+            "§cTHIS WILL RESET YOUR SkyHanni CONFIG! Click here to proceed.",
+            onClick = { resetConfig() },
+            "§eClick to confirm.",
             prefix = false,
             oneTimeClick = true,
         )
@@ -362,15 +371,9 @@ object SkyHanniDebugsAndTests {
             return
         }
 
-        val internalName = hand.getInternalNameOrNull()
-        if (internalName == null) {
-            ChatUtils.error("§cInternal name is null for item ${hand.name}")
-            return
-        }
-
-        val rawInternalName = internalName.asString()
-        OSUtils.copyToClipboard(rawInternalName)
-        ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
+        val internalName = hand.getInternalName().asString()
+        OSUtils.copyToClipboard(internalName)
+        ChatUtils.chat("§eCopied internal name §7$internalName §eto the clipboard!")
     }
 
     fun toggleRender() {
@@ -469,6 +472,15 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    fun onSHowCraftPrice(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!debugConfig.showCraftPrice) return
+        val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
+
+        event.toolTip.add("§7Craft price: ${price.addSeparators()}")
+    }
+
+    @SubscribeEvent
     fun onShowBzPrice(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showBZPrice) return
@@ -492,7 +504,7 @@ object SkyHanniDebugsAndTests {
             event.toolTip.add("Item name: no item.")
             return
         }
-        val name = internalName.itemName
+        val name = itemStack.itemName
         event.toolTip.add("Item name: '$name§7'")
     }
 
@@ -504,8 +516,7 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             itemRenderDebug()
         }
 
@@ -536,6 +547,44 @@ object SkyHanniDebugsAndTests {
             config.debugPos.renderString("test: $displayLine", posLabel = "Test")
         }
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
+    }
+
+    @SubscribeEvent
+    fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
+        @Suppress("ConstantConditionIf") if (false) {
+            dragAbleTest()
+        }
+    }
+
+    private fun dragAbleTest() {
+        val bone = ItemStack(Items.bone, 1).toDragItem()
+        val leaf = ItemStack(Blocks.leaves, 1).toDragItem()
+
+        config.debugItemPos.renderRenderables(
+            listOf(
+                DragNDrop.draggable(Renderable.string("A Bone"), { bone }),
+                Renderable.placeholder(0, 30),
+                DragNDrop.draggable(Renderable.string("A Leaf"), { leaf }),
+                Renderable.placeholder(0, 30),
+                DragNDrop.droppable(
+                    Renderable.string("Feed Dog"),
+                    object : Droppable {
+                        override fun handle(drop: Any?) {
+                            val unit = drop as ItemStack
+                            if (unit.item == Items.bone) {
+                                LorenzDebug.chatAndLog("Oh, a bone!")
+                            } else {
+                                LorenzDebug.chatAndLog("Disgusting that is not a bone!")
+                            }
+                        }
+
+                        override fun validTarget(item: Any?) = item is ItemStack
+
+                    },
+                ),
+            ),
+            posLabel = "Item Debug",
+        )
     }
 
     private fun itemRenderDebug() {
