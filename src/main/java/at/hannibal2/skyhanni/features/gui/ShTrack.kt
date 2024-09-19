@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -117,6 +118,12 @@ object ShTrack {
 
         override var errorMessage: String? = null
 
+        private fun fetchCollection(it: NEUInternalName): Long =
+            CollectionAPI.getCollectionCounter(it) ?: run {
+                errorMessage = "Collection amount is unknown"
+                0L
+            }
+
         override fun post() {
             val result: TrackingElement<*>
             when (state) {
@@ -134,10 +141,7 @@ object ShTrack {
 
                         CurrentFetch.COLLECTION -> {
                             {
-                                CollectionAPI.getCollectionCounter(it) ?: run {
-                                    errorMessage = "Collection amount is unknown"
-                                    0L
-                                }
+                                fetchCollection(it)
                             }
                         }
 
@@ -147,7 +151,9 @@ object ShTrack {
                     }
                     when (item) {
                         is ItemGroup -> {
-                            current = currentAmount ?: item.items.keys.sumOf(currentSelector)
+                            current = currentAmount
+                                ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(item.collection.asInternalName())
+                                else item.items.keys.sumOf(currentSelector)
                             result = ItemGroupElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
                         }
 

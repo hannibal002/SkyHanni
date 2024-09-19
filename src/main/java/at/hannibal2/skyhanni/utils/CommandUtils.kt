@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 object CommandUtils {
 
-    class ItemGroup(val name: String, vararg items: Pair<String, Int>) {
+    class ItemGroup(val name: String, vararg items: Pair<String, Int>, val collection: String = "") {
 
         val icon = items.first().first.asInternalName()
 
