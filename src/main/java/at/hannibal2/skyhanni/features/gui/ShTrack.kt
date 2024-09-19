@@ -2,12 +2,15 @@ package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionAPI
+import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandArgument
 import at.hannibal2.skyhanni.config.commands.CommandContextAwareObject
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
+import at.hannibal2.skyhanni.events.mining.PowderGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -32,11 +35,17 @@ object ShTrack {
 
     val arguments = listOf<CommandArgument<ContextObject>>(
         CommandArgument("-i") { _, c -> c.state = ContextObject.StateType.ITEM; 0 },
-        CommandArgument(defaultPosition = 0) { a, c -> numberCalculate(a, c) { context, number -> context.targetAmount = number } },
-        CommandArgument(defaultPosition = 1, validity = ::validIfItemState) { a, c ->
+        CommandArgument("-p") { _, c -> c.state = ContextObject.StateType.POWDER; 0 },
+        CommandArgument(defaultPosition = 1) { a, c -> numberCalculate(a, c) { context, number -> context.targetAmount = number } },
+        CommandArgument(defaultPosition = 0, validity = ::validIfItemState) { a, c ->
             val r = itemCheck(a, c)
             r.second?.let { c.item = it }
             r.first
+        },
+        CommandArgument(defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER }) { a, c ->
+            val entry = HotmAPI.PowderType.getValue(a.first())
+            c.item = entry
+            1
         },
         CommandArgument("-c", defaultPosition = -2) { a, c -> numberCalculate(a, c) { context, number -> context.currentAmount = number } },
         CommandArgument("-s", validity = ::validIfItemState) { _, c -> c.currentFetch = ContextObject.CurrentFetch.SACKS; 0 },
@@ -239,6 +248,15 @@ object ShTrack {
                     }
                 }
 
+                StateType.POWDER -> {
+                    val type = item as? HotmAPI.PowderType ?: run {
+                        errorMessage = "No powder specified"
+                        return
+                    }
+                    val current = currentAmount ?: type.getCurrent()
+                    result = PowderTrackingElement(type, current, targetAmount)
+                }
+
                 else -> {
                     errorMessage = "Unknown Stat"
                     return
@@ -256,7 +274,8 @@ object ShTrack {
         }
 
         enum class StateType {
-            ITEM
+            ITEM,
+            POWDER
         }
 
         enum class CurrentFetch {
@@ -328,6 +347,7 @@ object ShTrack {
     }
 
     private val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingInterface>> = mutableMapOf()
+    private val powderTracker = mutableListOf<PowderTrackingElement>()
 
     private var display: Renderable = Renderable.placeholder(0, 0)
 
@@ -362,6 +382,15 @@ object ShTrack {
             }
         }
 
+    }
+
+    @HandleEvent
+    fun onPowderGain(event: PowderGainEvent) {
+        powderTracker.forEach {
+            if (it.type == event.powder) {
+                it.update(event.amount)
+            }
+        }
     }
 
     private var scheduledUpdate = false
@@ -411,7 +440,8 @@ object ShTrack {
 
         private fun generateLine() = listOf(
             Renderable.itemStack(item.getItemStack()),
-            Renderable.string(item.itemName), Renderable.string((current.toString() + target?.let { " / $it" }) ?: ""),
+            Renderable.string(item.itemName),
+            Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
         )
 
         override fun itemChange(item: PrimitiveItemStack) {
@@ -457,13 +487,52 @@ object ShTrack {
 
         private fun generateLine() = listOf(
             Renderable.itemStack(group.icon.getItemStack()),
-            Renderable.string(group.name), Renderable.string((current.toString() + target?.let { " / $it" }) ?: ""),
+            Renderable.string(group.name),
+            Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
         )
 
         override fun itemChange(item: PrimitiveItemStack) {
             val multiple = group.items[item.internalName] ?: throw IllegalStateException("You should not be here!")
             update(item.amount * multiple)
         }
+    }
+
+    private class PowderTrackingElement(val type: HotmAPI.PowderType, var current: Long, val target: Long?) : TrackingElement() {
+
+        override var line = generateLine()
+
+        override fun internalUpdate(amount: Number) {
+            current += amount.toLong()
+            if (target != null && current >= target) {
+                if (shouldNotify) {
+                    notify("${type.displayName} §adone")
+                }
+                if (shouldAutoDelete) {
+                    delete()
+                }
+            }
+            line = generateLine()
+        }
+
+        private fun generateLine() = listOf(
+            Renderable.itemStack(type.icon),
+            Renderable.string(type.displayName),
+            Renderable.string(current.toString() + ((target?.let { " / $it" }) ?: "")),
+        )
+
+        override fun similarElement(other: TrackingElement): Boolean {
+            if (other !is PowderTrackingElement) return false
+            return other.type == this.type
+        }
+
+        override fun atRemove() {
+            powderTracker.remove(this)
+        }
+
+        override fun atAdd() {
+            powderTracker.add(this)
+        }
+
     }
 
     private abstract class TrackingElement {
