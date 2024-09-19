@@ -208,7 +208,7 @@ enum class HotmData(
             mapOf(
                 HotmReward.MINING_SPEED to 250.0,
                 HotmReward.GEMSTONE_FORTUNE to 150.0,
-                HotmReward.MORE_GEMSTONE_POWER to 300.0,
+                HotmReward.MORE_GEMSTONE_POWER to 200.0,
             )
         },
     ),
