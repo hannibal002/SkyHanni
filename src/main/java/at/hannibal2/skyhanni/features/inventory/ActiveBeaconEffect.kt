@@ -25,7 +25,7 @@ object ActiveBeaconEffect {
         "Profile Stat Upgrades"
     )
     private val slotPattern by patternGroup.pattern(
-        "slot",
+        "slot.active",
         "§aActive stat boost!"
     )
 
