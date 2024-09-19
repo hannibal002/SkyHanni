@@ -268,6 +268,7 @@ object ShTrack {
                 val index = tracker.indexOfFirst { result.similarElement(it) }
                 if (index != -1) {
                     tracker[index] = result
+                    return
                 }
             }
             tracker.add(result)
