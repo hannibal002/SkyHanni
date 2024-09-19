@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
-import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -25,7 +25,7 @@ object ArmorStackDisplay {
     private var stackSymbol = ""
     private var stackType = ""
     private var armorPieceCount = 0
-    private var display = ""
+    private var display = listOf<String>()
     private var stackDecayTimeCurrent = SimpleTimeMark.farPast()
 
     /**
@@ -74,10 +74,9 @@ object ArmorStackDisplay {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isEnabled()) {
-            config.position.renderString(display, posLabel = "Armor Stack Display")
+            config.position.renderStrings(display, posLabel = "Armor Stack Display")
         }
     }
-
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -85,31 +84,54 @@ object ArmorStackDisplay {
         display = drawDisplay()
     }
 
-    private fun drawDisplay(): String {
-        if (stackCount == 0 || armorPieceCount < 3) return ""
+    private fun drawDisplay(): List<String> {
+        if (stackCount == 0 || armorPieceCount < 3) return emptyList()
+        val displaySingleLine = config.showInSingleLine
+        val showStack = config.armorStackDisplay
+        val showTimer = config.armorStackDecayTimer
+        val maxStackOnly = config.maxStackOnly
+        val isMaxStack = stackCount == 10
 
-        return buildString {
-            if (config.armorStackDisplay) {
-                append("§6")
-                if (config.armorStackType) append("$stackType: ")
-                append("§l$stackCount$stackSymbol ")
-            }
+        val decayTimeString = if (showTimer) {
+            val remainingTime = stackDecayTimeCurrent.timeUntil().coerceAtLeast(0.milliseconds)
+            remainingTime.format(showMilliSeconds = true, showSmallerUnits = true)
+        } else ""
 
-            if (config.armorStackDecayTimer) {
-                val remainingTime = stackDecayTimeCurrent.timeUntil().coerceAtLeast(0.milliseconds)
-                val armorStackDecayDisplay = remainingTime.format(showMilliSeconds = true, showSmallerUnits = true)
-                val colorCode = when {
-                    config.maxStackOnly && stackCount == 10 -> "§b"
-                    stackCount == 10 -> "§9"
-                    else -> "§b"
+        val colorCode = when {
+            isMaxStack && maxStackOnly -> "§b"
+            isMaxStack -> "§9"
+            else -> "§b"
+        }
+
+        if (displaySingleLine) {
+            return listOf(buildString {
+                if (showStack) {
+                    append("§6")
+                    if (config.armorStackType) append("$stackType: ")
+                    append("§l$stackCount$stackSymbol ")
                 }
-                if (config.maxStackOnly && stackCount == 10 || !config.maxStackOnly) {
-                    append("$colorCode($armorStackDecayDisplay)")
+
+                if (showTimer && (!maxStackOnly || isMaxStack)) {
+                    append("$colorCode($decayTimeString)")
+
+                }
+            })
+        } else {
+            return buildList {
+                if (showStack) {
+                    add(buildString {
+                        append("§6")
+                        if (config.armorStackType) append("$stackType: ")
+                        append("§l$stackCount$stackSymbol ")
+                    })
+                }
+
+                if (showTimer && (!maxStackOnly || isMaxStack)) {
+                    add("$colorCode$decayTimeString")
                 }
             }
         }
     }
-
 
     private fun resetDecayTime() {
         armorPieceCount = InventoryUtils.getArmor().firstNotNullOfOrNull { armor ->

@@ -9,31 +9,37 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class ArmorStackDisplayConfig {
     @Expose
-    @ConfigOption(name = "Enable Display", desc = "Enable the armor stack display feature.")
+    @ConfigOption(name = "Enable", desc = "Enable the armor stack display feature.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Armor Stack", desc = "Display the number of stacks for armor pieces like Crimson, Terror, Aurora, etc.")
+    @ConfigOption(name = "Single Line Display", desc = "Show the overlay in a single line.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean armorStackDisplay = false;
+    public boolean showInSingleLine = true;
 
     @Expose
-    @ConfigOption(name = "Armor Stack Type", desc = "Shows the armor stack type like \"Dominus\".")
+    @ConfigOption(name = "Show Armor Stack", desc = "Display the current number of stacks for armors, such as Crimson, Terror, Aurora, etc.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean armorStackDisplay = true;
+
+    @Expose
+    @ConfigOption(name = "Show Armor Stack Type", desc = "Display the type of armor stack, such as 'Dominus', 'Hydra Strike', etc.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean armorStackType = false;
 
     @Expose
-    @ConfigOption(name = "Stack Decay Timer", desc = "Show a decay timer after gaining a stack.")
+    @ConfigOption(name = "Show Stack Decay Timer", desc = "Display a timer that shows when the armor stack will decay.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean armorStackDecayTimer = false;
+    public boolean armorStackDecayTimer = true;
 
     @Expose
-    @ConfigOption(name = "Max Stack Only", desc = "Show the decay timer only when the 10th stack is reached.")
+    @ConfigOption(name = "Max Stack Only", desc = "Display the decay timer only for the 10th stack.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maxStackOnly = false;
