@@ -84,7 +84,7 @@ object GardenVisitorSupercraft {
         hasIngredients = true
         for ((key, value) in ingredientReqs) {
             val sackItem = key.asInternalName().getAmountInSacks()
-            lastSuperCraftMaterial = internalName.itemName.removeColor()
+            lastSuperCraftMaterial = internalName.asString()
             if (sackItem < value * amount) {
                 hasIngredients = false
                 break
