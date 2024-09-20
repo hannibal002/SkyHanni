@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -21,14 +20,11 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
-import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
-import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -73,7 +69,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -84,7 +79,6 @@ object SkyHanniDebugsAndTests {
     private val debugConfig get() = config.debug
     var displayLine = ""
     var displayList = emptyList<List<Any>>()
-    var displayOnWorld = emptyMap<LorenzVec, String>()
 
     var globalRender = true
 
@@ -148,63 +142,7 @@ object SkyHanniDebugsAndTests {
     }
 
     private fun asyncTest() {
-        val graph = IslandGraphs.currentIslandGraph ?: return
-        val displayMap: MutableMap<LorenzVec, String> = mutableMapOf()
-        val nodes = graph.nodes
 
-        val nearestArea = mutableMapOf<GraphNode, GraphNode>()
-        for (node in nodes) {
-            val pathToNearestArea = GraphUtils.findFastestPath(graph, node) { it.getAreaTag(ignoreConfig = true) != null }?.first
-            if (pathToNearestArea == null) {
-                continue
-            }
-            val areaNode = pathToNearestArea.lastOrNull() ?: error("Empty path to nearest area")
-            nearestArea[node] = areaNode
-        }
-        var bugs = 0
-        for (node in nodes) {
-            val areaNode = nearestArea[node]?.name ?: continue
-            for (neighbour in node.neighbours.keys) {
-                val neighbouringAreaNode = nearestArea[neighbour]?.name ?: continue
-                if (neighbouringAreaNode == areaNode) continue
-                if ((null == node.getAreaTag(ignoreConfig = true))) {
-                    bugs++
-                    displayMap[node.position] = "§cConflicting areas $areaNode and $neighbouringAreaNode"
-                }
-            }
-        }
-        for (node in nodes) {
-            val nameNull = node.name.isNullOrBlank()
-            val tagsEmpty = node.tags.isEmpty()
-            if (nameNull > tagsEmpty) {
-                displayMap[node.position] = "§cMissing name despite having tags"
-                bugs++
-            }
-            if (tagsEmpty > nameNull) {
-                displayMap[node.position] = "§cMissing tags despite having name"
-                bugs++
-            }
-        }
-
-        val clusters = GraphUtils.findDisjointClusters(graph)
-        if (clusters.size > 1) {
-            val closestCluster = clusters.minBy { it.minOf { it.position.distanceSqToPlayer() } }
-            val foreignClusters = clusters.filter { it !== closestCluster }
-            val closestForeignNodes = foreignClusters.map { network -> network.minBy { it.position.distanceSqToPlayer() } }
-            closestForeignNodes.forEach {
-                displayMap[it.position] = "§cDisjoint node network"
-                bugs++
-            }
-            val closestForeignNode = closestForeignNodes.minBy { it.position.distanceSqToPlayer() }
-            val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
-            IslandGraphs.pathFind(closestNodeToForeignNode.position, Color.RED)
-        }
-
-        println("found $bugs bugs!")
-        displayOnWorld = displayMap
-        if (clusters.size <= 1) {
-            IslandGraphs.pathFind(displayMap.keys.minByOrNull { it.distanceSqToPlayer() } ?: return, Color.RED)
-        }
     }
 
     fun findNullConfig(args: Array<String>) {

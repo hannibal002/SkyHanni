@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -261,7 +261,9 @@ object GraphEditor {
         }
     }
 
-    private fun chatAtDisable() = ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.", ::commandIn)
+    private fun chatAtDisable() = ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.",
+        GraphEditor::commandIn
+    )
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
@@ -376,7 +378,7 @@ object GraphEditor {
                 addEdge(activeNode, closedNode)
                 feedBackInTutorial("Added new edge.")
             } else {
-                this.edges.removeAt(edge)
+                edges.removeAt(edge)
                 checkDissolve()
                 selectedEdge = findEdgeBetweenActiveAndClosed()
                 feedBackInTutorial("Removed edge.")
@@ -429,7 +431,7 @@ object GraphEditor {
         val compileGraph = compileGraph()
         if (config.useAsIslandArea) {
             IslandGraphs.setNewGraph(compileGraph)
-            SkyHanniDebugsAndTests.testCommand(emptyArray())
+            GraphEditorBugFinder.runTests()
         }
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
@@ -482,7 +484,7 @@ object GraphEditor {
                 nodes.remove(closedNode)
                 edges.removeIf { it.isInEdge(closedNode) }
                 if (closedNode == activeNode) activeNode = null
-                this.closedNode = null
+                GraphEditor.closedNode = null
                 return
             }
         }
@@ -530,7 +532,7 @@ object GraphEditor {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name, it.tags.mapNotNull { it.internalName }) }
-        val neighbours = this.nodes.map { node ->
+        val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
