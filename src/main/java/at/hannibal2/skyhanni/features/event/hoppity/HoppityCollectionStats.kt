@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,8 +16,10 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.consumeWhile
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -29,9 +32,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Pattern
@@ -50,7 +55,7 @@ object HoppityCollectionStats {
      */
     private val pagePattern by patternGroup.pattern(
         "page.current",
-        "(?:\\((?<page>\\d+)\\/(?<maxPage>\\d+)\\) )?Hoppity's Collection",
+        "(?:\\((?<page>\\d+)/(?<maxPage>\\d+)\\) )?Hoppity's Collection",
     )
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
@@ -181,6 +186,31 @@ object HoppityCollectionStats {
         shopMilestone to HighlightRabbitTypes.SHOP,
         strayRabbit to HighlightRabbitTypes.STRAYS,
     )
+
+    @SubscribeEvent
+    fun replaceItem(event: ReplaceItemEvent) {
+        if (!config.rarityDyeRecolor || !pagePattern.matches(event.inventory.name)) return
+        val item = event.originalItem
+        // The "base" missing rabbits are Gray Dye (minecraft:dye with metadata 8)
+        if (item.getMinecraftId().toString() != "minecraft:dye" || item.metadata != 8) return
+
+        val rarity = HoppityAPI.rarityByRabbit(item.displayName)
+        // Add NBT for the dye color itself
+        val newItemStack = ItemStack(Items.dye, 1, when (rarity) {
+            LorenzRarity.COMMON -> 7  // Light gray dye
+            LorenzRarity.UNCOMMON -> 10 // Lime dye
+            LorenzRarity.RARE -> 4 // Lapis lazuli
+            LorenzRarity.EPIC -> 5 // Purple dye
+            LorenzRarity.LEGENDARY -> 14 // Orange dye
+            LorenzRarity.MYTHIC -> 13 // Magenta dye
+            LorenzRarity.DIVINE -> 12 // Light blue dye
+            LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
+            else -> return
+        })
+        newItemStack.setLore(item.getLore())
+        newItemStack.setStackDisplayName(item.displayName)
+        event.replace(newItemStack)
+    }
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
