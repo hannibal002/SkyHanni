@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FAC
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -119,7 +118,11 @@ object HoppityAPI {
             ?.stack ?: return
         val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
 
-        sideDishNamePattern.matchMatcher(nameText) { EggFoundEvent(SIDE_DISH, index, null).post() }
+        sideDishNamePattern.matchMatcher(nameText) {
+            EggFoundEvent(SIDE_DISH, index, null).post()
+            lastMeal = SIDE_DISH
+            attemptFireRabbitFound()
+        }
         milestoneNamePattern.matchMatcher(nameText) {
             clickedStack.getLore().let {
                 if (!it.any { line -> line == "§eClick to claim!" }) return
