@@ -314,7 +314,7 @@ private fun isHighTierUmber(state: IBlockState): Boolean =
     (state.block == Blocks.double_stone_slab2 && state.getValue(BlockStoneSlabNew.VARIANT) == BlockStoneSlabNew.EnumType.RED_SANDSTONE)
 
 private fun isLowTierTungstenTunnels(state: IBlockState): Boolean =
-    state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.STONE
+    state.block == Blocks.monster_egg && state.getValue(BlockSilverfish.VARIANT) == BlockSilverfish.EnumType.COBBLESTONE
 
 private fun isLowTierTungstenMineshaft(state: IBlockState): Boolean = when (state.block) {
     Blocks.stone_slab -> state.getValue(BlockStoneSlab.VARIANT) == BlockStoneSlab.EnumType.COBBLESTONE
