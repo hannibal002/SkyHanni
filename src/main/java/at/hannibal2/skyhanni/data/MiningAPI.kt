@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.features.mining.isTitanium
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.countBy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -50,14 +51,15 @@ object MiningAPI {
 
     private var lastInitSound = SimpleTimeMark.farPast()
 
-    private var waitingForInitBlock = false
-    private var waitingForInitBlockPos: LorenzVec? = null
+    private var initBlockPos: LorenzVec? = null
     private var waitingForInitSound = true
 
     private var waitingForEffMinerSound = false
     private var waitingForEffMinerBlock = false
 
     var inGlacite = false
+    var inTunnels = false
+    var inMineshaft = false
     var inDwarvenMines = false
     var inCrystalHollows = false
     var inCrimsonIsle = false
@@ -65,12 +67,13 @@ object MiningAPI {
     var inSpidersDen = false
 
     var currentAreaOreBlocks = setOf<OreBlock>()
+        private set
 
     private var lastSkyblockArea: String? = null
 
     private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
     private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
-    private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
+    private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
     var cold: Int = 0
         private set
@@ -116,6 +119,7 @@ object MiningAPI {
     fun onBlockClick(event: BlockClickEvent) {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
+        //println(event.getBlockState.properties)
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         recentClickedBlocks += event.position to SimpleTimeMark.now()
     }
@@ -141,13 +145,14 @@ object MiningAPI {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName !in allowedSoundNames) return
+        //println("Sound: ${event.soundName} ${event.pitch} ${event.volume} ${event.location.toCleanString()}")
         if (waitingForInitSound) {
             if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
                 if (recentClickedBlocks.none { it.first == pos }) return
                 waitingForInitSound = false
-                waitingForInitBlock = true
-                waitingForInitBlockPos = event.location.roundLocationToBlock()
+                waitingForEffMinerBlock = true
+                initBlockPos = event.location.roundLocationToBlock()
                 lastInitSound = SimpleTimeMark.now()
             }
             return
@@ -164,21 +169,26 @@ object MiningAPI {
     @SubscribeEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
-        if (event.newState.block.let { it != Blocks.air && it != Blocks.bedrock }) return
-        if (event.oldState.block.let { it == Blocks.air || it == Blocks.bedrock }) return
-        if (event.oldState.block == Blocks.air) return
+        val oldState = event.oldState
+        val newState = event.newState
+        val oldBlock = oldState.block
+        val newBlock = newState.block
+
+        if (oldState == newState) return
+        if (oldBlock == Blocks.air || oldBlock == Blocks.bedrock) return
+        if (newBlock != Blocks.air && newBlock != Blocks.bedrock && !isTitanium(newState)) return
+
         val pos = event.location
         if (pos.distanceToPlayer() > 7) return
+        //println("Block change: $oldState -> $newState ${pos.toCleanString()}")
 
         if (lastInitSound.passedSince() > 100.milliseconds) return
 
-        val ore = OreBlock.getByStateOrNull(event.oldState) ?: return
+        val ore = OreBlock.getByStateOrNull(oldState) ?: return
 
-        if (waitingForInitBlock) {
-            if (waitingForInitBlockPos != pos) return
-            waitingForInitBlock = false
+        if (initBlockPos == pos) {
             surroundingMinedBlocks += MinedBlock(ore, true) to pos
-            waitingForEffMinerBlock = true
+            runEvent()
             return
         }
         if (waitingForEffMinerBlock) {
@@ -205,7 +215,11 @@ object MiningAPI {
 
         if (waitingForInitSound) return
         if (lastInitSound.passedSince() < 200.milliseconds) return
+        // in case the init block is not found
+        resetOreEvent()
+    }
 
+    private fun runEvent() {
         resetOreEvent()
 
         if (surroundingMinedBlocks.isEmpty()) return
@@ -237,8 +251,7 @@ object MiningAPI {
     private fun resetOreEvent() {
         lastInitSound = SimpleTimeMark.farPast()
         waitingForInitSound = true
-        waitingForInitBlock = false
-        waitingForInitBlockPos = null
+        initBlockPos = null
         waitingForEffMinerSound = false
         waitingForEffMinerBlock = false
     }
@@ -258,8 +271,7 @@ object MiningAPI {
                 add("lastInitSound: ${lastInitSound.passedSince().format()}")
             }
             add("waitingForInitSound: $waitingForInitSound")
-            add("waitingForInitBlock: $waitingForInitBlock")
-            add("waitingForInitBlockPos: $waitingForInitBlockPos")
+            add("waitingForInitBlockPos: $initBlockPos")
             add("waitingForEffMinerSound: $waitingForEffMinerSound")
             add("waitingForEffMinerBlock: $waitingForEffMinerBlock")
             add("recentlyClickedBlocks: ${recentClickedBlocks.joinToString { "(${it.first.toCleanString()}" }}")
@@ -281,6 +293,8 @@ object MiningAPI {
         lastSkyblockArea = currentArea
 
         inGlacite = inGlaciteArea()
+        inTunnels = inGlacialTunnels()
+        inMineshaft = inMineshaft()
         inDwarvenMines = inRegularDwarven()
         inCrystalHollows = inCrystalHollows()
         inCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()

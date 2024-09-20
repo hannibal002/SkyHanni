@@ -40,15 +40,19 @@ import kotlin.math.abs
  * 	jump pads between servers
  * 	ring of love/romeo juliet quest
  * 	death location
+ * 	% of island discvovered (every node was most closest node at least once)
  * hub:
  * 	12 starter NPC's
  * 	diana
  * farming:
- * 	pelt farming
+ * 	pelt farming area
  * rift:
  * 	enigma souls
  * 	eyes
  * 	big quests
+ * 	montezuma souls
+ * 	blood effigies
+ * 	avoid area around enderman
  * spider:
  * 	relicts + throw spot
  * dwarven mines:
@@ -56,7 +60,7 @@ import kotlin.math.abs
  * 	commssion areas
  * 	events: raffle, goblin slayer, donpieresso
  * deep
- * 	path to the bottom
+ * 	path to the bottom (Rhys NPC)
  * end
  * 	golem spawn
  * 	dragon death spot
@@ -65,12 +69,15 @@ import kotlin.math.abs
  *  area mini bosses
  *  daily quests
  *  intro tutorials with elle
+ *  fishing spots
  *
  * graph todo:
  * 	fix rename not using tick but input event we have (+ create the input event in the first place)
  * 	toggle distance to node by node path lengh, instead of eye of sight lenght
  * 	press test button again to enable "true test mode", with graph math and hiding other stuff
  * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
+ *
+ * 	mineshaft + corpse + ladder spot
  */
 
 @SkyHanniModule
