@@ -158,7 +158,7 @@ object MiningAPI {
             lastColdReset = SimpleTimeMark.now()
             return
         }
-        if (pickobulusUsePattern.matches(event.message) && HotmData.PICKOBULUS.enabled) {
+        if (pickobulusUsePattern.matches(event.message)) {
             lastPickobulusUse = SimpleTimeMark.now()
             return
         }
