@@ -110,7 +110,7 @@ object RiftWiltedBerberisHelper {
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!config.muteOthersSounds || !RiftAPI.inDreadfarm() || (hasFarmingToolInHand && isOnFarmland)) return
+        if (!isMuteOthersSoundsEnabled()) return
         val soundName = event.soundName
 
         if (soundName == "mob.horse.donkey.death" || soundName == "mob.horse.donkey.hit") {
@@ -160,4 +160,6 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
+    private fun isMuteOthersSoundsEnabled() =
+        RiftAPI.inRift() && (RiftAPI.inDreadfarm() || RiftAPI.inWestVillage()) && !(hasFarmingToolInHand && isOnFarmland) && config.muteOthersSounds
 }
