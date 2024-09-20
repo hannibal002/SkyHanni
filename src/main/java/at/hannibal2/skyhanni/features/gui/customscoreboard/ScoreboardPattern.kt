@@ -246,13 +246,17 @@ object ScoreboardPattern {
         "raffleuseless",
         "^(Find tickets on the|ground and bring them|to the raffle box)$",
     )
+
+    /**
+     * REGEX-TEST: Tickets: §a8 §7(17.4%)
+     */
     val raffleTicketsPattern by miningSb.pattern(
         "raffletickets",
-        "^Tickets: §a\\d+ §7\\(\\d{1,3}\\.\\d%\\)$",
+        "Tickets: §a\\d+ §7\\(\\d+(\\.\\d)?%\\)",
     )
     val rafflePoolPattern by miningSb.pattern(
         "rafflepool",
-        "^Pool: §6\\d+§8/500$",
+        "Pool: §6\\d+",
     )
     val mithrilUselessPattern by miningSb.pattern(
         "mithriluseless",
@@ -274,8 +278,13 @@ object ScoreboardPattern {
         "uselessgoblin",
         "^§7Kill goblins!$",
     )
+
+    /**
+     * REGEX-TEST: Remaining: §a1 goblin
+     * REGEX-TEST: Remaining: §a2 goblins
+     */
     val remainingGoblinPattern by miningSb.pattern(
-        "remaininggoblin", "^Remaining: §a\\d+ goblins$",
+        "remaininggoblin", "^Remaining: §a\\d+ goblins?$",
     )
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$",
@@ -303,9 +312,13 @@ object ScoreboardPattern {
         "magmaboss",
         "^§7Boss: §[c6e]\\d{1,3}%$",
     )
+
+    /**
+     * REGEX-TEST: §7Damage Soaked:§629,446 §e(+271
+     */
     val damageSoakedPattern by combatSb.pattern(
         "damagesoaked",
-        "^§7Damage Soaked:",
+        "^§7Damage Soaked:.*",
     )
     val killMagmasPattern by combatSb.pattern(
         "killmagmas",

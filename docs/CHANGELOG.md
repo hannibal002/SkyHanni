@@ -46,6 +46,11 @@
     + Use /shhoppitystats for live stats.
 + Added optional warning when Hoppity calls you with a rabbit to sell. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2272)
 + Added hotkey for picking up Abiphone calls from Hoppity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2272)
++ Added a draggable list for Hoppity's Collection menu rabbit highlighting. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
+    + Factory/Shop milestones = Yellow/Gold.
+    + Stray rabbits = Dark Aqua.
+    + Abi = Dark Green.
++ Added a toggle to highlight found rabbits in Hoppity's Collection menu. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
 
 #### The Carnival Features
 
@@ -151,6 +156,7 @@
 + Added per-election season Diana Trackers. - !nea (https://github.com/hannibal002/SkyHanni/pull/2487)
     + This includes the Diana Profit Tracker and the Mythological Creature Tracker.
     + The data is stored moving forward, but there is currently no way to view anything other than the current year.
++ Changed the Diana Profit Tracker and Mythological Creature Tracker to always be visible when holding the Ancestral Spade in hand, even if Diana is not the mayor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2496)
 
 #### Scoreboard Improvements
 
@@ -213,10 +219,15 @@
 #### Rift Improvements
 
 + Updated the description of the config for Enigma Soul Waypoints to help find the Rift Guide in the game. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2433)
++ Added Path Finder to Enigma Soul waypoints in the Rift. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2515)
 
 #### Dungeon Improvements
 
 + Added dungeon stars and crimson stars to estimated item value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2492)
+
+#### The Carnival Improvements
+
++ Updated the Zombie Shootout Diamond color to be a deeper blue. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2511)
 
 #### Misc Improvements
 
@@ -262,6 +273,11 @@
 + Fixed Powder for 10 Levels overflowing over the max level. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2422)
 + Fixed Glacite Tunnel Maps repeatedly showing the last commission goal even when there is no new commission. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2432)
 + Fixed Mineshaft Pity Counter not working with some ore types. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2436)
++ Fixed Tungsten Ore and Hardstone detection after the mining update. - Empa (https://github.com/hannibal002/SkyHanni/pull/2437)
++ Fixed item category errors after the new mining update. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2529)
++ Fixed blocks mined by Efficient Miner not being detected. - Empa (https://github.com/hannibal002/SkyHanni/pull/2526)
++ Fixed Corpse Tracker resetting items between restarts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2528)
++ Fixed the Corpse Tracker not displaying while in the Mineshaft. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2516)
 
 #### Scoreboard Fixes
 
@@ -280,6 +296,9 @@
 + Fixed Custom Scoreboard errors while doing Carnival activities. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2455)
 + Fixed Custom Scoreboard error while in a Dungeon Queue. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2441)
 + Fixed Custom Scoreboard Error during the Barry Protestors Quest. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2480)
++ Fixed a Custom Scoreboard error during the Magma Boss Fight and Goblin Raid. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2531)
++ Fixed a Custom Scoreboard error while in the Dojo. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2519)
++ Fixed a Custom Scoreboard error during M7 Dragons. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2510)
 
 #### Hoppity Fixes
 
@@ -312,6 +331,18 @@
 #### Garden Fixes
 
 + Fixed outdated Dicer gemstone fortune in FF guide. - Not_a_cow (https://github.com/hannibal002/SkyHanni/pull/2499)
++ Fixed some garden messages not being blocked. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2532)
++ Fixed active sprays not being removed from the GUI when using a washer. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2532)
+
+#### Combat Fixes
+
++ Updated Ghost Counter bestiary tiers to reflect Hypixel reducing the max kills needed from 250K to 100K. - Luna (https://github.com/hannibal002/SkyHanni/pull/2533)
++ Fixed a case where the Broodmother countdown could be wildly inaccurate. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2513)
+
+#### The Carnival Fixes
+
++ Fixed two "Catch a Fish" carnival goals not being properly detected from chat. - Luna (https://github.com/hannibal002/SkyHanni/pull/2517)
++ Fixed the bounding box of baby zombies in Zombie Shootout. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2512)
 
 #### Misc Fixes
 
@@ -327,6 +358,8 @@
 + Fixed performance issues with a high number of dungeon runs in one session. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2504)
 + Fixed `/shedittracker duplex` not working. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2501)
 + Fixed "Last Server Joined" spamming the chat. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2495)
++ Fixed lag spikes in Path Finder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2525)
++ Fixed old mayor perks not being marked as inactive when the mayor changes. - Luna (https://github.com/hannibal002/SkyHanni/pull/2524)
 
 ### Technical Details
 
@@ -366,6 +399,19 @@
 + Updated HandleEvent onlyOnIslands to handle multiple islands. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2502)
 + Added an abstract "bucketed" tracker that can store where items came from. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2306)
     + Takes an enum in instantiation and has built-in logic for swapping display types.
++ Graph Editor improvements. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2515)
+    + Code cleanup in Graph Editor, moving node lists into their own class.
+    + Fixed searchable tag list.
+    + Added more graph node tags; only display certain tags on specific islands in the editor.
+    + Added an option to limit the maximum render range of nodes and edges in the Graph Editor for better performance.
++ Hoppity's Collection highlighting now updates on event triggers instead of every frame. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
+
+### Removed Features
+
++ Removed Wild Strawberry Dye notification. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2520)
+    + Artist's Abode now sends a lobby-wide message for dye drops, making the notification obsolete.
++ Removed `Only Requirement Not Met` and `Highlight Requirement Rabbits` config options. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
+    + Replaced then with a draggable list of different Hoppity collection highlight options.
 
 ## Version 0.26
 
