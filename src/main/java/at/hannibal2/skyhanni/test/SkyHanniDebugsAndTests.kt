@@ -108,11 +108,6 @@ object SkyHanniDebugsAndTests {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Test", 1.5)
         }
-
-        for ((location, text) in displayOnWorld) {
-            event.drawDynamicText(location, text, 1.5)
-        }
-
     }
 
     fun waypoint(args: Array<String>) {
