@@ -57,7 +57,7 @@ object ChocolateFactoryBarnManager {
             }
             ChocolateAmount.addToAll(amount)
             HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
-            HoppityAPI.attemptFire(event, lastDuplicateAmount = amount)
+            HoppityAPI.attemptFireRabbitFound(event, lastDuplicateAmount = amount)
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {

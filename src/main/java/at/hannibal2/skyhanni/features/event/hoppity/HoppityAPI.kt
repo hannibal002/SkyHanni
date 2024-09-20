@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzRarity.DIVINE
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -101,8 +102,8 @@ object HoppityAPI {
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
                 when(groupOrNull("name") ?: return@matchMatcher) {
-                    "Fish the Rabbit" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber).post()
-                    "El Dorado" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber).post()
+                    "Fish the Rabbit" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
+                    "El Dorado" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
                     else -> return@matchMatcher
                 }
             }
@@ -118,55 +119,59 @@ object HoppityAPI {
             ?.stack ?: return
         val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
 
-        sideDishNamePattern.matchMatcher(nameText) { EggFoundEvent(SIDE_DISH, index).post() }
+        sideDishNamePattern.matchMatcher(nameText) { EggFoundEvent(SIDE_DISH, index, null).post() }
         milestoneNamePattern.matchMatcher(nameText) {
             clickedStack.getLore().let {
                 if (!it.any { line -> line == "§eClick to claim!" }) return
                 allTimeLorePattern.firstMatcher(it) {
-                    EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
+                    EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index, null).post()
                     lastMeal = CHOCOLATE_FACTORY_MILESTONE
-                    attemptFire()
+                    attemptFireRabbitFound()
                 }
                 shopLorePattern.firstMatcher(it) {
-                    EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
+                    EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index, null).post()
                     lastMeal = CHOCOLATE_SHOP_MILESTONE
-                    attemptFire()
+                    attemptFireRabbitFound()
                 }
             }
         }
     }
 
-    fun handleChat(event: LorenzChatEvent) {
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         eggFoundPattern.matchMatcher(event.message) {
             resetRabbitData()
             lastMeal = getEggType(event)
-            attemptFire(event)
+            lastMeal?.let { EggFoundEvent(it, null, groupOrNull("note")).post() }
+            attemptFireRabbitFound(event)
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
                 lastMeal = HoppityEggType.BOUGHT
-                attemptFire(event)
+                EggFoundEvent(HoppityEggType.BOUGHT, null, null).post()
+                attemptFireRabbitFound(event)
             }
         }
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
             lastName = group("name")
             lastRarity = group("rarity")
-            attemptFire(event)
+            attemptFireRabbitFound(event)
         }
 
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
             newRabbit = true
             groupOrNull("other")?.let {
-                attemptFire(event)
+                attemptFireRabbitFound(event)
                 return
             }
-            attemptFire(event)
+            attemptFireRabbitFound(event)
         }
     }
 
-    fun attemptFire(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
+    fun attemptFireRabbitFound(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
         lastDuplicateAmount?.let {
             this.lastDuplicateAmount = it
             this.duplicate = true

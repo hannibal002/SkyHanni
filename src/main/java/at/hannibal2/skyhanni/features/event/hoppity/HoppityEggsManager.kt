@@ -1,10 +1,13 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,7 +24,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
@@ -109,6 +111,20 @@ object HoppityEggsManager {
         lastNote = null
     }
 
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        if (!HoppityAPI.isHoppityEvent() || !event.type.isResetting) return
+        HoppityEggLocations.saveNearestEgg()
+        event.type.markClaimed()
+        lastMeal = event.type
+        lastNote = event.note
+    }
+
+    @HandleEvent
+    fun onRabbitFound(event: RabbitFoundEvent) {
+        HoppityCollectionStats.incrementRabbit(event.rabbitName)
+    }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -124,20 +140,7 @@ object HoppityEggsManager {
             return
         }
 
-        HoppityEggsCompactChat.handleChat(event)
-        HoppityAPI.handleChat(event)
-
         if (!HoppityAPI.isHoppityEvent()) return
-
-        eggFoundPattern.matchMatcher(event.message) {
-            HoppityEggLocations.saveNearestEgg()
-            val meal = getEggType(event)
-            val note = group("note").removeColor()
-            meal.markClaimed()
-            lastMeal = meal
-            lastNote = note
-            return
-        }
 
         noEggsLeftPattern.matchMatcher(event.message) {
             HoppityEggType.allFound()
@@ -163,10 +166,6 @@ object HoppityEggsManager {
         eggSpawnedPattern.matchMatcher(event.message) {
             getEggType(event).markSpawned()
             return
-        }
-
-        rabbitFoundPattern.matchMatcher(event.message) {
-            HoppityCollectionStats.incrementRabbit(group("name"))
         }
     }
 

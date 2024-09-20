@@ -61,6 +61,11 @@ object HoppityEggLocator {
     var currentEggType: HoppityEggType? = null
     var currentEggNote: String? = null
 
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        if (event.type.isResetting) resetData()
+    }
+
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         resetData()
@@ -169,11 +174,6 @@ object HoppityEggLocator {
     }
 
     private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
-
-    @HandleEvent
-    fun onEggFound(event: EggFoundEvent) {
-        if (event.type.isResetting) resetData()
-    }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {

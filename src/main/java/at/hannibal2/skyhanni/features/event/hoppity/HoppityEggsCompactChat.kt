@@ -16,11 +16,13 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -143,7 +145,9 @@ object HoppityEggsCompactChat {
         if (hoppityEggChat.size == 3) sendCompact()
     }
 
-    fun handleChat(event: LorenzChatEvent) {
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         eggFoundPattern.matchMatcher(event.message) {
             resetCompactData()
             lastChatMeal = getEggType(event)
