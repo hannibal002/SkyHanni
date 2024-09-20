@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -34,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -57,7 +55,7 @@ object HoppityCollectionStats {
      */
     private val pagePattern by patternGroup.pattern(
         "page.current",
-        "(?:\\((?<page>\\d+)/(?<maxPage>\\d+)\\) )?Hoppity's Collection",
+        "(?:\\((?<page>\\d+)\\/(?<maxPage>\\d+)\\) )?Hoppity's Collection",
     )
     private val duplicatesFoundPattern by patternGroup.pattern(
         "duplicates.found",
@@ -190,34 +188,58 @@ object HoppityCollectionStats {
     )
 
     private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean {
-        return stack.getMinecraftId().toString() == "minecraft:dye" && (
+        return stack.item == Items.dye && (
             stack.metadata == 8 || stack.getLore().any { it.lowercase().contains("milestone") }
-        )
+            )
     }
+
+    private val replacementCache: MutableMap<String, ItemStack> = mutableMapOf()
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!pagePattern.matches(event.inventory.name)) return
-        if (!missingRabbitStackNeedsFix(event.originalItem)) return
+        replacementCache[event.originalItem.displayName]?.let { event.replace(it) }
+    }
 
-        val itemStack = event.originalItem
-        val rarity = HoppityAPI.rarityByRabbit(itemStack.displayName)
-        // Add NBT for the dye color itself
-        val newItemStack = if (config.rarityDyeRecolor) ItemStack(Items.dye, 1, when (rarity) {
-            LorenzRarity.COMMON -> 7  // Light gray dye
-            LorenzRarity.UNCOMMON -> 10 // Lime dye
-            LorenzRarity.RARE -> 4 // Lapis lazuli
-            LorenzRarity.EPIC -> 5 // Purple dye
-            LorenzRarity.LEGENDARY -> 14 // Orange dye
-            LorenzRarity.MYTHIC -> 13 // Magenta dye
-            LorenzRarity.DIVINE -> 12 // Light blue dye
-            LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
-            else -> return
-        }) else ItemStack(Items.dye, 8)
+    @SubscribeEvent
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
+        if (!(LorenzUtils.inSkyBlock)) return
+        if (!pagePattern.matches(event.inventoryName)) {
+            // Clear highlight cache in case options are toggled
+            highlightMap.clear()
+            return
+        }
 
-        newItemStack.setLore(buildDescriptiveMilestoneLore(itemStack))
-        newItemStack.setStackDisplayName(itemStack.displayName)
-        event.replace(newItemStack)
+        event.inventoryItems.values.filter { it.hasDisplayName() && missingRabbitStackNeedsFix(it) }.forEach { stack ->
+            val rarity = HoppityAPI.rarityByRabbit(stack.displayName)
+            // Add NBT for the dye color itself
+            val newItemStack = if (config.rarityDyeRecolor) ItemStack(
+                Items.dye, 1,
+                when (rarity) {
+                    LorenzRarity.COMMON -> 7  // Light gray dye
+                    LorenzRarity.UNCOMMON -> 10 // Lime dye
+                    LorenzRarity.RARE -> 4 // Lapis lazuli
+                    LorenzRarity.EPIC -> 5 // Purple dye
+                    LorenzRarity.LEGENDARY -> 14 // Orange dye
+                    LorenzRarity.MYTHIC -> 13 // Magenta dye
+                    LorenzRarity.DIVINE -> 12 // Light blue dye
+                    LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
+                    else -> return
+                },
+            ) else ItemStack(Items.dye, 8)
+
+            newItemStack.setLore(buildDescriptiveMilestoneLore(stack))
+            newItemStack.setStackDisplayName(stack.displayName)
+            replacementCache[stack.displayName] = newItemStack
+        }
+
+        inInventory = true
+        if (config.hoppityCollectionStats) {
+            display = buildDisplay(event)
+        }
+
+        if (config.highlightRabbits.isNotEmpty()) {
+            for ((_, stack) in event.inventoryItems) filterRabbitToHighlight(stack)
+        }
     }
 
     private fun buildDescriptiveMilestoneLore(itemStack: ItemStack): List<String> {
@@ -236,7 +258,7 @@ object HoppityCollectionStats {
         replaceIndex?.let {
             ChocolateFactoryAPI.milestoneByRabbit(itemStack.displayName)?.let {
                 val displayAmount = it.amount.shortFormat()
-                val operationFormat = when(milestoneType) {
+                val operationFormat = when (milestoneType) {
                     HoppityEggType.CHOCOLATE_SHOP_MILESTONE -> "spending"
                     HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -> "reaching"
                     else -> "" // Never happens
@@ -250,25 +272,6 @@ object HoppityCollectionStats {
         }
 
         return existingLore
-    }
-
-    @SubscribeEvent
-    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!(LorenzUtils.inSkyBlock)) return
-        if (!pagePattern.matches(event.inventoryName)) {
-            // Clear highlight cache in case options are toggled
-            highlightMap.clear()
-            return
-        }
-
-        inInventory = true
-        if (config.hoppityCollectionStats) {
-            display = buildDisplay(event)
-        }
-
-        if (config.highlightRabbits.isNotEmpty()) {
-            for ((_, stack) in event.inventoryItems) filterRabbitToHighlight(stack)
-        }
     }
 
     private fun filterRabbitToHighlight(stack: ItemStack) {
@@ -299,6 +302,7 @@ object HoppityCollectionStats {
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         display = emptyList()
+        replacementCache.clear()
     }
 
     @SubscribeEvent
