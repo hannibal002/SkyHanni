@@ -528,7 +528,7 @@ object EstimatedItemValueCalculator {
                 return kuudraUpgradeTiers.indexOf(tier)
             }
         }
-        return 0
+        return -1
     }
 //     private fun getKuudraTier(internalName: NEUInternalName): Int? =
 //         kuudraUpgradeTiers.firstOrNull { it in internalName.toString() }?.let { kuudraUpgradeTiers.indexOf(it) }
