@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.features.chroma.TexturedChromaShader
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
+import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
@@ -28,6 +29,7 @@ object ShaderManager {
         TEXTURED_CHROMA(TexturedChromaShader.INSTANCE),
         ROUNDED_RECTANGLE(RoundedRectangleShader.INSTANCE),
         ROUNDED_RECT_OUTLINE(RoundedRectangleOutlineShader.INSTANCE),
+        ROUNDED_TEXTURE(RoundedTextureShader.INSTANCE),
         DARKEN(DarkenShader.INSTANCE)
         ;
 
@@ -71,7 +73,7 @@ object ShaderManager {
         ShaderHelper.glShaderSource(shaderID, source.toString())
         ShaderHelper.glCompileShader(shaderID)
 
-        if (ShaderHelper.glGetShaderi(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
+        if (ShaderHelper.glGetShaderInt(shaderID, ShaderHelper.GL_COMPILE_STATUS) == 0) {
             val errorMessage = "Failed to compile shader $fileName${type.extension}. Features that utilise this " +
                 "shader will not work correctly, if at all"
             val errorLog = StringUtils.trim(ShaderHelper.glGetShaderInfoLog(shaderID, 1024))

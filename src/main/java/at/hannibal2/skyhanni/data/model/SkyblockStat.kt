@@ -10,6 +10,7 @@ enum class SkyblockStat(val icon: String) {
     DEFENSE("§a❈"),
     STRENGTH("§c❁"),
     INTELLIGENCE("§b✎"),
+
     CRIT_DAMAGE("§9☠"),
     CRIT_CHANCE("§9☣"),
     FEROCITY("§c⫽"),
@@ -43,7 +44,8 @@ enum class SkyblockStat(val icon: String) {
     FORAGING_FORTUNE("§☘"),
     FARMING_FORTUNE("§6☘"),
     MINING_FORTUNE("§6☘"),
-    FEAR("§a☠")
+    FEAR("§a☠"),
+    HEAT_RESISTANCE("§c♨"),
     ;
 
     val capitalizedName = name.lowercase().allLettersFirstUppercase()

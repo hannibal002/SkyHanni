@@ -30,10 +30,12 @@ object PatcherSendCoordinates {
 
     /**
      * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4
+     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4broken
+     * REGEX-TEST: hannibal2: x: 2, y: 3, z: 4 extra text
      */
     private val coordinatePattern by RepoPattern.pattern(
         "misc.patchercoords.coords",
-        "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>.*)"
+        "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>[0-9.-]+(?: .*)?)"
     )
 
     @SubscribeEvent
@@ -55,7 +57,7 @@ object PatcherSendCoordinates {
                 split.first().toFloat()
             } else end.toFloat()
             patcherBeacon.add(PatcherBeacon(LorenzVec(x, y, z), description, System.currentTimeMillis() / 1000))
-            logger.log("got patcher coords and username")
+            logger.log("got Patcher coords and username")
         }
     }
 
@@ -76,10 +78,10 @@ object PatcherSendCoordinates {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()
-        // removed patcher beacon!
+        // removed Patcher beacon!
         patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + 5 && location.distanceIgnoreY(it.location) < 5 }
 
-        // removed patcher beacon after time!
+        // removed Patcher beacon after time!
         patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + config.duration }
     }
 

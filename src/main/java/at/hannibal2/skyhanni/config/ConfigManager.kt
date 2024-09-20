@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -65,8 +66,7 @@ class ConfigManager {
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
         require(value.javaClass == type.clazz)
-        @Suppress("UNCHECKED_CAST")
-        (type.property as KMutableProperty0<Any>).set(value)
+        @Suppress("UNCHECKED_CAST") (type.property as KMutableProperty0<Any>).set(value)
         (jsonHolder as MutableMap<ConfigFileType, Any>)[type] = value
     }
 
@@ -95,8 +95,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (LorenzEvent.isInGuardedEventHandler)
-                throw e
+            if (LorenzEvent.isInGuardedEventHandler) throw e
         }
     }
 
@@ -125,7 +124,7 @@ class ConfigManager {
         var missingConfigLink = false
         for (field in obj.javaClass.fields) {
             field.isAccessible = true
-            if (field.type != Position::class.java) {
+            if (field.type != Position::class.java && field.type != PositionList::class.java) {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
@@ -141,8 +140,13 @@ class ConfigManager {
                 }
                 continue
             }
-            val position = field.get(obj) as Position
-            position.setLink(configLink)
+            if (field.type == Position::class.java) {
+                val position = field.get(obj) as Position
+                position.setLink(configLink)
+            } else if (field.type == PositionList::class.java) {
+                val list = field.get(obj) as PositionList
+                list.setLink(configLink)
+            }
         }
         if (missingConfigLink) {
             println("")
@@ -245,7 +249,7 @@ class ConfigManager {
                 unit.toPath(),
                 file.toPath(),
                 StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.ATOMIC_MOVE
+                StandardCopyOption.ATOMIC_MOVE,
             )
         } catch (e: AccessDeniedException) {
             if (loop == 5) {

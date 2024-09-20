@@ -68,7 +68,7 @@ object ReforgeAPI {
 
         val rawReforgeStoneName = reforgeStone?.itemNameWithoutColor
 
-        val lowercaseName = name.lowercase()
+        val lowercaseName = name.lowercase().replace('-', '_')
 
         fun isValid(itemStack: ItemStack) = isValid(itemStack.getItemCategoryOrNull(), itemStack.getInternalName())
 
@@ -83,6 +83,7 @@ object ReforgeAPI {
             ReforgeType.BOW -> itemCategory == ItemCategory.BOW || itemCategory == ItemCategory.SHORT_BOW
             ReforgeType.ARMOR -> setOf(
                 ItemCategory.HELMET,
+                ItemCategory.CARNIVAL_MASK,
                 ItemCategory.CHESTPLATE,
                 ItemCategory.LEGGINGS,
                 ItemCategory.BOOTS,
