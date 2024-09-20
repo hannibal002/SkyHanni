@@ -36,18 +36,18 @@ object HoppityAPI {
     private var lastRarity = ""
     private var lastName = ""
     private var newRabbit = false
-    private var lastChatMeal: HoppityEggType? = null
+    private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
 
     val hoppityRarities by lazy { LorenzRarity.entries.filter { it <= DIVINE } }
 
-    private fun resetChatData() {
+    private fun resetRabbitData() {
         this.messageCount = 0
         this.duplicate = false
         this.newRabbit = false
         this.lastRarity = ""
         this.lastName = ""
-        this.lastChatMeal = null
+        this.lastMeal = null
         this.lastDuplicateAmount = null
     }
 
@@ -124,12 +124,12 @@ object HoppityAPI {
                 if (!it.any { line -> line == "§eClick to claim!" }) return
                 allTimeLorePattern.firstMatcher(it) {
                     EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
-                    lastChatMeal = CHOCOLATE_FACTORY_MILESTONE
+                    lastMeal = CHOCOLATE_FACTORY_MILESTONE
                     attemptFire()
                 }
                 shopLorePattern.firstMatcher(it) {
                     EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
-                    lastChatMeal = CHOCOLATE_SHOP_MILESTONE
+                    lastMeal = CHOCOLATE_SHOP_MILESTONE
                     attemptFire()
                 }
             }
@@ -138,14 +138,14 @@ object HoppityAPI {
 
     fun handleChat(event: LorenzChatEvent) {
         eggFoundPattern.matchMatcher(event.message) {
-            resetChatData()
-            lastChatMeal = getEggType(event)
+            resetRabbitData()
+            lastMeal = getEggType(event)
             attemptFire(event)
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
-                lastChatMeal = HoppityEggType.BOUGHT
+                lastMeal = HoppityEggType.BOUGHT
                 attemptFire(event)
             }
         }
@@ -171,9 +171,10 @@ object HoppityAPI {
             this.lastDuplicateAmount = it
             this.duplicate = true
         }
-        event?.let { messageCount++; ChatUtils.chat("messageCount incremented to ${messageCount}") }
-        val lastChatMeal = lastChatMeal ?: return
+        event?.let { messageCount++; ChatUtils.chat("messageCount incremented to $messageCount") }
+        val lastChatMeal = lastMeal ?: return
         if (messageCount != 3) return
         RabbitFoundEvent(lastChatMeal, duplicate, lastName, lastDuplicateAmount ?: 0).post()
+        resetRabbitData()
     }
 }
