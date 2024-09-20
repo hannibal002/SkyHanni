@@ -118,7 +118,7 @@ object HoppityEggsCompactChat {
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
-        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.type)) return
+        if (!HoppityEggsManager.config.compactChat || HoppityEggType.resettingEntries.contains(event.type) || event.type == BOUGHT) return
         lastChatMeal = event.type
         hoppityEggChat.add(
             when (event.type) {
