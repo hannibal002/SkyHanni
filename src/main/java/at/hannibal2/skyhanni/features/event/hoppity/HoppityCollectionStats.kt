@@ -449,7 +449,8 @@ object HoppityCollectionStats {
         return table
     }
 
-    fun incrementRabbit(name: String) {
+    fun getRabbitCount(name: String): Int = if (HoppityCollectionData.isKnownRabbit(name.removeColor())) loggedRabbits[name.removeColor()] ?: 0 else 0
+    fun incrementRabbitCount(name: String) {
         val rabbit = name.removeColor()
         if (!HoppityCollectionData.isKnownRabbit(rabbit)) return
         loggedRabbits[rabbit] = (loggedRabbits[rabbit] ?: 0) + 1

@@ -198,6 +198,11 @@ public class HoppityEggsConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Show Duplicate Amount", desc = "Show the number of previous finds of a duplicate rabbit in chat messages.")
+    @ConfigEditorBoolean
+    public boolean showDuplicateNumber = false;
+
+    @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +

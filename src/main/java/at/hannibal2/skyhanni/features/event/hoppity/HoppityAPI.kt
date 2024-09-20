@@ -51,6 +51,7 @@ object HoppityAPI {
         this.lastDuplicateAmount = null
     }
 
+    fun getLastRabbit(): String = this.lastName
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
 

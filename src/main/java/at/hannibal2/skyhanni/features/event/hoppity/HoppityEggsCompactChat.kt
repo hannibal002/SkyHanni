@@ -94,9 +94,15 @@ object HoppityEggsCompactChat {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
 
+            val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
+                (HoppityCollectionStats.getRabbitCount(this.lastName) + 1).takeIf { it > 1}?.let {
+                    " §7(§b#$it§7)"
+                } ?: ""
+            } else ""
+
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName §7(§6+$format Chocolate§7$timeStr)"
+            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
             "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
