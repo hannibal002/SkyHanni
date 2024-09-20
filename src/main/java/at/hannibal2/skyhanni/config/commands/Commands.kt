@@ -184,7 +184,6 @@ object Commands {
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
-
     private fun usersNormal() {
         registerCommand(
             "shmarkplayer",
@@ -193,8 +192,7 @@ object Commands {
         registerCommand("shtrackcollection", "Tracks your collection gain over time") { CollectionTracker.command(it) }
         registerCommand(
             "shcroptime",
-            "Calculates with your current crop per second speed " +
-                "how long you need to farm a crop to collect this amount of items",
+            "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items",
         ) { GardenCropTimeCommand.onCommand(it) }
         registerCommand(
             "shcropsin",
@@ -368,7 +366,7 @@ object Commands {
         ) { ColorFormattingHelper.printColorCodeList() }
         registerCommand(
             "shtps",
-            "Informs in chat about the server ticks per second (TPS)."
+            "Informs in chat about the server ticks per second (TPS).",
         ) { TpsCounter.tpsCommand() }
         registerCommand(
             "shcarry",
@@ -495,7 +493,7 @@ object Commands {
         ) { SkyBlockIslandTest.onCommand(it) }
         registerCommand(
             "shdebugprice",
-            "Debug different price sources for an item."
+            "Debug different price sources for an item.",
         ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
@@ -669,8 +667,7 @@ object Commands {
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA &&
-            (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",
