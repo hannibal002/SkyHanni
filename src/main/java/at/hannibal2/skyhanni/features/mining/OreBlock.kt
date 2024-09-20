@@ -22,6 +22,7 @@ import net.minecraft.block.state.IBlockState
 import net.minecraft.init.Blocks
 import net.minecraft.item.EnumDyeColor
 
+
 enum class OreBlock(
     val checkBlock: (IBlockState) -> Boolean,
     val checkArea: () -> Boolean,
@@ -145,11 +146,13 @@ enum class OreBlock(
         checkBlock = { it.block == Blocks.coal_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    PURE_IRON( // currently not detected
+    PURE_IRON(
+        // currently not detected
         checkBlock = { it.block == Blocks.iron_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    PURE_GOLD( // currently not detected
+    PURE_GOLD(
+        // currently not detected
         checkBlock = { it.block == Blocks.gold_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
@@ -157,15 +160,18 @@ enum class OreBlock(
         checkBlock = { it.block == Blocks.lapis_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    PURE_REDSTONE( // currently not detected
+    PURE_REDSTONE(
+        // currently not detected
         checkBlock = { it.block == Blocks.redstone_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    PURE_EMERALD( // currently not detected
+    PURE_EMERALD(
+        // currently not detected
         checkBlock = { it.block == Blocks.emerald_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
-    PURE_DIAMOND( // currently not detected
+    PURE_DIAMOND(
+        // currently not detected
         checkBlock = { it.block == Blocks.diamond_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
     ),
@@ -274,9 +280,17 @@ private fun isStone(state: IBlockState): Boolean {
 
 private fun isHardStoneHollows(state: IBlockState): Boolean {
     return when (state.block) {
-        Blocks.wool -> (state.getValue(BlockColored.COLOR) == EnumDyeColor.GRAY)
-        Blocks.stained_hardened_clay -> (state.getValue(BlockColored.COLOR) == EnumDyeColor.CYAN)
-        Blocks.stone -> (state.getValue(BlockStone.VARIANT) == BlockStone.EnumType.STONE)
+        Blocks.wool -> {
+            val color = state.getValue(BlockColored.COLOR)
+            color == EnumDyeColor.GRAY || color == EnumDyeColor.GREEN
+        }
+        Blocks.stained_hardened_clay -> when (state.getValue(BlockColored.COLOR)) {
+            EnumDyeColor.CYAN, EnumDyeColor.BROWN, EnumDyeColor.GRAY, EnumDyeColor.BLACK,
+            EnumDyeColor.LIME, EnumDyeColor.GREEN, EnumDyeColor.BLUE, EnumDyeColor.RED,
+            EnumDyeColor.SILVER -> true
+            else -> false
+        }
+        Blocks.clay, Blocks.stonebrick, Blocks.stone -> true
         else -> false
     }
 }
