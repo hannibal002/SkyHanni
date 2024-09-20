@@ -6,11 +6,11 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
-import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -71,7 +71,7 @@ object HoppityAPI {
      */
     private val sideDishNamePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "rabbit.sidedish",
-        "(?:§.)*?Golden Rabbit (?:§.)?- (?:§.)?Side Dish"
+        "(?:§.)*?Golden Rabbit (?:§.)?- (?:§.)?Side Dish",
     )
 
     /**
@@ -97,12 +97,12 @@ object HoppityAPI {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         InventoryUtils.getItemsInOpenChest().filter {
             it.stack.hasDisplayName() &&
-            it.stack.getMinecraftId().toString() == "minecraft:skull" &&
-            it.stack.getLore().isNotEmpty()
+                it.stack.getMinecraftId().toString() == "minecraft:skull" &&
+                it.stack.getLore().isNotEmpty()
         }.forEach {
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
-                when(groupOrNull("name") ?: return@matchMatcher) {
+                when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
                     "El Dorado" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
                     else -> return@matchMatcher

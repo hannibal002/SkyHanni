@@ -64,7 +64,7 @@ object ChocolateFactoryBarnManager {
             if (hoppityConfig.showDuplicateNumber && !hoppityConfig.compactChat) {
                 (HoppityCollectionStats.getRabbitCount(HoppityAPI.getLastRabbit()) + 1).takeIf { it > 1 }?.let {
                     event.chatComponent = ChatComponentText(
-                        event.message.replace("§7§lDUPLICATE RABBIT!", "§7§lDUPLICATE RABBIT! §7(§b#$it§7)§r")
+                        event.message.replace("§7§lDUPLICATE RABBIT!", "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"),
                     )
                 }
             }

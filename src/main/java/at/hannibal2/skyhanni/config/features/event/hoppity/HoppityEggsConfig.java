@@ -198,7 +198,7 @@ public class HoppityEggsConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Show Duplicate Amount", desc = "Show the number of previous finds of a duplicate rabbit in chat messages.")
+    @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
     @ConfigEditorBoolean
     public boolean showDuplicateNumber = false;
 
