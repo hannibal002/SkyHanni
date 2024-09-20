@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
 import at.hannibal2.skyhanni.data.model.TextInput;
-import at.hannibal2.skyhanni.features.garden.farming.GardenCustomKeybinds;
+import at.hannibal2.skyhanni.features.garden.GardenCustomKeybinds;
 import at.hannibal2.skyhanni.test.GraphEditor;
 import net.minecraft.client.settings.KeyBinding;
 import org.spongepowered.asm.mixin.Mixin;

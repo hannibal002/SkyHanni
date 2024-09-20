@@ -1,29 +1,26 @@
-package at.hannibal2.skyhanni.config.features.garden;
+package at.hannibal2.skyhanni.config.features.garden.customkeybinds;
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorButton;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import net.minecraft.client.Minecraft;
 import org.lwjgl.input.Keyboard;
 
-public class KeyBindConfig {
-    @Expose
-    @ConfigOption(name = "Enabled", desc = "Use custom keybinds while holding a farming tool or Daedalus Axe in the hand.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean enabled = false;
+import java.lang.reflect.Field;
 
-    @Expose
-    @ConfigOption(name = "Exclude Barn", desc = "Disable this feature while on the barn plot.")
-    @ConfigEditorBoolean
-    public boolean excludeBarn = false;
+public class KeyBindCrop {
 
-    @ConfigOption(name = "Disable All", desc = "Disable all keys.")
+//     TODO: find out why the game crashes on button press, even with no code in the runnable
+
+    @ConfigOption(name = "test button", desc = "test button")
+    @ConfigEditorButton(buttonText = "test")
+    public Runnable testButton = () -> {
+    };
+
+    @ConfigOption(name = "Disable All", desc = "Disable all keys of this crop.")
     @ConfigEditorButton(buttonText = "Disable")
-    public Runnable presetDisable = () -> {
+    public Runnable presetDisableCropLevel = () -> {
         attack = Keyboard.KEY_NONE;
         useItem = Keyboard.KEY_NONE;
         left = Keyboard.KEY_NONE;
@@ -32,13 +29,11 @@ public class KeyBindConfig {
         back = Keyboard.KEY_NONE;
         jump = Keyboard.KEY_NONE;
         sneak = Keyboard.KEY_NONE;
-
-        Minecraft.getMinecraft().thePlayer.closeScreen();
     };
 
-    @ConfigOption(name = "Set Default", desc = "Reset all keys to default.")
+    @ConfigOption(name = "Set Default", desc = "Reset all keys of this crop to default.")
     @ConfigEditorButton(buttonText = "Default")
-    public Runnable presetDefault = () -> {
+    public Runnable presetDefaultCropLevel = () -> {
         attack = -100;
         useItem = -99;
         left = Keyboard.KEY_A;
@@ -47,8 +42,8 @@ public class KeyBindConfig {
         back = Keyboard.KEY_S;
         jump = Keyboard.KEY_SPACE;
         sneak = Keyboard.KEY_LSHIFT;
-        Minecraft.getMinecraft().thePlayer.closeScreen();
     };
+
 
     @Expose
     @ConfigOption(name = "Attack", desc = "")
@@ -89,4 +84,5 @@ public class KeyBindConfig {
     @ConfigOption(name = "Sneak", desc = "")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_LSHIFT)
     public int sneak = Keyboard.KEY_LSHIFT;
+
 }
