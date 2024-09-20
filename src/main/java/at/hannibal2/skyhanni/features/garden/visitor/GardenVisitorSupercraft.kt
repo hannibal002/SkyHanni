@@ -109,7 +109,7 @@ object GardenVisitorSupercraft {
         if (event.slotId != 31) return
         event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
-            HypixelCommands.recipe(lastSuperCraftMaterial)
+            HypixelCommands.viewRecipe(lastSuperCraftMaterial)
             lastClick = SimpleTimeMark.now()
         }
     }
