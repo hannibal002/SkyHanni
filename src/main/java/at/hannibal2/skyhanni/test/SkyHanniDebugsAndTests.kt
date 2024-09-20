@@ -133,7 +133,6 @@ object SkyHanniDebugsAndTests {
 
     fun testCommand(args: Array<String>) {
 
-
 //            val a = Thread { OSUtils.copyToClipboard("123") }
 //            val b = Thread { OSUtils.copyToClipboard("456") }
 //            a.start()
@@ -517,11 +516,11 @@ object SkyHanniDebugsAndTests {
         Renderable.verticalEditTable(
             listOf(
                 listOf(Renderable.string("Help"), Renderable.string("Me")),
-                listOf(Renderable.string("Not"), Renderable.string("Now")),
+                listOf(Renderable.string("Not"), Renderable.placeholder(0, 15)),
                 listOf(Renderable.string("I'm Fine"), Renderable.string("And You")),
             ),
             onClick = { ChatUtils.chat("Clicked: $it") },
-            onHover = { ChatUtils.chat("Hover: $it") },
+            onHover = { /* ChatUtils.chat("Hover: $it") */ },
             onDrop = { f, t -> ChatUtils.chat("Dropped: $f to $t") },
         )
     }

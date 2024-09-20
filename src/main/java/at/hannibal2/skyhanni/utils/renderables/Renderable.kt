@@ -44,6 +44,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
+import java.util.UUID
 import kotlin.math.max
 
 interface Renderable {
@@ -704,9 +705,13 @@ interface Renderable {
 
             var holdingIndex = -1
             var isSnappingIn = false
+            var ySpace = 0
+
+            val uuid = UUID.randomUUID()
 
             override fun render(posX: Int, posY: Int) {
                 isSnappingIn = false
+                ySpace = 0
                 GlStateManager.pushMatrix()
                 var rowIndex = 0
                 var contentRowIndex = 0
@@ -715,15 +720,20 @@ interface Renderable {
                         contentRowIndex++
                         continue
                     }
-                    if (isBoxHovered(posX, width, posY + yOffsets[rowIndex], yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY - 1)
-                        && condition() && shouldAllowLink(true, bypassChecks)
+                    if (isBoxHovered(
+                            posX,
+                            width,
+                            posY + yOffsets[rowIndex],
+                            yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY - 1,
+                        ) && condition() && shouldAllowLink(true, bypassChecks)
                     ) {
                         onHover(rowIndex)
-                        DragNDrop.dragOnPress(Drag(rowIndex)) {
+                        DragNDrop.dragOnPress(Drag(rowIndex, uuid)) {
                             holdingIndex = contentRowIndex
                             onClick(rowIndex)
                         }
                         var dropped = false
+                        val preYSpace = ySpace
                         DragNDrop.handelDroppable(
                             object : Droppable {
 
@@ -736,34 +746,40 @@ interface Renderable {
                                 override fun preDrop(drop: Any?) {
                                     val element = drop as? Drag ?: return
                                     val index = element.rowIndex
-                                    content[index].drawRow(rowIndex, posX, posY + yOffsets[rowIndex], yOffsets[rowIndex].toFloat())
+                                    content[index].drawRow(index, posX, posY + ySpace, ySpace.toFloat(), true)
                                     dropped = true
                                     isSnappingIn = true
                                 }
 
-                                override fun validTarget(item: Any?): Boolean = item is Drag
+                                override fun validTarget(item: Any?): Boolean = item is Drag && item.uuid == uuid
 
                             },
                         )
-                        Gui.drawRect(
-                            posX,
-                            posY + yOffsets[rowIndex],
-                            posX + width,
-                            posY + yOffsets[rowIndex + 1] - emptySpaceY,
-                            Color.GRAY.withAlpha(if (dropped) 50 else 35),
-                        )
+                        val boxY: Pair<Int, Int>
                         if (dropped) {
                             rowIndex++
+                            boxY = preYSpace to ySpace
+                        } else {
+                            boxY = ySpace to if (contentRowIndex == content.size) height
+                            else ySpace + yOffsets[contentRowIndex + 1] - yOffsets[contentRowIndex]
                         }
+                        Gui.drawRect(
+                            posX,
+                            posY + boxY.first,
+                            posX + width,
+                            posY + boxY.second - emptySpaceY,
+                            Color.GRAY.withAlpha(if (dropped) 50 else 35),
+                        )
                     }
-                    content.getOrNull(contentRowIndex)?.drawRow(rowIndex, posX, posY + yOffsets[rowIndex], yOffsets[rowIndex].toFloat())
+                    content.getOrNull(contentRowIndex)?.drawRow(contentRowIndex, posX, posY + ySpace, ySpace.toFloat(), true)
                     rowIndex++
                     contentRowIndex++
                 }
                 GlStateManager.popMatrix()
             }
 
-            private fun List<Renderable?>.drawRow(rowIndex: Int, x: Int, y: Int, yOff: Float) {
+            private fun List<Renderable?>.drawRow(rowIndex: Int, x: Int, y: Int, yOff: Float, setYOffset: Boolean) {
+                val slotHeight = yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY
                 for ((index, renderable) in this.withIndex()) {
                     GlStateManager.pushMatrix()
                     GlStateManager.translate(xOffsets[index].toFloat(), yOff, 0F)
@@ -771,13 +787,17 @@ interface Renderable {
                         x + xOffsets[index],
                         y,
                         xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
-                        yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY,
+                        slotHeight,
                     )
                     GlStateManager.popMatrix()
                 }
+                if (setYOffset) {
+                    ySpace += slotHeight
+                }
             }
 
-            inner class Drag(val rowIndex: Int) : DragItem<Drag> {
+            inner class Drag(val rowIndex: Int, val uuid: UUID) : DragItem<Drag> {
+
                 override fun get() = this
 
                 override fun onDiscard() {
@@ -787,7 +807,7 @@ interface Renderable {
                 override fun onRender(mouseX: Int, mouseY: Int) {
                     if (!isSnappingIn) {
                         GlStateManager.translate(3f, 0f, 0f)
-                        content[rowIndex].drawRow(rowIndex, 0, 0, 0f)
+                        content[rowIndex].drawRow(rowIndex, 0, 0, 0f, false)
                         Gui.drawRect(0, 0, width, yOffsets[rowIndex + 1] - yOffsets[rowIndex] - emptySpaceY, Color.GRAY.withAlpha(30))
                         GlStateManager.translate(-3f, 0f, 0f)
                     }
