@@ -21,7 +21,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils.playPlingSound
+import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -29,7 +31,9 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.UUID
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,6 +43,7 @@ object TotemOfCorruption {
 
     private var display = emptyList<String>()
     private var totems: List<Totem> = emptyList()
+    private val warnedTotems = TimeLimitedCache<UUID, Boolean>(2.minutes)
 
     private val patternGroup = RepoPattern.group("fishing.totemofcorruption")
     private val totemNamePattern by patternGroup.pattern(
@@ -154,9 +159,10 @@ object TotemOfCorruption {
             val owner = getOwner(totem) ?: return@mapNotNull null
 
             val timeToWarn = config.warnWhenAboutToExpire.seconds
-            if (timeToWarn > 0.seconds && timeRemaining == timeToWarn) {
+            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && !warnedTotems.containsKey(totem.uniqueID)) {
                 playPlingSound()
                 sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
+                warnedTotems.put(totem.uniqueID, true)
             }
             Totem(totem.getLorenzVec(), timeRemaining, owner)
         }
