@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
-import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -199,31 +198,6 @@ object HoppityCollectionStats {
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
         replacementCache[event.originalItem.displayName]?.let { event.replace(it) }
-    }
-
-    @SubscribeEvent
-    fun replaceItem(event: ReplaceItemEvent) {
-        if (!config.rarityDyeRecolor || !pagePattern.matches(event.inventory.name)) return
-        val item = event.originalItem
-        // The "base" missing rabbits are Gray Dye (minecraft:dye with metadata 8)
-        if (item.getMinecraftId().toString() != "minecraft:dye" || item.metadata != 8) return
-
-        val rarity = HoppityAPI.rarityByRabbit(item.displayName)
-        // Add NBT for the dye color itself
-        val newItemStack = ItemStack(Items.dye, 1, when (rarity) {
-            LorenzRarity.COMMON -> 7  // Light gray dye
-            LorenzRarity.UNCOMMON -> 10 // Lime dye
-            LorenzRarity.RARE -> 4 // Lapis lazuli
-            LorenzRarity.EPIC -> 5 // Purple dye
-            LorenzRarity.LEGENDARY -> 14 // Orange dye
-            LorenzRarity.MYTHIC -> 13 // Magenta dye
-            LorenzRarity.DIVINE -> 12 // Light blue dye
-            LorenzRarity.SPECIAL -> 1 // Rose Red - Covering bases for future (?)
-            else -> return
-        })
-        newItemStack.setLore(item.getLore())
-        newItemStack.setStackDisplayName(item.displayName)
-        event.replace(newItemStack)
     }
 
     @SubscribeEvent
