@@ -193,6 +193,11 @@ public class ChocolateFactoryConfig {
     ));
 
     @Expose
+    @ConfigOption(name = "Re-color Missing Rabbit Dyes", desc = "Replace the gray dye in Hoppity's Collection with a color for the rarity of the rabbit.")
+    @ConfigEditorBoolean
+    public boolean rarityDyeRecolor = true;
+
+    @Expose
     @ConfigOption(
         name = "Show Missing Location Rabbits",
         desc = "Show the locations you have yet to find enough egg locations for in order to unlock the rabbit for that location."

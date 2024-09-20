@@ -48,7 +48,7 @@ import kotlin.math.abs
  * 	12 starter NPC's
  * 	diana
  * farming:
- * 	pelt farming
+ * 	pelt farming area
  * rift:
  * 	enigma souls
  * 	eyes

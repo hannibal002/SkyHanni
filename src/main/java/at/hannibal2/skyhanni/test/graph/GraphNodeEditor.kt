@@ -1,10 +1,10 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GraphEditor.distanceSqToPlayer
+import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
