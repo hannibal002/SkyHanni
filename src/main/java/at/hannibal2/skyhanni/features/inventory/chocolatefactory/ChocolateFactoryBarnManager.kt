@@ -42,7 +42,7 @@ object ChocolateFactoryBarnManager {
         if (!LorenzUtils.inSkyBlock) return
 
         HoppityEggsManager.newRabbitFound.matchMatcher(event.message) {
-            val profileStorage = profileStorage ?: return
+            val profileStorage = profileStorage ?: return@matchMatcher
             profileStorage.currentRabbits += 1
             trySendBarnFullMessage(inventory = false)
             HoppityEggsManager.shareWaypointPrompt()

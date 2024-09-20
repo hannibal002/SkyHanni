@@ -35,6 +35,7 @@ object HoppityAPI {
     private var duplicate = false
     private var lastRarity = ""
     private var lastName = ""
+    private var lastNameCache = ""
     private var newRabbit = false
     private var lastMeal: HoppityEggType? = null
     private var lastDuplicateAmount: Long? = null
@@ -51,7 +52,7 @@ object HoppityAPI {
         this.lastDuplicateAmount = null
     }
 
-    fun getLastRabbit(): String = this.lastName
+    fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
     fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
 
@@ -141,9 +142,10 @@ object HoppityAPI {
         }
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.HIGH)
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
+
         eggFoundPattern.matchMatcher(event.message) {
             resetRabbitData()
             lastMeal = getEggType(event)
@@ -161,6 +163,7 @@ object HoppityAPI {
 
         HoppityEggsManager.rabbitFoundPattern.matchMatcher(event.message) {
             lastName = group("name")
+            lastNameCache = lastName
             lastRarity = group("rarity")
             attemptFireRabbitFound()
         }
