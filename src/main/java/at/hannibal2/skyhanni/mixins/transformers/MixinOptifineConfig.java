@@ -11,13 +11,8 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @Mixin(targets = "Config", remap = false)
 public class MixinOptifineConfig {
 
-    @Inject(method = "isConnectedTextures", at = @At("HEAD"), cancellable = true)
+    @Inject(method = {"isConnectedTextures", "isConnectedTexturesFancy"}, at = @At("HEAD"), cancellable = true)
     private static void isConnectedTextures(CallbackInfoReturnable<Boolean> cir) {
-        if (MiningCommissionsBlocksColor.INSTANCE.getActive()) cir.setReturnValue(false);
-    }
-
-    @Inject(method = "isConnectedTexturesFancy", at = @At("HEAD"), cancellable = true)
-    private static void isConnectedTexturesFancy(CallbackInfoReturnable<Boolean> cir) {
         if (MiningCommissionsBlocksColor.INSTANCE.getActive()) cir.setReturnValue(false);
     }
 }
