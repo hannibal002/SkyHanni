@@ -131,7 +131,6 @@ object HoppityEggsManager {
 
         eggFoundPattern.matchMatcher(event.message) {
             HoppityEggLocations.saveNearestEgg()
-            HoppityEggLocator.eggFound()
             val meal = getEggType(event)
             val note = group("note").removeColor()
             meal.markClaimed()
