@@ -187,11 +187,8 @@ object HoppityCollectionStats {
         strayRabbit to HighlightRabbitTypes.STRAYS,
     )
 
-    private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean {
-        return stack.item == Items.dye && (
-            stack.metadata == 8 || stack.getLore().any { it.lowercase().contains("milestone") }
-            )
-    }
+    private fun missingRabbitStackNeedsFix(stack: ItemStack): Boolean =
+        stack.item == Items.dye && (stack.metadata == 8 || stack.getLore().any { it.lowercase().contains("milestone") })
 
     private val replacementCache: MutableMap<String, ItemStack> = mutableMapOf()
 
