@@ -93,6 +93,10 @@ object SummoningMobManager {
         if (mob !in mobs) return
         mobs -= mob
 
+        // since MobEvent.DeSpawn can be fired while outside sb
+        if (!LorenzUtils.inSkyBlock) return
+        if (!config.summonMessages) return
+
         if (!mob.isInRender()) return
         DelayedRun.runNextTick {
             if (lastChatTime.passedSince() > timeOut) {

@@ -53,7 +53,7 @@ class CropPage(val crop0: () -> CropType, sizeX: Int, sizeY: Int, paddingX: Int 
         FortuneStats.entries.filter { it.isActive() && it !in headers }.map { it.getFarmingBar() }
 
     private fun equipDisplay(): Renderable =
-        Renderable.fixedSizeCollum(
+        Renderable.fixedSizeColumn(
             Renderable.verticalContainer(
                 listOf(
                     crop.farmingItem.getDisplay(),
