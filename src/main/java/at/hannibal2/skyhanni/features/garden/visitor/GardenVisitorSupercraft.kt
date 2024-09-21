@@ -84,7 +84,7 @@ object GardenVisitorSupercraft {
         hasIngredients = true
         for ((key, value) in ingredientReqs) {
             val sackItem = key.asInternalName().getAmountInSacks()
-            lastSuperCraftMaterial = internalName.itemName.removeColor()
+            lastSuperCraftMaterial = internalName.asString()
             if (sackItem < value * amount) {
                 hasIngredients = false
                 break
@@ -109,7 +109,7 @@ object GardenVisitorSupercraft {
         if (event.slotId != 31) return
         event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
-            HypixelCommands.recipe(lastSuperCraftMaterial)
+            HypixelCommands.viewRecipe(lastSuperCraftMaterial)
             lastClick = SimpleTimeMark.now()
         }
     }

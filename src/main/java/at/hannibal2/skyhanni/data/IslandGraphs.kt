@@ -45,13 +45,14 @@ import kotlin.math.abs
  * 	12 starter NPC's
  * 	diana
  * farming:
- * 	pelt farming
+ * 	pelt farming area
  * rift:
  * 	enigma souls
  * 	eyes
  * 	big quests
  * 	montezuma souls
  * 	blood effigies
+ * 	avoid area around enderman
  * spider:
  * 	relicts + throw spot
  * dwarven mines:
