@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.CarryTrackerJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.slayer.SlayerType
@@ -31,6 +33,7 @@ object CarryTracker {
 
     private val customers = mutableListOf<Customer>()
     private val carryTypes = mutableMapOf<String, CarryType>()
+    private var slayerNames = emptyMap<SlayerType, List<String>>()
 
     private var display = listOf<Renderable>()
 
@@ -75,7 +78,7 @@ object CarryTracker {
         }
     }
 
-    // TODO move into own class
+    // TODO create trade event with player name, coins and items
     var lastTradedPlayer = ""
 
     @SubscribeEvent
@@ -100,7 +103,7 @@ object CarryTracker {
 
     fun onCommand(args: Array<String>) {
         if (args.size < 2 || args.size > 3) {
-            ChatUtils.userError("Usage:\n§c/shcarry <customer name> <type> <amountRequested>\n§c/shcarry <type> <price>")
+            ChatUtils.userError("Usage:\n§c/shcarry <customer name> <type> <amount requested>\n§c/shcarry <type> <price per>")
             return
         }
         if (args.size == 2) {
@@ -268,7 +271,6 @@ object CarryTracker {
 
     private fun Carry.getCost(): Double? {
         return type.pricePer?.let {
-//             min(requested, done) * it
             requested * it
         }?.takeIf { it != 0.0 }
     }
@@ -277,7 +279,7 @@ object CarryTracker {
 
     private fun createCarryType(input: String): CarryType? {
         if (input.length == 1) return null
-        val rawName = input.dropLast(1)
+        val rawName = input.dropLast(1).lowercase()
         val tier = input.last().digitToIntOrNull() ?: return null
 
         getSlayerType(rawName)?.let {
@@ -287,16 +289,7 @@ object CarryTracker {
         return null
     }
 
-    private fun getSlayerType(name: String): SlayerType? = when (name.lowercase()) {
-        "rev", "revenant", "zombie", "zomb" -> SlayerType.REVENANT
-        "tara", "tarantula", "spider", "brood", "broodfather" -> SlayerType.TARANTULA
-        "sven", "wolf", "packmaster" -> SlayerType.SVEN
-        "voidling", "void", "voidgloom", "eman", "enderman" -> SlayerType.VOID
-        "inferno", "demon", "demonlord", "blaze" -> SlayerType.INFERNO
-        "blood", "bloodfiend", "vamp", "vampire", "riftstalker" -> SlayerType.VAMPIRE
-
-        else -> null
-    }
+    private fun getSlayerType(name: String): SlayerType? = slayerNames.entries.find { name in it.value }?.key
 
     class Customer(
         val name: String,
