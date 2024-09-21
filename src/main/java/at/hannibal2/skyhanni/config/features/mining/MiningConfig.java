@@ -112,7 +112,6 @@ public class MiningConfig {
     public boolean flowstateHelper = false;
 
     @Expose
-    @ConfigOption(name = "Flowstate Helper", desc = "Shows stats for the Flowstate enchantment.")
     @ConfigLink(owner = MiningConfig.class, field = "flowstateHelper")
-    public Position flowstateHelperPosition = new Position();
+    public Position flowstateHelperPosition = new Position(0 , 0); //TODO
 }
