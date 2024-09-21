@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SkyBlockAreaChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -130,14 +130,14 @@ object IslandGraphs {
     private var inGlaciteTunnels: Boolean? = null
 
     @SubscribeEvent
-    fun onAreaChange(event: SkyBlockAreaChangeEvent) {
+    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
         if (currentIslandGraph != null) return
         // Should not happen, just as workaround still
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
 
         val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-        val now = event.newArea in areas
+        val now = event.area in areas
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             if (now) {
