@@ -39,11 +39,9 @@ public class FossilExcavatorConfig {
     @Expose
     @ConfigOption(
         name = "Hide Excavator Tooltips",
-        desc = "Hides tooltips of items inside of the excavator."
+        desc = "Hides tooltips of items inside of the Fossil Excavator."
     )
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean hideExcavatorTooltips = false;
-
-
+    public boolean hideExcavatorTooltips = true;
 }
