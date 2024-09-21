@@ -994,6 +994,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Stray rabbits = Dark Aqua.
     + Abi = Dark Green.
 + Added a toggle to highlight found rabbits in Hoppity's Collection menu. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
++ Added the ability to change the color of missing rabbit dyes in Hoppity's Collection to reflect rabbit rarity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2522)
 
 ### The Carnival
 
@@ -1327,6 +1328,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added to the Item Number list.
 + Added Compact Experimentation Table chat rewards. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2209)
     + Uses a compact chat message of rewards gained from Add-ons/Experiments.
++ Added Superpair Display. - ILike2WatchMemes  (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Displays found and matched pairs, power-ups, and missing pairs/normals.
++ Added Experiments Dry-Streak Display. - ILike2WatchMemes  (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Shows attempts and XP since the last ULTRA-RARE.
++ Added Experiments Profit Tracker. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Tracks profits in Coins and Enchanting XP.
 + In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
 + Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)

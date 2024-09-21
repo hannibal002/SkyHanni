@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
+import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -37,6 +38,10 @@ public class InventoryConfig {
     @Expose
     @Category(name = "Bazaar", desc = "Be smart when buying or selling many items in the Bazaar.")
     public BazaarConfig bazaar = new BazaarConfig();
+
+    @Expose
+    @Category(name = "Experimentation Table", desc = "QOL features for the Experimentation Table.")
+    public ExperimentationTableConfig experimentationTable = new ExperimentationTableConfig();
 
     @Expose
     @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
