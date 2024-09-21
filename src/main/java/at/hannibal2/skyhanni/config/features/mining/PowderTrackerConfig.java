@@ -7,6 +7,8 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
@@ -153,6 +155,39 @@ public class PowderTrackerConfig {
         @ConfigOption(name = "Highlight Chests", desc = "Highlight chest with a color depending on how much time left until it despawn.")
         @ConfigEditorBoolean
         public boolean highlightChests = true;
+
+        @Expose
+        @ConfigOption(name = "Draw Timer", desc = "Draw time left until the chest despawn.")
+        @ConfigEditorBoolean
+        public boolean drawTimerOnChest = true;
+
+        @Expose
+        @ConfigOption(name = "Draw Line", desc = "Draw a line starting at your cursor to the choosen chest.")
+        @ConfigEditorDropdown
+        public LineMode lineMode = LineMode.OLDEST;
+
+        public enum LineMode {
+            OLDEST("Oldest"),
+            NEAREST("Nearest"),
+            NONE("None")
+            ;
+
+            private final String str;
+
+            LineMode(String str) {
+                this.str = str;
+            }
+
+            @Override
+            public String toString() {
+                return str;
+            }
+        }
+
+        @Expose
+        @ConfigOption(name = "Line Count", desc = "Between how many chest do you want to draw a line to ?")
+        @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
+        public int drawLineToChestAmount = 2;
 
         @Expose
         @ConfigLink(owner = PowderTrackerConfig.class, field = "onlyWhenPowderGrinding")
