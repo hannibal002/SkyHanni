@@ -28,34 +28,25 @@ object ActiveBeaconEffect {
         "§aActive stat boost!",
     )
 
-    private var slot = -1
-    private var inInventory = false
+    private var slot: Int? = null
 
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        inInventory = inventoryPattern.matches(event.inventoryName)
-        if (!inInventory) return
+        if (!inventoryPattern.matches(event.inventoryName)) return
 
-        for ((slot, stack) in event.inventoryItems) {
-            if (stack.getLore().any { slotPattern.matches(it) }) {
-                this.slot = slot
-                return
-            }
-        }
-        slot = -1
+        slot = event.inventoryItems.filter { (_, stack) ->
+            stack.getLore().any { slotPattern.matches(it) }
+        }.firstNotNullOfOrNull { it.key }
     }
 
     @SubscribeEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
-        if (!inInventory) return
-        if (slot == -1) return
+        val slot = slot ?: return
 
-        val guiChest = event.gui
-        val chest = guiChest.inventorySlots
-        chest.getSlot(slot) highlight LorenzColor.GREEN
+        event.gui.inventorySlots.getSlot(slot) highlight LorenzColor.GREEN
     }
 
-    fun isEnabled() = config.highlightActiveBeaconEffect && IslandType.PRIVATE_ISLAND.isInIsland()
+    fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.highlightActiveBeaconEffect
 }
