@@ -7,6 +7,7 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
@@ -107,6 +108,13 @@ public class DevConfig {
         desc = "Mark SBA Contributors the same way as SkyHanni contributors.")
     @ConfigEditorBoolean
     public boolean fancySbaContributors = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Number Format Override",
+        desc = "Forces the number format to use the en_US locale.")
+    @ConfigEditorBoolean
+    public boolean numberFormatOverride = false;
 
     @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
