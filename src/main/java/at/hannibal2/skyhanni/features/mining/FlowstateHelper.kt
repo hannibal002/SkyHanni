@@ -4,16 +4,18 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.inPartialSeconds
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,6 +27,11 @@ object FlowstateHelper {
 
     private var blockBreakStreak = 0
 
+    private val pickobulusPattern by RepoPattern.pattern(
+        "mining.pickobulus.blockdestroy",
+        "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!"
+    )
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockMined(event: OreMinedEvent) {
         if (!MiningAPI.inCustomMiningIsland()) return
@@ -32,11 +39,24 @@ object FlowstateHelper {
 
         timeSinceBreak = SimpleTimeMark.now().plus(10.seconds)
         blockBreakStreak += event.extraBlocks.values.sum()
-        event.extraBlocks.forEach { (block, amount) ->
-            ChatUtils.debug("Mined $amount ${block.name}")
-        }
         createDisplay()
+        attemptClearDisplay()
+    }
 
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!MiningAPI.inCustomMiningIsland()) return
+        if (hasFlowstate() == null) return
+
+        pickobulusPattern.matchMatcher(event.message) {
+            timeSinceBreak = SimpleTimeMark.now().plus(10.seconds)
+            blockBreakStreak += group("amount").toInt()
+            createDisplay()
+            attemptClearDisplay()
+        }
+    }
+
+    private fun attemptClearDisplay() {
         DelayedRun.runDelayed(10.seconds) {
             if (timeSinceBreak.isInFuture()) return@runDelayed
             blockBreakStreak = 0
@@ -46,7 +66,9 @@ object FlowstateHelper {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!MiningAPI.inCustomMiningIsland()) return
         if (!config.flowstateHelper) return
+        if (hasFlowstate() == null) return
 
         if (display == null || timeSinceBreak.isInFuture()) createDisplay()
         display?.let {
