@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.collectWhile
 import at.hannibal2.skyhanni.utils.CollectionUtils.consumeWhile
@@ -449,11 +450,14 @@ object HoppityCollectionStats {
         return table
     }
 
-    fun getRabbitCount(name: String): Int = if (HoppityCollectionData.isKnownRabbit(name.removeColor())) loggedRabbits[name.removeColor()] ?: 0 else 0
+    fun getRabbitCount(name: String): Int = name.removeColor().run {
+        loggedRabbits[this]?.takeIf { HoppityCollectionData.isKnownRabbit(this) } ?: 0
+    }
+
     fun incrementRabbitCount(name: String) {
         val rabbit = name.removeColor()
         if (!HoppityCollectionData.isKnownRabbit(rabbit)) return
-        loggedRabbits[rabbit] = (loggedRabbits[rabbit] ?: 0) + 1
+        loggedRabbits.addOrPut(rabbit, 1)
     }
 
     // Gets the found rabbits according to the Hypixel progress bar
