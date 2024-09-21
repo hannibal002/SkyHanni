@@ -29,11 +29,10 @@ import kotlin.time.Duration.Companion.seconds
 object CarryTracker {
     private val config get() = SkyHanniMod.feature.misc
 
-    val customers = mutableListOf<Customer>()
-    val carryTypes = mutableMapOf<String, CarryType>()
+    private val customers = mutableListOf<Customer>()
+    private val carryTypes = mutableMapOf<String, CarryType>()
 
-    var display = listOf<Renderable>()
-
+    private var display = listOf<Renderable>()
 
     private val patternGroup = RepoPattern.group("carry")
 
@@ -155,7 +154,6 @@ object CarryTracker {
         }
     }
 
-
     private fun setPrice(rawType: String, rawPrice: String) {
         val carryType = getCarryType(rawType) ?: return
 
@@ -176,7 +174,7 @@ object CarryTracker {
         return customer
     }
 
-    fun CarryType.sameType(other: CarryType): Boolean = name == other.name && tier == other.tier
+    private fun CarryType.sameType(other: CarryType): Boolean = name == other.name && tier == other.tier
 
     private fun update() {
         val list = mutableListOf<Renderable>()
@@ -249,21 +247,19 @@ object CarryTracker {
                     tips = listOf(
                         "§7Carries for §b$customerName",
                         "",
-                        "§7Total cost: ${totalCostFormat}",
+                        "§7Total cost: $totalCostFormat",
                         "§7Already paid: $paidFormat",
-                        "§7Still missing: ${missingFormat}",
+                        "§7Still missing: $missingFormat",
                         "",
                         "§eClick to send missing coins in party chat!",
                     ),
                     onClick = {
                         HypixelCommands.partyChat(
-                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " +
-                                "still missing: ${missingFormat.removeColor()}",
+                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " + "still missing: ${missingFormat.removeColor()}",
                         )
                     },
                 ),
             )
-
 
         } else {
             list.addString("§b$customerName$totalCostFormat")
@@ -279,7 +275,7 @@ object CarryTracker {
 
     private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.formatNum()}"
 
-    fun createCarryType(input: String): CarryType? {
+    private fun createCarryType(input: String): CarryType? {
         if (input.length == 1) return null
         val rawName = input.dropLast(1)
         val tier = input.last().digitToIntOrNull() ?: return null
@@ -291,7 +287,7 @@ object CarryTracker {
         return null
     }
 
-    fun getSlayerType(name: String): SlayerType? = when (name.lowercase()) {
+    private fun getSlayerType(name: String): SlayerType? = when (name.lowercase()) {
         "rev", "revenant", "zombie", "zomb" -> SlayerType.REVENANT
         "tara", "tarantula", "spider", "brood", "broodfather" -> SlayerType.TARANTULA
         "sven", "wolf", "packmaster" -> SlayerType.SVEN
@@ -302,7 +298,6 @@ object CarryTracker {
         else -> null
     }
 
-
     class Customer(
         val name: String,
         var alreadyPaid: Double = 0.0,
@@ -310,7 +305,6 @@ object CarryTracker {
     )
 
     class Carry(val type: CarryType, val requested: Int, var done: Int = 0)
-
 
     abstract class CarryType(val name: String, val tier: Int, var pricePer: Double? = null) {
         override fun toString(): String = "§d$name $tier"
