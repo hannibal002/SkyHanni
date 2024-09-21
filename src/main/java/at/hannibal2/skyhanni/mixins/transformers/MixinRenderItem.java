@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
+import at.hannibal2.skyhanni.features.inventory.HarpFeatures;
 import at.hannibal2.skyhanni.mixins.hooks.RenderItemHookKt;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.entity.RenderItem;
@@ -20,5 +21,10 @@ public abstract class MixinRenderItem {
     @Inject(method = "renderItemIntoGUI", at = @At("RETURN"))
     public void renderItemReturn(ItemStack stack, int x, int y, CallbackInfo ci) {
         RenderItemHookKt.renderItemReturn(stack, x, y);
+    }
+
+    @Inject(method = "renderItemIntoGUI", at = @At("HEAD"), cancellable = true)
+    private void renderItemOverlayHead(ItemStack stack, int x, int y, CallbackInfo ci) {
+        HarpFeatures.tryBlockItemRender(stack, ci);
     }
 }

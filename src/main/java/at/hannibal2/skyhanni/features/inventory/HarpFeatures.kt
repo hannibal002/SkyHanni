@@ -7,12 +7,14 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -26,7 +28,9 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.Item
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -44,15 +48,15 @@ object HarpFeatures {
     private val patternGroup = RepoPattern.group("harp")
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
-        "Harp.*"
+        "Harp.*",
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",
-        "Melody.*"
+        "Melody.*",
     )
     private val songSelectedPattern by patternGroup.pattern(
         "song.selected",
-        "§aSong is selected!"
+        "§aSong is selected!",
     )
 
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
@@ -77,7 +81,7 @@ object HarpFeatures {
                 37 + index,
                 2,
                 3,
-                Minecraft.getMinecraft().thePlayer
+                Minecraft.getMinecraft().thePlayer,
             ) // middle clicks > left clicks
             lastClick = SimpleTimeMark.now()
             break
@@ -111,16 +115,16 @@ object HarpFeatures {
 
     private fun updateScale() {
         if (Minecraft.getMinecraft().currentScreen == null) {
-            DelayedRun.runNextTick() {
+            DelayedRun.runNextTick {
                 updateScale()
             }
             return
         }
         // Copied from Minecraft Code to update the scale
         val minecraft = Minecraft.getMinecraft()
-        val scaledresolution = ScaledResolution(minecraft)
-        val i = scaledresolution.scaledWidth
-        val j = scaledresolution.scaledHeight
+        val scaledResolution = ScaledResolution(minecraft)
+        val i = scaledResolution.scaledWidth
+        val j = scaledResolution.scaledHeight
         minecraft.currentScreen.setWorldAndResolution(minecraft, i, j)
     }
 
@@ -181,7 +185,7 @@ object HarpFeatures {
                 it,
                 event.clickedButton,
                 event.clickType,
-                Minecraft.getMinecraft().thePlayer
+                Minecraft.getMinecraft().thePlayer,
             )
         }
     }
@@ -213,6 +217,29 @@ object HarpFeatures {
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (event.slot.inventory !is ContainerLocalMenu) return
-            event.cancel()
+        event.cancel()
+    }
+
+    var inMenu = false
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        inMenu = isHarpGui(InventoryUtils.openInventoryName())
+    }
+
+    @JvmStatic
+    fun tryBlockRender(ci: CallbackInfo) {
+        if (inMenu) {
+            ci.cancel()
+        }
+    }
+
+    @JvmStatic
+    fun tryBlockItemRender(stack: ItemStack?, ci: CallbackInfo) {
+        if (inMenu) {
+            if (stack?.getInternalNameOrNull() != null) {
+                ci.cancel()
+            }
+        }
     }
 }
