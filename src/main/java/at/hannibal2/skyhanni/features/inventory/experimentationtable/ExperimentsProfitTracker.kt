@@ -54,6 +54,7 @@ object ExperimentsProfitTracker {
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
+    private var lastInventory = ""
     private var lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
     private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
@@ -177,9 +178,11 @@ object ExperimentsProfitTracker {
                 it.experimentsDone++
             }
         }
-        if (ExperimentationTableAPI.inTable && InventoryUtils.openInventoryName() == "Superpairs Rewards") {
+        if (lastInventory == "Superpairs Rewards") {
             handleExpBottles(true)
         }
+
+        lastInventory = InventoryUtils.openInventoryName()
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {

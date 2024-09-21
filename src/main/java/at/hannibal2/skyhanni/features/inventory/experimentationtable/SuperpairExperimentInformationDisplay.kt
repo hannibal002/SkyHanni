@@ -25,6 +25,7 @@ object SuperpairExperimentInformationDisplay {
 
     private var uncoveredAt = 0
     private var uncoveredItems = mutableListOf<Pair<Int, String>>()
+    private var uncoveredExp = mutableListOf<Pair<Int, Int>>()
     private var possiblePairs = 0
 
     data class Item(val index: Int, val name: String)
@@ -60,7 +61,7 @@ object SuperpairExperimentInformationDisplay {
     @SubscribeEvent
     fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        config.superpairDisplayPosition.renderStrings(display, posLabel = "Sperpair Experiment Information")
+        config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experiment Information")
         display = checkItems(toCheck)
     }
 
@@ -133,6 +134,8 @@ object SuperpairExperimentInformationDisplay {
                 ?: return else lastClicked.find { it.second == uncovered } ?: return
 
         val lastItem = InventoryUtils.getItemAtSlotIndex(lastSlotClicked.first) ?: return
+        val itemClicked = InventoryUtils.getItemAtSlotIndex(slot) ?: return
+
         val lastItemName = convertToReward(lastItem)
 
         if (isWaiting(lastItemName)) return
@@ -145,7 +148,7 @@ object SuperpairExperimentInformationDisplay {
                 uncoveredAt += 1
             }
 
-            hasFoundPair(slot, lastSlotClicked.first, reward, lastItemName) -> handleFoundPair(
+            hasFoundPair(slot, lastSlotClicked.first, reward, lastItemName) && lastItem.itemDamage == itemClicked.itemDamage -> handleFoundPair(
                 slot,
                 reward,
                 lastSlotClicked.first,
@@ -166,7 +169,7 @@ object SuperpairExperimentInformationDisplay {
 
         found[pair] = "Pair"
         found.entries.removeIf {
-            it.value == "Match" && right(it.key).first.name == reward
+            it.value == "Match" && right(it.key).first.index == slot
         }
         found.entries.removeIf {
             it.value == "Normal" && (left(it.key).index == slot || left(it.key).index == lastSlotClicked)
@@ -177,10 +180,10 @@ object SuperpairExperimentInformationDisplay {
         val match = uncoveredItems.find { it.second == reward }?.first ?: return
         val pair = toEither(ItemPair(Item(slot, reward), Item(match, reward)))
 
-        found[pair] = "Match"
-        found.entries.removeIf {
-            it.value == "Normal" && (left(it.key).index == slot || left(it.key).index == match)
-        }
+        if (found.none {
+                listOf("Pair", "Match").contains(it.value) && (right(it.key).first.index == slot)
+            }) found[pair] = "Match"
+        found.entries.removeIf { it.value == "Normal" && (left(it.key).index == slot || left(it.key).index == match) }
     }
 
     private fun handleNormalReward(slot: Int, reward: String) {
