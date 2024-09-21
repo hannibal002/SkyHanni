@@ -19,10 +19,18 @@ object ActiveBeaconEffect {
     val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.activebeaconeffect")
+
+    /**
+     * REGEX-TEST: Profile Stat Upgrades
+     */
     private val inventoryPattern by patternGroup.pattern(
         "inventory",
         "Profile Stat Upgrades",
     )
+
+    /**
+     * REGEX-TEST: §aActive stat boost!
+     */
     private val slotPattern by patternGroup.pattern(
         "slot.active",
         "§aActive stat boost!",
@@ -33,7 +41,10 @@ object ActiveBeaconEffect {
     @SubscribeEvent
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (!inventoryPattern.matches(event.inventoryName)) return
+        if (!inventoryPattern.matches(event.inventoryName)) {
+            slot = null
+            return
+        }
 
         slot = event.inventoryItems.filter { (_, stack) ->
             stack.getLore().any { slotPattern.matches(it) }
