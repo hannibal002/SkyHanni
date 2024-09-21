@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
@@ -129,12 +130,13 @@ object IslandGraphs {
 
     private var inGlaciteTunnels: Boolean? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onAreaChange(event: ScoreboardAreaChangeEvent) {
         if (currentIslandGraph != null) return
         // Should not happen, just as workaround still
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
 
+        // TODO repo
         val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
         val now = event.area in areas
