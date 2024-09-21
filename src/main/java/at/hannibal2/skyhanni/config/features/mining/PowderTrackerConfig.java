@@ -162,7 +162,7 @@ public class PowderTrackerConfig {
         public boolean drawTimerOnChest = true;
 
         @Expose
-        @ConfigOption(name = "Draw Line", desc = "Draw a line starting at your cursor to the choosen chest.")
+        @ConfigOption(name = "Draw Line", desc = "Draw a line starting at your cursor to the chosen chest.")
         @ConfigEditorDropdown
         public LineMode lineMode = LineMode.OLDEST;
 
