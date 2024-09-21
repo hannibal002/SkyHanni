@@ -67,7 +67,7 @@ object SkyHanniTypeAdapters {
 
     val SKYBLOCK_STAT: TypeAdapter<SkyblockStat> = SimpleStringTypeAdapter(
         { name.lowercase() },
-        { SkyblockStat.valueOf(this.uppercase()) },
+        { SkyblockStat.getValue(this.uppercase()) },
     )
 
     val TRACKER_DISPLAY_MODE = SimpleStringTypeAdapter.forEnum<SkyHanniTracker.DefaultDisplayMode>()
