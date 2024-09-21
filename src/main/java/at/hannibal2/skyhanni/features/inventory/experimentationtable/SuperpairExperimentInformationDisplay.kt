@@ -25,7 +25,6 @@ object SuperpairExperimentInformationDisplay {
 
     private var uncoveredAt = 0
     private var uncoveredItems = mutableListOf<Pair<Int, String>>()
-    private var uncoveredExp = mutableListOf<Pair<Int, Int>>()
     private var possiblePairs = 0
 
     data class Item(val index: Int, val name: String)
