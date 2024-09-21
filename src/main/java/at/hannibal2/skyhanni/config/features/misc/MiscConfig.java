@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,10 @@ public class MiscConfig {
     @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
 
+    @Expose
+    @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
+    public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
+
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
     @Expose
@@ -48,8 +53,9 @@ public class MiscConfig {
     public HideArmorConfig hideArmor2 = new HideArmorConfig();
 
     @Expose
-    @ConfigOption(name = "Potion Effects", desc = "")
+    @ConfigOption(name = "Non-God Pot Effects", desc = "")
     @Accordion
+    // TODO rename nonGodPotEffect
     public PotionEffectsConfig potionEffect = new PotionEffectsConfig();
 
     @Expose
@@ -108,9 +114,19 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
+    @ConfigOption(name = "Reminders", desc = "")
+    @Accordion
+    public RemindersConfig reminders = new RemindersConfig();
+
+    @Expose
+    @ConfigOption(name = "Last Servers", desc = "")
+    @Accordion
+    public LastServersConfig lastServers = new LastServersConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
-    public List<OutsideSbFeature> showOutsideSB = new ArrayList<>();
+    public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
 
     @Expose
     @ConfigOption(name = "Exp Bottles", desc = "Hide all the experience orbs lying on the ground.")
@@ -127,6 +143,9 @@ public class MiscConfig {
 
     @Expose
     public Position collectionCounterPos = new Position(10, 10, false, true);
+
+    @Expose
+    public Position carryPosition = new Position(10, 10, false, true);
 
     @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
@@ -218,6 +237,15 @@ public class MiscConfig {
 
     @Expose
     @ConfigOption(
+        name = "Fix Patcher Lines",
+        desc = "Suggest in chat to disable Patcher's `parallax fix` that breaks SkyHanni's line from middle of player to somewhere else."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean fixPatcherLines = true;
+
+    @Expose
+    @ConfigOption(
         name = "Time In Limbo",
         desc = "Show the time since you entered the limbo.")
     @ConfigEditorBoolean
@@ -294,4 +322,16 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean maintainGameVolume = false;
+
+    @Expose
+    @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gfsPiggyBank = true;
+
+    @Expose
+    @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean userluckEnabled = true;
 }

@@ -8,7 +8,11 @@ import kotlin.math.min
 
 object LocationUtils {
 
-    fun canSee(a: LorenzVec, b: LorenzVec) =
+    fun canSee(a: LorenzVec, b: LorenzVec, offset: Double? = null): Boolean {
+        return canSee0(a, b) && offset?.let { canSee0(a.add(y = it), b.add(y = it)) } ?: true
+    }
+
+    private fun canSee0(a: LorenzVec, b: LorenzVec) =
         Minecraft.getMinecraft().theWorld.rayTraceBlocks(a.toVec3(), b.toVec3(), false, true, false) == null
 
     fun playerLocation() = Minecraft.getMinecraft().thePlayer.getLorenzVec()
@@ -38,10 +42,10 @@ object LocationUtils {
 
     fun AxisAlignedBB.isPlayerInside() = isInside(playerLocation())
 
-    fun LorenzVec.canBeSeen(radius: Double = 150.0): Boolean {
+    fun LorenzVec.canBeSeen(radius: Double = 150.0, offset: Double? = null): Boolean {
         val a = playerEyeLocation()
         val b = this
-        val noBlocks = canSee(a, b)
+        val noBlocks = canSee(a, b, offset)
         val notTooFar = a.distance(b) < radius
         val inFov = true // TODO add Frustum "Frustum().isBoundingBoxInFrustum(entity.entityBoundingBox)"
         return noBlocks && notTooFar && inFov
@@ -105,5 +109,25 @@ object LocationUtils {
         val maxY = min(this.maxY, other.maxY)
         val maxZ = min(this.maxZ, other.maxZ)
         return AxisAlignedBB(minX, minY, minZ, maxX, maxY, maxZ)
+    }
+
+    fun calculatePlayerYaw(): Float {
+        val player = Minecraft.getMinecraft().thePlayer
+        var yaw = player.rotationYaw % 360
+        if (yaw < 0) yaw += 360
+        if (yaw > 180) yaw -= 360
+
+        return yaw
+    }
+
+    fun calculatePlayerFacingDirection(): LorenzVec {
+        var yaw = LocationUtils.calculatePlayerYaw() + 180
+        return when {
+            yaw < 45 -> LorenzVec(0, 0, -1)
+            yaw < 135 -> LorenzVec(1, 0, 0)
+            yaw < 225 -> LorenzVec(0, 0, 1)
+            yaw < 315 -> LorenzVec(-1, 0, 0)
+            else -> LorenzVec(0, 0, -1)
+        }
     }
 }

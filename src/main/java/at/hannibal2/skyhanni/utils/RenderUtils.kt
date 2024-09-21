@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
@@ -541,37 +541,6 @@ object RenderUtils {
         return renderer.getStringWidth(display)
     }
 
-    // Aligns using the width of element to render
-    private fun Position.renderString0(
-        string: String?,
-        offsetX: Int = 0,
-        offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment,
-    ): Int {
-        val display = "§f$string"
-        GlStateManager.pushMatrix()
-        transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
-        val width = this.getDummySize().x / this.scale
-
-        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
-
-        val strLen: Int = renderer.getStringWidth(string)
-        val x2 = when (alignmentEnum) {
-            HorizontalAlignment.LEFT -> offsetX.toFloat()
-            HorizontalAlignment.CENTER -> offsetX + width / 2f - strLen / 2f
-            HorizontalAlignment.RIGHT -> offsetX + width - strLen.toFloat()
-            else -> offsetX.toFloat()
-        }
-        GL11.glTranslatef(x2, 0f, 0f)
-        renderer.drawStringWithShadow(display, 0f, 0f, 0)
-
-        GlStateManager.popMatrix()
-
-        return renderer.getStringWidth(display)
-    }
-
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
@@ -579,25 +548,6 @@ object RenderUtils {
         var longestX = 0
         for (s in list) {
             val x = renderString0(s, offsetY = offsetY, centered = false)
-            if (x > longestX) {
-                longestX = x
-            }
-            offsetY += 10 + extraSpace
-        }
-        GuiEditManager.add(this, posLabel, longestX, offsetY)
-    }
-
-    fun Position.renderStringsAlignedWidth(
-        list: List<Pair<String, HorizontalAlignment>>,
-        extraSpace: Int = 0,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-
-        var offsetY = 0
-        var longestX = 0
-        for (pair in list) {
-            val x = renderString0(pair.first, offsetY = offsetY, alignmentEnum = pair.second)
             if (x > longestX) {
                 longestX = x
             }
@@ -697,7 +647,7 @@ object RenderUtils {
 
     /**
      * Accepts a single line to print.
-     * This  line is a list of things to print. Can print String or ItemStack objects.
+     * This line is a list of things to print. Can print String or ItemStack objects.
      */
     @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderSingleLineWithItems(
@@ -1132,6 +1082,7 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player) + add
     }
 
@@ -1318,6 +1269,7 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
+        showNoteNames: Boolean = false
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
@@ -1339,8 +1291,10 @@ object RenderUtils {
                 bezierPoint,
             )
         }
-        path.filter { it.name?.isNotEmpty() == true }.forEach {
-            this.drawDynamicText(it.position, it.name!!, textSize)
+        if (showNoteNames) {
+            path.filter { it.name?.isNotEmpty() == true }.forEach {
+                this.drawDynamicText(it.position, it.name!!, textSize)
+            }
         }
         val last = path.last()
         drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
@@ -1658,6 +1612,27 @@ object RenderUtils {
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
         GlStateManager.enableCull()
+    }
+
+    fun LorenzRenderWorldEvent.drawHitbox(
+        boundingBox: AxisAlignedBB,
+        lineWidth: Int,
+        color: Color,
+        depth: Boolean,
+    ) {
+        val cornersTop = boundingBox.getCorners(boundingBox.maxY)
+        val cornersBottom = boundingBox.getCorners(boundingBox.minY)
+
+        // Draw lines for the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersTop[i], cornersTop[(i + 1) % 4], color, lineWidth, depth)
+            this.draw3DLine(cornersBottom[i], cornersBottom[(i + 1) % 4], color, lineWidth, depth)
+        }
+
+        // Draw lines connecting the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersBottom[i], cornersTop[i], color, lineWidth, depth)
+        }
     }
 
     fun chromaColor(

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -137,6 +138,11 @@ object NEUItems {
         val map = mutableMapOf<String, NEUInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
+
+            // we ignore all builder blocks from the item name -> internal name cache
+            // because builder blocks can have the same display name as normal items.
+            if (rawInternalName.startsWith("BUILDER_")) continue
+
             val internalName = rawInternalName.asInternalName()
 
             // TODO remove all except one of them once neu is consistent
@@ -163,6 +169,16 @@ object NEUItems {
 
     fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.asInternalName()
+
+    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
+        val internalName = hypixelId.replace(':', '-')
+        return internalName.asInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
+    }
+
+    fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
+        getInternalNameFromHypixelIdOrNull(hypixelId)
+            ?: error("hypixel item id does not match internal name: $hypixelId")
+
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
@@ -327,7 +343,7 @@ object NEUItems {
             val id = current.first
             return if (current.second > 1) {
                 val child = getPrimitiveMultiplier(id, tryCount + 1)
-                val result = child.multiply(current.second)
+                val result = child * current.second
                 multiplierCache[internalName] = result
                 result
             } else {
@@ -351,6 +367,8 @@ object NEUItems {
     fun neuHasFocus(): Boolean {
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
+        // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
+        // https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/master/src/main/java/io/github/moulberry/notenoughupdates/overlays/RecipeSearchOverlay.java
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return true
         if (NEUOverlay.searchBarHasFocus) return true
 
