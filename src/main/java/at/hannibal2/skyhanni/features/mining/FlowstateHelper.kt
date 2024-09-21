@@ -4,10 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
@@ -22,10 +23,15 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FlowstateHelper {
     private val config get() = SkyHanniMod.feature.mining
-    private var timeSinceBreak = SimpleTimeMark.farPast()
-    private var display: List<Renderable>? = null
-
+    private var streakEndTimer = SimpleTimeMark.farPast()
     private var blockBreakStreak = 0
+
+    private var display: List<Renderable>? = null
+    private var displayDirty = false
+
+    private var titleRenderable = Renderable.string("")
+    private var streakRenderable = Renderable.string("")
+    private var speedRenderable = Renderable.string("")
 
     private val pickobulusPattern by RepoPattern.pattern(
         "mining.pickobulus.blockdestroy",
@@ -37,9 +43,10 @@ object FlowstateHelper {
         if (!MiningAPI.inCustomMiningIsland()) return
         if (hasFlowstate() == null) return
 
-        timeSinceBreak = SimpleTimeMark.now().plus(10.seconds)
+        streakEndTimer = SimpleTimeMark.now().plus(10.seconds)
         blockBreakStreak += event.extraBlocks.values.sum()
         createDisplay()
+        displayDirty = true
         attemptClearDisplay()
     }
 
@@ -49,19 +56,26 @@ object FlowstateHelper {
         if (hasFlowstate() == null) return
 
         pickobulusPattern.matchMatcher(event.message) {
-            timeSinceBreak = SimpleTimeMark.now().plus(10.seconds)
+            streakEndTimer = SimpleTimeMark.now().plus(10.seconds)
             blockBreakStreak += group("amount").toInt()
             createDisplay()
+            displayDirty = true
             attemptClearDisplay()
         }
     }
 
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!MiningAPI.inCustomMiningIsland()) return
+        if (hasFlowstate() == null) return
+
+        attemptClearDisplay()
+    }
+
     private fun attemptClearDisplay() {
-        DelayedRun.runDelayed(10.seconds) {
-            if (timeSinceBreak.isInFuture()) return@runDelayed
-            blockBreakStreak = 0
-            createDisplay()
-        }
+        if (streakEndTimer.isInFuture()) return
+        blockBreakStreak = 0
+        createDisplay()
     }
 
     @SubscribeEvent
@@ -70,7 +84,7 @@ object FlowstateHelper {
         if (!config.flowstateHelper) return
         if (hasFlowstate() == null) return
 
-        if (display == null || timeSinceBreak.isInFuture()) createDisplay()
+        if (display == null || streakEndTimer.isInFuture()) createDisplay()
         display?.let {
             config.flowstateHelperPosition.renderRenderables(
                 listOf(Renderable.verticalContainer(it, 1)),
@@ -81,18 +95,31 @@ object FlowstateHelper {
     }
 
     private fun createDisplay() {
-        val helperDisplay: MutableList<Renderable> = mutableListOf()
+        if (displayDirty) {
+            displayDirty = false
+            display = buildList {
+                createDisplayTitle()
+                createDisplayTimer()
+                createDisplayBlock()
+                createDisplaySpeed()
+            }
+        } else {
+            display = buildList {
+                titleRenderable
+                createDisplayTimer()
+                streakRenderable
+                speedRenderable
+            }
+        }
+    }
 
-        helperDisplay.add(Renderable.string("§d§lFlowstate Helper"))
-        helperDisplay.add(createDisplayTimer())
-        helperDisplay.add(createDisplayBlock())
-        helperDisplay.add(Renderable.string("§6+${getSpeedBonus()}⸕"))
-
-        display = helperDisplay.toList()
+    private fun createDisplayTitle(): Renderable {
+        titleRenderable = Renderable.string("§d§lFlowstate Helper")
+        return titleRenderable
     }
 
     private fun createDisplayTimer(): Renderable {
-        var timeRemaining = timeSinceBreak.minus(SimpleTimeMark.now()).inPartialSeconds
+        var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now()).inPartialSeconds
         if (timeRemaining < 0.0) timeRemaining = 0.0
 
         val timerColor = when (timeRemaining) {
@@ -106,13 +133,24 @@ object FlowstateHelper {
 
     private fun createDisplayBlock(): Renderable {
         val textColor = if (blockBreakStreak < 200) "§7" else "§f"
-        return Renderable.string("Streak: $textColor$blockBreakStreak")
+        streakRenderable = Renderable.string("Streak: $textColor$blockBreakStreak")
+        return streakRenderable
+    }
+
+    private fun createDisplaySpeed(): Renderable {
+        speedRenderable = Renderable.string("§6+${getSpeedBonus()}⸕")
+        return speedRenderable
     }
 
     private fun getSpeedBonus(): Int {
         val flowstateLevel = hasFlowstate() ?: 0
         if (blockBreakStreak >= 200) return 200 * flowstateLevel
         return blockBreakStreak * flowstateLevel
+    }
+
+    @SubscribeEvent
+    fun itemInHand(event: ItemInHandChangeEvent) {
+
     }
 
     private fun hasFlowstate(): Int? {
