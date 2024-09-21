@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.inPartialSeconds
@@ -21,7 +21,7 @@ import kotlin.time.Duration.Companion.seconds
 object FlowstateHelper {
     private val config get() = SkyHanniMod.feature.mining
     private var timeSinceBreak = SimpleTimeMark.farPast()
-    private var display: Renderable? = null
+    private var display: List<Renderable>? = null
 
     private var blockBreakStreak = 0
 
@@ -49,16 +49,42 @@ object FlowstateHelper {
         if (!config.flowstateHelper) return
 
         if (display == null || timeSinceBreak.isInFuture()) createDisplay()
-        display?.let { config.flowstateHelperPosition.renderRenderable(it, "Flowstate Helper", true) }
+        display?.let {
+            config.flowstateHelperPosition.renderRenderables(
+                listOf(Renderable.verticalContainer(it, 1)),
+                posLabel = "Flowstate Helper",
+                addToGuiManager = true
+            )
+        }
     }
 
     private fun createDisplay() {
-        var timeRemaining = timeSinceBreak.minus(SimpleTimeMark.now()).inPartialSeconds.toString()
-        if (timeRemaining.contains("-")) timeRemaining = "0.0"
-        display = Renderable.string(
-            "streak: ${if (blockBreakStreak >= 200) "§6" else ""}$blockBreakStreak" +
-                " §ftime until explode: $timeRemaining" + " speedbonus: ${getSpeedBonus()}",
-        )
+        val helperDisplay: MutableList<Renderable> = mutableListOf()
+
+        helperDisplay.add(Renderable.string("§d§lFlowstate Helper"))
+        helperDisplay.add(createDisplayTimer())
+        helperDisplay.add(createDisplayBlock())
+        helperDisplay.add(Renderable.string("§6+${getSpeedBonus()}⸕"))
+
+        display = helperDisplay.toList()
+    }
+
+    private fun createDisplayTimer(): Renderable {
+        var timeRemaining = timeSinceBreak.minus(SimpleTimeMark.now()).inPartialSeconds
+        if (timeRemaining < 0.0) timeRemaining = 0.0
+
+        val timerColor = when (timeRemaining) {
+            in 0.0..3.0 -> "§c"
+            in 3.0..6.0 -> "§e"
+            in 6.0..10.0 -> "§a"
+            else -> "§c"
+        }
+        return Renderable.string("Time Remaining: $timerColor$timeRemaining")
+    }
+
+    private fun createDisplayBlock(): Renderable {
+        val textColor = if (blockBreakStreak < 200) "§7" else "§f"
+        return Renderable.string("Streak: $textColor$blockBreakStreak")
     }
 
     private fun getSpeedBonus(): Int {
@@ -67,5 +93,9 @@ object FlowstateHelper {
         return blockBreakStreak * flowstateLevel
     }
 
-    private fun hasFlowstate(): Int? = ItemUtils.getHeldItem()?.getEnchantments()?.getValue("ultimate_flowstate")
+    private fun hasFlowstate(): Int? {
+        val enchantList = ItemUtils.getHeldItem()?.getEnchantments() ?: return null
+        if ("ultimate_flowstate" !in enchantList) return null
+        return enchantList.getValue("ultimate_flowstate")
+    }
 }
