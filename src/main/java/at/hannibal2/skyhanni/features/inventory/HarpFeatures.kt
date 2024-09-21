@@ -213,6 +213,6 @@ object HarpFeatures {
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (event.slot.inventory !is ContainerLocalMenu) return
-            event.cancel()
+        event.cancel()
     }
 }
