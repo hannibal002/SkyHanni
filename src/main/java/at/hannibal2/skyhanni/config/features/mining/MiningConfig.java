@@ -2,12 +2,17 @@ package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.features.mining.FlowstateHelper;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MiningConfig {
 
@@ -110,6 +115,11 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean flowstateHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Flowstate Appearance", desc = "Drag text to change the appearance.")
+    @ConfigEditorDraggableList()
+    public List<FlowstateHelper.FlowstateElements> flowstateHelperAppearance = new ArrayList<>(FlowstateHelper.FlowstateElements.defaultOption);
 
     @Expose
     @ConfigLink(owner = MiningConfig.class, field = "flowstateHelper")

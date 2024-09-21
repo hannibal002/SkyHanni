@@ -29,10 +29,6 @@ object FlowstateHelper {
     private var display: List<Renderable>? = null
     private var displayDirty = false
 
-    private var titleRenderable = Renderable.string("")
-    private var streakRenderable = Renderable.string("")
-    private var speedRenderable = Renderable.string("")
-
     private var flowstateCache: Int? = null
     private var hasChangedItem = true
 
@@ -40,6 +36,22 @@ object FlowstateHelper {
         "mining.pickobulus.blockdestroy",
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!"
     )
+
+    enum class FlowstateElements(val label: String, var renderable: Renderable) {
+        TITLE("§d§lFlowstate Helper", Renderable.string("")),
+        TIMER("Time Remaining: §b6.71", Renderable.string("")),
+        STREAK("Streak: §7234", Renderable.string("")),
+        SPEED("§6+600⸕", Renderable.string(""));
+
+        override fun toString() = label
+
+        companion object {
+            @JvmField
+            val defaultOption = listOf(
+                TITLE, TIMER, STREAK, SPEED
+            )
+        }
+    }
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockMined(event: OreMinedEvent) {
@@ -101,43 +113,47 @@ object FlowstateHelper {
     private fun createDisplay() {
         if (displayDirty) {
             displayDirty = false
+            createDisplayTitle()
+            createDisplayTimer()
+            createDisplayBlock()
+            createDisplaySpeed()
             display = buildList {
-                add(createDisplayTitle())
-                add(createDisplayTimer())
-                add(createDisplayBlock())
-                add(createDisplaySpeed())
+                config.flowstateHelperAppearance.forEach {
+                    add(it.renderable)
+                }
             }
         } else {
+            createDisplayTimer()
             display = buildList {
-                add(titleRenderable)
-                add(createDisplayTimer())
-                add(streakRenderable)
-                add(speedRenderable)
+                config.flowstateHelperAppearance.forEach {
+                    add(it.renderable)
+                }
             }
         }
     }
 
     private fun createDisplayTitle(): Renderable {
-        titleRenderable = Renderable.string("§d§lFlowstate Helper")
-        return titleRenderable
+        FlowstateElements.TITLE.renderable = Renderable.string("§d§lFlowstate Helper")
+        return FlowstateElements.TITLE.renderable
     }
 
     private fun createDisplayTimer(): Renderable {
         var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now()).inPartialSeconds
         if (timeRemaining < 0.0) timeRemaining = 0.0
 
-        return Renderable.string("Time Remaining: §b$timeRemaining")
+        FlowstateElements.TIMER.renderable = Renderable.string("Time Remaining: §b$timeRemaining")
+        return FlowstateElements.TIMER.renderable
     }
 
     private fun createDisplayBlock(): Renderable {
         val textColor = if (blockBreakStreak < 200) "§7" else "§f"
-        streakRenderable = Renderable.string("Streak: $textColor$blockBreakStreak")
-        return streakRenderable
+        FlowstateElements.STREAK.renderable = Renderable.string("Streak: $textColor$blockBreakStreak")
+        return FlowstateElements.STREAK.renderable
     }
 
     private fun createDisplaySpeed(): Renderable {
-        speedRenderable = Renderable.string("§6+${getSpeedBonus()}⸕")
-        return speedRenderable
+        FlowstateElements.SPEED.renderable = Renderable.string("§6+${getSpeedBonus()}⸕")
+        return FlowstateElements.SPEED.renderable
     }
 
     private fun getSpeedBonus(): Int {
