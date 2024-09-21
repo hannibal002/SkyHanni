@@ -129,7 +129,7 @@ object PowderChestTimer {
         }
     }
 
-    private fun LorenzVec.isOpened() = this in chestSet
+    private fun LorenzVec.isOpened() = chestSet.containsKey(this)
 
     private fun IBlockState.isChest() = block is BlockChest
 

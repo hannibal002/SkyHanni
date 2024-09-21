@@ -144,10 +144,15 @@ public class PowderTrackerConfig {
     public static class ChestTimer {
 
         @Expose
-        @ConfigOption(name = "Chest Timer", desc = "")
+        @ConfigOption(name = "Enabled", desc = "Enable the feature.")
         @ConfigEditorBoolean
         @FeatureToggle
         public boolean enabled = true;
+
+        @Expose
+        @ConfigOption(name = "Highlight Chests", desc = "Highlight chest with a color depending on how much time left until it despawn.")
+        @ConfigEditorBoolean
+        public boolean highlightChests = true;
 
         @Expose
         @ConfigLink(owner = PowderTrackerConfig.class, field = "onlyWhenPowderGrinding")
