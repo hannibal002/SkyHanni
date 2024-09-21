@@ -43,8 +43,16 @@ enum class SkyblockStat(val icon: String) {
     PRISTINE("§5✧"),
     FORAGING_FORTUNE("§☘"),
     FARMING_FORTUNE("§6☘"),
+
+    MINING_SPREAD("§e▚"),
     MINING_FORTUNE("§6☘"),
-    FEAR("§a☠")
+    ORE_FORTUNE("§6☘"),
+    DWARVEN_METAL_FORTUNE("§6☘"),
+    BLOCK_FORTUNE("§6☘"),
+    GEMSTONE_FORTUNE("§6☘"),
+
+    FEAR("§a☠"),
+    HEAT_RESISTANCE("§c♨"),
     ;
 
     val capitalizedName = name.lowercase().allLettersFirstUppercase()

@@ -9,6 +9,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.max
@@ -74,13 +75,13 @@ data class LorenzVec(
 
     override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Double): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * d"))
     fun multiply(d: Int): LorenzVec = LorenzVec(x * d, y * d, z * d)
 
-    @Deprecated("Use operator fun times instead", ReplaceWith("this * LorenzVec(x, y, z)"))
+    @Deprecated("Use operator fun times instead", ReplaceWith("this * v"))
     fun multiply(v: LorenzVec) = LorenzVec(x * v.x, y * v.y, z * v.z)
 
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
@@ -125,6 +126,8 @@ data class LorenzVec(
 
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(this.lengthSquared())
+
+    fun isNormalized(tolerance: Double = 0.01) = (lengthSquared() - 1.0).absoluteValue < tolerance
 
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 
@@ -214,6 +217,10 @@ data class LorenzVec(
     fun distanceToLine(startPos: LorenzVec, endPos: LorenzVec): Double {
         return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
+
+    fun middle(other: LorenzVec): LorenzVec = this.plus(other.minus(this) / 2)
+
+    private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
     companion object {
 
