@@ -27,6 +27,18 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
+/**
+ * TODO more carry features
+ * save on restart
+ * support for Dungeon, Kuudra, crimson minibosses
+ * average spawn time per slayer customer
+ * change customer name color if offline, onlilne, on your island
+ * show time since last boss died next to slayer customer name
+ * highlight slayer bosses for slayer customers
+ * automatically mark customers with /shmarkplaayers
+ * show a line behind them
+ */
+
 @SkyHanniModule
 object CarryTracker {
     private val config get() = SkyHanniMod.feature.misc
@@ -92,6 +104,12 @@ object CarryTracker {
             getCustomer(lastTradedPlayer).alreadyPaid += coinsGained
             update()
         }
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<CarryTrackerJson>("CarryTracker")
+        slayerNames = data.slayerNames.mapKeys { SlayerType.valueOf(it.key) }
     }
 
     @SubscribeEvent
