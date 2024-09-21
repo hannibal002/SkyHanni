@@ -54,7 +54,7 @@ object FlowstateHelper {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: LorenzChatEvent) { //TODO: Remove once #2540 is merged
         if (!MiningAPI.inCustomMiningIsland()) return
         if (hasFlowstate() == null) return
 
@@ -126,13 +126,7 @@ object FlowstateHelper {
         var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now()).inPartialSeconds
         if (timeRemaining < 0.0) timeRemaining = 0.0
 
-        val timerColor = when (timeRemaining) {
-            in 0.0..3.0 -> "§c"
-            in 3.0..6.0 -> "§e"
-            in 6.0..10.0 -> "§a"
-            else -> "§c"
-        }
-        return Renderable.string("Time Remaining: $timerColor$timeRemaining")
+        return Renderable.string("Time Remaining: §b$timeRemaining")
     }
 
     private fun createDisplayBlock(): Renderable {
