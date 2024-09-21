@@ -53,12 +53,12 @@ object MiningAPI {
 
     private val pickobulusUsePattern by group.pattern(
         "pickaxeability.use",
-        "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!"
+        "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
     )
 
     private val pickobulusEndPattern by group.pattern(
         "pickaxeability.end",
-        "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>[\\d,.]+) §r§7blocks!"
+        "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>[\\d,.]+) §r§7blocks!",
     )
 
     private data class MinedBlock(val ore: OreBlock, var confirmed: Boolean) {
@@ -100,8 +100,6 @@ object MiningAPI {
 
     var currentAreaOreBlocks = setOf<OreBlock>()
         private set
-
-    private set
 
     private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
