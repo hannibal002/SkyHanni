@@ -33,6 +33,9 @@ object FlowstateHelper {
     private var streakRenderable = Renderable.string("")
     private var speedRenderable = Renderable.string("")
 
+    private var flowstateCache: Int? = null
+    private var hasChangedItem = true
+
     private val pickobulusPattern by RepoPattern.pattern(
         "mining.pickobulus.blockdestroy",
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!"
@@ -59,8 +62,8 @@ object FlowstateHelper {
             streakEndTimer = SimpleTimeMark.now().plus(10.seconds)
             blockBreakStreak += group("amount").toInt()
             createDisplay()
-            displayDirty = true
             attemptClearDisplay()
+            displayDirty = true
         }
     }
 
@@ -75,6 +78,7 @@ object FlowstateHelper {
     private fun attemptClearDisplay() {
         if (streakEndTimer.isInFuture()) return
         blockBreakStreak = 0
+        displayDirty = true
         createDisplay()
     }
 
@@ -98,17 +102,17 @@ object FlowstateHelper {
         if (displayDirty) {
             displayDirty = false
             display = buildList {
-                createDisplayTitle()
-                createDisplayTimer()
-                createDisplayBlock()
-                createDisplaySpeed()
+                add(createDisplayTitle())
+                add(createDisplayTimer())
+                add(createDisplayBlock())
+                add(createDisplaySpeed())
             }
         } else {
             display = buildList {
-                titleRenderable
-                createDisplayTimer()
-                streakRenderable
-                speedRenderable
+                add(titleRenderable)
+                add(createDisplayTimer())
+                add(streakRenderable)
+                add(speedRenderable)
             }
         }
     }
@@ -149,13 +153,17 @@ object FlowstateHelper {
     }
 
     @SubscribeEvent
-    fun itemInHand(event: ItemInHandChangeEvent) {
-
+    fun onChangeItem(event: ItemInHandChangeEvent) {
+        hasChangedItem = true
     }
 
     private fun hasFlowstate(): Int? {
-        val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: return null
-        if ("ultimate_flowstate" !in enchantList) return null
-        return enchantList.getValue("ultimate_flowstate")
+        if (hasChangedItem) {
+            val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: return null
+            if ("ultimate_flowstate" !in enchantList) return null
+            flowstateCache = enchantList.getValue("ultimate_flowstate")
+            hasChangedItem = false
+        }
+        return flowstateCache
     }
 }
