@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class MiningConfig {
@@ -102,4 +104,15 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean forgeGfs = false;
+
+    @Expose
+    @ConfigOption(name = "Flowstate Helper", desc = "Shows stats for the Flowstate enchantment.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean flowstateHelper = false;
+
+    @Expose
+    @ConfigOption(name = "Flowstate Helper", desc = "Shows stats for the Flowstate enchantment.")
+    @ConfigLink(owner = MiningConfig.class, field = "flowstateHelper")
+    public Position flowstateHelperPosition = new Position();
 }
