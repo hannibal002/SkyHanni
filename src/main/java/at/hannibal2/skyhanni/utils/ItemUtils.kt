@@ -515,9 +515,4 @@ object ItemUtils {
             true, true,
         )
     }
-
-    fun getHeldItem(): ItemStack? {
-        val player = Minecraft.getMinecraft().thePlayer ?: return null
-        return player.heldItem
-    }
 }

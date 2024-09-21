@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.ItemUtils
+import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -116,7 +116,7 @@ object FlowstateHelper {
     }
 
     private fun hasFlowstate(): Int? {
-        val enchantList = ItemUtils.getHeldItem()?.getEnchantments() ?: return null
+        val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: return null
         if ("ultimate_flowstate" !in enchantList) return null
         return enchantList.getValue("ultimate_flowstate")
     }
