@@ -158,7 +158,7 @@ object TotemOfCorruption {
             val owner = getOwner(totem) ?: return@mapNotNull null
 
             val timeToWarn = config.warnWhenAboutToExpire.seconds
-            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && !warnedTotems.contains(totem.uniqueID)) {
+            if (timeToWarn > 0.seconds && timeRemaining <= timeToWarn && totem.uniqueID !in warnedTotems) {
                 playPlingSound()
                 sendTitle("§c§lTotem of Corruption §eabout to expire!", 5.seconds)
                 warnedTotems.add(totem.uniqueID)
