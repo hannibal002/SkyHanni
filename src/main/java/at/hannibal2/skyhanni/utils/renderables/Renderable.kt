@@ -443,7 +443,7 @@ interface Renderable {
 
             val fontRenderer by lazy { Minecraft.getMinecraft().fontRendererObj }
 
-            val list by lazy {
+            val map by lazy {
                 fontRenderer.listFormattedStringToWidth(
                     text, (width / scale).toInt(),
                 ).associateWith { fontRenderer.getStringWidth(it) }
@@ -452,13 +452,13 @@ interface Renderable {
             override val width by lazy { (rawWidth * scale).toInt() + 1 }
 
             val rawWidth by lazy {
-                if (list.size == 1)
-                    list.entries.first().value
+                if (map.size == 1)
+                    map.entries.first().value
                 else
-                    list.maxOf { it.value }
+                    map.maxOf { it.value }
             }
 
-            override val height by lazy { list.size * ((9 * scale).toInt() + 1) }
+            override val height by lazy { map.size * ((9 * scale).toInt() + 1) }
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -468,7 +468,7 @@ interface Renderable {
                 val fontRenderer = Minecraft.getMinecraft().fontRendererObj
                 GlStateManager.translate(1.0, 1.0, 0.0)
                 GlStateManager.scale(scale, scale, 1.0)
-                list.entries.forEachIndexed { index, (text, size) ->
+                map.entries.forEachIndexed { index, (text, size) ->
                     fontRenderer.drawStringWithShadow(
                         text,
                         RenderableUtils.calculateAlignmentXOffset(size, rawWidth, internalAlign).toFloat(),
