@@ -64,6 +64,7 @@ import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTrac
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
+import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -183,7 +184,6 @@ object Commands {
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
-
     private fun usersNormal() {
         registerCommand(
             "shmarkplayer",
@@ -192,8 +192,7 @@ object Commands {
         registerCommand("shtrackcollection", "Tracks your collection gain over time") { CollectionTracker.command(it) }
         registerCommand(
             "shcroptime",
-            "Calculates with your current crop per second speed " +
-                "how long you need to farm a crop to collect this amount of items",
+            "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items",
         ) { GardenCropTimeCommand.onCommand(it) }
         registerCommand(
             "shcropsin",
@@ -250,8 +249,7 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "Copy the English translation of a message in another language to the clipboard.\n" +
-                "Uses a 2 letter language code that can be found at the end of a translation message.",
+            "Copy the English translation of a message in another language to the clipboard.\n" + "Uses a 2 letter language code that can be found at the end of a translation message.",
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shtranslate",
@@ -367,8 +365,12 @@ object Commands {
         ) { ColorFormattingHelper.printColorCodeList() }
         registerCommand(
             "shtps",
-            "Informs in chat about the server ticks per second (TPS)."
+            "Informs in chat about the server ticks per second (TPS).",
         ) { TpsCounter.tpsCommand() }
+        registerCommand(
+            "shcarry",
+            "Keep track of carries you do.",
+        ) { CarryTracker.onCommand(it) }
     }
 
     private fun usersBugFix() {
@@ -490,7 +492,7 @@ object Commands {
         ) { SkyBlockIslandTest.onCommand(it) }
         registerCommand(
             "shdebugprice",
-            "Debug different price sources for an item."
+            "Debug different price sources for an item.",
         ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
@@ -585,9 +587,7 @@ object Commands {
         ) { TitleManager.command(it) }
         registerCommand(
             "shresetconfig",
-            "Reloads the config manager and rendering processors of MoulConfig. " +
-                "This §cWILL RESET §7your config, but also updating the java config files " +
-                "(names, description, orderings and stuff).",
+            "Reloads the config manager and rendering processors of MoulConfig. " + "This §cWILL RESET §7your config, but also updating the java config files " + "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
             "shreadcropmilestonefromclipboard",
@@ -664,8 +664,7 @@ object Commands {
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA &&
-            (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",

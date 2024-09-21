@@ -145,6 +145,9 @@ public class MiscConfig {
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
+    public Position carryPosition = new Position(10, 10, false, true);
+
+    @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
     @ConfigEditorBoolean
     @FeatureToggle

@@ -105,12 +105,6 @@ public class MiningConfig {
     public boolean highlightYourGoldenGoblin = true;
 
     @Expose
-    @ConfigOption(name = "Forge GfS", desc = "Get Forge ingredients of a recipe.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean forgeGfs = false;
-
-    @Expose
     @ConfigOption(name = "Flowstate Helper", desc = "Shows stats for the Flowstate enchantment.")
     @ConfigEditorBoolean
     @FeatureToggle
