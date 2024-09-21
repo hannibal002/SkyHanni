@@ -17,6 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
+// TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
 object SuperpairExperimentInformationDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
@@ -30,6 +31,7 @@ object SuperpairExperimentInformationDisplay {
     data class Item(val index: Int, val name: String)
     data class ItemPair(val first: Item, val second: Item)
 
+    // TODO remove string. use enum instead! maybe even create new data type instaed of map of pairs
     private var found = mutableMapOf<Pair<Item?, ItemPair?>, String>()
 
     private var toCheck = mutableListOf<Pair<Int, Int>>()
@@ -264,6 +266,7 @@ object SuperpairExperimentInformationDisplay {
     private fun isOutOfBounds(slot: Int, experiment: Experiment): Boolean =
         slot <= experiment.startSlot || slot >= experiment.endSlot || (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
+    // TODO remove left and right, use custom data type instead
     private fun left(it: Pair<Item?, ItemPair?>): Item = it.first ?: Item(-1, "")
 
     private fun right(it: Pair<Item?, ItemPair?>): ItemPair = it.second ?: ItemPair(Item(-1, ""), Item(-1, ""))

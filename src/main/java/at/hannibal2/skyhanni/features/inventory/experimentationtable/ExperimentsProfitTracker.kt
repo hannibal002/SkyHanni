@@ -100,31 +100,12 @@ object ExperimentsProfitTracker {
         if (!isEnabled()) return
 
         val message = event.message.removeColor()
-        if (claimMessagePattern.matches(message) && ExperimentMessages.DONE.isSelected())
+        if (claimMessagePattern.matches(message) && ExperimentMessages.DONE.isSelected()) {
             event.blockedReason = "CLAIM_MESSAGE"
+        }
 
         experimentsDropPattern.matchMatcher(message) {
-            val reward = group("reward")
-
-            event.blockedReason = when {
-                enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
-                experienceBottlePattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
-                listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
-                ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
-                else -> ""
-            }
-
-            enchantingExpPattern.matchMatcher(reward) {
-                tracker.modify {
-                    it.xpGained += group("amount").substringBefore(",").toInt() * 1000
-                }
-                return
-            }
-
-            val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
-            if (!experienceBottlePattern.matches(group("reward"))) tracker.addItem(internalName, 1, false)
-            else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
-
+            event.handleDrop(group("reward"))
             return
         }
 
@@ -134,6 +115,27 @@ object ExperimentsProfitTracker {
                 it.bitCost += increments.getValue(group("current").toInt())
             }
         }
+    }
+
+    private fun LorenzChatEvent.handleDrop(reward: String) {
+        blockedReason = when {
+            enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
+            experienceBottlePattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
+            listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
+            ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
+            else -> ""
+        }
+
+        enchantingExpPattern.matchMatcher(reward) {
+            tracker.modify {
+                it.xpGained += group("amount").substringBefore(",").toInt() * 1000
+            }
+            return
+        }
+
+        val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
+        if (!experienceBottlePattern.matches(reward)) tracker.addItem(internalName, 1, false)
+        else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
 
     @SubscribeEvent
@@ -231,6 +233,7 @@ object ExperimentsProfitTracker {
             if (internalName.asString() !in listOf("EXP_BOTTLE", "GRAND_EXP_BOTTLE", "TITANIC_EXP_BOTTLE")) continue
             currentBottlesInInventory.addOrPut(internalName, item.stackSize)
         }
+
         for ((internalName, amount) in currentBottlesInInventory) {
             val lastInInv = lastBottlesInInventory.getOrDefault(internalName, 0)
             if (lastInInv >= amount) {
@@ -238,6 +241,7 @@ object ExperimentsProfitTracker {
                 lastBottlesInInventory[internalName] = amount
                 continue
             }
+
             if (lastInInv == 0) {
                 currentBottlesInInventory[internalName] = 0
                 lastBottlesInInventory[internalName] = amount
@@ -254,6 +258,5 @@ object ExperimentsProfitTracker {
     private fun ExperimentMessages.isSelected() = config.hideMessages.contains(this)
 
     private fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled
-            && ExperimentationTableAPI.inDistanceToTable(LorenzVec.getBlockBelowPlayer(), 5.0)
+        LorenzUtils.inSkyBlock && config.enabled && ExperimentationTableAPI.inDistanceToTable(LorenzVec.getBlockBelowPlayer(), 5.0)
 }
