@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.SkyBlockAreaChangeEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -320,12 +320,12 @@ object HypixelData {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
                     val originalLocation = group("area").removeColor()
-                    val newArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
-                    val oldArea = skyBlockArea
-                    if (oldArea != newArea) {
-                        skyBlockArea = newArea
-                        skyBlockAreaWithSymbol = line.trim()
-                        SkyBlockAreaChangeEvent(newArea, oldArea).postAndCatch()
+                    val area = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    skyBlockAreaWithSymbol = line.trim()
+                    if (area != skyBlockArea) {
+                        val previousArea = skyBlockArea
+                        skyBlockArea = area
+                        ScoreboardAreaChangeEvent(area, previousArea).post()
                     }
                     break@loop
                 }
