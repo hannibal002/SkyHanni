@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.features.inventory.experimentationtable.Experimenta
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -42,6 +43,7 @@ import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object ExperimentsProfitTracker {
@@ -54,7 +56,6 @@ object ExperimentsProfitTracker {
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
-    private var lastInventory = ""
     private var lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
     private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
@@ -122,6 +123,8 @@ object ExperimentsProfitTracker {
 
             val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
             if (!experienceBottlePattern.matches(group("reward"))) tracker.addItem(internalName, 1, false)
+            else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
+
             return
         }
 
@@ -178,11 +181,6 @@ object ExperimentsProfitTracker {
                 it.experimentsDone++
             }
         }
-        if (lastInventory == "Superpairs Rewards") {
-            handleExpBottles(true)
-        }
-
-        lastInventory = InventoryUtils.openInventoryName()
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
