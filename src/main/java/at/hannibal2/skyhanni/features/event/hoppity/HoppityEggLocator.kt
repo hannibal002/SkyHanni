@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -8,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -58,6 +60,11 @@ object HoppityEggLocator {
     var possibleEggLocations = listOf<LorenzVec>()
     var currentEggType: HoppityEggType? = null
     var currentEggNote: String? = null
+
+    @HandleEvent
+    fun onEggFound(event: EggFoundEvent) {
+        if (event.type.isResetting) resetData()
+    }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -167,10 +174,6 @@ object HoppityEggLocator {
     }
 
     private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
-
-    fun eggFound() {
-        resetData()
-    }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {

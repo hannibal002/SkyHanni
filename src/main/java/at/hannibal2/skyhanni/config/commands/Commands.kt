@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
@@ -77,7 +78,6 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
-import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -92,6 +92,7 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
+import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
@@ -276,6 +277,10 @@ object Commands {
             "shresetpestprofittracker",
             "Resets the Pest Profit Tracker",
         ) { PestProfitTracker.resetCommand() }
+        registerCommand(
+            "shresetexperimentsprofittracker",
+            "Resets the Experiments Profit Tracker",
+        ) { ExperimentsProfitTracker.resetCommand() }
         registerCommand(
             "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker",

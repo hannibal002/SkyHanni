@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
@@ -64,6 +63,8 @@ object MiningAPI {
     private var waitingForEffMinerBlock = false
 
     var inGlacite = false
+    var inTunnels = false
+    var inMineshaft = false
     var inDwarvenMines = false
     var inCrystalHollows = false
     var inCrimsonIsle = false
@@ -71,10 +72,11 @@ object MiningAPI {
     var inSpidersDen = false
 
     var currentAreaOreBlocks = setOf<OreBlock>()
+        private set
 
     private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
     private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
-    private val allowedSoundNames = listOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
+    private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
     var cold: Int = 0
         private set
@@ -120,6 +122,7 @@ object MiningAPI {
     fun onBlockClick(event: BlockClickEvent) {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
+        //println(event.getBlockState.properties)
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         recentClickedBlocks += event.position to SimpleTimeMark.now()
     }
@@ -145,6 +148,7 @@ object MiningAPI {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName !in allowedSoundNames) return
+        //println("Sound: ${event.soundName} ${event.pitch} ${event.volume} ${event.location.toCleanString()}")
         if (waitingForInitSound) {
             if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
@@ -179,6 +183,7 @@ object MiningAPI {
 
         val pos = event.location
         if (pos.distanceToPlayer() > 7) return
+        //println("Block change: $oldState -> $newState ${pos.toCleanString()}")
 
         if (lastInitSound.passedSince() > 100.milliseconds) return
 
@@ -293,6 +298,8 @@ object MiningAPI {
 
     private fun updateLocation() {
         inGlacite = inGlaciteArea()
+        inTunnels = inGlacialTunnels()
+        inMineshaft = inMineshaft()
         inDwarvenMines = inRegularDwarven()
         inCrystalHollows = inCrystalHollows()
         inCrimsonIsle = IslandType.CRIMSON_ISLE.isInIsland()
