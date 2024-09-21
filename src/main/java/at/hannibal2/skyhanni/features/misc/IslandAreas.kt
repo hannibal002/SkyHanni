@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -19,6 +18,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -65,19 +65,10 @@ object IslandAreas {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val closedNote = IslandGraphs.closedNote ?: return
 
-        val paths = mutableMapOf<GraphNode, Graph>()
-
-        val map = mutableMapOf<GraphNode, Double>()
-        for (graphNode in graph.nodes) {
-            if (graphNode.getAreaTag() == null) continue
-            val (path, distance) = graph.findShortestPathAsGraphWithDistance(closedNote, graphNode)
-            paths[graphNode] = path
-            map[graphNode] = distance
-        }
+        val (paths, map) = GraphUtils.findFastestPaths(graph, closedNote) { it.getAreaTag() != null }
         this.paths = paths
 
         val finalNodes = mutableMapOf<GraphNode, Double>()
-
         val alreadyFoundAreas = mutableListOf<String>()
         for ((node, distance) in map.sorted()) {
             val areaName = node.name ?: continue
@@ -271,8 +262,8 @@ object IslandAreas {
     private val allAreas = listOf(GraphNodeTag.AREA, GraphNodeTag.SMALL_AREA)
     private val onlyLargeAreas = listOf(GraphNodeTag.AREA)
 
-    private fun GraphNode.getAreaTag(): GraphNodeTag? = tags.firstOrNull {
-        it in (if (config.includeSmallAreas) allAreas else onlyLargeAreas)
+    fun GraphNode.getAreaTag(ignoreConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
+        it in (if (config.includeSmallAreas || ignoreConfig) allAreas else onlyLargeAreas)
     }
 
     private fun setTarget(node: GraphNode) {

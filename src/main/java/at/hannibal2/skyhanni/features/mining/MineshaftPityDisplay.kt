@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPity
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityBlock.Companion.getPityBlock
 import at.hannibal2.skyhanni.features.mining.OreType.Companion.getOreType
-import at.hannibal2.skyhanni.features.mining.OreType.Companion.isGemstone
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -164,7 +163,7 @@ object MineshaftPityDisplay {
     // if the chance is 1/1500, it will return 1500
     private fun calculateChance(counter: Int): Double {
         val surveyorPercent = HotmData.SURVEYOR.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
-        val peakMountainPercent = HotmData.PEAK_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
+        val peakMountainPercent = HotmData.CORE_OF_THE_MOUNTAIN.getReward()[HotmReward.MINESHAFT_CHANCE] ?: 0.0
         val chance = counter / (1 + surveyorPercent / 100 + peakMountainPercent / 100)
         return chance
     }
