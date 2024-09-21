@@ -7,7 +7,6 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
