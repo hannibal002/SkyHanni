@@ -117,5 +117,5 @@ public class MiningConfig {
 
     @Expose
     @ConfigLink(owner = MiningConfig.class, field = "flowstateHelper")
-    public Position flowstateHelperPosition = new Position(0 , 0); //TODO
+    public Position flowstateHelperPosition = new Position(-110 , 9);
 }

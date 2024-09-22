@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -150,6 +151,14 @@ object FlowstateHelper {
     @SubscribeEvent
     fun onChangeItem(event: ItemInHandChangeEvent) {
         hasChangedItem = true
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        blockBreakStreak = 0
+        displayDirty = true
+        streakEndTimer = SimpleTimeMark.now()
+        createDisplay()
     }
 
     private fun hasFlowstate(): Int? {
