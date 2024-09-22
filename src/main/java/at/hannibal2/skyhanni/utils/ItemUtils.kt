@@ -153,12 +153,20 @@ object ItemUtils {
             .getCompoundTagAt(0).getString("Value")
     }
 
-    fun ItemStack.getSkullOwner(): String? {
+    fun ItemStack.getSkullOwnerId(): String? {
         if (item != Items.skull) return null
         if (tagCompound == null) return null
         val nbt = tagCompound
         if (!nbt.hasKey("SkullOwner")) return null
         return nbt.getCompoundTag("SkullOwner").getString("Id")
+    }
+
+    fun ItemStack.getSkullOwner(): NBTTagCompound? {
+        if (item != Items.skull) return null
+        if (tagCompound == null) return null
+        val nbt = tagCompound
+        if (!nbt.hasKey("SkullOwner")) return null
+        return nbt.getCompoundTag("SkullOwner")
     }
 
     // Taken from NEU

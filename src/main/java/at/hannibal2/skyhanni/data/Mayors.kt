@@ -114,6 +114,8 @@ enum class Mayor(
 
     fun isActive() = this == currentMayor
 
+    fun isSpecial() = this in listOf(SCORPIUS, JERRY, DERPY)
+
     companion object {
 
         fun getMayorFromName(name: String): Mayor? = entries.firstOrNull { it.mayorName == name || it.name == name }
