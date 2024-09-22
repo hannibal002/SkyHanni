@@ -19,7 +19,7 @@ object TestChatCommand {
                 "   §7[-clipboard]§e: §7Read the message from the clipboard",
                 "   §7[-s]§e: §7Hide the output message",
             )
-            ChatUtils.userError("Specify a chat message to test!\b${syntaxStrings.joinToString("\n")}")
+            ChatUtils.userError("Specify a chat message to test!\n${syntaxStrings.joinToString("\n")}")
             return
         }
 
