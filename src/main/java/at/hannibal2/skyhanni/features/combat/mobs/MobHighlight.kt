@@ -147,12 +147,14 @@ object MobHighlight {
     }
 
     private fun markArachneMinis(entity: EntityLivingBase) {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(50))
-        { config.arachneBossHighlighter }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(50)) {
+            config.arachneBossHighlighter
+        }
     }
 
     private fun markArachne(entity: EntityLivingBase) {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.RED.toColor().withAlpha(50))
-        { config.arachneBossHighlighter }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.RED.toColor().withAlpha(50)) {
+            config.arachneBossHighlighter
+        }
     }
 }

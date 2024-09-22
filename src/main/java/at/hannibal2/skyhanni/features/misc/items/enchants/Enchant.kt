@@ -110,7 +110,7 @@ open class Enchant : Comparable<Enchant> {
         @Expose
         private var stackLevel: TreeSet<Int>? = null
 
-        override fun toString() = "$nbtNum ${stackLevel.toString()} ${super.toString()}"
+        override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
     }
 
     class Dummy(name: String) : Enchant() {

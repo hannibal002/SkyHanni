@@ -299,7 +299,6 @@ object SackDisplay {
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
         PRICE_ASC("Price A", "Price Ascending"),
-        ;
     }
 
     enum class PriceFormat(val displayName: String) {

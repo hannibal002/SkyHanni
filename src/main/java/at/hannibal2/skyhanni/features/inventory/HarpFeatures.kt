@@ -111,16 +111,16 @@ object HarpFeatures {
 
     private fun updateScale() {
         if (Minecraft.getMinecraft().currentScreen == null) {
-            DelayedRun.runNextTick() {
+            DelayedRun.runNextTick {
                 updateScale()
             }
             return
         }
         // Copied from Minecraft Code to update the scale
         val minecraft = Minecraft.getMinecraft()
-        val scaledresolution = ScaledResolution(minecraft)
-        val i = scaledresolution.scaledWidth
-        val j = scaledresolution.scaledHeight
+        val scaledResolution = ScaledResolution(minecraft)
+        val i = scaledResolution.scaledWidth
+        val j = scaledResolution.scaledHeight
         minecraft.currentScreen.setWorldAndResolution(minecraft, i, j)
     }
 
