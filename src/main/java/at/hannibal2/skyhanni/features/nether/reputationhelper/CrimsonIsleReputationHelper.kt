@@ -42,8 +42,6 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
     var factionType = FactionType.NONE
 
-    private var lastUpdate = SimpleTimeMark.farPast()
-
     private var display = emptyList<List<Any>>()
     private var dirty = true
     var tabListQuestsMissing = false

@@ -754,6 +754,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun drawCylinderInWorld(
         color: Color,
         x: Double,

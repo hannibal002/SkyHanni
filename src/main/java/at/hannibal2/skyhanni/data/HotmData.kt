@@ -446,11 +446,14 @@ enum class HotmData(
             "perk.enable",
             "§a§lENABLED|(§.)*SELECTED",
         )
+
+        // unused for now since the assumption is when enabled isn't found, it is disabled,
+        // but the value might be useful in the future or for debugging
+        @Suppress("unused")
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
             "§c§lDISABLED|§7§eClick to select!",
-        ) // unused for now since the assumption is when enabled isn't found, it is disabled,
-        // but the value might be useful in the future or for debugging
+        )
 
         val perkCostPattern by patternGroup.pattern(
             "perk.cost",
@@ -529,7 +532,7 @@ enum class HotmData(
             HotmAPI.MayhemPerk.entries.forEach {
                 it.chatPattern
             }
-            (0..CORE_OF_THE_MOUNTAIN.maxLevel).forEach { level ->
+            for(level in 0..CORE_OF_THE_MOUNTAIN.maxLevel) {
                 val map = mutableMapOf<HotmReward, Double>()
                 if (level >= 1) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
                 if (level >= 2) map.addOrPut(HotmReward.ABILITY_LEVEL, 1.0)

@@ -105,6 +105,7 @@ open class Enchant : Comparable<Enchant> {
         private var nbtNum: String? = null
 
         @Expose
+        @Suppress("unused")
         private var statLabel: String? = null
 
         @Expose

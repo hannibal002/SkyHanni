@@ -18,12 +18,19 @@ style:
             - 'Mod.EventHandler'
     ReturnCount:
         active: true
-        max: 4
+        max: 5
         excludeGuardClauses: true
+        ignoreAnnotated:
+            - 'SubscribeEvent'
+            - 'HandleEvent'
+            - 'Mod.EventHandler'
     MaxLineLength:
         active: true
         maxLineLength: 140
         excludeCommentStatements: true
+    LoopWithTooManyJumpStatements:
+        active: true
+        maxJumpCount: 3
 
 formatting:
     MaximumLineLength: # ktlint - handled by detekt
@@ -67,4 +74,8 @@ exceptions:
     TooGenericExceptionCaught: # sometimes you just need to catch Exception
         active: false
     TooGenericExceptionThrown: # we don't have our own custom exceptions
+        active: false
+
+naming:
+    ConstructorParameterNaming: # pedantic
         active: false

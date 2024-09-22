@@ -277,6 +277,7 @@ object HideNotClickableItems {
         return true
     }
 
+    @Suppress("UNUSED_PARAMETER")
     private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
         if (!ComposterOverlay.inInventory) return false
 

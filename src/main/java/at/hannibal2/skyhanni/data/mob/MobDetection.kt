@@ -67,7 +67,7 @@ object MobDetection {
         MobData.retries.clear()
     }
 
-    // TODO this is a unused debug funciton. maybe connect with a debug commmand or remove
+    fun watchdogCommand() = watchdog()
     private fun watchdog() {
         val world = LorenzUtils.getPlayer()?.worldObj ?: return
         if (MobData.retries.any { it.value.entity.worldObj != world }) {

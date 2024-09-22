@@ -95,6 +95,8 @@ object BazaarCancelledBuyOrderClipboard {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
+
+        @Suppress("UNUSED_VARIABLE")
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
             group("coins").formatInt().addSeparators()
         } ?: return

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
+import at.hannibal2.skyhanni.data.mob.MobDetection
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
@@ -209,7 +210,7 @@ object Commands {
         registerCommand(
             "shclearslayerprofits",
             "Clearing the total slayer profit for the current slayer type",
-        ) { SlayerProfitTracker.clearProfitCommand(it) }
+        ) { SlayerProfitTracker.clearProfitCommand() }
         registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3",
@@ -498,6 +499,10 @@ object Commands {
             "shdebugscoreboard",
             "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update.",
         ) { ScoreboardData.toggleMonitor() }
+        registerCommand(
+            "shdebugmobdetection",
+            "Trigger the watchdog check on Mob Detection."
+        ) { MobDetection.watchdogCommand() }
     }
 
     private fun developersCodingHelp() {

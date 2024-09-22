@@ -130,16 +130,16 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("set test waypoint")
     }
 
+    @Suppress("UNUSED_PARAMETER")
     fun testCommand(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
             asyncTest()
         }
     }
 
-    private fun asyncTest() {
+    private fun asyncTest() {}
 
-    }
-
+    @Suppress("UNUSED_PARAMETER")
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
         findNull(SkyHanniMod.feature, "config")

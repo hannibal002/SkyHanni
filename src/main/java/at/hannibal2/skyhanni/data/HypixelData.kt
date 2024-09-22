@@ -42,7 +42,13 @@ object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
 
-    // TODO add regex tests
+    /**
+     * REGEX-TEST: mc.hypixel.net
+     * REGEX-TEST: alpha.hypixel.net
+     * REGEX-TEST: hypixel.net
+     * REGEX-TEST: play.hypixel.net
+     * REGEX-TEST: multi.named.hypixel.net
+     */
     private val serverNameConnectionPattern by patternGroup.pattern(
         "servername.connection",
         "(?<prefix>.+\\.)?hypixel\\.net",
@@ -51,6 +57,8 @@ object HypixelData {
         "servername.scoreboard",
         "§e(?<prefix>.+\\.)?hypixel\\.net",
     )
+
+    @Suppress("unused")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",

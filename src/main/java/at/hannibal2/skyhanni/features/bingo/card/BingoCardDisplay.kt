@@ -37,7 +37,6 @@ object BingoCardDisplay {
     private var hasHiddenPersonalGoals = false
 
     private const val MAX_PERSONAL_GOALS = 20
-    private const val MAX_COMMUNITY_GOALS = 5
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
     private var displayMode = 0
