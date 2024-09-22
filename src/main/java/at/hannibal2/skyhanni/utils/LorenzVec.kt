@@ -9,6 +9,7 @@ import net.minecraft.util.BlockPos
 import net.minecraft.util.Rotations
 import net.minecraft.util.Vec3
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.acos
 import kotlin.math.cos
 import kotlin.math.max
@@ -125,6 +126,8 @@ data class LorenzVec(
 
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(this.lengthSquared())
+
+    fun isNormalized(tolerance: Double = 0.01) = (lengthSquared() - 1.0).absoluteValue < tolerance
 
     fun isZero(): Boolean = x == 0.0 && y == 0.0 && z == 0.0
 

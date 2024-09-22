@@ -36,4 +36,12 @@ public class FossilExcavatorConfig {
     @FeatureToggle
     public boolean glacitePowderStack = false;
 
+    @Expose
+    @ConfigOption(
+        name = "Hide Excavator Tooltips",
+        desc = "Hides tooltips of items inside of the Fossil Excavator."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideExcavatorTooltips = true;
 }

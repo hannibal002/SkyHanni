@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -75,7 +76,7 @@ object ReforgeAPI {
         fun isValid(itemCategory: ItemCategory?, internalName: NEUInternalName) = when (type) {
             ReforgeType.SWORD -> setOf(
                 ItemCategory.SWORD,
-                ItemCategory.PICKAXE_AND_SWORD,
+                ItemCategory.GAUNTLET,
                 ItemCategory.LONGSWORD,
                 ItemCategory.FISHING_WEAPON,
             ).contains(itemCategory)
@@ -98,7 +99,7 @@ object ReforgeAPI {
             ReforgeType.PICKAXE ->
                 itemCategory == ItemCategory.PICKAXE ||
                     itemCategory == ItemCategory.DRILL ||
-                    itemCategory == ItemCategory.PICKAXE_AND_SWORD
+                    itemCategory == ItemCategory.GAUNTLET
 
             ReforgeType.EQUIPMENT -> setOf(
                 ItemCategory.CLOAK,
@@ -111,7 +112,7 @@ object ReforgeAPI {
             ReforgeType.ROD -> itemCategory == ItemCategory.FISHING_ROD || itemCategory == ItemCategory.FISHING_WEAPON
             ReforgeType.SWORD_AND_ROD -> setOf(
                 ItemCategory.SWORD,
-                ItemCategory.PICKAXE_AND_SWORD,
+                ItemCategory.GAUNTLET,
                 ItemCategory.LONGSWORD,
                 ItemCategory.FISHING_ROD,
                 ItemCategory.FISHING_WEAPON,
@@ -176,7 +177,18 @@ object ReforgeAPI {
                     while (reader.hasNext()) {
                         val name = reader.nextName()
                         val value = reader.nextDouble()
-                        list[SkyblockStat.valueOf(name.uppercase())] = value
+
+                        val stat = SkyblockStat.getValueOrNull(name.uppercase()) ?: run {
+                            ErrorManager.logErrorStateWithData(
+                                "Unknown stat: '${name.uppercase()}'",
+                                "Stat list could not parse stat",
+                                "failed" to name.uppercase(),
+                                betaOnly = true,
+                            )
+                            continue
+                        }
+
+                        list[stat] = value
                     }
                     reader.endObject()
                     return list
