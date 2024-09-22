@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,6 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
@@ -181,7 +181,7 @@ object CarryTracker {
         val price = rawPrice.formatDoubleOrUserError() ?: return
         carryType.pricePer = price
         update()
-        ChatUtils.chat("Set carry price for $carryType §eto §6${price.formatNum()} coins.")
+        ChatUtils.chat("Set carry price for $carryType §eto §6${price.addSeparators()} coins.")
     }
 
     private fun getCustomer(customerName: String): Customer {
@@ -260,7 +260,7 @@ object CarryTracker {
         val totalCost = customer.carries.sumOf { it.getCost() ?: 0.0 }
         val totalCostFormat = formatCost(totalCost)
         if (totalCostFormat != "") {
-            val paidFormat = "§6${customer.alreadyPaid.formatNum()}"
+            val paidFormat = "§6${customer.alreadyPaid.addSeparators()}"
             val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
@@ -293,7 +293,7 @@ object CarryTracker {
         }?.takeIf { it != 0.0 }
     }
 
-    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.formatNum()}"
+    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.addSeparators()}"
 
     private fun createCarryType(input: String): CarryType? {
         if (input.length == 1) return null
