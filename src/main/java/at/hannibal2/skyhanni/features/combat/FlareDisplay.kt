@@ -100,7 +100,7 @@ object FlareDisplay {
                     }
                 }
             }
-            if (remainingTime > 5.seconds || remainingTime < 0.seconds) continue
+            if (remainingTime > 5.seconds || remainingTime <= 0.seconds) continue
             val message = "$name §eexpires in: §b${remainingTime.inWholeSeconds}s"
             when (config.alertType) {
                 FlareConfig.AlertType.CHAT -> {
@@ -125,7 +125,7 @@ object FlareDisplay {
     private fun getRemainingTime(flare: Flare): Duration {
         val entity = flare.entity
         val aliveTime = entity.ticksExisted.ticks
-        val remainingTime = (MAX_FLARE_TIME - aliveTime)
+        val remainingTime = (MAX_FLARE_TIME - aliveTime).coerceAtLeast(Duration.ZERO)
         return remainingTime
     }
 
