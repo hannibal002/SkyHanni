@@ -26,6 +26,13 @@ data class HoppityEggLocationsJson(
     @Expose val maxUpgradeLevelPerPrestige: Map<Int, List<Int>>,
     @Expose val maxPrestige: Int,
     @Expose val chocolateMilestones: TreeSet<Long>,
+    @Expose val chocolateShopMilestones: List<MilestoneJson>,
+    @Expose val chocolateFactoryMilestones: List<MilestoneJson>,
     @Expose val apiEggLocations: Map<IslandType, Map<String, LorenzVec>>,
     @Expose val specialRabbits: List<String>
+)
+
+data class MilestoneJson(
+    @Expose val amount: Long,
+    @Expose val rabbit: String,
 )
