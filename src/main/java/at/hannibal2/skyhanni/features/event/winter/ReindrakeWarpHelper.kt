@@ -19,17 +19,17 @@ object ReindrakeWarpHelper {
     private val patternGroup = RepoPattern.group("event.winter.reindrakewarphelper")
 
     /**
-     * REGEX-TEST: &c&lWOAH! &cA &4Reindrake &cwas summoned from the depths!
+     * REGEX-TEST: §c§lWOAH! §cA §4Reindrake §cwas summoned from the depths!
      */
-    private val inventoryPattern by patternGroup.pattern(
+    private val spawnPattern by patternGroup.pattern(
         "spawn.message",
-        "&c&lWOAH! &cA &4Reindrake &cwas summoned from the depths!",
+        "§c§lWOAH! §cA §4Reindrake §cwas summoned from the depths!",
     )
 
     @SubscribeEvent
     fun onMessage(event: LorenzChatEvent) {
         if (!isEnabled()) return
-        if (!inventoryPattern.matches(event.message)) return
+        if (!spawnPattern.matches(event.message)) return
         ChatUtils.clickToActionOrDisable(
             "Click to warp to the Winter Island spawn!",
             config::reindrakeWarpHelper,
