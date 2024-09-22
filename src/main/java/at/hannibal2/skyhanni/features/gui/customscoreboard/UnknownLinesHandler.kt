@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
@@ -28,7 +29,7 @@ object UnknownLinesHandler {
             PurseAPI.coinsPattern,
             SbPattern.motesPattern,
             BitsAPI.bitsScoreboardPattern,
-            SbPattern.heatPattern,
+            MiningAPI.heatPattern,
             SbPattern.copperPattern,
             SbPattern.locationPattern,
             SbPattern.lobbyCodePattern,
