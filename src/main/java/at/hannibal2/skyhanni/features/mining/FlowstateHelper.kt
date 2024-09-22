@@ -38,7 +38,7 @@ object FlowstateHelper {
     )
 
     enum class FlowstateElements(val label: String, var renderable: Renderable) {
-        TITLE("§d§lFlowstate Helper", Renderable.string("")),
+        TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
         TIMER("Time Remaining: §b6.71", Renderable.string("")),
         STREAK("Streak: §7234", Renderable.string("")),
         SPEED("§6+600⸕", Renderable.string(""));
@@ -82,7 +82,6 @@ object FlowstateHelper {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!MiningAPI.inCustomMiningIsland()) return
-        if (hasFlowstate() == null) return
 
         attemptClearDisplay()
     }
@@ -103,9 +102,10 @@ object FlowstateHelper {
         if (display == null || streakEndTimer.isInFuture()) createDisplay()
         display?.let {
             config.flowstateHelperPosition.renderRenderables(
-                listOf(Renderable.verticalContainer(it, 1)),
-                posLabel = "Flowstate Helper",
-                addToGuiManager = true
+                it,
+                1,
+                "Flowstate Helper",
+                true
             )
         }
     }
@@ -113,28 +113,13 @@ object FlowstateHelper {
     private fun createDisplay() {
         if (displayDirty) {
             displayDirty = false
-            createDisplayTitle()
             createDisplayTimer()
             createDisplayBlock()
             createDisplaySpeed()
-            display = buildList {
-                config.flowstateHelperAppearance.forEach {
-                    add(it.renderable)
-                }
-            }
         } else {
             createDisplayTimer()
-            display = buildList {
-                config.flowstateHelperAppearance.forEach {
-                    add(it.renderable)
-                }
-            }
         }
-    }
-
-    private fun createDisplayTitle(): Renderable {
-        FlowstateElements.TITLE.renderable = Renderable.string("§d§lFlowstate Helper")
-        return FlowstateElements.TITLE.renderable
+        display = config.flowstateHelperAppearance.map { it.renderable }
     }
 
     private fun createDisplayTimer(): Renderable {
