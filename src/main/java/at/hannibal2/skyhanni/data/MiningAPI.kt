@@ -311,7 +311,7 @@ object MiningAPI {
     }
 
     private fun updateHeat(newHeat: Int) {
-        if (cold == 0 && lastHeatUpdate.passedSince() < 1.seconds) return
+        if (heat == 0 && lastHeatUpdate.passedSince() < 1.seconds) return
         lastHeatUpdate = SimpleTimeMark.now()
         heat = newHeat
     }
