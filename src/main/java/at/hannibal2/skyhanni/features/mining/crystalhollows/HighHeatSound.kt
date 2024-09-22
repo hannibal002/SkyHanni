@@ -17,5 +17,5 @@ object HighHeatSound {
         if (event.soundName == "mob.wolf.panting" && event.pitch == 0.0f && event.volume == 1.0f) event.cancel()
     }
 
-    private fun isEnabled() = config.muteHighHeat && MiningAPI.inCrystalHollows()
+    private fun isEnabled() = config.muteHighHeat && MiningAPI.inCrystalHollows() && MiningAPI.heat >= 90
 }
