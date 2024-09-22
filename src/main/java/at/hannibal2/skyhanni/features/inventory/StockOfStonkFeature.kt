@@ -20,7 +20,6 @@ object StockOfStonkFeature {
 
     private val repoGroup = RepoPattern.group("inventory.stockofstonks")
 
-
     /**
      * REGEX-TEST: Stonks Auction
      */
@@ -42,7 +41,7 @@ object StockOfStonkFeature {
      */
     private val topPattern by repoGroup.pattern(
         "top",
-        "§5§o§7§7▶ §c§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
+        "§5§o§7§.▶ §c§lTOP (?<rank>[\\d,]+)§7 - §5Stock of Stonks §8x(?<amount>\\d+)",
     )
 
     /**
