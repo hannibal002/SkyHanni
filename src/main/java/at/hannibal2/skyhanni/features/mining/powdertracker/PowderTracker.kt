@@ -317,7 +317,7 @@ object PowderTracker {
             }
 
             val (flawless, fine, flawed, rough) = convert(totalGemstone)
-            addSearchString("§5${flawless}§7-§9${fine}§7-§a${flawed}§f-${rough} $color$gem Gemstone", "Gemstone")
+            addSearchString("§5$flawless§7-§9$fine§7-§a$flawed§f-$rough $color$gem Gemstone", "Gemstone")
         }
 
         var totalParts = 0L

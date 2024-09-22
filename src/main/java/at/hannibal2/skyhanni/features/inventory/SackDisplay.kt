@@ -143,7 +143,7 @@ object SackDisplay {
                     add(
                         Renderable.hoverTips(
                             Renderable.string(
-                                "§d${magmaFish}",
+                                "§d$magmaFish",
                                 horizontalAlign = config.alignment
                             ),
                             listOf(
@@ -303,16 +303,14 @@ object SackDisplay {
     }
 
     enum class PriceFormat(val displayName: String) {
-        FORMATED("Formatted"),
-        UNFORMATED("Unformatted"),
-        ;
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted"),
     }
 
     enum class NumberFormat(val displayName: String) {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
         UNFORMATTED("Unformatted"),
-        ;
     }
 
     @SubscribeEvent

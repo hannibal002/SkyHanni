@@ -32,6 +32,12 @@ formatting:
         active: false
     ArgumentListWrapping: # ktlint - way too aggressive
         active: false
+    NoBlankLineBeforeRbrace: # pedantic
+        active: false
+    NoConsecutiveBlankLines: # pedantic
+        active: false
+    NoEmptyFirstLineInMethodBlock: # pedantic
+        active: false
 
 complexity:
     CyclomaticComplexMethod:

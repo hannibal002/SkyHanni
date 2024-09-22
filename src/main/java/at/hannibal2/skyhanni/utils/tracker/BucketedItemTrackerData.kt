@@ -67,6 +67,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
 
     @Expose
     private var selectedBucket: E? = null
+
     @Expose
     private var bucketedItems: MutableMap<E, MutableMap<NEUInternalName, TrackedItem>> = HashMap()
 

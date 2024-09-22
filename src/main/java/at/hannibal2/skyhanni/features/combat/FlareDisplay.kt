@@ -194,7 +194,6 @@ object FlareDisplay {
         SOS("§5SOS Flare", "+125%"),
         ALERT("§9Alert Flare", "+50%"),
         WARNING("§aWarning Flare", null),
-        ;
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled

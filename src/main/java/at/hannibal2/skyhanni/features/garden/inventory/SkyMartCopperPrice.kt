@@ -72,7 +72,7 @@ object SkyMartCopperPrice {
                     add("§7Profit per purchase: §6${profit.shortFormat()} ")
                     add("")
                     add("§7Copper amount: §c${copper.addSeparators()} ")
-                    add("§7Profit per copper: §6${perFormat} ")
+                    add("§7Profit per copper: §6$perFormat ")
                 }
                 table.add(
                     DisplayTableEntry(

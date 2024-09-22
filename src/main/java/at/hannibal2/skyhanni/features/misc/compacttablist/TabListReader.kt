@@ -26,6 +26,7 @@ object TabListReader {
         "username",
         "^\\[(?<sblevel>\\d+)] (?:\\[\\w+] )?(?<username>\\w+)"
     )
+
     /**
      * REGEX-TEST: §r§r§7You have a §r§cGod Potion §r§7active! §r§d12 Hours§r
      */
@@ -33,6 +34,7 @@ object TabListReader {
         "effects.godpot",
         "§r§r§7You have a §r§cGod Potion §r§7active! §r§d(?<timer>[\\w ]+)§r"
     )
+
     /**
      * REGEX-TEST: §r§r§a§lActive Effects§r
      */
@@ -40,6 +42,7 @@ object TabListReader {
         "effects.active",
         "Active Effects(?:§.)*(?:\\n(?:§.)*§7.+)*"
     )
+
     /**
      * REGEX-TEST: §r§r§7§r§7You have §r§e1 §r§7active effect. Use "§r§6/effects§r§7" to see it!§r
      */

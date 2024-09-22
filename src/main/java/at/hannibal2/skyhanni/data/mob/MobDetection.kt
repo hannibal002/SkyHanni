@@ -126,7 +126,7 @@ object MobDetection {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
         }
 
-        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
+        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) } // Spawn
         (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
 
         MobData.notSeenMobs.removeIf(::canBeSeen)

@@ -228,7 +228,7 @@ object CarryTracker {
                             add("§7Missing: §e$missing")
                             add("")
                             if (cost != "") {
-                                add("§7Total cost: §e${cost}")
+                                add("§7Total cost: §e$cost")
                                 add("§7Cost per carry: §e${formatCost(carry.type.pricePer)}")
                             } else {
                                 add("§cNo price set for this carry!")
@@ -264,7 +264,7 @@ object CarryTracker {
             val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
-                    Renderable.string("§b$customerName $paidFormat§8/${totalCostFormat}"),
+                    Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
                     tips = listOf(
                         "§7Carries for §b$customerName",
                         "",

@@ -57,6 +57,7 @@ object SlayerRngMeterDisplay {
         "changeditem",
         "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
     )
+
     /**
      * REGEX-TEST: §aEnchanted Book (§d§lDuplex I§a)
      */

@@ -49,7 +49,6 @@ object NonGodPotEffectDisplay {
         val isMixin: Boolean = false,
         val inventoryItemName: String = tabListName,
     ) {
-
         SMOLDERING("§aSmoldering Polarization I"),
         GLOWY("§2Mushed Glowy Tonic I"),
         WISP("§bWisp's Ice-Flavored Water I"),
@@ -76,7 +75,6 @@ object NonGodPotEffectDisplay {
         CURSE_OF_GREED("§4Curse of Greed I"),
 
         COLD_RESISTANCE_4("§bCold Resistance IV"),
-        ;
     }
 
     private val effectsCountPattern by RepoPattern.pattern(

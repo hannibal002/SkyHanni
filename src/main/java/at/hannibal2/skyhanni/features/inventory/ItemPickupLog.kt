@@ -42,7 +42,7 @@ object ItemPickupLog {
             "§a+256",
             { entry, prefix ->
                 val formattedAmount = if (config.shorten) entry.amount.shortFormat() else entry.amount.addSeparators()
-                Renderable.string("${prefix}${formattedAmount}")
+                Renderable.string("$prefix$formattedAmount")
             },
         ),
         ICON(

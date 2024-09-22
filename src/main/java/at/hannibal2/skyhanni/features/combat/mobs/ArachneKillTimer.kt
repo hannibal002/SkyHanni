@@ -29,6 +29,7 @@ object ArachneKillTimer {
         "calling.spawned",
         "§c\\[BOSS] Arachne§r§f: A befitting welcome!"
     )
+
     /**
      * REGEX-TEST: §c[BOSS] Arachne§r§f: With your sacrifice.
      */
@@ -36,6 +37,7 @@ object ArachneKillTimer {
         "crystal.spawned",
         "§c\\[BOSS] Arachne§r§f: With your sacrifice."
     )
+
     /**
      * REGEX-TEST: §f                              §r§6§lARACHNE DOWN!
      */
@@ -43,6 +45,7 @@ object ArachneKillTimer {
         "dead",
         "§f.*§r§6§lARACHNE DOWN!"
     )
+
     /**
      * REGEX-TEST: §f                 §r§eYour Damage: §r§a1,155,000 §r§7(Position #1)
      */

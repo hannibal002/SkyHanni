@@ -127,7 +127,7 @@ object CarnivalZombieShootout {
             content = Renderable.horizontalContainer(
                 listOf(
                     Renderable.itemStack(lamp),
-                    Renderable.string("§6Disappears in $prefix${timer}"),
+                    Renderable.string("§6Disappears in $prefix$timer"),
                 ),
                 spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,

@@ -88,10 +88,11 @@ object EasterEggWaypoints {
 
     // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next egg event
 
+    @Suppress("NoTrailingSpaces")
     /*
         Title:
         §e§lHYPIXEL
-        
+
         '§703/14/24  §8L30A'
         '  '
         'Rank: §bMVP§d+§b'

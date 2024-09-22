@@ -488,7 +488,7 @@ object ComposterOverlay {
         }
         val havingInInventory = internalName.getAmountInInventory()
         if (havingInInventory >= itemsNeeded) {
-            ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
+            ChatUtils.chat("$itemName §8x$itemsNeeded §ealready found in inventory!")
             return
         }
 

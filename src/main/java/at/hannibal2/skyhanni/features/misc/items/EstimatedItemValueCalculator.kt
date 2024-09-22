@@ -923,11 +923,11 @@ object EstimatedItemValueCalculator {
 
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
-        return "§b$name ${second} Shard"
+        return "§b$name $second Shard"
     }
 
-    fun Pair<String, Int>.getAttributePrice(): Double? = EstimatedItemValueCalculator.getPriceOrCompositePriceForAttribute(
-        "ATTRIBUTE_SHARD+ATTRIBUTE_" + first,
+    private fun Pair<String, Int>.getAttributePrice(): Double? = getPriceOrCompositePriceForAttribute(
+        "ATTRIBUTE_SHARD+ATTRIBUTE_$first",
         second,
     )
 }

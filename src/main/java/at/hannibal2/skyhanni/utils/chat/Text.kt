@@ -97,5 +97,4 @@ object Text {
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)
         this.command = "/shaction $token"
     }
-    
 }

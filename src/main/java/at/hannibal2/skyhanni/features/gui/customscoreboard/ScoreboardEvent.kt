@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.features.combat.SpidersDenAPI.isAtTopOfNest
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEvent.VOTING
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -345,7 +344,7 @@ private fun getTrapperLines() = buildList {
 }
 
 private fun getTrapperShowWhen(): Boolean =
-    getSbLines().any { ScoreboardPattern.peltsPattern.matches(it) || ScoreboardPattern.mobLocationPattern.matches(it) }
+    getSbLines().any { SbPattern.peltsPattern.matches(it) || SbPattern.mobLocationPattern.matches(it) }
 
 private fun getGardenCleanUpLines(): List<String> =
     listOf(getSbLines().first { SbPattern.cleanUpPattern.matches(it) }.trim())
@@ -372,9 +371,9 @@ private fun getWinterLines() = buildList {
 }
 
 private fun getWinterShowWhen(): Boolean = getSbLines().any {
-    ScoreboardPattern.winterEventStartPattern.matches(it)
-        || (ScoreboardPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
-        || ScoreboardPattern.winterWavePattern.matches(it)
+    SbPattern.winterEventStartPattern.matches(it)
+        || (SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
+        || SbPattern.winterWavePattern.matches(it)
 }
 
 private fun getNewYearLines() = listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
@@ -393,7 +392,7 @@ private fun getSpookyLines() = buildList {
     ) // Candy
 }
 
-private fun getSpookyShowWhen(): Boolean = getSbLines().any { ScoreboardPattern.spookyPattern.matches(it) }
+private fun getSpookyShowWhen(): Boolean = getSbLines().any { SbPattern.spookyPattern.matches(it) }
 
 private fun getTablistEvent(): String? =
     TabListData.getTabList().firstOrNull { SbPattern.eventNamePattern.matches(it) }

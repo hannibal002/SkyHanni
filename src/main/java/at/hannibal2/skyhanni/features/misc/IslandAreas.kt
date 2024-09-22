@@ -149,7 +149,7 @@ object IslandAreas {
                 ChatUtils.debug("Found a faster node, rerouting...")
                 setTarget(node)
             }
-            val coloredName = "${color.getChatColor()}${name}"
+            val coloredName = "${color.getChatColor()}$name"
 
             var suffix = ""
             paths[node]?.let { path ->
@@ -165,7 +165,7 @@ object IslandAreas {
             }
 
             val distance = difference.round(1)
-            val text = "${coloredName}§7: §e$distance$suffix"
+            val text = "$coloredName§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {
                 foundCurrentArea = true
