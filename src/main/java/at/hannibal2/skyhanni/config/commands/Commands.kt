@@ -95,6 +95,7 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ComplexCommand
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -727,6 +728,7 @@ object Commands {
         specifiers: Collection<A>,
         context: () -> O,
     ) {
+        ComplexCommand(rawName, specifiers, context)
         registerCommand(rawName, description) {
             advancedHandleCommand(it, specifiers, context())
         }
@@ -783,5 +785,6 @@ data class CommandArgument<T : CommandContextAwareObject>(
     /** -1 = invalid, -2 last element else index of the position of defaults */
     val defaultPosition: Int = -1,
     val validity: (T) -> Boolean = { true },
+    val tabComplete: (String) -> Collection<String> = { emptyList() },
     val handler: (Iterable<String>, T) -> Int,
 )

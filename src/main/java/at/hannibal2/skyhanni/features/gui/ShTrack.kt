@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.PowderGainEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CommandUtils
 import at.hannibal2.skyhanni.utils.CommandUtils.ItemGroup
 import at.hannibal2.skyhanni.utils.CommandUtils.itemCheck
 import at.hannibal2.skyhanni.utils.CommandUtils.numberCalculate
@@ -37,12 +38,15 @@ object ShTrack {
         CommandArgument("-i") { _, c -> c.state = ContextObject.StateType.ITEM; 0 },
         CommandArgument("-p") { _, c -> c.state = ContextObject.StateType.POWDER; 0 },
         CommandArgument(defaultPosition = 1) { a, c -> numberCalculate(a, c) { context, number -> context.targetAmount = number } },
-        CommandArgument(defaultPosition = 0, validity = ::validIfItemState) { a, c ->
+        CommandArgument(defaultPosition = 0, validity = ::validIfItemState, tabComplete = CommandUtils::itemTabComplete) { a, c ->
             val r = itemCheck(a, c)
             r.second?.let { c.item = it }
             r.first
         },
-        CommandArgument(defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER }) { a, c ->
+        CommandArgument(
+            defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER },
+            tabComplete = { s -> HotmAPI.PowderType.entries.filter { it.name.startsWith(s.uppercase()) }.map { it.name } },
+        ) { a, c ->
             val entry = HotmAPI.PowderType.getValue(a.first())
             c.item = entry
             1

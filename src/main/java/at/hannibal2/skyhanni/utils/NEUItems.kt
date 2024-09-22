@@ -46,6 +46,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import java.util.NavigableMap
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
@@ -179,7 +180,6 @@ object NEUItems {
         getInternalNameFromHypixelIdOrNull(hypixelId)
             ?: error("hypixel item id does not match internal name: $hypixelId")
 
-
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
@@ -285,7 +285,7 @@ object NEUItems {
         }
     }
 
-    fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
+    fun allNeuRepoItems(): NavigableMap<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
     fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
         itemIdCache[item]?.let {
@@ -297,6 +297,8 @@ object NEUItems {
         itemIdCache[item] = result
         return result
     }
+
+    fun findInternalNameStartingWith(prefix: String): Set<String> = StringUtils.subMapOfStringsStartingWith(prefix, allNeuRepoItems()).keys
 
     fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }

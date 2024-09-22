@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.commands.CommandArgument
 import at.hannibal2.skyhanni.config.commands.CommandContextAwareObject
+import at.hannibal2.skyhanni.events.TabCompletionEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.TreeMap
 
 object CommandUtils {
 
@@ -14,12 +19,14 @@ object CommandUtils {
         val items = items.associate { it.first.asInternalName() to it.second }
 
         init {
-            entries[items.first().first.uppercase().replace(" ", "_")] = this
+            entries[name] = this
         }
 
         companion object {
 
-            private val entries = mutableMapOf<String, ItemGroup>()
+            private val entries = TreeMap<String, ItemGroup>()
+
+            fun groupStartingWith(start: String): Collection<ItemGroup> = StringUtils.subMapOfStringsStartingWith(start, entries).values
 
             fun findGroup(string: String): ItemGroup? {
                 val search = string.replace(" ", "_").uppercase()
@@ -35,6 +42,10 @@ object CommandUtils {
         ;
     }
 
+    private val namePattern = "^name:(.*)".toRegex()
+    private val internalPattern = "^internal:(.*)".toRegex()
+    private val groupPattern = "^(?:group|collection):(.*)".toRegex()
+
     fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, Any?> {
         @Suppress("ReplaceSizeZeroCheckWithIsEmpty") // A bug since the replacement does not work for iterable interface.
         if (args.count() == 0) {
@@ -42,10 +53,6 @@ object CommandUtils {
             return 0 to null
         }
         val first = args.first()
-
-        val namePattern = "^name:".toRegex()
-        val internalPattern = "^internal:".toRegex()
-        val groupPattern = "^(?:group|collection):".toRegex()
 
         val expected = when {
             namePattern.matches(first) -> NameSource.ITEM_NAME
@@ -59,9 +66,9 @@ object CommandUtils {
         val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
 
         val item: Any? = when (expected) {
-            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "").replace(" ", "_").asInternalName()
-            NameSource.ITEM_NAME -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "").replace("_", " "))
-            NameSource.GROUP -> ItemGroup.findGroup(collected)
+            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$1").replace(" ", "_").asInternalName()
+            NameSource.ITEM_NAME -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "$1").replace("_", " "))
+            NameSource.GROUP -> ItemGroup.findGroup(collected.replace(groupPattern, "$1"))
             null -> {
                 val fromItemName = NEUInternalName.fromItemNameOrNull(collected.replace("_", " "))
                 if (fromItemName?.getItemStackOrNull() != null) {
@@ -84,6 +91,35 @@ object CommandUtils {
         return grabbed.size to item
     }
 
+    fun itemTabComplete(start: String): List<String> = buildList {
+        if (start.isEmpty()) return@buildList
+        val expected = when {
+            namePattern.matches(start) -> NameSource.ITEM_NAME
+            internalPattern.matches(start) -> NameSource.INTERNAL_NAME
+            groupPattern.matches(start) -> NameSource.GROUP
+            else -> null
+        }
+
+        val uppercaseStart = start.uppercase().replace(" ", "_")
+
+        // TODO add prefix support
+        when (expected) {
+            NameSource.INTERNAL_NAME -> {
+                addAll(NEUItems.findInternalNameStartingWith(uppercaseStart))
+            }
+
+            NameSource.ITEM_NAME -> {} // TODO
+            NameSource.GROUP -> {
+                addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name })
+            }
+
+            null -> {
+                addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name })
+                addAll(NEUItems.findInternalNameStartingWith(uppercaseStart))
+            }
+        }
+    }
+
     fun <T : CommandContextAwareObject> numberCalculate(args: Iterable<String>, context: T, use: (T, Long) -> Unit): Int {
         NEUCalculator.calculateOrNull(args.firstOrNull())?.toLong()?.let { use(context, it) } ?: {
             context.errorMessage = "Unkown number/calculation: '${args.firstOrNull()}'"
@@ -93,3 +129,90 @@ object CommandUtils {
 
 }
 
+data class ComplexCommand<O : CommandContextAwareObject>(
+    val name: String,
+    val specifiers: Collection<CommandArgument<O>>,
+    val context: () -> O,
+) {
+
+    init {
+        entries[name] = this
+    }
+
+    private fun tabParse(args: List<String>, partial: String?): List<String> {
+        val context = context()
+
+        var index = 0
+        var amountNoPrefixArguments = 0
+
+        while (args.size > index) {
+            val current = args[index]
+            val (spec, lookup) = specifiers.firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
+                ?: specifiers.firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }
+                    ?.let {
+                        amountNoPrefixArguments++
+                        it to -1
+                    }
+                ?: specifiers.firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
+                    amountNoPrefixArguments++
+                    it to -1
+                } ?: (null to 0)
+            val result = spec?.handler?.let { it(args.slice((lookup + index + 1)..<args.size), context) }
+            if (result == null) {
+                context.errorMessage = "Unknown argument: '$current'"
+            }
+            context.errorMessage?.let {
+                continue
+            }
+            index += (1 + lookup) + (result ?: 0)
+        }
+
+        val result = mutableListOf<String>()
+
+        val validSpecifier = specifiers.filter { it.validity(context) }
+
+        val rest = args.slice(index..<args.size).joinToString() + (partial ?: "")
+
+        if (rest.isEmpty()) {
+            result.addAll(validSpecifier.mapNotNull { it.prefix.takeIf { it.isNotEmpty() } })
+            result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete("") }.flatten())
+        } else {
+            result.addAll(
+                validSpecifier.filter { it.prefix.startsWith(rest) }
+                    .mapNotNull { it.prefix.takeIf { it.isNotEmpty() } },
+            )
+            result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete(rest) }.flatten())
+        }
+
+        return result
+    }
+
+    @SkyHanniModule
+    companion object {
+        val entries = mutableMapOf<String, ComplexCommand<*>>()
+
+        // TODO clear on chat close
+        private var tabCachedCommand: ComplexCommand<*>? = null
+        private var tabCached = emptyList<String>()
+        private var tabBeginString = ""
+
+        @SubscribeEvent
+        fun onTabCompletion(event: TabCompletionEvent) {
+            val command = entries[event.command] ?: return
+            if (tabCachedCommand == command && event.leftOfCursor == tabBeginString) {
+                event.addSuggestions(tabCached)
+                return
+            }
+            tabCachedCommand = command
+            val rawArgs = event.leftOfCursor.split(" ").drop(1)
+            val isPartial = rawArgs.last().isNotEmpty()
+            val args = if (isPartial) rawArgs.dropLast(1) else rawArgs
+
+            val partial = if (isPartial) rawArgs.last() else null
+
+            tabBeginString = event.leftOfCursor
+            tabCached = command.tabParse(args, partial)
+            event.addSuggestions(tabCached)
+        }
+    }
+}
