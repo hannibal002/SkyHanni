@@ -74,6 +74,15 @@ enum class SkyblockStat(
     NETHER_WART_FORTUNE("§7☘", "", " §7(?:§m)☘ Nether Wart Fortune (?<value>.*)"),
     COCOA_BEANS_FORTUNE("§7☘", "", " §7(?:§m)☘ Cocoa Beans Fortune (?<value>.*)"),
     SUGAR_CANE_FORTUNE("§7☘", "", " §7(?:§m)☘ Sugar Cane Fortune (?<value>.*)"),
+
+    MINING_SPREAD("§e▚","",""),
+    ORE_FORTUNE("§6☘","",""),
+    DWARVEN_METAL_FORTUNE("§6☘","",""),
+    BLOCK_FORTUNE("§6☘","",""),
+    GEMSTONE_FORTUNE("§6☘","",""),
+    HEAT_RESISTANCE("§c♨","",""),
+
+    UNKNOWN("§c?","","")
     ;
 
     var lastKnownValue: Double
@@ -103,6 +112,10 @@ enum class SkyblockStat(
         val fontSizeOfLargestIcon by lazy {
             entries.maxOf { Minecraft.getMinecraft().fontRendererObj.getStringWidth(it.icon) } + 1
         }
+
+        fun getValueOrNull(string: String): SkyblockStat? = entries.firstOrNull { it.name == string }
+
+        fun getValue(string: String): SkyblockStat = getValueOrNull(string) ?: UNKNOWN
 
         init {
             entries.forEach {
