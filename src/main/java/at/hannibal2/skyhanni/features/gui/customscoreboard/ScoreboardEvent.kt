@@ -444,7 +444,8 @@ private fun getBroodmotherLines(): List<String> =
 private fun getMiningEventsLines() = buildList {
     // Wind
     if (getSbLines().any { SbPattern.windCompassPattern.matches(it) }
-        && getSbLines().any { SbPattern.windCompassArrowPattern.matches(it) }) {
+        && getSbLines().any { SbPattern.windCompassArrowPattern.matches(it) }
+    ) {
         add(getSbLines().first { SbPattern.windCompassPattern.matches(it) })
         add("| ${getSbLines().first { SbPattern.windCompassArrowPattern.matches(it) }} §f|")
     }
@@ -457,14 +458,16 @@ private fun getMiningEventsLines() = buildList {
 
     // Zone Events
     if (getSbLines().any { SbPattern.miningEventPattern.matches(it) }
-        && getSbLines().any { SbPattern.miningEventZonePattern.matches(it) }) {
+        && getSbLines().any { SbPattern.miningEventZonePattern.matches(it) }
+    ) {
         add(getSbLines().first { SbPattern.miningEventPattern.matches(it) }.removePrefix("Event: "))
         add("in ${getSbLines().first { SbPattern.miningEventZonePattern.matches(it) }.removePrefix("Zone: ")}")
     }
 
     // Zone Events but no Zone Line
     if (getSbLines().any { SbPattern.miningEventPattern.matches(it) }
-        && getSbLines().none { SbPattern.miningEventZonePattern.matches(it) }) {
+        && getSbLines().none { SbPattern.miningEventZonePattern.matches(it) }
+    ) {
         add(
             getSbLines().first { SbPattern.miningEventPattern.matches(it) }
                 .removePrefix("Event: "),
@@ -473,21 +476,24 @@ private fun getMiningEventsLines() = buildList {
 
     // Mithril Gourmand
     if (getSbLines().any { SbPattern.mithrilRemainingPattern.matches(it) }
-        && getSbLines().any { SbPattern.mithrilYourMithrilPattern.matches(it) }) {
+        && getSbLines().any { SbPattern.mithrilYourMithrilPattern.matches(it) }
+    ) {
         add(getSbLines().first { SbPattern.mithrilRemainingPattern.matches(it) })
         add(getSbLines().first { SbPattern.mithrilYourMithrilPattern.matches(it) })
     }
 
     // Raffle
     if (getSbLines().any { SbPattern.raffleTicketsPattern.matches(it) }
-        && getSbLines().any { SbPattern.rafflePoolPattern.matches(it) }) {
+        && getSbLines().any { SbPattern.rafflePoolPattern.matches(it) }
+    ) {
         add(getSbLines().first { SbPattern.raffleTicketsPattern.matches(it) })
         add(getSbLines().first { SbPattern.rafflePoolPattern.matches(it) })
     }
 
     // Raid
     if (getSbLines().any { SbPattern.yourGoblinKillsPattern.matches(it) }
-        && getSbLines().any { SbPattern.remainingGoblinPattern.matches(it) }) {
+        && getSbLines().any { SbPattern.remainingGoblinPattern.matches(it) }
+    ) {
         add(getSbLines().first { SbPattern.yourGoblinKillsPattern.matches(it) })
         add(getSbLines().first { SbPattern.remainingGoblinPattern.matches(it) })
     }

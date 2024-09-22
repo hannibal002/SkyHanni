@@ -55,7 +55,8 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             },
             vTab(ItemStack(Items.map), Renderable.string("§eUpgrades")) {
                 currentPage = FortuneGuidePage.UPGRADES
-            })
+            },
+        )
         horizontalTabs = buildList {
             add(
                 hTab(ItemStack(Blocks.grass), Renderable.string("§eOverview")) {

@@ -23,7 +23,8 @@ object PrivateIslandNoPickaxeAbility {
 
         if (event.itemInHand?.getItemCategoryOrNull()?.let {
                 ItemCategory.miningTools.contains(it)
-            } == true) {
+            } == true
+        ) {
             event.cancel()
         }
     }

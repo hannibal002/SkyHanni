@@ -485,7 +485,8 @@ object SkillAPI {
             1 -> listOf("levelwithxp", "xpforlevel", "goal")
             2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
                 strings,
-                SkillType.entries.map { it.displayName })
+                SkillType.entries.map { it.displayName }
+            )
             else
                 listOf()
 
@@ -501,7 +502,8 @@ object SkillAPI {
                 "§6/shskills goal - §bView your current goal",
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
                 "",
-            ).joinToString("\n"), prefix = false
+            ).joinToString("\n"),
+            prefix = false
         )
     }
 

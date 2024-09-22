@@ -97,8 +97,9 @@ object MobDetection {
     }
 
     private fun Mob.watchdogCheck(world: World): Boolean =
-        this.baseEntity.worldObj != world || (this.armorStand?.let { it.worldObj != world }
-            ?: false) || this.extraEntities.any { it.worldObj != world }
+        this.baseEntity.worldObj != world || (
+            this.armorStand?.let { it.worldObj != world } ?: false
+            ) || this.extraEntities.any { it.worldObj != world }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

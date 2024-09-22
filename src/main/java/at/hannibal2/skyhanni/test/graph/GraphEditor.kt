@@ -261,7 +261,8 @@ object GraphEditor {
         }
     }
 
-    private fun chatAtDisable() = ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.",
+    private fun chatAtDisable() = ChatUtils.clickableChat(
+        "Graph Editor is now inactive. §lClick to activate.",
         GraphEditor::commandIn
     )
 
@@ -531,7 +532,11 @@ object GraphEditor {
     private fun compileGraph(): Graph {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name, it.tags.mapNotNull { it.internalName }) }
+        val nodes = nodes.mapIndexed { index, it ->
+            GraphNode(index, it.position, it.name, it.tags.map
+                { it.internalName }
+            )
+        }
         val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1

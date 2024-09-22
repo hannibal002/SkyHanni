@@ -79,7 +79,8 @@ object CraftMaterialsFromBazaar {
                         listOf("§eClick here to buy the items from bazaar!"),
                         onClick = {
                             getFromBazaar(neededMaterials)
-                        })
+                        }
+                    )
                 )
             }
         }
@@ -109,9 +110,14 @@ object CraftMaterialsFromBazaar {
                 val priceMultiplier = amount * multiplier
                 val text = "§8${priceMultiplier.addSeparators()}x " + material.itemName +
                     " §6${(material.getPrice() * priceMultiplier).shortFormat(false)}"
-                add(Renderable.optionalLink(text, onClick = {
-                    BazaarApi.searchForBazaarItem(material, priceMultiplier)
-                }))
+                add(
+                    Renderable.optionalLink(
+                        text,
+                        onClick = {
+                            BazaarApi.searchForBazaarItem(material, priceMultiplier)
+                        }
+                    )
+                )
             }
             add(
                 Renderable.clickAndHover(
@@ -120,7 +126,8 @@ object CraftMaterialsFromBazaar {
                     onClick = {
                         purchasing = false
                         display = emptyList()
-                    })
+                    }
+                )
             )
             addMultipliers()
         }

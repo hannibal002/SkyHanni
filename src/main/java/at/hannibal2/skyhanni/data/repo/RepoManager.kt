@@ -231,10 +231,8 @@ class RepoManager(private val configLocation: File) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
                 val text = mutableListOf<IChatComponent>()
-                text.add(
-                    ("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
-                        "Please report this error on the Discord!").asComponent(),
-                )
+                @Suppress("MaximumLineLength")
+                text.add("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. Please report this error on the Discord!".asComponent())
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
                 text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())

@@ -131,12 +131,16 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
-    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } && listOf(
-        "CHESTPLATE",
-        "LEGGINGS",
-        "HELMET",
-        "BOOTS",
-    ).any { internalName.endsWith(it) })
+    private fun isKuudraSet(internalName: String) = (
+        kuudraSets.any {
+            internalName.contains(it)
+        } && listOf(
+            "CHESTPLATE",
+            "LEGGINGS",
+            "HELMET",
+            "BOOTS",
+        ).any { internalName.endsWith(it) }
+    )
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
@@ -220,7 +224,9 @@ object EstimatedItemValueCalculator {
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
         val intRange = if (config.useAttributeComposite.get()) 1..10 else level..level
         return intRange.mapNotNull { lowerLevel ->
-            "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
+            "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()?.let {
+                it / (1 shl lowerLevel) * (1 shl level).toDouble()
+            }
         }.minOrNull()
     }
 

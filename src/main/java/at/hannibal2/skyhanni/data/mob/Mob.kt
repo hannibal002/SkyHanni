@@ -154,9 +154,11 @@ class Mob(
         relativeBoundingBox =
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
-        owner = (ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
-        } else null)?.let { MobUtils.OwnerShip(it) }
+        owner = (
+            ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
+                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+            } else null
+        )?.let { MobUtils.OwnerShip(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
@@ -164,15 +166,16 @@ class Mob(
             MobData.externRemoveOfRetryAmount += it
         }
 
-    fun updateBoundingBox() {
+    private fun updateBoundingBox() {
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
     }
 
-    private fun makeRelativeBoundingBox() =
-        (baseEntity.entityBoundingBox.union(
+    private fun makeRelativeBoundingBox() = (
+        baseEntity.entityBoundingBox.union(
             extraEntities.filter { it !is EntityArmorStand }
                 .mapNotNull { it.entityBoundingBox },
-        ))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+        )
+        )?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +

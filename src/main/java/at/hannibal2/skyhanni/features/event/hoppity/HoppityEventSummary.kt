@@ -98,8 +98,8 @@ object HoppityEventSummary {
 
         if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
             sendStatsMessage(stats, year)
-            (ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
-                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization."))
+            ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
+                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
         }
     }
 
@@ -155,8 +155,10 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.MILESTONE_RABBITS) { sb, stats, _ ->
-                ((stats.mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
-                    (stats.mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)).takeIf { it > 0 }?.let {
+                var milestoneRabbitsFound = 0
+                milestoneRabbitsFound += stats.mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0
+                milestoneRabbitsFound += stats.mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0
+                milestoneRabbitsFound.takeIf { it > 0 }?.let {
                     sb.appendHeadedLine("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7.")
                 }
             }

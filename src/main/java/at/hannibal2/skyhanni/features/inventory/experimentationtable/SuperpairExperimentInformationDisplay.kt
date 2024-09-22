@@ -76,7 +76,10 @@ object SuperpairExperimentInformationDisplay {
         if (item.displayName.removeColor() == "?") return
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
 
-        if (lastClicked.none { it.first == event.slotId && it.second == uncoveredAt } && lastClick.passedSince() > 100.milliseconds) {
+        if (lastClicked.none {
+                it.first == event.slotId && it.second == uncoveredAt
+            } && lastClick.passedSince() > 100.milliseconds
+        ) {
             if (clicksItem != null && clicksItem.displayName.removeColor().split(" ")[1] == "0") return
             lastClicked.add(Pair(event.slotId, uncoveredAt))
             lastClick = SimpleTimeMark.now()
@@ -131,7 +134,10 @@ object SuperpairExperimentInformationDisplay {
 
     private fun handleReward(slot: Int, uncovered: Int, reward: String) {
         val lastSlotClicked =
-            if (instantFind == 0 && lastClicked.none { it.first == -1 && it.second == uncovered - 1 } && lastClicked.size != 1) lastClicked.find { it.second == uncovered - 1 }
+            if (instantFind == 0 && lastClicked.none {
+                    it.first == -1 && it.second == uncovered - 1
+                } && lastClicked.size != 1
+            ) lastClicked.find { it.second == uncovered - 1 }
                 ?: return else lastClicked.find { it.second == uncovered } ?: return
 
         val lastItem = InventoryUtils.getItemAtSlotIndex(lastSlotClicked.first) ?: return
@@ -183,7 +189,8 @@ object SuperpairExperimentInformationDisplay {
 
         if (found.none {
                 listOf("Pair", "Match").contains(it.value) && (right(it.key).first.index == slot)
-            }) found[pair] = "Match"
+            }
+        ) found[pair] = "Match"
         found.entries.removeIf { it.value == "Normal" && (left(it.key).index == slot || left(it.key).index == match) }
     }
 
@@ -192,7 +199,10 @@ object SuperpairExperimentInformationDisplay {
 
         if (found.none {
                 listOf("Match", "Pair").contains(it.value) && (right(it.key).first.index == slot || right(it.key).second.index == slot)
-            } && found.none { it.value == "Normal" && left(it.key).index == slot }) found[item] = "Normal"
+            } && found.none {
+                it.value == "Normal" && left(it.key).index == slot
+            }
+        ) found[item] = "Normal"
     }
 
     private fun calculatePossiblePairs() =
