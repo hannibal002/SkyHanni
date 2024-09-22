@@ -664,7 +664,7 @@ private fun getCookieDisplayPair() = listOf(
         BitsAPI.cookieBuffTime?.let {
             if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
         } ?: "§cOpen SbMenu!"
-    ) to HorizontalAlignment.LEFT,
+        ) to HorizontalAlignment.LEFT,
 )
 
 private fun getCookieShowWhen(): Boolean {

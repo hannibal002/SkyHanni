@@ -276,7 +276,7 @@ object BingoNextStepHelper {
                     160 * 32,
                     mapOf("Emerald" to 1, "Enchanted Emerald" to 160)
                 ) requires IslandType.DWARVEN_MINES.getStep()
-            )
+                )
         }
 
         if (description == "Obtain a Mathematical Hoe Blueprint.") {
@@ -287,7 +287,7 @@ object BingoNextStepHelper {
                     32,
                     mapOf("Jacob's Ticket" to 1)
                 ).addItemRequirements() requires IslandType.GARDEN.getStep()
-            )
+                )
         }
 
         crystalPattern.matchMatcher(description) {

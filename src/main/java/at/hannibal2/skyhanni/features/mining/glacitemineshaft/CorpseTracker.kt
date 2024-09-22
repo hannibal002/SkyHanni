@@ -45,9 +45,11 @@ object CorpseTracker {
         }
 
         override fun getDescription(timesGained: Long): List<String> {
-            val divisor = 1.coerceAtLeast(getSelectedBucket()?.let {
-                corpsesLooted[it]?.toInt()
-            } ?: corpsesLooted.sumAllValues().toInt())
+            val divisor = 1.coerceAtLeast(
+                getSelectedBucket()?.let {
+                    corpsesLooted[it]?.toInt()
+                } ?: corpsesLooted.sumAllValues().toInt()
+            )
             val percentage = timesGained.toDouble() / divisor
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
@@ -88,7 +90,7 @@ object CorpseTracker {
 
         var profit = tracker.drawItems(bucketData, { true }, this)
         val applicableKeys: List<CorpseType> = bucketData.getSelectedBucket()?.let {
-            listOf(it) 
+            listOf(it)
         } ?: enumValues<CorpseType>().toList()
             .filter { bucketData.corpsesLooted[it] != null }
         var totalKeyCost = 0.0

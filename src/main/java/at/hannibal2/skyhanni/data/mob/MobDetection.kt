@@ -307,8 +307,8 @@ object MobDetection {
                         + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
                         + "\n Position: ${retry.entity.getLorenzVec()}\n "
                         + "DistanceC: ${
-                        entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
-                    }\n"
+                            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                        }\n"
                         + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
                         "}",
                 )
@@ -354,10 +354,10 @@ object MobDetection {
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
             is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-            {
-                shouldClear.set(true)
-                allEntitiesViaPacketId.clear()
-            }
+                {
+                    shouldClear.set(true)
+                    allEntitiesViaPacketId.clear()
+                }
         }
     }
 

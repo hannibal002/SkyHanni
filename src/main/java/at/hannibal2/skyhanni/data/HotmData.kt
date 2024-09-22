@@ -385,7 +385,7 @@ enum class HotmData(
         get() = if (enabled) effectiveLevel else 0
 
     /** Level that considering [blueEgg]*/
-    val effectiveLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
+    private val effectiveLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
 
     val isMaxLevel: Boolean
         get() = effectiveLevel >= maxLevel // >= to account for +1 from Blue Cheese
@@ -421,7 +421,14 @@ enum class HotmData(
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
-        val abilities = listOf(PICKOBULUS, MINING_SPEED_BOOST, MANIAC_MINER, GEMSTONE_INFUSION, ANOMALOUS_DESIRE, SHEER_FORCE)
+        val abilities = listOf(
+            PICKOBULUS,
+            MINING_SPEED_BOOST,
+            MANIAC_MINER,
+            GEMSTONE_INFUSION,
+            ANOMALOUS_DESIRE,
+            SHEER_FORCE
+        )
 
         private val inventoryPattern by patternGroup.pattern(
             "inventory",
@@ -532,7 +539,7 @@ enum class HotmData(
             HotmAPI.MayhemPerk.entries.forEach {
                 it.chatPattern
             }
-            for(level in 0..CORE_OF_THE_MOUNTAIN.maxLevel) {
+            for (level in 0..CORE_OF_THE_MOUNTAIN.maxLevel) {
                 val map = mutableMapOf<HotmReward, Double>()
                 if (level >= 1) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
                 if (level >= 2) map.addOrPut(HotmReward.ABILITY_LEVEL, 1.0)

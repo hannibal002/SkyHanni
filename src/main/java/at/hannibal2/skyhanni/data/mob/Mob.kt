@@ -158,7 +158,7 @@ class Mob(
             ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
                 summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
             } else null
-        )?.let { MobUtils.OwnerShip(it) }
+            )?.let { MobUtils.OwnerShip(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =

@@ -135,7 +135,7 @@ object PowderTracker {
         }
     }
 
-    @Suppress("Wrapping")
+    @Suppress("Wrapping", "PropertyWrapping")
     private val tracker = SkyHanniTracker("Powder Tracker", { Data() }, { it.powderTracker }) { formatDisplay(drawDisplay(it)) }
 
     class Data : TrackerData() {

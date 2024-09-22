@@ -17,7 +17,7 @@ import org.lwjgl.opengl.GLContext
  *  Credit: [ShaderHelper.java](https://github.com/BiscuitDevelopment/SkyblockAddons/blob/main/src/main/java/codes/biscuit/skyblockaddons/shader/ShaderHelper.java)
  */
 object ShaderHelper {
-    
+
     private var SHADERS_SUPPORTED: Boolean
 
     private var USING_ARB_SHADERS: Boolean

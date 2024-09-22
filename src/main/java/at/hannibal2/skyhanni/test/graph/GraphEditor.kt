@@ -533,7 +533,11 @@ object GraphEditor {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, it ->
-            GraphNode(index, it.position, it.name, it.tags.map
+            GraphNode(
+                index,
+                it.position,
+                it.name,
+                it.tags.map
                 { it.internalName }
             )
         }

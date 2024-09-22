@@ -17,8 +17,8 @@ enum class GraphNodeTag(
     AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area."),
     SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house."),
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map."),
-    // LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
     TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport."),
+    // LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
 
     // on multiple islands
     ROMEO("romeo", LorenzColor.WHITE, "Romeo & Juliette Quest", "Spots related to the Romeo and Juliette/Ring of Love quest line."),

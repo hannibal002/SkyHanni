@@ -641,7 +641,11 @@ object RenderUtils {
         if (list.isEmpty()) return
 
         val render =
-            list.map { it.map { Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it") } }
+            list.map {
+                it.map { entry ->
+                    Renderable.fromAny(entry, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $entry")
+                }
+            }
 
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }

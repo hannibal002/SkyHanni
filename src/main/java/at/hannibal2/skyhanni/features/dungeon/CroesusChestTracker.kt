@@ -144,8 +144,8 @@ object CroesusChestTracker {
                             group("floor").romanToDecimal()
                         }
                     } ?: "0"
+                    )
                 )
-            )
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED

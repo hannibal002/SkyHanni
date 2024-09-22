@@ -300,8 +300,8 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (BESTIARY_LEVEL.isSelected() && (
-                chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")
-            ) && lore.any {
+            chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")
+                ) && lore.any {
                 it.contains("Deaths: ")
             }
         ) {
