@@ -75,14 +75,15 @@ enum class SkyblockStat(
     COCOA_BEANS_FORTUNE("§7☘", "", " §7(?:§m)☘ Cocoa Beans Fortune (?<value>.*)"),
     SUGAR_CANE_FORTUNE("§7☘", "", " §7(?:§m)☘ Sugar Cane Fortune (?<value>.*)"),
 
-    MINING_SPREAD("§e▚","",""),
-    ORE_FORTUNE("§6☘","",""),
-    DWARVEN_METAL_FORTUNE("§6☘","",""),
-    BLOCK_FORTUNE("§6☘","",""),
-    GEMSTONE_FORTUNE("§6☘","",""),
-    HEAT_RESISTANCE("§c♨","",""),
+    MINING_SPREAD("§e▚", " (§r§7§m)?Mining Spread: (§r§e)?▚(?<value>.*)", " (§7§m|§e)▚ Mining Spread (§f)?(?<value>.*)"),
+    GEMSTONE_SPREAD("§e▚", " (§r§7§m)?Mining Spread: (§r§e)?▚(?<value>.*)", " (§7§m|§e)▚ Gemstone Spread (§f)?(?<value>.*)"),
+    ORE_FORTUNE("§6☘", " Ore Fortune: §r§6☘(?<value>.*)", " §6☘ Ore Fortune §f103"),
+    DWARVEN_METAL_FORTUNE("§6☘", " Dwarven Metal Fortune: §r§6☘(?<value>.*)", " §6☘ Dwarven Metal Fortune §f(?<value>.*)"),
+    BLOCK_FORTUNE("§6☘", " Block Fortune: §r§6☘(?<value>.*)", " §6☘ Block Fortune §f(?<value>.*)"),
+    GEMSTONE_FORTUNE("§6☘", " Gemstone Fortune: §r§6☘(?<value>.*)", " §6☘ Gemstone Fortune §f(?<value>.*)"),
+    HEAT_RESISTANCE("§c♨", " Heat Resistance: §r§c♨(?<value>.*)", " §c♨ Heat Resistance §f(?<value>.*)"),
 
-    UNKNOWN("§c?","","")
+    UNKNOWN("§c?", "", "")
     ;
 
     var lastKnownValue: Double
