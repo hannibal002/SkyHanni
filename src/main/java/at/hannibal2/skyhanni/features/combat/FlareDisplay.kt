@@ -100,7 +100,7 @@ object FlareDisplay {
                     }
                 }
             }
-            if (remainingTime > 5.seconds) continue
+            if (remainingTime > 5.seconds || remainingTime < 0.seconds) continue
             val message = "$name §eexpires in: §b${remainingTime.inWholeSeconds}s"
             when (config.alertType) {
                 FlareConfig.AlertType.CHAT -> {
@@ -194,7 +194,6 @@ object FlareDisplay {
         SOS("§5SOS Flare", "+125%"),
         ALERT("§9Alert Flare", "+50%"),
         WARNING("§aWarning Flare", null),
-        ;
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
