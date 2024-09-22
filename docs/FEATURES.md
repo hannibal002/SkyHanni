@@ -864,6 +864,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Option to show the walls also when inside the Nucleus.
 + Fossil Excavator Solver. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1427)
     + Shows where to next click for optimal chance of solving the fossil. If there is a fossil this will find it within 18 moves.
++ Hides tooltips of items inside the Fossil Excavator in Glacite Tunnels. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2539)
 + Excavation Profit Tracker. - hannibal2 + Empa (https://github.com/hannibal002/SkyHanni/pull/1432)
     + Count all drops you gain while excavating in the Fossil Research Center.
     + Track Glacite Powder gained as well (no profit, but progress).
@@ -989,6 +990,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Use /shhoppitystats for live stats.
 + Added optional warning when Hoppity calls you with a rabbit to sell. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2272)
 + Added hotkey for picking up Abiphone calls from Hoppity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2272)
++ Added a draggable list for Hoppity's Collection menu rabbit highlighting. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
+    + Factory/Shop milestones = Yellow/Gold.
+    + Stray rabbits = Dark Aqua.
+    + Abi = Dark Green.
++ Added a toggle to highlight found rabbits in Hoppity's Collection menu. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
++ Added the ability to change the color of missing rabbit dyes in Hoppity's Collection to reflect rabbit rarity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2522)
 
 ### The Carnival
 
@@ -1322,9 +1329,16 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Added to the Item Number list.
 + Added Compact Experimentation Table chat rewards. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2209)
     + Uses a compact chat message of rewards gained from Add-ons/Experiments.
++ Added Superpair Display. - ILike2WatchMemes  (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Displays found and matched pairs, power-ups, and missing pairs/normals.
++ Added Experiments Dry-Streak Display. - ILike2WatchMemes  (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Shows attempts and XP since the last ULTRA-RARE.
++ Added Experiments Profit Tracker. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2171)
+    + Tracks profits in Coins and Enchanting XP.
 + In-Water Display. - Stella (https://github.com/hannibal002/SkyHanni/pull/1892)
     + Useful when using a Prismarine Blade in Stranded Mode.
 + Added Beacon Power Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/1901)
++ Added highlighting for the active Beacon Effect. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2546)
 + Added Hide Useless Armor Stands. - Empa (https://github.com/hannibal002/SkyHanni/pull/1962)
     + Hides armor stands that briefly appear on Hypixel.
 + **Custom Wardrobe**, a new look for the wardrobe. - j10an15, Empa (https://github.com/hannibal002/SkyHanni/pull/2039)
@@ -1367,6 +1381,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added option to hide pet nametag text. - Empa + j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1880)
 + Added Transfer Cooldown Prevention. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/1751)
     + Wait for the transfer cooldown to complete before sending commands like warp/is/hub.
++ Added Carry Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2185)
+    + Use `/shcarry` to add carries to a customer, and set a price for a slayer boss.
+    + Automatically counts slayer bosses you carry.
+    + Automatically tracks coins received from customers via `/trade`.
 
 </details>
 <details open><summary>
