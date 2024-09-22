@@ -25,7 +25,7 @@ object CurrentMayorScreen : ElectionViewerScreen() {
             listOf(
                 Renderable.string("Current Mayor & Minister", horizontalAlign = HorizontalAlignment.CENTER),
                 Renderable.string(
-                    "Next election in §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}",
+                    "New Mayor in §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}",
                     horizontalAlign = HorizontalAlignment.CENTER,
                 ),
                 Renderable.horizontalContainer(
