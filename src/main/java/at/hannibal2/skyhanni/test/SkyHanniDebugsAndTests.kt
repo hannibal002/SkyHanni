@@ -133,34 +133,13 @@ object SkyHanniDebugsAndTests {
 
     fun testCommand(args: Array<String>) {
 
-//            val a = Thread { OSUtils.copyToClipboard("123") }
-//            val b = Thread { OSUtils.copyToClipboard("456") }
-//            a.start()
-//            b.start()
+SkyHanniMod.coroutineScope.launch {
+            asyncTest()
+        }
+    }
 
-//            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
-//                println("$i: '$s'")
-//            }
+    private fun asyncTest() {
 
-//            val name = args[0]
-//            val pitch = args[1].toFloat()
-//            val sound = SoundUtils.createSound("note.harp", 1.35f)
-//            val sound = SoundUtils.createSound("random.orb", 11.2f)
-//            SoundUtils.createSound(name, pitch).playSound()
-
-//            a = args[0].toDouble()
-//            b = args[1].toDouble()
-//            c = args[2].toDouble()
-
-//            for (line in getPlayerTabOverlay().footer.unformattedText
-//                .split("\n")) {
-//                println("footer: '$line'")
-//            }
-//
-//
-//            for (line in TabListUtils.getTabList()) {
-//                println("tablist: '$line'")
-//            }
     }
 
     fun findNullConfig(args: Array<String>) {

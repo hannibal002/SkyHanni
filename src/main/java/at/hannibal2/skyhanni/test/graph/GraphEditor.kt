@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.test
+package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
+import at.hannibal2.skyhanni.utils.RaycastUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
@@ -127,6 +128,7 @@ object GraphEditor {
         if (!inEditMode && !inTextMode) {
             add("§ePlace: §6${KeyboardManager.getKeyName(config.placeKey)}")
             add("§eSelect: §6${KeyboardManager.getKeyName(config.selectKey)}")
+            add("§eSelect (Look): §6${KeyboardManager.getKeyName(config.selectRaycastKey)}")
             add("§eConnect: §6${KeyboardManager.getKeyName(config.connectKey)}")
             add("§eTest: §6${KeyboardManager.getKeyName(config.dijkstraKey)}")
             add("§eVision: §6${KeyboardManager.getKeyName(config.throughBlocksKey)}")
@@ -259,7 +261,9 @@ object GraphEditor {
         }
     }
 
-    private fun chatAtDisable() = ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.", ::commandIn)
+    private fun chatAtDisable() = ChatUtils.clickableChat("Graph Editor is now inactive. §lClick to activate.",
+        GraphEditor::commandIn
+    )
 
     private fun input() {
         if (LorenzUtils.isAnyGuiActive()) return
@@ -346,13 +350,35 @@ object GraphEditor {
                 closedNode
             }
         }
+        if (config.selectRaycastKey.isKeyClicked()) {
+            val playerRay = RaycastUtils.createPlayerLookDirectionRay()
+            var minimumDistance = Double.MAX_VALUE
+            var minimumNode: GraphingNode? = null
+            for (node in nodes) {
+                val nodeCenterPosition = node.position.add(0.5, 0.5, 0.5)
+                val distance = RaycastUtils.findDistanceToRay(playerRay, nodeCenterPosition)
+                if (distance > minimumDistance) {
+                    continue
+                }
+                if (minimumDistance > 1.0) {
+                    minimumNode = node
+                    minimumDistance = distance
+                    continue
+                }
+                if (minimumNode == null || minimumNode.position.distanceSqToPlayer() > node.position.distanceSqToPlayer()) {
+                    minimumNode = node
+                    minimumDistance = distance
+                }
+            }
+            activeNode = minimumNode
+        }
         if (activeNode != closedNode && config.connectKey.isKeyClicked()) {
             val edge = getEdgeIndex(activeNode, closedNode)
             if (edge == null) {
                 addEdge(activeNode, closedNode)
                 feedBackInTutorial("Added new edge.")
             } else {
-                this.edges.removeAt(edge)
+                edges.removeAt(edge)
                 checkDissolve()
                 selectedEdge = findEdgeBetweenActiveAndClosed()
                 feedBackInTutorial("Removed edge.")
@@ -405,6 +431,7 @@ object GraphEditor {
         val compileGraph = compileGraph()
         if (config.useAsIslandArea) {
             IslandGraphs.setNewGraph(compileGraph)
+            GraphEditorBugFinder.runTests()
         }
         val json = compileGraph.toJson()
         OSUtils.copyToClipboard(json)
@@ -457,7 +484,7 @@ object GraphEditor {
                 nodes.remove(closedNode)
                 edges.removeIf { it.isInEdge(closedNode) }
                 if (closedNode == activeNode) activeNode = null
-                this.closedNode = null
+                GraphEditor.closedNode = null
                 return
             }
         }
@@ -505,7 +532,7 @@ object GraphEditor {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
         val nodes = nodes.mapIndexed { index, it -> GraphNode(index, it.position, it.name, it.tags.mapNotNull { it.internalName }) }
-        val neighbours = this.nodes.map { node ->
+        val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
@@ -523,7 +550,7 @@ object GraphEditor {
                     it.id,
                     it.position,
                     it.name,
-                    it.tagNames?.mapNotNull { GraphNodeTag.byId(it) }?.toMutableList() ?: mutableListOf(),
+                    it.tagNames.mapNotNull { tag -> GraphNodeTag.byId(tag) }.toMutableList(),
                 )
             },
         )
