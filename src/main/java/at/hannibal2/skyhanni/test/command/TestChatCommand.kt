@@ -23,7 +23,6 @@ object TestChatCommand {
             return
         }
 
-
         SkyHanniMod.launchCoroutine {
             val mutArgs = args.toMutableList()
             val multiLines = mutArgs.remove("-lines")
