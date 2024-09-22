@@ -262,7 +262,7 @@ object HoppityCollectionStats {
                     else -> "" // Never happens
                 }
 
-                //List indexing is weird
+                // List indexing is weird
                 existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount"
                 existingLore[replaceIndex] = "§7all-time §6Chocolate."
                 return existingLore

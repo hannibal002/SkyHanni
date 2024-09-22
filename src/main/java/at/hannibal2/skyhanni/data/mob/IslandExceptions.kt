@@ -104,7 +104,7 @@ object IslandExceptions {
         nextEntity: EntityLivingBase?,
         armorStand: EntityArmorStand?,
     ) = when {
-        baseEntity is EntitySlime && nextEntity is EntitySlime -> MobData.MobResult.illegal// Bacte Tentacle
+        baseEntity is EntitySlime && nextEntity is EntitySlime -> MobData.MobResult.illegal // Bacte Tentacle
         baseEntity is EntitySlime && armorStand != null && armorStand.cleanName().startsWith("﴾ [Lv10] B") ->
             MobData.MobResult.found(Mob(baseEntity, Mob.Type.BOSS, armorStand, name = "Bacte"))
 

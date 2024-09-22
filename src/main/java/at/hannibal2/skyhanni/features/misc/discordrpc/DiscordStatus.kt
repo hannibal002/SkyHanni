@@ -113,7 +113,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 lastKnownDisplayStrings[LOCATION] = location
             }
         }
-        lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
+        lastKnownDisplayStrings[LOCATION] ?: "None" // only display None if we don't have a last known area
     }),
 
     PURSE({

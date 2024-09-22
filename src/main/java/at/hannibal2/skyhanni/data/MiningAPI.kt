@@ -120,7 +120,6 @@ object MiningAPI {
     fun onBlockClick(event: BlockClickEvent) {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        //println(event.getBlockState.properties)
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         recentClickedBlocks += event.position to SimpleTimeMark.now()
     }
@@ -146,7 +145,6 @@ object MiningAPI {
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName !in allowedSoundNames) return
-        //println("Sound: ${event.soundName} ${event.pitch} ${event.volume} ${event.location.toCleanString()}")
         if (waitingForInitSound) {
             if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
@@ -181,7 +179,6 @@ object MiningAPI {
 
         val pos = event.location
         if (pos.distanceToPlayer() > 7) return
-        //println("Block change: $oldState -> $newState ${pos.toCleanString()}")
 
         if (lastInitSound.passedSince() > 100.milliseconds) return
 

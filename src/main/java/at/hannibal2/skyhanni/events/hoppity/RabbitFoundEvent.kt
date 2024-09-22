@@ -11,5 +11,4 @@ class RabbitFoundEvent(
 ) : SkyHanniEvent() {
     override fun toString(): String =
         "§fType§7: ${eggType.coloredName}\n§fDuplicate§7: §b$duplicate\n§fRabbit§7: $rabbitName\n§fChoc Gained§7: §6$chocGained"
-    val ignore = "Colour"
 }

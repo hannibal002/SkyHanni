@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import java.lang.ArithmeticException
 import net.minecraft.event.HoverEvent
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
@@ -212,7 +211,7 @@ object EnchantParser {
                 "Item has enchants in nbt but none were found?",
                 "item" to currentItem,
                 "loreList" to loreList,
-                "nbt" to currentItem?.getExtraAttributes()
+                "nbt" to currentItem?.getExtraAttributes(),
             )
             return
         } catch (e: ConcurrentModificationException) {
@@ -221,7 +220,7 @@ object EnchantParser {
                 "ConcurrentModificationException whilst formatting enchants",
                 "loreList" to loreList,
                 "format" to config.format.get(),
-                "orderedEnchants" to orderedEnchants
+                "orderedEnchants" to orderedEnchants,
             )
         }
 

@@ -204,14 +204,14 @@ object ChocolateFactoryStrayTracker {
 
         // "Base" strays - Common -> Epic, raw choc only reward.
         strayLorePattern.matchMatcher(loreLine) {
-            //Pretty sure base strays max at Epic, but...
+            // Pretty sure base strays max at Epic, but...
             val rarity = HoppityAPI.rarityByRabbit(group("rabbit")) ?: return@matchMatcher
             incrementRarity(rarity, group("amount").formatLong())
         }
 
         // Fish the Rabbit
         fishTheRabbitPattern.matchMatcher(loreLine) {
-            //Also fairly sure that Fish maxes out at Rare, but...
+            // Also fairly sure that Fish maxes out at Rare, but...
             val rarity = HoppityAPI.rarityByRabbit(group("color")) ?: return@matchMatcher
             incrementRarity(rarity, group("amount").formatLong())
         }
