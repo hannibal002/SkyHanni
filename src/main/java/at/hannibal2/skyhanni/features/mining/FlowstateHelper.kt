@@ -31,7 +31,6 @@ object FlowstateHelper {
     private var displayDirty = false
 
     private var flowstateCache: Int? = null
-    private var hasChangedItem = true
 
     private val pickobulusPattern by RepoPattern.pattern(
         "mining.pickobulus.blockdestroy",
@@ -42,7 +41,8 @@ object FlowstateHelper {
         TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
         TIMER("Time Remaining: §b6.71", Renderable.string("")),
         STREAK("Streak: §7234", Renderable.string("")),
-        SPEED("§6+600⸕", Renderable.string(""));
+        SPEED("§6+600⸕", Renderable.string("")),
+        ;
 
         override fun toString() = label
 
@@ -57,7 +57,7 @@ object FlowstateHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockMined(event: OreMinedEvent) {
         if (!MiningAPI.inCustomMiningIsland()) return
-        if (hasFlowstate() == null) return
+        if (flowstateCache == null) return
 
         streakEndTimer = SimpleTimeMark.now().plus(10.seconds)
         blockBreakStreak += event.extraBlocks.values.sum()
@@ -69,7 +69,7 @@ object FlowstateHelper {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) { //TODO: Remove once #2540 is merged
         if (!MiningAPI.inCustomMiningIsland()) return
-        if (hasFlowstate() == null) return
+        if (flowstateCache == null) return
 
         pickobulusPattern.matchMatcher(event.message) {
             streakEndTimer = SimpleTimeMark.now().plus(10.seconds)
@@ -98,7 +98,7 @@ object FlowstateHelper {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!MiningAPI.inCustomMiningIsland()) return
         if (!config.flowstateHelper) return
-        if (hasFlowstate() == null) return
+        if (flowstateCache == null) return
 
         if (display == null || streakEndTimer.isInFuture()) createDisplay()
         display?.let {
@@ -143,31 +143,26 @@ object FlowstateHelper {
     }
 
     private fun getSpeedBonus(): Int {
-        val flowstateLevel = hasFlowstate() ?: 0
+        val flowstateLevel = flowstateCache ?: 0
         if (blockBreakStreak >= 200) return 200 * flowstateLevel
         return blockBreakStreak * flowstateLevel
     }
 
     @SubscribeEvent
     fun onChangeItem(event: ItemInHandChangeEvent) {
-        hasChangedItem = true
+        hasFlowstate()
     }
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        blockBreakStreak = 0
-        displayDirty = true
-        streakEndTimer = SimpleTimeMark.now()
-        createDisplay()
+        streakEndTimer = SimpleTimeMark.farPast()
+        attemptClearDisplay()
     }
 
     private fun hasFlowstate(): Int? {
-        if (hasChangedItem) {
-            val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: return null
-            if ("ultimate_flowstate" !in enchantList) return null
-            flowstateCache = enchantList.getValue("ultimate_flowstate")
-            hasChangedItem = false
-        }
+        val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: return null
+        if ("ultimate_flowstate" !in enchantList) return null
+        flowstateCache = enchantList.getValue("ultimate_flowstate")
         return flowstateCache
     }
 }
