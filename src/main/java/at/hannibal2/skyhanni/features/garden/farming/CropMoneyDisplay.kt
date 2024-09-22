@@ -97,6 +97,7 @@ object CropMoneyDisplay {
         display = drawDisplay()
     }
 
+    // TODO: Split up this 150 line function
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
 

@@ -137,6 +137,7 @@ object SkyHanniDebugsAndTests {
         }
     }
 
+    @Suppress("EmptyFunctionBlock")
     private fun asyncTest() {}
 
     @Suppress("UNUSED_PARAMETER")
@@ -483,10 +484,6 @@ object SkyHanniDebugsAndTests {
         }
         val name = itemStack.itemName
         event.toolTip.add("Item name: '$name§7'")
-    }
-
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
     }
 
     @SubscribeEvent

@@ -145,6 +145,7 @@ object GhostCounter {
         display = formatDisplay(drawDisplay())
     }
 
+    // TODO: Split up this 150 line function
     private fun drawDisplay() = buildList<List<Any>> {
         val textFormatting = config.textFormatting
         val ghostKillPerSorrow: Int = when (Option.SORROWCOUNT.get()) {

@@ -67,6 +67,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
+@Suppress("LargeClass")
 object DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null

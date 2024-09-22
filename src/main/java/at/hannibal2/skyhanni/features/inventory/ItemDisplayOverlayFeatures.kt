@@ -114,6 +114,7 @@ object ItemDisplayOverlayFeatures {
         event.stackTip = getStackTip(event.stack) ?: return
     }
 
+    // TODO: Split up this 200 line function
     private fun getStackTip(item: ItemStack): String? {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
@@ -319,7 +320,7 @@ object ItemDisplayOverlayFeatures {
         return null
     }
 
-    fun isOwnItem(lore: List<String>) =
+    private fun isOwnItem(lore: List<String>) =
         lore.none {
             it.contains("Click to trade!") ||
                 it.contains("Starting bid:") ||

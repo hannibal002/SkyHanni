@@ -185,6 +185,7 @@ object Commands {
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
+    @Suppress("LongMethod")
     private fun usersNormal() {
         registerCommand(
             "shmarkplayer",
@@ -505,6 +506,7 @@ object Commands {
         ) { MobDetection.watchdogCommand() }
     }
 
+    @Suppress("LongMethod")
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }

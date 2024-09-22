@@ -47,9 +47,9 @@ formatting:
         active: false
 
 complexity:
-    CyclomaticComplexMethod:
+    CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method
         active: true
-        threshold: 20
+        threshold: 25
         ignoreAnnotated:
             - 'SubscribeEvent'
             - 'HandleEvent'
@@ -65,6 +65,18 @@ complexity:
         thresholdInInterfaces: 20
         thresholdInObjects: 20
         thresholdInEnums: 11
+        ignoreAnnotated:
+            - 'SkyhanniModule'
+    ComplexCondition: # aggressive by default, at a complexity of 4
+        active: true
+        threshold: 6
+    LongMethod: # default max length of 60, caught way too much
+        active: true
+        threshold: 100
+        ignoreAnnotated:
+            - 'SubscribeEvent'
+            - 'HandleEvent'
+            - 'Mod.EventHandler'
 
 exceptions:
     SwallowedException: # there are valid reasons to do this

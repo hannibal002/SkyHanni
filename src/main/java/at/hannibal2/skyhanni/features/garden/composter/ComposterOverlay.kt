@@ -564,18 +564,25 @@ object ComposterOverlay {
         }
     }
 
+    private val ignoredInternalNames = listOf(
+        "POTION_AFFINITY_TALISMAN",
+        "CROPIE_TALISMAN",
+        "SPEED_TALISMAN",
+        "SIMPLE_CARROT_CANDY",
+    )
+
+    private val ignoredInternalEndings = listOf(
+        "_BOOTS",
+        "_HELMET",
+        "_CHESTPLATE",
+        "_LEGGINGS",
+    )
+
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
         for ((internalName, _) in NEUItems.allNeuRepoItems()) {
-            if (internalName == "POTION_AFFINITY_TALISMAN"
-                || internalName == "CROPIE_TALISMAN"
-                || internalName.endsWith("_BOOTS")
-                || internalName.endsWith("_HELMET")
-                || internalName.endsWith("_CHESTPLATE")
-                || internalName.endsWith("_LEGGINGS")
-                || internalName == "SPEED_TALISMAN"
-                || internalName == "SIMPLE_CARROT_CANDY"
-            ) continue
+            if (ignoredInternalNames.any { internalName.contains(it) }) continue
+            if (ignoredInternalEndings.any { internalName.endsWith(it) }) continue
 
             var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
             if (amount <= 9) continue
