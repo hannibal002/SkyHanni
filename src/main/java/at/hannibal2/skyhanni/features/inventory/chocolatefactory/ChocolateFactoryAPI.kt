@@ -84,7 +84,6 @@ object ChocolateFactoryAPI {
     var maxRabbits = 395
 
     var maxMilestoneChocolate = 700_000_000_000L
-    var chocolateMilestones = TreeSet<Long>()
     private var chocolateMilestones = TreeSet<Long>()
     private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
