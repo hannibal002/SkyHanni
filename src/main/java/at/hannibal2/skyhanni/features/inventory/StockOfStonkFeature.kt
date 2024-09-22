@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.transformAt
+import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -84,7 +85,7 @@ object StockOfStonkFeature {
             }
             bidPattern.matchMatcher(line) {
                 val cost = group("amount").replace(",", "").toLong()
-                val ratio = cost / stonksReward
+                val ratio = cost / stonksReward.transformIf({ this == 0 }, { 1 })
                 event.toolTip[index - 1] = line + " §7(§6§6${ratio.addSeparators()} §7per)" // double §6 for the replacement at the end
                 if (ratio < bestRatio) {
                     bestValueIndex = index - 1
