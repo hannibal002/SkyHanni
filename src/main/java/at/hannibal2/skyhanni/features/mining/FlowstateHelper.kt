@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -38,13 +39,11 @@ object FlowstateHelper {
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!"
     )
 
-    private val emptyEnderable = Renderable.string("")
-
-    enum class GUIElements(val label: String, var renderable: Renderable) {
+    enum class GUIElements(val label: String, var renderable: Renderable = Renderable.string("")) {
         TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
-        TIMER("Time Remaining: §b6.71", emptyEnderable),
-        STREAK("Streak: §7234", emptyEnderable),
-        SPEED("§6+600⸕", emptyEnderable),
+        TIMER("Time Remaining: §b6.71"),
+        STREAK("Streak: §7234"),
+        SPEED("§6+600⸕"),
         ;
 
         override fun toString() = label
@@ -55,8 +54,12 @@ object FlowstateHelper {
                     var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
                     if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
 
-                    renderable = Renderable
-                        .string("Time Remaining: §b${timeRemaining.format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true)}")
+                    renderable = Renderable.string(
+                        "Time Remaining: ${getTimerColor(timeRemaining)}${
+                            timeRemaining.format(
+                                TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true
+                            )
+                        }")
                 }
                 STREAK -> {
                     val textColor = if (blockBreakStreak < 200) "§7" else "§f"
@@ -146,6 +149,16 @@ object FlowstateHelper {
     fun onIslandChange(event: IslandChangeEvent) {
         streakEndTimer = SimpleTimeMark.farPast()
         attemptClearDisplay()
+    }
+
+    private fun getTimerColor(timeRemaining: Duration): String {
+        if (!config.colorfulTimer) return "§6"
+        return when (timeRemaining) {
+            in 0.seconds..3.seconds -> "§c"
+            in 3.seconds..6.seconds -> "§e"
+            in 6.seconds..10.seconds -> "§a"
+            else -> "§6"
+        }
     }
 
     private fun hasFlowstate() {
