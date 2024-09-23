@@ -24,9 +24,9 @@ object SpringBootsHelper {
     @SubscribeEvent
     fun onSound(event: PlaySoundEvent) {
         if (!isEnabled()) return
-        if (!(event.soundName == "note.pling" || event.soundName == "fireworks.launch")) return // event.soundName == "note.hat" ||
+        if (!(event.soundName == "note.pling" || event.soundName == "fireworks.launch" || event.soundName == "random.eat")) return
         if (InventoryUtils.getBoots()?.getInternalName()?.asString() != "SPRING_BOOTS") return
-        if (event.soundName == "fireworks.launch") {
+        if (event.soundName == "fireworks.launch" || event.soundName == "random.eat") {
             soundStreak = 0
             return
         }
