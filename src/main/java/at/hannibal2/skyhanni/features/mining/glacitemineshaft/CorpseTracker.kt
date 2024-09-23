@@ -3,10 +3,14 @@ package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.CorpseLootedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
@@ -134,6 +138,20 @@ object CorpseTracker {
         if (event.newIsland == IslandType.MINESHAFT || event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()
         }
+    }
+
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled()) return
+        ProfileStorageData.profileSpecific?.mining?.mineshaft?.corpseProfitTracker?.let { trackerData ->
+            trackerData.getSelectedBucket()?.let {
+                tracker.addItem(it, event.internalName, event.amount)
+                ChatUtils.chat("Added ${event.internalName.itemName} §8x${event.amount} to Corpse Tracker §8(${it.displayName}§8)§e.")
+            } ?: ChatUtils.chat(
+                "§cYou do not have a Corpse Type selected, and cannot add loot to this tracker generically.\n" +
+                "§eSelect a type in the GUI in your inventory, then re-run this command."
+            )
+        } ?: ErrorManager.skyHanniError("Could not fetch profile storage data for CorpseTracker.")
     }
 
     fun resetCommand() {

@@ -36,7 +36,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         addItem(bucket, SKYBLOCK_COIN, coins)
     }
 
-    fun addItem(bucket: E, internalName: NEUInternalName, amount: Int) {
+    fun addItem(bucket: E, internalName: NEUInternalName, amount: Int, manuallyAdded: Boolean = false) {
         modify {
             it.addItem(bucket, internalName, amount)
         }
@@ -46,10 +46,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         }
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat) {
+        if (config.warnings.chat && price >= config.warnings.minimumChat && !manuallyAdded) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
-        if (config.warnings.title && price >= config.warnings.minimumTitle) {
+        if (config.warnings.title && price >= config.warnings.minimumTitle && !manuallyAdded) {
             LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
