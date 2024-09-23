@@ -34,11 +34,11 @@ object NavigationHelper {
 
     fun onCommand(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            asyncTest(args)
+            doCommandAsync(args)
         }
     }
 
-    private fun asyncTest(args: Array<String>) {
+    private fun doCommandAsync(args: Array<String>) {
         val searchTerm = args.joinToString(" ").lowercase()
         val distances = calculateDistances(searchTerm)
         val names = calculateNames(distances)
@@ -60,7 +60,8 @@ object NavigationHelper {
             }
             val tag = node.tags.first { it in allowedTags }
             // TODO include most closest area, if this is no area (type in area = forger in forge)
-            component.hover = ("§eClick to start navigating to\n" + "§7Type: §r${tag.displayName}\n" + "§7Distance: §e$distance blocks").asComponent()
+            component.hover =
+                ("§eClick to start navigating to\n" + "§7Type: §r${tag.displayName}\n" + "§7Distance: §e$distance blocks").asComponent()
             text.add(component)
         }
         text.add(Text.createDivider())
@@ -94,11 +95,11 @@ object NavigationHelper {
         val distances = mutableMapOf<GraphNode, Double>()
         for (node in nodes) {
             val name = node.name ?: continue
-            if (!node.tags.any { it in allowedTags }) continue
+            val remainingTags = node.tags.filter { it in allowedTags }
+            if (remainingTags.isEmpty()) continue
             if (name.lowercase().contains(searchTerm)) {
                 distances[node] = grapth.findShortestDistance(closedNote, node)
             }
-            val remainingTags = node.tags.filter { it in allowedTags }
             if (remainingTags.size != 1) {
                 println("found node with invalid amount of tags: ${node.name} (${remainingTags.map { it.cleanName }}")
             }
