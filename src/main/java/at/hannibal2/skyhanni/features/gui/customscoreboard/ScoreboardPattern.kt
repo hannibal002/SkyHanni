@@ -246,13 +246,17 @@ object ScoreboardPattern {
         "raffleuseless",
         "^(Find tickets on the|ground and bring them|to the raffle box)$",
     )
+
+    /**
+     * REGEX-TEST: Tickets: §a8 §7(17.4%)
+     */
     val raffleTicketsPattern by miningSb.pattern(
         "raffletickets",
-        "^Tickets: §a\\d+ §7\\(\\d{1,3}\\.\\d%\\)$",
+        "Tickets: §a\\d+ §7\\(\\d+(\\.\\d)?%\\)",
     )
     val rafflePoolPattern by miningSb.pattern(
         "rafflepool",
-        "^Pool: §6\\d+§8/500$",
+        "Pool: §6\\d+",
     )
     val mithrilUselessPattern by miningSb.pattern(
         "mithriluseless",

@@ -46,7 +46,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -250,13 +249,14 @@ object GardenVisitorFeatures {
 
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
-            ?.allIngredients() ?: emptySet()
+            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            ?.ingredients ?: emptySet()
         if (ingredients.isEmpty()) return
 
+        // TODO change key to NEUInternalName
         val requiredIngredients = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
-            val key = ingredient.internalItemId
+            val key = ingredient.internalName.asString()
             requiredIngredients[key] =
                 requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
         }

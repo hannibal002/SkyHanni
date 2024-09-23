@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -74,17 +73,18 @@ object GardenVisitorSupercraft {
     private fun getSupercraftForSacks(internalName: NEUInternalName, amount: Int) {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .firstOrNull { !it.allIngredients().first().internalItemId.contains("PEST") }
-            ?.allIngredients() ?: return
+            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            ?.ingredients ?: return
+        // TODO change key to NEUInternalName
         val ingredientReqs = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
-            val key = ingredient.internalItemId
+            val key = ingredient.internalName.asString()
             ingredientReqs[key] = ingredientReqs.getOrDefault(key, 0) + ingredient.count.toInt()
         }
         hasIngredients = true
         for ((key, value) in ingredientReqs) {
             val sackItem = key.asInternalName().getAmountInSacks()
-            lastSuperCraftMaterial = internalName.itemName.removeColor()
+            lastSuperCraftMaterial = internalName.asString()
             if (sackItem < value * amount) {
                 hasIngredients = false
                 break
@@ -109,7 +109,7 @@ object GardenVisitorSupercraft {
         if (event.slotId != 31) return
         event.cancel()
         if (lastClick.passedSince() > 0.3.seconds) {
-            HypixelCommands.recipe(lastSuperCraftMaterial)
+            HypixelCommands.viewRecipe(lastSuperCraftMaterial)
             lastClick = SimpleTimeMark.now()
         }
     }
