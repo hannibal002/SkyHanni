@@ -33,7 +33,7 @@ object ReindrakeWarpHelper {
         ChatUtils.clickToActionOrDisable(
             "Click to warp to the Winter Island spawn!",
             config::reindrakeWarpHelper,
-            actionName = "Reindrake Warp Helper",
+            actionName = "warp to winter island spawn",
             action = { HypixelCommands.warp("winter") }
         )
     }
