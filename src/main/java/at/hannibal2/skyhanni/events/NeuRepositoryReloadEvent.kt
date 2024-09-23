@@ -15,9 +15,7 @@ import java.io.File
 import java.lang.reflect.Type
 
 class NeuRepositoryReloadEvent : LorenzEvent() {
-    fun getConstant(file: String): JsonObject? {
-        return File(manager.repoLocation, "constants/$file.json").getJson()
-    }
+    fun getConstant(file: String): JsonObject? = File(manager.repoLocation, "constants/$file.json").getJson()
 
     inline fun <reified T : Any> readConstant(file: String, gson: Gson = ConfigManager.gson): T {
         val data = getConstant(file) ?: ErrorManager.skyHanniError("$file failed to load from neu repo!")
