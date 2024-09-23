@@ -56,7 +56,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FilenameUtils
@@ -241,7 +240,7 @@ object GhostCounter {
             }
         }
 
-        addAsSingletonList(Utils.chromaStringByColourCode(textFormatting.titleFormat.replace("&", "§")))
+        addAsSingletonList(textFormatting.titleFormat.replace("&", "§"))
         addAsSingletonList(textFormatting.ghostKilledFormat.formatText(KILLS))
         addAsSingletonList(textFormatting.sorrowsFormat.formatText(Option.SORROWCOUNT))
         addAsSingletonList(textFormatting.ghostSinceSorrowFormat.formatText(Option.GHOSTSINCESORROW.getInt()))

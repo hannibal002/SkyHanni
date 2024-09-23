@@ -22,6 +22,7 @@ import com.google.common.collect.Lists
 import io.github.moulberry.notenoughupdates.util.NotificationHandler
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
@@ -43,14 +44,23 @@ object ItemUtils {
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    fun ItemStack.getLore(): List<String> {
-        val tagCompound = this.tagCompound ?: return emptyList()
-        val tagList = tagCompound.getCompoundTag("display").getTagList("Lore", 8)
+    fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+
+    fun NBTTagCompound?.getLore(): List<String> {
+        this ?: return emptyList()
+        val tagList = this.getCompoundTag("display").getTagList("Lore", 8)
         val list: MutableList<String> = ArrayList()
         for (i in 0 until tagList.tagCount()) {
             list.add(tagList.getStringTagAt(i))
         }
         return list
+    }
+
+    fun getDisplayName(compound: NBTTagCompound?): String? {
+        compound ?: return null
+        val name = compound.getCompoundTag("display").getString("Name")
+        if (name == null || name.isEmpty()) return null
+        return name
     }
 
     fun ItemStack.setLore(lore: List<String>): ItemStack {
@@ -67,11 +77,13 @@ object ItemUtils {
     }
 
     var ItemStack.extraAttributes: NBTTagCompound
-        get() = this.tagCompound?.getCompoundTag("ExtraAttributes") ?: NBTTagCompound()
+        get() = this.tagCompound?.extraAttributes ?: NBTTagCompound()
         set(value) {
             val tag = this.tagCompound ?: NBTTagCompound().also { tagCompound = it }
             tag.setTag("ExtraAttributes", value)
         }
+
+    val NBTTagCompound.extraAttributes: NBTTagCompound get() = this.getCompoundTag("ExtraAttributes")
 
     fun ItemStack.overrideId(id: String): ItemStack {
         extraAttributes = extraAttributes.apply { setString("id", id) }
@@ -181,6 +193,20 @@ object ItemUtils {
         tag.setTag("SkullOwner", skullOwner)
         render.tagCompound = tag
         return render
+    }
+
+    fun createItemStack(item: Item, displayName: String, vararg lore: String): ItemStack {
+        return createItemStack(item, displayName, lore.toList())
+    }
+
+    // Taken from NEU
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+        val stack = ItemStack(item, amount, damage)
+        val tag = NBTTagCompound()
+        addNameAndLore(tag, displayName, *lore.toTypedArray())
+        tag.setInteger("HideFlags", 254)
+        stack.tagCompound = tag
+        return stack
     }
 
     // Taken from NEU
@@ -314,6 +340,28 @@ object ItemUtils {
         set(value) {
             setStackDisplayName(value)
         }
+
+    // Taken from NEU
+    fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+        val tag = this.tagCompound ?: NBTTagCompound()
+        val display = tag.getCompoundTag("display")
+        val loreList = NBTTagList()
+        for (line in lore) {
+            loreList.appendTag(NBTTagString(line))
+        }
+
+        display.setString("Name", displayName)
+        display.setTag("Lore", loreList)
+
+        tag.setTag("display", display)
+        tag.setInteger("HideFlags", 254)
+        if (disableNeuTooltips) {
+            tag.setBoolean("disableNeuTooltip", true)
+        }
+
+        this.tagCompound = tag
+        return this
+    }
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
