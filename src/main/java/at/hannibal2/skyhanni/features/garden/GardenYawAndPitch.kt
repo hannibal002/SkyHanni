@@ -30,7 +30,7 @@ object GardenYawAndPitch {
         if (GardenAPI.toolInHand == null && !config.showWithoutTool) return
 
         val player = Minecraft.getMinecraft().thePlayer
-        var yaw = LocationUtils.calculatePlayerYaw()
+        val yaw = LocationUtils.calculatePlayerYaw()
         val pitch = player.rotationPitch
 
         if (yaw != lastYaw || pitch != lastPitch) {
