@@ -2,21 +2,21 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import io.github.moulberry.notenoughupdates.recipes.Ingredient
 
-class PrimitiveIngredient(val internalName: NEUInternalName, val count: Int = 1) {
+class PrimitiveIngredient(val internalName: NEUInternalName, val count: Double = 1.0) {
 
     constructor(ingredientIdentifier: String) : this(
         ingredientIdentifier.substringBefore(':').asInternalName(),
-        ingredientIdentifier.substringAfter(':').formatInt(),
+        ingredientIdentifier.substringAfter(':').formatDouble(),
     )
 
     companion object {
-        fun coinIngredient(count: Double = 1.0) = PrimitiveIngredient(SKYBLOCK_COIN, count.toInt())
+        fun coinIngredient(count: Double = 1.0) = PrimitiveIngredient(SKYBLOCK_COIN, count)
 
         fun fromNeuIngredient(neuIngredient: Ingredient) =
-            PrimitiveIngredient(neuIngredient.internalItemId.asInternalName(), neuIngredient.count.toInt())
+            PrimitiveIngredient(neuIngredient.internalItemId.asInternalName(), neuIngredient.count)
     }
 
     fun isCoin() = internalName == SKYBLOCK_COIN
@@ -24,5 +24,7 @@ class PrimitiveIngredient(val internalName: NEUInternalName, val count: Int = 1)
     override fun toString() = "$internalName x$count"
 
     fun toPair() = Pair(internalName, count)
-    fun toPrimitiveItemStack() = PrimitiveItemStack(internalName, count)
+
+    // TODO should maybe throw an error when trying to use with internalName == SKYBLOCK_COIN
+    fun toPrimitiveItemStack() = PrimitiveItemStack(internalName, count.toInt())
 }

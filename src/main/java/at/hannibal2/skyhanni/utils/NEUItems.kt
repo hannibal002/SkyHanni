@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -308,8 +309,8 @@ object NEUItems {
             if (!recipe.isCraftingRecipe()) continue
 
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.getCachedIngredients()) {
-                val count = ingredient.count
+            for (ingredient in recipe.getCachedIngredients().map { it.toPrimitiveItemStack() }) {
+                val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
                 if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
@@ -331,8 +332,7 @@ object NEUItems {
                     continue
                 }
 
-                val old = map.getOrDefault(internalItemId, 0)
-                map[internalItemId] = old + count
+                map.addOrPut(internalItemId, amount)
             }
             if (map.size != 1) continue
             val current = map.iterator().next().toPair()

@@ -255,7 +255,7 @@ object GardenVisitorFeatures {
         if (ingredients.isEmpty()) return
 
         val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
-        for ((key, count) in ingredients.map { it.toPair() }) {
+        for ((key, count) in ingredients.map { it.toPrimitiveItemStack() }) {
             requiredIngredients.addOrPut(key, count)
         }
         var hasIngredients = true

@@ -198,7 +198,7 @@ object MinionCraftHelper {
             val output = recipe.output ?: continue
             if (!output.internalName.contains("_GENERATOR_")) continue
             val map = mutableMapOf<NEUInternalName, Int>()
-            for ((itemId, count) in recipe.ingredients.map { it.toPair() }) {
+            for ((itemId, count) in recipe.ingredients.map { it.toPrimitiveItemStack() }) {
                 if (minionId != itemId) {
                     map.addOrPut(itemId, count)
                 }

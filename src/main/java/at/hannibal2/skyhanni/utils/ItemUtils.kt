@@ -511,9 +511,7 @@ object ItemUtils {
 
     fun neededItems(recipe: PrimitiveRecipe): Map<NEUInternalName, Int> {
         val neededItems = mutableMapOf<NEUInternalName, Int>()
-        for (ingredient in recipe.ingredients) {
-            val material = ingredient.internalName
-            val amount = ingredient.count
+        for ((material, amount) in recipe.ingredients.map { it.toPrimitiveItemStack() }) {
             neededItems.addOrPut(material, amount)
         }
         return neededItems
