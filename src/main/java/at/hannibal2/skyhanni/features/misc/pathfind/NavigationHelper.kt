@@ -59,7 +59,8 @@ object NavigationHelper {
                 sendNavigateMessage(name, goBack)
             }
             val tag = node.tags.first { it in allowedTags }
-            component.hover = ("§eClick to start navigating to\n" + "Type: ${tag.displayName}\n" + "Distance: $distance").asComponent()
+            // TODO include most closest area, if this is no area (type in area = forger in forge)
+            component.hover = ("§eClick to start navigating to\n" + "§7Type: §r${tag.displayName}\n" + "§7Distance: §e$distance blocks").asComponent()
             text.add(component)
         }
         text.add(Text.createDivider())
