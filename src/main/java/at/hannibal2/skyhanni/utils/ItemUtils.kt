@@ -465,7 +465,7 @@ object ItemUtils {
         val neededItems = mutableMapOf<NEUInternalName, Int>()
         for (ingredient in recipe.ingredients) {
             val material = ingredient.internalName
-            val amount = ingredient.count.toInt()
+            val amount = ingredient.count
             neededItems.addOrPut(material, amount)
         }
         return neededItems
