@@ -15,7 +15,7 @@ data class PrimitiveRecipe(
     val recipeType: RecipeType,
 ) {
 
-    val output get() = outputs.firstOrNull()
+    val output by lazy { outputs.firstOrNull() }
 
     companion object {
         fun fromNeuRecipe(neuRecipe: NeuRecipe): PrimitiveRecipe {
@@ -37,7 +37,6 @@ data class PrimitiveRecipe(
 
         fun convertMultiple(neuRecipes: Collection<NeuRecipe>) = neuRecipes.map { fromNeuRecipe(it) }
     }
-
 
     fun isCraftingRecipe() = this.recipeType == CRAFTING
 }

@@ -138,7 +138,7 @@ object MinionCraftHelper {
 
             for (recipe in recipes) {
                 for (ingredient in recipe.getCachedIngredients()) {
-                    val ingredientInternalName = ingredient.internalName.asInternalName()
+                    val ingredientInternalName = ingredient.internalName
                     if (ingredientInternalName == internalName) return true
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
@@ -171,7 +171,7 @@ object MinionCraftHelper {
                     if (!recipe.isCraftingRecipe()) continue
 
                     for (ingredient in recipe.getCachedIngredients()) {
-                        val id = ingredient.internalName.asInternalName()
+                        val id = ingredient.internalName
                         if (!id.contains("_GENERATOR_") && !allIngredients.contains(id)) {
                             allIngredients.add(id)
                         }
@@ -195,11 +195,10 @@ object MinionCraftHelper {
         for (recipe in NEUItems.getRecipes(nextMinionId)) {
             if (!recipe.isCraftingRecipe()) continue
             val output = recipe.output ?: continue
-            val internalItemId = output.internalName.asInternalName()
-            if (!internalItemId.contains("_GENERATOR_")) continue
+            if (!output.internalName.contains("_GENERATOR_")) continue
             val map = mutableMapOf<NEUInternalName, Int>()
             for (input in recipe.ingredients) {
-                val itemId = input.internalName.asInternalName()
+                val itemId = input.internalName
                 if (minionId != itemId) {
                     val count = input.count.toInt()
                     val old = map.getOrDefault(itemId, 0)

@@ -311,7 +311,7 @@ object NEUItems {
             val map = mutableMapOf<NEUInternalName, Int>()
             for (ingredient in recipe.getCachedIngredients()) {
                 val count = ingredient.count.toInt()
-                var internalItemId = ingredient.internalName.asInternalName()
+                var internalItemId = ingredient.internalName
                 // ignore cactus green
                 if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
                     internalItemId = "CACTUS".asInternalName()

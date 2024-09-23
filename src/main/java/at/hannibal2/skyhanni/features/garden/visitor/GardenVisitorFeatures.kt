@@ -253,9 +253,10 @@ object GardenVisitorFeatures {
             ?.ingredients ?: emptySet()
         if (ingredients.isEmpty()) return
 
+        // TODO change key to NEUInternalName
         val requiredIngredients = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
-            val key = ingredient.internalName
+            val key = ingredient.internalName.asString()
             requiredIngredients[key] =
                 requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
         }

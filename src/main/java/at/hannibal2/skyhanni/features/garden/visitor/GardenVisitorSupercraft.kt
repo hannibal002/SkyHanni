@@ -8,13 +8,11 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.HypixelCommands
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -75,9 +73,10 @@ object GardenVisitorSupercraft {
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
             ?.ingredients ?: return
+        // TODO change key to NEUInternalName
         val ingredientReqs = mutableMapOf<String, Int>()
         for (ingredient in ingredients) {
-            val key = ingredient.internalName
+            val key = ingredient.internalName.asString()
             ingredientReqs[key] = ingredientReqs.getOrDefault(key, 0) + ingredient.count.toInt()
         }
         hasIngredients = true

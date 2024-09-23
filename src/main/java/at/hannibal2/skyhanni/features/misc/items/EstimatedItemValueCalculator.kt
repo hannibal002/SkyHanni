@@ -893,7 +893,7 @@ object EstimatedItemValueCalculator {
                 totalPrice += if (ingredient.isCoin()) {
                     ingredient.count
                 } else {
-                    ingredient.internalName.asInternalName().getPrice() * ingredient.count
+                    ingredient.internalName.getPrice() * ingredient.count
                 }
             }
 
