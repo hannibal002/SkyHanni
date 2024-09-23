@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.text.NumberFormat
+import java.util.Locale
 import java.util.TreeMap
 import kotlin.math.pow
 
 object NumberUtil {
+
+    private val config get() = SkyHanniMod.feature
 
     private val suffixes = TreeMap<Long, String>().apply {
         this[1000L] = "k"
@@ -107,7 +111,10 @@ object NumberUtil {
         return this.toString() + this.ordinal()
     }
 
-    fun Number.addSeparators(): String = NumberFormat.getNumberInstance().format(this)
+    fun Number.addSeparators(): String {
+        return if (!config.dev.numberFormatOverride) NumberFormat.getNumberInstance().format(this)
+        else NumberFormat.getNumberInstance(Locale.US).format(this)
+    }
 
     fun String.romanToDecimalIfNecessary() = toIntOrNull() ?: romanToDecimal()
 

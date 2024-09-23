@@ -122,7 +122,7 @@ object HoppityEggsManager {
 
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
-        HoppityCollectionStats.incrementRabbit(event.rabbitName)
+        HoppityCollectionStats.incrementRabbitCount(event.rabbitName)
     }
 
     @SubscribeEvent
@@ -233,7 +233,7 @@ object HoppityEggsManager {
         val message = "All $amount Hoppity Eggs are ready to be found!"
         if (config.warpUnclaimedEggs) {
             val (action, actionName) = if (LorenzUtils.inSkyBlock) {
-                { HypixelCommands.warp(config.warpDestination) } to "${"warp to ${config.warpDestination}".trim()}"
+                { HypixelCommands.warp(config.warpDestination) } to "warp to ${config.warpDestination}".trim()
             } else {
                 { HypixelCommands.skyblock() } to "join /skyblock!"
             }

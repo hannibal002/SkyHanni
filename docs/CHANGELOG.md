@@ -16,6 +16,7 @@
 + Added a "Get from Sack" button in the forge recipe menu to retrieve ingredients. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2106)
 + Added Tracker for Glacite Corpses. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2306)
     + Tracks overall loot and loot per type.
++ Hides tooltips of items inside the Fossil Excavator in Glacite Tunnels. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2539)
 
 #### Rift Features
 
@@ -122,6 +123,10 @@
 + Added Broodmother spawn alert, countdown and stage change messages. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2325)
     + Countdown will not show until a spawning stage change is observed, and may be off by a few seconds.
 + Added Broodmother support to the Damage Indicator. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2325)
++ Added Carry Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2185)
+    + Use `/shcarry` to add carries to a customer, and set a price for a slayer boss.
+    + Automatically counts slayer bosses you carry.
+    + Automatically tracks coins received from customers via `/trade`.
 
 #### Fishing Features
 
@@ -145,6 +150,7 @@
 + Added option to hide pet nametag text. - Empa + j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1880)
 + Added Transfer Cooldown Prevention. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/1751)
     + Wait for the transfer cooldown to complete before sending commands like warp/is/hub.
++ Added highlighting for the active Beacon Effect. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2546)
 
 ### Improvements
 
@@ -205,6 +211,7 @@
 + Chocolate Factory: Shows "time to next milestone" instead of "max milestone" when you are at Prestige 6. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2503)
 + Added the required chocolate amount to the tooltip of milestone rabbits in Hoppity's Collection. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2523)
 + Improved the responsiveness of Hoppity Chat Compacting. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2488)
++ Added the ability to see how many duplicates you have previously found in Hoppity messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2556)
 
 #### Combat Improvements
 
@@ -246,6 +253,7 @@
     + Search works in all SkyHanni Trackers and the Sack Display.
     + In your inventory, hover over the GUI with your mouse, then start typing to search.
 + Improved the performance of pathfinding logic in Area Navigation. - nea (https://github.com/hannibal002/SkyHanni/pull/2537)
++ Added a toggle to force the `en_US` locale for number formatting. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2563)
 
 ### Fixes
 
@@ -276,6 +284,7 @@
 + Fixed "click to show tunnel map" from the Glacite Mines commission menu appearing in the inventory. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2485)
 + Fixed Mouse Keys not working as Wardrobe Slot Hotkeys. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2506)
 + Fixed Estimated Item Value incorrectly showing all Kuudra armor as starred. - Luna (https://github.com/hannibal002/SkyHanni/pull/2550)
++ Fixed Experiments Profit Tracker & Superpair Data. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2560)
 
 #### Mining Fixes
 
@@ -295,6 +304,8 @@
 + Fixed Sky Mall perks not being read correctly after the Hypixel update. - Luna (https://github.com/hannibal002/SkyHanni/pull/2551)
 + Fixed Mining Commission Blocks Color not working properly with Connected Textures. - Empa (https://github.com/hannibal002/SkyHanni/pull/2553)
 + Fixed Gemstone Gauntlet item category. - Luna (https://github.com/hannibal002/SkyHanni/pull/2534)
++ Fixed Glacite powder being tracked as Glacite in Corpse Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2557)
++ Fixed "Mining Commissions Block Color" disabling OptiFine connected textures. - nopo (https://github.com/hannibal002/SkyHanni/pull/2559)
 
 #### Scoreboard Fixes
 
@@ -380,6 +391,8 @@
 + Fixed lag spikes in Path Finder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2525)
 + Fixed old mayor perks not being marked as inactive when the mayor changes. - Luna (https://github.com/hannibal002/SkyHanni/pull/2524)
 + Fixed direct GitHub downloads triggering the source checker. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2548)
++ Fixed reforge display not working with new mining stats. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2555)
++ Fixed Totem of Corruption expiry warning not working in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/2554)
 
 ### Technical Details
 
@@ -430,6 +443,10 @@
 + Added options to the graph node list to hide nodes with certain tags. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2537)
 + Removed the use of `LorenzChatEvent()` for 'manually' adding data to Hoppity Chat Compact. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2488)
     + Now uses `EggFoundEvent()`.
++ The Renderable Wrapped String now has an option to align text inside the wrapped string box. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2372)
++ Improved handling of unknown stats for ReforgeAPI. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2562)
++ Added `AreaChangeEvent`. - Empa (https://github.com/hannibal002/SkyHanni/pull/2535)
++ Updated `HandleEvent` to allow `onlyOnIsland` usage for a single island without brackets. - Empa (https://github.com/hannibal002/SkyHanni/pull/2535)
 
 ### Removed Features
 
@@ -437,6 +454,8 @@
     + Artist's Abode now sends a lobby-wide message for dye drops, making the notification obsolete.
 + Removed `Only Requirement Not Met` and `Highlight Requirement Rabbits` config options. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
     + Replaced then with a draggable list of different Hoppity collection highlight options.
++ Removed "Forge GfS". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2564)
+    + Hypixel now pulls directly from sacks when using the forge.
 
 ## Version 0.26
 

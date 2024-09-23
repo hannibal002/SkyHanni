@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -11,6 +13,7 @@ import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.events.player.PlayerDeathEvent
+import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.features.mining.OreBlock
 import at.hannibal2.skyhanni.features.mining.isTitanium
@@ -38,7 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
-    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Glacite Lake")
+    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
     // TODO rename to include suffix "pattern", add regex test
@@ -68,8 +71,6 @@ object MiningAPI {
 
     var currentAreaOreBlocks = setOf<OreBlock>()
         private set
-
-    private var lastSkyblockArea: String? = null
 
     private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
     private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
@@ -203,10 +204,6 @@ object MiningAPI {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!inCustomMiningIsland()) return
-
-        if (LorenzUtils.lastWorldSwitch.passedSince() < 4.seconds) return
-        updateLocation()
-
         if (currentAreaOreBlocks.isEmpty()) return
 
         // if somehow you take more than 20 seconds to mine a single block, congrats
@@ -217,6 +214,17 @@ object MiningAPI {
         if (lastInitSound.passedSince() < 200.milliseconds) return
         // in case the init block is not found
         resetOreEvent()
+    }
+
+    @HandleEvent
+    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
+        if (!inCustomMiningIsland()) return
+        updateLocation()
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        updateLocation()
     }
 
     private fun runEvent() {
@@ -287,11 +295,6 @@ object MiningAPI {
     }
 
     private fun updateLocation() {
-        val currentArea = LorenzUtils.skyBlockArea
-        // TODO add area change event with HypixelData.skyBlockArea instead
-        if (currentArea == lastSkyblockArea) return
-        lastSkyblockArea = currentArea
-
         inGlacite = inGlaciteArea()
         inTunnels = inGlacialTunnels()
         inMineshaft = inMineshaft()
