@@ -24,9 +24,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
@@ -106,6 +108,19 @@ object IslandGraphs {
 
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
+    private var inGlaciteTunnels: Boolean? = null
+
+    private val patternGroup = RepoPattern.group("data.island.navigation")
+
+    /**
+     * REGEX-TEST: Dwarven Base Camp
+     * REGEX-TEST: Forge
+     * REGEX-TEST: Fossil Research Center
+     */
+    private val glaciteTunnelsPattern by patternGroup.pattern(
+        "glacitetunnels",
+        "(Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center)",
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -118,7 +133,6 @@ object IslandGraphs {
     fun onIslandChange(event: IslandChangeEvent) {
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return
-        if (event.newIsland == IslandType.DWARVEN_MINES) return
         loadIsland(event.newIsland)
     }
 
@@ -128,16 +142,16 @@ object IslandGraphs {
         reset()
     }
 
-    private var inGlaciteTunnels: Boolean? = null
-    val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
+    fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
 
     @HandleEvent
     fun onAreaChange(event: ScoreboardAreaChangeEvent) {
-        if (!IslandType.DWARVEN_MINES.isInIsland()) return
+        if (!IslandType.DWARVEN_MINES.isInIsland()) {
+            inGlaciteTunnels = null
+            return
+        }
 
-        // TODO repo
-
-        val now = LorenzUtils.skyBlockArea in areas
+        val now = isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
             loadDwarvenMines()
@@ -145,7 +159,7 @@ object IslandGraphs {
     }
 
     private fun loadDwarvenMines() {
-        if (LorenzUtils.skyBlockArea in areas) {
+        if (isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)) {
             reloadFromJson("GLACITE_TUNNELS")
         } else {
             reloadFromJson("DWARVEN_MINES")
@@ -155,8 +169,9 @@ object IslandGraphs {
     private fun loadIsland(newIsland: IslandType) {
         if (newIsland == IslandType.DWARVEN_MINES) {
             loadDwarvenMines()
+        } else {
+            reloadFromJson(newIsland.name)
         }
-        reloadFromJson(newIsland.name)
     }
 
     private fun reloadFromJson(islandName: String) {
