@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
@@ -181,7 +181,7 @@ object CarryTracker {
         val price = rawPrice.formatDoubleOrUserError() ?: return
         carryType.pricePer = price
         update()
-        ChatUtils.chat("Set carry price for $carryType §eto §6${price.addSeparators()} coins.")
+        ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
 
     private fun getCustomer(customerName: String): Customer {
@@ -260,7 +260,7 @@ object CarryTracker {
         val totalCost = customer.carries.sumOf { it.getCost() ?: 0.0 }
         val totalCostFormat = formatCost(totalCost)
         if (totalCostFormat != "") {
-            val paidFormat = "§6${customer.alreadyPaid.addSeparators()}"
+	            val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
             val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
@@ -293,7 +293,7 @@ object CarryTracker {
         }?.takeIf { it != 0.0 }
     }
 
-    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.addSeparators()}"
+    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.shortFormat()}"
 
     private fun createCarryType(input: String): CarryType? {
         if (input.length == 1) return null
