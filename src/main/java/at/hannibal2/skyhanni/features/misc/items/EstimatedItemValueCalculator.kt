@@ -498,11 +498,6 @@ object EstimatedItemValueCalculator {
                 if (remainingStars <= 0) continue
 
                 val price = getPriceFor(prices, remainingStars) ?: return null
-                println(" ")
-                println("price for $id ($remainingStars)")
-                println("price.itemPrice: ${price.itemPrice}")
-                println("essencePrice: ${price.essencePrice}")
-                println("itemPrice: ${price.itemPrice}")
                 finalPrice = finalPrice?.let { it + price } ?: price
                 remainingStars -= prices.size
             }
