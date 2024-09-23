@@ -31,7 +31,7 @@ object ReindrakeWarpHelper {
         if (!isEnabled()) return
         if (!spawnPattern.matches(event.message)) return
         ChatUtils.clickToActionOrDisable(
-            "Click to warp to the Winter Island spawn!",
+            "A Reindrake was detected. Click to warp to the Winter Island spawn!",
             config::reindrakeWarpHelper,
             actionName = "warp to winter island spawn",
             action = { HypixelCommands.warp("winter") }
