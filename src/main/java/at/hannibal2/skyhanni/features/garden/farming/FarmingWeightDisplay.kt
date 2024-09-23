@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
@@ -447,7 +447,7 @@ object FarmingWeightDisplay {
         val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
         val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -477,7 +477,7 @@ object FarmingWeightDisplay {
     private fun loadWeight(localProfile: String) {
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         var error: Throwable? = null
 
@@ -573,7 +573,7 @@ object FarmingWeightDisplay {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         try {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)
