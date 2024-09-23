@@ -46,6 +46,7 @@ object MiningAPI {
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
+    // TODO add regex test
     private val coldResetPattern by group.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
@@ -53,16 +54,24 @@ object MiningAPI {
 
     private val pickbobulusGroup = group.group("pickobulus")
 
+    /**
+     * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
+     */
+
     private val pickobulusUsePattern by pickbobulusGroup.pattern(
         "use",
         "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
     )
 
+    // TODO add regex test
     private val pickobulusEndPattern by pickbobulusGroup.pattern(
         "end",
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>[\\d,.]+) §r§7blocks!",
     )
 
+    /**
+     * REGEX-TEST: §7Your §r§aPickobulus §r§7didn't destroy any blocks!
+     */
     private val pickobulusFailPattern by pickbobulusGroup.pattern(
         "fail",
         "§7Your §r§aPickobulus §r§7didn't destroy any blocks!"
