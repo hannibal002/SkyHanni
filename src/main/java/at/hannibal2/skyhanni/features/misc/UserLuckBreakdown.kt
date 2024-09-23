@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -160,7 +160,7 @@ object UserLuckBreakdown {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
         }
-        val limboLuck = storage?.limbo?.userLuck?.round(1) ?: 0.0f
+        val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0.0f
         when (event.slot.inventory.name) {
             "Your Equipment and Stats" -> equipmentMenuTooltip(event, limboLuck)
             "Your Stats Breakdown" -> statsBreakdownLoreTooltip(event, limboLuck)
@@ -270,7 +270,7 @@ object UserLuckBreakdown {
         calcSkillLuck()
         return when (type) {
             "mainMenu" -> {
-                val luckString = tryTruncateFloat(luckInput.round(2))
+                val luckString = tryTruncateFloat(luckInput.roundTo(2))
                 if (luckInput == 0.0f) {
                     arrayOf(
                         "§7SkyHanni User Luck is the best stat.",
@@ -293,7 +293,7 @@ object UserLuckBreakdown {
             }
 
             "limbo" -> {
-                val luckString = tryTruncateFloat(luckInput.round(2))
+                val luckString = tryTruncateFloat(luckInput.roundTo(2))
                 arrayOf(
                     "§8Action",
                     "",

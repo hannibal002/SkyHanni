@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -164,7 +164,7 @@ object IslandAreas {
                 }
             }
 
-            val distance = difference.round(1)
+            val distance = difference.roundTo(1)
             val text = "${coloredName}§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {

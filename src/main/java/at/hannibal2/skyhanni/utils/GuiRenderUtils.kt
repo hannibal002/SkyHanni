@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -204,7 +204,7 @@ object GuiRenderUtils {
                                 scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
                             ),
                             Renderable.string(
-                                "§2${(percent * 100).round(1)}%",
+                                "§2${(percent * 100).roundTo(1)}%",
                                 scale = scale,
                                 horizontalAlign = HorizontalAlignment.RIGHT,
                             ),

@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import java.io.FileReader
 
@@ -106,8 +106,8 @@ object GhostUtil {
             )
     }
 
-    fun String.formatText(value: Double, session: Double) = this.replace("%value%", value.roundToPrecision(2).addSeparators())
-        .replace("%session%", session.roundToPrecision(2).addSeparators())
+    fun String.formatText(value: Double, session: Double) = this.replace("%value%", value.roundTo(2).addSeparators())
+        .replace("%session%", session.roundTo(2).addSeparators())
         .replace("&", "§")
 
     fun String.formatBestiary(currentKill: Int, killNeeded: Int): String {
@@ -129,5 +129,5 @@ object GhostUtil {
     }
 
     private fun percent(number: Double) =
-        100.0.coerceAtMost(((number / 100_000) * 100).roundToPrecision(4)).toString()
+        100.0.coerceAtMost(((number / 100_000) * 100).roundTo(4)).toString()
 }

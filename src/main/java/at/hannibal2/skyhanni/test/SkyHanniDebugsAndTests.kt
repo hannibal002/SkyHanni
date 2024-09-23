@@ -38,7 +38,6 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzDebug
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -47,6 +46,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -324,9 +324,9 @@ object SkyHanniDebugsAndTests {
 
     fun copyLocation(args: Array<String>) {
         val location = LocationUtils.playerLocation()
-        val x = (location.x + 0.001).round(1)
-        val y = (location.y + 0.001).round(1)
-        val z = (location.z + 0.001).round(1)
+        val x = (location.x + 0.001).roundTo(1)
+        val y = (location.y + 0.001).roundTo(1)
+        val z = (location.z + 0.001).roundTo(1)
         if (args.size == 1 && args[0].equals("json", false)) {
             OSUtils.copyToClipboard("\"$x:$y:$z\"")
             return
@@ -576,7 +576,8 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }
+                    .toList(),
             )
         }
         config.debugItemPos.renderRenderables(
