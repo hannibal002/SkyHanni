@@ -182,7 +182,7 @@ object MiningAPI {
             val amount = group("amount").formatInt()
             resetPickobulusEvent()
             val blocks = pickobulusMinedBlocks.take(amount).countBy { it.second }
-            OreMinedEvent(null, blocks).post()
+            if (blocks.isNotEmpty()) OreMinedEvent(null, blocks).post()
             pickobulusMinedBlocks.clear()
             return
         }
