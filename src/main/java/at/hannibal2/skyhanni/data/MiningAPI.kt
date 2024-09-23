@@ -51,14 +51,21 @@ object MiningAPI {
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
-    private val pickobulusUsePattern by group.pattern(
-        "pickaxeability.use",
+    private val pickbobulusGroup = group.group("pickobulus")
+
+    private val pickobulusUsePattern by pickbobulusGroup.pattern(
+        "use",
         "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
     )
 
-    private val pickobulusEndPattern by group.pattern(
-        "pickaxeability.end",
+    private val pickobulusEndPattern by pickbobulusGroup.pattern(
+        "end",
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>[\\d,.]+) §r§7blocks!",
+    )
+
+    private val pickobulusFailPattern by pickbobulusGroup.pattern(
+        "fail",
+        "§7Your §r§aPickobulus §r§7didn't destroy any blocks!"
     )
 
     private data class MinedBlock(val ore: OreBlock, var confirmed: Boolean) {
@@ -166,6 +173,11 @@ object MiningAPI {
             lastPickobulusUse = SimpleTimeMark.now()
             return
         }
+        if (pickobulusFailPattern.matches(event.message)) {
+            resetPickobulusEvent()
+            pickobulusMinedBlocks.clear()
+            return
+        }
         pickobulusEndPattern.matchMatcher(event.message) {
             val amount = group("amount").formatInt()
             resetPickobulusEvent()
@@ -174,6 +186,7 @@ object MiningAPI {
             pickobulusMinedBlocks.clear()
             return
         }
+
     }
 
     @SubscribeEvent
@@ -316,6 +329,7 @@ object MiningAPI {
         lastColdReset = SimpleTimeMark.now()
         recentClickedBlocks.clear()
         surroundingMinedBlocks.clear()
+        pickobulusMinedBlocks.clear()
         currentAreaOreBlocks = setOf()
         resetOreEvent()
         resetPickobulusEvent()
