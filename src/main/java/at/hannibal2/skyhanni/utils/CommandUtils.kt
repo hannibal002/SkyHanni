@@ -38,13 +38,12 @@ object CommandUtils {
     private enum class NameSource {
         INTERNAL_NAME,
         ITEM_NAME,
-        GROUP
-        ;
+        GROUP;
     }
 
-    private val namePattern = "^name:(.*)".toRegex()
-    private val internalPattern = "^internal:(.*)".toRegex()
-    private val groupPattern = "^(?:group|collection):(.*)".toRegex()
+    private val namePattern = "^(?i)(name:)(.*)".toRegex()
+    private val internalPattern = "^(?i)(internal:)(.*)".toRegex()
+    private val groupPattern = "(?i)^(group:|collection:)(.*)".toRegex()
 
     fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, Any?> {
         @Suppress("ReplaceSizeZeroCheckWithIsEmpty") // A bug since the replacement does not work for iterable interface.
@@ -66,9 +65,9 @@ object CommandUtils {
         val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
 
         val item: Any? = when (expected) {
-            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$1").replace(" ", "_").asInternalName()
-            NameSource.ITEM_NAME -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "$1").replace("_", " "))
-            NameSource.GROUP -> ItemGroup.findGroup(collected.replace(groupPattern, "$1"))
+            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$2").replace(" ", "_").asInternalName()
+            NameSource.ITEM_NAME -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "$2").replace("_", " "))
+            NameSource.GROUP -> ItemGroup.findGroup(collected.replace(groupPattern, "$2"))
             null -> {
                 val fromItemName = NEUInternalName.fromItemNameOrNull(collected.replace("_", " "))
                 if (fromItemName?.getItemStackOrNull() != null) {
@@ -101,21 +100,56 @@ object CommandUtils {
         }
 
         val uppercaseStart = start.uppercase().replace(" ", "_")
+        val lowercaseStart = start.lowercase().replace("_", " ")
 
-        // TODO add prefix support
+        // TODO fix space edge case for internal and group
+
         when (expected) {
             NameSource.INTERNAL_NAME -> {
-                addAll(NEUItems.findInternalNameStartingWith(uppercaseStart))
+                val prefix = start.replace(internalPattern, "$1")
+                val withoutPrefix = uppercaseStart.replace(internalPattern, "$2")
+                if (withoutPrefix.isEmpty()) return@buildList
+                addAll(NEUItems.findInternalNameStartingWithWithoutNPCs(withoutPrefix).map { prefix + it })
             }
 
-            NameSource.ITEM_NAME -> {} // TODO
+            NameSource.ITEM_NAME -> {
+                val prefix = start.replace(namePattern, "$1")
+                val withoutPrefix = lowercaseStart.replace(namePattern, "$2")
+                if (withoutPrefix.isEmpty()) return@buildList
+                addAll(
+                    NEUItems.findItemNameStartingWithWithoutNPCs(withoutPrefix).map { r ->
+                        val index = start.replace(namePattern, "$2").indexOfLast { it == ' ' }
+                        if (index == -1) {
+                            prefix + r.replace(" ", "_")
+                        } else {
+                            r.substring(index + 1, r.length).replace(" ", "_")
+                        }
+                    },
+                )
+            }
+
             NameSource.GROUP -> {
-                addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name })
+                val prefix = start.replace(groupPattern, "$1")
+                val withoutPrefix = uppercaseStart.replace(groupPattern, "$2")
+                if (withoutPrefix.isEmpty()) return@buildList
+                addAll(ItemGroup.groupStartingWith(withoutPrefix).map { prefix + it.name })
             }
 
             null -> {
                 addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name })
-                addAll(NEUItems.findInternalNameStartingWith(uppercaseStart))
+                addAll(NEUItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart))
+                if (size < 200) {
+                    addAll(
+                        NEUItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { r ->
+                            val index = start.indexOfLast { it == ' ' }
+                            if (index == -1) {
+                                r.replace(" ", "_")
+                            } else {
+                                r.substring(index + 1, r.length - 1).replace(" ", "_")
+                            }
+                        },
+                    )
+                }
             }
         }
     }
@@ -146,14 +180,13 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         var amountNoPrefixArguments = 0
 
         while (args.size > index) {
+            val loopStartAmountNoPrefix = amountNoPrefixArguments
             val current = args[index]
             val (spec, lookup) = specifiers.firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
-                ?: specifiers.firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }
-                    ?.let {
-                        amountNoPrefixArguments++
-                        it to -1
-                    }
-                ?: specifiers.firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
+                ?: specifiers.firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }?.let {
+                    amountNoPrefixArguments++
+                    it to -1
+                } ?: specifiers.firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
                     amountNoPrefixArguments++
                     it to -1
                 } ?: (null to 0)
@@ -162,7 +195,10 @@ data class ComplexCommand<O : CommandContextAwareObject>(
                 context.errorMessage = "Unknown argument: '$current'"
             }
             context.errorMessage?.let {
-                continue
+                if (loopStartAmountNoPrefix != amountNoPrefixArguments) {
+                    amountNoPrefixArguments = loopStartAmountNoPrefix
+                }
+                break
             }
             index += (1 + lookup) + (result ?: 0)
         }
@@ -171,15 +207,14 @@ data class ComplexCommand<O : CommandContextAwareObject>(
 
         val validSpecifier = specifiers.filter { it.validity(context) }
 
-        val rest = args.slice(index..<args.size).joinToString() + (partial ?: "")
+        val rest = (args.slice(index..<args.size).joinToString(" ") + (partial?.let { " $it" } ?: "")).trimStart()
 
         if (rest.isEmpty()) {
             result.addAll(validSpecifier.mapNotNull { it.prefix.takeIf { it.isNotEmpty() } })
             result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete("") }.flatten())
         } else {
             result.addAll(
-                validSpecifier.filter { it.prefix.startsWith(rest) }
-                    .mapNotNull { it.prefix.takeIf { it.isNotEmpty() } },
+                validSpecifier.filter { it.prefix.startsWith(rest) }.mapNotNull { it.prefix.takeIf { it.isNotEmpty() } },
             )
             result.addAll(validSpecifier.filter { it.defaultPosition == amountNoPrefixArguments }.map { it.tabComplete(rest) }.flatten())
         }
