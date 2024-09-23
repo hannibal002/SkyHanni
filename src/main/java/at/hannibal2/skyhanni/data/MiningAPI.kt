@@ -43,7 +43,7 @@ import kotlin.time.Duration.Companion.seconds
 object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
-    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Glacite Lake")
+    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
     private val coldResetPattern by group.pattern(
