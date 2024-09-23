@@ -20,7 +20,7 @@ object CollectionUtils {
     }
 
     inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        for (i in 1..amount) this.poll() ?: break
+        for (unused in 1..amount) this.poll() ?: break
         return this
     }
 

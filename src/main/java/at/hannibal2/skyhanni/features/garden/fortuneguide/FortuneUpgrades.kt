@@ -90,10 +90,10 @@ object FortuneUpgrades {
     private fun getEquipmentUpgrades() {
         val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in FarmingItems.equip) {
-            val item = piece.getItem() ?: return
+            val item = piece.getItem()
             // todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
-            val enchantments = item.getEnchantments() ?: emptyMap()
+            val enchantments = item.getEnchantments().orEmpty()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
             if (greenThumbLvl != 5 && visitors != 0.0) {
                 genericUpgrades.add(
@@ -157,7 +157,7 @@ object FortuneUpgrades {
         cropSpecificUpgrades.addAll(genericUpgrades)
         // todo tell them to get the tool if it is missing
         val crop = tool?.getCropType() ?: return
-        val enchantments = tool.getEnchantments() ?: emptyMap()
+        val enchantments = tool.getEnchantments().orEmpty()
         val turboCropLvl = enchantments[crop.getTurboCrop()] ?: 0
         val dedicationLvl = enchantments["dedication"] ?: 0
         val cultivatingLvl = enchantments["cultivating"] ?: 0

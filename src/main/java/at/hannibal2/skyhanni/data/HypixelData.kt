@@ -143,7 +143,7 @@ object HypixelData {
 
     // Data from locraw
     var locrawData: JsonObject? = null
-    private var locraw: MutableMap<String, String> = listOf(
+    private val locraw: MutableMap<String, String> = listOf(
         "server",
         "gametype",
         "lobbyname",
@@ -152,14 +152,14 @@ object HypixelData {
         "map",
     ).associateWith { "" }.toMutableMap()
 
-    val server get() = locraw["server"] ?: ""
-    val gameType get() = locraw["gametype"] ?: ""
-    val lobbyName get() = locraw["lobbyname"] ?: ""
-    val lobbyType get() = locraw["lobbytype"] ?: ""
-    val mode get() = locraw["mode"] ?: ""
-    val map get() = locraw["map"] ?: ""
+    val server get() = locraw["server"].orEmpty()
+    val gameType get() = locraw["gametype"].orEmpty()
+    val lobbyName get() = locraw["lobbyname"].orEmpty()
+    val lobbyType get() = locraw["lobbytype"].orEmpty()
+    val mode get() = locraw["mode"].orEmpty()
+    val map get() = locraw["map"].orEmpty()
 
-    fun checkCurrentServerId() {
+    private fun checkCurrentServerId() {
         if (!LorenzUtils.inSkyBlock) return
         if (serverId != null) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
@@ -234,7 +234,7 @@ object HypixelData {
                 if (obj.has("server")) {
                     locrawData = obj
                     for (key in locraw.keys) {
-                        locraw[key] = obj[key]?.asString ?: ""
+                        locraw[key] = obj[key]?.asString.orEmpty()
                     }
                     inLimbo = locraw["server"] == "limbo"
                     inLobby = locraw["lobbyname"] != ""
@@ -253,7 +253,7 @@ object HypixelData {
         }
     }
 
-    private var loggerIslandChange = LorenzLogger("debug/island_change")
+    private val loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -409,7 +409,7 @@ object HypixelData {
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
+        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP.orEmpty()) {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -464,7 +464,7 @@ object HypixelData {
             TabListData.fullyLoaded = true
             // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
             val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
+            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
             islandType = getIslandType(foundIsland, guesting)
         }
 

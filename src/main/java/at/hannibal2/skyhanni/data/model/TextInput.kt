@@ -93,7 +93,7 @@ class TextInput {
             }
 
         private var textBox
-            get() = activeInstance?.textBox ?: ""
+            get() = activeInstance?.textBox.orEmpty()
             set(value) {
                 activeInstance?.textBox = value
             }

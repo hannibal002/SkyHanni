@@ -3,7 +3,13 @@ config:
     validation: true
 
 GrammarRules:
-    AvoidColour:
+    active: true
+    AvoidColour: # custom rule to prefer color to colour
+        active: true
+
+FormattingRules:
+    active: true
+    CustomCommentSpacing:
         active: true
 
 
@@ -31,6 +37,15 @@ style:
     LoopWithTooManyJumpStatements:
         active: true
         maxJumpCount: 3
+    UnnecessaryAbstractClass: # gets horrendously messed up with Event classes
+        active: false
+    UnusedPrivateMember: # gets tripped up by API methods
+        active: false
+    UnusedPrivateProperty: # loops that don't use their iterator
+        active: true
+        allowedNames: "^(unused|_)$"
+    UseCheckOrError:
+        active: false
 
 formatting:
     MaximumLineLength: # ktlint - handled by detekt
@@ -46,6 +61,8 @@ formatting:
     NoEmptyFirstLineInMethodBlock: # pedantic
         active: false
     ParameterListWrapping: # pedantic, can be useful in compact code
+        active: false
+    CommentSpacing: # handled by custom rule
         active: false
 
 complexity:
@@ -92,4 +109,10 @@ exceptions:
 
 naming:
     ConstructorParameterNaming: # pedantic
+        active: false
+
+potential-bugs:
+    DoubleMutabilityForCollection: # went crazy about all the mutable collections
+        active: false
+    HasPlatformType: # false positives on config get() methods
         active: false

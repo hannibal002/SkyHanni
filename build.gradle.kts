@@ -336,10 +336,6 @@ detekt {
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
     baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
     source.setFrom(project.sourceSets.named("main").map { it.allSource })
-//     source.setFrom(
-//         "$projectDir/src/main/kotlin",
-//         "$projectDir/src/main/java"
-//     )
 }
 
 tasks.withType<Detekt>().configureEach {

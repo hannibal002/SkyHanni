@@ -140,7 +140,7 @@ object EstimatedItemValueCalculator {
             "HELMET",
             "BOOTS",
         ).any { internalName.endsWith(it) }
-    )
+        )
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
@@ -500,8 +500,8 @@ object EstimatedItemValueCalculator {
                 tiers[id] = getKuudraTier(id)
 
             }
-            for ((id, tier) in tiers.sorted()) {
-                val prices = EssenceItemUtils.itemPrices[id]!!
+            for ((id, _) in tiers.sorted()) {
+                val prices = EssenceItemUtils.itemPrices[id] ?: continue
                 maxStars += prices.size
                 if (remainingStars <= 0) continue
 

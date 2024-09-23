@@ -63,7 +63,7 @@ object DungeonLividFinder {
 
         if (event.isMod(20)) {
             if (lividArmorStand == null) {
-                val amountArmorStands = EntityUtils.getEntities<EntityArmorStand>().filter { it.name.contains("Livid") }.count()
+                val amountArmorStands = EntityUtils.getEntities<EntityArmorStand>().count { it.name.contains("Livid") }
                 if (amountArmorStands >= 8) {
                     ErrorManager.logErrorStateWithData(
                         "Could not find livid",

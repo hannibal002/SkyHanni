@@ -32,7 +32,7 @@ object DungeonRankTabListColor {
 
         pattern.matchMatcher(event.text.stripHypixelMessage()) {
             val sbLevel = group("sbLevel")
-            val rank = groupOrNull("rank") ?: ""
+            val rank = groupOrNull("rank").orEmpty()
             val playerName = group("playerName")
             val className = group("className")
             val classLevel = group("classLevel")

@@ -88,11 +88,11 @@ class MobFinder {
         else -> {
             when (entity) {
                 /*
-                     * Note that the order does matter here.
-                     * For example, if you put EntityZombie before EntityPigZombie,
-                     * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
-                     * Please take this into consideration if you are to modify this.
-                    */
+                 * Note that the order does matter here.
+                 * For example, if you put EntityZombie before EntityPigZombie,
+                 * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
+                 * Please take this into consideration if you are to modify this.
+                 */
                 is EntityOtherPlayerMP -> tryAddEntityOtherPlayerMP(entity)
                 is EntityIronGolem -> tryAddEntityIronGolem(entity)
                 is EntityPigZombie -> tryAddEntityPigZombie(entity)
@@ -393,8 +393,8 @@ class MobFinder {
     }
 
     private fun tryAddEntityMagmaCube(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")
-            && entity.hasMaxHealth(200_000_000, true) -> {
+        entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ") &&
+            entity.hasMaxHealth(200_000_000, true) -> {
             EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
         }
 

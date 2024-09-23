@@ -49,7 +49,7 @@ object EntityUtils {
 
     fun getPlayerEntities(): MutableList<EntityOtherPlayerMP> {
         val list = mutableListOf<EntityOtherPlayerMP>()
-        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers() ?: emptyList()) {
+        for (entity in Minecraft.getMinecraft().theWorld?.getLoadedPlayers().orEmpty()) {
             if (!entity.isNPC() && entity is EntityOtherPlayerMP) {
                 list.add(entity)
             }
@@ -179,11 +179,11 @@ object EntityUtils {
         if (Minecraft.getMinecraft()
                 .isOnMainThread()
         ) it else it.toMutableList() // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization, but *does* make crashes because of it rarer.
-    }?.asSequence()?.filterNotNull() ?: emptySequence()
+    }?.asSequence()?.filterNotNull().orEmpty()
 
     fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft()?.theWorld?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
-    }?.asSequence()?.filterNotNull() ?: emptySequence()
+    }?.asSequence()?.filterNotNull().orEmpty()
 
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
 

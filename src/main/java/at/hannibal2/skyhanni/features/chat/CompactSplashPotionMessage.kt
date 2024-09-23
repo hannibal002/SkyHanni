@@ -55,7 +55,7 @@ object CompactSplashPotionMessage {
                 val byPlayer = groupOrNull("playerName")?.let { player ->
                     val displayName = player.cleanPlayerName(displayName = true)
                     " §aby $displayName"
-                } ?: ""
+                }.orEmpty()
                 sendMessage("§a§lPotion Effect! §r$effectName$byPlayer")
             } != null
         }

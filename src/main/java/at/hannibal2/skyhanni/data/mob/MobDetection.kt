@@ -303,13 +303,13 @@ object MobDetection {
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
                 MobData.logger.log(
-                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
-                        + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
-                        + "\n Position: ${retry.entity.getLorenzVec()}\n "
-                        + "DistanceC: ${
+                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n " +
+                        "is already Found: ${MobData.entityToMob[retry.entity] != null})." +
+                        "\n Position: ${retry.entity.getLorenzVec()}\n " +
+                        "DistanceC: ${
                             entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
-                        }\n"
-                        + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
+                        }\n" +
+                        "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
                         "}",
                 )
                 // Uncomment this to make it closed a loop
@@ -339,7 +339,7 @@ object MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        getRetry(entity)?.apply { this.entity = entity }
+        getRetry(entity)?.entity = entity
         MobData.currentEntityLiving.refreshReference(entity)
         MobData.previousEntityLiving.refreshReference(entity)
         // update map

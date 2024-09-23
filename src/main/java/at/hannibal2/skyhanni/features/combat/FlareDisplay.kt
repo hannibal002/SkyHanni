@@ -119,7 +119,7 @@ object FlareDisplay {
                 else -> {}
             }
         }
-        display = newDisplay ?: emptyList()
+        display = newDisplay.orEmpty()
     }
 
     private fun getRemainingTime(flare: Flare): Duration {

@@ -80,8 +80,8 @@ class DefaultConfigOptionGui(
         fun button(title: String, tooltip: List<String>, func: () -> Unit) {
             val width = mc.fontRendererObj.getStringWidth(title)
             var overMouse = false
-            if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width)
-                && mouseY - (height + ySize) / 2 in -barSize..0
+            if (mouseX - ((this.width - xSize) / 2 + padding) in i..(i + width) &&
+                mouseY - (height + ySize) / 2 in -barSize..0
             ) {
                 overMouse = true
                 hoveringTextToDraw = tooltip
@@ -106,19 +106,19 @@ class DefaultConfigOptionGui(
         button("Turn all on", listOf()) {
             for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_ON)
-                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
+                orderedOptions[entry.key]?.forEach { it.toggleOverride = null }
             }
         }
         button("Turn all off", listOf()) {
             for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.TURN_ALL_OFF)
-                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
+                orderedOptions[entry.key]?.forEach { it.toggleOverride = null }
             }
         }
         button("Leave all untouched", listOf()) {
             for (entry in resetSuggestionState.entries) {
                 entry.setValue(ResetSuggestionState.LEAVE_DEFAULTS)
-                orderedOptions[entry.key]!!.forEach { it.toggleOverride = null }
+                orderedOptions[entry.key]?.forEach { it.toggleOverride = null }
             }
         }
         button("Cancel", listOf()) {
@@ -164,12 +164,12 @@ class DefaultConfigOptionGui(
                     hoveringTextToDraw = listOf(
                         "§e${cat.name}",
                         "§7${cat.description}"
-                    ) + orderedOptions[cat]!!.map { "§7 - §a" + it.name }
+                    ) + (orderedOptions[cat]?.map { "§7 - §a" + it.name }.orEmpty())
                 }
 
                 if (shouldClick) {
                     resetSuggestionState[cat] = suggestionState.next
-                    orderedOptions[cat]!!.forEach { it.toggleOverride = null }
+                    orderedOptions[cat]?.forEach { it.toggleOverride = null }
                 }
             }
 

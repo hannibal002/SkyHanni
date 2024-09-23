@@ -26,6 +26,7 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.util.Locale
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
@@ -165,8 +166,8 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Void?> {
-        val comp = CompletableFuture<Void?>()
+    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Unit?> {
+        val comp = CompletableFuture<Unit?>()
         if (!atomicShouldManuallyReload.get()) return comp
         ErrorManager.resetCache()
         DelayedRun.onThread.execute {
@@ -284,13 +285,13 @@ class RepoManager(private val configLocation: File) {
         val repoUser = config.location.user
         val repoName = config.location.name
         val repoBranch = config.location.branch
-        return String.format("https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
+        return String.format(Locale.US, "https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
     }
 
     private fun getDownloadUrl(commitId: String?): String {
         val repoUser = config.location.user
         val repoName = config.location.name
-        return String.format("https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
+        return String.format(Locale.US, "https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
     }
 
     @Throws(IOException::class)

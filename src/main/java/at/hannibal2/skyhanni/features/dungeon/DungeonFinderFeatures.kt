@@ -215,6 +215,9 @@ object DungeonFinderFeatures {
         val map = mutableMapOf<Int, LorenzColor>()
         if (!partyFinderTitlePattern.matches(event.inventoryName)) return map
         inInventory = true
+
+        // TODO: Refactor this loop to not use 5 continue statements
+        @Suppress("LoopWithTooManyJumpStatements")
         for ((slot, stack) in event.inventoryItems) {
             val lore = stack.getLore()
             if (!checkIfPartyPattern.matches(stack.displayName)) continue

@@ -124,12 +124,11 @@ object ConfigUpdaterMigrator {
                     storage?.get("players")?.asJsonObject?.entrySet()?.flatMap { player ->
                         player.value.asJsonObject["profiles"]?.asJsonObject?.entrySet()?.map {
                             "storage.players.${player.key}.profiles.${it.key}"
-                        } ?: listOf()
-                    } ?: listOf()
+                        }.orEmpty()
+                    }.orEmpty()
                     ),
                 "#player" to (
-                    storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }
-                        ?: listOf()
+                    storage?.get("players")?.asJsonObject?.entrySet()?.map { "storage.players.${it.key}" }.orEmpty()
                     ),
             )
             val migration = ConfigFixEvent(

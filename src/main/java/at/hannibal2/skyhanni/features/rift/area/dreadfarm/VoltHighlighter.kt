@@ -38,8 +38,8 @@ object VoltHighlighter {
     fun onArmorChange(event: EntityEquipmentChangeEvent) {
         if (!RiftAPI.inRift() || !config.voltWarning) return
         val player = Minecraft.getMinecraft().thePlayer ?: return
-        if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING
-            && event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
+        if (event.isHead && getVoltState(event.entity) == VoltState.DOING_LIGHTNING &&
+            event.entity.positionVector.squareDistanceTo(player.positionVector) <= LIGHTNING_DISTANCE * LIGHTNING_DISTANCE
         ) {
             chargingSince = chargingSince.editCopy {
                 this[event.entity] = SimpleTimeMark.now()

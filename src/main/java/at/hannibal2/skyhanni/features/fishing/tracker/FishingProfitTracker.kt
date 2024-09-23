@@ -83,6 +83,8 @@ object FishingProfitTracker {
 
         override fun getCustomPricePer(internalName: NEUInternalName): Double {
             // TODO find better way to tell if the item is a trophy
+            // Todo: Refactor to remove !! operator
+            @Suppress("MapGetWithNotNullAssertionOperator")
             val neuInternalNames = itemCategories["Trophy Fish"]!!
 
             return if (internalName in neuInternalNames) {
@@ -163,6 +165,8 @@ object FishingProfitTracker {
         val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
             { true }
         } else {
+            // Todo: Refactor to remove !! operator
+            @Suppress("MapGetWithNotNullAssertionOperator")
             val items = itemCategories[currentCategory]!!
             { it in items }
         }

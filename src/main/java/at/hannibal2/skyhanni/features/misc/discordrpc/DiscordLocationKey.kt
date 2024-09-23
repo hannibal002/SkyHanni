@@ -301,11 +301,11 @@ object DiscordLocationKey {
         return if (normalRPC.contains(keyIfNormal)) {
             keyIfNormal
         } else if (specialRPC.containsKey(location)) {
-            specialRPC[location]!!
+            specialRPC[location] ?: getAmbiguousKey(location)
         } else if (specialNetherRPC.contains(location)) {
             "crimson-isle"
         } else if (specialRiftRPC.containsKey(location)) {
-            specialRiftRPC[location]!!
+            specialRiftRPC[location] ?: getAmbiguousKey(location)
         } else {
             getAmbiguousKey(location) // will return skyblock-logo if not found
         }

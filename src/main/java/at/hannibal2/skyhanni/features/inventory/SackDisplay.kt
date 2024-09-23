@@ -137,7 +137,7 @@ object SackDisplay {
                     }
 
                     // TODO change color of amount if full
-    //                 if (colorCode == "§a") addString("§c§l(Full!)")
+                    // if (colorCode == "§a") addString("§c§l(Full!)")
 
                     if (SackAPI.isTrophySack && magmaFish > 0) {
                         totalMagmaFish += magmaFish

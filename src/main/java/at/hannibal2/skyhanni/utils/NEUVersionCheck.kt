@@ -56,6 +56,7 @@ object NEUVersionCheck {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         } catch (e: java.lang.Exception) {
+            @Suppress("PrintStackTrace")
             e.printStackTrace()
         }
 

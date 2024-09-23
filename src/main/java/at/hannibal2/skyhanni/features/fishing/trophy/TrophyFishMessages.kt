@@ -91,8 +91,8 @@ object TrophyFishMessages {
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
-        config.bronzeHider && rarity == TrophyRarity.BRONZE && amount != 1
-            || config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
+        config.bronzeHider && rarity == TrophyRarity.BRONZE && amount != 1 ||
+            config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

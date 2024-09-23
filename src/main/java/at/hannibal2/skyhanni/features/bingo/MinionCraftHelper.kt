@@ -116,11 +116,9 @@ object MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            if (item.hasEnchantments()) continue
-            val rawId = item.getInternalName()
-            if (!isMinionName(name)) {
-                if (!allIngredients.contains(rawId)) continue
-                if (!isAllowed(allMinions, rawId)) continue
+            if (!isMinionName(name) && !item.hasEnchantments()) {
+                val rawId = item.getInternalName()
+                if (!allIngredients.contains(rawId) || !isAllowed(allMinions, rawId)) continue
 
                 val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
                 val old = otherItems.getOrDefault(itemId, 0)

@@ -58,6 +58,8 @@ object CosmeticFollowingLine {
         val last2 = locations.keys.toList().takeLast(2)
 
         locations.keys.zipWithNext { a, b ->
+            // Todo: Refactor to remove !! operator
+            @Suppress("MapGetWithNotNullAssertionOperator")
             val locationSpot = locations[b]!!
             if (firstPerson && !locationSpot.onGround && b in last7) {
                 // Do not render the line in the face, keep more distance while the line is in the air
@@ -86,6 +88,8 @@ object CosmeticFollowingLine {
 
 
         latestLocations.keys.zipWithNext { a, b ->
+            // Todo: Refactor to remove !! operator
+            @Suppress("MapGetWithNotNullAssertionOperator")
             val locationSpot = latestLocations[b]!!
             event.draw3DLine(a, b, color, locationSpot.getWidth(), !config.behindBlocks)
         }

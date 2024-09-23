@@ -492,8 +492,8 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
-    && CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
+private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
+    CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
     val cold = -MiningAPI.cold
@@ -583,7 +583,7 @@ private fun getDateDisplayPair() =
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     val symbol =
-        getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol") ?: ""
+        getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol").orEmpty()
     return listOf(
         "§7" + SkyBlockTime.now()
             .formatted(
@@ -598,7 +598,7 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
     val lobbyCode = HypixelData.serverId
-    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
+    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" }.orEmpty()
     val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: "<hidden>"
     return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
 }

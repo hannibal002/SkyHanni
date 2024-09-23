@@ -128,7 +128,7 @@ object BingoCardDisplay {
 
     private fun percentageFormat(it: BingoGoal) = it.communtyGoalPercentage?.let {
         " " + BingoAPI.getCommunityPercentageColor(it)
-    } ?: ""
+    }.orEmpty()
 
     private fun MutableList<Renderable>.addPersonalGoals() {
         val todo = BingoAPI.personalGoals.filter { !it.done }.toMutableList()

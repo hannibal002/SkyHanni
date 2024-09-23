@@ -16,8 +16,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
 // TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
+@SkyHanniModule
 object SuperpairExperimentInformationDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable

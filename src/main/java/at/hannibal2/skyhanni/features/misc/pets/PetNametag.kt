@@ -36,7 +36,7 @@ object PetNametag {
             val lvl = group("lvl").formatInt()
             val rarity = group("rarity")
             val pet = group("pet")
-            val skin = groupOrNull("skin") ?: ""
+            val skin = groupOrNull("skin").orEmpty()
 
             val hideLevel = config.hidePetLevel
             val hideMaxLevel = config.hideMaxPetLevel && (lvl == 100 || lvl == 200)

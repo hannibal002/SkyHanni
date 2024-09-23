@@ -712,6 +712,7 @@ object Commands {
                     args: Array<String>?,
                     pos: BlockPos?,
                 ): List<String> {
+                    @Suppress("UseOrEmpty")
                     return autoComplete(args ?: emptyArray())
                 }
             },

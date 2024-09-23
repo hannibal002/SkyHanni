@@ -44,7 +44,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf(),
+            else regexes?.regexes.orEmpty(),
         )
 
     /**
