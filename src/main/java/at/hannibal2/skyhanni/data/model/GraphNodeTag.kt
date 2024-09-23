@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 enum class GraphNodeTag(
     val internalName: String,
     val color: LorenzColor,
-    cleanName: String,
+    val cleanName: String,
     val description: String,
     val onlyIsland: IslandType? = null,
 ) {
