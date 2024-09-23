@@ -886,7 +886,7 @@ object EstimatedItemValueCalculator {
                 val ingredient = PrimitiveIngredient(ingredients)
 
                 totalPrice += if (ingredient.isCoin()) {
-                    ingredient.count.toDouble()
+                    ingredient.count
                 } else {
                     ingredient.internalName.getPrice() * ingredient.count
                 }
