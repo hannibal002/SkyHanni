@@ -94,7 +94,7 @@ import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.graph.GraphEditor
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
@@ -382,7 +382,7 @@ object Commands {
         registerCommand(
             "shtogglehypixelapierrors",
             "Show/hide hypixel api error messages in chat",
-        ) { APIUtil.toggleApiErrorMessages() }
+        ) { APIUtils.toggleApiErrorMessages() }
         registerCommand(
             "shclearcropspeed",
             "Reset garden crop speed data and best crop time data",

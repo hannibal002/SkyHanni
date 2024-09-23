@@ -99,7 +99,7 @@ object ArachneSpawnTimer {
 
         val packet = event.packet
         if (packet is S2APacketParticles) {
-            val location = packet.toLorenzVec().round(2)
+            val location = packet.toLorenzVec().roundTo(2)
             if (arachneAltarLocation.distance(location) > 30) return
             if (packet.particleType == EnumParticleTypes.REDSTONE && packet.particleSpeed == 1.0f) {
                 particleCounter += 1
