@@ -31,6 +31,7 @@ object FlowstateHelper {
     private var display: List<Renderable>? = null
     private var displayDirty = false
     private var displayHibernating = true
+    private var timeSinceHibernation = SimpleTimeMark.farPast()
 
     private var flowstateCache: Int? = null
 
@@ -102,6 +103,7 @@ object FlowstateHelper {
         blockBreakStreak = 0
         displayDirty = true
         displayHibernating = true
+        timeSinceHibernation = SimpleTimeMark.now()
         createDisplay()
     }
 
@@ -111,9 +113,13 @@ object FlowstateHelper {
         if (!config.enabled) return
         if (flowstateCache == null) return
 
-        if (!displayHibernating) {
-            if (display == null || streakEndTimer.isInFuture()) createDisplay()
+        if (displayHibernating && config.autoHide > -1 && timeSinceHibernation.passedSince() > config.autoHide.seconds) {
+            return
         }
+        if (display == null || streakEndTimer.isInFuture()) {
+            createDisplay()
+        }
+
         display?.let {
             config.position.renderRenderables(
                 it,
@@ -154,9 +160,10 @@ object FlowstateHelper {
     private fun getTimerColor(timeRemaining: Duration): String {
         if (!config.colorfulTimer) return "§6"
         return when (timeRemaining) {
-            in 0.seconds..3.seconds -> "§c"
-            in 3.seconds..6.seconds -> "§e"
-            in 6.seconds..10.seconds -> "§a"
+            in 0.seconds..2.seconds -> "§c"
+            in 2.seconds..5.seconds -> "§6§#§f§c§7§a§2§5§/"
+            in 5.seconds..7.seconds -> "§e"
+            in 7.seconds..10.seconds -> "§a"
             else -> "§6"
         }
     }

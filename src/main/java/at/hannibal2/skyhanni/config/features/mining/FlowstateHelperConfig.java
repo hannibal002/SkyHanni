@@ -32,7 +32,7 @@ public class FlowstateHelperConfig {
     @Expose
     @ConfigOption(name = "Autohide", desc = "Automatically hides the GUI after a certain time idle, in seconds.")
     @ConfigEditorSlider(
-        minValue = 0,
+        minValue = -1,
         maxValue = 30,
         minStep = 1
     )
