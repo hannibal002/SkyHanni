@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -74,7 +75,12 @@ object GraphNodeEditor {
         lastUpdate = SimpleTimeMark.now() + 60.seconds
         nodesDisplay = buildList {
             addString("§eToggle Visible Tags")
+            val map = mutableMapOf<GraphNodeTag, Int>()
             for (tag in GraphNodeTag.entries) {
+                val nodes = GraphEditor.nodes.count { tag in it.tags }
+                map[tag] = nodes
+            }
+            for (tag in map.sortedDesc().keys) {
                 val isVisible = tag in tagsToShow
                 val nodes = GraphEditor.nodes.count { tag in it.tags }
                 val visibilityText = if (isVisible) " §aVisible" else " §7Invisible"
