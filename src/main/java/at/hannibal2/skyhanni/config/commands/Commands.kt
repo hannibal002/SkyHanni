@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
@@ -32,6 +33,7 @@ import at.hannibal2.skyhanni.features.event.diana.InquisitorWaypointShare
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocations
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggLocator
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEventSummary
 import at.hannibal2.skyhanni.features.event.jerry.frozentreasure.FrozenTreasureTracker
 import at.hannibal2.skyhanni.features.fishing.tracker.FishingProfitTracker
@@ -55,11 +57,14 @@ import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
+import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
@@ -74,7 +79,6 @@ import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.test.DebugCommand
-import at.hannibal2.skyhanni.test.GraphEditor
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.SkyHanniConfigSearchResetCommand
@@ -89,6 +93,7 @@ import at.hannibal2.skyhanni.test.command.CopyScoreboardCommand
 import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
+import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtil
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
@@ -179,7 +184,6 @@ object Commands {
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
     }
 
-
     private fun usersNormal() {
         registerCommand(
             "shmarkplayer",
@@ -188,8 +192,7 @@ object Commands {
         registerCommand("shtrackcollection", "Tracks your collection gain over time") { CollectionTracker.command(it) }
         registerCommand(
             "shcroptime",
-            "Calculates with your current crop per second speed " +
-                "how long you need to farm a crop to collect this amount of items",
+            "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items",
         ) { GardenCropTimeCommand.onCommand(it) }
         registerCommand(
             "shcropsin",
@@ -218,6 +221,7 @@ object Commands {
         registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
         registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand() }
         registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerRngDropTracker.resetCommand() }
+        registerCommand("shresetcorpsetracker", "Resets the Glacite Mineshaft Corpse Tracker") { CorpseTracker.resetCommand() }
         registerCommand(
             "shresetendernodetracker",
             "Resets the Ender Node Tracker",
@@ -245,8 +249,7 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "Copy the English translation of a message in another language to the clipboard.\n" +
-                "Uses a 2 letter language code that can be found at the end of a translation message.",
+            "Copy the English translation of a message in another language to the clipboard.\n" + "Uses a 2 letter language code that can be found at the end of a translation message.",
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shtranslate",
@@ -272,6 +275,10 @@ object Commands {
             "shresetpestprofittracker",
             "Resets the Pest Profit Tracker",
         ) { PestProfitTracker.resetCommand() }
+        registerCommand(
+            "shresetexperimentsprofittracker",
+            "Resets the Experiments Profit Tracker",
+        ) { ExperimentsProfitTracker.resetCommand() }
         registerCommand(
             "shresetmythologicalcreaturetracker",
             "Resets the Mythological Creature Tracker",
@@ -358,8 +365,12 @@ object Commands {
         ) { ColorFormattingHelper.printColorCodeList() }
         registerCommand(
             "shtps",
-            "Informs in chat about the server ticks per second (TPS)."
+            "Informs in chat about the server ticks per second (TPS).",
         ) { TpsCounter.tpsCommand() }
+        registerCommand(
+            "shcarry",
+            "Keep track of carries you do.",
+        ) { CarryTracker.onCommand(it) }
     }
 
     private fun usersBugFix() {
@@ -438,6 +449,10 @@ object Commands {
             "shresetpunchcard",
             "Resets the Rift Punchcard Artifact player list.",
         ) { PunchcardHighlight.clearList() }
+        registerCommand(
+            "shedittracker",
+            "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers.",
+        ) { TrackerManager.commandEditTracker(it) }
     }
 
     private fun developersDebugFeatures() {
@@ -477,7 +492,7 @@ object Commands {
         ) { SkyBlockIslandTest.onCommand(it) }
         registerCommand(
             "shdebugprice",
-            "Debug different price sources for an item."
+            "Debug different price sources for an item.",
         ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
@@ -488,6 +503,7 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
+        registerCommand("shtestrabbitpaths", "Tests pathfinding to rabbit eggs. Use a number 0-14.") { HoppityEggLocator.testPathfind(it) }
         registerCommand(
             "shtestitem",
             "test item internal name resolving",
@@ -571,9 +587,7 @@ object Commands {
         ) { TitleManager.command(it) }
         registerCommand(
             "shresetconfig",
-            "Reloads the config manager and rendering processors of MoulConfig. " +
-                "This §cWILL RESET §7your config, but also updating the java config files " +
-                "(names, description, orderings and stuff).",
+            "Reloads the config manager and rendering processors of MoulConfig. " + "This §cWILL RESET §7your config, but also updating the java config files " + "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
             "shreadcropmilestonefromclipboard",
@@ -650,8 +664,7 @@ object Commands {
             else -> currentStream
         }
 
-        val switchingToBeta = updateStream == UpdateStream.BETA &&
-            (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
         if (switchingToBeta) {
             ChatUtils.clickableChat(
                 "Are you sure you want to switch to beta? These versions may be less stable.",

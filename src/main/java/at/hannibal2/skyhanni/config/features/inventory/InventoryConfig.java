@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.HasLegacyId;
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig;
 import at.hannibal2.skyhanni.config.features.inventory.customwardrobe.CustomWardrobeConfig;
+import at.hannibal2.skyhanni.config.features.inventory.experimentationtable.ExperimentationTableConfig;
 import at.hannibal2.skyhanni.config.features.inventory.helper.HelperConfig;
 import at.hannibal2.skyhanni.config.features.itemability.ItemAbilityConfig;
 import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig;
@@ -39,6 +40,10 @@ public class InventoryConfig {
     public BazaarConfig bazaar = new BazaarConfig();
 
     @Expose
+    @Category(name = "Experimentation Table", desc = "QOL features for the Experimentation Table.")
+    public ExperimentationTableConfig experimentationTable = new ExperimentationTableConfig();
+
+    @Expose
     @Category(name = "Enchant Parsing", desc = "Settings for SkyHanni's Enchant Parsing")
     public EnchantParsingConfig enchantParsing = new EnchantParsingConfig();
 
@@ -61,6 +66,7 @@ public class InventoryConfig {
     @Expose
     @ConfigOption(name = "Item Pickup Log", desc = "Logs all the picked up and dropped items")
     @Accordion
+    // TODO remove the suffix "config"
     public ItemPickupLogConfig itemPickupLogConfig = new ItemPickupLogConfig();
 
     @Expose
@@ -72,6 +78,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Not Clickable Items", desc = "Better not click that item.")
     @Accordion
     public HideNotClickableConfig hideNotClickable = new HideNotClickableConfig();
+
+    @Expose
+    @ConfigOption(name = "Personal Compactor Overlay", desc = "Overlay for the Personal Compactor and Deletor.")
+    @Accordion
+    public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
 
     @Expose
     @ConfigOption(name = "RNG Meter", desc = "")
@@ -117,6 +128,11 @@ public class InventoryConfig {
     @ConfigOption(name = "Page Scrolling", desc = "")
     @Accordion
     public PageScrollingConfig pageScrolling = new PageScrollingConfig();
+
+    @Expose
+    @ConfigOption(name = "Magical Power Display", desc = "")
+    @Accordion
+    public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
 
     @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
@@ -266,8 +282,20 @@ public class InventoryConfig {
     public boolean stonkOfStonkPrice = true;
 
     @Expose
+    @ConfigOption(name = "Minister in Calendar", desc = "Show the Minister with their perk in the Calendar.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean ministerInCalendar = true;
+
+    @Expose
     @ConfigOption(name = "Show hex as actual color", desc = "Changes the color of hex codes to the actual color.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean hexAsColorInLore = true;
+
+    @Expose
+    @ConfigOption(name = "Highlight Active Beacon Effect", desc = "Highlights the currently selected beacon effect in the beacon inventory.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightActiveBeaconEffect = true;
 }

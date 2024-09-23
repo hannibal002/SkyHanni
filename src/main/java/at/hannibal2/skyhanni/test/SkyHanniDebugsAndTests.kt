@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -115,45 +116,28 @@ object SkyHanniDebugsAndTests {
         if (args.isEmpty()) {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
+            IslandGraphs.stop()
         }
 
         val x = args[0].toDouble()
         val y = args[1].toDouble()
         val z = args[2].toDouble()
-        testLocation = LorenzVec(x, y, z)
+        val location = LorenzVec(x, y, z)
+        testLocation = location
+        if (args.getOrNull(3) == "pathfind") {
+            IslandGraphs.pathFind(location)
+        }
         ChatUtils.chat("set test waypoint")
     }
 
     fun testCommand(args: Array<String>) {
-        SoundUtils.playBeepSound()
-//            val a = Thread { OSUtils.copyToClipboard("123") }
-//            val b = Thread { OSUtils.copyToClipboard("456") }
-//            a.start()
-//            b.start()
+        SkyHanniMod.coroutineScope.launch {
+            asyncTest()
+        }
+    }
 
-//            for ((i, s) in ScoreboardData.siedebarLinesFormatted().withIndex()) {
-//                println("$i: '$s'")
-//            }
+    private fun asyncTest() {
 
-//            val name = args[0]
-//            val pitch = args[1].toFloat()
-//            val sound = SoundUtils.createSound("note.harp", 1.35f)
-//            val sound = SoundUtils.createSound("random.orb", 11.2f)
-//            SoundUtils.createSound(name, pitch).playSound()
-
-//            a = args[0].toDouble()
-//            b = args[1].toDouble()
-//            c = args[2].toDouble()
-
-//            for (line in getPlayerTabOverlay().footer.unformattedText
-//                .split("\n")) {
-//                println("footer: '$line'")
-//            }
-//
-//
-//            for (line in TabListUtils.getTabList()) {
-//                println("tablist: '$line'")
-//            }
     }
 
     fun findNullConfig(args: Array<String>) {
@@ -509,8 +493,7 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             itemRenderDebug()
         }
 
@@ -545,8 +528,7 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             dragAbleTest()
         }
     }
@@ -594,8 +576,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }
-                    .toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.round(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(

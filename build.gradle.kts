@@ -18,6 +18,7 @@ plugins {
     kotlin("plugin.power-assert")
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
+    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
@@ -312,12 +313,18 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
         onlyIf { false }
     }
 }
+
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
+
+blossom {
+    replaceToken("@MOD_VERSION@", version)
+}
+
 val sourcesJar by tasks.creating(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
