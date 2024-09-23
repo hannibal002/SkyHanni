@@ -102,8 +102,8 @@ object FlowstateHelper {
         if (streakEndTimer.isInFuture()) return
         blockBreakStreak = 0
         displayDirty = true
+        if (!displayHibernating) timeSinceHibernation = SimpleTimeMark.now()
         displayHibernating = true
-        timeSinceHibernation = SimpleTimeMark.now()
         createDisplay()
     }
 
@@ -113,9 +113,7 @@ object FlowstateHelper {
         if (!config.enabled) return
         if (flowstateCache == null) return
 
-        if (displayHibernating && config.autoHide > -1 && timeSinceHibernation.passedSince() > config.autoHide.seconds) {
-            return
-        }
+        if (displayHibernating && config.autoHide > -1 && timeSinceHibernation.passedSince() > config.autoHide.seconds) return
         if (display == null || streakEndTimer.isInFuture()) {
             createDisplay()
         }
