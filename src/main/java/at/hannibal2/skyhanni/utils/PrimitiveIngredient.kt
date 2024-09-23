@@ -7,9 +7,12 @@ import io.github.moulberry.notenoughupdates.recipes.Ingredient
 
 class PrimitiveIngredient(val internalName: NEUInternalName, val count: Double = 1.0) {
 
+    constructor(internalName: NEUInternalName, count: Int) : this(internalName, count.toDouble())
+
     constructor(ingredientIdentifier: String) : this(
         ingredientIdentifier.substringBefore(':').asInternalName(),
-        ingredientIdentifier.substringAfter(':').formatDouble(),
+        // if second part is blank, the count is assumed to be 1
+        ingredientIdentifier.substringAfter(':').let { if (it.isBlank()) 1.0 else it.formatDouble() },
     )
 
     companion object {
@@ -18,7 +21,8 @@ class PrimitiveIngredient(val internalName: NEUInternalName, val count: Double =
         fun fromNeuIngredient(neuIngredient: Ingredient) =
             PrimitiveIngredient(neuIngredient.internalItemId.asInternalName(), neuIngredient.count)
 
-        fun Set<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> = map { it.toPrimitiveItemStack() }
+        fun Set<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> =
+            map { it.toPrimitiveItemStack() }
     }
 
     fun isCoin() = internalName == SKYBLOCK_COIN
