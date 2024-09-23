@@ -12,7 +12,7 @@ class PrimitiveIngredient(val internalName: NEUInternalName, val count: Double =
     constructor(ingredientIdentifier: String) : this(
         ingredientIdentifier.substringBefore(':').asInternalName(),
         // if second part is blank, the count is assumed to be 1
-        ingredientIdentifier.substringAfter(':').let { if (it.isBlank()) 1.0 else it.formatDouble() },
+        ingredientIdentifier.substringAfter(':', "").let { if (it.isBlank()) 1.0 else it.formatDouble() },
     )
 
     companion object {
