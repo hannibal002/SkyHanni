@@ -45,7 +45,7 @@ object NavigationHelper {
 
         val text = mutableListOf<IChatComponent>()
         text.add(Text.createDivider())
-        text.add("found ${names.size} for '$searchTerm'".asComponent().center())
+        text.add("§7Found ${names.size} locations ($searchTerm)".asComponent().center())
         val goBack = {
             onCommand(searchTerm.split(" ").toTypedArray())
             IslandGraphs.stop()
