@@ -83,12 +83,10 @@ object NumberUtil {
      */
     fun Double.roundTo(precision: Int): Double {
         val scale = 10.0.pow(precision)
-        return kotlin.math.round(scale) / scale
+        return kotlin.math.round(this * scale) / scale
     }
 
-    fun Float.roundTo(precision: Int): Float {
-        return toDouble().roundTo(precision).toFloat()
-    }
+    fun Float.roundTo(precision: Int): Float = toDouble().roundTo(precision).toFloat()
 
     @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
     fun Double.roundToPrecision(precision: Int) = this.roundTo(precision)

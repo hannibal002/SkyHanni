@@ -101,10 +101,10 @@ object LorenzUtils {
         return originalMessage.stripHypixelMessage()
     }
 
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
     fun Double.round(decimals: Int) = this.roundTo(decimals)
 
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
     fun Float.round(decimals: Int) = this.roundTo(decimals)
 
     // TODO replace all calls with regex
