@@ -41,7 +41,7 @@ object IslandAreas {
 
     private var nodes = mapOf<GraphNode, Double>()
     private var paths = mapOf<GraphNode, Graph>()
-    private var display: Renderable? = null
+    var display: Renderable? = null
     private var targetNode: GraphNode? = null
     private var currentAreaName = ""
     private val textInput = TextInput()
@@ -103,7 +103,7 @@ object IslandAreas {
         }
     }
 
-    private fun updatePosition() {
+    fun updatePosition() {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
