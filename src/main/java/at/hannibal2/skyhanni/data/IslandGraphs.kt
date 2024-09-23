@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -31,6 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * TODO
@@ -116,46 +117,49 @@ object IslandGraphs {
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (currentIslandGraph != null) return
-        if (event.newIsland ==IslandType.DWARVEN_MINES) {
-            reset()
-            return
-        }
+        if (event.newIsland == IslandType.NONE) return
+        if (event.newIsland == IslandType.DWARVEN_MINES) return
         loadIsland(event.newIsland)
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        currentIslandGraph = null
         reset()
     }
 
     private var inGlaciteTunnels: Boolean? = null
+    val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
     @HandleEvent
     fun onAreaChange(event: ScoreboardAreaChangeEvent) {
-        if (currentIslandGraph != null) return
-        // Should not happen, just as workaround still
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
 
         // TODO repo
-        val areas = setOf("Glacite Tunnels", "Dwarven Base Camp", "Great Glacite Lake", "Fossil Research Center")
 
-        val now = event.area in areas
+        val now = LorenzUtils.skyBlockArea in areas
         if (inGlaciteTunnels != now) {
             inGlaciteTunnels = now
-            if (now) {
-                reloadFromJson("GLACITE_TUNNELS")
-            } else {
-                loadIsland(IslandType.DWARVEN_MINES)
-            }
+            loadDwarvenMines()
+        }
+    }
+
+    private fun loadDwarvenMines() {
+        if (LorenzUtils.skyBlockArea in areas) {
+            reloadFromJson("GLACITE_TUNNELS")
+        } else {
+            reloadFromJson("DWARVEN_MINES")
         }
     }
 
     private fun loadIsland(newIsland: IslandType) {
+        if (newIsland == IslandType.DWARVEN_MINES) {
+            loadDwarvenMines()
+        }
         reloadFromJson(newIsland.name)
     }
 
     private fun reloadFromJson(islandName: String) {
-        ChatUtils.debug("reloadFromJson: $islandName")
         val constant = "island_graphs/$islandName"
         val name = "constants/$constant.json"
         val jsonFile = File(SkyHanniMod.repo.repoLocation, name)
@@ -171,19 +175,30 @@ object IslandGraphs {
     fun setNewGraph(graph: Graph) {
         reset()
         currentIslandGraph = graph
+
+        // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
+        handleTick()
+        IslandAreas.noteMoved()
+        DelayedRun.runDelayed(150.milliseconds) {
+            IslandAreas.updatePosition()
+        }
     }
 
     private fun reset() {
-        currentIslandGraph = null
         closedNote = null
         currentTarget = null
         goal = null
         fastestPath = null
+        IslandAreas.display = null
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        handleTick()
+    }
+
+    private fun handleTick() {
         val prevClosed = closedNote
 
         val graph = currentIslandGraph ?: return
