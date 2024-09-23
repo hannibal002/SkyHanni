@@ -1,18 +1,11 @@
 package at.hannibal2.skyhanni.config.features.mining;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
-import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.mining.FlowstateHelper;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class MiningConfig {
 
@@ -81,6 +74,11 @@ public class MiningConfig {
     public MineshaftPityDisplayConfig mineshaftPityDisplay = new MineshaftPityDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Flowstate Helper", desc = "")
+    @Accordion
+    public FlowstateHelperConfig flowstateHelper = new FlowstateHelperConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -103,19 +101,4 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightYourGoldenGoblin = true;
-
-    @Expose
-    @ConfigOption(name = "Flowstate Helper", desc = "Shows stats for the Flowstate enchantment.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean flowstateHelper = false;
-
-    @Expose
-    @ConfigOption(name = "Flowstate Appearance", desc = "Drag text to change the appearance.")
-    @ConfigEditorDraggableList()
-    public List<FlowstateHelper.FlowstateElements> flowstateHelperAppearance = new ArrayList<>(FlowstateHelper.FlowstateElements.defaultOption);
-
-    @Expose
-    @ConfigLink(owner = MiningConfig.class, field = "flowstateHelper")
-    public Position flowstateHelperPosition = new Position(-110 , 9);
 }

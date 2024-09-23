@@ -6,16 +6,16 @@ import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
-import at.hannibal2.skyhanni.utils.inPartialSeconds
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,12 +23,13 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FlowstateHelper {
-    private val config get() = SkyHanniMod.feature.mining
+    private val config get() = SkyHanniMod.feature.mining.flowstateHelper
     private var streakEndTimer = SimpleTimeMark.farPast()
     private var blockBreakStreak = 0
 
     private var display: List<Renderable>? = null
     private var displayDirty = false
+    private var displayHibernating = true
 
     private var flowstateCache: Int? = null
 
@@ -37,14 +38,34 @@ object FlowstateHelper {
         "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!"
     )
 
-    enum class FlowstateElements(val label: String, var renderable: Renderable) {
+    private val emptyEnderable = Renderable.string("")
+
+    enum class GUIElements(val label: String, var renderable: Renderable) {
         TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
-        TIMER("Time Remaining: §b6.71", Renderable.string("")),
-        STREAK("Streak: §7234", Renderable.string("")),
-        SPEED("§6+600⸕", Renderable.string("")),
+        TIMER("Time Remaining: §b6.71", emptyEnderable),
+        STREAK("Streak: §7234", emptyEnderable),
+        SPEED("§6+600⸕", emptyEnderable),
         ;
 
         override fun toString() = label
+
+        fun create() {
+            when (this) {
+                TIMER -> {
+                    var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
+                    if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
+
+                    renderable = Renderable
+                        .string("Time Remaining: §b${timeRemaining.format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true)}")
+                }
+                STREAK -> {
+                    val textColor = if (blockBreakStreak < 200) "§7" else "§f"
+                    renderable = Renderable.string("Streak: $textColor$blockBreakStreak")
+                }
+                SPEED -> renderable = Renderable.string("§6+${getSpeedBonus()}⸕")
+                else -> return
+            }
+        }
 
         companion object {
             @JvmField
@@ -59,25 +80,11 @@ object FlowstateHelper {
         if (!MiningAPI.inCustomMiningIsland()) return
         if (flowstateCache == null) return
 
-        streakEndTimer = SimpleTimeMark.now().plus(10.seconds)
+        displayHibernating = false
+        streakEndTimer = 10.seconds.fromNow()
         blockBreakStreak += event.extraBlocks.values.sum()
-        createDisplay()
         displayDirty = true
-        attemptClearDisplay()
-    }
-
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) { //TODO: Remove once #2540 is merged
-        if (!MiningAPI.inCustomMiningIsland()) return
-        if (flowstateCache == null) return
-
-        pickobulusPattern.matchMatcher(event.message) {
-            streakEndTimer = SimpleTimeMark.now().plus(10.seconds)
-            blockBreakStreak += group("amount").toInt()
-            createDisplay()
-            attemptClearDisplay()
-            displayDirty = true
-        }
+        createDisplay()
     }
 
     @SubscribeEvent
@@ -91,18 +98,21 @@ object FlowstateHelper {
         if (streakEndTimer.isInFuture()) return
         blockBreakStreak = 0
         displayDirty = true
+        displayHibernating = true
         createDisplay()
     }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!MiningAPI.inCustomMiningIsland()) return
-        if (!config.flowstateHelper) return
+        if (!config.enabled) return
         if (flowstateCache == null) return
 
-        if (display == null || streakEndTimer.isInFuture()) createDisplay()
+        if (!displayHibernating) {
+            if (display == null || streakEndTimer.isInFuture()) createDisplay()
+        }
         display?.let {
-            config.flowstateHelperPosition.renderRenderables(
+            config.position.renderRenderables(
                 it,
                 1,
                 "Flowstate Helper",
@@ -114,32 +124,11 @@ object FlowstateHelper {
     private fun createDisplay() {
         if (displayDirty) {
             displayDirty = false
-            createDisplayTimer()
-            createDisplayBlock()
-            createDisplaySpeed()
-        } else {
-            createDisplayTimer()
+            GUIElements.STREAK.create()
+            GUIElements.SPEED.create()
         }
-        display = config.flowstateHelperAppearance.map { it.renderable }
-    }
-
-    private fun createDisplayTimer(): Renderable {
-        var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now()).inPartialSeconds
-        if (timeRemaining < 0.0) timeRemaining = 0.0
-
-        FlowstateElements.TIMER.renderable = Renderable.string("Time Remaining: §b$timeRemaining")
-        return FlowstateElements.TIMER.renderable
-    }
-
-    private fun createDisplayBlock(): Renderable {
-        val textColor = if (blockBreakStreak < 200) "§7" else "§f"
-        FlowstateElements.STREAK.renderable = Renderable.string("Streak: $textColor$blockBreakStreak")
-        return FlowstateElements.STREAK.renderable
-    }
-
-    private fun createDisplaySpeed(): Renderable {
-        FlowstateElements.SPEED.renderable = Renderable.string("§6+${getSpeedBonus()}⸕")
-        return FlowstateElements.SPEED.renderable
+        GUIElements.TIMER.create()
+        display = config.appearance.map { it.renderable }
     }
 
     private fun getSpeedBonus(): Int {
@@ -159,10 +148,15 @@ object FlowstateHelper {
         attemptClearDisplay()
     }
 
-    private fun hasFlowstate(): Int? {
-        val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: return null
-        if ("ultimate_flowstate" !in enchantList) return null
+    private fun hasFlowstate() {
+        val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: run {
+            flowstateCache = null
+            return
+        }
+        if ("ultimate_flowstate" !in enchantList) {
+            flowstateCache = null
+            return
+        }
         flowstateCache = enchantList.getValue("ultimate_flowstate")
-        return flowstateCache
     }
 }
