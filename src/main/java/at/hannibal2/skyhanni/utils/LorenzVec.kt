@@ -153,7 +153,10 @@ data class LorenzVec(
         return result
     }
 
-    fun round(decimals: Int) = LorenzVec(x.roundTo(decimals), y.roundTo(decimals), z.roundTo(decimals))
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    fun round(precision: Int) = roundTo(precision)
+
+    fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
     fun roundLocationToBlock(): LorenzVec {
         val x = (x - .499999).roundTo(0)
@@ -164,6 +167,7 @@ data class LorenzVec(
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
+    // TODO better name. dont confuse with roundTo()
     fun roundLocation(): LorenzVec {
         val x = if (this.x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1

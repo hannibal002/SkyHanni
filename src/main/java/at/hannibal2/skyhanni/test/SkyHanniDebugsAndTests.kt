@@ -606,7 +606,7 @@ object SkyHanniDebugsAndTests {
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
-//        val distance = LocationUtils.playerLocation().distance(event.location).round(2)
+//        val distance = LocationUtils.playerLocation().distance(event.location).roundTo(2)
 //
 //        println("")
 //        println("particleType: $particleType")
