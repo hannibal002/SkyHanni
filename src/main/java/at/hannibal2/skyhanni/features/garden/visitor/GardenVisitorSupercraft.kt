@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -75,7 +76,7 @@ object GardenVisitorSupercraft {
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
             ?.ingredients ?: return
         val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
-        for ((key, count) in ingredients.map { it.toPrimitiveItemStack() }) {
+        for ((key, count) in ingredients.toPrimitiveItemStacks()) {
             requiredIngredients.addOrPut(key, count)
         }
         hasIngredients = true

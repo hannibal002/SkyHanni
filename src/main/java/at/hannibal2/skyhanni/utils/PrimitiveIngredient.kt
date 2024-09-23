@@ -17,6 +17,8 @@ class PrimitiveIngredient(val internalName: NEUInternalName, val count: Double =
 
         fun fromNeuIngredient(neuIngredient: Ingredient) =
             PrimitiveIngredient(neuIngredient.internalItemId.asInternalName(), neuIngredient.count)
+
+        fun Set<PrimitiveIngredient>.toPrimitiveItemStacks(): List<PrimitiveItemStack> = map { it.toPrimitiveItemStack() }
     }
 
     fun isCoin() = internalName == SKYBLOCK_COIN
