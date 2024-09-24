@@ -28,6 +28,8 @@ object CommandUtils {
 
             fun groupStartingWith(start: String): Collection<ItemGroup> = StringUtils.subMapOfStringsStartingWith(start, entries).values
 
+            fun groupNameStartingWith(start: String): List<String> = groupStartingWith(start).map { it.name }
+
             fun findGroup(string: String): ItemGroup? {
                 val search = string.replace(" ", "_").uppercase()
                 return entries[search]
@@ -102,56 +104,26 @@ object CommandUtils {
         val uppercaseStart = start.uppercase().replace(" ", "_")
         val lowercaseStart = start.lowercase().replace("_", " ")
 
+        fun MutableList<String>.resultAdd(pattern: Regex, start: String, transformedStart: String, f: (String) -> Collection<String>) {
+            val prefix = start.replace(pattern, "$1")
+            val withoutPrefix = transformedStart.replace(pattern, "$2")
+            if (withoutPrefix.isEmpty()) return
+            val lastSpaceIndex = start.replace(pattern, "$2").indexOfLast { it == ' ' } + 1
+            this@resultAdd.addAll(
+                f(withoutPrefix).map { r ->
+                    if (lastSpaceIndex == 0) {
+                        prefix + r
+                    } else {
+                        r.substring(lastSpaceIndex)
+                    }
+                },
+            )
+        }
+
         when (expected) {
-            NameSource.INTERNAL_NAME -> {
-                val prefix = start.replace(internalPattern, "$1")
-                val withoutPrefix = uppercaseStart.replace(internalPattern, "$2")
-                if (withoutPrefix.isEmpty()) return@buildList
-                val lastSpaceIndex = start.replace(internalPattern, "$2").indexOfLast { it == ' ' } + 1
-                addAll(
-                    NEUItems.findInternalNameStartingWithWithoutNPCs(withoutPrefix).map { r ->
-                        if (lastSpaceIndex == 0) {
-                            prefix + r
-                        } else {
-                            r.substring(lastSpaceIndex)
-                        }
-                    },
-                )
-            }
-
-            NameSource.ITEM_NAME -> {
-                val prefix = start.replace(namePattern, "$1")
-                val withoutPrefix = lowercaseStart.replace(namePattern, "$2")
-                if (withoutPrefix.isEmpty()) return@buildList
-                val lastSpaceIndex = start.replace(namePattern, "$2").indexOfLast { it == ' ' } + 1
-                addAll(
-                    NEUItems.findItemNameStartingWithWithoutNPCs(withoutPrefix).map { r ->
-                        if (lastSpaceIndex == 0) {
-                            prefix + r.replace(" ", "_")
-                        } else {
-                            r.substring(lastSpaceIndex).replace(" ", "_")
-                        }
-                    },
-                )
-            }
-
-            NameSource.GROUP -> {
-                val prefix = start.replace(groupPattern, "$1")
-                val withoutPrefix = uppercaseStart.replace(groupPattern, "$2")
-                if (withoutPrefix.isEmpty()) return@buildList
-                val lastSpaceIndex = start.replace(groupPattern, "$2").indexOfLast { it == ' ' } + 1
-                addAll(
-                    ItemGroup.groupStartingWith(withoutPrefix).map {
-                        val r = it.name
-                        if (lastSpaceIndex == 0) {
-                            prefix + r
-                        } else {
-                            r.substring(lastSpaceIndex)
-                        }
-                    },
-                )
-            }
-
+            NameSource.INTERNAL_NAME -> resultAdd(internalPattern, start, uppercaseStart, NEUItems::findInternalNameStartingWithWithoutNPCs)
+            NameSource.ITEM_NAME -> resultAdd(namePattern, start, lowercaseStart, NEUItems::findItemNameStartingWithWithoutNPCs)
+            NameSource.GROUP -> resultAdd(groupPattern, start, uppercaseStart, ItemGroup::groupNameStartingWith)
             null -> {
                 val lastSpaceIndex = start.indexOfLast { it == ' ' } + 1
                 addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name.substring(lastSpaceIndex) })
@@ -159,7 +131,7 @@ object CommandUtils {
                 if (size < 200) {
                     addAll(
                         NEUItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { r ->
-                            r.substring(lastSpaceIndex, r.length).replace(" ", "_")
+                            r.substring(lastSpaceIndex).replace(" ", "_")
                         },
                     )
                 }
