@@ -141,7 +141,7 @@ object CommandUtils {
 
     fun <T : CommandContextAwareObject> numberCalculate(args: Iterable<String>, context: T, use: (T, Long) -> Unit): Int {
         NEUCalculator.calculateOrNull(args.firstOrNull())?.toLong()?.let { use(context, it) } ?: {
-            context.errorMessage = "Unkown number/calculation: '${args.firstOrNull()}'"
+            context.errorMessage = "Invalid number/calculation: '${args.firstOrNull()}'"
         }
         return args.firstOrNull()?.let { 1 } ?: 0
     }

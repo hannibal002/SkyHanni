@@ -54,7 +54,12 @@ object ShTrack {
         CommandArgument("-c", defaultPosition = -2) { a, c -> numberCalculate(a, c) { context, number -> context.currentAmount = number } },
         CommandArgument("-s", validity = ::validIfItemState) { _, c -> c.currentFetch = ContextObject.CurrentFetch.SACKS; 0 },
         CommandArgument("-v", validity = ::validIfItemState) { _, c -> c.currentFetch = ContextObject.CurrentFetch.INVENTORY; 0 },
-        CommandArgument("-cc", validity = ::validIfItemState) { _, c -> c.currentFetch = ContextObject.CurrentFetch.COLLECTION; 0 },
+        CommandArgument(
+            "-cc",
+            validity = { validIfItemState(it) && (it.item as? ItemGroup)?.collection?.isNotEmpty() == true },
+        ) { _, c ->
+            c.currentFetch = ContextObject.CurrentFetch.COLLECTION; 0
+        },
         CommandArgument("-d") { _, c -> c.allowDupe = true; 0 },
         CommandArgument("-k") { _, c -> c.autoDelete = false; 0 },
         CommandArgument("-n") { _, c -> c.notify = true; 0 },
@@ -183,7 +188,7 @@ object ShTrack {
                 }
 
                 else -> {
-                    errorMessage = "Unknown Stat"
+                    errorMessage = "No tracking type specified"
                     return
                 }
             }
