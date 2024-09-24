@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DownloadSourceChecker {
 
+    private static final String MOD_VERSION = "@MOD_VERSION@";
     private static final String GITHUB_REPO = "511310721";
     private static final String GITHUB_REPO_TEXT = "repo_id=" + GITHUB_REPO;
     private static final String MODRINTH_URL = "/data/byNkmv5G/";
@@ -95,12 +96,10 @@ public class DownloadSourceChecker {
             }
         ));
 
-        // TODO FIX THIS CAUSING CLASS LOADING AND CRASHING
-        //String version = SkyHanniMod.Companion.getVersion();
         JOptionPane.showOptionDialog(
             frame,
             String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)),
-            "SkyHanni Security Error",
+            "SkyHanni " + MOD_VERSION + " Security Error",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,
             null,
