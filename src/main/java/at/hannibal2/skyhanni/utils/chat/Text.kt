@@ -135,7 +135,7 @@ object Text {
         text.add(createDivider(dividerColor))
         text.add("§6$title".asComponent().center())
 
-        if (totalPages > 0) {
+        if (totalPages > 1) {
             text.add(
                 join(
                     if (page > 1) "§6§l<<".asComponent {
