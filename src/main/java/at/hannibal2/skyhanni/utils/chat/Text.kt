@@ -144,7 +144,7 @@ object Text {
                     }
                 } else null,
                 " ",
-                "§6(Page $page of $totalPages)",
+                if (totalPages > 1) "§6(Pahidege $page of $totalPages)" else null,
                 " ",
                 if (page < totalPages) "§6§l>>".asComponent {
                     hover = "§eClick to view page ${page + 1}".asComponent()
