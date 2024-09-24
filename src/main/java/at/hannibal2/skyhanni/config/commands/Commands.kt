@@ -795,4 +795,18 @@ data class CommandArgument<T : CommandContextAwareObject>(
     val validity: (T) -> Boolean = { true },
     val tabComplete: (String) -> Collection<String> = { emptyList() },
     val handler: (Iterable<String>, T) -> Int,
-)
+) {
+
+    constructor(
+        documentation: String,
+        prefix: String = "",
+        /** -1 = invalid, -2 last element else index of the position of defaults */
+        defaultPosition: Int = -1,
+        validity: (T) -> Boolean = { true },
+        tabComplete: (String) -> Collection<String> = { emptyList() },
+        noDocumentationFor: List<MutableSet<CommandArgument<T>>> = emptyList(),
+        handler: (Iterable<String>, T) -> Int,
+    ) : this(documentation, prefix, defaultPosition, validity, tabComplete, handler) {
+        noDocumentationFor.forEach { it.add(this) }
+    }
+}

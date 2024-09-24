@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.mining.PowderGainEvent
+import at.hannibal2.skyhanni.features.gui.ShTrack.DocumentationExcludes.itemTrack
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CommandUtils
 import at.hannibal2.skyhanni.utils.CommandUtils.ItemGroup
@@ -35,8 +36,20 @@ object ShTrack {
     private val config get() = SkyHanniMod.feature.gui.shTrackConfig
 
     val arguments = listOf<CommandArgument<ContextObject>>(
-        CommandArgument("<> - Sets the tracking type to items", "-i") { _, c -> c.state = ContextObject.StateType.ITEM; 0 },
-        CommandArgument("<> - Sets the tracking type to powder", "-p") { _, c -> c.state = ContextObject.StateType.POWDER; 0 },
+        CommandArgument(
+            "<> - Sets the tracking type to items",
+            "-i",
+            noDocumentationFor = listOf(itemTrack),
+        ) { _, c ->
+            c.state = ContextObject.StateType.ITEM; 0
+        },
+        CommandArgument(
+            "<> - Sets the tracking type to powder",
+            "-p",
+            noDocumentationFor = listOf(itemTrack),
+        ) { _, c ->
+            c.state = ContextObject.StateType.POWDER; 0
+        },
         CommandArgument("<number/calculation> - Sets the target amount", defaultPosition = 1) { a, c ->
             numberCalculate(
                 a,
@@ -57,6 +70,7 @@ object ShTrack {
             "<powder> - Powder to be tracked.",
             defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER },
             tabComplete = { s -> HotmAPI.PowderType.entries.filter { it.name.startsWith(s.uppercase()) }.map { it.name } },
+            noDocumentationFor = listOf(itemTrack),
         ) { a, c ->
             val entry = HotmAPI.PowderType.getValue(a.first())
             c.item = entry
@@ -87,8 +101,7 @@ object ShTrack {
     )
 
     object DocumentationExcludes {
-        // TODO better reference system
-        val itemTrack = setOf(arguments[0], arguments[1], arguments[4])
+        val itemTrack = mutableSetOf<CommandArgument<ContextObject>>()
     }
 
     private fun validIfItemState(context: ContextObject) = context.state == ContextObject.StateType.ITEM
