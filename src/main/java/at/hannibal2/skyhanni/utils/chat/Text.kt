@@ -135,25 +135,27 @@ object Text {
         text.add(createDivider(dividerColor))
         text.add("§6$title".asComponent().center())
 
-        text.add(
-            join(
-                if (page > 1) "§6§l<<".asComponent {
-                    hover = "§eClick to view page ${page - 1}".asComponent()
-                    onClick {
-                        displayPaginatedList(title, list, chatLineId, emptyMessage, page - 1, maxPerPage, dividerColor, formatter)
-                    }
-                } else null,
-                " ",
-                if (totalPages > 1) "§6(Pahidege $page of $totalPages)" else null,
-                " ",
-                if (page < totalPages) "§6§l>>".asComponent {
-                    hover = "§eClick to view page ${page + 1}".asComponent()
-                    onClick {
-                        displayPaginatedList(title, list, chatLineId, emptyMessage, page + 1, maxPerPage, dividerColor, formatter)
-                    }
-                } else null,
-            ).center(),
-        )
+        if (totalPages > 0) {
+            text.add(
+                join(
+                    if (page > 1) "§6§l<<".asComponent {
+                        hover = "§eClick to view page ${page - 1}".asComponent()
+                        onClick {
+                            displayPaginatedList(title, list, chatLineId, emptyMessage, page - 1, maxPerPage, dividerColor, formatter)
+                        }
+                    } else null,
+                    " ",
+                    "§6(Page $page of $totalPages)",
+                    " ",
+                    if (page < totalPages) "§6§l>>".asComponent {
+                        hover = "§eClick to view page ${page + 1}".asComponent()
+                        onClick {
+                            displayPaginatedList(title, list, chatLineId, emptyMessage, page + 1, maxPerPage, dividerColor, formatter)
+                        }
+                    } else null,
+                ).center(),
+            )
+        }
 
         text.add(createDivider(dividerColor))
 

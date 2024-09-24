@@ -45,9 +45,10 @@ object NavigationHelper {
             onCommand(searchTerm.split(" ").toTypedArray())
             IslandGraphs.stop()
         }
+        val title = if (searchTerm.isBlank()) "SkyHanni Navigation Locations" else "SkyHanni Navigation Locations Matching: \"$searchTerm\""
 
         Text.displayPaginatedList(
-            "SkyHanni Navigation Locations",
+            title,
             locations,
             chatLineId = NAVIGATION_CHAT_ID,
             emptyMessage = "No locations found.",

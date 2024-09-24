@@ -35,8 +35,10 @@ object HelpCommand {
             it.name.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
         }
 
+        val title = if (search.isBlank()) "SkyHanni Commands" else "SkyHanni Commands Matching: \"$search\""
+
         Text.displayPaginatedList(
-            "SkyHanni Commands",
+            title,
             filtered,
             chatLineId = HELP_ID,
             emptyMessage = "No commands found.",
