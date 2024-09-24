@@ -8,14 +8,14 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class ExcavatorTooltipHiderConfig {
 
     @Expose
-    @ConfigOption(name = "Hide Excavator Tooltips", desc = "Hides tooltips of the Dirt inside of the Fossil Excavator.")
+    @ConfigOption(name = "Hide Dirt", desc = "Hides tooltips of the Dirt inside of the Fossil Excavator.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean hideExcavatorTooltips = true;
+    public boolean hideDirt = true;
 
     @Expose
-    @ConfigOption(name = "Hide all Excavator Tooltips", desc = "Hide all tooltips inside inside of the Fossil Excavator.")
+    @ConfigOption(name = "Hide Everything", desc = "Hide all tooltips inside of the Fossil Excavator.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean hideAllExcavatorTooltips = false;
+    public boolean hideEverything = false;
 }
