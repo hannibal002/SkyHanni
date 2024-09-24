@@ -1,9 +1,8 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.commands.CommandArgument
-import at.hannibal2.skyhanni.config.commands.CommandContextAwareObject
 import at.hannibal2.skyhanni.events.TabCompletionEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CommandArgument.Companion.findSpecifierAndGetResult
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -183,7 +182,7 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         entries[name] = this
     }
 
-    private fun tabParse(args: List<String>, partial: String?): List<String> {
+    private fun tabParse(args: Array<String>, partial: String?): List<String> {
         val context = context()
 
         var index = 0
@@ -191,26 +190,14 @@ data class ComplexCommand<O : CommandContextAwareObject>(
 
         while (args.size > index) {
             val loopStartAmountNoPrefix = amountNoPrefixArguments
-            val current = args[index]
-            val (spec, lookup) = specifiers.firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
-                ?: specifiers.firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }?.let {
-                    amountNoPrefixArguments++
-                    it to -1
-                } ?: specifiers.firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
-                    amountNoPrefixArguments++
-                    it to -1
-                } ?: (null to 0)
-            val result = spec?.handler?.let { it(args.slice((lookup + index + 1)..<args.size), context) }
-            if (result == null) {
-                context.errorMessage = "Unknown argument: '$current'"
-            }
+            val step = specifiers.findSpecifierAndGetResult(args, index, context, amountNoPrefixArguments) { amountNoPrefixArguments++ }
             context.errorMessage?.let {
                 if (loopStartAmountNoPrefix != amountNoPrefixArguments) {
                     amountNoPrefixArguments = loopStartAmountNoPrefix
                 }
                 break
             }
-            index += (1 + lookup) + (result ?: 0)
+            index += step
         }
 
         val result = mutableListOf<String>()
@@ -256,8 +243,84 @@ data class ComplexCommand<O : CommandContextAwareObject>(
             val partial = if (isPartial) rawArgs.last() else null
 
             tabBeginString = event.leftOfCursor
-            tabCached = command.tabParse(args, partial)
+            tabCached = command.tabParse(args.toTypedArray(), partial)
             event.addSuggestions(tabCached)
+        }
+    }
+}
+
+interface CommandContextAwareObject {
+    /** Setting this to none null will print the [errorMessage] as a user error and terminates the command handling */
+    var errorMessage: String?
+
+    /** Function that is executed after all arguments have been handled */
+    fun post()
+}
+
+data class CommandArgument<T : CommandContextAwareObject>(
+    val documentation: String,
+    val prefix: String = "",
+    /** -1 = invalid, -2 last element else index of the position of defaults */
+    val defaultPosition: Int = -1,
+    val validity: (T) -> Boolean = { true },
+    val tabComplete: (String) -> Collection<String> = { emptyList() },
+    val handler: (Iterable<String>, T) -> Int,
+) {
+
+    constructor(
+        documentation: String,
+        prefix: String = "",
+        /** -1 = invalid, -2 last element else index of the position of defaults */
+        defaultPosition: Int = -1,
+        validity: (T) -> Boolean = { true },
+        tabComplete: (String) -> Collection<String> = { emptyList() },
+        noDocumentationFor: List<MutableSet<CommandArgument<T>>> = emptyList(),
+        handler: (Iterable<String>, T) -> Int,
+    ) : this(documentation, prefix, defaultPosition, validity, tabComplete, handler) {
+        noDocumentationFor.forEach { it.add(this) }
+    }
+
+    override fun toString(): String = documentation
+
+    fun getResult(
+        args: Array<String>,
+        lookup: Int,
+        index: Int,
+        context: T,
+    ) = this.handler(args.slice((lookup + index + 1)..<args.size), context)
+
+    companion object {
+        private fun <A : CommandArgument<O>, O : CommandContextAwareObject> Collection<A>.findSpecifier(
+            current: String,
+            context: O,
+            amountNoPrefixArguments: Int,
+            amountNoPrefixArgumentsIncrement: () -> Unit,
+        ): Pair<A?, Int> = (firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
+            ?: firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }
+                ?.let {
+                    amountNoPrefixArgumentsIncrement()
+                    it to -1
+                }
+            ?: firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
+                amountNoPrefixArgumentsIncrement()
+                it to -1
+            } ?: (null to 0))
+
+        fun <A : CommandArgument<O>, O : CommandContextAwareObject> Collection<A>.findSpecifierAndGetResult(
+            args: Array<String>,
+            index: Int,
+            context: O,
+            amountNoPrefixArguments: Int,
+            amountNoPrefixArgumentsIncrement: () -> Unit,
+        ): Int {
+            val (spec, lookup) = findSpecifier(args[index], context, amountNoPrefixArguments, amountNoPrefixArgumentsIncrement)
+            val result = spec?.getResult(args, lookup, index, context)
+            return if (result == null) {
+                context.errorMessage = "Unknown argument: '${args[index]}'"
+                lookup + 1
+            } else {
+                lookup + 1 + result
+            }
         }
     }
 }
