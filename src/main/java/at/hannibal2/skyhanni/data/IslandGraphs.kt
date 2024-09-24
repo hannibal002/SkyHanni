@@ -188,6 +188,7 @@ object IslandGraphs {
     }
 
     fun setNewGraph(graph: Graph) {
+        IslandAreas.display = null
         reset()
         currentIslandGraph = graph
 
@@ -204,7 +205,6 @@ object IslandGraphs {
         currentTarget = null
         goal = null
         fastestPath = null
-        IslandAreas.display = null
     }
 
     @SubscribeEvent
