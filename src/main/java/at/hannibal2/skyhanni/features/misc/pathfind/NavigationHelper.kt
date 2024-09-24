@@ -77,6 +77,8 @@ object NavigationHelper {
     private fun calculateNames(distances: Map<GraphNode, Double>): MutableMap<String, GraphNode> {
         val names = mutableMapOf<String, GraphNode>()
         for (node in distances.sorted().keys) {
+            // hiding areas that are none
+            if (node.name == "no_area") continue
             val tag = node.tags.first { it in allowedTags }
             val name = "${node.name} §7(${tag.displayName}§7)"
             if (name in names) continue
