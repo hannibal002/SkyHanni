@@ -6,6 +6,7 @@ import net.minecraft.event.ClickEvent
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 
 object Text {
@@ -96,6 +97,12 @@ object Text {
     fun IChatComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)
         this.command = "/shaction $token"
+    }
+
+
+    fun createDivider() = Text.HYPHEN.fitToChat().style {
+        strikethrough = true
+        color = EnumChatFormatting.BLUE
     }
     
 }
