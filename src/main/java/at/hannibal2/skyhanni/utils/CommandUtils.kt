@@ -102,27 +102,34 @@ object CommandUtils {
         val uppercaseStart = start.uppercase().replace(" ", "_")
         val lowercaseStart = start.lowercase().replace("_", " ")
 
-        // TODO fix space edge case for internal and group
-
         when (expected) {
             NameSource.INTERNAL_NAME -> {
                 val prefix = start.replace(internalPattern, "$1")
                 val withoutPrefix = uppercaseStart.replace(internalPattern, "$2")
                 if (withoutPrefix.isEmpty()) return@buildList
-                addAll(NEUItems.findInternalNameStartingWithWithoutNPCs(withoutPrefix).map { prefix + it })
+                val lastSpaceIndex = start.replace(internalPattern, "$2").indexOfLast { it == ' ' } + 1
+                addAll(
+                    NEUItems.findInternalNameStartingWithWithoutNPCs(withoutPrefix).map { r ->
+                        if (lastSpaceIndex == 0) {
+                            prefix + r
+                        } else {
+                            r.substring(lastSpaceIndex)
+                        }
+                    },
+                )
             }
 
             NameSource.ITEM_NAME -> {
                 val prefix = start.replace(namePattern, "$1")
                 val withoutPrefix = lowercaseStart.replace(namePattern, "$2")
                 if (withoutPrefix.isEmpty()) return@buildList
+                val lastSpaceIndex = start.replace(namePattern, "$2").indexOfLast { it == ' ' } + 1
                 addAll(
                     NEUItems.findItemNameStartingWithWithoutNPCs(withoutPrefix).map { r ->
-                        val index = start.replace(namePattern, "$2").indexOfLast { it == ' ' }
-                        if (index == -1) {
+                        if (lastSpaceIndex == 0) {
                             prefix + r.replace(" ", "_")
                         } else {
-                            r.substring(index + 1, r.length).replace(" ", "_")
+                            r.substring(lastSpaceIndex).replace(" ", "_")
                         }
                     },
                 )
@@ -132,21 +139,27 @@ object CommandUtils {
                 val prefix = start.replace(groupPattern, "$1")
                 val withoutPrefix = uppercaseStart.replace(groupPattern, "$2")
                 if (withoutPrefix.isEmpty()) return@buildList
-                addAll(ItemGroup.groupStartingWith(withoutPrefix).map { prefix + it.name })
+                val lastSpaceIndex = start.replace(groupPattern, "$2").indexOfLast { it == ' ' } + 1
+                addAll(
+                    ItemGroup.groupStartingWith(withoutPrefix).map {
+                        val r = it.name
+                        if (lastSpaceIndex == 0) {
+                            prefix + r
+                        } else {
+                            r.substring(lastSpaceIndex)
+                        }
+                    },
+                )
             }
 
             null -> {
-                addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name })
-                addAll(NEUItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart))
+                val lastSpaceIndex = start.indexOfLast { it == ' ' } + 1
+                addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name.substring(lastSpaceIndex) })
+                addAll(NEUItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart).map { it.substring(lastSpaceIndex) })
                 if (size < 200) {
                     addAll(
                         NEUItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { r ->
-                            val index = start.indexOfLast { it == ' ' }
-                            if (index == -1) {
-                                r.replace(" ", "_")
-                            } else {
-                                r.substring(index + 1, r.length - 1).replace(" ", "_")
-                            }
+                            r.substring(lastSpaceIndex, r.length).replace(" ", "_")
                         },
                     )
                 }
