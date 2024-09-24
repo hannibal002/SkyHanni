@@ -66,7 +66,15 @@ object ChumBucketHider {
         // Chum Bucket
         if (config.hideBucket.get() && entity.inventory.any { it != null && (it.name == "§fEmpty Chum Bucket" || it.name == "§aEmpty Chumcap Bucket") }) {
             val entityLocation = entity.getLorenzVec()
-            for (title in titleEntity.toSet()) {
+            val toSet = try {
+                titleEntity.toSet()
+            } catch (e: NoSuchElementException) {
+                // Caught an NoSuchElementException in ChumBucketHider at CheckRenderEntityEvent: null
+                // We know this happens, but we cant fix it, apparently.
+                // TODO fix it anyway
+                return
+            }
+            for (title in toSet) {
                 if (entityLocation.equalsIgnoreY(title.getLorenzVec())) {
                     hiddenEntities.add(entity)
                     event.cancel()
