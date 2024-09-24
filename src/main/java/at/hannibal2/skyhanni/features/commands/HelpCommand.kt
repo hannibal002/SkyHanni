@@ -5,13 +5,10 @@ import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.center
-import at.hannibal2.skyhanni.utils.chat.Text.fitToChat
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.send
-import at.hannibal2.skyhanni.utils.chat.Text.style
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import kotlin.math.ceil
 
@@ -19,11 +16,6 @@ object HelpCommand {
 
     private const val COMMANDS_PER_PAGE = 15
     private const val HELP_ID = -6457563
-
-    private fun createDivider() = Text.HYPHEN.fitToChat().style {
-        strikethrough = true
-        color = EnumChatFormatting.BLUE
-    }
 
     private fun createCommandEntry(command: Commands.CommandInfo): IChatComponent {
         val category = command.category
@@ -60,7 +52,7 @@ object HelpCommand {
 
         val text = mutableListOf<IChatComponent>()
 
-        text.add(createDivider())
+        text.add(Text.createDivider())
         text.add(title.asComponent().center())
         text.add(
             Text.join(
@@ -77,7 +69,7 @@ object HelpCommand {
                 } else null,
             ).center(),
         )
-        text.add(createDivider())
+        text.add(Text.createDivider())
 
         if (filtered.isEmpty()) {
             text.add(Text.EMPTY)
@@ -91,7 +83,7 @@ object HelpCommand {
             }
         }
 
-        text.add(createDivider())
+        text.add(Text.createDivider())
 
         Text.multiline(text).send(HELP_ID)
     }

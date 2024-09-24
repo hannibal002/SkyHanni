@@ -13,13 +13,10 @@ import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.center
 import at.hannibal2.skyhanni.utils.chat.Text.command
-import at.hannibal2.skyhanni.utils.chat.Text.fitToChat
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.send
-import at.hannibal2.skyhanni.utils.chat.Text.style
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.chat.Text.wrap
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -44,11 +41,6 @@ object ReminderManager {
 
     private fun sendMessage(message: String) = Text.join("§e[Reminder]", " ", message).send(REMINDERS_ACTION_ID)
 
-    private fun createDivider() = Text.HYPHEN.fitToChat().style {
-        strikethrough = true
-        color = EnumChatFormatting.BLUE
-    }
-
     private fun parseDuration(text: String): Duration? = try {
         val duration = TimeUtils.getDuration(text)
         if (duration <= 1.seconds) null else duration
@@ -64,7 +56,7 @@ object ReminderManager {
 
         val text: MutableList<IChatComponent> = mutableListOf()
 
-        text.add(createDivider())
+        text.add(Text.createDivider())
 
         text.add(
             Text.join(
@@ -113,7 +105,7 @@ object ReminderManager {
             text.add(Text.EMPTY)
         }
 
-        text.add(createDivider())
+        text.add(Text.createDivider())
 
         Text.join(*text.toTypedArray(), separator = Text.NEWLINE).send(REMINDERS_LIST_ID)
     }
@@ -183,7 +175,7 @@ object ReminderManager {
     }
 
     private fun help() {
-        createDivider().send()
+        Text.createDivider().send()
         "§6SkyHanni Reminder Commands:".asComponent().send()
         "§e/shremind <time> <reminder> - §bCreates a new reminder".asComponent().send()
         "§e/shremind list <page> - §bLists all reminders".asComponent().send()
@@ -191,7 +183,7 @@ object ReminderManager {
         "§e/shremind edit <id> <reminder> - §bEdits a reminder".asComponent().send()
         "§e/shremind move <id> <time> - §bMoves a reminder".asComponent().send()
         "§e/shremind help - §bShows this help message".asComponent().send()
-        createDivider().send()
+        Text.createDivider().send()
     }
 
     @SubscribeEvent

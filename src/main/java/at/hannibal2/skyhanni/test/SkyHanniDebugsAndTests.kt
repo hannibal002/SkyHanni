@@ -132,11 +132,11 @@ object SkyHanniDebugsAndTests {
 
     fun testCommand(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            asyncTest()
+            asyncTest(args)
         }
     }
 
-    private fun asyncTest() {
+    private fun asyncTest(args: Array<String>) {
 
     }
 
