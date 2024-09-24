@@ -192,6 +192,7 @@ object Commands {
             "shtrackitem",
             "Track any item",
             ShTrack.arguments,
+            ShTrack.DocumentationExcludes.itemTrack,
         ) {
             ShTrack.ContextObject().apply { state = ShTrack.ContextObject.StateType.ITEM }
         }
@@ -731,10 +732,11 @@ object Commands {
         rawName: String,
         description: String,
         specifiers: Collection<A>,
+        excludedSpecifiersFromDescription: Set<A> = emptySet(),
         context: () -> O,
     ) {
-        ComplexCommand(rawName, specifiers, context)
-        registerCommand(rawName, description) {
+        val command = ComplexCommand(rawName, specifiers, context)
+        registerCommand(rawName, command.constructHelp(description, excludedSpecifiersFromDescription)) {
             advancedHandleCommand(it, specifiers, context())
         }
     }
@@ -786,6 +788,7 @@ interface CommandContextAwareObject {
 }
 
 data class CommandArgument<T : CommandContextAwareObject>(
+    val documentation: String,
     val prefix: String = "",
     /** -1 = invalid, -2 last element else index of the position of defaults */
     val defaultPosition: Int = -1,

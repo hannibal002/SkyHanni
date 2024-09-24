@@ -154,6 +154,31 @@ data class ComplexCommand<O : CommandContextAwareObject>(
     val context: () -> O,
 ) {
 
+    fun constructHelp(description: String, excludedSpecifiersFromDescription: Set<CommandArgument<O>>): String = buildString {
+        appendLine(name)
+        appendLine(description)
+        specifiers
+            .filter { !excludedSpecifiersFromDescription.contains(it) }
+            .sortedBy {
+                when (it.defaultPosition) {
+                    -1 -> Int.MAX_VALUE
+                    -2 -> Int.MAX_VALUE - 1
+                    else -> it.defaultPosition
+                }
+            }
+            .forEach {
+                if (it.prefix.isNotEmpty()) {
+                    if (it.defaultPosition != -1) {
+                        appendLine("[${it.prefix}] ${it.documentation}")
+                    } else {
+                        appendLine("${it.prefix} ${it.documentation}")
+                    }
+                } else {
+                    appendLine(it.documentation)
+                }
+            }
+    }
+
     init {
         entries[name] = this
     }

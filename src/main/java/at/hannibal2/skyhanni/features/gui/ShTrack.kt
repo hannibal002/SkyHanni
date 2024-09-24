@@ -35,15 +35,26 @@ object ShTrack {
     private val config get() = SkyHanniMod.feature.gui.shTrackConfig
 
     val arguments = listOf<CommandArgument<ContextObject>>(
-        CommandArgument("-i") { _, c -> c.state = ContextObject.StateType.ITEM; 0 },
-        CommandArgument("-p") { _, c -> c.state = ContextObject.StateType.POWDER; 0 },
-        CommandArgument(defaultPosition = 1) { a, c -> numberCalculate(a, c) { context, number -> context.targetAmount = number } },
-        CommandArgument(defaultPosition = 0, validity = ::validIfItemState, tabComplete = CommandUtils::itemTabComplete) { a, c ->
+        CommandArgument("<> - Sets the tracking type to items", "-i") { _, c -> c.state = ContextObject.StateType.ITEM; 0 },
+        CommandArgument("<> - Sets the tracking type to powder", "-p") { _, c -> c.state = ContextObject.StateType.POWDER; 0 },
+        CommandArgument("<number/calculation> - Sets the target amount", defaultPosition = 1) { a, c ->
+            numberCalculate(
+                a,
+                c,
+            ) { context, number -> context.targetAmount = number }
+        },
+        CommandArgument(
+            "<item> - Item to be tracked",
+            defaultPosition = 0,
+            validity = ::validIfItemState,
+            tabComplete = CommandUtils::itemTabComplete,
+        ) { a, c ->
             val r = itemCheck(a, c)
             r.second?.let { c.item = it }
             r.first
         },
         CommandArgument(
+            "<powder> - Powder to be tracked.",
             defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER },
             tabComplete = { s -> HotmAPI.PowderType.entries.filter { it.name.startsWith(s.uppercase()) }.map { it.name } },
         ) { a, c ->
@@ -51,19 +62,34 @@ object ShTrack {
             c.item = entry
             1
         },
-        CommandArgument("-c", defaultPosition = -2) { a, c -> numberCalculate(a, c) { context, number -> context.currentAmount = number } },
-        CommandArgument("-s", validity = ::validIfItemState) { _, c -> c.currentFetch = ContextObject.CurrentFetch.SACKS; 0 },
-        CommandArgument("-v", validity = ::validIfItemState) { _, c -> c.currentFetch = ContextObject.CurrentFetch.INVENTORY; 0 },
+        CommandArgument("<number/calculation> - Sets the current amount", "-c", defaultPosition = -2) { a, c ->
+            numberCalculate(a, c) { context, number ->
+                context.currentAmount = number
+            }
+        },
         CommandArgument(
-            "-cc",
+            "<> - Sets the current amount from sacks and inventory",
+            "-s",
+            validity = ::validIfItemState,
+        ) { _, c -> c.currentFetch = ContextObject.CurrentFetch.SACKS; 0 },
+        CommandArgument("<> - Sets the current amount from inventory", "-v", validity = ::validIfItemState) { _, c ->
+            c.currentFetch = ContextObject.CurrentFetch.INVENTORY; 0
+        },
+        CommandArgument(
+            "<> - Sets the current amount from collections (Only works with item groups)", "-cc",
             validity = { validIfItemState(it) && (it.item as? ItemGroup)?.collection?.isNotEmpty() == true },
         ) { _, c ->
             c.currentFetch = ContextObject.CurrentFetch.COLLECTION; 0
         },
-        CommandArgument("-d") { _, c -> c.allowDupe = true; 0 },
-        CommandArgument("-k") { _, c -> c.autoDelete = false; 0 },
-        CommandArgument("-n") { _, c -> c.notify = true; 0 },
+        CommandArgument("<> - Does not replace the last equivalent tracking instance", "-d") { _, c -> c.allowDupe = true; 0 },
+        CommandArgument("<> - Does not delete the tracker on target completion", "-k") { _, c -> c.autoDelete = false; 0 },
+        CommandArgument("<> - Sends a notification on completion", "-n") { _, c -> c.notify = true; 0 },
     )
+
+    object DocumentationExcludes {
+        // TODO better reference system
+        val itemTrack = setOf(arguments[0], arguments[1], arguments[4])
+    }
 
     private fun validIfItemState(context: ContextObject) = context.state == ContextObject.StateType.ITEM
 
