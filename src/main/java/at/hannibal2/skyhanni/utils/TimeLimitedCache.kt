@@ -48,11 +48,24 @@ class TimeLimitedCache<K : Any, V : Any>(
      * Modifications to the returned map are not supported and may lead to unexpected behavior.
      * This method is intended for read-only operations such as iteration or retrieval of values.
      *
+     * This returning map and any view into that map via [Map.keys], [Map.values] or [Map.entries],
+     * may return [Collection.size] values larger than the elements actually present during iteration.
+     * This can lead to problems with kotlins [Iterable.toSet], [Iterable.toList] (etc.) small collection
+     * optimizations. Those methods (and similar ones) have optimizations for single element collections.
+     * Since the [Collection.size] is checked first those methods will then not make any additional
+     * checks when accessing the elements of the collection. This can lead to rare [NoSuchElementException].
+     * Therefore, the direct constructors of [HashSet], [ArrayList] and similar are to be preferred,
+     * since they make no such optimizations.
+     *
      * @return A read-only view of the cache's underlying map.
      */
     private fun getMap(): ConcurrentMap<K, V> {
         val asMap: ConcurrentMap<K, V>
 
+        // TODO: the returned map view here is live and is updated as the underlying cache is.
+        //       the lock here is relatively pointless. i don't know why it was put here, but i
+        //       can't imagine a good reason, since every access to the returned map would also
+        //       need to be guarded by the same lock to be effective.
         cacheLock.readLock().lock()
         try {
             asMap = cache.asMap()
