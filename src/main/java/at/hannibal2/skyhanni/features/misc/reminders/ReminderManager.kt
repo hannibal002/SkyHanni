@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.chat.Text.wrap
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
@@ -51,12 +50,11 @@ object ReminderManager {
     private fun listReminders(page: Int) {
         Text.displayPaginatedList(
             "SkyHanni Reminders",
-            "No reminders found.",
-            REMINDERS_PER_PAGE,
-            REMINDERS_LIST_ID,
             getSortedReminders(),
-            page,
-            EnumChatFormatting.BLUE,
+            chatLineId = REMINDERS_LIST_ID,
+            emptyMessage = "No reminders found.",
+            currentPage = page,
+            maxPerPage = REMINDERS_PER_PAGE,
         ) { reminderEntry ->
             val id = reminderEntry.key
             val reminder = reminderEntry.value

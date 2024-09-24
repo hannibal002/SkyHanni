@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
-import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
 
 object HelpCommand {
@@ -38,12 +37,11 @@ object HelpCommand {
 
         Text.displayPaginatedList(
             "SkyHanni Commands",
-            "No commands found.",
-            COMMANDS_PER_PAGE,
-            HELP_ID,
             filtered,
-            page,
-            EnumChatFormatting.BLUE,
+            chatLineId = HELP_ID,
+            emptyMessage = "No commands found.",
+            currentPage = page,
+            maxPerPage = COMMANDS_PER_PAGE,
         ) { createCommandEntry(it) }
     }
 

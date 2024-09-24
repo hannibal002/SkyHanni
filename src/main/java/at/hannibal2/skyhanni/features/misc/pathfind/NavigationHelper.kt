@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import kotlinx.coroutines.launch
-import net.minecraft.util.EnumChatFormatting
 
 object NavigationHelper {
     private const val NAVIGATION_CHAT_ID = -6457562
@@ -49,12 +48,9 @@ object NavigationHelper {
 
         Text.displayPaginatedList(
             "SkyHanni Navigation Locations",
-            "No locations found.",
-            15,
-            NAVIGATION_CHAT_ID,
             locations,
-            1,
-            EnumChatFormatting.BLUE,
+            chatLineId = NAVIGATION_CHAT_ID,
+            emptyMessage = "No locations found.",
         ) { (name, node) ->
             val distance = distances[node]!!.roundTo(1)
             val component = "$name §e$distance".asComponent()
