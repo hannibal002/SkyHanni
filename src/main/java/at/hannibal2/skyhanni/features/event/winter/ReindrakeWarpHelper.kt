@@ -23,7 +23,7 @@ object ReindrakeWarpHelper {
      */
     private val spawnPattern by patternGroup.pattern(
         "spawn.message",
-        "§c§lWOAH! §cA §4Reindrake §cwas summoned from the depths!",
+        "§c§lWOAH! §r§cA §r§4Reindrake §r§cwas summoned from the depths!",
     )
 
     @SubscribeEvent
