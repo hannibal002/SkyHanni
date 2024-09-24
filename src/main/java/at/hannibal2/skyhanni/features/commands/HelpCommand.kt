@@ -3,14 +3,10 @@ package at.hannibal2.skyhanni.features.commands
 import at.hannibal2.skyhanni.config.commands.Commands
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.chat.Text.asComponent
-import at.hannibal2.skyhanni.utils.chat.Text.center
 import at.hannibal2.skyhanni.utils.chat.Text.hover
-import at.hannibal2.skyhanni.utils.chat.Text.onClick
-import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
+import net.minecraft.util.EnumChatFormatting
 import net.minecraft.util.IChatComponent
-import kotlin.math.ceil
 
 object HelpCommand {
 
@@ -35,57 +31,20 @@ object HelpCommand {
         }
     }
 
-    private fun showPage(
-        page: Int,
-        search: String,
-        commands: List<Commands.CommandInfo>,
-    ) {
+    private fun showPage(page: Int, search: String, commands: List<Commands.CommandInfo>) {
         val filtered = commands.filter {
             it.name.contains(search, ignoreCase = true) || it.description.contains(search, ignoreCase = true)
         }
 
-        val maxPage = if (filtered.isNotEmpty()) {
-            ceil(filtered.size.toDouble() / COMMANDS_PER_PAGE).toInt()
-        } else 1
-        val page = page.coerceIn(1, maxPage)
-        val title = if (search.isEmpty()) "§6SkyHanni Commands" else "§6SkyHanni Commands matching '$search'"
-
-        val text = mutableListOf<IChatComponent>()
-
-        text.add(Text.createDivider())
-        text.add(title.asComponent().center())
-        text.add(
-            Text.join(
-                if (page > 1) "§6§l<<".asComponent {
-                    this.hover = "§eClick to view page ${page - 1}".asComponent()
-                    this.onClick { showPage(page - 1, search, commands) }
-                } else null,
-                " ",
-                "§6(Page $page of $maxPage)",
-                " ",
-                if (page < maxPage) "§6§l>>".asComponent {
-                    this.hover = "§eClick to view page ${page + 1}".asComponent()
-                    this.onClick { showPage(page + 1, search, commands) }
-                } else null,
-            ).center(),
-        )
-        text.add(Text.createDivider())
-
-        if (filtered.isEmpty()) {
-            text.add(Text.EMPTY)
-            text.add("§cNo commands found.".asComponent().center())
-            text.add(Text.EMPTY)
-        } else {
-            val start = (page - 1) * COMMANDS_PER_PAGE
-            val end = (page * COMMANDS_PER_PAGE).coerceAtMost(filtered.size)
-            for (i in start until end) {
-                text.add(createCommandEntry(filtered[i]))
-            }
-        }
-
-        text.add(Text.createDivider())
-
-        Text.multiline(text).send(HELP_ID)
+        Text.displayPaginatedList(
+            "SkyHanni Commands",
+            "No commands found.",
+            COMMANDS_PER_PAGE,
+            HELP_ID,
+            filtered,
+            page,
+            EnumChatFormatting.BLUE,
+        ) { createCommandEntry(it) }
     }
 
     fun onCommand(args: Array<String>, commands: List<Commands.CommandInfo>) {

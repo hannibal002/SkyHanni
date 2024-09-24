@@ -60,6 +60,7 @@ object Text {
         }
         return this
     }
+
     fun IChatComponent.center(width: Int = Minecraft.getMinecraft().ingameGUI.chatGUI.chatWidth): IChatComponent {
         val textWidth = this.width()
         val spaceWidth = SPACE.width()
@@ -99,10 +100,76 @@ object Text {
         this.command = "/shaction $token"
     }
 
-
-    fun createDivider() = Text.HYPHEN.fitToChat().style {
+    fun createDivider(dividerColor: EnumChatFormatting = EnumChatFormatting.BLUE) = HYPHEN.fitToChat().style {
         strikethrough = true
-        color = EnumChatFormatting.BLUE
+        color = dividerColor
     }
-    
+
+    /**
+     * Displays a paginated list of entries in the chat.
+     *
+     * @param title The title of the paginated list.
+     * @param emptyMessage The message to display if the list is empty.
+     * @param maxPerPage The number of entries to display per page.
+     * @param chatLineId The ID of the chat line for message updates.
+     * @param entries The list of entries to paginate and display.
+     * @param currentPage The current page to display.
+     * @param dividerColor The color of the divider lines.
+     * @param formatter A function to format each entry into an IChatComponent.
+     */
+    fun <T> displayPaginatedList(
+        title: String,
+        emptyMessage: String,
+        maxPerPage: Int = 15,
+        chatLineId: Int,
+        entries: List<T>,
+        currentPage: Int = 1,
+        dividerColor: EnumChatFormatting = EnumChatFormatting.BLUE,
+        formatter: (T) -> IChatComponent,
+    ) {
+        val text: MutableList<IChatComponent> = mutableListOf()
+
+        val totalPages = (entries.size + maxPerPage - 1) / maxPerPage
+        val page = if (totalPages == 0) 0 else currentPage
+
+        text.add(createDivider(dividerColor))
+        text.add("§6$title".asComponent().center())
+
+        text.add(
+            join(
+                if (page > 1) "§6§l<<".asComponent {
+                    hover = "§eClick to view page ${page - 1}".asComponent()
+                    onClick {
+                        displayPaginatedList(title, emptyMessage, maxPerPage, chatLineId, entries, page - 1, dividerColor, formatter)
+                    }
+                } else null,
+                " ",
+                "§6(Page $page of $totalPages)",
+                " ",
+                if (page < totalPages) "§6§l>>".asComponent {
+                    hover = "§eClick to view page ${page + 1}".asComponent()
+                    onClick {
+                        displayPaginatedList(title, emptyMessage, maxPerPage, chatLineId, entries, page + 1, dividerColor, formatter)
+                    }
+                } else null,
+            ).center(),
+        )
+
+        text.add(createDivider(dividerColor))
+
+        if (entries.isNotEmpty()) {
+            val start = (page - 1) * maxPerPage
+            val end = (page * maxPerPage).coerceAtMost(entries.size)
+            for (i in start until end) {
+                text.add(formatter(entries[i]))
+            }
+        } else {
+            text.add(EMPTY)
+            text.add("§c$emptyMessage".asComponent().center())
+            text.add(EMPTY)
+        }
+
+        text.add(createDivider(dividerColor))
+        multiline(text).send(chatLineId)
+    }
 }
