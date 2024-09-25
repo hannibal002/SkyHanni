@@ -423,8 +423,9 @@ enum class TabWidget(
             val removeIndexes = mutableListOf<Int>()
 
             for ((index, header) in headers) when {
-                PLAYER_LIST.pattern.matches(header) -> if (playerListFound) removeIndexes.add(index - removeIndexes.size) else playerListFound =
-                    true
+                PLAYER_LIST.pattern.matches(header) ->
+                    if (playerListFound) removeIndexes.add(index - removeIndexes.size)
+                    else playerListFound = true
 
                 INFO.pattern.matches(header) -> if (infoFound) removeIndexes.add(index - removeIndexes.size) else infoFound =
                     true
