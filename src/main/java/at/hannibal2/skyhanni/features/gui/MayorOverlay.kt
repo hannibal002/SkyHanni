@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.Perk.Companion.toPerk
@@ -9,30 +10,28 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-private fun renderPerson(
-    title: String,
-    name: String?,
-    perks: List<Perk>?,
-): Renderable {
-    val colorCode = MayorAPI.mayorNameToColorCode(name ?: "")
+private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
+    val colorCode = MayorAPI.mayorNameToColorCode(name.orEmpty())
+    val perkLines = perks?.map { perk ->
+        val ministerPrefix = if (perk.minister) "§6✯ " else ""
+        " $ministerPrefix§e${perk.perkName}" to "§7${perk.description}"
+    } ?: emptyList()
 
     return Renderable.verticalContainer(
         buildMap {
             name?.let { put("$colorCode$title $it", null) }
-            perks?.map { perk ->
-                val ministerPerk = if (perk.minister) "§6✯ " else ""
-                " $ministerPerk§e${perk.perkName}" to "§7${perk.description}"
-            }?.let { putAll(it) }
-        }.map { pair ->
-            pair.value?.let {
+            putAll(perkLines)
+        }.map { (key, value) ->
+            value?.let {
                 Renderable.hoverTips(
-                    Renderable.string(pair.key),
+                    Renderable.string(key),
                     listOf(Renderable.wrappedString(it, 200)),
                 )
-            } ?: Renderable.string(pair.key)
+            } ?: Renderable.string(key)
         },
     )
 }
@@ -43,9 +42,9 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         {
             val currentMayor = MayorAPI.currentMayor
             renderPerson(
-                title = "Mayor",
-                name = currentMayor?.mayorName,
-                perks = currentMayor?.activePerks,
+                "Mayor",
+                currentMayor?.mayorName,
+                currentMayor?.activePerks,
             )
         },
     ),
@@ -54,9 +53,9 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         {
             val currentMinister = MayorAPI.currentMinister
             renderPerson(
-                title = "Minister",
-                name = currentMinister?.mayorName,
-                perks = currentMinister?.activePerks,
+                "Minister",
+                currentMinister?.mayorName,
+                currentMinister?.activePerks,
             )
         },
     ),
@@ -68,15 +67,22 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
             Renderable.verticalContainer(
                 candidates.map { candidate ->
                     renderPerson(
-                        title = "Candidate",
-                        name = candidate.name,
-                        perks = candidate.perks.mapNotNull { it.toPerk() },
+                        "Candidate",
+                        candidate.name,
+                        candidate.perks.mapNotNull { it.toPerk() },
                     )
                 },
                 spacing = 5,
             )
         },
-    );
+    ),
+    NEW_MAYOR(
+        "New Mayor Time",
+        {
+            Renderable.string("§7New Mayor in: §e${MayorAPI.nextMayorTimestamp.timeUntil().format(showMilliSeconds = false)}")
+        },
+    ),
+    ;
 
     override fun toString() = configLine
 
@@ -95,10 +101,9 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         @SubscribeEvent
         fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
             if (!isEnabled()) return
-            val display = display ?: return
-            config.position.renderRenderable(display, posLabel = "Mayor Overlay")
+            display?.let { config.position.renderRenderable(it, posLabel = "Mayor Overlay") }
         }
 
-        fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+        private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
     }
 }
