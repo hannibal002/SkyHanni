@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import com.google.common.cache.CacheBuilder
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.TimeUnit
-import java.util.concurrent.locks.ReentrantReadWriteLock
 import kotlin.time.Duration
 
 class TimeLimitedCache<K : Any, V : Any>(
@@ -11,19 +10,8 @@ class TimeLimitedCache<K : Any, V : Any>(
     private val removalListener: (K?, V?) -> Unit = { _, _ -> },
 ) : Iterable<Map.Entry<K, V>> {
 
-    private val cacheLock = ReentrantReadWriteLock()
-
-    private val cache = CacheBuilder.newBuilder()
-        .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-        .removalListener {
-            cacheLock.writeLock().lock()
-            try {
-                removalListener(it.key, it.value)
-            } finally {
-                cacheLock.writeLock().unlock()
-            }
-        }
-        .build<K, V>()
+    private val cache = CacheBuilder.newBuilder().expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
+        .removalListener { removalListener(it.key, it.value) }.build<K, V>()
 
     // TODO IntelliJ cant replace this, find another way?
 //     @Deprecated("outdated", ReplaceWith("[key] = value"))
@@ -59,22 +47,7 @@ class TimeLimitedCache<K : Any, V : Any>(
      *
      * @return A read-only view of the cache's underlying map.
      */
-    private fun getMap(): ConcurrentMap<K, V> {
-        val asMap: ConcurrentMap<K, V>
-
-        // TODO: the returned map view here is live and is updated as the underlying cache is.
-        //       the lock here is relatively pointless. i don't know why it was put here, but i
-        //       can't imagine a good reason, since every access to the returned map would also
-        //       need to be guarded by the same lock to be effective.
-        cacheLock.readLock().lock()
-        try {
-            asMap = cache.asMap()
-        } finally {
-            cacheLock.readLock().unlock()
-        }
-
-        return asMap
-    }
+    private fun getMap(): ConcurrentMap<K, V> = cache.asMap()
 
     fun containsKey(key: K): Boolean = cache.getIfPresent(key) != null
 
