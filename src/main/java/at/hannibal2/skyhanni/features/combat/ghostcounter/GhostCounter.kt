@@ -282,8 +282,10 @@ object GhostCounter {
         val moneyMadeTips = buildList {
             for ((name, count, value) in priceMap) {
                 moneyMade += (count.toLong() * value.toLong())
-                add("$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} " +
-                    "§f= §6${(value.toLong() * count.toLong()).addSeparators()}")
+                add(
+                    "$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} " +
+                        "§f= §6${(value.toLong() * count.toLong()).addSeparators()}"
+                )
             }
             add("§bTotal: §6${moneyMade.addSeparators()}")
             add("§eClick to copy to clipboard!")

@@ -653,7 +653,7 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
                 }
 
             }.toTypedArray()
-        listOf("$title:", *tuning).map { it to HorizontalAlignment.LEFT }
+        listOf("$title:").plus(tuning).map { it to HorizontalAlignment.LEFT }
     }
 }
 
@@ -841,7 +841,7 @@ private fun getPartyDisplayPair() =
                 " §7- §f$it"
             }
             .toTypedArray()
-        listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
+        listOf(title).plus(partyList).map { it to HorizontalAlignment.LEFT }
     }
 
 private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {

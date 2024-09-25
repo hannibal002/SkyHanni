@@ -200,6 +200,11 @@ object ItemUtils {
         return createItemStack(item, displayName, lore.toList())
     }
 
+    // Overload to reduce spread operator usage
+    fun createItemStack(item: Item, displayName: String, lore: Array<String>): ItemStack {
+        return createItemStack(item, displayName, lore.toList(), 1, 0)
+    }
+
     // Taken from NEU
     fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
         val stack = ItemStack(item, amount, damage)

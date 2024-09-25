@@ -48,6 +48,9 @@ style:
         active: false
     ForbiddenComment: # every TODO gets flagged
         active: false
+    DestructuringDeclarationWithTooManyEntries: # too aggressive
+        active: true
+        maxDestructuringEntries: 5
 
 formatting:
     MaximumLineLength: # ktlint - handled by detekt

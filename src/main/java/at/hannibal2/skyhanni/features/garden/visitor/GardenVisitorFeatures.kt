@@ -583,9 +583,10 @@ object GardenVisitorFeatures {
             }
 
             if (
-                (config.highlightStatus == HighlightMode.COLOR ||
-                    config.highlightStatus == HighlightMode.BOTH) &&
-                entity is EntityLivingBase
+                (
+                    config.highlightStatus == HighlightMode.COLOR ||
+                        config.highlightStatus == HighlightMode.BOTH
+                    ) && entity is EntityLivingBase
             ) {
                 val color = visitor.status.color
                 if (color != -1) {

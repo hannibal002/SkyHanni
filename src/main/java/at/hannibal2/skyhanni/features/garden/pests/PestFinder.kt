@@ -124,7 +124,9 @@ object PestFinder {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() && (
-                PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds)) return
+                PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
+                )
+        ) return
 
         val playerLocation = event.exactPlayerEyeLocation()
         val visibility = config.visibilityType
