@@ -138,7 +138,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @Suppress("EmptyFunctionBlock")
-    private fun asyncTest() {}
+    private fun asyncTest(args: Array<String>) {}
 
     @Suppress("UNUSED_PARAMETER")
     fun findNullConfig(args: Array<String>) {
