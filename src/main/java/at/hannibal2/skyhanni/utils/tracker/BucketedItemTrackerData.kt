@@ -28,6 +28,13 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         resetItems()
     }
 
+    fun addItem(internalName: NEUInternalName, stackSize: Int): Boolean {
+        return selectedBucket?.let {
+            addItem(it, internalName, stackSize)
+            true
+        } ?: false
+    }
+
     fun addItem(bucket: E, internalName: NEUInternalName, stackSize: Int) {
         val bucketMap = bucketedItems.getOrPut(bucket) { HashMap() }
         val item = bucketMap.getOrPut(internalName) { TrackedItem() }

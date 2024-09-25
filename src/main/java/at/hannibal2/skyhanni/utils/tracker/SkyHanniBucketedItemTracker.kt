@@ -32,24 +32,37 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         val SKYBLOCK_COIN = NEUInternalName.SKYBLOCK_COIN
     }
 
-    fun addCoins(bucket: E, coins: Int) {
-        addItem(bucket, SKYBLOCK_COIN, coins)
+    fun addItemToSelectedBucket(internalName: NEUInternalName, amount: Int, command: Boolean = false) {
+        val addSuccess: Boolean = getSharedTracker()?.tryModify {
+            it.addItem(internalName, amount)
+        } ?: false
+
+        if(!addSuccess) {
+            ChatUtils.chat(
+                "§cYou do not have a selected bucket for $name, and loot cannot be added to this tracker generically.\n" +
+                    "§ePlease select a bucket in your inventory UI, then try again."
+            )
+        } else processAddedItem(internalName, amount, command)
     }
 
-    fun addItem(bucket: E, internalName: NEUInternalName, amount: Int, manuallyAdded: Boolean = false) {
+    fun addItem(bucket: E, internalName: NEUInternalName, amount: Int, command: Boolean = false) {
         modify {
             it.addItem(bucket, internalName, amount)
         }
+        processAddedItem(internalName, amount, command)
+    }
+
+    private fun processAddedItem(internalName: NEUInternalName, amount: Int, command: Boolean) {
         getSharedTracker()?.let {
             val hidden = it.get(DisplayMode.TOTAL).getItemsProp()[internalName]!!.hidden
             it.get(DisplayMode.SESSION).getItemsProp()[internalName]!!.hidden = hidden
         }
 
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat && !manuallyAdded) {
+        if (config.warnings.chat && price >= config.warnings.minimumChat && !command) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
-        if (config.warnings.title && price >= config.warnings.minimumTitle && !manuallyAdded) {
+        if (config.warnings.title && price >= config.warnings.minimumTitle && !command) {
             LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
