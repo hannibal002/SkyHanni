@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -290,10 +291,10 @@ object HypixelData {
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
+            ProfileStorageData.profileJoinMessage()
             if (profileName == newProfile) return
             profileName = newProfile
             ProfileJoinEvent(newProfile).postAndCatch()
-            ProfileStorageData.profileJoinMessage()
         }
     }
 
@@ -318,9 +319,14 @@ object HypixelData {
         if (LorenzUtils.onHypixel && LorenzUtils.inSkyBlock) {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
-                    val originalLocation = group("area")
-                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    val originalLocation = group("area").removeColor()
+                    val area = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
                     skyBlockAreaWithSymbol = line.trim()
+                    if (area != skyBlockArea) {
+                        val previousArea = skyBlockArea
+                        skyBlockArea = area
+                        ScoreboardAreaChangeEvent(area, previousArea).post()
+                    }
                     break@loop
                 }
             }

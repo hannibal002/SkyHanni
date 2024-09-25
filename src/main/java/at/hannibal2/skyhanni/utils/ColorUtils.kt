@@ -40,4 +40,6 @@ object ColorUtils {
     fun Color.withAlpha(alpha: Int): Int = (alpha.coerceIn(0, 255) shl 24) or (rgb and 0x00ffffff)
 
     fun Color.addAlpha(alpha: Int): Color = Color(red, green, blue, alpha)
+
+    fun getColorFromHex(hex: String): Int = runCatching { Color(Integer.decode(hex)) }.getOrNull()?.rgb ?: 0
 }

@@ -91,7 +91,7 @@ object MobHighlight {
             event.exactPlayerEyeLocation(),
             arachne.getLorenzVec().up(1.0),
             LorenzColor.RED.toColor(),
-            5,
+            config.lineToArachneWidth,
             true,
         )
     }

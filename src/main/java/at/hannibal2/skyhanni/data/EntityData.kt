@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
+import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -32,6 +33,7 @@ object EntityData {
 
     private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
     private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
+    private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
 
     private val ignoredEntities = listOf(
         EntityArmorStand::class.java,
@@ -100,4 +102,12 @@ object EntityData {
         event.postAndCatch()
         event.chatComponent
     }
+
+    @JvmStatic
+    fun getHealthDisplay(text: String) = healthDisplayCache.getOrPut(text) {
+        val event = EntityHealthDisplayEvent(text)
+        event.postAndCatch()
+        event.text
+    }
+
 }
