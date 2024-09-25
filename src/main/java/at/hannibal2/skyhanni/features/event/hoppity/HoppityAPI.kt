@@ -106,11 +106,13 @@ object HoppityAPI {
                 when (groupOrNull("name") ?: return@matchMatcher) {
                     "Fish the Rabbit" -> {
                         EggFoundEvent(STRAY, it.slotNumber, null).post()
+                        lastName = "§9Fish the Rabbit"
                         lastMeal = STRAY
                         attemptFireRabbitFound()
                     }
                     "El Dorado" -> {
                         EggFoundEvent(STRAY, it.slotNumber, null).post()
+                        lastName = "§6El Dorado"
                         lastMeal = STRAY
                         attemptFireRabbitFound()
                     }
