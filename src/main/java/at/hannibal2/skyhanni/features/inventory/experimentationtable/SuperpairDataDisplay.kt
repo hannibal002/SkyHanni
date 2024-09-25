@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 // TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
-object SuperpairExperimentInformationDisplay {
+object SuperpairDataDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
 
@@ -38,15 +38,12 @@ object SuperpairExperimentInformationDisplay {
         fun isOneOf(vararg types: FoundType) = types.contains(this)
     }
 
-    private var display = emptyList<String>()
-
-    private var uncoveredItems = mutableMapOf<Int, Item>()
-    private var found = mutableMapOf<FoundData, FoundType>()
-
-    private var instantFind = 0
-
     private val sideSpaces1 = listOf(17, 18, 26, 27, 35, 36)
     private val sideSpaces2 = listOf(16, 17, 18, 19, 25, 26, 27, 28, 34, 35, 36, 37)
+
+    private var display = emptyList<String>()
+    private var uncoveredItems = mutableMapOf<Int, Item>()
+    private var found = mutableMapOf<FoundData, FoundType>()
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -54,7 +51,6 @@ object SuperpairExperimentInformationDisplay {
 
         uncoveredItems = mutableMapOf()
         found.clear()
-        instantFind = 0
     }
 
     @SubscribeEvent
@@ -90,17 +86,14 @@ object SuperpairExperimentInformationDisplay {
                 if (uncoveredItems.none { it.key == uncovered && it.value.index == event.slotId })
                     uncoveredItems[uncovered + 1] = itemData
 
-                println(isPowerUp(reward) to isReward(itemName))
-                println(uncoveredItems)
-
                 when {
-                    isPowerUp(reward) -> handlePowerUp(itemData, reward, uncovered + 1)
+                    isPowerUp(reward) -> handlePowerUp(itemData, uncovered + 1)
                     isReward(itemName) -> handleReward(itemData, uncovered + 1)
                 }
 
                 val since = clicksSinceSeparator(uncoveredItems)
 
-                if ((since >= 2 || (since == -1 && uncoveredItems.size >= 2)) && instantFind == 0)
+                if ((since >= 2 || (since == -1 && uncoveredItems.size >= 2)))
                     uncoveredItems[uncovered + 2] = emptyItem
 
                 display = drawDisplay()
@@ -108,35 +101,32 @@ object SuperpairExperimentInformationDisplay {
         }
     }
 
-    private fun handlePowerUp(item: Item, reward: String, uncovered: Int) {
+    private fun handlePowerUp(item: Item, uncovered: Int) {
+        if (item.reward != "Instant Find") uncoveredItems.remove(uncovered)
+
         found[FoundData(item = item)] = FoundType.POWERUP
-        println(found.entries)
-        uncoveredItems.remove(uncovered)
-        if (reward == "Instant Find") instantFind += 1
     }
 
     private fun handleReward(item: Item, uncovered: Int) {
         val last = uncoveredItems.getOrDefault(uncovered - 1, item)
-
-        println(uncovered)
-        println(item)
-        println(last)
 
         val pair = ItemPair(item, last)
 
         if (isWaiting(last.reward)) return
 
         when {
-            instantFind >= 1 -> {
-                handleFoundPair(ItemPair(item, emptyItem))
-                instantFind--
-                uncoveredItems[uncovered + 1] = emptyItem
-            }
-
+            last.reward == "Instant Find" -> handleInstantFind(item, uncovered)
             hasFoundPair(pair) -> handleFoundPair(pair)
             hasFoundMatch(item) -> handleFoundMatch(item)
             else -> handleNormalReward(item)
         }
+    }
+
+    private fun handleInstantFind(item: Item, uncovered: Int) {
+        uncoveredItems[uncovered - 1] = item
+        uncoveredItems[uncovered] = emptyItem
+
+        handleFoundPair(ItemPair(item, emptyItem))
     }
 
     private fun handleFoundPair(
@@ -151,7 +141,6 @@ object SuperpairExperimentInformationDisplay {
         }
 
         found[FoundData(pair = pair)] = FoundType.PAIR
-        println(found)
     }
 
     private fun handleFoundMatch(item: Item) {
@@ -159,15 +148,11 @@ object SuperpairExperimentInformationDisplay {
         val pair = ItemPair(item, match)
 
         if (found.any {
-                it.value.isOneOf(FoundType.MATCH, FoundType.PAIR) && anyDuplicates(
-                    it.key.pair.first.index,
-                    it.key.pair.second.index,
-                    item.index,
-                    match.index,
-                )
+                it.value.isOneOf(FoundType.MATCH, FoundType.PAIR) && (
+                    anyDuplicates(it.key.pair.first.index, item.index, match.index) ||
+                        anyDuplicates(it.key.pair.first.index, item.index, match.index))
             }) return
 
-        println(match.index to item.index)
         found.entries.removeIf { it.value == FoundType.NORMAL && anyDuplicates(it.key.item.index, item.index, match.index) }
         found[FoundData(pair = pair)] = FoundType.MATCH
     }
@@ -182,14 +167,8 @@ object SuperpairExperimentInformationDisplay {
                 }
             }) return
 
-        println(anyDuplicates(43, 41, 43))
-
         found[FoundData(item = item)] = FoundType.NORMAL
-        println(found)
     }
-
-    private fun calculatePossiblePairs(currentExperiment: Experiment) =
-        ((currentExperiment.gridSize - 2) / 2) - found.filter { it.value != FoundType.POWERUP }.size
 
     private fun drawDisplay() = buildList {
         val currentExperiment = ExperimentationTableAPI.getCurrentExperiment() ?: return emptyList<String>()
@@ -230,6 +209,9 @@ object SuperpairExperimentInformationDisplay {
         for (string in toAdd) if (string != toAdd.last()) add(" ├ $string") else add(" └ $string")
     }
 
+    private fun calculatePossiblePairs(currentExperiment: Experiment) =
+        ((currentExperiment.gridSize - 2) / 2) - found.filter { it.value != FoundType.POWERUP }.size
+
     private fun convertToReward(item: ItemStack) = if (item.displayName.removeColor() == "Enchanted Book") item.getLore()[2].removeColor()
     else item.displayName.removeColor()
 
@@ -250,7 +232,8 @@ object SuperpairExperimentInformationDisplay {
 
     private fun isPowerUp(reward: String) = ExperimentationTableAPI.powerUpPattern.matches(reward)
 
-    private fun isReward(reward: String) = ExperimentationTableAPI.rewardPattern.matches(reward)
+    private fun isReward(reward: String) =
+        ExperimentationTableAPI.rewardPattern.matches(reward) || ExperimentationTableAPI.powerUpPattern.matches(reward)
 
     private fun isWaiting(itemName: String) =
         listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!").contains(itemName)
@@ -261,14 +244,14 @@ object SuperpairExperimentInformationDisplay {
     }
 
     private fun isOutOfBounds(slot: Int, experiment: Experiment): Boolean =
-        slot <= experiment.startSlot || slot >= experiment.endSlot || (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
+        slot <= experiment.startSlot || slot >= experiment.endSlot ||
+            (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
-    private fun anyDuplicates(search: Any, vararg toSearch: Any) = toSearch.contains(search)
-
-    private fun ItemStack.reward() = convertToReward(this)
+    private fun anyDuplicates(search: Any, vararg toSearch: Any) = search in toSearch
 
     private fun Item.sameAs(other: Item) =
         this.reward == other.reward && this.damage == other.damage
 
-    private fun isEnabled() = config.superpairDisplay && ExperimentationTableAPI.getCurrentExperiment() != null
+    private fun isEnabled() =
+        config.superpairDisplay && ExperimentationTableAPI.getCurrentExperiment() != null
 }
