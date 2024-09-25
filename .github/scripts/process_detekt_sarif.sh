@@ -17,16 +17,19 @@ read -r -d '' jq_command <<'EOF'
 {
     "full_path": .locations[].physicalLocation.artifactLocation.uri | sub("file://$(pwd)/"; ""),
     "file_name": (.locations[].physicalLocation.artifactLocation.uri | split("/") | last),
-    "line": .locations[].physicalLocation.region.startLine,
+    "l": .locations[].physicalLocation,
     "level": .level,
     "message": .message.text,
     "ruleId": .ruleId
 } |
 (
     "::" + (.level) +
-    " file=" + (.full_path) + ",line=" + (.line|tostring) + ",title=" + (.ruleId) +
-    "::" + (.file_name) + ":" + (.line|tostring) +
-    " - " + (.message)
+    " file=" + (.full_path) +
+    ",line=" + (.l.region.startLine|tostring) +
+    ",title=" + (.ruleId) +
+    ",col=" + (.l.region.startColumn|tostring) +
+    ",endColumn=" + (.l.region.endColumn|tostring) +
+    "::" + (.message.text)
 )
 EOF
 
