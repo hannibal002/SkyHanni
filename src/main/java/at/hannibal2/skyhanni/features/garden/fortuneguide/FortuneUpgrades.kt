@@ -287,6 +287,7 @@ object FortuneUpgrades {
         else -> 8
     }
 
+    // TODO use
     @Suppress("unused")
     private val cropUpgrades = listOf(5, 10, 20, 50, 100, 500, 1000, 5000, 10000)
 

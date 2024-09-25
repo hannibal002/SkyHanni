@@ -308,7 +308,7 @@ object SkillProgress {
                         }
                         append("§7)")
                     },
-                    tips
+                    tips,
                 )
             }
         }

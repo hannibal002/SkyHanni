@@ -263,7 +263,7 @@ object GraphEditor {
 
     private fun chatAtDisable() = ChatUtils.clickableChat(
         "Graph Editor is now inactive. §lClick to activate.",
-        GraphEditor::commandIn
+        GraphEditor::commandIn,
     )
 
     private fun input() {
@@ -539,15 +539,14 @@ object GraphEditor {
                 node.name,
                 node.tags.map {
                     it.internalName
-                }
+                },
             )
         }
         val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
                 val otherNode = if (node == edge.node1) edge.node2 else edge.node1
                 // TODO: Refactor to remove !! operator
-                @Suppress("MapGetWithNotNullAssertionOperator")
-                nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
+                @Suppress("MapGetWithNotNullAssertionOperator") nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
         nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
@@ -570,8 +569,12 @@ object GraphEditor {
         edges.addAll(
             graph.map { node ->
                 // TODO: Refactor to remove !! operator
-                @Suppress("MapGetWithNotNullAssertionOperator")
-                node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!) }
+                @Suppress("MapGetWithNotNullAssertionOperator") node.neighbours.map {
+                    GraphingEdge(
+                        translation[node]!!,
+                        translation[it.key]!!,
+                    )
+                }
             }.flatten().distinct(),
         )
         id = nodes.lastOrNull()?.id?.plus(1) ?: 0

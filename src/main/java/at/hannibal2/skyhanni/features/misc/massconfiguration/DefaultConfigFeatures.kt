@@ -75,13 +75,12 @@ object DefaultConfigFeatures {
             ChatUtils.chat("Unknown version $old")
             return
         }
-        optionList = optionList
-            .mapValues { option ->
-                option.value.filter {
-                    (togglesInNewVersion == null || it.path in togglesInNewVersion) &&
-                        (togglesInOldVersion == null || it.path !in togglesInOldVersion)
-                }
+        optionList = optionList.mapValues { option ->
+            option.value.filter {
+                (togglesInNewVersion == null || it.path in togglesInNewVersion) &&
+                    (togglesInOldVersion == null || it.path !in togglesInOldVersion)
             }
+        }
             .filter { (_, filteredOptions) -> filteredOptions.isNotEmpty() }
         if (optionList.isEmpty()) {
             ChatUtils.chat("There are no new options to configure between $old and $new")

@@ -53,7 +53,7 @@ object RiftTimer {
         currentTime = 0.seconds
     }
 
-    // todo use ActionBarValueUpdateEvent
+    // TODO use ActionBarValueUpdateEvent
     @SubscribeEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return

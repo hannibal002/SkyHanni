@@ -866,7 +866,7 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     amountOfUnknownLines = unconfirmedUnknownLines.size
 
     return listOf(
-        "§cUndetected Lines:" to HorizontalAlignment.LEFT
+        "§cUndetected Lines:" to HorizontalAlignment.LEFT,
     ) + unconfirmedUnknownLines.map {
         it to HorizontalAlignment.LEFT
     }
