@@ -52,7 +52,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
                         candidate.perks.mapNotNull { it.toPerk() },
                     )
                 },
-                spacing = 5,
+                spacing = config.candidateSpacing,
             )
         },
     ),
@@ -73,7 +73,9 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         @SubscribeEvent
         fun onSecondPassed(event: SecondPassedEvent) {
             if (!isEnabled()) return
-            display = config.mayorOverlay.map { it.createLines() }.let { Renderable.verticalContainer(it, spacing = 10) }
+            with(config) {
+                display = mayorOverlay.map { it.createLines() }.let { Renderable.verticalContainer(it, spacing = spacing) }
+            }
         }
 
         @SubscribeEvent
