@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -19,17 +18,19 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
@@ -40,9 +41,9 @@ object IslandAreas {
 
     private var nodes = mapOf<GraphNode, Double>()
     private var paths = mapOf<GraphNode, Graph>()
-    private var display: Renderable? = null
+    var display: Renderable? = null
     private var targetNode: GraphNode? = null
-    private var currentAreaName = ""
+    var currentAreaName = ""
     private val textInput = TextInput()
 
     @SubscribeEvent
@@ -54,7 +55,9 @@ object IslandAreas {
     }
 
     fun noteMoved() {
-        updateNodes()
+        SkyHanniMod.coroutineScope.launch {
+            updateNodes()
+        }
     }
 
     private fun updateNodes() {
@@ -62,19 +65,10 @@ object IslandAreas {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val closedNote = IslandGraphs.closedNote ?: return
 
-        val paths = mutableMapOf<GraphNode, Graph>()
-
-        val map = mutableMapOf<GraphNode, Double>()
-        for (graphNode in graph.nodes) {
-            if (graphNode.getAreaTag() == null) continue
-            val (path, distance) = graph.findShortestPathAsGraphWithDistance(closedNote, graphNode)
-            paths[graphNode] = path
-            map[graphNode] = distance
-        }
+        val (paths, map) = GraphUtils.findFastestPaths(graph, closedNote) { it.getAreaTag() != null }
         this.paths = paths
 
         val finalNodes = mutableMapOf<GraphNode, Double>()
-
         val alreadyFoundAreas = mutableListOf<String>()
         for ((node, distance) in map.sorted()) {
             val areaName = node.name ?: continue
@@ -109,7 +103,7 @@ object IslandAreas {
         }
     }
 
-    private fun updatePosition() {
+    fun updatePosition() {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
@@ -170,7 +164,7 @@ object IslandAreas {
                 }
             }
 
-            val distance = difference.round(1)
+            val distance = difference.roundTo(1)
             val text = "${coloredName}§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {
@@ -268,8 +262,8 @@ object IslandAreas {
     private val allAreas = listOf(GraphNodeTag.AREA, GraphNodeTag.SMALL_AREA)
     private val onlyLargeAreas = listOf(GraphNodeTag.AREA)
 
-    private fun GraphNode.getAreaTag(): GraphNodeTag? = tags.firstOrNull {
-        it in (if (config.includeSmallAreas) allAreas else onlyLargeAreas)
+    fun GraphNode.getAreaTag(ignoreConfig: Boolean = false): GraphNodeTag? = tags.firstOrNull {
+        it in (if (config.includeSmallAreas || ignoreConfig) allAreas else onlyLargeAreas)
     }
 
     private fun setTarget(node: GraphNode) {

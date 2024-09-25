@@ -32,6 +32,7 @@ import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker;
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
@@ -65,6 +66,29 @@ public class ProfileSpecificStorage {
 
     @Expose
     public String currentPet = "";
+
+    @Expose
+    public ExperimentationStorage experimentation = new ExperimentationStorage();
+
+    public static class ExperimentationStorage {
+
+        @Expose
+        public LorenzVec tablePos = new LorenzVec();
+
+        @Expose
+        public ExperimentsDryStreakStorage dryStreak = new ExperimentsDryStreakStorage();
+
+        public static class ExperimentsDryStreakStorage {
+            @Expose
+            public int attemptsSince = 0;
+
+            @Expose
+            public int xpSince = 0;
+        }
+
+        @Expose
+        public ExperimentsProfitTracker.Data experimentsProfitTracker = new ExperimentsProfitTracker.Data();
+    }
 
     @Expose
     public ChocolateFactoryStorage chocolateFactory = new ChocolateFactoryStorage();
