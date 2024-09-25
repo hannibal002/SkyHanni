@@ -37,10 +37,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             it.addItem(internalName, amount)
         } ?: false
 
-        if(!addSuccess) {
+        if (!addSuccess) {
             ChatUtils.chat(
                 "§cYou do not have a selected bucket for $name, and loot cannot be added to this tracker generically.\n" +
-                    "§ePlease select a bucket in your inventory UI, then try again."
+                    "§ePlease select a bucket in your inventory UI, then try again.",
             )
         } else processAddedItem(internalName, amount, command)
     }
@@ -72,9 +72,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             lists.addSearchableSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.sellName },
-                isCurrent = { it?.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceSource = it?.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
+                    config.priceSource = it.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
                     update()
                 },
             )
