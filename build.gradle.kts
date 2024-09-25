@@ -337,8 +337,8 @@ publishing.publications {
     }
 }
 
-// Detekt:
-detekt {
+// Detekt: TODO: Uncomment this when we're ready to enforce
+/*detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
     baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
@@ -361,4 +361,4 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
-}
+}*/

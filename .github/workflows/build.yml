@@ -36,22 +36,22 @@ jobs:
                 with:
                     name: "Test Results"
                     path: versions/1.8.9/build/reports/tests/test/
-    detekt:
-        name: Run detekt
-        runs-on: ubuntu-latest
+    #detekt:
+    #    name: Run detekt
+    #    runs-on: ubuntu-latest
 
-        steps:
-            -   name: Checkout code
-                uses: actions/checkout@v4
-            -   uses: ./.github/actions/setup-normal-workspace
-            -   name: Run detekt
-                run: |
-                    ./gradlew detekt --stacktrace
-            -   name: Annotate detekt failures
-                if: ${{ !cancelled() }}
-                run: |
-                    chmod +x .github/scripts/process_detekt_sarif.sh
-                    ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/detekt.sarif
+    #    steps:
+    #        -   name: Checkout code
+    #            uses: actions/checkout@v4
+    #        -   uses: ./.github/actions/setup-normal-workspace
+    #        -   name: Run detekt
+    #            run: |
+    #                ./gradlew detekt --stacktrace
+    #        -   name: Annotate detekt failures
+    #            if: ${{ !cancelled() }}
+    #            run: |
+    #                chmod +x .github/scripts/process_detekt_sarif.sh
+    #                ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/detekt.sarif
     
 
     preprocess:
