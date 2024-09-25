@@ -46,6 +46,8 @@ style:
         allowedNames: "^(unused|_)$"
     UseCheckOrError:
         active: false
+    ForbiddenComment: # every TODO gets flagged
+        active: false
 
 formatting:
     MaximumLineLength: # ktlint - handled by detekt
@@ -85,7 +87,7 @@ complexity:
         thresholdInObjects: 20
         thresholdInEnums: 11
         ignoreAnnotated:
-            - 'SkyhanniModule'
+            - 'SkyHanniModule'
     ComplexCondition: # aggressive by default, at a complexity of 4
         active: true
         threshold: 6
