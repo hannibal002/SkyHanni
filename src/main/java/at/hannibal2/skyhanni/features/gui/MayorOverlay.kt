@@ -14,28 +14,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
-    val colorCode = MayorAPI.mayorNameToColorCode(name.orEmpty())
-    val perkLines = perks?.map { perk ->
-        val ministerPrefix = if (perk.minister) "§6✯ " else ""
-        " $ministerPrefix§e${perk.perkName}" to "§7${perk.description}"
-    } ?: emptyList()
-
-    return Renderable.verticalContainer(
-        buildMap {
-            name?.let { put("$colorCode$title $it", null) }
-            putAll(perkLines)
-        }.map { (key, value) ->
-            value?.let {
-                Renderable.hoverTips(
-                    Renderable.string(key),
-                    listOf(Renderable.wrappedString(it, 200)),
-                )
-            } ?: Renderable.string(key)
-        },
-    )
-}
-
 enum class MayorOverlay(private val configLine: String, private val createLines: () -> Renderable) {
     MAYOR(
         "Mayor",
@@ -94,7 +72,6 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
         @SubscribeEvent
         fun onSecondPassed(event: SecondPassedEvent) {
             if (!isEnabled()) return
-
             display = config.mayorOverlay.map { it.createLines() }.let { Renderable.verticalContainer(it, spacing = 10) }
         }
 
@@ -106,4 +83,26 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 
         private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MAYOR_OVERLAY.isSelected()) && config.enabled
     }
+}
+
+private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
+    val colorCode = MayorAPI.mayorNameToColorCode(name.orEmpty())
+    val perkLines = perks?.map { perk ->
+        val ministerPrefix = if (perk.minister) "§6✯ " else ""
+        " $ministerPrefix§e${perk.perkName}" to "§7${perk.description}"
+    } ?: emptyList()
+
+    return Renderable.verticalContainer(
+        buildMap {
+            name?.let { put("$colorCode$title $it", null) }
+            putAll(perkLines)
+        }.map { (key, value) ->
+            value?.let {
+                Renderable.hoverTips(
+                    Renderable.string(key),
+                    listOf(Renderable.wrappedString(it, 200)),
+                )
+            } ?: Renderable.string(key)
+        },
+    )
 }
