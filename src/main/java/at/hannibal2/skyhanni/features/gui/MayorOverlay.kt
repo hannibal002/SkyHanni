@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+private val config get() = SkyHanniMod.feature.gui.mayorOverlay
+
 enum class MayorOverlay(private val configLine: String, private val createLines: () -> Renderable) {
     MAYOR(
         "Mayor",
@@ -66,7 +68,6 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 
     @SkyHanniModule
     companion object {
-        private val config get() = SkyHanniMod.feature.gui.mayorOverlay
         var display: Renderable? = null
 
         @SubscribeEvent
@@ -87,9 +88,8 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
 
 private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Renderable {
     val colorCode = MayorAPI.mayorNameToColorCode(name.orEmpty())
-    val perkLines = perks?.map { perk ->
-        val ministerPrefix = if (perk.minister) "§6✯ " else ""
-        " $ministerPrefix§e${perk.perkName}" to "§7${perk.description}"
+    val perkLines = perks?.takeIf { config.showPerks }?.map { perk ->
+        "${if (perk.minister) "§6✯ " else ""}§e${perk.perkName}" to "§7${perk.description}"
     } ?: emptyList()
 
     return Renderable.verticalContainer(

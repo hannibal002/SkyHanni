@@ -24,6 +24,11 @@ public class MayorOverlayConfig {
     public List<MayorOverlay> mayorOverlay = new ArrayList<>(MayorOverlay.getEntries());
 
     @Expose
+    @ConfigOption(name = "Show Perks", desc = "Show the perks of the mayor.")
+    @ConfigEditorBoolean
+    public boolean showPerks = true;
+
+    @Expose
     @ConfigLink(owner = MayorOverlayConfig.class, field = "enabled")
     public Position position = new Position(10, 10, false, true);
 
