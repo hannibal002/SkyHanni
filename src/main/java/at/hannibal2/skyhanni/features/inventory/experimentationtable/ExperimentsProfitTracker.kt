@@ -3,10 +3,12 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
@@ -28,7 +30,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -93,6 +94,13 @@ object ExperimentsProfitTracker {
 
         @Expose
         var startCost = 0L
+    }
+
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+
+        tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @SubscribeEvent
@@ -162,7 +170,7 @@ object ExperimentsProfitTracker {
                 val price = internalName.getPrice()
                 val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
                 val maxPrice = npcPrice.coerceAtLeast(price)
-                startCostTemp += maxPrice.roundTo(0).toInt()
+                startCostTemp += maxPrice.toInt()
                 iterator.remove()
             }
             tracker.modify {
