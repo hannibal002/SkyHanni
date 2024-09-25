@@ -49,4 +49,5 @@ enum class RecipeType {
     KAT_UPGRADE,
     ESSENCE,
     CRAFTING,
+    ;
 }

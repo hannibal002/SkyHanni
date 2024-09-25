@@ -68,7 +68,6 @@ enum class MiningEventType(
 
         },
     ),
-    @Suppress("MaxLineLength")
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, 'c', true,
         ItemUtils.createSkull(
@@ -77,7 +76,6 @@ enum class MiningEventType(
             "ewogICJ0aW1lc3RhbXAiIDogMTYwNzQ2NDg4MTMwOCwKICAicHJvZmlsZUlkIiA6ICJhMmY4MzQ1OTVjODk0YTI3YWRkMzA0OTcxNmNhOTEwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJiUHVuY2giLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTcyODUwOTA2YjdmMGQ5NTJjMGU1MDgwNzNjYzQzOWZkMzM3NGNjZjViODg5YzA2ZjdlOGQ5MGNjMGNjMjU1YyIKICAgIH0KICB9Cn0=",
         ),
     ),
-    @Suppress("MaxLineLength")
     BETTER_TOGETHER(
         "BETTER TOGETHER", "Better", 18.minutes, 'd', false,
         object : Renderable {

@@ -132,7 +132,8 @@ object GuiRenderUtils {
             // borders
             GuiScreen.drawRect(
                 tooltipX - 3, tooltipY - 3 + 1, tooltipX - 3 + 1, tooltipY + tooltipHeight + 3 - 1, borderColor,
-            )
+
+                )
 
             GuiScreen.drawRect(
                 tooltipX + tooltipTextWidth + 2,
@@ -197,24 +198,23 @@ object GuiRenderUtils {
                             Renderable.string(
                                 "§2${DecimalFormat("0.##").format(current)} / ${
                                     DecimalFormat(
-                                        "0.##"
+                                        "0.##",
                                     ).format(maxValue)
                                 }☘",
-                                scale = scale,
-                                horizontalAlign = HorizontalAlignment.LEFT
+                                scale = scale, horizontalAlign = HorizontalAlignment.LEFT,
                             ),
                             Renderable.string(
                                 "§2${(percent * 100).roundTo(1)}%",
                                 scale = scale,
-                                horizontalAlign = HorizontalAlignment.RIGHT
+                                horizontalAlign = HorizontalAlignment.RIGHT,
                             ),
                         ),
-                        width
+                        width,
                     ),
-                    Renderable.progressBar(percent, width = width)
-                )
+                    Renderable.progressBar(percent, width = width),
+                ),
             ),
-            tooltip.split('\n').map { Renderable.string(it) }
+            tooltip.split('\n').map { Renderable.string(it) },
         )
     }
 

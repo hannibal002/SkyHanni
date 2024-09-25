@@ -25,13 +25,13 @@ object EssenceItemUtils {
         for ((name, data) in unformattedData) {
 
             val essencePrices = loadEssencePrices(data)
-            val extraItems = data.extraItems.orEmpty()
+            val extraItems = data.extraItems ?: emptyMap()
             val (coinPrices, iemPrices) = loadCoinAndItemPrices(extraItems)
 
             val upgradePrices = mutableMapOf<Int, EssenceUpgradePrice>()
             for ((tier, essencePrice) in essencePrices) {
                 val coinPrice = coinPrices[tier]
-                val itemPrice = iemPrices[tier].orEmpty()
+                val itemPrice = iemPrices[tier] ?: emptyMap()
                 upgradePrices[tier] = EssenceUpgradePrice(essencePrice, coinPrice, itemPrice)
             }
 
@@ -64,9 +64,7 @@ object EssenceItemUtils {
         return Pair(collectCoinPrices, collectItemPrices)
     }
 
-    private fun split(string: String): Pair<NEUInternalName, Long> = string.split(":").let {
-        it[0].asInternalName() to it[1].toLong()
-    }
+    private fun split(string: String): Pair<NEUInternalName, Long> = string.split(":").let { it[0].asInternalName() to it[1].toLong() }
 
     private fun loadEssencePrices(data: NeuEssenceCostJson): MutableMap<Int, EssencePrice> {
         val map = mutableMapOf<Int, EssencePrice>()

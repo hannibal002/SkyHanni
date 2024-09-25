@@ -34,7 +34,7 @@ data class NeuReforgeJson(
                     LorenzRarity.valueOf(
                         it.key.uppercase().replace(" ", "_"),
                     )
-                }.orEmpty()
+                } ?: emptyMap()
 
                 else -> emptyMap()
             }
@@ -53,10 +53,10 @@ data class NeuReforgeJson(
                 is Map<*, *> -> {
                     val type = "SPECIAL_ITEMS"
                     val map = any as? Map<String, List<String>> ?: return type to emptyList()
-                    val internalNames = map["internalName"]?.map { it.asInternalName() }.orEmpty()
+                    val internalNames = map["internalName"]?.map { it.asInternalName() } ?: emptyList()
                     val itemType = map["itemid"]?.map {
                         NEUItems.getInternalNamesForItemId(Item.getByNameOrId(it))
-                    }?.flatten().orEmpty()
+                    }?.flatten() ?: emptyList()
                     type to (internalNames + itemType)
                 }
 

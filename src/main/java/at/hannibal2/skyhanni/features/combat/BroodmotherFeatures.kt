@@ -49,7 +49,7 @@ object BroodmotherFeatures {
     @SubscribeEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
-        val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()
+        val newStage = event.widget.matchMatcherFirstLine { group("stage") } ?: ""
         if (newStage.isNotEmpty()) {
             lastStage = currentStage
             currentStage = StageEntry.valueOf(newStage.replace("!", "").uppercase())

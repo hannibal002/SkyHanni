@@ -113,17 +113,17 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
                 lastKnownDisplayStrings[LOCATION] = location
             }
         }
-        lastKnownDisplayStrings[LOCATION] ?: "None" // only display None if we don't have a last known area
+        lastKnownDisplayStrings[LOCATION] ?: "None"// only display None if we don't have a last known area
     }),
 
     PURSE({
         val scoreboard = ScoreboardData.sidebarLinesFormatted
         // Matches coins amount in purse or piggy, with optional decimal points
         val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
-            purseRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
+            purseRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
         val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
-            motesRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
+            motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
         }
         lastKnownDisplayStrings[PURSE] = when {
             coins == "1" -> "1 Coin"
@@ -131,9 +131,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             motes == "1" -> "1 Mote"
             motes != "" && motes != null -> "$motes Motes"
 
-            else -> lastKnownDisplayStrings[PURSE].orEmpty()
+            else -> lastKnownDisplayStrings[PURSE] ?: ""
         }
-        lastKnownDisplayStrings[PURSE].orEmpty()
+        lastKnownDisplayStrings[PURSE] ?: ""
     }),
 
     BITS({
@@ -158,12 +158,12 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         if (ActionBarStatsData.MANA.value != "") {
             lastKnownDisplayStrings[STATS] = statString
         }
-        lastKnownDisplayStrings[STATS].orEmpty()
+        lastKnownDisplayStrings[STATS] ?: ""
     }),
 
     ITEM({
         InventoryUtils.getItemInHand()?.let {
-            String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
+            String.format("Holding ${it.displayName.removeColor()}")
         } ?: "No item in hand"
     }),
 
@@ -268,7 +268,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         }
 
         val itemInHand = InventoryUtils.getItemInHand()
-        val itemName = itemInHand?.displayName?.removeColor().orEmpty()
+        val itemName = itemInHand?.displayName?.removeColor() ?: ""
 
         val extraAttributes = getExtraAttributes(itemInHand)
 
@@ -335,7 +335,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     })
     ;
 
-    fun getDisplayString(): String = displayMessageSupplier().orEmpty()
+    fun getDisplayString(): String = displayMessageSupplier() ?: ""
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {
@@ -344,4 +344,5 @@ enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatu
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
     DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
     AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
+    ;
 }

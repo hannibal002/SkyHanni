@@ -57,10 +57,7 @@ object DianaFixChat {
         errorCounter++
         if (errorCounter == 1) {
             if (successfulCounter < 5) {
-                ChatUtils.chat(
-                    "Could not find Diana Guess using sound and particles, " +
-                        "please try again. (Was this a funny sound easter egg?)"
-                )
+                ChatUtils.chat("Could not find Diana Guess using sound and particles, please try again. (Was this a funny sound easter egg?)")
             }
             return
         }
@@ -76,8 +73,7 @@ object DianaFixChat {
                         HypixelCommands.particleQuality("high")
                         errorCounter = 0
                         ChatUtils.chat("Now try again!")
-                    }
-                )
+                    })
             }
         } else {
             if (!hasSetToggleMusic) {
@@ -91,8 +87,7 @@ object DianaFixChat {
                             HypixelCommands.toggleMusic()
                             errorCounter = 0
                             ChatUtils.chat("Now try again, please!")
-                        }
-                    )
+                        })
                 }
             } else {
                 ErrorManager.logErrorStateWithData(

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -136,10 +137,10 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    @Suppress("EmptyFunctionBlock")
-    private fun asyncTest(args: Array<String>) {}
+    private fun asyncTest(args: Array<String>) {
 
-    @Suppress("UNUSED_PARAMETER")
+    }
+
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
         findNull(SkyHanniMod.feature, "config")
@@ -378,7 +379,7 @@ object SkyHanniDebugsAndTests {
                 add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
                 add("  §eitemName: '${internalName.itemName}§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
+                add("  §eprice: '§6${price}§e'")
                 return@buildList
             }
 
@@ -388,7 +389,7 @@ object SkyHanniDebugsAndTests {
                 add("§einternal name: §7${internalName.asString()}")
                 add("§einternal name -> item name: '$itemName§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6$price§e'")
+                add("  §eprice: '§6${price}§e'")
                 return@buildList
             }
 
@@ -486,11 +487,14 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+    }
+
+    @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             itemRenderDebug()
         }
 
@@ -525,8 +529,7 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf")
-        if (false) {
+        @Suppress("ConstantConditionIf") if (false) {
             dragAbleTest()
         }
     }

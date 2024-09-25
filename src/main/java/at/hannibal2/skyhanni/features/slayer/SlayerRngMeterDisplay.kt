@@ -57,7 +57,6 @@ object SlayerRngMeterDisplay {
         "changeditem",
         "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
     )
-
     /**
      * REGEX-TEST: §aEnchanted Book (§d§lDuplex I§a)
      */
@@ -124,7 +123,7 @@ object SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/$to§7)")
+                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
                 lastItemDroppedTime = SimpleTimeMark.now()
             }
             if (blockChat) {
@@ -218,8 +217,7 @@ object SlayerRngMeterDisplay {
 
         if (SlayerAPI.latestSlayerCategory.let {
                 it.endsWith(" I") || it.endsWith(" II")
-            }
-        ) {
+            }) {
             return ""
         }
         val latestSlayerCategory = SlayerAPI.latestSlayerCategory

@@ -89,7 +89,7 @@ object CropSpeedMeter {
             snapshot = emptyList()
         } else {
             currentCrop?.let {
-                val crops = it.getCounter() - (startCrops[it] ?: 0L)
+                val crops = it.getCounter() - startCrops[it]!!
                 val blocks = currentBlocks
                 val cropsPerBlocks = (crops.toDouble() / blocks.toDouble()).roundTo(3)
 

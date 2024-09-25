@@ -252,7 +252,7 @@ object GardenVisitorFeatures {
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
             .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
-            ?.ingredients.orEmpty()
+            ?.ingredients ?: emptySet()
         if (ingredients.isEmpty()) return
 
         val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
@@ -582,12 +582,7 @@ object GardenVisitorFeatures {
                 }
             }
 
-            if (
-                (
-                    config.highlightStatus == HighlightMode.COLOR ||
-                        config.highlightStatus == HighlightMode.BOTH
-                    ) && entity is EntityLivingBase
-            ) {
+            if ((config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH) && entity is EntityLivingBase) {
                 val color = visitor.status.color
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(
@@ -687,7 +682,7 @@ object GardenVisitorFeatures {
                     add("shoppingList: '${visitor.shoppingList}'")
                 }
                 visitor.offer?.offerItem?.getInternalName()?.let {
-                    add("offer: '$it'")
+                    add("offer: '${it}'")
                 }
             }
         }

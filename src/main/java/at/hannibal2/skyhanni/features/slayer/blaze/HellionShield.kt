@@ -14,4 +14,5 @@ enum class HellionShield(
     ASHEN("§8§lASHEN", "Ashen", LorenzColor.DARK_GRAY),
     SPIRIT("§f§lSPIRIT", "Spirit", LorenzColor.WHITE),
     CRYSTAL("§b§lCRYSTAL", "Crystal", LorenzColor.AQUA),
+    ;
 }

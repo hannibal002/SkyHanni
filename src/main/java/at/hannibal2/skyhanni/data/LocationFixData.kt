@@ -11,7 +11,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object LocationFixData {
 
-    private val locationFixes = mutableMapOf<IslandType, List<LocationFix>>()
+    private var locationFixes = mutableMapOf<IslandType, List<LocationFix>>()
 
     private data class LocationFix(val area: AxisAlignedBB, val realLocation: String)
 

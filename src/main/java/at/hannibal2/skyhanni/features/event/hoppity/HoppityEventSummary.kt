@@ -98,8 +98,8 @@ object HoppityEventSummary {
 
         if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
             sendStatsMessage(stats, year)
-            ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
-                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
+            (ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
+                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization."))
         }
     }
 
@@ -155,10 +155,8 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.MILESTONE_RABBITS) { sb, stats, _ ->
-                var milestoneRabbitsFound = 0
-                milestoneRabbitsFound += stats.mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0
-                milestoneRabbitsFound += stats.mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0
-                milestoneRabbitsFound.takeIf { it > 0 }?.let {
+                ((stats.mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
+                    (stats.mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)).takeIf { it > 0 }?.let {
                     sb.appendHeadedLine("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7.")
                 }
             }
@@ -204,8 +202,7 @@ object HoppityEventSummary {
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
-        val availableYearsFormat = "§eHoppity Event Stats are available for the following years:§r\n" +
-            statsYearFormatList.joinToString("§e, ") { it }
+        val availableYearsFormat = "§eHoppity Event Stats are available for the following years:§r\n${statsYearFormatList.joinToString("§e, ") { it }}"
 
         if (parsedInt == null) {
             if (HoppityAPI.isHoppityEvent()) {

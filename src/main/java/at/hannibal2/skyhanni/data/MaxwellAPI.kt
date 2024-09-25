@@ -52,7 +52,7 @@ object MaxwellAPI {
         }
 
     var favoritePowers: List<String>
-        get() = storage?.maxwell?.favoritePowers.orEmpty()
+        get() = storage?.maxwell?.favoritePowers ?: listOf()
         set(value) {
             storage?.maxwell?.favoritePowers = value
         }

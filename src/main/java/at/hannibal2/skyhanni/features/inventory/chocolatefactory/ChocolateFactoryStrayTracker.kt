@@ -45,7 +45,6 @@ object ChocolateFactoryStrayTracker {
     private val config get() = ChocolateFactoryAPI.config
     private var claimedStraysSlots = mutableListOf<Int>()
 
-    // <editor-fold desc="Regex Patterns">
     /**
      * REGEX-TEST: §9Zero §d§lCAUGHT!
      * REGEX-TEST: §6§lGolden Rabbit §d§lCAUGHT!
@@ -104,16 +103,13 @@ object ChocolateFactoryStrayTracker {
     /**
      * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
      */
-    @Suppress("MaxLineLength")
     private val fishTheRabbitPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.fish",
         "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
     )
-    // </editor-fold>
 
-    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
-        drawDisplay(it)
-    }
+    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker })
+    { drawDisplay(it) }
 
     class Data : TrackerData() {
         override fun reset() {
@@ -156,7 +152,7 @@ object ChocolateFactoryStrayTracker {
         add(
             Renderable.hoverTips(
                 "§6§lStray Tracker",
-                tips = listOf("§a+§b$formattedExtraTime §afrom strays§7"),
+                tips = listOf("§a+§b${formattedExtraTime} §afrom strays§7"),
             ).toSearchable(),
         )
         HoppityAPI.hoppityRarities.forEach { rarity ->
@@ -169,11 +165,11 @@ object ChocolateFactoryStrayTracker {
         val caughtString = caughtOfRarity?.toString() ?: return null
 
         val rarityExtraChocMs = data.straysExtraChocMs[rarity]?.milliseconds
-        val extraChocFormat = rarityExtraChocMs?.format().orEmpty()
+        val extraChocFormat = rarityExtraChocMs?.format() ?: ""
 
         val colorCode = rarity.chatColorCode
         val lineHeader = "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"
-        val lineFormat = "$lineHeader$caughtString"
+        val lineFormat = "${lineHeader}${caughtString}"
 
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"
@@ -208,14 +204,14 @@ object ChocolateFactoryStrayTracker {
 
         // "Base" strays - Common -> Epic, raw choc only reward.
         strayLorePattern.matchMatcher(loreLine) {
-            // Pretty sure base strays max at Epic, but...
+            //Pretty sure base strays max at Epic, but...
             val rarity = HoppityAPI.rarityByRabbit(group("rabbit")) ?: return@matchMatcher
             incrementRarity(rarity, group("amount").formatLong())
         }
 
         // Fish the Rabbit
         fishTheRabbitPattern.matchMatcher(loreLine) {
-            // Also fairly sure that Fish maxes out at Rare, but...
+            //Also fairly sure that Fish maxes out at Rare, but...
             val rarity = HoppityAPI.rarityByRabbit(group("color")) ?: return@matchMatcher
             incrementRarity(rarity, group("amount").formatLong())
         }

@@ -53,6 +53,7 @@ object HighlightMiningCommissionMobs {
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
 
         // new commissions
+        ;
     }
 
     @SubscribeEvent
@@ -66,7 +67,8 @@ object HighlightMiningCommissionMobs {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
                     LorenzColor.YELLOW.toColor().withAlpha(127)
-                ) { isEnabled() && type in active }
+                )
+                { isEnabled() && type in active }
             }
         }
     }
@@ -97,7 +99,8 @@ object HighlightMiningCommissionMobs {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
                     LorenzColor.YELLOW.toColor().withAlpha(127)
-                ) { isEnabled() && type in active }
+                )
+                { isEnabled() && type in active }
             }
         }
     }

@@ -32,7 +32,7 @@ object ItemStars {
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
-        val stack = event.itemStack
+        val stack = event.itemStack ?: return
         if (stack.stackSize != 1) return
 
         val itemName = stack.name

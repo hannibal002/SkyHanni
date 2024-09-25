@@ -14,7 +14,6 @@ import org.apache.logging.log4j.core.LoggerContext
 import org.apache.logging.log4j.core.filter.AbstractFilter
 import org.apache.logging.log4j.message.Message
 
-@Suppress("CommentWrapping")
 class MinecraftConsoleFilter(private val loggerConfigName: String) : AbstractFilter(
     /* onMatch = */ Filter.Result.ACCEPT,
     /* onMismatch = */ Filter.Result.DENY,

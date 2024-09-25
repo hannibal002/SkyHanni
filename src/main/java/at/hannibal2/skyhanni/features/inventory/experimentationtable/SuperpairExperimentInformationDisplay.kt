@@ -16,8 +16,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
-// TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
 @SkyHanniModule
+// TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
 object SuperpairExperimentInformationDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
@@ -76,10 +76,7 @@ object SuperpairExperimentInformationDisplay {
         if (item.displayName.removeColor() == "?") return
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
 
-        if (lastClicked.none {
-                it.first == event.slotId && it.second == uncoveredAt
-            } && lastClick.passedSince() > 100.milliseconds
-        ) {
+        if (lastClicked.none { it.first == event.slotId && it.second == uncoveredAt } && lastClick.passedSince() > 100.milliseconds) {
             if (clicksItem != null && clicksItem.displayName.removeColor().split(" ")[1] == "0") return
             lastClicked.add(Pair(event.slotId, uncoveredAt))
             lastClick = SimpleTimeMark.now()
@@ -134,10 +131,7 @@ object SuperpairExperimentInformationDisplay {
 
     private fun handleReward(slot: Int, uncovered: Int, reward: String) {
         val lastSlotClicked =
-            if (instantFind == 0 && lastClicked.none {
-                    it.first == -1 && it.second == uncovered - 1
-                } && lastClicked.size != 1
-            ) lastClicked.find { it.second == uncovered - 1 }
+            if (instantFind == 0 && lastClicked.none { it.first == -1 && it.second == uncovered - 1 } && lastClicked.size != 1) lastClicked.find { it.second == uncovered - 1 }
                 ?: return else lastClicked.find { it.second == uncovered } ?: return
 
         val lastItem = InventoryUtils.getItemAtSlotIndex(lastSlotClicked.first) ?: return
@@ -155,12 +149,7 @@ object SuperpairExperimentInformationDisplay {
                 uncoveredAt += 1
             }
 
-            hasFoundPair(
-                slot,
-                lastSlotClicked.first,
-                reward,
-                lastItemName
-            ) && lastItem.itemDamage == itemClicked.itemDamage -> handleFoundPair(
+            hasFoundPair(slot, lastSlotClicked.first, reward, lastItemName) && lastItem.itemDamage == itemClicked.itemDamage -> handleFoundPair(
                 slot,
                 reward,
                 lastSlotClicked.first,
@@ -194,8 +183,7 @@ object SuperpairExperimentInformationDisplay {
 
         if (found.none {
                 listOf("Pair", "Match").contains(it.value) && (right(it.key).first.index == slot)
-            }
-        ) found[pair] = "Match"
+            }) found[pair] = "Match"
         found.entries.removeIf { it.value == "Normal" && (left(it.key).index == slot || left(it.key).index == match) }
     }
 
@@ -204,10 +192,7 @@ object SuperpairExperimentInformationDisplay {
 
         if (found.none {
                 listOf("Match", "Pair").contains(it.value) && (right(it.key).first.index == slot || right(it.key).second.index == slot)
-            } && found.none {
-                it.value == "Normal" && left(it.key).index == slot
-            }
-        ) found[item] = "Normal"
+            } && found.none { it.value == "Normal" && left(it.key).index == slot }) found[item] = "Normal"
     }
 
     private fun calculatePossiblePairs() =
@@ -279,12 +264,7 @@ object SuperpairExperimentInformationDisplay {
     }
 
     private fun isOutOfBounds(slot: Int, experiment: Experiment): Boolean =
-        slot <= experiment.startSlot ||
-            slot >= experiment.endSlot ||
-            (
-                if (experiment.sideSpace == 1) slot in sideSpaces1
-                else slot in sideSpaces2
-                )
+        slot <= experiment.startSlot || slot >= experiment.endSlot || (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
     // TODO remove left and right, use custom data type instead
     private fun left(it: Pair<Item?, ItemPair?>): Item = it.first ?: Item(-1, "")

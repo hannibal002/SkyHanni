@@ -28,9 +28,8 @@ object SeaCreatureTracker {
 
     private val config get() = SkyHanniMod.feature.fishing.seaCreatureTracker
 
-    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker }) {
-        drawDisplay(it)
-    }
+    private val tracker = SkyHanniTracker("Sea Creature Tracker", { Data() }, { it.fishing.seaCreatureTracker })
+    { drawDisplay(it) }
 
     class Data : TrackerData() {
 
@@ -56,12 +55,12 @@ object SeaCreatureTracker {
         }
     }
 
-    private const val NAME_ALL: CategoryName = "All"
-    private var currentCategory: CategoryName = NAME_ALL
+    private val nameAll: CategoryName = "All"
+    private var currentCategory: CategoryName = nameAll
 
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
-        map[NAME_ALL] = data.amount.size
+        map[nameAll] = data.amount.size
         for ((category, names) in SeaCreatureManager.allVariants) {
             val amount = names.count { it in data.amount }
             if (amount > 0) {
@@ -104,7 +103,7 @@ object SeaCreatureTracker {
         val amounts = getCurrentCategories(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
-            currentCategory = NAME_ALL
+            currentCategory = nameAll
         }
 
         if (tracker.isInventoryOpen()) {
@@ -119,7 +118,7 @@ object SeaCreatureTracker {
             )
         }
 
-        return if (currentCategory == NAME_ALL) {
+        return if (currentCategory == nameAll) {
             { true }
         } else filterCurrentCategory()
     }

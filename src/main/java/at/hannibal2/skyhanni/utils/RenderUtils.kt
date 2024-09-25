@@ -52,7 +52,6 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-@Suppress("LargeClass", "FunctionNaming")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {
@@ -651,11 +650,7 @@ object RenderUtils {
         if (list.isEmpty()) return
 
         val render =
-            list.map {
-                it.map { entry ->
-                    Renderable.fromAny(entry, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $entry")
-                }
-            }
+            list.map { it.map { Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it") } }
 
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
@@ -769,7 +764,6 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    @Suppress("UNUSED_PARAMETER")
     fun drawCylinderInWorld(
         color: Color,
         x: Double,
@@ -1325,11 +1319,11 @@ object RenderUtils {
                 }
             } else {
                 val pathLines = path.zipWithNext()
-                pathLines.forEachIndexed { index, pathLine ->
-                    val reduce = pathLine.second.minus(pathLine.first).normalize().times(bezierPoint)
+                pathLines.forEachIndexed { index, it ->
+                    val reduce = it.second.minus(it.first).normalize().times(bezierPoint)
                     draw3DLine(
-                        if (index != 0) pathLine.first + reduce else pathLine.first,
-                        if (index != pathLines.lastIndex) pathLine.second - reduce else pathLine.second,
+                        if (index != 0) it.first + reduce else it.first,
+                        if (index != pathLines.lastIndex) it.second - reduce else it.second,
                         color,
                         lineWidth,
                         depth,

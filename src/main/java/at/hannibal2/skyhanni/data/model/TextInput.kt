@@ -65,7 +65,6 @@ class TextInput {
             activeInstance = null
         }
 
-        @Suppress("UNUSED_PARAMETER")
         fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
                 cir.returnValue = false
@@ -93,7 +92,7 @@ class TextInput {
             }
 
         private var textBox
-            get() = activeInstance?.textBox.orEmpty()
+            get() = activeInstance?.textBox ?: ""
             set(value) {
                 activeInstance?.textBox = value
             }

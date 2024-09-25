@@ -22,7 +22,7 @@ import kotlin.time.Duration.Companion.minutes
 @SkyHanniModule
 object SummoningSoulsName {
 
-    // TODO repo, Rename this to be more descriptive
+    // TODO repo
     private const val TEXTURE =
         "ewogICJ0aW1lc3RhbXAiIDogMTYwMTQ3OTI2NjczMywKICAicHJvZmlsZUlkIiA6ICJmMzA1ZjA5NDI0NTg0ZjU" +
             "4YmEyYjY0ZjAyZDcyNDYyYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJqcm9ja2EzMyIsCiAgInNpZ25hdH" +

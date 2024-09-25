@@ -20,7 +20,7 @@ object CollectionUtils {
     }
 
     inline fun <reified T : Queue<E>, reified E> T.drain(amount: Int): T {
-        for (unused in 1..amount) this.poll() ?: break
+        for (i in 1..amount) this.poll() ?: break
         return this
     }
 
@@ -291,11 +291,8 @@ object CollectionUtils {
     }
 
     fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
-        generateSequence(start) {
-            it + 1
-        }.map {
-            (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn
-        }.takeWhile { it <= end }
+        generateSequence(start) { it + 1 }.map { (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn }
+            .takeWhile { it <= end }
 
     fun MutableList<Renderable>.addItemStack(internalName: NEUInternalName) {
         addItemStack(internalName.getItemStack())

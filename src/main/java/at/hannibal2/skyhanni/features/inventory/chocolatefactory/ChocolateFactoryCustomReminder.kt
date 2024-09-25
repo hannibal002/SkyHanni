@@ -61,8 +61,6 @@ object ChocolateFactoryCustomReminder {
 
     /**
      * REGEX-TEST: §cYou don't have enough Chocolate!
-     * REGEX-TEST: §cYou don't have the required items!
-     * REGEX-TEST: §cYou must collect 300B all-time Chocolate!
      */
     private val chatMessagePattern by patternGroup.list(
         "chat.hide",
@@ -73,9 +71,16 @@ object ChocolateFactoryCustomReminder {
 
     @SubscribeEvent
     fun onChat(event: SystemMessageEvent) {
-        if (!isEnabled() || !ChocolateFactoryAPI.inChocolateFactory || !configReminder.hideChat) return
-        if (chatMessagePattern.matches(event.message)) {
-            event.blockedReason = "custom_reminder"
+        if (!isEnabled()) return
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        if (configReminder.hideChat) {
+
+            if (chatMessagePattern.matches(event.message)) {
+                //§cYou don't have the required items!
+                //§cYou must collect 300B all-time Chocolate!
+//             if (event.message == "§cYou don't have enough Chocolate!") {
+                event.blockedReason = "custom_reminder"
+            }
         }
     }
 

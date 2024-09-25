@@ -41,9 +41,8 @@ object ArmorDropTracker {
 
     private var hasArmor = false
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker }) {
-        drawDisplay(it)
-    }
+    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
+    { drawDisplay(it) }
 
     class Data : TrackerData() {
 

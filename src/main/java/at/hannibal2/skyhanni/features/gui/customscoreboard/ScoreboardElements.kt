@@ -370,11 +370,10 @@ private fun getTitleDisplayPair(): List<ScoreboardElementType> {
     }
 
     return if (displayConfig.titleAndFooter.useCustomTitle) {
-        listOf(
-            displayConfig.titleAndFooter.customTitle.get().toString()
-                .replace("&", "§")
-                .split("\\n")
-                .map { it to alignment },
+        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
+            .replace("&", "§")
+            .split("\\n")
+            .map { it to alignment }
         ).flatten()
     } else {
         listOf(ScoreboardData.objectiveTitle to alignment)
@@ -492,8 +491,8 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
-    CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
+private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
+    && CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
     val cold = -MiningAPI.cold
@@ -583,7 +582,7 @@ private fun getDateDisplayPair() =
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     val symbol =
-        getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol").orEmpty()
+        getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
             .formatted(
@@ -598,12 +597,11 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
     val lobbyCode = HypixelData.serverId
-    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" }.orEmpty()
+    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
     val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: "<hidden>"
     return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
 }
 
-@Suppress("Wrapping")
 private fun getPowerDisplayPair() = listOf(
     (MaxwellAPI.currentPower?.let {
         val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
@@ -612,7 +610,8 @@ private fun getPowerDisplayPair() = listOf(
         } else {
             "Power: §a$it $mp"
         }
-    } ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT,
+    }
+        ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT,
 )
 
 private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
@@ -653,18 +652,17 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
                 }
 
             }.toTypedArray()
-        listOf("$title:").plus(tuning).map { it to HorizontalAlignment.LEFT }
+        listOf("$title:", *tuning).map { it to HorizontalAlignment.LEFT }
     }
 }
 
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair() = listOf(
-    "§dCookie Buff§f: " + (
-        BitsAPI.cookieBuffTime?.let {
-            if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
-        } ?: "§cOpen SbMenu!"
-        ) to HorizontalAlignment.LEFT,
+    "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
+        if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
+    }
+        ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT,
 )
 
 private fun getCookieShowWhen(): Boolean {
@@ -841,7 +839,7 @@ private fun getPartyDisplayPair() =
                 " §7- §f$it"
             }
             .toTypedArray()
-        listOf(title).plus(partyList).map { it to HorizontalAlignment.LEFT }
+        listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
     }
 
 private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
@@ -865,11 +863,7 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unconfirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
     amountOfUnknownLines = unconfirmedUnknownLines.size
 
-    return listOf(
-        "§cUndetected Lines:" to HorizontalAlignment.LEFT,
-    ) + unconfirmedUnknownLines.map {
-        it to HorizontalAlignment.LEFT
-    }
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unconfirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
 }
 
 private fun getExtraShowWhen(): Boolean {

@@ -15,7 +15,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 object ClipboardUtils {
 
-    private val dispatcher = Dispatchers.IO
+    private var dispatcher = Dispatchers.IO
     private var lastClipboardAccessTime = SimpleTimeMark.farPast()
 
     private fun canAccessClipboard(): Boolean {
@@ -32,10 +32,8 @@ object ClipboardUtils {
         delay(11)
         getClipboard(retries - 1)
     } else {
-        ErrorManager.logErrorStateWithData(
-            "can not read clipboard",
-            "clipboard can not be accessed after 20 retries"
-        )
+        ErrorManager.logErrorStateWithData("can not read clipboard",
+            "clipboard can not be accessed after 20 retries")
         null
     }
 

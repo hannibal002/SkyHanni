@@ -17,8 +17,8 @@ enum class GraphNodeTag(
     AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area."),
     SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house."),
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map."),
+    //     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
     TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport."),
-    // LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
 
     // on multiple islands
     ROMEO("romeo", LorenzColor.WHITE, "Romeo & Juliette Quest", "Spots related to the Romeo and Juliette/Ring of Love quest line."),
@@ -38,7 +38,7 @@ enum class GraphNodeTag(
     // diana
 
     // Farming Islands: Pelts
-    // FARMING_CROP("farming_crop", LorenzColor.WHITE, "Farming Crop", "A spot where you can break crops on farming islands."),
+//     FARMING_CROP("farming_crop", LorenzColor.WHITE, "Farming Crop", "A spot where you can break crops on farming islands."),
 
     // Rift
     RIFT_ENIGMA("rift_enigma", LorenzColor.DARK_PURPLE, "Enigma Soul", "Enigma Souls in the Rift.", onlyIsland = IslandType.THE_RIFT),

@@ -42,8 +42,8 @@ object DungeonsRaceGuide {
         for ((key, map) in data.data) {
             val nothingNoReturn = map["nothing:no_return"]
             parkourHelpers[key] = ParkourHelper(
-                nothingNoReturn?.locations.orEmpty(),
-                nothingNoReturn?.shortCuts.orEmpty(),
+                nothingNoReturn?.locations ?: listOf(),
+                nothingNoReturn?.shortCuts ?: listOf(),
                 platformSize = 1.0,
                 detectionRange = 7.0,
                 depth = false,

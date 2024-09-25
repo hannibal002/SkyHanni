@@ -39,8 +39,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -344,7 +344,7 @@ object ComposterOverlay {
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
 
         val organicMatterPrice = getPrice(organicMatterItem)
-        val organicMatterFactor = organicMatterFactors[organicMatterItem] ?: 0.0
+        val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
 
         val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
         val organicMatterRequiredPreview = ComposterAPI.organicMatterRequiredPer(upgrade)
@@ -353,7 +353,7 @@ object ComposterOverlay {
         val organicMatterPricePerPreview = organicMatterPrice * (organicMatterRequiredPreview / organicMatterFactor)
 
         val fuelPrice = getPrice(fuelItem)
-        val fuelFactor = fuelFactors[fuelItem] ?: 0.0
+        val fuelFactor = fuelFactors[fuelItem]!!
 
         val fuelRequired = ComposterAPI.fuelRequiredPer(null)
         val fuelRequiredPreview = ComposterAPI.fuelRequiredPer(upgrade)
@@ -386,7 +386,7 @@ object ComposterOverlay {
         bigList: MutableList<List<Any>>,
         factors: Map<NEUInternalName, Double>,
         missing: Double,
-        offeredOffset: Int = 0,
+        testOffset_: Int = 0,
         onClick: (NEUInternalName) -> Unit,
     ): NEUInternalName {
         val map = mutableMapOf<NEUInternalName, Double>()
@@ -394,11 +394,11 @@ object ComposterOverlay {
             map[internalName] = factor / getPrice(internalName)
         }
 
-        val testOffset = if (offeredOffset > map.size) {
+        val testOffset = if (testOffset_ > map.size) {
             ChatUtils.userError("Invalid Composter Overlay Offset! $testOffset cannot be greater than ${map.size}!")
             ComposterOverlay.testOffset = 0
             0
-        } else offeredOffset
+        } else testOffset_
 
         val first: NEUInternalName? = calculateFirst(map, testOffset, factors, missing, onClick, bigList)
         if (testOffset != 0) {
@@ -427,7 +427,7 @@ object ComposterOverlay {
             i++
             if (i < testOffset) continue
             if (first == null) first = internalName
-            val factor = factors[internalName] ?: 0.0
+            val factor = factors[internalName]!!
 
             val item = internalName.getItemStack()
             val price = getPrice(internalName)
@@ -488,7 +488,7 @@ object ComposterOverlay {
         }
         val havingInInventory = internalName.getAmountInInventory()
         if (havingInInventory >= itemsNeeded) {
-            ChatUtils.chat("$itemName §8x$itemsNeeded §ealready found in inventory!")
+            ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
             return
         }
 
@@ -564,25 +564,18 @@ object ComposterOverlay {
         }
     }
 
-    private val ignoredInternalNames = listOf(
-        "POTION_AFFINITY_TALISMAN",
-        "CROPIE_TALISMAN",
-        "SPEED_TALISMAN",
-        "SIMPLE_CARROT_CANDY",
-    )
-
-    private val ignoredInternalEndings = listOf(
-        "_BOOTS",
-        "_HELMET",
-        "_CHESTPLATE",
-        "_LEGGINGS",
-    )
-
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
         for ((internalName, _) in NEUItems.allNeuRepoItems()) {
-            if (ignoredInternalNames.any { internalName.contains(it) }) continue
-            if (ignoredInternalEndings.any { internalName.endsWith(it) }) continue
+            if (internalName == "POTION_AFFINITY_TALISMAN"
+                || internalName == "CROPIE_TALISMAN"
+                || internalName.endsWith("_BOOTS")
+                || internalName.endsWith("_HELMET")
+                || internalName.endsWith("_CHESTPLATE")
+                || internalName.endsWith("_LEGGINGS")
+                || internalName == "SPEED_TALISMAN"
+                || internalName == "SIMPLE_CARROT_CANDY"
+            ) continue
 
             var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
             if (amount <= 9) continue

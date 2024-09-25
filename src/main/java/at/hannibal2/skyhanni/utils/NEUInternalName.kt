@@ -54,8 +54,6 @@ class NEUInternalName private constructor(private val internalName: String) {
     override fun equals(other: Any?): Boolean {
         if (other is NEUInternalName) {
             return internalName == other.internalName
-        } else if (other is String) {
-            return internalName == other
         }
         return super.equals(other)
     }
@@ -63,6 +61,8 @@ class NEUInternalName private constructor(private val internalName: String) {
     override fun toString(): String = "internalName:$internalName"
 
     override fun hashCode(): Int = internalName.hashCode()
+
+    fun equals(other: String) = internalName == other
 
     fun contains(other: String) = internalName.contains(other)
 

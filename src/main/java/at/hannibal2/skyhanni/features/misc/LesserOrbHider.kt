@@ -19,8 +19,6 @@ object LesserOrbHider {
     private val config get() = SkyHanniMod.feature.misc
     private val hiddenEntities = CollectionUtils.weakReferenceList<EntityArmorStand>()
 
-    // Todo: Move this to the repo
-    @Suppress("MaxLineLength")
     private const val LESSER_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjgzMjM2NjM5NjA3MDM2YzFiYTM5MWMyYjQ2YTljN2IwZWZkNzYwYzhiZmEyOTk2YTYwNTU1ODJiNGRhNSJ9fX0="
 

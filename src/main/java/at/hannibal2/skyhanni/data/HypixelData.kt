@@ -42,13 +42,7 @@ object HypixelData {
 
     private val patternGroup = RepoPattern.group("data.hypixeldata")
 
-    /**
-     * REGEX-TEST: mc.hypixel.net
-     * REGEX-TEST: alpha.hypixel.net
-     * REGEX-TEST: hypixel.net
-     * REGEX-TEST: play.hypixel.net
-     * REGEX-TEST: multi.named.hypixel.net
-     */
+    // TODO add regex tests
     private val serverNameConnectionPattern by patternGroup.pattern(
         "servername.connection",
         "(?<prefix>.+\\.)?hypixel\\.net",
@@ -57,8 +51,6 @@ object HypixelData {
         "servername.scoreboard",
         "§e(?<prefix>.+\\.)?hypixel\\.net",
     )
-
-    @Suppress("unused")
     private val islandNamePattern by patternGroup.pattern(
         "islandname",
         "(?:§.)*(Area|Dungeon): (?:§.)*(?<island>.*)",
@@ -143,7 +135,7 @@ object HypixelData {
 
     // Data from locraw
     var locrawData: JsonObject? = null
-    private val locraw: MutableMap<String, String> = listOf(
+    private var locraw: MutableMap<String, String> = listOf(
         "server",
         "gametype",
         "lobbyname",
@@ -152,14 +144,14 @@ object HypixelData {
         "map",
     ).associateWith { "" }.toMutableMap()
 
-    val server get() = locraw["server"].orEmpty()
-    val gameType get() = locraw["gametype"].orEmpty()
-    val lobbyName get() = locraw["lobbyname"].orEmpty()
-    val lobbyType get() = locraw["lobbytype"].orEmpty()
-    val mode get() = locraw["mode"].orEmpty()
-    val map get() = locraw["map"].orEmpty()
+    val server get() = locraw["server"] ?: ""
+    val gameType get() = locraw["gametype"] ?: ""
+    val lobbyName get() = locraw["lobbyname"] ?: ""
+    val lobbyType get() = locraw["lobbytype"] ?: ""
+    val mode get() = locraw["mode"] ?: ""
+    val map get() = locraw["map"] ?: ""
 
-    private fun checkCurrentServerId() {
+    fun checkCurrentServerId() {
         if (!LorenzUtils.inSkyBlock) return
         if (serverId != null) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 1.seconds) return
@@ -226,7 +218,7 @@ object HypixelData {
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
     private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-    // todo convert to proper json object
+    //todo convert to proper json object
     fun checkForLocraw(message: String) {
         jsonBracketPattern.matchMatcher(message.removeColor()) {
             try {
@@ -234,7 +226,7 @@ object HypixelData {
                 if (obj.has("server")) {
                     locrawData = obj
                     for (key in locraw.keys) {
-                        locraw[key] = obj[key]?.asString.orEmpty()
+                        locraw[key] = obj[key]?.asString ?: ""
                     }
                     inLimbo = locraw["server"] == "limbo"
                     inLobby = locraw["lobbyname"] != ""
@@ -253,7 +245,7 @@ object HypixelData {
         }
     }
 
-    private val loggerIslandChange = LorenzLogger("debug/island_change")
+    private var loggerIslandChange = LorenzLogger("debug/island_change")
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
@@ -409,7 +401,7 @@ object HypixelData {
             }
         }
 
-        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP.orEmpty()) {
+        serverNameConnectionPattern.matchMatcher(mc.currentServerData?.serverIP ?: "") {
             hypixel = true
             if (group("prefix") == "alpha.") {
                 hypixelAlpha = true
@@ -464,7 +456,7 @@ object HypixelData {
             TabListData.fullyLoaded = true
             // Can not use color coding, because of the color effect (§f§lSKYB§6§lL§e§lOCK§A§L GUEST)
             val guesting = guestPattern.matches(ScoreboardData.objectiveTitle.removeColor())
-            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() }.orEmpty()
+            foundIsland = TabWidget.AREA.matchMatcherFirstLine { group("island").removeColor() } ?: ""
             islandType = getIslandType(foundIsland, guesting)
         }
 

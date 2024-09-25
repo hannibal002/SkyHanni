@@ -189,7 +189,7 @@ class SkyHanniItemTracker<Data : ItemTrackerData>(
 
         if (SkyHanniMod.feature.dev.debug.enabled) {
             add("")
-            add("§7$internalName")
+            add("§7${internalName}")
         }
     }
 

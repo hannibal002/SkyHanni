@@ -385,7 +385,7 @@ enum class HotmData(
         get() = if (enabled) effectiveLevel else 0
 
     /** Level that considering [blueEgg]*/
-    private val effectiveLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
+    val effectiveLevel: Int get() = storage?.perks?.get(this.name)?.level?.plus(blueEgg()) ?: 0
 
     val isMaxLevel: Boolean
         get() = effectiveLevel >= maxLevel // >= to account for +1 from Blue Cheese
@@ -421,14 +421,7 @@ enum class HotmData(
 
         val storage get() = ProfileStorageData.profileSpecific?.mining?.hotmTree
 
-        val abilities = listOf(
-            PICKOBULUS,
-            MINING_SPEED_BOOST,
-            MANIAC_MINER,
-            GEMSTONE_INFUSION,
-            ANOMALOUS_DESIRE,
-            SHEER_FORCE
-        )
+        val abilities = listOf(PICKOBULUS, MINING_SPEED_BOOST, MANIAC_MINER, GEMSTONE_INFUSION, ANOMALOUS_DESIRE, SHEER_FORCE)
 
         private val inventoryPattern by patternGroup.pattern(
             "inventory",
@@ -453,14 +446,11 @@ enum class HotmData(
             "perk.enable",
             "§a§lENABLED|(§.)*SELECTED",
         )
-
-        // unused for now since the assumption is when enabled isn't found, it is disabled,
-        // but the value might be useful in the future or for debugging
-        @Suppress("unused")
         private val disabledPattern by patternGroup.pattern(
             "perk.disabled",
             "§c§lDISABLED|§7§eClick to select!",
-        )
+        ) // unused for now since the assumption is when enabled isn't found, it is disabled,
+        // but the value might be useful in the future or for debugging
 
         val perkCostPattern by patternGroup.pattern(
             "perk.cost",
@@ -539,7 +529,7 @@ enum class HotmData(
             HotmAPI.MayhemPerk.entries.forEach {
                 it.chatPattern
             }
-            for (level in 0..CORE_OF_THE_MOUNTAIN.maxLevel) {
+            (0..CORE_OF_THE_MOUNTAIN.maxLevel).forEach { level ->
                 val map = mutableMapOf<HotmReward, Double>()
                 if (level >= 1) map.addOrPut(HotmReward.EXTRA_TOKENS, 1.0)
                 if (level >= 2) map.addOrPut(HotmReward.ABILITY_LEVEL, 1.0)

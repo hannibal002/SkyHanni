@@ -124,9 +124,7 @@ object CraftableItemList {
         inInventory = false
     }
 
-    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double = neededItems.map {
-        it.key.getPrice() * it.value
-    }.sum()
+    private fun pricePer(neededItems: Map<NEUInternalName, Int>): Double = neededItems.map { it.key.getPrice() * it.value }.sum()
 
     private fun canCraftAmount(
         need: Map<NEUInternalName, Int>,

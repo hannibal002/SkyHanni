@@ -90,7 +90,7 @@ object RiftBloodEffigies {
 
         val split = hearts.split("§").drop(1)
         for ((index, s) in split.withIndex()) {
-            val time = effigiesTimes[index] ?: continue
+            val time = effigiesTimes[index]!!
 
             if (time.isInPast()) {
                 if (s == "7") {
@@ -131,7 +131,7 @@ object RiftBloodEffigies {
 
         for ((index, location) in locations.withIndex()) {
             val name = "Effigy #${index + 1}"
-            val duration = effigiesTimes[index] ?: continue
+            val duration = effigiesTimes[index]!!
 
             if (duration.isFarPast()) {
                 if (config.unknownTime) {

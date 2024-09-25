@@ -56,7 +56,6 @@ object NEUVersionCheck {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
         } catch (e: java.lang.Exception) {
-            @Suppress("PrintStackTrace")
             e.printStackTrace()
         }
 
@@ -74,7 +73,6 @@ object NEUVersionCheck {
                     try {
                         Desktop.getDesktop().browse(URI(link))
                     } catch (e: java.lang.Exception) {
-                        @Suppress("PrintStackTrace")
                         e.printStackTrace()
                     }
                 }

@@ -43,7 +43,7 @@ object LimboPlaytime {
     private val enabled get() = SkyHanniMod.feature.misc.showLimboTimeInPlaytimeDetailed
 
     private val itemID = "ENDER_PEARL".asInternalName()
-    private const val ITEM_NAME = "§aLimbo"
+    private val itemName = "§aLimbo"
     private lateinit var limboItem: ItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
@@ -60,7 +60,7 @@ object LimboPlaytime {
             lastCreateCooldown = SimpleTimeMark.now()
             limboItem = ItemUtils.createItemStack(
                 itemID.getItemStack().item,
-                ITEM_NAME,
+                itemName,
                 *createItemLore()
             )
         }

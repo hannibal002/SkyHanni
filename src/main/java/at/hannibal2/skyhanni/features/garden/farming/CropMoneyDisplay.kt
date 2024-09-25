@@ -97,7 +97,6 @@ object CropMoneyDisplay {
         display = drawDisplay()
     }
 
-    // TODO: Split up this 150 line function
     private fun drawDisplay(): List<List<Any>> {
         val newDisplay = mutableListOf<List<Any>>()
 
@@ -161,8 +160,7 @@ object CropMoneyDisplay {
                 }
                 val bazaarData = internalName.getBazaarData()
                 val price =
-                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160
-                    else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
+                    if (LorenzUtils.noTradeMode || bazaarData == null) internalName.getNpcPrice() / 160 else (bazaarData.instantBuyPrice + bazaarData.sellOfferPrice) / 320
                 extraDicerCoins = 60 * 60 * GardenCropSpeed.getRecentBPS() * dicerDrops * price
             }
 
@@ -231,7 +229,7 @@ object CropMoneyDisplay {
             }
 
             val coinsColor = if (isCurrent && config.compact) "§e" else "§6"
-            val moneyArray = moneyPerHourData[internalName].orEmpty()
+            val moneyArray = moneyPerHourData[internalName]!!
 
             for (price in moneyArray) {
                 val finalPrice = price + extraMushroomCowPerkCoins + extraDicerCoins + extraArmorCoins

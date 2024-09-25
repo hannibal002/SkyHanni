@@ -137,15 +137,10 @@ object CroesusChestTracker {
 
             val lore = item.getLore()
 
-            run.floor = run.floor ?: (
-                (if (masterPattern.matches(item.name)) "M" else "F") + (
-                    lore.firstNotNullOfOrNull {
-                        floorPattern.matchMatcher(it) {
-                            group("floor").romanToDecimal()
-                        }
-                    } ?: "0"
-                    )
-                )
+            if (run.floor == null) run.floor =
+                (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
+                    floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
+                } ?: "0")
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED
@@ -154,7 +149,7 @@ object CroesusChestTracker {
                     "Croesus Chest couldn't be read correctly.",
                     "Open state check failed for chest.",
                     "run" to run,
-                    "lore" to lore,
+                    "lore" to lore
                 ).run { null }
             }
         }
@@ -277,16 +272,13 @@ object CroesusChestTracker {
 
     @JvmStatic
     fun generateMaxChestAsList(): List<DungeonRunInfo> = generateMaxChest().toList()
-    private fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence {
-        DungeonRunInfo()
-    }.take(MAX_CHESTS)
+    private fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(MAX_CHESTS)
 
-    private fun getLastActiveChest(includeDungeonKey: Boolean = false): Int = (
-        croesusChests?.indexOfLast {
+    fun getLastActiveChest(includeDungeonKey: Boolean = false): Int =
+        (croesusChests?.indexOfLast {
             it.floor != null &&
                 (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))
-        } ?: -1
-        ) + 1
+        } ?: -1) + 1
 
     enum class OpenedState {
         UNOPENED,

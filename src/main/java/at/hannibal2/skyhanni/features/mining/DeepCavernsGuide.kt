@@ -97,10 +97,7 @@ object DeepCavernsGuide {
             if (it.displayName != "§aObsidian Sanctuary") {
                 if (!show) {
                     start()
-                    ChatUtils.chat(
-                        "Automatically enabling Deep Caverns Guide, helping " +
-                            "you find the way to the bottom of the Deep Caverns and the path to Rhys."
-                    )
+                    ChatUtils.chat("Automatically enabling Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys.")
                 }
             }
         }

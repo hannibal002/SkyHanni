@@ -249,7 +249,6 @@ fun DijkstraTree.findPathToDestination(end: GraphNode): Pair<Graph, Double> {
             current = distances.towardsOrigin[current] ?: return Graph(emptyList()) to 0.0
         }
     }
-    @Suppress("MapGetWithNotNullAssertionOperator")
     return Graph(reversePath.reversed()) to distances.distances[end]!!
 }
 

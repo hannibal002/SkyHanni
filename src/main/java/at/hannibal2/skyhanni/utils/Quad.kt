@@ -28,9 +28,4 @@ data class Quad<out A, out B, out C, out D>(
      * Returns string representation of the [Quad] including its [first], [second], [third] and [fourth] values.
      */
     override fun toString(): String = "($first, $second, $third, $fourth)"
-
-    companion object {
-        @Suppress("ConstPropertyName", "UnusedPrivateProperty") // Conflicting rules here...
-        private const val serialVersionUID: Long = 1L
-    }
 }

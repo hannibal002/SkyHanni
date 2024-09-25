@@ -67,7 +67,7 @@ object MobDetection {
         MobData.retries.clear()
     }
 
-    fun watchdogCommand() = watchdog()
+    // TODO this is a unused debug funciton. maybe connect with a debug commmand or remove
     private fun watchdog() {
         val world = LorenzUtils.getPlayer()?.worldObj ?: return
         if (MobData.retries.any { it.value.entity.worldObj != world }) {
@@ -97,9 +97,8 @@ object MobDetection {
     }
 
     private fun Mob.watchdogCheck(world: World): Boolean =
-        this.baseEntity.worldObj != world || (
-            this.armorStand?.let { it.worldObj != world } ?: false
-            ) || this.extraEntities.any { it.worldObj != world }
+        this.baseEntity.worldObj != world || (this.armorStand?.let { it.worldObj != world }
+            ?: false) || this.extraEntities.any { it.worldObj != world }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -127,7 +126,7 @@ object MobDetection {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
         }
 
-        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) } // Spawn
+        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
         (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
 
         MobData.notSeenMobs.removeIf(::canBeSeen)
@@ -303,13 +302,13 @@ object MobDetection {
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
                 MobData.logger.log(
-                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n " +
-                        "is already Found: ${MobData.entityToMob[retry.entity] != null})." +
-                        "\n Position: ${retry.entity.getLorenzVec()}\n " +
-                        "DistanceC: ${
-                            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
-                        }\n" +
-                        "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
+                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
+                        + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
+                        + "\n Position: ${retry.entity.getLorenzVec()}\n "
+                        + "DistanceC: ${
+                        entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                    }\n"
+                        + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
                         "}",
                 )
                 // Uncomment this to make it closed a loop
@@ -339,7 +338,7 @@ object MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        getRetry(entity)?.entity = entity
+        getRetry(entity)?.apply { this.entity = entity }
         MobData.currentEntityLiving.refreshReference(entity)
         MobData.previousEntityLiving.refreshReference(entity)
         // update map
@@ -353,13 +352,11 @@ object MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S01PacketJoinGame ->
-                // one of the first packets that is sent when switching servers inside the BungeeCord Network
-                // (please someone prove this, I just found it out via Testing)
-                {
-                    shouldClear.set(true)
-                    allEntitiesViaPacketId.clear()
-                }
+            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
+            {
+                shouldClear.set(true)
+                allEntitiesViaPacketId.clear()
+            }
         }
     }
 

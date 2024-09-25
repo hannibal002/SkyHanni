@@ -49,6 +49,7 @@ object FarmingLaneFeatures {
         TOO_SLOW("§cToo slow!"),
         CALCULATING("§aCalculating.."),
         NORMAL(""),
+        ;
     }
 
     @HandleEvent

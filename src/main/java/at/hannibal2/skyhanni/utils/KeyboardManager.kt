@@ -153,29 +153,22 @@ object KeyboardManager {
         override fun iterator(): Iterator<KeyBinding> =
             object : Iterator<KeyBinding> {
 
-                var current: KeyBinding? = w
-                var reachedEnd = false
+                var current = w
 
                 override fun hasNext(): Boolean =
                     current != down
 
                 override fun next(): KeyBinding {
-                    val result = current ?: throw NoSuchElementException("No more elements in the iterator.")
-
-                    current = when (result) {
-                        w -> a
-                        a -> s
-                        s -> d
-                        d -> up
-                        up -> down
-                        down -> {
-                            reachedEnd = true
-                            null
+                    return current.also {
+                        current = when (it) {
+                            w -> a
+                            a -> s
+                            s -> d
+                            d -> up
+                            up -> down
+                            else -> throw java.lang.IndexOutOfBoundsException()
                         }
-                        else -> throw NoSuchElementException("No more elements in the iterator..")
                     }
-
-                    return result
                 }
 
             }

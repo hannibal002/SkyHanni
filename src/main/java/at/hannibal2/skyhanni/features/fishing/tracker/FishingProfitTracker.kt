@@ -83,8 +83,6 @@ object FishingProfitTracker {
 
         override fun getCustomPricePer(internalName: NEUInternalName): Double {
             // TODO find better way to tell if the item is a trophy
-            // Todo: Refactor to remove !! operator
-            @Suppress("MapGetWithNotNullAssertionOperator")
             val neuInternalNames = itemCategories["Trophy Fish"]!!
 
             return if (internalName in neuInternalNames) {
@@ -100,8 +98,8 @@ object FishingProfitTracker {
 
     private val MAGMA_FISH by lazy { "MAGMA_FISH".asInternalName() }
 
-    private const val NAME_ALL: CategoryName = "All"
-    private var currentCategory: CategoryName = NAME_ALL
+    private val nameAll: CategoryName = "All"
+    private var currentCategory: CategoryName = nameAll
 
     private var itemCategories = mapOf<String, List<NEUInternalName>>()
 
@@ -112,7 +110,7 @@ object FishingProfitTracker {
 
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
-        map[NAME_ALL] = data.items.size
+        map[nameAll] = data.items.size
         for ((name, items) in itemCategories) {
             val amount = items.count { it in data.items }
             if (amount > 0) {
@@ -147,7 +145,7 @@ object FishingProfitTracker {
         checkMissingItems(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
-            currentCategory = NAME_ALL
+            currentCategory = nameAll
         }
 
         if (tracker.isInventoryOpen()) {
@@ -162,11 +160,9 @@ object FishingProfitTracker {
             )
         }
 
-        val filter: (NEUInternalName) -> Boolean = if (currentCategory == NAME_ALL) {
+        val filter: (NEUInternalName) -> Boolean = if (currentCategory == nameAll) {
             { true }
         } else {
-            // Todo: Refactor to remove !! operator
-            @Suppress("MapGetWithNotNullAssertionOperator")
             val items = itemCategories[currentCategory]!!
             { it in items }
         }

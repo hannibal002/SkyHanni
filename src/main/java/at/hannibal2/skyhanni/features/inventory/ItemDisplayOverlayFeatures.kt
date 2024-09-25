@@ -114,7 +114,6 @@ object ItemDisplayOverlayFeatures {
         event.stackTip = getStackTip(event.stack) ?: return
     }
 
-    // TODO: Split up this 200 line function
     private fun getStackTip(item: ItemStack): String? {
         val itemName = item.cleanName()
         val internalName = item.getInternalName()
@@ -150,7 +149,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (NEW_YEAR_CAKE.isSelected() && internalName == "NEW_YEAR_CAKE".asInternalName()) {
-            val year = item.getNewYearCake()?.toString().orEmpty()
+            val year = item.getNewYearCake()?.toString() ?: ""
             return "§b$year"
         }
 
@@ -299,12 +298,7 @@ object ItemDisplayOverlayFeatures {
             }
         }
 
-        if (BESTIARY_LEVEL.isSelected() && (
-                chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")
-                ) && lore.any {
-                it.contains("Deaths: ")
-            }
-        ) {
+        if (BESTIARY_LEVEL.isSelected() && (chestName.contains("Bestiary ➜") || chestName.contains("Fishing ➜")) && lore.any { it.contains("Deaths: ") }) {
             lore.matchFirst(bestiaryStackPattern) {
                 val tier = (group("tier").romanToDecimalIfNecessary() - 1)
                 return tier.toString()
@@ -325,7 +319,7 @@ object ItemDisplayOverlayFeatures {
         return null
     }
 
-    private fun isOwnItem(lore: List<String>) =
+    fun isOwnItem(lore: List<String>) =
         lore.none {
             it.contains("Click to trade!") ||
                 it.contains("Starting bid:") ||

@@ -91,7 +91,6 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    @Suppress("MaxLineLength")
     private enum class ParticleType(val check: S2APacketParticles.() -> Boolean) {
         EMPTY({
             particleType == net.minecraft.util.EnumParticleTypes.CRIT_MAGIC && particleCount == 4 && particleSpeed == 0.01f && xOffset == 0.5f && yOffset == 0.1f && zOffset == 0.5f

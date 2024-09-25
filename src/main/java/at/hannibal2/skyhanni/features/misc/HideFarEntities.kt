@@ -41,10 +41,6 @@ object HideFarEntities {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled &&
-        (
-            !(GardenAPI.inGarden() && config.excludeGarden) &&
-                !(DungeonAPI.inDungeon() && config.excludeDungeon)
-            )
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && (!(GardenAPI.inGarden() && config.excludeGarden) && !(DungeonAPI.inDungeon() && config.excludeDungeon))
 
 }

@@ -80,11 +80,11 @@ object TunnelsMaps {
     private val cooldowns = mutableMapOf<GraphNode, SimpleTimeMark>()
     private var active: String = ""
 
+    private lateinit var fairySouls: Map<String, GraphNode>
     // TODO what is this? why is there a difference? can this be replaced with GraphNodeTag.GRIND_ORES?
     private lateinit var newGemstones: Map<String, List<GraphNode>>
     private lateinit var oldGemstones: Map<String, List<GraphNode>>
     private lateinit var normalLocations: Map<String, List<GraphNode>>
-    private lateinit var fairySouls: Map<String, GraphNode>
 
     private var locationDisplay: List<Renderable> = emptyList()
 
@@ -148,7 +148,7 @@ object TunnelsMaps {
 
     /** @return Errors with an empty String */
     private fun getGenericName(input: String): String = translateTable.getOrPut(input) {
-        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) }.orEmpty()
+        possibleLocations.keys.firstOrNull { it.uppercase().removeColor().contains(input.uppercase()) } ?: ""
     }
 
     private var clickTranslate = mapOf<Int, String>()
@@ -329,7 +329,7 @@ object TunnelsMaps {
                     Renderable.horizontalContainer(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.string("§d[${name}]"), onClick = guiSetActive(it.key))
                         },
                     ),
                     Renderable.string("§dFairy Souls"),
@@ -365,11 +365,9 @@ object TunnelsMaps {
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
         Renderable.string(
-            (it.key.getFirstColorCode()?.let { "§$it" }.orEmpty()) + (
-                "ROUGH_".plus(
-                    it.key.removeColor().removeSuffix("stone"),
-                ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()
-                ),
+            (it.key.getFirstColorCode()?.let { "§$it" } ?: "") + ("ROUGH_".plus(
+                it.key.removeColor().removeSuffix("stone"),
+            ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),

@@ -200,8 +200,8 @@ object PartyChatCommands {
         var message = "Ignored player list:"
         if (blacklist.size > 15) {
             message += "\n§e"
-            blacklist.forEachIndexed { i, blacklistedUser ->
-                message += blacklistedUser
+            blacklist.forEachIndexed { i, it ->
+                message += it
                 if (i < blacklist.size - 1) {
                     message += ", "
                 }

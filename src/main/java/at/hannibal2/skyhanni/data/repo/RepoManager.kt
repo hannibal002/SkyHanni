@@ -26,7 +26,6 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import java.util.Locale
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
@@ -69,7 +68,7 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private val atomicShouldManuallyReload = AtomicBoolean(false) // TODO remove the workaround
+    private val atomicShouldManuallyReload = AtomicBoolean(false)// TODO remove the workaround
 
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
@@ -166,8 +165,8 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Unit?> {
-        val comp = CompletableFuture<Unit?>()
+    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Void?> {
+        val comp = CompletableFuture<Void?>()
         if (!atomicShouldManuallyReload.get()) return comp
         ErrorManager.resetCache()
         DelayedRun.onThread.execute {
@@ -232,12 +231,9 @@ class RepoManager(private val configLocation: File) {
         if (joinEvent) {
             if (unsuccessfulConstants.isNotEmpty()) {
                 val text = mutableListOf<IChatComponent>()
-                @Suppress("MaximumLineLength")
                 text.add(
-                    (
-                        "§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
-                            "Please report this error on the Discord!"
-                        ).asComponent()
+                    ("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                        "Please report this error on the Discord!").asComponent(),
                 )
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
@@ -290,13 +286,13 @@ class RepoManager(private val configLocation: File) {
         val repoUser = config.location.user
         val repoName = config.location.name
         val repoBranch = config.location.branch
-        return String.format(Locale.US, "https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
+        return String.format("https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
     }
 
     private fun getDownloadUrl(commitId: String?): String {
         val repoUser = config.location.user
         val repoName = config.location.name
-        return String.format(Locale.US, "https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
+        return String.format("https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
     }
 
     @Throws(IOException::class)

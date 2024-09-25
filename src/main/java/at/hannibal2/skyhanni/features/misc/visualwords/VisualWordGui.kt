@@ -511,7 +511,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (KeyboardManager.isPastingKeysDown()) {
             SkyHanniMod.coroutineScope.launch {
-                val clipboard = OSUtils.readFromClipboard().orEmpty()
+                val clipboard = OSUtils.readFromClipboard() ?: ""
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
                         currentText += char

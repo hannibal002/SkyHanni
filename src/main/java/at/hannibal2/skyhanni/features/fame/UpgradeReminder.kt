@@ -52,9 +52,6 @@ object UpgradeReminder {
         "claimed",
         "§eYou claimed the §r§a(?<upgrade>.+) §r§eupgrade!",
     )
-
-    // TODO use
-    @Suppress("unused")
     private val upgradePattern by patternGroup.pattern(
         "upgrade",
         "§eClick to start upgrade!",

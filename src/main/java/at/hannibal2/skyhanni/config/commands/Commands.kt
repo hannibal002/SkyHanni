@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
-import at.hannibal2.skyhanni.data.mob.MobDetection
 import at.hannibal2.skyhanni.features.bingo.card.BingoCardDisplay
 import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHelper
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
@@ -187,7 +186,6 @@ object Commands {
         registerCommand("shnavigate", "Using path finder to go to locatons") { NavigationHelper.onCommand(it) }
     }
 
-    @Suppress("LongMethod")
     private fun usersNormal() {
         registerCommand(
             "shmarkplayer",
@@ -213,7 +211,7 @@ object Commands {
         registerCommand(
             "shclearslayerprofits",
             "Clearing the total slayer profit for the current slayer type",
-        ) { SlayerProfitTracker.clearProfitCommand() }
+        ) { SlayerProfitTracker.clearProfitCommand(it) }
         registerCommand(
             "shimportghostcounterdata",
             "Manually importing the ghost counter data from GhostCounterV3",
@@ -253,8 +251,7 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "Copy the English translation of a message in another language to the clipboard.\n" +
-                "Uses a 2 letter language code that can be found at the end of a translation message.",
+            "Copy the English translation of a message in another language to the clipboard.\n" + "Uses a 2 letter language code that can be found at the end of a translation message.",
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shtranslate",
@@ -501,22 +498,14 @@ object Commands {
         ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
-            "Monitors the scoreboard changes: Prints the raw scoreboard lines " +
-                "in the console after each update, with time since last update.",
+            "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update.",
         ) { ScoreboardData.toggleMonitor() }
-        registerCommand(
-            "shdebugmobdetection",
-            "Trigger the watchdog check on Mob Detection."
-        ) { MobDetection.watchdogCommand() }
     }
 
-    @Suppress("LongMethod")
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shtestrabbitpaths", "Tests pathfinding to rabbit eggs. Use a number 0-14.") {
-            HoppityEggLocator.testPathfind(it)
-        }
+        registerCommand("shtestrabbitpaths", "Tests pathfinding to rabbit eggs. Use a number 0-14.") { HoppityEggLocator.testPathfind(it) }
         registerCommand(
             "shtestitem",
             "test item internal name resolving",
@@ -600,9 +589,7 @@ object Commands {
         ) { TitleManager.command(it) }
         registerCommand(
             "shresetconfig",
-            "Reloads the config manager and rendering processors of MoulConfig. " +
-                "This §cWILL RESET §7your config, but also updating the java config files " +
-                "(names, description, orderings and stuff).",
+            "Reloads the config manager and rendering processors of MoulConfig. " + "This §cWILL RESET §7your config, but also updating the java config files " + "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
             "shreadcropmilestonefromclipboard",
@@ -718,7 +705,6 @@ object Commands {
                     args: Array<String>?,
                     pos: BlockPos?,
                 ): List<String> {
-                    @Suppress("UseOrEmpty")
                     return autoComplete(args ?: emptyArray())
                 }
             },

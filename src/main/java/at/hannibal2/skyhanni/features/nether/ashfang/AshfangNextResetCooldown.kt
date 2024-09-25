@@ -30,8 +30,7 @@ object AshfangNextResetCooldown {
 
         if (EntityUtils.getEntities<EntityArmorStand>().any {
                 it.posY > 145 && (it.name.contains("§c§9Ashfang Acolyte§r") || it.name.contains("§c§cAshfang Underling§r"))
-            }
-        ) {
+            }) {
             spawnTime = SimpleTimeMark.now()
         }
     }

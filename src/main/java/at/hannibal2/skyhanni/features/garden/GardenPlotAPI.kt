@@ -191,7 +191,7 @@ object GardenPlotAPI {
         }
 
     fun Plot.markExpiredSprayAsNotified() {
-        getData()?.sprayHasNotified = true
+        getData()?.apply { sprayHasNotified = true }
     }
 
     private fun Plot.setSpray(spray: SprayType, duration: Duration) {

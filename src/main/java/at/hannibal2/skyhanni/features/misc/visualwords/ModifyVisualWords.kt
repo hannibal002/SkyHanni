@@ -46,6 +46,15 @@ object ModifyVisualWords {
                     )
                 }
             }
+
+            // Disabled, as it's only a novelty for 30 seconds and will annoy after that everyone.
+            /*
+            if (LorenzUtils.isAprilFoolsDay && !FontRendererHook.cameFromChat && Random.nextDouble() < 0.02) {
+                modifiedText = modifiedText.replace(reverseRegex) {
+                    it.groupValues[1] + it.groupValues[2].reversed()
+                }
+            }
+            */
             modifiedText
         }
     }

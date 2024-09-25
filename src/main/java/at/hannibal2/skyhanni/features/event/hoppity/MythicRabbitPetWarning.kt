@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import kotlin.time.Duration.Companion.seconds
 
 object MythicRabbitPetWarning {
-    private const val MYTHIC_RABBIT = "§dRabbit"
-    private var lastCheck = SimpleTimeMark.farPast()
+    val mythicRabbit = "§dRabbit"
+    var lastCheck = SimpleTimeMark.farPast()
 
     fun check() {
         if (!HoppityEggsManager.config.petWarning) return
@@ -21,7 +21,7 @@ object MythicRabbitPetWarning {
         }
     }
 
-    fun correctPet() = PetAPI.isCurrentPet(MYTHIC_RABBIT)
+    fun correctPet() = PetAPI.isCurrentPet(mythicRabbit)
 
     private fun warn() {
         ChatUtils.chat("Use a §dMythic Rabbit Pet §efor more chocolate!")

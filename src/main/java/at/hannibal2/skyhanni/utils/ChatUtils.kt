@@ -123,12 +123,10 @@ object ChatUtils {
         oneTimeClick: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(
-            Text.text(msgPrefix + message) {
-                this.onClick(expireAt, oneTimeClick, onClick)
-                this.hover = hover.asComponent()
-            }
-        )
+        chat(Text.text(msgPrefix + message) {
+            this.onClick(expireAt, oneTimeClick, onClick)
+            this.hover = hover.asComponent()
+        })
     }
 
     /**
@@ -150,14 +148,12 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
-        chat(
-            Text.text(msgPrefix + message) {
-                this.hover = Text.multiline(hover)
-                if (command != null) {
-                    this.command = command
-                }
+        chat(Text.text(msgPrefix + message) {
+            this.hover = Text.multiline(hover)
+            if (command != null) {
+                this.command = command
             }
-        )
+        })
     }
 
     /**
@@ -180,12 +176,10 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(
-            Text.text(msgPrefix + message) {
-                this.url = url
-                this.hover = "$prefixColor$hover".asComponent()
-            }
-        )
+        chat(Text.text(msgPrefix + message) {
+            this.url = url
+            this.hover = "$prefixColor$hover".asComponent()
+        })
         if (autoOpen) OSUtils.openBrowser(url)
     }
 

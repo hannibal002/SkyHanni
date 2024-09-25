@@ -37,8 +37,8 @@ object GuiEditManager {
 
     private var lastHotkeyPressed = SimpleTimeMark.farPast()
 
-    private val currentPositions = TimeLimitedCache<String, Position>(15.seconds)
-    private val currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
+    private var currentPositions = TimeLimitedCache<String, Position>(15.seconds)
+    private var currentBorderSize = mutableMapOf<String, Pair<Int, Int>>()
     private var lastMovedGui: String? = null
 
     @SubscribeEvent

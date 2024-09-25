@@ -58,10 +58,8 @@ class LorenzLogger(filePath: String) {
                 }
             }
         } catch (e: SecurityException) {
-            @Suppress("PrintStackTrace")
             e.printStackTrace()
         } catch (e: IOException) {
-            @Suppress("PrintStackTrace")
             e.printStackTrace()
         }
 

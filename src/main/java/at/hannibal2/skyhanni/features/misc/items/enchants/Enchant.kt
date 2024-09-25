@@ -10,8 +10,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
-import net.minecraft.item.ItemStack
 import java.util.TreeSet
+import net.minecraft.item.ItemStack
 
 open class Enchant : Comparable<Enchant> {
     @Expose
@@ -94,7 +94,8 @@ open class Enchant : Comparable<Enchant> {
         return if (this.isUltimate()) -1 else 1
     }
 
-    class Normal : Enchant()
+    class Normal : Enchant() {
+    }
 
     class Ultimate : Enchant() {
         override fun getFormat(level: Int, itemStack: ItemStack?) = "§d§l"
@@ -105,13 +106,12 @@ open class Enchant : Comparable<Enchant> {
         private var nbtNum: String? = null
 
         @Expose
-        @Suppress("unused")
         private var statLabel: String? = null
 
         @Expose
         private var stackLevel: TreeSet<Int>? = null
 
-        override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
+        override fun toString() = "$nbtNum ${stackLevel.toString()} ${super.toString()}"
     }
 
     class Dummy(name: String) : Enchant() {

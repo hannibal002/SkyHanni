@@ -16,7 +16,6 @@ class Uniform<T>(
     private val uniformValuesSupplier: () -> T,
 ) {
 
-    @Suppress("UtilityClassWithPublicConstructor")
     class UniformType<T> {
         companion object {
 

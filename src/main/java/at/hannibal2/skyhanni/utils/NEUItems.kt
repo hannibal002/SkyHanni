@@ -64,7 +64,6 @@ object NEUItems {
             .registerTypeAdapter(
                 HypixelApiTrophyFish::class.java,
                 object : TypeAdapter<HypixelApiTrophyFish>() {
-                    @Suppress("EmptyFunctionBlock")
                     override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
                     override fun read(reader: JsonReader): HypixelApiTrophyFish {

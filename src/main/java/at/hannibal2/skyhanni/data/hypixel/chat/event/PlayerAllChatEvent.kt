@@ -21,14 +21,11 @@ class PlayerAllChatEvent(
     val isAGuest by lazy { privateIslandGuest != null }
 
     companion object {
-        private val listenerList = ListenerList(
-            AbstractChatEvent(
-                ComponentSpan.empty(),
-                ComponentSpan.empty(),
-                ChatComponentText(""),
-                ""
-            ).listenerList
-        )
+        private val listenerList = ListenerList(AbstractChatEvent(
+            ComponentSpan.empty(),
+            ComponentSpan.empty(),
+            ChatComponentText(""),
+            "").listenerList)
     }
 
     /**
@@ -48,10 +45,8 @@ class PlayerAllChatEvent(
      * This method is required if [setup] is present.
      */
     @ApiStatus.Internal
-    constructor() : this(
-        null, null, null, "",
-        ComponentSpan.empty(), ComponentSpan.empty(), ChatComponentText("")
-    )
+    constructor() : this(null, null, null, "",
+                         ComponentSpan.empty(), ComponentSpan.empty(), ChatComponentText(""))
 
     /**
      * This method is required if [setup] is present.

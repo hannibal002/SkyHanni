@@ -156,16 +156,14 @@ object GardenCropMilestoneDisplay {
         val useCustomGoal = customTargetLevel != 0 && customTargetLevel > currentTier
         nextTier = if (useCustomGoal) customTargetLevel else nextTier
 
-        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontalContainer(
-            buildList {
-                addCropIconRenderable(crop)
-                if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
-                    addString("§7" + crop.cropName + " §eMAXED")
-                } else {
-                    addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
-                }
+        lineMap[MilestoneTextEntry.MILESTONE_TIER] = Renderable.horizontalContainer(buildList {
+            addCropIconRenderable(crop)
+            if (crop.isMaxed(overflowDisplay) && !overflowDisplay) {
+                addString("§7" + crop.cropName + " §eMAXED")
+            } else {
+                addString("§7" + crop.cropName + " §8$currentTier➜§3$nextTier")
             }
-        )
+        })
 
         val allowOverflowOrCustom = overflowDisplay || useCustomGoal
         val cropsForNextTier = GardenCropMilestones.getCropsForTier(nextTier, crop, allowOverflowOrCustom)
@@ -304,12 +302,10 @@ object GardenCropMilestoneDisplay {
         val missing = need - have
 
         lineMap[MushroomTextEntry.TITLE] = Renderable.string("§6Mooshroom Cow Perk")
-        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(
-            buildList {
-                addCropIconRenderable(mushroom)
-                addString("§7Mushroom Milestone $nextTier")
-            }
-        )
+        lineMap[MushroomTextEntry.MUSHROOM_TIER] = Renderable.horizontalContainer(buildList {
+            addCropIconRenderable(mushroom)
+            addString("§7Mushroom Milestone $nextTier")
+        })
 
         lineMap[MushroomTextEntry.NUMBER_OUT_OF_TOTAL] = Renderable.string("§e$haveFormat§8/§e$needFormat")
 

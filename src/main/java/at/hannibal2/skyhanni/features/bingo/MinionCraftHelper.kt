@@ -98,8 +98,7 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: Array<ItemStack?>):
-        Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
+    private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
         val minions = mutableMapOf<String, NEUInternalName>()
@@ -118,9 +117,11 @@ object MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item?.name?.removeColor() ?: continue
-            if (!isMinionName(name) && !item.hasEnchantments()) {
-                val rawId = item.getInternalName()
-                if (!allIngredients.contains(rawId) || !isAllowed(allMinions, rawId)) continue
+            if (item.hasEnchantments()) continue
+            val rawId = item.getInternalName()
+            if (!isMinionName(name)) {
+                if (!allIngredients.contains(rawId)) continue
+                if (!isAllowed(allMinions, rawId)) continue
 
                 val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
                 val old = otherItems.getOrDefault(itemId, 0)
@@ -143,9 +144,7 @@ object MinionCraftHelper {
                     if (ingredientInternalName == internalName) return true
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
-                    if (primitiveStack.internalName == ingredientPrimitive.internalName &&
-                        primitiveStack.amount < ingredientPrimitive.amount
-                    ) return true
+                    if (primitiveStack.internalName == ingredientPrimitive.internalName && primitiveStack.amount < ingredientPrimitive.amount) return true
                 }
             }
         }

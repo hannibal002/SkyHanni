@@ -62,7 +62,6 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
-@Suppress("LargeClass")
 object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
@@ -130,16 +129,12 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
-    private fun isKuudraSet(internalName: String) = (
-        kuudraSets.any {
-            internalName.contains(it)
-        } && listOf(
-            "CHESTPLATE",
-            "LEGGINGS",
-            "HELMET",
-            "BOOTS",
-        ).any { internalName.endsWith(it) }
-        )
+    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } && listOf(
+        "CHESTPLATE",
+        "LEGGINGS",
+        "HELMET",
+        "BOOTS",
+    ).any { internalName.endsWith(it) })
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
@@ -223,9 +218,7 @@ object EstimatedItemValueCalculator {
     private fun getPriceOrCompositePriceForAttribute(attributeName: String, level: Int): Double? {
         val intRange = if (config.useAttributeComposite.get()) 1..10 else level..level
         return intRange.mapNotNull { lowerLevel ->
-            "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()?.let {
-                it / (1 shl lowerLevel) * (1 shl level).toDouble()
-            }
+            "$attributeName;$lowerLevel".asInternalName().getPriceOrNull()?.let { it / (1 shl lowerLevel) * (1 shl level).toDouble() }
         }.minOrNull()
     }
 
@@ -499,8 +492,8 @@ object EstimatedItemValueCalculator {
                 tiers[id] = getKuudraTier(id)
 
             }
-            for ((id, _) in tiers.sorted()) {
-                val prices = EssenceItemUtils.itemPrices[id] ?: continue
+            for ((id, tier) in tiers.sorted()) {
+                val prices = EssenceItemUtils.itemPrices[id]!!
                 maxStars += prices.size
                 if (remainingStars <= 0) continue
 
@@ -745,9 +738,8 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
-        // todo use repo
+        //todo use repo
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
-        @Suppress("PropertyWrapping")
         val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
         val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
@@ -925,11 +917,11 @@ object EstimatedItemValueCalculator {
 
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
-        return "§b$name $second Shard"
+        return "§b$name ${second} Shard"
     }
 
-    private fun Pair<String, Int>.getAttributePrice(): Double? = getPriceOrCompositePriceForAttribute(
-        "ATTRIBUTE_SHARD+ATTRIBUTE_$first",
+    fun Pair<String, Int>.getAttributePrice(): Double? = EstimatedItemValueCalculator.getPriceOrCompositePriceForAttribute(
+        "ATTRIBUTE_SHARD+ATTRIBUTE_" + first,
         second,
     )
 }

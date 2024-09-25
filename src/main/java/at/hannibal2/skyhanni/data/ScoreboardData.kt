@@ -25,7 +25,7 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName.orEmpty()
+    val objectiveTitle: String get() = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName ?: ""
 
     private var dirty = false
 
@@ -48,7 +48,7 @@ object ScoreboardData {
              *        - '§8- §c§6Flame Dr§6agon§a 460M§c❤'
              * ```
              */
-            val lastColor = start.lastColorCode().orEmpty()
+            val lastColor = start.lastColorCode() ?: ""
 
             // Generate the list of color suffixes
             val colorSuffixes = lastColor.chunked(2).toMutableList()

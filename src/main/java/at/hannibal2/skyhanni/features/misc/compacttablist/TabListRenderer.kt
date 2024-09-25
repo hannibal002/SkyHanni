@@ -66,7 +66,6 @@ object TabListRenderer {
         }
     }
 
-    // TODO: Split into util functions
     private fun drawTabList() {
         val columns = TabListReader.renderColumns
 

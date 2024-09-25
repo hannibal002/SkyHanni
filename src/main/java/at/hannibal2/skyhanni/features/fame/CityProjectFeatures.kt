@@ -178,16 +178,14 @@ object CityProjectFeatures {
         val lore = item.getLore()
         val completed = lore.lastOrNull()?.let { completedPattern.matches(it) } ?: false
         if (completed) return
-
-        // TODO: Refactor this loop to use less continue & break statements
-        @Suppress("LoopWithTooManyJumpStatements")
         for (line in lore) {
             if (line == "§7Cost") {
                 next = true
                 continue
             }
             if (!next) continue
-            if (line == "" || line.contains("Bits")) break
+            if (line == "") break
+            if (line.contains("Bits")) break
 
             val (name, amount) = ItemUtils.readItemAmount(line) ?: continue
             val internalName = NEUInternalName.fromItemName(name)

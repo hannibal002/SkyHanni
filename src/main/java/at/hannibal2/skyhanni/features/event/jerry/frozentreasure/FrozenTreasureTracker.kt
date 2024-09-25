@@ -42,9 +42,8 @@ object FrozenTreasureTracker {
     private var icePerSecond = mutableListOf<Long>()
     private var icePerHour = 0
     private var stoppedChecks = 0
-    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker }) {
-        formatDisplay(drawDisplay(it))
-    }
+    private val tracker = SkyHanniTracker("Frozen Treasure Tracker", { Data() }, { it.frozenTreasureTracker })
+    { formatDisplay(drawDisplay(it)) }
 
     init {
         FrozenTreasure.entries.forEach { it.chatPattern }

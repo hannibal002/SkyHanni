@@ -21,8 +21,8 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
         update(content, footer)
     }
 
-    // TODO split up this 240 lines function
-    private fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
+    //TODO split up this 240 lines function
+    fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
         val content = mutableListOf<MutableList<Renderable>>()
         val footer = mutableListOf<Renderable>()
         val timeUntilCakes = FFStats.cakeExpireTime.timeUntil().format(TimeUnit.HOUR, maxUnits = 1)
@@ -103,7 +103,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val moreInfo = "§2Select a piece for more info"
         val wordArmor = if (FarmingItems.currentArmor == null) "Armor" else "Piece"
-        val armorName = FarmingItems.currentArmor?.getItem()?.displayName.orEmpty()
+        val armorName = FarmingItems.currentArmor?.getItem()?.displayName ?: ""
 
         content.addTable(
             1,
@@ -161,7 +161,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
 
         val wordEquip = if (FarmingItems.currentEquip == null) "Equipment" else "Piece"
 
-        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName.orEmpty()
+        val equipmentName = FarmingItems.currentEquip?.getItem()?.displayName ?: ""
 
         content.addTable(
             1,

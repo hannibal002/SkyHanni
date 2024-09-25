@@ -44,6 +44,7 @@ object ChestValue {
     private val chestItems = mutableMapOf<String, Item>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
+    private var compactInventory = true
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -229,16 +230,18 @@ object ChestValue {
     enum class SortType(val shortName: String, val longName: String) {
         PRICE_DESC("Price D", "Price Descending"),
         PRICE_ASC("Price A", "Price Ascending"),
+        ;
     }
 
     enum class FormatType(val type: String) {
         SHORT("Formatted"),
         LONG("Unformatted"),
+        ;
     }
 
     enum class DisplayType(val type: String) {
         NORMAL("Normal"),
-        COMPACT("Aligned"),
+        COMPACT("Aligned")
     }
 
     private fun isValidStorage(): Boolean {

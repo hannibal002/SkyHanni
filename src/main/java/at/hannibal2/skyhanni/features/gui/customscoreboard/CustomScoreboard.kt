@@ -48,7 +48,7 @@ object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
-    private const val GUI_NAME = "Custom Scoreboard"
+    private val guiName = "Custom Scoreboard"
 
     // Cached scoreboard data, only update after no change for 300ms
     var activeLines = emptyList<String>()
@@ -80,12 +80,12 @@ object CustomScoreboard {
 
         RenderBackground.updatePosition(finalRenderable)
 
-        config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
+        config.position.renderRenderable(finalRenderable, posLabel = guiName)
     }
 
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
-        if (event.guiName == GUI_NAME) {
+        if (event.guiName == guiName) {
             with(alignmentConfig) {
                 if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
                     verticalAlignment != VerticalAlignment.DONT_ALIGN

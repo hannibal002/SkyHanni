@@ -29,10 +29,7 @@ object EasterEggWaypoints {
         if (!isEnabled()) return
 
         val message = event.message
-        if (message.startsWith("§a§lYou found an Easter Egg! §r") ||
-            message == "§aYou have received the §bsuper reward§a!" ||
-            message == "§cYou already found this egg!"
-        ) {
+        if (message.startsWith("§a§lYou found an Easter Egg! §r") || message == "§aYou have received the §bsuper reward§a!" || message == "§cYou already found this egg!") {
             val egg = EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
             egg.found = true
             if (closest == egg) {
@@ -91,11 +88,10 @@ object EasterEggWaypoints {
 
     // TODO use regex with the help of knowing the original lore. Will most likely need to wait until next egg event
 
-    @Suppress("NoTrailingSpaces")
     /*
         Title:
         §e§lHYPIXEL
-
+        
         '§703/14/24  §8L30A'
         '  '
         'Rank: §bMVP§d+§b'
@@ -110,7 +106,7 @@ object EasterEggWaypoints {
         'Easter Eggs: §a0/§a30'
         '             '
         '§ewww.hypixel.net'
-     */
+    */
     private fun checkScoreboardEasterSpecific(): Boolean {
         val a = ScoreboardData.sidebarLinesFormatted.any { it.contains("Hypixel Level") }
         val b = ScoreboardData.sidebarLinesFormatted.any { it.contains("Easter") }

@@ -49,12 +49,10 @@ object SackAPI {
         "sack",
         "^(.* Sack|Enchanted .* Sack)\$",
     )
-    @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
-    @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
         " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
@@ -233,12 +231,12 @@ object SackAPI {
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
-        }.orEmpty()
+        } ?: ""
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
-        }.orEmpty()
+        } ?: ""
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return
@@ -414,5 +412,5 @@ enum class SackStatus {
     MISSING,
     CORRECT,
     ALRIGHT,
-    OUTDATED,
+    OUTDATED;
 }
