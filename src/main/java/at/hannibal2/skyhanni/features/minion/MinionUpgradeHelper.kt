@@ -11,14 +11,15 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.ItemUtils.setLore
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.entity.player.InventoryPlayer
+import net.minecraft.init.Blocks
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -67,8 +68,9 @@ object MinionUpgradeHelper {
     }
 
     private fun createDisplayItem(): ItemStack {
-        val neuItem = "DIAMOND BLOCK".asInternalName().getItemStack().item
         val itemPrice = itemName.asInternalName().getPriceOrNull() ?: 0.0
+
+        val displayName = "§bGet required items"
         val lore = buildList {
             val itemsRemaining = itemsNeeded - itemsInSacks
             if (itemsInSacks > 0) {
@@ -82,15 +84,11 @@ object MinionUpgradeHelper {
                 add("§7Buy §a${itemsRemaining}§7x §b$itemName §7from the Bazaar")
                 if (itemsInSacks > 0) add("§7Remaining Items Cost: §6${(itemsRemaining * itemPrice).shortFormat()} §7coins")
             }
-
             add("§7Total Cost: §6${(itemsNeeded * itemPrice).shortFormat()} §7coins")
         }
 
-        return Utils.createItemStack(
-            neuItem,
-            "§bGet required items",
-            *lore.toTypedArray()
-        )
+        val diamondBlockItemStack = ItemStack(Item.getItemFromBlock(Blocks.diamond_block), 1)
+        return diamondBlockItemStack.setStackDisplayName(displayName).setLore(lore)
     }
 
     @SubscribeEvent
