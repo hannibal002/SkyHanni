@@ -145,7 +145,7 @@ object MinionCraftHelper {
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
                     if (primitiveStack.internalName == ingredientPrimitive.internalName &&
                         primitiveStack.amount < ingredientPrimitive.amount
-                        ) return true
+                    ) return true
                 }
             }
         }

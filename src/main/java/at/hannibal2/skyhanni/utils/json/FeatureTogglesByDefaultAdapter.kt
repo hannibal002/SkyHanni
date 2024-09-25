@@ -82,7 +82,7 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
                 it.isAnnotationPresent(FeatureToggle::class.java) ||
                     gson.getAdapter(TypeToken.get(getType(type, it))) is Adapter
             }
-            ) return null
+        ) return null
 
         val originalWrite = gson.getDelegateAdapter(this, type)
         return Adapter(originalWrite, t as Class<T>, gson, type)

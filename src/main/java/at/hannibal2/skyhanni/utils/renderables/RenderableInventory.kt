@@ -97,7 +97,7 @@ object RenderableInventory {
                                 false,
                             )
                         } ?: Renderable.placeholder((16 * scale).toInt(), (16 * scale).toInt())
-                    ).also { index++ }
+                        ).also { index++ }
                 } else Renderable.placeholder(0, 0)
                 Renderable.drawInsideFixedSizedImage(
                     renderable,

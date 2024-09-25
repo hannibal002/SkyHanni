@@ -56,10 +56,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
                 (type as? Class<E>)?.enumConstants
             } ?: ErrorManager.skyHanniError(
-                "Unable to retrieve enum constants for E in BucketedItemTrackerData",
-                "selectedBucket" to selectedBucket,
-                "dataClass" to this.javaClass.superclass.name,
-            )
+            "Unable to retrieve enum constants for E in BucketedItemTrackerData",
+            "selectedBucket" to selectedBucket,
+            "dataClass" to this.javaClass.superclass.name,
+        )
     }
 
     @Expose

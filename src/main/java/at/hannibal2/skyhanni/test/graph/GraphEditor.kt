@@ -537,8 +537,9 @@ object GraphEditor {
                 index,
                 it.position,
                 it.name,
-                it.tags.map
-                { it.internalName }
+                it.tags.map {
+                    it.internalName
+                }
             )
         }
         val neighbours = GraphEditor.nodes.map { node ->

@@ -164,7 +164,7 @@ object IslandAreas {
                 }
             }
 
-            val distance = difference.round(1)
+            val distance = difference.roundTo(1)
             val text = "$coloredName§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {

@@ -83,7 +83,7 @@ object ConfigUpdaterMigrator {
             if (newParentElement !is JsonObject) {
                 logger.log(
                     "Catastrophic: element at path $old could not be " +
-                    "relocated to $new, since another element already inhabits that path"
+                        "relocated to $new, since another element already inhabits that path"
                 )
                 return
             }

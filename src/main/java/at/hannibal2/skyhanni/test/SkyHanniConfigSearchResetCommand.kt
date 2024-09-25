@@ -225,8 +225,8 @@ object SkyHanniConfigSearchResetCommand {
                 val objectName = obj.getObjectName()
                 if (obj !is Runnable && objectName.startsWith(className) && (
                         objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
-                        objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage")
-                    )
+                            objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage")
+                        )
                 ) {
                     "<category>"
                 } else if (onlyValue) {
