@@ -73,6 +73,7 @@ import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
@@ -95,7 +96,7 @@ import at.hannibal2.skyhanni.test.command.TestChatCommand
 import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.graph.GraphEditor
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
@@ -183,6 +184,7 @@ object Commands {
         registerCommand("shmayor", "View the current Mayor.", listOf("shelection")) { openElectionViewer() }
         registerCommand("shremind", "Set a reminder for yourself") { ReminderManager.command(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
+        registerCommand("shnavigate", "Using path finder to go to locatons") { NavigationHelper.onCommand(it) }
     }
 
     private fun usersNormal() {
@@ -383,7 +385,7 @@ object Commands {
         registerCommand(
             "shtogglehypixelapierrors",
             "Show/hide hypixel api error messages in chat",
-        ) { APIUtil.toggleApiErrorMessages() }
+        ) { APIUtils.toggleApiErrorMessages() }
         registerCommand(
             "shclearcropspeed",
             "Reset garden crop speed data and best crop time data",

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
@@ -10,32 +11,37 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DPathWithWaypoint
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
 import kotlin.math.abs
+import kotlin.time.Duration.Companion.milliseconds
 
 /**
  * TODO
  * benefits of every island graphs:
  * global:
  * 	NEU's fairy souls
- * 	point of interest
- * 	slayer area
- * 	NEU's NPC's
+ * 	slayer area (not all there yet)
+ * 	NEU's NPC's (auto acitvate when searching via neu)
  * 	races (end, park, winter, dungeon hub)
  * 	jump pads between servers
  * 	ring of love/romeo juliet quest
@@ -47,7 +53,6 @@ import kotlin.math.abs
  * farming:
  * 	pelt farming area
  * rift:
- * 	enigma souls
  * 	eyes
  * 	big quests
  * 	montezuma souls
@@ -70,14 +75,20 @@ import kotlin.math.abs
  *  daily quests
  *  intro tutorials with elle
  *  fishing spots
+ * mineshaft
+ *  different types mapped out
+ *  paths to ladder and possible corpse locations, and known corpse locations
  *
- * graph todo:
+ * Additional global things:
+ *  use custom graphs for your island/garden
+ *  suggest using warp points if closer
+ *  support cross island paths (have a list of all node names in all islands)
+ *
+ * Changes in graph editor:
  * 	fix rename not using tick but input event we have (+ create the input event in the first place)
  * 	toggle distance to node by node path lengh, instead of eye of sight lenght
  * 	press test button again to enable "true test mode", with graph math and hiding other stuff
  * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
- *
- * 	mineshaft + corpse + ladder spot
  */
 
 @SkyHanniModule
@@ -101,26 +112,73 @@ object IslandGraphs {
 
     private var fastestPath: Graph? = null
     private var condition: () -> Boolean = { true }
+    private var inGlaciteTunnels: Boolean? = null
+
+    private val patternGroup = RepoPattern.group("data.island.navigation")
+
+    /**
+     * REGEX-TEST: Dwarven Base Camp
+     * REGEX-TEST: Forge
+     * REGEX-TEST: Fossil Research Center
+     */
+    private val glaciteTunnelsPattern by patternGroup.pattern(
+        "glacitetunnels",
+        "(Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center)",
+    )
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        reloadFromJson(LorenzUtils.skyBlockIsland)
+        loadIsland(LorenzUtils.skyBlockIsland)
     }
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        reloadFromJson(event.newIsland)
+        if (currentIslandGraph != null) return
+        if (event.newIsland == IslandType.NONE) return
+        loadIsland(event.newIsland)
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
+        currentIslandGraph = null
         reset()
     }
 
-    private fun reloadFromJson(newIsland: IslandType) {
-        val islandName = newIsland.name
+    fun isGlaciteTunnelsArea(area: String?): Boolean = glaciteTunnelsPattern.matches(area)
+
+    @HandleEvent
+    fun onAreaChange(event: ScoreboardAreaChangeEvent) {
+        if (!IslandType.DWARVEN_MINES.isInIsland()) {
+            inGlaciteTunnels = null
+            return
+        }
+
+        val now = isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)
+        if (inGlaciteTunnels != now) {
+            inGlaciteTunnels = now
+            loadDwarvenMines()
+        }
+    }
+
+    private fun loadDwarvenMines() {
+        if (isGlaciteTunnelsArea(LorenzUtils.skyBlockArea)) {
+            reloadFromJson("GLACITE_TUNNELS")
+        } else {
+            reloadFromJson("DWARVEN_MINES")
+        }
+    }
+
+    private fun loadIsland(newIsland: IslandType) {
+        if (newIsland == IslandType.DWARVEN_MINES) {
+            loadDwarvenMines()
+        } else {
+            reloadFromJson(newIsland.name)
+        }
+    }
+
+    private fun reloadFromJson(islandName: String) {
         val constant = "island_graphs/$islandName"
         val name = "constants/$constant.json"
         val jsonFile = File(SkyHanniMod.repo.repoLocation, name)
@@ -134,8 +192,16 @@ object IslandGraphs {
     }
 
     fun setNewGraph(graph: Graph) {
+        IslandAreas.display = null
         reset()
         currentIslandGraph = graph
+
+        // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
+        handleTick()
+        IslandAreas.noteMoved()
+        DelayedRun.runDelayed(150.milliseconds) {
+            IslandAreas.updatePosition()
+        }
     }
 
     private fun reset() {
@@ -148,6 +214,10 @@ object IslandGraphs {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        handleTick()
+    }
+
+    private fun handleTick() {
         val prevClosed = closedNote
 
         val graph = currentIslandGraph ?: return
@@ -294,8 +364,7 @@ object IslandGraphs {
 
         val nodes = graph.nodes
         val potentialSkip =
-            nodes.lastOrNull { it.position.canBeSeen(maxSkipDistance, -1.0) && abs(it.position.y - playerY) <= 2 }
-                ?: return null
+            nodes.lastOrNull { it.position.canBeSeen(maxSkipDistance, -1.0) && abs(it.position.y - playerY) <= 2 } ?: return null
 
         val angleSkip = if (potentialSkip == nodes.first()) {
             false
