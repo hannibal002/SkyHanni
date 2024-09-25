@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.combat.SpidersDenAPI.isAtTopOfNest
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.eventsConfig
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -411,12 +413,9 @@ private fun getActiveEventLine(): List<String> {
     val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
 
-    val currentActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeEndsPattern.matches(it) }
-        ?.let {
-            SbPattern.eventTimeEndsPattern.matchMatcher(it) {
-                group("time")
-            }
-        }
+    val currentActiveEventTime = ScoreboardPattern.eventTimeEndsPattern.firstMatcher(TabWidget.EVENT.lines) {
+        group("time")
+    } ?: return emptyList()
 
     return listOf(currentActiveEvent, " Ends in: §e$currentActiveEventTime")
 }
@@ -426,12 +425,9 @@ private fun getActiveEventShowWhen(): Boolean =
 
 private fun getSoonEventLine(): List<String> {
     val soonActiveEvent = getTablistEvent() ?: return emptyList()
-    val soonActiveEventTime = TabListData.getTabList().firstOrNull { SbPattern.eventTimeStartsPattern.matches(it) }
-        ?.let {
-            SbPattern.eventTimeStartsPattern.matchMatcher(it) {
-                group("time")
-            }
-        }
+    val soonActiveEventTime = ScoreboardPattern.eventTimeStartsPattern.firstMatcher(TabWidget.EVENT.lines) {
+        group("time")
+    } ?: return emptyList()
 
     return listOf(soonActiveEvent, " Starts in: §e$soonActiveEventTime")
 }
