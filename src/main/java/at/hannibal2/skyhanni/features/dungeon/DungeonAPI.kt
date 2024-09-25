@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.DungeonClickedBlockEvent
+import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
@@ -380,6 +380,6 @@ object DungeonAPI {
 
             else -> return
         }
-        DungeonClickedBlockEvent(position, blockType).post()
+        DungeonBlockClickEvent(position, blockType).post()
     }
 }
