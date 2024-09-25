@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.event;
 
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig;
+import at.hannibal2.skyhanni.config.features.event.carnival.CarnivalConfig;
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig;
 import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig;
@@ -43,6 +44,10 @@ public class EventConfig {
     @Expose
     public GreatSpookConfig spook = new GreatSpookConfig();
 
+    @Expose
+    @Category(name = "The Carnival", desc = "Features for games at §eThe Carnival §7when §bFoxy §7is Mayor.")
+    public CarnivalConfig carnival = new CarnivalConfig();
+
     // comment in if the event is needed again
 //    @ConfigOption(name = "300þ Anniversary Celebration", desc = "Features for the 300þ year of SkyBlock")
     @Accordion
@@ -52,5 +57,4 @@ public class EventConfig {
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose
     public LobbyWaypointsConfig lobbyWaypoints = new LobbyWaypointsConfig();
-
 }
