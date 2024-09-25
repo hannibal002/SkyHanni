@@ -249,17 +249,17 @@ object UserLuckBreakdown {
         val skillLuck = skillOverflowLuck.values.sum()
         val totalLuck = skillLuck + limboLuck
 
-        mainLuckItem = ItemUtils.createItemStack(
+        mainLuckItem = ItemUtils.createItemStackExplicit(
             mainLuckID.getItemStack().item,
             "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
             createItemLore("mainMenu", totalLuck),
         )
-        limboItem = ItemUtils.createItemStack(
+        limboItem = ItemUtils.createItemStackExplicit(
             limboID.getItemStack().item,
             LIMBO_NAME,
             createItemLore("limbo", limboLuck),
         )
-        skillsItem = ItemUtils.createItemStack(
+        skillsItem = ItemUtils.createItemStackExplicit(
             skillsID.getItemStack().item,
             SKILLS_NAME,
             createItemLore("skills"),

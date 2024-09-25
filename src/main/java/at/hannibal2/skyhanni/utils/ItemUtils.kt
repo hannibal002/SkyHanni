@@ -201,8 +201,8 @@ object ItemUtils {
     }
 
     // Overload to reduce spread operator usage
-    fun createItemStack(item: Item, displayName: String, lore: Array<String>): ItemStack {
-        return createItemStack(item, displayName, lore.toList(), 1, 0)
+    fun createItemStackExplicit(item: Item, displayName: String, loreArray: Array<String>): ItemStack {
+        return createItemStack(item, displayName, loreArray.toList(), 1, 0)
     }
 
     // Taken from NEU
