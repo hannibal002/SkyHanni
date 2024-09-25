@@ -73,12 +73,10 @@ object ChatCopy {
     }
 
     private fun getOffset(): Int {
-        return try {
+        return runCatching {
             val patcherConfigClass = Class.forName("club.sk1er.patcher.config.PatcherConfig")
             if (patcherConfigClass.getDeclaredFieldOrNull("chatPosition")?.getBoolean(null) == true) 12 else 0
-        } catch (e: Exception) {
-            0
-        }
+        }.getOrNull() ?: 0
     }
 
 
