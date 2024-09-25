@@ -68,7 +68,7 @@ object ExperimentationTableAPI {
      */
     val rewardPattern by patternGroup.pattern(
         "rewards",
-        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment The Fish",
+        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment the Fish",
     )
 
     /**
