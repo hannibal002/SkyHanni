@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
 import net.minecraft.network.play.server.S2APacketParticles
@@ -153,17 +153,21 @@ data class LorenzVec(
         return result
     }
 
-    fun round(decimals: Int) = LorenzVec(x.round(decimals), y.round(decimals), z.round(decimals))
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
+    fun round(precision: Int) = roundTo(precision)
+
+    fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
     fun roundLocationToBlock(): LorenzVec {
-        val x = (x - .499999).round(0)
-        val y = (y - .499999).round(0)
-        val z = (z - .499999).round(0)
+        val x = (x - .499999).roundTo(0)
+        val y = (y - .499999).roundTo(0)
+        val z = (z - .499999).roundTo(0)
         return LorenzVec(x, y, z)
     }
 
     fun slope(other: LorenzVec, factor: Double) = this + (other - this).scale(factor)
 
+    // TODO better name. dont confuse with roundTo()
     fun roundLocation(): LorenzVec {
         val x = if (this.x < 0) x.toInt() - 1 else x.toInt()
         val y = y.toInt() - 1
