@@ -41,7 +41,7 @@ object TentacleWaypoint {
         tentacles += event.entity to 0
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.THE_RIFT])
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onEntityDamage(event: EntityHurtEvent<EntitySlime>) {
         if (!isEnabled()) return
 
