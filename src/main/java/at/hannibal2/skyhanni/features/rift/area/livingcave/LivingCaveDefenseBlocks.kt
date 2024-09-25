@@ -147,7 +147,7 @@ object LivingCaveDefenseBlocks {
                 val location = block.location
                 event.drawWaypointFilled(location, color)
                 event.drawLineToEye(
-                    location.add(0.5, 0.5, 0.5),
+                    location.blockCenter(),
                     color,
                     1,
                     false,
