@@ -69,13 +69,13 @@ enum class CarnivalGoal(
     CATCH_A_FISH_SCORE(
         GoalType.CATCH_A_FISH,
         "§7Reach §a3,000 score §7in a single game",
-        "(§8 - §r)?§7Catch §r§a30 Fish §r§7in a single game of §r§3Catch a Fish§r§7.",
+        "(§8 - §r)?§7Reach §r§a3,000 score §r§7in a single game of §r§3Catch a Fish§r§7.",
         "Reach §a3,000 score",
     ),
     CATCH_FISH(
         GoalType.CATCH_A_FISH,
         "§7Catch §a30 Fish §7in a single game of",
-        "(§8 - §r)?§7Reach §r§a3,000 score §r§7in a single game of §r§3Catch a Fish§r§7.",
+        "(§8 - §r)?§7Catch §r§a30 Fish §r§7in a single game of §r§3Catch a Fish§r§7.",
         "Catch §a30 Fish",
     ),
     CATCH_YELLOW_FISH(
