@@ -117,6 +117,7 @@ object SkyHanniDebugsAndTests {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
             IslandGraphs.stop()
+            return
         }
 
         val x = args[0].toDouble()

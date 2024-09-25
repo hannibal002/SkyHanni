@@ -43,7 +43,7 @@ object IslandAreas {
     private var paths = mapOf<GraphNode, Graph>()
     var display: Renderable? = null
     private var targetNode: GraphNode? = null
-    private var currentAreaName = ""
+    var currentAreaName = ""
     private val textInput = TextInput()
 
     @SubscribeEvent
