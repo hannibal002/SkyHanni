@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.misc
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -9,17 +10,17 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -33,6 +34,7 @@ object UserLuckBreakdown {
     private var skillCalcCoolDown = SimpleTimeMark.farPast()
 
     private val storage get() = ProfileStorageData.playerSpecific
+    private val config get() = SkyHanniMod.feature.misc
 
     private lateinit var mainLuckItem: ItemStack
     private val mainLuckID = "ENDER_PEARL".asInternalName()
@@ -71,6 +73,7 @@ object UserLuckBreakdown {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
+        if (!config.userluckEnabled) return
         if (event.inventory !is ContainerLocalMenu) return
         if (!inMiscStats) return
 
@@ -151,12 +154,13 @@ object UserLuckBreakdown {
 
     @SubscribeEvent
     fun onHoverItem(event: LorenzToolTipEvent) {
+        if (!config.userluckEnabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
         }
-        val limboLuck = storage?.limbo?.userLuck?.round(1) ?: 0.0f
+        val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0.0f
         when (event.slot.inventory.name) {
             "Your Equipment and Stats" -> equipmentMenuTooltip(event, limboLuck)
             "Your Stats Breakdown" -> statsBreakdownLoreTooltip(event, limboLuck)
@@ -212,6 +216,7 @@ object UserLuckBreakdown {
 
     @SubscribeEvent
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!config.userluckEnabled) return
         if (!inMiscStats) return
         val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
         if (limboUserLuck == 0.0f && !showAllStats) return
@@ -232,9 +237,11 @@ object UserLuckBreakdown {
     }
 
     private fun createItems() {
-        fillerItem = Utils.createItemStack(
+        fillerItem = ItemUtils.createItemStack(
             fillerID.getItemStack().item,
             fillerName,
+            listOf(),
+            1,
             15,
         )
 
@@ -242,17 +249,17 @@ object UserLuckBreakdown {
         val skillLuck = skillOverflowLuck.values.sum()
         val totalLuck = skillLuck + limboLuck
 
-        mainLuckItem = Utils.createItemStack(
+        mainLuckItem = ItemUtils.createItemStack(
             mainLuckID.getItemStack().item,
             "$mainLuckName §f${tryTruncateFloat(totalLuck)}",
             *createItemLore("mainMenu", totalLuck),
         )
-        limboItem = Utils.createItemStack(
+        limboItem = ItemUtils.createItemStack(
             limboID.getItemStack().item,
             limboName,
             *createItemLore("limbo", limboLuck),
         )
-        skillsItem = Utils.createItemStack(
+        skillsItem = ItemUtils.createItemStack(
             skillsID.getItemStack().item,
             skillsName,
             *createItemLore("skills"),
@@ -263,7 +270,7 @@ object UserLuckBreakdown {
         calcSkillLuck()
         return when (type) {
             "mainMenu" -> {
-                val luckString = tryTruncateFloat(luckInput.round(2))
+                val luckString = tryTruncateFloat(luckInput.roundTo(2))
                 if (luckInput == 0.0f) {
                     arrayOf(
                         "§7SkyHanni User Luck is the best stat.",
@@ -286,7 +293,7 @@ object UserLuckBreakdown {
             }
 
             "limbo" -> {
-                val luckString = tryTruncateFloat(luckInput.round(2))
+                val luckString = tryTruncateFloat(luckInput.roundTo(2))
                 arrayOf(
                     "§8Action",
                     "",

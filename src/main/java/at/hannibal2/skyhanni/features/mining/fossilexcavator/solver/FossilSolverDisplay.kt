@@ -12,11 +12,12 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.FossilExcavatorAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -34,11 +35,11 @@ object FossilSolverDisplay {
     private val patternGroup = RepoPattern.group("mining.fossilexcavator")
     private val chargesRemainingPattern by patternGroup.pattern(
         "chargesremaining",
-        "Chisel Charges Remaining: (?<charges>\\d+)"
+        "Chisel Charges Remaining: (?<charges>\\d+)",
     )
     private val fossilProgressPattern by patternGroup.pattern(
         "fossilprogress",
-        "Fossil Excavation Progress: (?<progress>[\\d.]+%)"
+        "Fossil Excavation Progress: (?<progress>[\\d.]+%)",
     )
 
     private val inExcavatorMenu get() = FossilExcavatorAPI.inExcavatorMenu
@@ -156,14 +157,14 @@ object FossilSolverDisplay {
     }
 
     @SubscribeEvent
-    fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
+    fun onBackgroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (inExcavatorMenu) return
         if (slotToClick == null) return
 
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.slotIndex == slotToClick) {
-                slot highlight LorenzColor.GREEN
+                slot highlight LorenzColor.GREEN.toColor().addAlpha(90)
             }
         }
     }
@@ -217,7 +218,7 @@ object FossilSolverDisplay {
     }
 
     fun nextData(slotToClick: FossilTile, correctPercentage: Double, fossilsRemaining: Int) {
-        val formattedPercentage = (correctPercentage * 100).round(1)
+        val formattedPercentage = (correctPercentage * 100).roundTo(1)
 
         possibleFossilsRemaining = fossilsRemaining
         FossilSolverDisplay.slotToClick = slotToClick.toSlotIndex()

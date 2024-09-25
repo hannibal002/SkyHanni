@@ -2,25 +2,28 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
-import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.collect.Lists
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
 import io.github.moulberry.notenoughupdates.util.NotificationHandler
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
@@ -42,9 +45,11 @@ object ItemUtils {
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    fun ItemStack.getLore(): List<String> {
-        val tagCompound = this.tagCompound ?: return emptyList()
-        val tagList = tagCompound.getCompoundTag("display").getTagList("Lore", 8)
+    fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+
+    fun NBTTagCompound?.getLore(): List<String> {
+        this ?: return emptyList()
+        val tagList = this.getCompoundTag("display").getTagList("Lore", 8)
         val list: MutableList<String> = ArrayList()
         for (i in 0 until tagList.tagCount()) {
             list.add(tagList.getStringTagAt(i))
@@ -52,13 +57,44 @@ object ItemUtils {
         return list
     }
 
-    val ItemStack.extraAttributes: NBTTagCompound get() = this.tagCompound.getCompoundTag("ExtraAttributes")
+    fun getDisplayName(compound: NBTTagCompound?): String? {
+        compound ?: return null
+        val name = compound.getCompoundTag("display").getString("Name")
+        if (name == null || name.isEmpty()) return null
+        return name
+    }
+
+    fun ItemStack.setLore(lore: List<String>): ItemStack {
+        val tagCompound = this.tagCompound ?: NBTTagCompound()
+        val display = tagCompound.getCompoundTag("display")
+        val tagList = NBTTagList()
+        for (line in lore) {
+            tagList.appendTag(NBTTagString(line))
+        }
+        display.setTag("Lore", tagList)
+        tagCompound.setTag("display", display)
+        this.tagCompound = tagCompound
+        return this
+    }
+
+    var ItemStack.extraAttributes: NBTTagCompound
+        get() = this.tagCompound?.extraAttributes ?: NBTTagCompound()
+        set(value) {
+            val tag = this.tagCompound ?: NBTTagCompound().also { tagCompound = it }
+            tag.setTag("ExtraAttributes", value)
+        }
+
+    val NBTTagCompound.extraAttributes: NBTTagCompound get() = this.getCompoundTag("ExtraAttributes")
+
+    fun ItemStack.overrideId(id: String): ItemStack {
+        extraAttributes = extraAttributes.apply { setString("id", id) }
+        return this
+    }
 
     // TODO change else janni is sad
-    fun ItemStack.isCoopSoulBound(): Boolean =
-        getLore().any {
-            it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
-        }
+    fun ItemStack.isCoopSoulBound(): Boolean = getLore().any {
+        it == "§8§l* §8Co-op Soulbound §8§l*" || it == "§8§l* §8Soulbound §8§l*"
+    }
 
     // TODO change else janni is sad
     fun ItemStack.isSoulBound(): Boolean = getLore().any { it == "§8§l* §8Soulbound §8§l*" }
@@ -69,8 +105,7 @@ object ItemUtils {
 
     fun getItemsInInventory(withCursorItem: Boolean = false): List<ItemStack> {
         val list: LinkedList<ItemStack> = LinkedList()
-        val player = Minecraft.getMinecraft().thePlayer
-            ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
+        val player = Minecraft.getMinecraft().thePlayer ?: ErrorManager.skyHanniError("getItemsInInventoryWithSlots: player is null!")
 
         for (slot in player.openContainer.inventorySlots) {
             if (slot.hasStack) {
@@ -102,7 +137,7 @@ object ItemUtils {
             return NEUInternalName.WISP_POTION
         }
         val internalName = NEUItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
-        return internalName?.asInternalName()
+        return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
 
     fun ItemStack.isVanilla() = NEUItems.isVanillaItem(this)
@@ -125,8 +160,8 @@ object ItemUtils {
         if (tagCompound == null) return null
         val nbt = tagCompound
         if (!nbt.hasKey("SkullOwner")) return null
-        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties")
-            .getTagList("textures", Constants.NBT.TAG_COMPOUND).getCompoundTagAt(0).getString("Value")
+        return nbt.getCompoundTag("SkullOwner").getCompoundTag("Properties").getTagList("textures", Constants.NBT.TAG_COMPOUND)
+            .getCompoundTagAt(0).getString("Value")
     }
 
     fun ItemStack.getSkullOwner(): String? {
@@ -161,6 +196,20 @@ object ItemUtils {
         return render
     }
 
+    fun createItemStack(item: Item, displayName: String, vararg lore: String): ItemStack {
+        return createItemStack(item, displayName, lore.toList())
+    }
+
+    // Taken from NEU
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+        val stack = ItemStack(item, amount, damage)
+        val tag = NBTTagCompound()
+        addNameAndLore(tag, displayName, *lore.toTypedArray())
+        tag.setInteger("HideFlags", 254)
+        stack.tagCompound = tag
+        return stack
+    }
+
     // Taken from NEU
     private fun addNameAndLore(tag: NBTTagCompound, displayName: String, vararg lore: String) {
         val display = NBTTagCompound()
@@ -177,6 +226,15 @@ object ItemUtils {
 
     fun ItemStack.getItemRarityOrCommon() = getItemRarityOrNull() ?: LorenzRarity.COMMON
 
+    private val itemCategoryRepoCheckPattern by RepoPattern.pattern(
+        "itemcategory.repocheck",
+        ItemCategory.entries.joinToString(separator = "|") { it.name },
+    )
+    private val rarityCategoryRepoCheckPattern by RepoPattern.pattern(
+        "rarity.repocheck",
+        LorenzRarity.entries.joinToString(separator = "|") { it.name },
+    )
+
     private fun ItemStack.readItemCategoryAndRarity(): Pair<LorenzRarity?, ItemCategory?> {
         val cleanName = this.cleanName()
 
@@ -186,8 +244,7 @@ object ItemUtils {
 
         for (line in this.getLore().reversed()) {
             val (category, rarity) = UtilsPatterns.rarityLoreLinePattern.matchMatcher(line) {
-                group("itemCategory").replace(" ", "_") to
-                    group("rarity").replace(" ", "_")
+                group("itemCategory").replace(" ", "_") to group("rarity").replace(" ", "_")
             } ?: continue
 
             val itemCategory = getItemCategory(category, name, cleanName)
@@ -202,6 +259,8 @@ object ItemUtils {
                     "inventory name" to InventoryUtils.openInventoryName(),
                     "pattern result" to category,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !itemCategoryRepoCheckPattern.matches(category) },
                 )
             }
             if (itemRarity == null) {
@@ -211,7 +270,10 @@ object ItemUtils {
                     "internal name" to getInternalName(),
                     "item name" to name,
                     "inventory name" to InventoryUtils.openInventoryName(),
+                    "pattern result" to rarity,
                     "lore" to getLore(),
+                    betaOnly = true,
+                    condition = { !rarityCategoryRepoCheckPattern.matches(rarity) },
                 )
             }
 
@@ -263,8 +325,7 @@ object ItemUtils {
         return data.itemRarity
     }
 
-    private fun itemRarityLastCheck(data: CachedItemData) =
-        data.itemRarityLastCheck.passedSince() > 10.seconds
+    private fun itemRarityLastCheck(data: CachedItemData) = data.itemRarityLastCheck.passedSince() > 10.seconds
 
     /**
      * Use when comparing the name (e.g. regex), not for showing to the user
@@ -280,6 +341,28 @@ object ItemUtils {
         set(value) {
             setStackDisplayName(value)
         }
+
+    // Taken from NEU
+    fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+        val tag = this.tagCompound ?: NBTTagCompound()
+        val display = tag.getCompoundTag("display")
+        val loreList = NBTTagList()
+        for (line in lore) {
+            loreList.appendTag(NBTTagString(line))
+        }
+
+        display.setString("Name", displayName)
+        display.setTag("Lore", loreList)
+
+        tag.setTag("display", display)
+        tag.setInteger("HideFlags", 254)
+        if (disableNeuTooltips) {
+            tag.setBoolean("disableNeuTooltip", true)
+        }
+
+        this.tagCompound = tag
+        return this
+    }
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
@@ -343,7 +426,18 @@ object ItemUtils {
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.itemName: String
-        get() = getInternalName().itemName
+        get() {
+            getAttributeFromShard()?.let {
+                return it.getAttributeName()
+            }
+            return getInternalNameOrNull()?.itemName ?: "<null>"
+        }
+
+    fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
+        if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
+        val attributes = getAttributes() ?: return null
+        return attributes.firstOrNull()
+    }
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
@@ -354,6 +448,9 @@ object ItemUtils {
 
     /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NEUInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
+
+    val NEUInternalName.readableInternalName: String
+        get() = asString().replace("_", " ").lowercase()
 
     private fun NEUInternalName.grabItemName(): String {
         if (this == NEUInternalName.WISP_POTION) {
@@ -384,6 +481,11 @@ object ItemUtils {
             return name.replace("Enchanted Book", itemStack.getLore()[0].removeColor())
         }
 
+        // obfuscated trophy fish
+        if (name.contains("§kObfuscated")) {
+            return name.replace("§kObfuscated", "Obfuscated")
+        }
+
         // hide pet level
         PetAPI.getCleanName(name)?.let {
             return "$it Pet"
@@ -410,20 +512,20 @@ object ItemUtils {
         return list
     }
 
-    fun neededItems(recipe: NeuRecipe): Map<NEUInternalName, Int> {
+    fun neededItems(recipe: PrimitiveRecipe): Map<NEUInternalName, Int> {
         val neededItems = mutableMapOf<NEUInternalName, Int>()
-        for (ingredient in recipe.ingredients) {
-            val material = ingredient.internalItemId.asInternalName()
-            val amount = ingredient.count.toInt()
+        for ((material, amount) in recipe.ingredients.toPrimitiveItemStacks()) {
             neededItems.addOrPut(material, amount)
         }
         return neededItems
     }
 
-    fun getRecipePrice(recipe: NeuRecipe, pastRecipes: List<NeuRecipe> = emptyList()): Double =
-        neededItems(recipe).map {
-            it.key.getPrice(pastRecipes = pastRecipes) * it.value
-        }.sum()
+    fun PrimitiveRecipe.getRecipePrice(
+        priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
+    ): Double = neededItems(this).map {
+        it.key.getPrice(priceSource, pastRecipes) * it.value
+    }.sum()
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {

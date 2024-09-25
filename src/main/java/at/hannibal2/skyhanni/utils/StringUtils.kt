@@ -247,7 +247,6 @@ object StringUtils {
         } ?: text
     }
 
-
     /**
      * Creates a comma-separated list using natural formatting (a, b, and c).
      * @param list - the list of strings to join into a string, containing 0 or more elements.
@@ -567,4 +566,13 @@ object StringUtils {
     fun Char.isVowel(): Boolean = this in vowels
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.isValidUuid(): Boolean {
+        return try {
+            UUID.fromString(this)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
 }
