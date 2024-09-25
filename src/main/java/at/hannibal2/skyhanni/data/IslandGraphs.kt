@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
@@ -100,7 +102,9 @@ object IslandGraphs {
     var closedNote: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
+    private var currentTargetNode: GraphNode? = null
     private var color = Color.WHITE
+    private var shouldAllowRerouting = false
     private var showGoalExact = false
     private var onFound: () -> Unit = {}
     private var goal: GraphNode? = null
@@ -188,11 +192,11 @@ object IslandGraphs {
         }
 
         val graph = RepoUtils.getConstant(SkyHanniMod.repo.repoLocation, constant, Graph.gson, Graph::class.java)
+        IslandAreas.display = null
         setNewGraph(graph)
     }
 
     fun setNewGraph(graph: Graph) {
-        IslandAreas.display = null
         reset()
         currentIslandGraph = graph
 
@@ -271,6 +275,27 @@ object IslandGraphs {
     private fun onNewNote() {
         // TODO create an event
         IslandAreas.noteMoved()
+        if (shouldAllowRerouting) {
+            tryRerouting()
+        }
+    }
+
+    private fun tryRerouting() {
+        val target = currentTargetNode ?: return
+        val closest = closedNote ?: return
+        val graph = currentIslandGraph ?: return
+        val sameNodes = mutableMapOf<GraphNode, Double>()
+        for (node in graph.nodes) {
+            if (target.sameNameAndTags(node)) {
+                val (_, distance) = graph.findShortestPathAsGraphWithDistance(closest, node)
+                sameNodes[node] = distance
+            }
+        }
+        val newTarget = sameNodes.sorted().keys.firstOrNull() ?: return
+        if (newTarget != target) {
+            ChatUtils.debug("Rerouting navigation..")
+            newTarget.pathFind(color, onFound, allowRerouting = true, condition)
+        }
     }
 
     fun stop() {
@@ -279,14 +304,40 @@ object IslandGraphs {
         fastestPath = null
     }
 
+    fun GraphNode.pathFind(
+        color: Color = LorenzColor.WHITE.toColor(),
+        onFound: () -> Unit = {},
+        // when a faster node with the same name + tags exists, reroute to this node
+        allowRerouting: Boolean = false,
+        condition: () -> Boolean = { true },
+    ) {
+        reset()
+        currentTargetNode = this
+        shouldAllowRerouting = allowRerouting
+        pathFind0(location = position, color, onFound, showGoalExact = false, condition)
+    }
+
     fun pathFind(
+        location: LorenzVec,
+        color: Color = LorenzColor.WHITE.toColor(),
+        onFound: () -> Unit = {},
+        // when the goal is further away from the node, show a line and waypoint to that node
+        showGoalExact: Boolean = false,
+        condition: () -> Boolean = { true },
+    ) {
+        reset()
+        currentTargetNode = null
+        shouldAllowRerouting = false
+        pathFind0(location, color, onFound, showGoalExact, condition)
+    }
+
+    private fun pathFind0(
         location: LorenzVec,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
         showGoalExact: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
-        reset()
         currentTarget = location
         this.color = color
         this.onFound = onFound
@@ -312,11 +363,11 @@ object IslandGraphs {
             bezierPoint = 2.0,
             textSize = 1.0,
         )
-        val lastNode = graph.nodes.last().position
-        val targetLocation = currentTarget ?: return
-        event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
 
         if (showGoalExact) {
+            val targetLocation = currentTarget ?: return
+            val lastNode = graph.nodes.last().position
+            event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
             event.drawWaypointFilled(targetLocation, color)
         }
     }

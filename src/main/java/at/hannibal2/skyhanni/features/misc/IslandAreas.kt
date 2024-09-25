@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -144,11 +144,6 @@ object IslandAreas {
             val isTarget = node.name == targetNode?.name
             val color = if (isTarget) LorenzColor.GOLD else tag.color
 
-            // trying to find a faster path to the existing target
-            if (isTarget && node != targetNode) {
-                ChatUtils.debug("Found a faster node, rerouting...")
-                setTarget(node)
-            }
             val coloredName = "${color.getChatColor()}${name}"
 
             var suffix = ""
@@ -159,6 +154,7 @@ object IslandAreas {
                 passedAreas.remove("null")
                 passedAreas.remove(currentAreaName)
                 // so show areas needed to pass thorough
+                // TODO show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
 //                     suffix = " §7${passedAreas.joinToString(", ")}"
                 }
@@ -269,8 +265,9 @@ object IslandAreas {
     private fun setTarget(node: GraphNode) {
         targetNode = node
         val color = config.pathfinder.color.get().toChromaColor()
-        IslandGraphs.pathFind(
-            node.position, color,
+        node.pathFind(
+            color,
+            allowRerouting = true,
             onFound = {
                 targetNode = null
                 updatePosition()

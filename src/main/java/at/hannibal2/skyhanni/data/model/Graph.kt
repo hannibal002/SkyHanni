@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.model
 
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.json.SkyHanniTypeAdapters.registerTypeAdapter
@@ -164,6 +165,10 @@ class GraphNode(val id: Int, val position: LorenzVec, val name: String? = null, 
 
         return true
     }
+
+    fun sameNameAndTags(other: GraphNode): Boolean = name == other.name && allowedTags == other.allowedTags
+
+    private val allowedTags get() = tags.filter { it in NavigationHelper.allowedTags }
 }
 
 fun Graph.findShortestPathAsGraph(start: GraphNode, end: GraphNode): Graph = this.findShortestPathAsGraphWithDistance(start, end).first

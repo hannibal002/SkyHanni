@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.findShortestDistance
@@ -57,7 +58,7 @@ object NavigationHelper {
             val distance = distances[node]!!.roundTo(1)
             val component = "$name §e$distance".asComponent()
             component.onClick {
-                IslandGraphs.pathFind(node.position)
+                node.pathFind(allowRerouting = true)
                 sendNavigateMessage(name, goBack)
             }
             val tag = node.tags.first { it in allowedTags }
