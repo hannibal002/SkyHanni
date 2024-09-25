@@ -1279,7 +1279,8 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
-        showNoteNames: Boolean = false
+        showNoteNames: Boolean = false,
+        markLastBlock: Boolean = true,
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
@@ -1306,8 +1307,10 @@ object RenderUtils {
                 this.drawDynamicText(it.position, it.name!!, textSize)
             }
         }
-        val last = path.last()
-        drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        if (markLastBlock) {
+            val last = path.last()
+            drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        }
     }
 
     class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {

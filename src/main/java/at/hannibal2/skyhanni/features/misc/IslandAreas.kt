@@ -81,7 +81,7 @@ object IslandAreas {
         nodes = finalNodes
     }
 
-    var hasMoved = false
+    private var hasMoved = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -264,8 +264,11 @@ object IslandAreas {
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
+        val tag = node.getAreaTag() ?: return
+        val displayName = tag.color.getChatColor() + node.name
         val color = config.pathfinder.color.get().toChromaColor()
         node.pathFind(
+            displayName,
             color,
             allowRerouting = true,
             onFound = {

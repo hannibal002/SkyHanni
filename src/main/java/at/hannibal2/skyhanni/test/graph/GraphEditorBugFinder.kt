@@ -40,6 +40,7 @@ object GraphEditorBugFinder {
             }
         }
 
+
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in nodes) {
             val pathToNearestArea = GraphUtils.findFastestPath(graph, node) { it.getAreaTag(ignoreConfig = true) != null }?.first
@@ -85,13 +86,13 @@ object GraphEditorBugFinder {
             }
             val closestForeignNode = closestForeignNodes.minBy { it.position.distanceSqToPlayer() }
             val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
-            closestNodeToForeignNode.pathFind(Color.RED)
+            closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED)
         }
 
         println("found $bugs bugs!")
         this.errorsInWorld = errorsInWorld
         if (clusters.size <= 1) {
-            errorsInWorld.keys.minByOrNull { it.position.distanceSqToPlayer() }?.pathFind(Color.RED)
+            errorsInWorld.keys.minByOrNull { it.position.distanceSqToPlayer() }?.pathFind("Graph Editor Bug", Color.RED)
         }
     }
 
