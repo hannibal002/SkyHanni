@@ -40,9 +40,8 @@ import kotlin.time.Duration.Companion.milliseconds
  * benefits of every island graphs:
  * global:
  * 	NEU's fairy souls
- * 	point of interest
- * 	slayer area
- * 	NEU's NPC's
+ * 	slayer area (not all there yet)
+ * 	NEU's NPC's (auto acitvate when searching via neu)
  * 	races (end, park, winter, dungeon hub)
  * 	jump pads between servers
  * 	ring of love/romeo juliet quest
@@ -54,7 +53,6 @@ import kotlin.time.Duration.Companion.milliseconds
  * farming:
  * 	pelt farming area
  * rift:
- * 	enigma souls
  * 	eyes
  * 	big quests
  * 	montezuma souls
@@ -77,14 +75,20 @@ import kotlin.time.Duration.Companion.milliseconds
  *  daily quests
  *  intro tutorials with elle
  *  fishing spots
+ * mineshaft
+ *  different types mapped out
+ *  paths to ladder and possible corpse locations, and known corpse locations
  *
- * graph todo:
+ * Additional global things:
+ *  use custom graphs for your island/garden
+ *  suggest using warp points if closer
+ *  support cross island paths (have a list of all node names in all islands)
+ *
+ * Changes in graph editor:
  * 	fix rename not using tick but input event we have (+ create the input event in the first place)
  * 	toggle distance to node by node path lengh, instead of eye of sight lenght
  * 	press test button again to enable "true test mode", with graph math and hiding other stuff
  * 	option to compare two graphs, and store multiple graphs in the edit mode in paralell
- *
- * 	mineshaft + corpse + ladder spot
  */
 
 @SkyHanniModule
@@ -188,6 +192,7 @@ object IslandGraphs {
     }
 
     fun setNewGraph(graph: Graph) {
+        IslandAreas.display = null
         reset()
         currentIslandGraph = graph
 
@@ -204,7 +209,6 @@ object IslandGraphs {
         currentTarget = null
         goal = null
         fastestPath = null
-        IslandAreas.display = null
     }
 
     @SubscribeEvent
