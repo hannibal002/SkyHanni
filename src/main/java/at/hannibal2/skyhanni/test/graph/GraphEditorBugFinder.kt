@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.IslandAreas.getAreaTag
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.graph.GraphEditor.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.GraphUtils
@@ -29,6 +30,15 @@ object GraphEditorBugFinder {
         val graph = IslandGraphs.currentIslandGraph ?: return
         val errorsInWorld: MutableMap<LorenzVec, String> = mutableMapOf()
         val nodes = graph.nodes
+
+        for (node in nodes) {
+            if (node.tags.any { it in NavigationHelper.allowedTags }) {
+                val remainingTags = node.tags.filter { it in NavigationHelper.allowedTags }
+                if (remainingTags.size != 1) {
+                    errorsInWorld[node.position] = "§cConflicting tags: $remainingTags"
+                }
+            }
+        }
 
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in nodes) {
@@ -93,5 +103,6 @@ object GraphEditorBugFinder {
             event.drawDynamicText(location, text, 1.5)
         }
     }
+
     fun isEnabled() = GraphEditor.isEnabled()
 }
