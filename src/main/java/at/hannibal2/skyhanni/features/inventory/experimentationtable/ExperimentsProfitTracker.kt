@@ -3,11 +3,13 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
@@ -93,6 +95,13 @@ object ExperimentsProfitTracker {
 
         @Expose
         var startCost = 0L
+    }
+
+    @SubscribeEvent
+    fun onItemAdd(event: ItemAddEvent) {
+        if (!isEnabled() || event.source != ItemAddManager.Source.COMMAND) return
+
+        tracker.addItem(event.internalName, event.amount, command = true)
     }
 
     @SubscribeEvent
