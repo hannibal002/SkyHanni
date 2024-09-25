@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -33,10 +32,16 @@ object FrogMaskDisplay {
     private var region: Pair<String, SimpleTimeMark> = "" to SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("misc.frogmask")
+
+    /**
+     * REGEX-TEST: §7Today's region: §aDark Thicket
+     */
     private val activeRegionPattern by patternGroup.pattern(
         "description.active",
-        "Today's region: (?<region>.+)",
+        "§7Today's region: (?<region>.+)",
     )
+
+    private val frogMask by lazy { "FROG_MASK".asInternalName().getItemStack() }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -56,7 +61,7 @@ object FrogMaskDisplay {
         val helmet = InventoryUtils.getHelmet() ?: return
         if (helmet.getInternalName() != "FROG_MASK".asInternalName()) return
 
-        activeRegionPattern.matchAll(helmet.getLore().map { it.removeColor() }) {
+        activeRegionPattern.matchAll(helmet.getLore()) {
             val nextRegion = group("region")
             val now = SkyBlockTime.now()
             val nextRegionTime = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
@@ -72,9 +77,9 @@ object FrogMaskDisplay {
 
         return Renderable.horizontalContainer(
             listOf(
-                Renderable.itemStack("FROG_MASK".asInternalName().getItemStack()),
+                Renderable.itemStack(frogMask),
                 Renderable.string(
-                    "§5Frog Mask§6 - §a${region.first} §6for §e$timeString",
+                    "§5Frog Mask§6 - ${region.first} §6for §e$timeString",
                 ),
             ),
             spacing = 1,
