@@ -12,18 +12,9 @@ class TimeLimitedCache<K : Any, V : Any>(
     private val removalListener: (K?, V?, RemovalCause) -> Unit = { _, _, _ -> },
 ) : Iterable<Map.Entry<K, V>> {
 
-    private val cacheLock = ReentrantReadWriteLock()
-
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-        .removalListener {
-            cacheLock.writeLock().lock()
-            try {
-                removalListener(it.key, it.value)
-            } finally {
-                cacheLock.writeLock().unlock()
-            }
-        }
+        .removalListener { removalListener(it.key, it.value, it.cause) }
         .build<K, V>()
 
     // TODO IntelliJ cant replace this, find another way?
