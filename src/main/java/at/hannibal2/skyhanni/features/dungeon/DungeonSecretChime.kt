@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickedBlockType
-import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
+import at.hannibal2.skyhanni.events.DungeonClickedBlockEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -13,7 +13,7 @@ object DungeonSecretChime {
     private val config get() = SkyHanniMod.feature.dungeon.secretChime
 
     @HandleEvent
-    fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
+    fun onDungeonClickedBlock(event: DungeonClickedBlockEvent) {
         if (!isEnabled()) return
         val isWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
         if (isWaterRoom && event.blockType == ClickedBlockType.LEVER) return
