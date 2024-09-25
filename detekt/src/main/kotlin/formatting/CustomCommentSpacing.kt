@@ -22,15 +22,20 @@ class CustomCommentSpacing(config: Config) : Rule(config) {
         "#else",
         "#elseif",
         "#endif",
+        "$$"
     )
 
     override fun visitComment(comment: PsiComment) {
-        val commentText = comment.text.trimStart('/')
-        if (allowedPatterns.any { commentText.startsWith(it) }) {
+        if (allowedPatterns.any { comment.text.contains(it) }) {
             return
         }
 
-        if (commentText.length > 1 && !commentText.substring(2).startsWith(" ")) {
+        /**
+         * REGEX-TEST: // Test comment
+         * REGEX-TEST: /* Test comment */
+         */
+        val commentRegex = Regex("""^(?:\/{2}|\/\*)(?:\s.*|$)""", RegexOption.DOT_MATCHES_ALL)
+        if (!commentRegex.matches(comment.text)) {
             report(
                 CodeSmell(
                     issue,
