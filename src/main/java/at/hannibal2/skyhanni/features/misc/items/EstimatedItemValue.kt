@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -32,6 +33,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 
 @SkyHanniModule
@@ -87,6 +89,15 @@ object EstimatedItemValue {
     fun tryRendering() {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
+
+        // TODO add "is debug enabled" check once users notice this easteregg
+        if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+            EstimatedItemValueCalculator.starChange += 1
+            cache.clear()
+        } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
+            EstimatedItemValueCalculator.starChange -= 1
+            cache.clear()
+        }
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
     }
