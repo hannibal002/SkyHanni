@@ -130,7 +130,6 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("set test waypoint")
     }
 
-    @Suppress("UNUSED_PARAMETER")
     fun testCommand(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
             asyncTest(args)
