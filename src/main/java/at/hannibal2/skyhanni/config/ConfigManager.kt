@@ -151,7 +151,8 @@ class ConfigManager {
         }
         if (missingConfigLink) {
             println("")
-            println("This crash is here to remind you to fix the missing @ConfigLink annotation over your new config position config element.")
+            println("This crash is here to remind you to fix the missing @ConfigLink " +
+                "annotation over your new config position config element.")
             println("")
             println("Steps to fix:")
             println("1. Search for `WEE WOO WEE WOO` in the console output.")

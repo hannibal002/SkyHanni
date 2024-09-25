@@ -24,6 +24,8 @@ object AshfangBlazingSouls {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang.blazingSouls
 
+    // TODO: Rename this to be more descriptive, repo
+    @Suppress("MaxLineLength")
     private const val TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvODI4N2IzOTdkYWY5NTE2YTBiZDc2ZjVmMWI3YmY5Nzk1MTVkZjNkNWQ4MzNlMDYzNWZhNjhiMzdlZTA4MjIxMiJ9fX0="
     private val souls = mutableListOf<EntityArmorStand>()

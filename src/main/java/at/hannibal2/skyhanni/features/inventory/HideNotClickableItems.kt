@@ -564,7 +564,10 @@ object HideNotClickableItems {
         val bazaarInventory = BazaarApi.inBazaarInventory
 
         val auctionHouseInventory =
-            chestName == "Co-op Auction House" || chestName == "Auction House" || chestName == "Create BIN Auction" || chestName == "Create Auction"
+            chestName == "Co-op Auction House" ||
+                chestName == "Auction House" ||
+                chestName == "Create BIN Auction" ||
+                chestName == "Create Auction"
         if (!bazaarInventory && !auctionHouseInventory) return false
         showGreenLine = true
 

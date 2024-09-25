@@ -115,7 +115,9 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() || !inRoom) return
-        if ((event.soundName == "random.burp" && event.volume == 0.8f) || (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)) {
+        if ((event.soundName == "random.burp" && event.volume == 0.8f) ||
+            (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)
+        ) {
             index = 0
             found = false
             countdown = null

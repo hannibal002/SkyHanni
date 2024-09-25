@@ -532,12 +532,12 @@ object GraphEditor {
     private fun compileGraph(): Graph {
         prune()
         val indexedTable = nodes.mapIndexed { index, node -> node.id to index }.toMap()
-        val nodes = nodes.mapIndexed { index, it ->
+        val nodes = nodes.mapIndexed { index, node ->
             GraphNode(
                 index,
-                it.position,
-                it.name,
-                it.tags.map {
+                node.position,
+                node.name,
+                node.tags.map {
                     it.internalName
                 }
             )
@@ -550,7 +550,7 @@ object GraphEditor {
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
-        nodes.forEachIndexed { index, it -> it.neighbours = neighbours[index].toMap() }
+        nodes.forEachIndexed { index, node -> node.neighbours = neighbours[index].toMap() }
         return Graph(nodes)
     }
 
@@ -566,7 +566,7 @@ object GraphEditor {
                 )
             },
         )
-        val translation = graph.mapIndexed { index, it -> it to nodes[index] }.toMap()
+        val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
         edges.addAll(
             graph.map { node ->
                 // TODO: Refactor to remove !! operator

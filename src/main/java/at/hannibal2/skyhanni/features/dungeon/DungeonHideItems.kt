@@ -21,6 +21,7 @@ import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
+@Suppress("MaxLineLength")
 object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider

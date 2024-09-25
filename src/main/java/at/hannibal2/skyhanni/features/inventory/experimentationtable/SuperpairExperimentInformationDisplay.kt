@@ -155,7 +155,11 @@ object SuperpairExperimentInformationDisplay {
                 uncoveredAt += 1
             }
 
-            hasFoundPair(slot, lastSlotClicked.first, reward, lastItemName) && lastItem.itemDamage == itemClicked.itemDamage -> handleFoundPair(
+            hasFoundPair(slot,
+                lastSlotClicked.first,
+                reward,
+                lastItemName
+            ) && lastItem.itemDamage == itemClicked.itemDamage -> handleFoundPair(
                 slot,
                 reward,
                 lastSlotClicked.first,
@@ -274,7 +278,10 @@ object SuperpairExperimentInformationDisplay {
     }
 
     private fun isOutOfBounds(slot: Int, experiment: Experiment): Boolean =
-        slot <= experiment.startSlot || slot >= experiment.endSlot || (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
+        slot <= experiment.startSlot ||
+            slot >= experiment.endSlot ||
+            (if (experiment.sideSpace == 1) slot in sideSpaces1
+            else slot in sideSpaces2)
 
     // TODO remove left and right, use custom data type instead
     private fun left(it: Pair<Item?, ItemPair?>): Item = it.first ?: Item(-1, "")

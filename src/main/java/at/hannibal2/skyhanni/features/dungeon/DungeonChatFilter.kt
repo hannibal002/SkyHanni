@@ -25,6 +25,7 @@ object DungeonChatFilter {
     private val endMessagesEndWith = listOf(
         " Experience §r§b(Team Bonus)"
     )
+    @Suppress("MaxLineLength")
     private val abilityPatterns = listOf(
         "§7Your Guided Sheep hit §r§c(.*) §r§7enemy for §r§c(.*) §r§7damage.".toPattern(),
         "§a§lBUFF! §fYou were splashed by (.*) §fwith §r§cHealing VIII§r§f!".toPattern(),
@@ -99,11 +100,13 @@ object DungeonChatFilter {
     private val buffMessages = listOf(
         "§a§lBUFF! §fYou have gained §r§cHealing V§r§f!"
     )
+    @Suppress("MaxLineLength")
     private val puzzlePatterns = listOf(
         "§a§lPUZZLE SOLVED! (.*) §r§ewasn't fooled by §r§c(.*)§r§e! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§a§lPUZZLE SOLVED! (.*) §r§etied Tic Tac Toe! §r§4G§r§co§r§6o§r§ed§r§a §r§2j§r§bo§r§3b§r§5!".toPattern(),
         "§4\\[STATUE] Oruo the Omniscient§r§f: §r(.*) §r§fthinks the answer is §r§6 . §r(.*)§r§f! §r§fLock in your party's answer in my Chamber!".toPattern(),
     )
+    @Suppress("MaxLineLength")
     private val puzzleMessages = listOf(
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fThough I sit stationary in this prison that is §r§cThe Catacombs§r§f, my knowledge knows no bounds.",
         "§4[STATUE] Oruo the Omniscient§r§f: §r§fProve your knowledge by answering 3 questions and I shall reward you in ways that transcend time!",
@@ -122,6 +125,7 @@ object DungeonChatFilter {
         "§e§lRIGHT CLICK §r§7on §r§7a §r§8WITHER §r§7door§r§7 to open it. This key can only be used to open §r§a1§r§7 door!",
         "§e§lRIGHT CLICK §r§7on §r§7the §r§cBLOOD DOOR§r§7 to open it. This key can only be used to open §r§a1§r§7 door!"
     )
+    @Suppress("MaxLineLength")
     private val pickupPatterns = listOf(
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT§r§e!".toPattern(),
         "(.*) §r§ehas obtained §r§a§r§9Superboom TNT §r§8x2§r§e!".toPattern(),

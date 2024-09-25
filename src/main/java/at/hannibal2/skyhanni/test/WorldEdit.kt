@@ -105,7 +105,8 @@ object WorldEdit {
         }
         when (it.firstOrNull()) {
             null, "help" -> {
-                ChatUtils.chat("Use a wood axe and left/right click to select a region in the world. Then use /shworldedit copy or /shworldedit reset.")
+                ChatUtils.chat("Use a wood axe and left/right click to select a " +
+                    "region in the world. Then use /shworldedit copy or /shworldedit reset.")
             }
 
             "copy" -> {

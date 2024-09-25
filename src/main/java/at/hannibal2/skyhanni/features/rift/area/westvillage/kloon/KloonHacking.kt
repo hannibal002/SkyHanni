@@ -89,7 +89,9 @@ object KloonHacking {
                     slot highlight if (correctButton) LorenzColor.GREEN else LorenzColor.RED
                     continue
                 }
-                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 && slot.stack!!.displayName.removeColor() == correctButtons[i]) {
+                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 &&
+                    slot.stack!!.displayName.removeColor() == correctButtons[i]
+                ) {
                     slot highlight LorenzColor.YELLOW
                 }
                 if (slot.slotIndex == i * 9 + 17) {

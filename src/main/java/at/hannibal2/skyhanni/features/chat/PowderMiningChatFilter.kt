@@ -62,6 +62,7 @@ object PowderMiningChatFilter {
     /**
      * REGEX-TEST: §cYou need a tool with a §r§aBreaking Power §r§cof §r§66§r§c to mine Ruby Gemstone Block§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!
      */
+    @Suppress("MaxLineLength")
     private val breakingPowerPattern by patternGroup.pattern(
         "warning.breakingpower",
         "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!.+",
@@ -215,6 +216,7 @@ object PowderMiningChatFilter {
      * REGEX-TEST: §r§9Electron Transmitter
      * REGEX-TEST: §r§9Superlite Motor
      */
+    @Suppress("MaxLineLength")
     private val robotPartsPattern by patternGroup.pattern(
         "reward.robotparts",
         "§r§9(?:FTX 3070|Synthetic Heart|Control Switch|Robotron Reflector|Electron Transmitter|Superlite Motor)( §r§8x(?<amount>[\\d,]+))?",
@@ -247,6 +249,7 @@ object PowderMiningChatFilter {
      * REGEX-TEST: §r§9⸕ Fine Amber Gemstone
      * REGEX-TEST: §r§5⸕ Flawless Amber Gemstone
      */
+    @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "reward.gemstone",
         "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",

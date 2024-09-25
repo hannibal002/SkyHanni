@@ -161,7 +161,9 @@ object Translator {
                 val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
                 messageToSend = "$messageToSend$sentenceWithoutQuotes"
             }
-        } // The first translated sentence only has 1 extra char at the end, but sentences after it need 1 at the front and 1 at the end removed in the substring
+        }
+        // The first translated sentence only has 1 extra char at the end,
+        // but sentences after it need 1 at the front and 1 at the end removed in the substring
         messageToSend = messageToSend.substring(1, messageToSend.length)
         return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
     }

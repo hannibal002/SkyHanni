@@ -46,6 +46,7 @@ object FarmingFortuneDisplay {
         "tablist.universal",
         " Farming Fortune: §r§6☘(?<fortune>\\d+)",
     )
+    @Suppress("MaxLineLength")
     private val cropSpecificTabFortunePattern by patternGroup.pattern(
         "tablist.cropspecific",
         " (?<crop>Wheat|Carrot|Potato|Pumpkin|Sugar Cane|Melon|Cactus|Cocoa Beans|Mushroom|Nether Wart) Fortune: §r§6☘(?<fortune>\\d+)",
@@ -54,6 +55,7 @@ object FarmingFortuneDisplay {
         "collection",
         "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
     )
+    @Suppress("MaxLineLength")
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
         "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",
