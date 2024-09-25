@@ -42,7 +42,6 @@ object UserLuckBreakdown {
 
     private lateinit var fillerItem: ItemStack
     private var fillerID = "STAINED_GLASS_PANE".asInternalName()
-    private const val FILLER_NAME = " "
 
     private lateinit var limboItem: ItemStack
     private var limboID = "ENDER_PEARL".asInternalName()

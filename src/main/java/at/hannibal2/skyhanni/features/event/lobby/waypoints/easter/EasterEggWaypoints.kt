@@ -30,9 +30,9 @@ object EasterEggWaypoints {
 
         val message = event.message
         if (message.startsWith("§a§lYou found an Easter Egg! §r") ||
-                message == "§aYou have received the §bsuper reward§a!" ||
-                message == "§cYou already found this egg!"
-            ) {
+            message == "§aYou have received the §bsuper reward§a!" ||
+            message == "§cYou already found this egg!"
+        ) {
             val egg = EasterEgg.entries.minByOrNull { it.waypoint.distanceSqToPlayer() }!!
             egg.found = true
             if (closest == egg) {

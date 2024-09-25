@@ -12,7 +12,7 @@ object ReminderUtils {
     // TODO: add arachne fight, add slayer boss spawned, add dragon fight
     fun isBusy(ignoreFarmingContest: Boolean = false): Boolean =
         (DungeonAPI.inDungeon() && !DungeonAPI.completed) ||
-            LorenzUtils.inKuudraFight || 
+            LorenzUtils.inKuudraFight ||
             (FarmingContestAPI.inContest && !ignoreFarmingContest) ||
             RiftAPI.inRift() || IslandType.DARK_AUCTION.isInIsland() || IslandType.MINESHAFT.isInIsland() ||
             IslandType.NONE.isInIsland() || IslandType.UNKNOWN.isInIsland()

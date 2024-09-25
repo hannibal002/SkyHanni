@@ -52,7 +52,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-@Suppress("LargeClass")
+@Suppress("LargeClass", "FunctionNaming")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {

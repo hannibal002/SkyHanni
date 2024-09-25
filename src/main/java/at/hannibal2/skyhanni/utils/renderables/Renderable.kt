@@ -620,7 +620,7 @@ interface Renderable {
                 Minecraft.getMinecraft().fontRendererObj.getStringWidth(
                     searchPrefix + textInput.editTextWithAlwaysCarriage()
                 ) * scale
-            ).toInt() + 1
+                ).toInt() + 1
 
             init {
                 textInput.registerToEvent(key) {

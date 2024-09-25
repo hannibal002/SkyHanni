@@ -66,6 +66,10 @@ formatting:
         active: false
     CommentSpacing: # handled by custom rule
         active: false
+    SpacingBetweenDeclarationsWithAnnotations: # nah
+        active: false
+    SpacingBetweenDeclarationsWithComments: # also nah
+        active: false
 
 complexity:
     CyclomaticComplexMethod: # default threshold of 15, caught almost every complex method

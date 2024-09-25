@@ -30,7 +30,7 @@ data class Quad<out A, out B, out C, out D>(
     override fun toString(): String = "($first, $second, $third, $fourth)"
 
     companion object {
-        @Suppress("ConstPropertyName") // Conflicting rules here...
+        @Suppress("ConstPropertyName", "UnusedPrivateProperty") // Conflicting rules here...
         private const val serialVersionUID: Long = 1L
     }
 }

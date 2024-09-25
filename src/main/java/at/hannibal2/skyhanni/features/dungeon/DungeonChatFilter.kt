@@ -164,6 +164,7 @@ object DungeonChatFilter {
         "(.*)§a is now ready!".toPattern(),
         "§aDungeon starts in (.*) seconds.".toPattern(),
     )
+    @Suppress("MaxLineLength")
     private val prepareMessages = listOf(
         "§aYour active Potion Effects have been paused and stored. They will be restored when you leave Dungeons! You are not allowed to use existing Potion Effects while in Dungeons.",
         "§aDungeon starts in 1 second.",

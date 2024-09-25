@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.features.misc.items.enchants.EnchantParser.enchantmentPattern
 import com.google.gson.annotations.Expose
 
+@Suppress("VariableNaming")
 class EnchantsJson {
     @Expose
     var NORMAL: HashMap<String, Enchant.Normal> = hashMapOf()

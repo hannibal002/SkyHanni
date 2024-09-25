@@ -141,7 +141,7 @@ object DianaProfitTracker {
 
         if (message == "§6§lRARE DROP! §r§eYou dug out a §r§9Griffin Feather§r§e!" ||
             message == "§eFollow the arrows to find the §r§6treasure§r§e!"
-            ) {
+        ) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
             tryHide(event)
         }

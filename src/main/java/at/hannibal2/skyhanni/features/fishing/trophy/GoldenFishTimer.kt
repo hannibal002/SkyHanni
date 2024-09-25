@@ -94,6 +94,7 @@ object GoldenFishTimer {
     }
 
     // TODO: Move to repo
+    @Suppress("MaxLineLength")
     private const val GOLDEN_FISH_SKULL_TEXTURE =
         "ewogICJ0aW1lc3RhbXAiIDogMTY0MzgzMTA2MDE5OCwKICAicHJvZmlsZUlkIiA6ICJiN2ZkYmU2N2NkMDA0NjgzYjlmYTllM2UxNzczODI1NCIsCiAgInByb2ZpbGVOY" +
             "W1lIiA6ICJDVUNGTDE0IiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6IC" +
