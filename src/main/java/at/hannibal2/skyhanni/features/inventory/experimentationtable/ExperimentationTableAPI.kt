@@ -119,7 +119,7 @@ object ExperimentationTableAPI {
      */
     val experienceBottlePattern by patternGroup.pattern(
         "xpbottle",
-        "(?:Titanic |Grand |\\b)Experience Bottle",
+        "(?:Colossal |Titanic |Grand |\\b)Experience Bottle",
     )
 
     /**

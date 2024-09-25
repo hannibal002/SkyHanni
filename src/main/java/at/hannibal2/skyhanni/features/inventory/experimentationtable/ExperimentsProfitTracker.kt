@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory.experimentationtable
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -139,8 +139,23 @@ object ExperimentsProfitTracker {
     }
 
     @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!isEnabled() ||
+            InventoryUtils.openInventoryName() != "Bottles of Enchanting" ||
+            !listOf(11, 12, 14, 15).contains(event.slotId)
+        ) return
+        val stack = event.slot?.stack ?: return
+
+        experienceBottlePattern.matchMatcher(stack.displayName.removeColor()) {
+            tracker.modify {
+                it.startCost -= calculateBottlePrice(stack.getInternalName())
+            }
+        }
+    }
+
+    @SubscribeEvent
     fun onItemClick(event: ItemClickEvent) {
-        if (event.clickType == ClickType.RIGHT_CLICK) {
+        if (isEnabled() && event.clickType == ClickType.RIGHT_CLICK) {
             val item = event.itemInHand ?: return
             if (experienceBottlePattern.matches(item.displayName.removeColor())) {
                 lastSplashTime = SimpleTimeMark.now()
@@ -158,11 +173,7 @@ object ExperimentsProfitTracker {
             val iterator = lastSplashes.iterator()
             while (iterator.hasNext()) {
                 val item = iterator.next()
-                val internalName = item.getInternalName()
-                val price = internalName.getPrice()
-                val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
-                val maxPrice = npcPrice.coerceAtLeast(price)
-                startCostTemp += maxPrice.roundTo(0).toInt()
+                startCostTemp += calculateBottlePrice(item.getInternalName())
                 iterator.remove()
             }
             tracker.modify {
@@ -172,6 +183,13 @@ object ExperimentsProfitTracker {
         }
 
         handleExpBottles(false)
+    }
+
+    private fun calculateBottlePrice(internalName: NEUInternalName): Int {
+        val price = internalName.getPrice()
+        val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
+        val maxPrice = npcPrice.coerceAtLeast(price)
+        return maxPrice.toInt()
     }
 
     @SubscribeEvent
