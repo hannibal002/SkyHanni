@@ -24,9 +24,9 @@ read -r -d '' jq_command <<'EOF'
 } |
 (
     "::" + (.level) +
-    " file=" + (.full_path) + "#L" + (.line|tostring) +
+    " file=" + (.full_path) + ",line=" + (.line|tostring) + ",title=" + (.ruleId) +
     "::" + (.file_name) + ":" + (.line|tostring) +
-    " - " + (.ruleId) + ": " + (.message)
+    " - " + (.message)
 )
 EOF
 
