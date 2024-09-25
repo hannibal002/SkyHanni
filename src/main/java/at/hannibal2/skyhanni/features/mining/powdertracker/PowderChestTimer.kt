@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.mining.PowderTrackerConfig
+import at.hannibal2.skyhanni.config.features.mining.PowderChestTimerConfig
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.data.IslandType
@@ -41,7 +41,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object PowderChestTimer {
 
-    private val config get() = SkyHanniMod.feature.mining.powderTracker.chestTimer
+    private val config get() = SkyHanniMod.feature.mining.powderChestTimer
 
     private var display = Renderable.string("Chest Timer")
     private val chestSet = TimeLimitedCache<LorenzVec, SimpleTimeMark>(61.seconds)
@@ -147,7 +147,7 @@ object PowderChestTimer {
             }
 
             when (config.lineMode) {
-                PowderTrackerConfig.ChestTimer.LineMode.OLDEST -> {
+                PowderChestTimerConfig.LineMode.OLDEST -> {
                     val sorted = chestSet.sortedBy { it.value.timeUntil() }
                     if (sorted.isNotEmpty()) {
                         val chestToConnect = sorted.take(config.drawLineToChestAmount)
@@ -181,7 +181,7 @@ object PowderChestTimer {
                     }
                 }
 
-                PowderTrackerConfig.ChestTimer.LineMode.NEAREST -> {
+                PowderChestTimerConfig.LineMode.NEAREST -> {
                     val sorted = chestSet.sortedBy { it.key.distanceToPlayer() }
                     if (sorted.isNotEmpty()) {
                         val chestToConnect = sorted.take(config.drawLineToChestAmount)
