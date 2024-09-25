@@ -21,6 +21,7 @@ plugins {
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
     id("io.gitlab.arturbosch.detekt")
+    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
@@ -141,9 +142,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // June 3, 2024, 9:30 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
+    // August 27, 2024, 4:30 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.3
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.3:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -298,12 +299,18 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
         onlyIf { false }
     }
 }
+
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
+
+blossom {
+    replaceToken("@MOD_VERSION@", version)
+}
+
 val sourcesJar by tasks.creating(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
