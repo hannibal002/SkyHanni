@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RecalculatingValue
@@ -122,7 +122,7 @@ object PowderChestTimer {
         val first = chestSet.minByOrNull { it.value.timeUntil() } ?: return Renderable.string("")
 
         val timeUntil = first.value.timeUntil()
-        val color = timeUntil.colorForTime().getChatColor()
+        val color = timeUntil.getColorBasedOnTime().toChatColor()
 
         return Renderable.string("$color$timeUntil §8(§e$count §b$name§8)")
     }
@@ -132,7 +132,7 @@ object PowderChestTimer {
         if (!isEnabled()) return
         for ((loc, time) in chestSet) {
 
-            val color = time.timeUntil().getColorBasedOnTime()
+            val color = if (config.useStaticColor) config.staticColor.toChromaColor() else time.timeUntil().getColorBasedOnTime()
 
             if (config.highlightChests)
                 event.drawWaypointFilled(loc, color, seeThroughBlocks = false)
@@ -142,7 +142,7 @@ object PowderChestTimer {
                 event.drawString(
                     loc.add(y = y, x = 0.5, z = 0.5), "${time.timeUntil()}",
                     seeThroughBlocks = false,
-                    color = color
+                    color = color,
                 )
             }
 
@@ -163,18 +163,16 @@ object PowderChestTimer {
 
                             for (i in 0 until chestToConnect.size - 1) {
                                 val (current, currentTime) = chestToConnect[i]
-                                val (next, nextTime) = chestToConnect[i + 1]
+                                val (next, _) = chestToConnect[i + 1]
 
                                 val currentUtil = currentTime.timeUntil()
-                                val nextUntil = nextTime.timeUntil()
 
                                 val currentColor = currentUtil.getColorBasedOnTime()
-                                val nextColor = nextUntil.getColorBasedOnTime()
 
                                 event.draw3DLine(
                                     current.getMiddle(),
                                     next.getMiddle(),
-                                    interpolateColor(currentColor, nextColor),
+                                    currentColor,
                                     3,
                                     true,
                                 )
@@ -199,18 +197,14 @@ object PowderChestTimer {
 
                             for (i in 0 until chestToConnect.size - 1) {
                                 val (current, currentTime) = chestToConnect[i]
-                                val (next, nextTime) = chestToConnect[i + 1]
+                                val (next, _) = chestToConnect[i + 1]
 
-                                val currentUtil = currentTime.timeUntil()
-                                val nextUntil = nextTime.timeUntil()
-
-                                val currentColor = currentUtil.getColorBasedOnTime()
-                                val nextColor = nextUntil.getColorBasedOnTime()
+                                val currentUntil = currentTime.timeUntil()
 
                                 event.draw3DLine(
                                     current.getMiddle(),
                                     next.getMiddle(),
-                                    interpolateColor(currentColor, nextColor),
+                                    currentUntil.getColorBasedOnTime(),
                                     3,
                                     true,
                                 )
@@ -224,33 +218,31 @@ object PowderChestTimer {
         }
     }
 
-    private fun Duration.getColorBasedOnTime(): Color {
-        val totalTime = 60.0
-        val timeFraction = inWholeSeconds / totalTime
-
-        return Color(
-            (1.0 - timeFraction).toFloat(),
-            timeFraction.toFloat(),
-            0f,
-            0.8f
-        )
-    }
-
-    private fun Duration.colorForTime(): LorenzColor {
-        return when (this.inWholeSeconds) {
-            in 0..9 -> LorenzColor.RED
-            in 10..29 -> LorenzColor.GOLD
-            in 30..60 -> LorenzColor.GREEN
-            else -> LorenzColor.WHITE
+    private fun Color.toChatColor(): String {
+        return when (this) {
+            Color.RED -> "§4"
+            Color.GREEN -> "§a"
+            Color.ORANGE -> "§6"
+            else -> ""
         }
     }
 
-    private fun interpolateColor(startColor: Color, endColor: Color): Color {
-        return Color(
-            (startColor.red + endColor.red) / 2,
-            (startColor.green + endColor.green) / 2,
-            (startColor.blue + endColor.blue) / 2,
-        )
+    private fun Duration.getColorBasedOnTime(): Color {
+        val totalTime = inWholeSeconds
+
+        return when {
+            totalTime > 30 -> {
+                Color.GREEN
+            }
+
+            totalTime in 11..30 -> {
+                Color.ORANGE
+            }
+
+            else -> {
+                Color.RED
+            }
+        }
     }
 
     private fun LorenzVec.getMiddle() = add(0.5, 0.5, 0.5)
