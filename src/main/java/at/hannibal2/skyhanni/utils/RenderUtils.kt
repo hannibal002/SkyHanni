@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -1588,7 +1587,11 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun LorenzRenderWorldEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
     ) {
         GlStateManager.disableCull()
 

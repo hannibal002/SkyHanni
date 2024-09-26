@@ -4,8 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
-import at.hannibal2.skyhanni.data.model.findAllShortestDistances
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -19,6 +17,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -239,8 +238,6 @@ object IslandGraphs {
     private fun handleTick() {
         val prevClosed = closedNote
 
-        val graph = currentIslandGraph ?: return
-
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
                 onFound()
@@ -252,6 +249,7 @@ object IslandGraphs {
             }
         }
 
+        val graph = currentIslandGraph ?: return
         val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
         val newClosest = sortedNodes.first()
         if (closedNote == newClosest) return
@@ -287,9 +285,8 @@ object IslandGraphs {
     private fun findNewPath() {
         val goal = IslandGraphs.goal ?: return
         val closest = closedNote ?: return
-        val graph = currentIslandGraph ?: return
 
-        val (path, distance) = graph.findShortestPathAsGraphWithDistance(closest, goal)
+        val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
 
@@ -361,8 +358,7 @@ object IslandGraphs {
     private fun tryRerouting() {
         val target = currentTargetNode ?: return
         val closest = closedNote ?: return
-        val graph = currentIslandGraph ?: return
-        val map = graph.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
+        val map = GraphUtils.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
         val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
             ChatUtils.debug("Rerouting navigation..")

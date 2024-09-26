@@ -43,7 +43,7 @@ object GraphEditorBugFinder {
 
         val nearestArea = mutableMapOf<GraphNode, GraphNode>()
         for (node in nodes) {
-            val pathToNearestArea = GraphUtils.findFastestPath(graph, node) { it.getAreaTag(ignoreConfig = true) != null }?.first
+            val pathToNearestArea = GraphUtils.findFastestPath(node) { it.getAreaTag(ignoreConfig = true) != null }?.first
             if (pathToNearestArea == null) {
                 continue
             }
