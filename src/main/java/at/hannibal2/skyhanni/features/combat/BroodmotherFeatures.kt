@@ -150,6 +150,9 @@ object BroodmotherFeatures {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
         if (display.isEmpty()) return
+        if (broodmotherSpawnTime.isInPast() && !broodmotherSpawnTime.isFarPast()) {
+            display = "§4Broodmother spawning now!"
+        }
 
         config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
     }
