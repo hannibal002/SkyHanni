@@ -321,7 +321,7 @@
     <ID>VarCouldBeVal:SlayerItemsOnGround.kt$SlayerItemsOnGround$private var itemsOnGround = TimeLimitedCache&lt;EntityItem, String&gt;(2.seconds)</ID>
     <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var dingSlope = mutableListOf&lt;Float&gt;()</ID>
     <ID>VarCouldBeVal:SoopyGuessBurrow.kt$SoopyGuessBurrow$private var locations = mutableListOf&lt;LorenzVec&gt;()</ID>
-    <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$// TODO remove string. use enum instead! maybe even create new data type instaed of map of pairs private var found = mutableMapOf&lt;Pair&lt;Item?, ItemPair?&gt;, String&gt;()</ID>
+    <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$// TODO remove string. use enum instead! maybe even create new data type instead of map of pairs private var found = mutableMapOf&lt;Pair&lt;Item?, ItemPair?&gt;, String&gt;()</ID>
     <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$private var lastClicked = mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;()</ID>
     <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$private var toCheck = mutableListOf&lt;Pair&lt;Int, Int&gt;&gt;()</ID>
     <ID>VarCouldBeVal:SuperpairExperimentInformationDisplay.kt$SuperpairExperimentInformationDisplay$private var uncoveredItems = mutableListOf&lt;Pair&lt;Int, String&gt;&gt;()</ID>
