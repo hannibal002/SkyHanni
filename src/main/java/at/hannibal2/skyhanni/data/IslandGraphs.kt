@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.findAllShortestDistances
 import at.hannibal2.skyhanni.data.model.findShortestPathAsGraphWithDistance
 import at.hannibal2.skyhanni.data.repo.RepoUtils
 import at.hannibal2.skyhanni.events.EntityMoveEvent
@@ -352,14 +353,8 @@ object IslandGraphs {
         val target = currentTargetNode ?: return
         val closest = closedNote ?: return
         val graph = currentIslandGraph ?: return
-        val sameNodes = mutableMapOf<GraphNode, Double>()
-        for (node in graph.nodes) {
-            if (target.sameNameAndTags(node)) {
-                val (_, distance) = graph.findShortestPathAsGraphWithDistance(closest, node)
-                sameNodes[node] = distance
-            }
-        }
-        val newTarget = sameNodes.sorted().keys.firstOrNull() ?: return
+        val map = graph.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
+        val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
             ChatUtils.debug("Rerouting navigation..")
             newTarget.pathFind(label, color, onFound, allowRerouting = true, condition)
@@ -398,6 +393,7 @@ object IslandGraphs {
         shouldAllowRerouting = allowRerouting
         pathFind0(location = position, label, color, onFound, showGoalExact = false, condition)
     }
+
     /**
      * Activates pathfinding to a location in the island.
      *
