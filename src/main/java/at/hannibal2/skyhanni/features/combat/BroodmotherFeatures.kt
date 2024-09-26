@@ -158,8 +158,10 @@ object BroodmotherFeatures {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isCountdownEnabled()) return
 
-        if (broodmotherSpawnTime.isFarPast() && currentStage == StageEntry.ALIVE) {
-            display = "§4Broodmother spawned!"
+        if (broodmotherSpawnTime.isFarPast()) {
+            if (currentStage == StageEntry.ALIVE) {
+                display = "§4Broodmother spawned!"
+            }
         } else {
             val countdown = broodmotherSpawnTime.timeUntil().format()
             display = "§4Broodmother spawning in §b$countdown"
