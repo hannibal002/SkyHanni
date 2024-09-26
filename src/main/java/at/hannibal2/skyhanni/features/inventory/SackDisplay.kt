@@ -153,7 +153,7 @@ object SackDisplay {
                             ),
                         )
                     )
-                    //TOOD add cache
+                    // TODO add cache
                     addItemStack("MAGMA_FISH".asInternalName())
                 }
                 if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")

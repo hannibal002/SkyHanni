@@ -600,7 +600,7 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    private fun prune() { //TODO fix
+    private fun prune() { // TODO fix
         val hasNeighbours = nodes.associateWith { false }.toMutableMap()
         edges.forEach {
             hasNeighbours[it.node1] = true
