@@ -148,7 +148,7 @@ object ItemPickupLog {
 
             if (cursorItem != null) {
                 val hash = cursorItem.hash()
-                //this prevents items inside hypixel guis counting when picked up
+                // this prevents items inside hypixel guis counting when picked up
                 if (oldItemList.contains(hash)) {
                     inventoryItems.add(cursorItem)
                 }
