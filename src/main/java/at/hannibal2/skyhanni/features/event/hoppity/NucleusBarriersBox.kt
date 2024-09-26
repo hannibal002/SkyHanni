@@ -62,7 +62,7 @@ object NucleusBarriersBox {
             }
             RenderUtils.drawFilledBoundingBox_nea(
                 axis,
-                renderColor.addOpacity(config.opacity.toInt()),
+                renderColor.addOpacity(config.opacity),
                 partialTicks = event.partialTicks,
                 renderRelativeToCamera = false
             )

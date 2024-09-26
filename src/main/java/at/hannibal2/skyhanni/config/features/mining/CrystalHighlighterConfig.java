@@ -49,8 +49,8 @@ public class CrystalHighlighterConfig {
         name = "Highlight Opacity",
         desc = "Set the opacity of the highlighted boxes.\n§70§8: §7Transparent\n§7100§8: §7Solid"
     )
-    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
-    public float opacity = 60f;
+    @ConfigEditorSlider(minValue = 0, maxValue = 100, minStep = 1)
+    public int opacity = 60;
 
     @Expose
     @ConfigOption(
