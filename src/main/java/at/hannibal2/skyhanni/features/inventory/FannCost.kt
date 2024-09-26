@@ -5,7 +5,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -31,8 +34,16 @@ object FannCost {
         "§aBegin Training",
     )
     private val expEarnedPattern by patternGroup.pattern(
-        "exp",
+        "exp.total",
         """Will earn a total of (\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) EXP\.?""",
+    )
+    private val dailyExpPattern by patternGroup.pattern(
+        "exp.daily",
+        """EXP Per Day: ([\d,]+)(?: \(\+\d{1,2}(\.\d{1,2})?%\))?""",
+    )
+    private val durationPattern by patternGroup.pattern(
+        "training.duration.pattern",
+        """Will take: (?<day>\d+)d (?<hr>\d{1,2})h (?<min>\d{1,2})m (?<sec>\d{1,2})s""",
     )
     private val coinsPattern by patternGroup.pattern(
         "coin",
@@ -56,10 +67,35 @@ object FannCost {
         if (!trainingSlotInventoryPattern.matches(InventoryUtils.openInventoryName())) return
         if (!anvilPattern.matches(event.itemStack.displayName)) return
         val tooltip = event.toolTip
-        ChatUtils.debug("exp earned: ${tooltip.getExpEarned()}")
-        ChatUtils.debug("coins: ${tooltip.getCoins()}")
-        ChatUtils.debug("training mode: $trainingMode")
-        ChatUtils.debug("training type: ${tooltip.getTrainingType()}")
+
+        val trainingType = tooltip.getTrainingType()
+
+        when (trainingMode) {
+            TrainingMode.DAY_COUNT -> {
+                if (trainingType != null) {
+                    if (trainingType == TrainingType.FREE) return
+                    if (!showCoins) return
+
+                    val totalExp = tooltip.getExpEarned() ?: return
+                    val coins = tooltip.getCoins()
+                    val coinPerExp = coins / totalExp
+                    tooltip.insertAfterCoin("   §6Coins per XP: ${coinPerExp.roundTo(2)}")
+                }
+            }
+
+            TrainingMode.UNTIL_LEVEL -> {
+                if (trainingType != null) {
+                    if (trainingType == TrainingType.FREE) return
+                    if (!showCoins) return
+
+                    val dailyExp = tooltip.getDailyExp() ?: return
+                    val duration = tooltip.getDuration() ?: return
+                    val coins = tooltip.getCoins()
+                    val coinPerExp = coins / (dailyExp * duration)
+                    tooltip.insertAfterCoin("   §6Coins per XP: ${coinPerExp.roundTo(2)}")
+                }
+            }
+        }
     }
 
     @SubscribeEvent
@@ -72,6 +108,16 @@ object FannCost {
                 trainingMode = TrainingMode.UNTIL_LEVEL
             } else if (userInputPattern.matches(name)) {
                 trainingMode = TrainingMode.DAY_COUNT
+            }
+        }
+    }
+
+    private fun MutableList<String>.insertAfterCoin(content: String) {
+        val iter = this.listIterator()
+        while (iter.hasNext()) {
+            val line = iter.next().removeColor()
+            if (coinsPattern.matcher(line).find()) {
+                iter.add(content)
             }
         }
     }
@@ -90,17 +136,50 @@ object FannCost {
     }
 
     private fun List<String>.getCoins(): Double {
-        return coinsPattern.read(this) { it.replace(",", "").toDouble() } ?: 0.0
+        return coinsPattern.read(this) { it._toDouble() } ?: 0.0
     }
 
     private fun List<String>.getExpEarned(): Double? {
-        return expEarnedPattern.read(this) { it.replace(",", "").toDouble() }
+        return expEarnedPattern.read(this) { it._toDouble() }
+    }
+
+    private fun List<String>.getDailyExp(): Double? {
+        return dailyExpPattern.read(this) { it._toDouble() }
     }
 
     private fun List<String>.getTrainingType(): TrainingType? {
         return trainingTypePattern.read(this) { typestr ->
             TrainingType.entries.firstOrNull { it.type == typestr }
         }
+    }
+
+    private fun List<String>.getDuration(): Double? {
+        for (line in this) {
+            val linePlain = line.removeColor()
+            val matcher = durationPattern.matcher(linePlain)
+            if (matcher.find()) {
+                // Extract the named groups and convert them to integers
+                val days = matcher.getIntOrZero("day")
+                val hours = matcher.getIntOrZero("hr")
+                val minutes = matcher.getIntOrZero("min")
+                val seconds = matcher.getIntOrZero("sec")
+
+                // Calculate the total duration in days
+                val totalDays = days + hours / 24.0 + minutes / 1440.0 + seconds / 86400.0
+
+                // Return the total duration as a Double representing days
+                return totalDays
+            }
+        }
+        return null  // Return null if no valid duration is found
+    }
+
+    private fun Matcher.getIntOrZero(key: String): Int {
+        return this.group(key)?.toInt() ?: 0
+    }
+
+    private fun String._toDouble(): Double {
+        return this.replace(",", "").toDouble()
     }
 
     private enum class TrainingMode {
