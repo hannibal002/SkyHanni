@@ -49,6 +49,8 @@ object HotmAPI {
             "\\s+§8- §.(?<powder>[\\d,]+) $displayName Powder",
         )
 
+        val displayNameWithColor = color + displayName
+
         fun pattern(isHeart: Boolean) = if (isHeart) heartPattern else resetPattern
 
         fun getStorage() = ProfileStorageData.profileSpecific?.mining?.powder?.get(this)

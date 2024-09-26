@@ -133,7 +133,7 @@ object SkyHanniDebugsAndTests {
 
     fun testCommand(args: Array<String>) {
 
-SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.coroutineScope.launch {
             asyncTest()
         }
     }
@@ -498,7 +498,7 @@ SkyHanniMod.coroutineScope.launch {
                 listOf(Renderable.string("Not"), Renderable.placeholder(0, 15)),
                 listOf(Renderable.string("I'm Fine"), Renderable.string("And You")),
             ),
-            onClick = { ChatUtils.chat("Clicked: $it") },
+            onStartGrab = { ChatUtils.chat("Clicked: $it") },
             onHover = { /* ChatUtils.chat("Hover: $it") */ },
             onDrop = { f, t -> ChatUtils.chat("Dropped: $f to $t") },
         )

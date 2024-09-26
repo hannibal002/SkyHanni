@@ -693,9 +693,10 @@ interface Renderable {
             xPadding: Int = 1,
             yPadding: Int = 0,
             useEmptySpace: Boolean = false,
-            onHover: (Int) -> Unit,
-            onClick: (Int) -> Unit,
             onDrop: (Int, Int) -> Unit,
+            onHover: (Int) -> Unit = {},
+            onStartGrab: (Int) -> Unit = {},
+            onEndGrab: (Int) -> Unit = {},
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
@@ -739,7 +740,7 @@ interface Renderable {
                         onHover(rowIndex)
                         DragNDrop.dragOnPress(Drag(rowIndex, uuid)) {
                             holdingIndex = contentRowIndex
-                            onClick(rowIndex)
+                            onStartGrab(rowIndex)
                         }
                         var dropped = false
                         val preYSpace = ySpace
@@ -748,6 +749,7 @@ interface Renderable {
 
                                 override fun handle(drop: Any?) {
                                     val element = drop as? Drag ?: return
+                                    onEndGrab(holdingIndex)
                                     holdingIndex = -1
                                     onDrop(element.rowIndex, rowIndex)
                                 }
@@ -810,6 +812,7 @@ interface Renderable {
                 override fun get() = this
 
                 override fun onDiscard() {
+                    onEndGrab(holdingIndex)
                     holdingIndex = -1
                 }
 

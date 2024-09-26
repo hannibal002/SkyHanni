@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.CommandUtils.itemCheck
 import at.hannibal2.skyhanni.utils.CommandUtils.numberCalculate
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -28,7 +29,9 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.function.Predicate
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -288,6 +291,13 @@ object ShTrack {
             return r
         }
 
+        override fun remove(element: TrackingElement<*>): Boolean = indexOf(element).let {
+            if (it == -1) false else {
+                removeAt(it)
+                true
+            }
+        }
+
         override fun removeAt(index: Int): TrackingElement<*> {
             this[index].atRemove()
             val r = super.removeAt(index)
@@ -329,6 +339,27 @@ object ShTrack {
             super.removeRange(fromIndex, toIndex)
             updateDisplay()
         }
+
+        override fun removeAll(elements: Collection<TrackingElement<*>>): Boolean {
+            var r = true
+            elements.forEach { if (!remove(it)) r = false }
+            return r
+        }
+
+        override fun removeIf(filter: Predicate<in TrackingElement<*>>): Boolean {
+            var r = false
+            val iter = iterator()
+            while (iter.hasNext()) {
+                val it = iter.next()
+                if (filter.test(it)) {
+                    r = true
+                    it.atRemove()
+                    iter.remove()
+                }
+            }
+            updateDisplay()
+            return r
+        }
     }
 
     private val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingInterface>> = mutableMapOf()
@@ -336,13 +367,22 @@ object ShTrack {
 
     private var display: Renderable = Renderable.placeholder(0, 0)
 
+    private var hasGrab = false
+
     @SubscribeEvent
     fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent) {
         if (scheduledUpdate) {
             display = Renderable.verticalEditTable(
                 tracker.map { it.line },
-                onHover = {},
-                onClick = {},
+                onHover = {
+                    if (!hasGrab) {
+                        val tracker = tracker[it]
+                        RenderableTooltips.setTooltipForRender(tracker.generateHover().map { Renderable.string(it) }, spacedTitle = true)
+                        tracker.handleUserInput()
+                    }
+                },
+                onStartGrab = { hasGrab = true },
+                onEndGrab = { hasGrab = false },
                 onDrop = { a, b ->
                     tracker.move(a, b)
                     updateDisplay()
@@ -398,6 +438,8 @@ object ShTrack {
         override val includeSack: Boolean,
     ) : TrackingElement<Long>(), ItemTrackingInterface {
 
+        override val name = item.itemName
+
         override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemTrackingElement) return false
             return other.item == this.item
@@ -416,7 +458,7 @@ object ShTrack {
         override fun internalUpdate(amount: Number) {
             current += amount.toLong()
             if (target != null && current >= target) {
-                handleDone("${item.itemName} §adone")
+                handleDone("$name §adone")
             }
         }
 
@@ -439,6 +481,8 @@ object ShTrack {
         override val target: Long?,
         override val includeSack: Boolean,
     ) : TrackingElement<Long>(), ItemTrackingInterface {
+
+        override val name = main.itemName
 
         val map = NEUItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()
 
@@ -466,7 +510,7 @@ object ShTrack {
         override fun internalUpdate(amount: Number) {
             current += amount.toLong()
             if (target != null && mappedCurrent >= target) {
-                handleDone("${main.itemName} §adone")
+                handleDone("$name §adone")
             }
         }
 
@@ -491,6 +535,8 @@ object ShTrack {
         override val target: Long?,
         override val includeSack: Boolean,
     ) : TrackingElement<Long>(), ItemTrackingInterface {
+
+        override val name = group.name
 
         override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemGroupElement) return false
@@ -533,6 +579,8 @@ object ShTrack {
     private class PowderTrackingElement(val type: HotmAPI.PowderType, override var current: Long, override val target: Long?) :
         TrackingElement<Long>() {
 
+        override val name = "${type.displayNameWithColor} Powder"
+
         override fun internalUpdate(amount: Number) {
             current += amount.toLong()
             if (target != null && current >= target) {
@@ -568,6 +616,8 @@ object ShTrack {
 
         abstract var current: T
         abstract val target: T?
+
+        abstract val name: String
 
         fun update(amount: Number) {
             if (amount == 0) return
@@ -606,6 +656,17 @@ object ShTrack {
         abstract fun atAdd()
 
         abstract fun generateLine(): List<Renderable>
+        open fun generateHover(): List<String> = listOf(
+            "$name §eTracker",
+            "§e§lRIGHT CLICK §r§eto §cdelete",
+        )
+
+        open fun handleUserInput() {
+            if ((-99).isKeyClicked()) { // Right Click
+                delete()
+            }
+        }
+
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
