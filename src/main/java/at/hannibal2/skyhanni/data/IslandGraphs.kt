@@ -252,32 +252,36 @@ object IslandGraphs {
             }
         }
 
-        val d = graph.sortedBy { it.position.distanceSqToPlayer() }
-        val newClosest = d.first()
+        val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
+        val newClosest = sortedNodes.first()
         if (closedNote == newClosest) return
-        fastestPath?.let { p ->
-            val closest = p.nodes.minBy { it.position.distanceSqToPlayer() }
-            val distance = closest.position.distanceToPlayer()
-            if (distance < 5) {
-                if (distance < 3) {
-                    val index = p.nodes.indexOf(closest)
-                    val newNodes = p.drop(index)
-                    val newGraph = Graph(newNodes)
-                    fastestPath = newGraph
-                    newNodes.getOrNull(1)?.let {
-                        secondClosedNote = it
-                    }
-                    setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
-                }
-                return
-            }
-        }
+        if (onCurrentPath()) return
+
         closedNote = newClosest
-        secondClosedNote = d.getOrNull(1)
+        secondClosedNote = sortedNodes.getOrNull(1)
         onNewNote()
         hasMoved = false
         if (newClosest == prevClosed) return
         findNewPath()
+    }
+
+    private fun onCurrentPath(): Boolean {
+        val path = fastestPath ?: return false
+        val closest = path.nodes.minBy { it.position.distanceSqToPlayer() }
+        val distance = closest.position.distanceToPlayer()
+        if (distance > 5) return false
+
+        if (distance < 3) {
+            val index = path.nodes.indexOf(closest)
+            val newNodes = path.drop(index)
+            val newGraph = Graph(newNodes)
+            fastestPath = newGraph
+            newNodes.getOrNull(1)?.let {
+                secondClosedNote = it
+            }
+            setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
+        }
+        return true
     }
 
     private fun findNewPath() {
