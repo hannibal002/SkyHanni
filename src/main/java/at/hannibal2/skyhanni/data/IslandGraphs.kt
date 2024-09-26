@@ -377,11 +377,19 @@ object IslandGraphs {
         totalDistance = 0.0
     }
 
+    /**
+     * Activates pathfinding, with this graph node as goal.
+     *
+     * @param label The name of the naviation goal in chat.
+     * @param color The color of the lines in world.
+     * @param onFound The callback that gets fired when the goal is reached.
+     * @param allowRerouting When a different node with same name and tags as the origianl goal is closer to the player, starts routing to this instead.
+     * @param condition The pathfinding stops when the condition is no longer valid.
+     */
     fun GraphNode.pathFind(
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
-        // when a faster node with the same name + tags exists, reroute to this node
         allowRerouting: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
@@ -390,13 +398,21 @@ object IslandGraphs {
         shouldAllowRerouting = allowRerouting
         pathFind0(location = position, label, color, onFound, showGoalExact = false, condition)
     }
-
+    /**
+     * Activates pathfinding to a location in the island.
+     *
+     * @param location The goal of the pathfinder.
+     * @param label The name of the naviation goal in chat.
+     * @param color The color of the lines in world.
+     * @param onFound The callback that gets fired when the goal is reached.
+     * @param showGoalExact Wether the exact location should be shown as a waypoint, as well as shwoing a line from last node to the goal location.
+     * @param condition The pathfinding stops when the condition is no longer valid.
+     */
     fun pathFind(
         location: LorenzVec,
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
-        // when the goal is further away from the node, show a line and waypoint to that node
         showGoalExact: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
