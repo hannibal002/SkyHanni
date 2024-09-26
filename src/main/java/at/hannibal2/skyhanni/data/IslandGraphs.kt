@@ -276,9 +276,14 @@ object IslandGraphs {
         secondClosedNote = d.getOrNull(1)
         onNewNote()
         hasMoved = false
+        if (newClosest == prevClosed) return
+        findNewPath()
+    }
+
+    private fun findNewPath() {
+        val goal = IslandGraphs.goal ?: return
         val closest = closedNote ?: return
-        val goal = goal ?: return
-        if (closest == prevClosed) return
+        val graph = currentIslandGraph ?: return
 
         val (path, distance) = graph.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
