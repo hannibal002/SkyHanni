@@ -275,7 +275,7 @@ object PowderMiningChatFilter {
         // To simplify regex statements, this check is done outside
         val ssMessage = message.takeIf { it.startsWith("    ") }?.substring(4) ?: return null
 
-        //Powder
+        // Powder
         powderRewardPattern.matchMatcher(ssMessage) {
             if (config.powderThreshold == 60000) return "powder_mining_powder"
             val amountStr = groupOrNull("amount") ?: "1"
@@ -286,7 +286,7 @@ object PowderMiningChatFilter {
             }
         }
 
-        //Essence
+        // Essence
         essenceRewardPattern.matchMatcher(ssMessage) {
             if (config.essenceThreshold == 20) return "powder_mining_essence"
             val amountStr = groupOrNull("amount") ?: "1"
@@ -301,11 +301,11 @@ object PowderMiningChatFilter {
         blockGoblinEggs(ssMessage)?.let { return it }
         blockGemstones(ssMessage)?.let { return it }
 
-        //Fallback default
+        // Fallback default
         return null
     }
 
-    var rewardPatterns: Map<Pair<Pattern, PowderMiningConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
+    private var rewardPatterns: Map<Pair<Pattern, PowderMiningConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -339,7 +339,7 @@ object PowderMiningChatFilter {
             if (config.goblinEggs == PowderMiningConfig.GoblinEggEntry.HIDE_ALL) return "powder_mining_goblin_eggs"
 
             return when (val colorStr = groupOrNull("color")?.lowercase()) {
-                //'Colorless', base goblin eggs will never be shown in this code path
+                // 'Colorless', base goblin eggs will never be shown in this code path
                 null -> "powder_mining_goblin_eggs"
                 "green" -> if (config.goblinEggs > PowderMiningConfig.GoblinEggEntry.GREEN_UP) {
                     "powder_mining_goblin_eggs"
@@ -380,7 +380,7 @@ object PowderMiningChatFilter {
                 "amethyst" -> gemstoneConfig.amethystGemstones
                 "jade" -> gemstoneConfig.jadeGemstones
                 "topaz" -> gemstoneConfig.topazGemstones
-                //Failure case that should never be reached
+                // Failure case that should never be reached
                 else -> return "no_filter"
             }
 

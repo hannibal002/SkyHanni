@@ -31,7 +31,7 @@ object SuperpairExperimentInformationDisplay {
     data class Item(val index: Int, val name: String)
     data class ItemPair(val first: Item, val second: Item)
 
-    // TODO remove string. use enum instead! maybe even create new data type instaed of map of pairs
+    // TODO remove string. use enum instead! maybe even create new data type instead of map of pairs
     private var found = mutableMapOf<Pair<Item?, ItemPair?>, String>()
 
     private var toCheck = mutableListOf<Pair<Int, Int>>()
