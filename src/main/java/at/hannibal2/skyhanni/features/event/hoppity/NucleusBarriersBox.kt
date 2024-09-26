@@ -57,11 +57,12 @@ object NucleusBarriersBox {
             val renderColor = when (config.displayType) {
                 CrystalHighlighterConfig.DisplayType.CRYSTAL_COLORS -> crystal.color
                 CrystalHighlighterConfig.DisplayType.CHROMA -> LorenzColor.CHROMA
+                CrystalHighlighterConfig.DisplayType.BLACK -> LorenzColor.BLACK
                 else -> LorenzColor.WHITE
             }
             RenderUtils.drawFilledBoundingBox_nea(
                 axis,
-                renderColor.addOpacity((config.opacity * 100).toInt()),
+                renderColor.addOpacity(config.opacity.toInt()),
                 partialTicks = event.partialTicks,
                 renderRelativeToCamera = false
             )

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.mining;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -22,11 +23,13 @@ public class CrystalHighlighterConfig {
         name = "Display Type",
         desc = "Choose the display type for the highlighted boxes."
     )
+    @ConfigEditorDropdown
     public DisplayType displayType = DisplayType.CRYSTAL_COLORS;
 
     public enum DisplayType {
         CRYSTAL_COLORS("Crystal Colors"),
         CHROMA("Chroma"),
+        BLACK("Black")
         ;
 
         private final String str;
@@ -44,10 +47,10 @@ public class CrystalHighlighterConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Opacity",
-        desc = "Set the opacity of the highlighted boxes.\n§80§7: §8Transparent\n§81§7: §fSolid"
+        desc = "Set the opacity of the highlighted boxes.\n§70§8: §7Transparent\n§7100§8: §7Solid"
     )
-    @ConfigEditorSlider(minValue = 0f, maxValue = 1f, minStep = 0.05f)
-    public float opacity = 0.6f;
+    @ConfigEditorSlider(minValue = 0f, maxValue = 100f, minStep = 1f)
+    public float opacity = 60f;
 
     @Expose
     @ConfigOption(
