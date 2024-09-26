@@ -24,7 +24,7 @@ public class DebugConfig {
     @Expose
     @ConfigOption(
         name = "Mod Menu Log",
-        desc = "Enables debug messages when the currently opened GUI changes, with the path to the gui class. " +
+        desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +
             "Useful for adding more mods to quick mod menu switch."
     )
     @ConfigEditorBoolean
@@ -64,6 +64,11 @@ public class DebugConfig {
     @ConfigOption(name = "Show NPC Price", desc = "Show NPC price in item lore.")
     @ConfigEditorBoolean
     public boolean showNpcPrice = false;
+
+    @Expose
+    @ConfigOption(name = "Show Craft Price", desc = "Show craft price in item lore.")
+    @ConfigEditorBoolean
+    public boolean showCraftPrice = false;
 
     @Expose
     @ConfigOption(name = "Show BZ Price", desc = "Show BZ price in item lore.")
@@ -106,7 +111,7 @@ public class DebugConfig {
     public boolean hotSwapDetection = false;
 
     @Expose
-    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always oudated.")
+    @ConfigOption(name = "Always Outdated", desc = "For the sake of the auto updater, act like you are always outdated.")
     @ConfigEditorBoolean
     public boolean alwaysOutdated = false;
 
@@ -117,18 +122,19 @@ public class DebugConfig {
     public boolean eventCounter = false;
 
     @Expose
-    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled whie pressing this hotkey.")
+    @ConfigOption(name = "Bypass Advanced Tab List", desc = "The Advanced Player Tab list is disabled while pressing this hotkey.")
     @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
     public int bypassAdvancedPlayerTabList = Keyboard.KEY_NONE;
 
     @Expose
-    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while f3 is open.")
+    @ConfigOption(name = "SkyBlock Area", desc = "Show your current area in SkyBlock while F3 is open.")
     @ConfigEditorBoolean
     public boolean currentAreaDebug = true;
 
     @Expose
-    @ConfigOption(name = "Oreblock Name", desc = "Show the OreBlock you are currently looking at.")
+    @ConfigOption(name = "OreBlock Name", desc = "Show the OreBlock you are currently looking at.")
     @ConfigEditorBoolean
+    // TODO rename to rayTracedOreBlock
     public boolean raytracedOreblock = true;
 
     @Expose
@@ -150,6 +156,11 @@ public class DebugConfig {
     @ConfigOption(name = "Never April Fools", desc = "Admit it, you hate fun.")
     @ConfigEditorBoolean
     public boolean neverFunnyTime = false;
+
+    @Expose
+    @ConfigOption(name = "Always Hoppity's", desc = "Always act as if Hoppity's Hunt is active.")
+    @ConfigEditorBoolean
+    public boolean alwaysHoppitys = false;
 
     // Does not have a config element!
     @Expose

@@ -70,7 +70,7 @@ object EasterEggWaypoints {
         }
 
         if (config.allEntranceWaypoints) {
-            for (eggEntrance in EggEntrances.entries) {
+            for (eggEntrance in EggEntrance.entries) {
                 if (!eggEntrance.easterEgg.any { it.shouldShow() }) continue
                 event.drawWaypointFilled(eggEntrance.waypoint, LorenzColor.YELLOW.toColor())
                 event.drawDynamicText(eggEntrance.waypoint, "§e" + eggEntrance.eggEntranceName, 1.5)

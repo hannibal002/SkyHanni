@@ -14,7 +14,7 @@ public class HideFarEntitiesConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Min Distance", desc = "Always shows mobs that are at least that close to the player.")
+    @ConfigOption(name = "Min Distance", desc = "Always show mobs that are at least that close to the player.")
     @ConfigEditorSlider(minValue = 3, maxValue = 30, minStep = 1)
     public int minDistance = 10;
 

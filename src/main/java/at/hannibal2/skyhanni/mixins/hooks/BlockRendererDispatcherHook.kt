@@ -1,9 +1,6 @@
 package at.hannibal2.skyhanni.mixins.hooks
 
 import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor
-import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.CommissionBlock.Companion.onColor
-import at.hannibal2.skyhanni.features.mining.MiningCommissionsBlocksColor.replaceBlocksMapCache
-import at.hannibal2.skyhanni.features.mining.OreType.Companion.isOreType
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.block.state.IBlockState
 import net.minecraft.client.renderer.BlockRendererDispatcher
@@ -20,20 +17,13 @@ fun modifyGetModelFromBlockState(
     pos: BlockPos?,
     cir: CallbackInfoReturnable<IBakedModel>,
 ) {
-    if (state == null || pos == null) return
-    var returnState: IBlockState = state
+    if (pos == null) return
 
     if (!LorenzUtils.inSkyBlock) return
 
-    if (MiningCommissionsBlocksColor.enabled && MiningCommissionsBlocksColor.active) {
-        returnState = replaceBlocksMapCache.getOrPut(state) {
-            MiningCommissionsBlocksColor.CommissionBlock.entries.firstOrNull {
-                state.isOreType(it.oreType)
-            }?.onColor(state) ?: state
-        }
-    }
+    val returnState = MiningCommissionsBlocksColor.processState(state)
 
-    if (returnState !== state) {
+    if (returnState != state) {
         cir.returnValue = blockRendererDispatcher.blockModelShapes.getModelForState(returnState)
     }
 }

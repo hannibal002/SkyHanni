@@ -23,8 +23,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -168,7 +168,7 @@ object ItemAbilityCooldown {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Holy Ice
-            event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f -> {
+            event.soundName == "random.drink" && event.pitch.roundTo(1) == 1.8f && event.volume == 1.0f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
             // Royal Pigeon
@@ -178,6 +178,13 @@ object ItemAbilityCooldown {
 
             event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.WAND_OF_STRENGTH.sound()
+            }
+            // Tactical Insertion
+            event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1.0f -> {
+                ItemAbility.TACTICAL_INSERTION.activate(LorenzColor.DARK_PURPLE, 3_000)
+            }
+            event.soundName == "mob.zombie.remedy" && event.pitch == 1.8888888f && event.volume == 0.7f -> {
+                ItemAbility.TACTICAL_INSERTION.activate(null, 17_000)
             }
         }
     }

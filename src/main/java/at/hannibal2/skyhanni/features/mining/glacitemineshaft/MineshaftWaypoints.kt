@@ -26,7 +26,7 @@ object MineshaftWaypoints {
 
     private const val BLOCKS_FORWARD: Int = 7
 
-    val waypoints: MutableList<MineshaftWaypoint> = mutableListOf()
+    val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
 
     @SubscribeEvent
@@ -38,7 +38,7 @@ object MineshaftWaypoints {
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
 
-        val playerLocation = LocationUtils.playerLocation().round(0).add(y = -1)
+        val playerLocation = LocationUtils.playerLocation().roundTo(0).add(y = -1)
 
         if (config.mineshaftWaypoints.entranceLocation) {
             waypoints.add(MineshaftWaypoint(waypointType = MineshaftWaypointType.ENTRANCE, location = playerLocation))

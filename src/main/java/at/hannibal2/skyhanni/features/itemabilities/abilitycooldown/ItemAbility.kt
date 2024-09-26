@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.itemabilities.abilitycooldown
 
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import kotlin.math.floor
 
 enum class ItemAbility(
@@ -49,6 +49,7 @@ enum class ItemAbility(
     SHADOW_FURY(15, "STARRED_SHADOW_FURY"),
     ROYAL_PIGEON(5),
     WAND_OF_STRENGTH(10),
+    TACTICAL_INSERTION(20),
 
     // doesn't have a sound
     ENDER_BOW("Ender Warp", 5, "Ender Bow"),
@@ -105,7 +106,7 @@ enum class ItemAbility(
             duration /= 100
             var d = duration.toDouble()
             d /= 10.0
-            d.round(1).addSeparators()
+            d.roundTo(1).addSeparators()
         } else {
             duration /= 1000
             duration++

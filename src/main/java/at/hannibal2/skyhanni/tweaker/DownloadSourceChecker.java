@@ -14,7 +14,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class DownloadSourceChecker {
 
-    private static final String GITHUB_REPO_TEXT = "repo_id=511310721";
+    private static final String MOD_VERSION = "@MOD_VERSION@";
+    private static final String GITHUB_REPO = "511310721";
+    private static final String GITHUB_REPO_TEXT = "repo_id=" + GITHUB_REPO;
     private static final String MODRINTH_URL = "/data/byNkmv5G/";
     private static final String THE_PASSWORD = "danger";
 
@@ -97,7 +99,7 @@ public class DownloadSourceChecker {
         JOptionPane.showOptionDialog(
             frame,
             String.format(String.join("\n", SECURITY_POPUP), uriToSimpleString(host)),
-            "SkyHanni Security Error",
+            "SkyHanni " + MOD_VERSION + " Security Error",
             JOptionPane.DEFAULT_OPTION,
             JOptionPane.ERROR_MESSAGE,
             null,
@@ -121,8 +123,12 @@ public class DownloadSourceChecker {
             URI host = getHost(file);
             if (host == null) return null;
 
-            if (host.getHost().equals("objects.githubusercontent.com") && host.getPath().contains(GITHUB_REPO_TEXT)) {
-                return null;
+            if (host.getHost().equals("objects.githubusercontent.com")) {
+                if (host.getQuery().contains(GITHUB_REPO_TEXT)) {
+                    return null;
+                } else if (host.getPath().contains("/" + GITHUB_REPO + "/")) {
+                    return null;
+                }
             } else if (host.getHost().equals("cdn.modrinth.com") && host.getPath().startsWith(MODRINTH_URL)) {
                 return null;
             }
@@ -135,7 +141,7 @@ public class DownloadSourceChecker {
     private static URI getHost(File file) throws Exception {
         final File adsFile = new File(file.getAbsolutePath() + ":Zone.Identifier:$DATA");
         String host = null;
-        try(BufferedReader reader = new BufferedReader(new FileReader(adsFile))) {
+        try (BufferedReader reader = new BufferedReader(new FileReader(adsFile))) {
             String line = reader.readLine();
             while (line != null) {
                 if (line.startsWith("HostUrl=")) {

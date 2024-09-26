@@ -15,14 +15,16 @@ object MythicRabbitPetWarning {
 
         if (lastCheck.passedSince() < 30.seconds) return
 
-        if (!PetAPI.isCurrentPet(mythicRabbit)) {
+        if (!correctPet()) {
             lastCheck = SimpleTimeMark.now()
             warn()
         }
     }
 
+    fun correctPet() = PetAPI.isCurrentPet(mythicRabbit)
+
     private fun warn() {
-        ChatUtils.chat("Use a mythic Rabbit pet for more chocolate!")
+        ChatUtils.chat("Use a §dMythic Rabbit Pet §efor more chocolate!")
         LorenzUtils.sendTitle("§cNo Rabbit Pet!", 3.seconds)
     }
 }

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.NEURenderEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -35,15 +36,26 @@ object GuiData {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onGuiClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
+
+        if (CustomWardrobeKeybinds.allowMouseClick()) return
+
         if (preDrawEventCancelled) event.isCanceled = true
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onGuiKeyPress(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
-        val (escKey, invKey) = Minecraft.getMinecraft().gameSettings.let {
-            Keyboard.KEY_ESCAPE to it.keyBindInventory.keyCode
+        val allowedKeys = Minecraft.getMinecraft().gameSettings.let {
+            listOf(
+                Keyboard.KEY_ESCAPE,
+                it.keyBindInventory.keyCode,
+                it.keyBindScreenshot.keyCode,
+                it.keyBindFullscreen.keyCode,
+            )
         }
-        if (escKey.isKeyHeld() || invKey.isKeyHeld()) return
+        if (allowedKeys.any { it.isKeyHeld() }) return
+
+        if (CustomWardrobeKeybinds.allowKeyboardClick()) return
+
         if (preDrawEventCancelled) event.isCanceled = true
     }
 

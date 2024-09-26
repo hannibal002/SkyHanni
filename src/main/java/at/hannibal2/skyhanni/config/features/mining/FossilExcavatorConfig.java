@@ -20,7 +20,7 @@ public class FossilExcavatorConfig {
 
     @Expose
     @ConfigOption(
-        name = "Profit Per Excavation",
+        name = "Profit per Excavation",
         desc = "Show profit/loss in chat after each excavation. Also includes breakdown information on hover."
     )
     @ConfigEditorBoolean
@@ -36,4 +36,12 @@ public class FossilExcavatorConfig {
     @FeatureToggle
     public boolean glacitePowderStack = false;
 
+    @Expose
+    @ConfigOption(
+        name = "Hide Excavator Tooltips",
+        desc = "Hides tooltips of items inside of the Fossil Excavator."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean hideExcavatorTooltips = true;
 }
