@@ -67,7 +67,7 @@ object EssenceShopHelper {
     /**
      * REGEX-TEST: §a§lUNLOCKED
      */
-    private val maxedUpgradeLorePattern by patternGroup.pattern(
+    val maxedUpgradeLorePattern by patternGroup.pattern(
         "essence.maxedupgrade",
         ".*§a§lUNLOCKED",
     )
@@ -77,7 +77,7 @@ object EssenceShopHelper {
      * REGEX-TEST: §aForbidden Speed III
      * REGEX-TEST: §aReturn to Sender X
      */
-    private val essenceUpgradePattern by patternGroup.pattern(
+    val essenceUpgradePattern by patternGroup.pattern(
         "essence.upgrade",
         "§.(?<upgrade>.*) (?<tier>[IVXLCDM]*)",
     )
@@ -93,12 +93,12 @@ object EssenceShopHelper {
     data class EssenceShopProgress(val essenceName: String, val purchasedUpgrades: Map<String, Int>) {
         private val essenceShop = essenceShops.find { it.shopName.equals(essenceName, ignoreCase = true) }
         val remainingUpgrades: MutableList<EssenceShopUpgradeStatus> = essenceShop?.upgrades?.map {
-            val purchasedAmount = purchasedUpgrades[it.name]
+            val purchasedAmount = purchasedUpgrades[it.name] ?: 0
             EssenceShopUpgradeStatus(
                 it.name,
-                currentLevel = purchasedAmount ?: 0,
+                currentLevel = purchasedAmount,
                 maxLevel = it.costs.count(),
-                remainingCosts = (if (purchasedAmount == null) it.costs else it.costs.drop(purchasedAmount)).toMutableList(),
+                remainingCosts = it.costs.drop(purchasedAmount).toMutableList(),
             )
         }?.toMutableList() ?: mutableListOf()
         val nonRepoUpgrades = purchasedUpgrades.filter { purchasedUpgrade ->
@@ -108,7 +108,7 @@ object EssenceShopHelper {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!enabled() || essenceShops.isEmpty() || currentProgress == null) return
+        if (!isEnabled() || essenceShops.isEmpty() || currentProgress == null) return
         if (!essenceShopPattern.matches(event.inventory.name)) return
         if (event.slot == CUSTOM_STACK_LOCATION) {
             val progressStack = getCustomItemStack() ?: return
@@ -145,7 +145,7 @@ object EssenceShopHelper {
     }
 
     @SubscribeEvent
-    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         processInventoryEvent(event)
     }
 
@@ -154,59 +154,56 @@ object EssenceShopHelper {
         processInventoryEvent(event)
     }
 
-    private fun getCustomItemStack(): ItemStack? {
-        return if (currentProgress == null) null else {
-            createItemStack(
-                "GOLD_NUGGET".asInternalName().getItemStack().item,
-                "§bRemaining $currentEssenceType Essence Upgrades",
-                *buildList {
-                    val progress = currentProgress!!
-                    val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
-                    if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
-                    else {
-                        add("")
-                        remaining.forEach {
-                            add(
-                                "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
-                                    it.remainingCosts.sum().addSeparators()
-                                }",
-                            )
-                        }
-                        add("")
-
-                        val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
-                        add("§7Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
-                        essenceNeeded = upgradeTotal - essenceOwned
-                        if (essenceOwned > 0) add("§7Essence Owned: §8${essenceOwned.addSeparators()}")
-                        if (essenceNeeded > 0) {
-                            add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
-                            val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
-
-                            val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
-                            val totalInstantPrice = bzInstantPrice * essenceNeeded
-                            add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
-
-                            val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
-                            val totalOrderPrice = bzOrderPrice * essenceNeeded
-                            add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
-
-                            add("")
-                            add("§e§oClick to open Bazaar!")
-                        } else addAll(listOf("", "§e§oYou have enough essence!"))
+    private fun getCustomItemStack(): ItemStack? = currentProgress?.let { progress ->
+        createItemStack(
+            "GOLD_NUGGET".asInternalName().getItemStack().item,
+            "§bRemaining $currentEssenceType Essence Upgrades",
+            *buildList {
+                val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
+                if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
+                else {
+                    add("")
+                    remaining.forEach {
+                        add(
+                            "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
+                                it.remainingCosts.sum().addSeparators()
+                            }",
+                        )
                     }
+                    add("")
 
-                    if (progress.nonRepoUpgrades.any()) {
+                    val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
+                    add("§7Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
+                    essenceNeeded = upgradeTotal - essenceOwned
+                    if (essenceOwned > 0) add("§7Essence Owned: §8${essenceOwned.addSeparators()}")
+                    if (essenceNeeded > 0) {
+                        add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
+                        val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
+
+                        val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
+                        val totalInstantPrice = bzInstantPrice * essenceNeeded
+                        add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
+
+                        val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
+                        val totalOrderPrice = bzOrderPrice * essenceNeeded
+                        add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
+
                         add("")
-                        add("§cFound upgrades not in repo§c§l:")
-                        progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
-                    }
-                }.toTypedArray(),
-            )
-        }
+                        add("§e§oClick to open Bazaar!")
+                    } else addAll(listOf("", "§e§oYou have enough essence!"))
+                }
+
+                if (progress.nonRepoUpgrades.any()) {
+                    add("")
+                    add("§cFound upgrades not in repo§c§l:")
+                    progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
+                }
+            }.toTypedArray(),
+        )
     }
 
     private fun processInventoryEvent(event: InventoryOpenEvent) {
-        if (!enabled() || essenceShops.isEmpty()) return
+        if (!isEnabled() || essenceShops.isEmpty()) return
         essenceShopPattern.matchMatcher(event.inventoryName) {
             currentEssenceType = groupOrNull("essence") ?: return
             val essenceName = "ESSENCE_${currentEssenceType.uppercase()}"
@@ -266,5 +263,5 @@ object EssenceShopHelper {
         currentProgress = EssenceShopProgress(essenceName, purchasedUpgrades)
     }
 
-    private fun enabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.essenceShopHelper
+    private fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.essenceShopHelper
 }
