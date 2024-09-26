@@ -14,8 +14,8 @@ public class CrystalHighlighterConfig {
         name = "Highlight Crystal Nucleus barriers",
         desc = "Draw visible bounding boxes around the Crystal Nucleus crystal barrier blocks."
     )
-    @FeatureToggle
     @ConfigEditorBoolean
+    @FeatureToggle
     public boolean enabled = true;
 
     @Expose
@@ -29,7 +29,7 @@ public class CrystalHighlighterConfig {
     public enum DisplayType {
         CRYSTAL_COLORS("Crystal Colors"),
         CHROMA("Chroma"),
-        BLACK("Black")
+        BLACK("Black"),
         ;
 
         private final String str;
