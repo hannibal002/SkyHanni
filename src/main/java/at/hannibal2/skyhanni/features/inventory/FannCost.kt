@@ -19,7 +19,7 @@ object FannCost {
     private val config get() = SkyHanniMod.feature.inventory.fannCost
     private val showCoins get() = config.coinsPerXP
     private val showBits get() = config.xpPerBit
-    private var isDayTrainingMode = true
+    private var trainingMode: TrainingMode = TrainingMode.DAY_COUNT
 
     private val patternGroup = RepoPattern.group("fann.inventory")
     private val trainingSlotInventoryPattern by patternGroup.pattern(
@@ -46,6 +46,10 @@ object FannCost {
         "slot24.name.input",
         "User Input",
     )
+    private val trainingTypePattern by patternGroup.pattern(
+        "training.type",
+        "Type: (Free|Light|Moderate|Expert|Ultra|Turbo!)",
+    )
 
     @SubscribeEvent
     fun onFannAnvilTooltip(event: LorenzToolTipEvent) {
@@ -54,7 +58,8 @@ object FannCost {
         val tooltip = event.toolTip
         ChatUtils.debug("exp earned: ${tooltip.getExpEarned()}")
         ChatUtils.debug("coins: ${tooltip.getCoins()}")
-        ChatUtils.debug("isDayTrainingMode: $isDayTrainingMode")
+        ChatUtils.debug("training mode: $trainingMode")
+        ChatUtils.debug("training type: ${tooltip.getTrainingType()}")
     }
 
     @SubscribeEvent
@@ -64,33 +69,51 @@ object FannCost {
         if (slot24 != null) {
             val name = slot24.displayName.removeColor()
             if (desiredLevelPatter.matches(name)) {
-                isDayTrainingMode = false
+                trainingMode = TrainingMode.UNTIL_LEVEL
             } else if (userInputPattern.matches(name)) {
-                isDayTrainingMode = true
+                trainingMode = TrainingMode.DAY_COUNT
             }
         }
     }
 
-
-    private fun Pattern.read(lore: List<String>): Double? {
+    // To avoid duplicate code
+    private fun <T> Pattern.read(lore: List<String>, func: (String) -> T): T? {
         for (line in lore) {
             val linePlain = line.removeColor()
             val matcher = matcher(linePlain)
             if (matcher.find()) {
-                val res = matcher.group(1).replace(",", "").toDouble()
-                return res
+                val res = matcher.group(1)
+                return func(res)
             }
         }
         return null
     }
 
     private fun List<String>.getCoins(): Double {
-        return coinsPattern.read(this) ?: 0.0
+        return coinsPattern.read(this) { it.replace(",", "").toDouble() } ?: 0.0
     }
 
     private fun List<String>.getExpEarned(): Double? {
-        return expEarnedPattern.read(this)
+        return expEarnedPattern.read(this) { it.replace(",", "").toDouble() }
     }
 
+    private fun List<String>.getTrainingType(): TrainingType? {
+        return trainingTypePattern.read(this) { typestr ->
+            TrainingType.entries.firstOrNull { it.type == typestr }
+        }
+    }
 
+    private enum class TrainingMode {
+        DAY_COUNT,
+        UNTIL_LEVEL
+    }
+
+    private enum class TrainingType(val type: String) {
+        FREE("Free"),
+        LIGHT("Light"),
+        MODERATE("Moderate"),
+        EXPERT("Expert"),
+        ULTRA("Ultra"),
+        TURBO("Turbo!"),
+    }
 }
