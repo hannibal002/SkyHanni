@@ -52,5 +52,7 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
         fun getById(id: Int) = if (entries.size > id) entries[id] else null
 
         fun getByName(name: String): LorenzRarity? = entries.find { it.name.equals(name, ignoreCase = true) }
+
+        fun getByColorCode(colorCode: Char): LorenzRarity? = entries.find { it.color.chatColorCode == colorCode }
     }
 }
