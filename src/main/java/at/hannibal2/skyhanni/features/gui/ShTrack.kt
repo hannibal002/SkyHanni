@@ -28,8 +28,12 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
+import com.google.gson.TypeAdapter
+import com.google.gson.stream.JsonReader
+import com.google.gson.stream.JsonWriter
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.function.Predicate
 import kotlin.time.Duration.Companion.seconds
@@ -105,6 +109,7 @@ object ShTrack {
         CommandArgument("<> - Does not delete the tracker on target completion", "-k") { _, c -> c.autoDelete = false; 0 },
         CommandArgument("<> - Sends a notification on completion", "-n") { _, c -> c.notify = true; 0 },
         CommandArgument("<> - Uses all tiers of an item", "-m", validity = ::validIfItemState) { _, c -> c.multiItem = true; 0 },
+        CommandArgument("<> - Does not save the tracker on game close", "-t") { _, c -> c.shouldSave = false; 0 },
     )
 
     object DocumentationExcludes {
@@ -123,6 +128,7 @@ object ShTrack {
         var autoDelete = true
         var notify = false
         var multiItem = false
+        var shouldSave = true
 
         var state: StateType? = null
             set(value) {
@@ -250,6 +256,7 @@ object ShTrack {
             }
             result.shouldNotify = notify
             result.shouldAutoDelete = autoDelete
+            result.shouldSave = shouldSave
             result.line = result.generateLine()
             if (!allowDupe) {
                 val index = tracker.indexOfFirst { result.similarElement(it) }
@@ -360,6 +367,25 @@ object ShTrack {
             updateDisplay()
             return r
         }
+    }
+
+    private val gson = BaseGsonBuilder.gson().registerTypeAdapter(
+        TrackingElement::class.java,
+        object : TypeAdapter<TrackingElement<*>>() {
+            override fun write(out: JsonWriter, value: TrackingElement<*>) {
+                out.beginObject()
+                value.toJson(out)
+                out.endObject()
+            }
+
+            override fun read(reader: JsonReader): TrackingElement<*>? {
+                return null
+            }
+        },
+    ).create()
+
+    fun toJson(): String {
+        return gson.toJson(tracker.toList())
     }
 
     private val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingInterface>> = mutableMapOf()
@@ -613,6 +639,7 @@ object ShTrack {
 
         var shouldNotify = false
         var shouldAutoDelete = false
+        var shouldSave = true
 
         abstract var current: T
         abstract val target: T?
@@ -665,6 +692,15 @@ object ShTrack {
             if ((-99).isKeyClicked()) { // Right Click
                 delete()
             }
+        }
+
+        open fun toJson(out: JsonWriter) {
+            out.name("type").value(this::class.simpleName)
+            out.name("name").value(name)
+            out.name("target").value(target)
+            out.name("current").value(current)
+            out.name("shouldAutoDelete").value(shouldAutoDelete)
+            out.name("shouldNotify").value(shouldNotify)
         }
 
     }
