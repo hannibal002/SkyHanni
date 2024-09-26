@@ -36,7 +36,7 @@ class AvoidBritishSpelling(config: Config) : Rule(config) {
                     CodeSmell(
                         issue,
                         Entity.from(expression),
-                        "Avoid using the word '${word.key}' in code, prefer '${word.value}' instead.",
+                        "Avoid using the word '${word.key}' in code, '${word.value}' is preferred instead.",
                     ),
                 )
             }
