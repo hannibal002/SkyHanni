@@ -211,4 +211,13 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(
+        name = "Highlight Crystal Nucleus barriers",
+        desc = "Draw visible bounding boxes around the Crystal Nucleus crystal barrier blocks."
+    )
+    @FeatureToggle
+    @ConfigEditorBoolean
+    public boolean drawBarrierBoxes = true;
 }
