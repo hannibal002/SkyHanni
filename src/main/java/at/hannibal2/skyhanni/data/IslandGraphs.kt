@@ -252,12 +252,13 @@ object IslandGraphs {
         }
 
         val d = graph.sortedBy { it.position.distanceSqToPlayer() }
-        val newClosest = d.getOrNull(0)
+        val newClosest = d.first()
         if (closedNote == newClosest) return
         fastestPath?.let { p ->
-            if (p.nodes.any { it.position.distanceToPlayer() < 5 }) {
-                val closest = p.nodes.minBy { it.position.distanceToPlayer() }
-                if (closest.position.distanceToPlayer() < 3) {
+            val closest = p.nodes.minBy { it.position.distanceSqToPlayer() }
+            val distance = closest.position.distanceToPlayer()
+            if (distance < 5) {
+                if (distance < 3) {
                     val index = p.nodes.indexOf(closest)
                     val newNodes = p.drop(index)
                     val newGraph = Graph(newNodes)
@@ -433,10 +434,10 @@ object IslandGraphs {
         if (totalDistance == 0.0 || distance > totalDistance) {
             totalDistance = distance
         }
-        senChatDistance(distance)
+        sendChatDistance(distance)
     }
 
-    private fun senChatDistance(distance: Double) {
+    private fun sendChatDistance(distance: Double) {
         val percentage = (1 - (distance / totalDistance)) * 100
         val componentText = "§e[SkyHanni] Navigating to §r$label §f[§e$distance§f] §f(§c${percentage.roundTo(1)}%§f)".asComponent()
         componentText.onClick(
@@ -467,14 +468,13 @@ object IslandGraphs {
             true,
             bezierPoint = 2.0,
             textSize = 1.0,
-            markLastBlock = showGoalExact
+            markLastBlock = showGoalExact,
         )
 
         if (showGoalExact) {
             val targetLocation = currentTarget ?: return
             val lastNode = path.nodes.last().position
             event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
-//             event.drawWaypointFilled(targetLocation, color)
         }
     }
 
