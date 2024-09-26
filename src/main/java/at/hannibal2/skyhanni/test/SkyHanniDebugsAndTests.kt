@@ -137,9 +137,8 @@ object SkyHanniDebugsAndTests {
         }
     }
 
-    private fun asyncTest(args: Array<String>) {
-
-    }
+    @Suppress("EmptyFunctionBlock")
+    private fun asyncTest(args: Array<String>) {}
 
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
@@ -487,8 +486,8 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-    }
+    @Suppress("EmptyFunctionBlock")
+    fun onChat(event: LorenzChatEvent) {}
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
