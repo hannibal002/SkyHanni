@@ -29,6 +29,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import at.hannibal2.skyhanni.utils.TimeUnit
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.block.BlockChest
 import net.minecraft.block.state.IBlockState
@@ -124,7 +126,7 @@ object PowderChestTimer {
         val timeUntil = first.value.timeUntil()
         val color = timeUntil.getColorBasedOnTime().toChatColor()
 
-        return Renderable.string("$color$timeUntil §8(§e$count §b$name§8)")
+        return Renderable.string("$color${timeUntil.format(TimeUnit.SECOND)} §8(§e$count §b$name§8)")
     }
 
     @SubscribeEvent
@@ -140,9 +142,8 @@ object PowderChestTimer {
             if (config.drawTimerOnChest) {
                 val y = if (loc.y <= LocationUtils.playerLocation().y) 1.25 else -0.25
                 event.drawString(
-                    loc.add(y = y, x = 0.5, z = 0.5), "${time.timeUntil()}",
-                    seeThroughBlocks = false,
-                    color = color,
+                    loc.add(y = y, x = 0.5, z = 0.5), time.timeUntil().format(TimeUnit.SECOND),
+                    seeThroughBlocks = false
                 )
             }
 
