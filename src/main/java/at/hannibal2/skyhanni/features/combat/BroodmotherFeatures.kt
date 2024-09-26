@@ -50,7 +50,7 @@ object BroodmotherFeatures {
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
         val newStage = event.widget.matchMatcherFirstLine { group("stage") } ?: ""
-        if (newStage.isNotEmpty()) {
+        if (newStage.isNotEmpty() && newStage != lastStage.toString()) {
             lastStage = currentStage
             currentStage = StageEntry.valueOf(newStage.replace("!", "").uppercase())
             onStageUpdate()
@@ -60,7 +60,7 @@ object BroodmotherFeatures {
     private fun onStageUpdate() {
         ChatUtils.debug("New Broodmother stage: $currentStage")
 
-        if (lastStage == null && onServerJoin()) return
+        if (onServerJoin()) return
 
         // ignore Hypixel bug where the stage may temporarily revert to Imminent after the Broodmother's death
         if (currentStage == StageEntry.IMMINENT && lastStage == StageEntry.ALIVE) return
@@ -91,9 +91,10 @@ object BroodmotherFeatures {
     }
 
     private fun onServerJoin(): Boolean {
+        if (lastStage != null || !config.stageOnJoin) return false
         // don't send if user has config enabled for either of the alive messages
         // this is so that two messages aren't immediately sent upon joining a server
-        if (config.stageOnJoin && !(currentStage == StageEntry.ALIVE && isAliveMessageEnabled())) {
+        if (!(currentStage == StageEntry.ALIVE && isAliveMessageEnabled())) {
             val pluralize = StringUtils.pluralize(currentStage?.minutes ?: 0, "minute")
             var message = "The Broodmother's current stage in this server is ${currentStage.toString().replace("!", "")}§e."
             if (currentStage?.minutes != 0) {
@@ -101,9 +102,8 @@ object BroodmotherFeatures {
             }
             ChatUtils.chat(message)
             return true
-        } else {
-            return false
         }
+        return false
     }
 
     private fun onBroodmotherSpawn() {
