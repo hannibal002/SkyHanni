@@ -25,10 +25,10 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -162,7 +162,7 @@ object ExperimentsProfitTracker {
                 val price = internalName.getPrice()
                 val npcPrice = internalName.getNpcPriceOrNull() ?: 0.0
                 val maxPrice = npcPrice.coerceAtLeast(price)
-                startCostTemp += maxPrice.round(0).toInt()
+                startCostTemp += maxPrice.roundTo(0).toInt()
                 iterator.remove()
             }
             tracker.modify {
