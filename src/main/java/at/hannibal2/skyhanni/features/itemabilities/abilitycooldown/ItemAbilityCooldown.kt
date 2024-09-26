@@ -44,11 +44,11 @@ object ItemAbilityCooldown {
     private val patternGroup = RepoPattern.group("item.abilities.cooldown")
     private val youAlignedOthersPattern by patternGroup.pattern(
         "alignedother",
-        "§eYou aligned §r§a.* §r§eother player(s)?!"
+        "§eYou aligned §r§a.* §r§eother player(s)?!",
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
-        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength",
     )
 
     private var lastAbility = ""
@@ -87,7 +87,7 @@ object ItemAbilityCooldown {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
                             "SHADOW_FURY".asInternalName(),
-                            "STARRED_SHADOW_FURY".asInternalName()
+                            "STARRED_SHADOW_FURY".asInternalName(),
                         )
                     ) return
 
@@ -175,7 +175,7 @@ object ItemAbilityCooldown {
             event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.ROYAL_PIGEON.sound()
             }
-
+            // Wand of Strength
             event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.WAND_OF_STRENGTH.sound()
             }
@@ -183,8 +183,13 @@ object ItemAbilityCooldown {
             event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1.0f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(LorenzColor.DARK_PURPLE, 3_000)
             }
+
             event.soundName == "mob.zombie.remedy" && event.pitch == 1.8888888f && event.volume == 0.7f -> {
                 ItemAbility.TACTICAL_INSERTION.activate(null, 17_000)
+            }
+            // Blaze Slayer Flares
+            event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
+                ItemAbility.SOS_FLARE.sound()
             }
         }
     }
@@ -276,7 +281,7 @@ object ItemAbilityCooldown {
         items = abilityItems.entries.associateByTo(
             mutableMapOf(),
             { it.key.getIdentifier() },
-            { kp -> kp.value.map { createItemText(it) } }
+            { kp -> kp.value.map { createItemText(it) } },
         ).mapKeysNotNull { it.key }
 
     }
