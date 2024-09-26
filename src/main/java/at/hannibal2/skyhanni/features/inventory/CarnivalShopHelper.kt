@@ -39,6 +39,7 @@ object CarnivalShopHelper {
     private var currentEventType: String = ""
     private var tokensOwned: Int = 0
     private var tokensNeeded: Int = 0
+    private var infoItemStack: ItemStack? = null
 
     /**
      * REGEX-TEST:
@@ -74,12 +75,9 @@ object CarnivalShopHelper {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!isEnabled() || eventShops.isEmpty() || currentProgress == null) return
+        if (!isEnabled() || eventShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
         if (!eventShops.any { it.shopName.equals(event.inventory.name, ignoreCase = true) }) return
-        if (event.slot == CUSTOM_STACK_LOCATION) {
-            val progressStack = getCustomItemStack() ?: return
-            event.replace(progressStack)
-        }
+        infoItemStack.let { event.replace(it) }
     }
 
     @SubscribeEvent
@@ -108,39 +106,41 @@ object CarnivalShopHelper {
         processInventoryEvent(event)
     }
 
-    private fun getCustomItemStack(): ItemStack? = currentProgress?.let { progress ->
-        createItemStack(
-            "NAME_TAG".asInternalName().getItemStack().item,
-            "§bRemaining $currentEventType Token Upgrades",
-            *buildList {
-                val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
-                if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
-                else {
-                    add("")
-                    remaining.forEach {
-                        add(
-                            "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
-                                it.remainingCosts.sum().addSeparators()
-                            }",
-                        )
+    private fun regenerateItemStack() {
+        infoItemStack = currentProgress?.let { progress ->
+            createItemStack(
+                "NAME_TAG".asInternalName().getItemStack().item,
+                "§bRemaining $currentEventType Token Upgrades",
+                *buildList {
+                    val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
+                    if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
+                    else {
+                        add("")
+                        remaining.forEach {
+                            add(
+                                "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
+                                    it.remainingCosts.sum().addSeparators()
+                                }",
+                            )
+                        }
+                        add("")
+
+                        val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
+                        add("§7Sum Tokens Needed: §8${upgradeTotal.addSeparators()}")
+                        tokensNeeded = upgradeTotal - tokensOwned
+                        if (tokensOwned > 0) add("§7Tokens Owned: §8${tokensOwned.addSeparators()}")
+                        if (tokensNeeded > 0) add("§7Additional Tokens Needed: §8${tokensNeeded.addSeparators()}")
+                        else addAll(listOf("", "§e§oYou have enough tokens!"))
                     }
-                    add("")
 
-                    val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
-                    add("§7Sum Tokens Needed: §8${upgradeTotal.addSeparators()}")
-                    tokensNeeded = upgradeTotal - tokensOwned
-                    if (tokensOwned > 0) add("§7Tokens Owned: §8${tokensOwned.addSeparators()}")
-                    if (tokensNeeded > 0) add("§7Additional Tokens Needed: §8${tokensNeeded.addSeparators()}")
-                    else addAll(listOf("", "§e§oYou have enough tokens!"))
-                }
-
-                if (progress.nonRepoUpgrades.any()) {
-                    add("")
-                    add("§cFound upgrades not in repo§c§l:")
-                    progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
-                }
-            }.toTypedArray(),
-        )
+                    if (progress.nonRepoUpgrades.any()) {
+                        add("")
+                        add("§cFound upgrades not in repo§c§l:")
+                        progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
+                    }
+                }.toTypedArray(),
+            )
+        }
     }
 
     private fun processInventoryEvent(event: InventoryOpenEvent) {
@@ -149,6 +149,7 @@ object CarnivalShopHelper {
         currentEventType = matchingShop.shopName
         processEventShopUpgrades(event.inventoryItems)
         processTokenShopFooter(event)
+        regenerateItemStack()
     }
 
     private fun processTokenShopFooter(event: InventoryOpenEvent) {
