@@ -57,6 +57,10 @@ object ItemAbilityCooldown {
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
+    private val WARNING_FLARE = "WARNING_FLARE".asInternalName()
+    private val ALERT_FLARE = "ALERT_FLARE".asInternalName()
+    private val SOS_FLARE = "SOS_FLARE".asInternalName()
+
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
@@ -189,7 +193,13 @@ object ItemAbilityCooldown {
             }
             // Blaze Slayer Flares
             event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
-                ItemAbility.SOS_FLARE.sound()
+                val recent = InventoryUtils.recentItemsInHand.values
+                if (WARNING_FLARE in recent || ALERT_FLARE in recent) {
+                    ItemAbility.ALERT_FLARE.sound()
+                }
+                if (SOS_FLARE in recent) {
+                    ItemAbility.SOS_FLARE.sound()
+                }
             }
         }
     }
