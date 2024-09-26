@@ -70,14 +70,14 @@ object BroodmotherFeatures {
             return
         }
 
+        val lastStage = lastStage ?: return
+        val timeUntilSpawn = currentStage?.minutes?.minutes ?: return
+        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn
+
         if (currentStage == StageEntry.IMMINENT && config.imminentWarning) {
             playImminentWarning()
             return
         }
-
-        val lastStage = lastStage ?: return
-        val timeUntilSpawn = currentStage?.minutes?.minutes ?: return
-        broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn
 
         if (currentStage !in config.stages) return
         if (currentStage == StageEntry.SLAIN) {
@@ -158,10 +158,8 @@ object BroodmotherFeatures {
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isCountdownEnabled()) return
 
-        if (broodmotherSpawnTime.isFarPast()) {
-            if (lastStage != null && currentStage == StageEntry.ALIVE) {
-                display = "§4Broodmother spawned!"
-            }
+        if (broodmotherSpawnTime.isFarPast() && currentStage == StageEntry.ALIVE) {
+            display = "§4Broodmother spawned!"
         } else {
             val countdown = broodmotherSpawnTime.timeUntil().format()
             display = "§4Broodmother spawning in §b$countdown"
