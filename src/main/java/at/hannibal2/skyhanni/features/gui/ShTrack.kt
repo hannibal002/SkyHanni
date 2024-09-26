@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
@@ -90,14 +91,17 @@ object ShTrack {
             c.currentFetch = ContextObject.CurrentFetch.INVENTORY; 0
         },
         CommandArgument(
-            "<> - Sets the current amount from collections (Only works with item groups)", "-cc",
-            validity = { validIfItemState(it) && (it.item as? ItemGroup)?.collection?.isNotEmpty() == true },
+            "<> - Sets the current amount from collections (Does also do -m)", "-cc",
+            validity = { validIfItemState(it) },
         ) { _, c ->
-            c.currentFetch = ContextObject.CurrentFetch.COLLECTION; 0
+            c.currentFetch = ContextObject.CurrentFetch.COLLECTION
+            c.multiItem = true
+            0
         },
         CommandArgument("<> - Does not replace the last equivalent tracking instance", "-d") { _, c -> c.allowDupe = true; 0 },
         CommandArgument("<> - Does not delete the tracker on target completion", "-k") { _, c -> c.autoDelete = false; 0 },
         CommandArgument("<> - Sends a notification on completion", "-n") { _, c -> c.notify = true; 0 },
+        CommandArgument("<> - Uses all tiers of an item", "-m", validity = ::validIfItemState) { _, c -> c.multiItem = true; 0 },
     )
 
     object DocumentationExcludes {
@@ -115,6 +119,7 @@ object ShTrack {
         var allowDupe = false
         var autoDelete = true
         var notify = false
+        var multiItem = false
 
         var state: StateType? = null
             set(value) {
@@ -166,11 +171,10 @@ object ShTrack {
 
         override var errorMessage: String? = null
 
-        private fun fetchCollection(it: NEUInternalName): Long =
-            CollectionAPI.getCollectionCounter(it) ?: run {
-                errorMessage = "Collection amount is unknown"
-                0L
-            }
+        private fun fetchCollection(it: NEUInternalName): Long = CollectionAPI.getCollectionCounter(it) ?: run {
+            errorMessage = "Collection amount is unknown"
+            0L
+        }
 
         override fun post() {
             val result: TrackingElement<*>
@@ -206,8 +210,18 @@ object ShTrack {
                         }
 
                         is NEUInternalName -> {
-                            current = currentAmount ?: currentSelector(item)
-                            result = ItemTrackingElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                            if (multiItem) {
+                                val base = NEUItems.getPrimitiveMultiplier(item)
+                                current =
+                                    currentAmount?.let { it * base.amount } ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(
+                                        base.internalName,
+                                    )
+                                    else base.internalName.getMultipleMap().entries.sumOf { currentSelector(it.key) * it.value }
+                                result = ItemsStackElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                            } else {
+                                current = currentAmount ?: currentSelector(item)
+                                result = ItemTrackingElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
+                            }
                         }
 
                         else -> {
@@ -382,8 +396,7 @@ object ShTrack {
         override var current: Long,
         override val target: Long?,
         override val includeSack: Boolean,
-    ) :
-        TrackingElement<Long>(), ItemTrackingInterface {
+    ) : TrackingElement<Long>(), ItemTrackingInterface {
 
         override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemTrackingElement) return false
@@ -418,13 +431,66 @@ object ShTrack {
         }
     }
 
+    private fun NEUInternalName.getMultipleMap() = CollectionAPI.findAllMultiples()[this] ?: mapOf(this to 1)
+
+    private class ItemsStackElement(
+        val main: NEUInternalName,
+        override var current: Long,
+        override val target: Long?,
+        override val includeSack: Boolean,
+    ) : TrackingElement<Long>(), ItemTrackingInterface {
+
+        val map = NEUItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()
+
+        private val mappedCurrent get() = map[main]?.let { current.div(it) } ?: current
+
+        override fun similarElement(other: TrackingElement<*>): Boolean {
+            if (other !is ItemsStackElement) return false
+            return other.main == this.main
+        }
+
+        override fun atRemove() {
+            for (item in map.keys) {
+                itemTrackers[item]?.remove(this)
+            }
+        }
+
+        override fun atAdd() {
+            for (item in map.keys) {
+                itemTrackers.compute(item) { _, v ->
+                    v?.also { it.add(this) } ?: mutableListOf(this)
+                }
+            }
+        }
+
+        override fun internalUpdate(amount: Number) {
+            current += amount.toLong()
+            if (target != null && mappedCurrent >= target) {
+                handleDone("${main.itemName} §adone")
+            }
+        }
+
+        override fun generateLine() = listOf(
+            Renderable.itemStack(main.getItemStack()),
+            Renderable.string(main.itemName),
+
+            Renderable.string(mappedCurrent.toString() + ((target?.let { " / $it" }) ?: "")),
+        )
+
+        override fun itemChange(item: PrimitiveItemStack) {
+            val multiple = map[item.internalName] ?: throw IllegalStateException("You should not be here!")
+            update(item.amount * multiple)
+        }
+    }
+
+    // TODO remove
+    @Deprecated("Not needed anymore")
     private class ItemGroupElement(
         val group: ItemGroup,
         override var current: Long,
         override val target: Long?,
         override val includeSack: Boolean,
-    ) :
-        TrackingElement<Long>(), ItemTrackingInterface {
+    ) : TrackingElement<Long>(), ItemTrackingInterface {
 
         override fun similarElement(other: TrackingElement<*>): Boolean {
             if (other !is ItemGroupElement) return false
