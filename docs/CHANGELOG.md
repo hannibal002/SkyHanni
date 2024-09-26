@@ -151,6 +151,12 @@
 + Added Transfer Cooldown Prevention. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/1751)
     + Wait for the transfer cooldown to complete before sending commands like warp/is/hub.
 + Added highlighting for the active Beacon Effect. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2546)
++ Added navigation command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2575)
+    + Use `/shnavigate <name>` to find interesting locations on your current SkyBlock island by searching for them.
+    + Displays a pathfinder to the location.
+    + Works with NPCs, points of interest, areas, slayer spots, emissaries, crimson mini-bosses, spots to mine ores, break crops, and kill mobs.
+    + Does not yet work with Spider's Den and Dungeon Hub (still needs to be mapped out).
++ Added a message to warp to Winter Island spawn when a Reindrake spawns. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2569)
 
 ### Improvements
 
@@ -162,6 +168,9 @@
 + Some icons in the Mining Event Display now use the texture of the item they represent. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2425)
     + E.g., Raffle Event -> Raffle Ticket.
 + Changed how Powder Tracker works to account for powder buffs. - Jordyrat + Empa (https://github.com/hannibal002/SkyHanni/pull/2394)
++ Added an option to hide all tooltips inside the Fossil Excavator. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2579)
++ Added support for using the Pickobulus ability for the Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2540)
++ Added Area Navigation support to Glacite Tunnels. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2544)
 
 #### Diana Improvements
 
@@ -254,6 +263,7 @@
     + In your inventory, hover over the GUI with your mouse, then start typing to search.
 + Improved the performance of pathfinding logic in Area Navigation. - nea (https://github.com/hannibal002/SkyHanni/pull/2537)
 + Added a toggle to force the `en_US` locale for number formatting. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2563)
++ Queued GfS will now always fall back to a default amount if one is not specified. - Luna (https://github.com/hannibal002/SkyHanni/pull/2584)
 
 ### Fixes
 
@@ -285,6 +295,7 @@
 + Fixed Mouse Keys not working as Wardrobe Slot Hotkeys. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2506)
 + Fixed Estimated Item Value incorrectly showing all Kuudra armor as starred. - Luna (https://github.com/hannibal002/SkyHanni/pull/2550)
 + Fixed Experiments Profit Tracker & Superpair Data. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2560)
++ Fixed price per unit for Stonk of Stonks auction not working for the bracket you are in. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2572)
 
 #### Mining Fixes
 
@@ -306,6 +317,9 @@
 + Fixed Gemstone Gauntlet item category. - Luna (https://github.com/hannibal002/SkyHanni/pull/2534)
 + Fixed Glacite powder being tracked as Glacite in Corpse Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2557)
 + Fixed "Mining Commissions Block Color" disabling OptiFine connected textures. - nopo (https://github.com/hannibal002/SkyHanni/pull/2559)
++ Fixed some blocks in the Crystal Hollows being detected as Mithril instead of Hard Stone. - Luna (https://github.com/hannibal002/SkyHanni/pull/2580)
++ Fixed "Mining Commissions Block Color" causing OptiFine connected textures not to connect properly. - nopo (https://github.com/hannibal002/SkyHanni/pull/2577)
++ Fixed the Mineshaft Pity Counter not working in the Great Glacite Lake. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2565)
 
 #### Scoreboard Fixes
 
@@ -374,6 +388,10 @@
 + Fixed two "Catch a Fish" carnival goals not being properly detected from chat. - Luna (https://github.com/hannibal002/SkyHanni/pull/2517)
 + Fixed the bounding box of baby zombies in Zombie Shootout. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2512)
 
+#### Fishing Fixes
+
++ Fixed error messages while using the Chum Bucket Hider feature. - nea89 (https://github.com/hannibal002/SkyHanni/pull/2587)
+
 #### Misc Fixes
 
 + Fixed Mayor Detection failing when Special Mayors are in office. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2389)
@@ -393,6 +411,7 @@
 + Fixed direct GitHub downloads triggering the source checker. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2548)
 + Fixed reforge display not working with new mining stats. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2555)
 + Fixed Totem of Corruption expiry warning not working in some cases. - Luna (https://github.com/hannibal002/SkyHanni/pull/2554)
++ Fixed a few typos in the config. - rdbt (https://github.com/hannibal002/SkyHanni/pull/2585)
 
 ### Technical Details
 
@@ -447,6 +466,20 @@
 + Improved handling of unknown stats for ReforgeAPI. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2562)
 + Added `AreaChangeEvent`. - Empa (https://github.com/hannibal002/SkyHanni/pull/2535)
 + Updated `HandleEvent` to allow `onlyOnIsland` usage for a single island without brackets. - Empa (https://github.com/hannibal002/SkyHanni/pull/2535)
++ Created a Text method to display a paginated list. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2583)
+    + Moved existing paged lists in `/shcommands` and `/shremind` to use this.
++ Node Tags filter list in Graph Editor now sorts by nodes per tag. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2575)
++ Additional code cleanup around ingredients. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2576)
++ Removed duplicate rounding functions. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/1931)
++ Added HTTP Request Patching. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2578)
++ Removed references to NEU code, especially code from the Utils class in NEU. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2419)
++ Banned importing `io.github.moulberry.notenoughupdates.util.Utils`. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2419)
++ Added common live templates. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2463)
+    + These can be automatically imported via the plugin "Live Templates Sharing".
++ Created and used primitive recipe and ingredient classes. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2460)
+    + These are added as a layer between SkyHanni and NEU so that we are not reliant on NEU functions.
++ Added Blossom Gradle plugin for token replacement in code. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2558)
+    + `@MOD_VERSION@` is now a token that will be replaced.
 
 ### Removed Features
 

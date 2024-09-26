@@ -16,8 +16,8 @@ public class MixinOptifineConnectedTextures {
         return OptifineConnectedTexturesHookKt.modifyConnectedTexturesBlockState(state);
     }
 
-    @ModifyArg(method = "getConnectedTexture", at = @At(value = "INVOKE", target = "skipConnectedTexture"))
-    private static IBlockState modifySkipConnectedTexture(IBlockState state) {
+    @ModifyArg(method = "isNeighbour", at = @At(value = "INVOKE", target = "isNeighbour"), index = 4)
+    private static IBlockState modifyIsNeighbour(IBlockState state) {
         return OptifineConnectedTexturesHookKt.modifyConnectedTexturesBlockState(state);
     }
 }

@@ -24,7 +24,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -41,16 +43,47 @@ import kotlin.time.Duration.Companion.seconds
 object MiningAPI {
 
     private val group = RepoPattern.group("data.miningapi")
-    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Glacite Lake")
+    private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
-    // TODO rename to include suffix "pattern", add regex test
-    private val coldReset by group.pattern(
+    // TODO add regex test
+    private val coldResetPattern by group.pattern(
         "cold.reset",
-        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7.",
+        "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
-    private data class MinedBlock(val ore: OreBlock, var confirmed: Boolean, val time: SimpleTimeMark = SimpleTimeMark.now())
+    private val pickbobulusGroup = group.group("pickobulus")
+
+    /**
+     * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
+     */
+
+    private val pickobulusUsePattern by pickbobulusGroup.pattern(
+        "use",
+        "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
+    )
+
+    // TODO add regex test
+    private val pickobulusEndPattern by pickbobulusGroup.pattern(
+        "end",
+        "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>[\\d,.]+) §r§7blocks!",
+    )
+
+    /**
+     * REGEX-TEST: §7Your §r§aPickobulus §r§7didn't destroy any blocks!
+     */
+    private val pickobulusFailPattern by pickbobulusGroup.pattern(
+        "fail",
+        "§7Your §r§aPickobulus §r§7didn't destroy any blocks!"
+    )
+
+    private data class MinedBlock(val ore: OreBlock, var confirmed: Boolean) {
+        val time: SimpleTimeMark = SimpleTimeMark.now()
+    }
+
+    // normal mining
+    private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
+    private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
 
     private var lastInitSound = SimpleTimeMark.farPast()
 
@@ -60,6 +93,18 @@ object MiningAPI {
     private var waitingForEffMinerSound = false
     private var waitingForEffMinerBlock = false
 
+    // pickobulus
+    private var lastPickobulusUse = SimpleTimeMark.farPast()
+    private var lastPickobulusExplosion = SimpleTimeMark.farPast()
+    private var pickobulusExplosionPos: LorenzVec? = null
+    private val pickobulusMinedBlocks = ConcurrentLinkedQueue<Pair<LorenzVec, OreBlock>>()
+
+    private val pickobulusActive get() = lastPickobulusUse.passedSince() < 2.seconds
+
+    private var pickobulusWaitingForSound = false
+    private var pickobulusWaitingForBlock = false
+
+    // oreblock data
     var inGlacite = false
     var inTunnels = false
     var inMineshaft = false
@@ -72,15 +117,15 @@ object MiningAPI {
     var currentAreaOreBlocks = setOf<OreBlock>()
         private set
 
-    private val recentClickedBlocks = ConcurrentSet<Pair<LorenzVec, SimpleTimeMark>>()
-    private val surroundingMinedBlocks = ConcurrentLinkedQueue<Pair<MinedBlock, LorenzVec>>()
     private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
     var cold: Int = 0
         private set
 
     var lastColdUpdate = SimpleTimeMark.farPast()
+        private set
     var lastColdReset = SimpleTimeMark.farPast()
+        private set
 
     fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isInIsland()
 
@@ -128,10 +173,29 @@ object MiningAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!inColdIsland()) return
-        if (coldReset.matches(event.message)) {
+        if (coldResetPattern.matches(event.message)) {
             updateCold(0)
             lastColdReset = SimpleTimeMark.now()
+            return
         }
+        if (pickobulusUsePattern.matches(event.message)) {
+            lastPickobulusUse = SimpleTimeMark.now()
+            return
+        }
+        if (pickobulusFailPattern.matches(event.message)) {
+            resetPickobulusEvent()
+            pickobulusMinedBlocks.clear()
+            return
+        }
+        pickobulusEndPattern.matchMatcher(event.message) {
+            val amount = group("amount").formatInt()
+            resetPickobulusEvent()
+            val blocks = pickobulusMinedBlocks.take(amount).countBy { it.second }
+            if (blocks.isNotEmpty()) OreMinedEvent(null, blocks).post()
+            pickobulusMinedBlocks.clear()
+            return
+        }
+
     }
 
     @SubscribeEvent
@@ -145,8 +209,18 @@ object MiningAPI {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
+        if (event.soundName == "random.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
+            lastPickobulusExplosion = SimpleTimeMark.now()
+            pickobulusExplosionPos = event.location
+            pickobulusWaitingForSound = true
+            return
+        }
         if (event.soundName !in allowedSoundNames) return
-        //println("Sound: ${event.soundName} ${event.pitch} ${event.volume} ${event.location.toCleanString()}")
+        if (pickobulusActive && pickobulusWaitingForSound) {
+            pickobulusWaitingForSound = false
+            pickobulusWaitingForBlock = true
+            return
+        }
         if (waitingForInitSound) {
             if (event.soundName != "random.orb" && event.pitch == 0.7936508f) {
                 val pos = event.location.roundLocationToBlock()
@@ -180,10 +254,19 @@ object MiningAPI {
         if (newBlock != Blocks.air && newBlock != Blocks.bedrock && !isTitanium(newState)) return
 
         val pos = event.location
-        if (pos.distanceToPlayer() > 7) return
-        //println("Block change: $oldState -> $newState ${pos.toCleanString()}")
+        if (pickobulusActive && pickobulusWaitingForBlock) {
+            val explosionPos = pickobulusExplosionPos ?: return
+            if (explosionPos.distance(pos) > 15) return
+            val ore = OreBlock.getByStateOrNull(oldState) ?: return
+            if (pickobulusMinedBlocks.any { it.first == pos }) return
+            pickobulusMinedBlocks += pos to ore
+            pickobulusWaitingForBlock = false
+            pickobulusWaitingForSound = true
+            return
+        }
 
         if (lastInitSound.passedSince() > 100.milliseconds) return
+        if (pos.distanceToPlayer() > 7) return
 
         val ore = OreBlock.getByStateOrNull(oldState) ?: return
 
@@ -210,10 +293,13 @@ object MiningAPI {
         recentClickedBlocks.removeIf { it.second.passedSince() >= 20.seconds }
         surroundingMinedBlocks.removeIf { it.first.time.passedSince() >= 20.seconds }
 
-        if (waitingForInitSound) return
-        if (lastInitSound.passedSince() < 200.milliseconds) return
-        // in case the init block is not found
-        resetOreEvent()
+        if (!waitingForInitSound && lastInitSound.passedSince() > 200.milliseconds) {
+            resetOreEvent()
+        }
+        if (!lastPickobulusUse.isFarPast() && lastPickobulusUse.passedSince() > 5.seconds) {
+            resetPickobulusEvent()
+            pickobulusMinedBlocks.clear()
+        }
     }
 
     @HandleEvent
@@ -252,8 +338,10 @@ object MiningAPI {
         lastColdReset = SimpleTimeMark.now()
         recentClickedBlocks.clear()
         surroundingMinedBlocks.clear()
+        pickobulusMinedBlocks.clear()
         currentAreaOreBlocks = setOf()
         resetOreEvent()
+        resetPickobulusEvent()
     }
 
     private fun resetOreEvent() {
@@ -262,6 +350,14 @@ object MiningAPI {
         initBlockPos = null
         waitingForEffMinerSound = false
         waitingForEffMinerBlock = false
+    }
+
+    private fun resetPickobulusEvent() {
+        lastPickobulusUse = SimpleTimeMark.farPast()
+        lastPickobulusExplosion = SimpleTimeMark.farPast()
+        pickobulusExplosionPos = null
+        pickobulusWaitingForSound = false
+        pickobulusWaitingForBlock = false
     }
 
     @SubscribeEvent
