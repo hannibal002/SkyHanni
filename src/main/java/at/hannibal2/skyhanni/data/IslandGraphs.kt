@@ -473,7 +473,7 @@ object IslandGraphs {
 
         if (path.nodes.size > 1) {
             val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 5 else 7
-            path = Graph(path.nodes.filter { it.position.distanceToPlayer() > hideNearby })
+            path = Graph(path.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
         }
 //         graph = skipNodes(graph) ?: graph
 
