@@ -74,6 +74,11 @@ public class MiningConfig {
     public MineshaftPityDisplayConfig mineshaftPityDisplay = new MineshaftPityDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Crystal Nucleus Crystal Highlights", desc = "")
+    @Accordion
+    public CrystalHighlighterConfig crystalHighlighter = new CrystalHighlighterConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle

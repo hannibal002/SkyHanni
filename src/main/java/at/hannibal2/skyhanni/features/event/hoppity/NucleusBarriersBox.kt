@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.mining.CrystalHighlighterConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,14 +16,14 @@ import java.awt.Color
 
 @SkyHanniModule
 object NucleusBarriersBox {
-    private val config = SkyHanniMod.feature.event.hoppityEggs
+    private val config = SkyHanniMod.feature.mining.crystalHighlighter
 
-    private enum class Crystal(val color: Color) {
-        AMBER(LorenzColor.GOLD.addOpacity(60)),
-        AMETHYST(LorenzColor.DARK_PURPLE.addOpacity(60)),
-        TOPAZ(LorenzColor.YELLOW.addOpacity(60)),
-        JADE(LorenzColor.GREEN.addOpacity(60)),
-        SAPPHIRE(LorenzColor.BLUE.addOpacity(60)),
+    private enum class Crystal(val color: LorenzColor) {
+        AMBER(LorenzColor.GOLD),
+        AMETHYST(LorenzColor.DARK_PURPLE),
+        TOPAZ(LorenzColor.YELLOW),
+        JADE(LorenzColor.GREEN),
+        SAPPHIRE(LorenzColor.BLUE),
     }
 
     private val crystalCoordinatePairs: MutableMap<Crystal, AxisAlignedBB> = mapOf(
@@ -53,16 +54,21 @@ object NucleusBarriersBox {
         if (!isEnabled()) return
 
         crystalCoordinatePairs.forEach { (crystal, axis) ->
+            val renderColor = when (config.displayType) {
+                CrystalHighlighterConfig.DisplayType.CRYSTAL_COLORS -> crystal.color
+                CrystalHighlighterConfig.DisplayType.CHROMA -> LorenzColor.CHROMA
+                else -> LorenzColor.WHITE
+            }
             RenderUtils.drawFilledBoundingBox_nea(
                 axis,
-                crystal.color,
+                renderColor.addOpacity((config.opacity * 100).toInt()),
                 partialTicks = event.partialTicks,
                 renderRelativeToCamera = false
             )
         }
     }
 
-    private fun isEnabled() = config.drawBarrierBoxes &&
-        HoppityAPI.isHoppityEvent() &&
+    private fun isEnabled() = config.enabled &&
+        (HoppityAPI.isHoppityEvent() || !config.onlyDuringHoppity)&&
         IslandType.CRYSTAL_HOLLOWS.isInIsland()
 }
