@@ -101,7 +101,9 @@ format like "- #821" to illustrate the dependency.
     - `detekt` is our code quality tool. It checks for code smells and style issues.
     - If you have a build failure stating `Analysis failed with ... weighted issues.`, you can check `versions/[target version]/build/reports/detekt/` for a comprehensive list of issues.
     - **There are valid reasons to deviate from the norm**
-        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaseline`. 
+        - If you have such a case, either use `@Supress("rule_name")`, or re-build the `baseline.xml` file, using `./gradlew detektBaselineMain`.
+      After running detektBaselineMain, you should find a file called `baseline-main.xml` in the `version/1.8.9` folder, rename the file to
+     `baseline.xml` replacing the old one. You also should copy the new contents of this file to the [main baseline file](detekt/baseline.xml)
 - Do not copy features from other mods. Exceptions:
     - Mods that are paid to use.
   - Mods that have reached their end of life. (Rip SBA, Dulkir and Soopy).
