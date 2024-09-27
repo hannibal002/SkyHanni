@@ -39,8 +39,8 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
-import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -488,7 +488,7 @@ object ComposterOverlay {
         }
         val havingInInventory = internalName.getAmountInInventory()
         if (havingInInventory >= itemsNeeded) {
-            ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
+            ChatUtils.chat("$itemName §8x$itemsNeeded §ealready found in inventory!")
             return
         }
 

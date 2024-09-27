@@ -106,7 +106,7 @@ object AnitaMedalProfit {
             "§7Item price: §6${itemPrice.shortFormat()} ",
             // TODO add more exact material cost breakdown
             "§7Material cost: §6${fullCost.shortFormat()} ",
-            "§7Final profit: §6${profitFormat} ",
+            "§7Final profit: §6$profitFormat ",
         )
         table.add(
             DisplayTableEntry(

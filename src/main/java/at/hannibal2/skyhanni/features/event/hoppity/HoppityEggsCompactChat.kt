@@ -105,7 +105,7 @@ object HoppityEggsCompactChat {
             "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}$lastName$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
         } else if (newRabbit) {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
-            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7(${lastProfit}§7)"
+            "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7($lastProfit§7)"
         } else "?"
     }
 
