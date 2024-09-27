@@ -111,13 +111,13 @@ object PetAPI {
         if (newPetLine == pet?.rawPetName) return
 
         event.lines.forEach { line ->
-            if (analyseWidgetPetLine(line)) return@forEach
-            if (analyseWidgetStringLine(line, newPetLine)) return@forEach
+            if (analyseWidgetPetLine(line, newPetLine)) return@forEach
+            if (analyseWidgetStringLine(line)) return@forEach
             if (analyseWidgetXPLine(line)) return@forEach
         }
     }
 
-    private fun analyseWidgetPetLine(line: String): Boolean {
+    private fun analyseWidgetStringLine(line: String): Boolean {
         widgetString.matchMatcher(line) {
             val string = group("string")
             if (string == "No pet selected") {
@@ -140,7 +140,7 @@ object PetAPI {
         return false
     }
 
-    private fun analyseWidgetStringLine(line: String, newPetLine: String): Boolean {
+    private fun analyseWidgetPetLine(line: String, newPetLine: String): Boolean {
         petWidget.matchMatcher(line) {
             val xp = levelToXP(
                 group("level").toInt(),
@@ -334,14 +334,14 @@ object PetAPI {
             val isGoldenDragon = input[2].toBooleanStrictOrNull()
             if (level != null && rarity != null && isGoldenDragon != null) {
                 val xp: Int = levelToXP(level, rarity, isGoldenDragon) ?: run {
-                    ChatUtils.chat("bad input. invalid rarity or level")
+                    ChatUtils.userError("bad input. invalid rarity or level")
                     return
                 }
                 ChatUtils.chat(xp.addSeparators())
                 return
             }
         }
-        ChatUtils.chat("bad usage. /shcalcpetxp <level> <rarity> <isGdrag>")
+        ChatUtils.userError("bad usage. /shcalcpetxp <level> <rarity> <isGdrag>")
     }
 
     private fun levelToXP(level: Int, rarity: LorenzRarity, isGoldenDragon: Boolean = false): Int? {
@@ -376,7 +376,7 @@ object PetAPI {
         LorenzRarity.LEGENDARY -> 20
         LorenzRarity.MYTHIC -> 20
         else -> {
-            ChatUtils.chat("bad rarity. ${rarity.name}")
+            ChatUtils.userError("bad rarity. ${rarity.name}")
             null
         }
     }
