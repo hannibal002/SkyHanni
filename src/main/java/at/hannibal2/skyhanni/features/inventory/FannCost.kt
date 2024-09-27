@@ -47,7 +47,7 @@ object FannCost {
     )
     private val coinsPattern by patternGroup.pattern(
         "coin",
-        """(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) Coins""",
+        """(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) Coins(?: \([1-5]% off\))?""",
     )
     private val desiredLevelPatter by patternGroup.pattern(
         "slot24.name.level",
@@ -79,7 +79,7 @@ object FannCost {
                     val totalExp = tooltip.getExpEarned() ?: return
                     val coins = tooltip.getCoins()
                     val coinPerExp = coins / totalExp
-                    tooltip.insertAfterCoin("   §6Coins per XP: ${coinPerExp.roundTo(2)}")
+                    tooltip.insertAfterCoin("   §6Coins/XP: ${coinPerExp.roundTo(2)}")
                 }
             }
 
@@ -92,7 +92,7 @@ object FannCost {
                     val duration = tooltip.getDuration() ?: return
                     val coins = tooltip.getCoins()
                     val coinPerExp = coins / (dailyExp * duration)
-                    tooltip.insertAfterCoin("   §6Coins per XP: ${coinPerExp.roundTo(2)}")
+                    tooltip.insertAfterCoin("   §6Coins/XP: ${coinPerExp.roundTo(2)}")
                 }
             }
         }
