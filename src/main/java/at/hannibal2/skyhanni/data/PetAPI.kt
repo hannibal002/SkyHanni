@@ -19,16 +19,7 @@ object PetAPI {
         "Pets(?: \\(\\d+/\\d+\\) )?",
     )
 
-    private var rawPetName: String? = null
-    private var petEquipped = false
-
-    private var petName: String? = null
-    private var petRarity: LorenzRarity? = null
-    private var petHasSkin: Boolean? = null
-    private var petItem: NEUInternalName? = null
-
-    private var petLevel: Int? = null
-    private var petXP: Double? = null
+    private var pet: PetData? = null
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -70,7 +61,7 @@ object PetAPI {
      */
     private val xpWidget by patternGroup.pattern(
         "widget.xp",
-        "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflowxp>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
+        "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflow>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
     )
 
     private val ignoredPetStrings = listOf(
@@ -111,56 +102,62 @@ object PetAPI {
     fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
     @SubscribeEvent
-    fun onTabUpdate(event: WidgetUpdateEvent) {
+    fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
 
         val newPetLine = event.lines.getOrNull(1) ?: return
-        if (newPetLine == rawPetName) return
+        if (newPetLine == pet?.rawPetName) return
 
-        rawPetName = newPetLine
+        petWidget.matchMatcher(newPetLine) {
+            pet = PetData(
+                group("name"),
+                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
+                NEUInternalName.NONE,
+                group("skin") != null,
+                group("level").toInt(),
+                0.0,
+                newPetLine,
+            )
+        }
 
         widgetString.matchMatcher(newPetLine) {
             val string = group("string")
             if (string == "No pet selected") {
-                removePet()
+                pet = null
                 return
             }
-            petItem = NEUInternalName.fromItemNameOrNull(string)
+            pet = pet?.let {
+                PetData(
+                    it.name,
+                    it.rarity,
+                    NEUInternalName.fromItemNameOrNull(string) ?: NEUInternalName.NONE,
+                    it.hasSkin,
+                    it.level,
+                    it.xp,
+                    it.rawPetName,
+                )
+            }
         }
 
-        petWidget.matchMatcher(newPetLine) {
-            petEquipped = true
-            petName = group("name")
-            petRarity = LorenzRarity.getByColorCode(group("rarity")[0])
-            petLevel = group("level").toInt()
-            petHasSkin = group("skin") != null
-            return
-        }
 
         xpWidget.matchMatcher(newPetLine) {
             //i don't feel like doing this right now
         }
     }
 
-    private fun removePet() {
-        petName = null
-        petLevel = null
-        petRarity = null
-        petHasSkin = null
-        petEquipped = false
-        petItem = null
-    }
-
     @SubscribeEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("PetAPI")
-        event.addIrrelevant {
-            add("petName: '$petName'")
-            add("petRarity: '$petRarity'")
-            add("petLevel: '$petLevel'")
-            add("petHasSkin: '$petHasSkin'")
-            add("petEquipped: '$petEquipped'")
-            add("petItem: '$petItem'")
+        if (pet != null) {
+            event.addIrrelevant {
+                add("petName: '${pet?.name}'")
+                add("petRarity: '${pet?.rarity}'")
+                add("petLevel: '${pet?.level}'")
+                add("petHasSkin: '${pet?.hasSkin}'")
+                add("petItem: '${pet?.petItem}'")
+            }
+        } else {
+            event.addData("no pet equipped")
         }
     }
 }
