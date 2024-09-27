@@ -22,7 +22,7 @@ class OverviewPage(sizeX: Int, sizeY: Int, paddingX: Int = 15, paddingY: Int = 7
     }
 
     // TODO split up this 240 lines function - remove suppression when done
-    @Suppress("CyclomaticComplexMethod")
+    @Suppress("CyclomaticComplexMethod", "LongMethod")
     private fun getPage(): Pair<List<List<Renderable>>, List<Renderable>> {
         val content = mutableListOf<MutableList<Renderable>>()
         val footer = mutableListOf<Renderable>()
