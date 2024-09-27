@@ -1,8 +1,10 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.skyblock.PetChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -53,7 +55,7 @@ object PetAPI {
      */
     private val widgetString by patternGroup.pattern(
         "widget.string",
-        "^ §r§.(?<string>[\\w -]+)\$",
+        "^ §r(?<string>§.[\\w -]+)\$",
     )
 
     /**
@@ -107,58 +109,55 @@ object PetAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
 
-        val newPetLine = event.lines.getOrNull(1) ?: return
+        val newPetLine = event.lines.getOrNull(1)?.removePrefix(" ") ?: return
         if (newPetLine == pet?.rawPetName) return
 
+        var petItem = NEUInternalName.NONE
         event.lines.forEach { line ->
-            if (analyseWidgetPetLine(line, newPetLine)) return@forEach
-            if (analyseWidgetStringLine(line)) return@forEach
+            petItem = analyseWidgetStringLine(line)
+            if (petItem != NEUInternalName.NONE) return@forEach
+        }
+
+        event.lines.forEach { line ->
+            if (analyseWidgetPetLine(line, petItem, newPetLine)) return@forEach
             if (analyseWidgetXPLine(line)) return@forEach
         }
     }
 
-    private fun analyseWidgetStringLine(line: String): Boolean {
-        widgetString.matchMatcher(line) {
-            val string = group("string")
-            if (string == "No pet selected") {
-                pet = null
-                return true
-            }
-            pet = pet?.let {
-                PetData(
-                    it.name,
-                    it.rarity,
-                    NEUInternalName.fromItemNameOrNull(string) ?: NEUInternalName.NONE,
-                    it.hasSkin,
-                    it.level,
-                    it.xp,
-                    it.rawPetName,
-                )
-            }
-            return true
-        }
-        return false
-    }
-
-    private fun analyseWidgetPetLine(line: String, newPetLine: String): Boolean {
+    private fun analyseWidgetPetLine(line: String, petItem: NEUInternalName, newPetLine: String): Boolean {
         petWidget.matchMatcher(line) {
             val xp = levelToXP(
                 group("level").toInt(),
                 LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
                 group("name").contains("Golden Dragon")
             )
-            pet = PetData(
+            val newPet = PetData(
                 group("name"),
                 LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
-                NEUInternalName.NONE,
+                petItem,
                 group("skin") != null,
                 group("level").toInt(),
                 xp?.toDouble() ?: 0.0,
                 newPetLine,
             )
+            PetChangeEvent(pet, newPet).post()
+            pet = newPet
             return true
         }
         return false
+    }
+
+    private fun analyseWidgetStringLine(line: String): NEUInternalName {
+        widgetString.matchMatcher(line) {
+            val string = group("string")
+            if (string == "No pet selected") {
+                PetChangeEvent(pet, null).post()
+                pet = null
+                return NEUInternalName.NONE
+            }
+            return NEUInternalName.fromItemNameOrNull(string) ?: NEUInternalName.NONE
+        }
+        return NEUInternalName.NONE
     }
 
     private fun analyseWidgetXPLine(line: String): Boolean {
@@ -184,23 +183,6 @@ object PetAPI {
             return true
         }
         return false
-    }
-
-    @SubscribeEvent
-    fun onDebug(event: DebugDataCollectEvent) {
-        event.title("PetAPI")
-        if (pet != null) {
-            event.addIrrelevant {
-                add("petName: '${pet?.name}'")
-                add("petRarity: '${pet?.rarity}'")
-                add("petItem: '${pet?.petItem}'")
-                add("petHasSkin: '${pet?.hasSkin}'")
-                add("petLevel: '${pet?.level}'")
-                add("petXP: '${pet?.xp}'")
-            }
-        } else {
-            event.addData("no pet equipped")
-        }
     }
 
     //taken from NEU
@@ -379,5 +361,28 @@ object PetAPI {
             ChatUtils.userError("bad rarity. ${rarity.name}")
             null
         }
+    }
+
+    @SubscribeEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("PetAPI")
+        if (pet != null) {
+            event.addIrrelevant {
+                add("petName: '${pet?.name}'")
+                add("petRarity: '${pet?.rarity}'")
+                add("petItem: '${pet?.petItem}'")
+                add("petHasSkin: '${pet?.hasSkin}'")
+                add("petLevel: '${pet?.level}'")
+                add("petXP: '${pet?.xp}'")
+                add("rawPetLine: '${pet?.rawPetName}'")
+            }
+        } else {
+            event.addData("no pet equipped")
+        }
+    }
+
+    @HandleEvent
+    fun onPetChange(event: PetChangeEvent) {
+        ChatUtils.debug("oldPet: ${event.oldPet}, newPet: ${event.newPet}")
     }
 }
