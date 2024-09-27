@@ -113,31 +113,34 @@ object PetAPI {
         if (newPetLine == pet?.rawPetName) return
 
         var petItem = NEUInternalName.NONE
+        var petXP: Double? = null
         event.lines.forEach { line ->
             petItem = analyseWidgetStringLine(line)
             if (petItem != NEUInternalName.NONE) return@forEach
+            petXP = analyseWidgetXPLine(line)
+            if (petXP == null) return@forEach
         }
 
         event.lines.forEach { line ->
-            if (analyseWidgetPetLine(line, petItem, newPetLine)) return@forEach
-            if (analyseWidgetXPLine(line)) return@forEach
+            if (analyseWidgetPetLine(line, petItem, petXP, newPetLine)) return@forEach
         }
     }
 
-    private fun analyseWidgetPetLine(line: String, petItem: NEUInternalName, newPetLine: String): Boolean {
+    private fun analyseWidgetPetLine(line: String, petItem: NEUInternalName, petXP: Double?, newPetLine: String): Boolean {
+        val xpOverLevel = petXP ?: 0.0
         petWidget.matchMatcher(line) {
-            val xp = levelToXP(
+            val xp = (levelToXP(
                 group("level").toInt(),
                 LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
                 group("name").contains("Golden Dragon")
-            )
+            ))
             val newPet = PetData(
                 group("name"),
                 LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
                 petItem,
                 group("skin") != null,
                 group("level").toInt(),
-                xp?.toDouble() ?: 0.0,
+                (xp?.plus(xpOverLevel)) ?: 0.0,
                 newPetLine,
             )
             PetChangeEvent(pet, newPet).post()
@@ -160,29 +163,16 @@ object PetAPI {
         return NEUInternalName.NONE
     }
 
-    private fun analyseWidgetXPLine(line: String): Boolean {
+    private fun analyseWidgetXPLine(line: String): Double? {
         xpWidget.matchMatcher(line) {
-            if (group("max") != null) return true
+            if (group("max") != null) return null
 
             val overflow = group("overflow")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
             val currentXP = group("currentXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
 
-            val xp = overflow + currentXP
-
-            pet = pet?.let {
-                PetData(
-                    it.name,
-                    it.rarity,
-                    it.petItem,
-                    it.hasSkin,
-                    it.level,
-                    levelToXP(it.level, it.rarity, it.name.contains("Golden Dragon"))?.plus(xp) ?: 0.0,
-                    it.rawPetName,
-                )
-            }
-            return true
+            return overflow + currentXP
         }
-        return false
+        return null
     }
 
     //taken from NEU
