@@ -572,10 +572,10 @@ object ComposterOverlay {
     )
 
     private fun isBlockedArmor(internalName: String): Boolean {
-        return internalName.endsWith("_BOOTS")
-            || internalName.endsWith("_HELMET")
-            || internalName.endsWith("_CHESTPLATE")
-            || internalName.endsWith("_LEGGINGS")
+        return internalName.endsWith("_BOOTS") ||
+            internalName.endsWith("_HELMET") ||
+            internalName.endsWith("_CHESTPLATE") ||
+            internalName.endsWith("_LEGGINGS")
     }
 
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {

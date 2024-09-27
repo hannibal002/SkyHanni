@@ -392,8 +392,8 @@ class MobFinder {
     }
 
     private fun tryAddEntityMagmaCube(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")
-            && entity.hasMaxHealth(200_000_000, true) -> {
+        entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ") &&
+            entity.hasMaxHealth(200_000_000, true) -> {
             EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
         }
 
