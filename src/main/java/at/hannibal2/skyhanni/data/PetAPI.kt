@@ -375,4 +375,96 @@ object PetAPI {
     fun onPetChange(event: PetChangeEvent) {
         ChatUtils.debug("oldPet: ${event.oldPet}, newPet: ${event.newPet}")
     }
+
+
+    // {
+    //   "strikethrough": false,
+    //   "hoverEvent": {
+    //     "action": "show_text",
+    //     "value": {
+    //       "bold": false,
+    //       "italic": false,
+    //       "underlined": false,
+    //       "strikethrough": false,
+    //       "obfuscated": false,
+    //       "color": "red",
+    //       "extra": [
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "green",
+    //           "text": "When:\n"
+    //         },
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "gray",
+    //           "text": "You throw a fishing hook.\n\n"
+    //         },
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "green",
+    //           "text": "Equip: "
+    //         },
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "yellow",
+    //           "text": "⭐ "
+    //         },
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "gray",
+    //           "text": "[Lvl 100] "
+    //         },
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "gold",
+    //           "text": "Scatha\n"
+    //         },
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "green",
+    //           "text": "Held Item: "
+    //         },
+    //         {
+    //           "bold": false,
+    //           "italic": false,
+    //           "underlined": false,
+    //           "strikethrough": false,
+    //           "obfuscated": false,
+    //           "color": "blue",
+    //           "text": "Mining Exp Boost"
+    //         }
+    //       ],
+    //       "text": "Autopet Rule\n\n"
+    //     }
+    //   },
+    //   "text": "§cAutopet §eequipped your §7[Lvl 100] §6Scatha§e! §a§lVIEW RULE"
+    // }
 }
