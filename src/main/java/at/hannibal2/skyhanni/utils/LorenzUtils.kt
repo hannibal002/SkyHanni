@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -100,23 +101,11 @@ object LorenzUtils {
         return originalMessage.stripHypixelMessage()
     }
 
-    fun Double.round(decimals: Int): Double {
-        var multiplier = 1.0
-        repeat(decimals) { multiplier *= 10 }
-        val result = kotlin.math.round(this * multiplier) / multiplier
-        val a = result.toString()
-        val b = toString()
-        return if (a.length > b.length) this else result
-    }
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
+    fun Double.round(decimals: Int) = this.roundTo(decimals)
 
-    fun Float.round(decimals: Int): Float {
-        var multiplier = 1.0
-        repeat(decimals) { multiplier *= 10 }
-        val result = kotlin.math.round(this * multiplier) / multiplier
-        val a = result.toString().length
-        val b = toString().length
-        return if (a > b) this else result.toFloat()
-    }
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
+    fun Float.round(decimals: Int) = this.roundTo(decimals)
 
     // TODO replace all calls with regex
     @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
@@ -300,7 +289,8 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
-    fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && islandTypes.any { it.isInIsland() }
+    fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
+    fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
 
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
@@ -315,6 +305,7 @@ object LorenzUtils {
             this.cancel()
         }
     }
+
     // TODO move into mayor api
     val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 

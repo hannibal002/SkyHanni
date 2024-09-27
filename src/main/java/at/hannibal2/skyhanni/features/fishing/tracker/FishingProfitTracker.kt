@@ -13,10 +13,9 @@ import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -26,6 +25,9 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -119,26 +121,26 @@ object FishingProfitTracker {
         return map
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§e§lFishing Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§e§lFishing Profit Tracker")
         val filter: (NEUInternalName) -> Boolean = addCategories(data)
 
         val profit = tracker.drawItems(data, filter, this)
 
         val fishedCount = data.totalCatchAmount
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§7Times fished: §e${fishedCount.addSeparators()}",
                 listOf("§7You've reeled in §e${fishedCount.addSeparators()} §7catches."),
-            ),
+            ).toSearchable(),
         )
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.totalCatchAmount, "catch"))
+        add(tracker.addTotalProfit(profit, data.totalCatchAmount, "catch"))
 
         tracker.addPriceFromButton(this)
     }
 
-    private fun MutableList<List<Any>>.addCategories(data: Data): (NEUInternalName) -> Boolean {
+    private fun MutableList<Searchable>.addCategories(data: Data): (NEUInternalName) -> Boolean {
         val amounts = getCurrentCategories(data)
         checkMissingItems(data)
         val list = amounts.keys.toList()

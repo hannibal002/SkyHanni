@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -25,6 +25,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -171,32 +173,32 @@ object SlayerProfitTracker {
         return internalName in allowedList
     }
 
-    private fun drawDisplay(data: Data) = buildList<List<Any>> {
+    private fun drawDisplay(data: Data) = buildList<Searchable> {
         val tracker = getTracker() ?: return@buildList
-        addAsSingletonList("§e§l$itemLogCategory Profit Tracker")
+        addSearchString("§e§l$itemLogCategory Profit Tracker")
 
         var profit = tracker.drawItems(data, { true }, this)
         val slayerSpawnCost = data.slayerSpawnCost
         if (slayerSpawnCost != 0L) {
             val slayerSpawnCostFormat = slayerSpawnCost.shortFormat()
-            addAsSingletonList(
+            add(
                 Renderable.hoverTips(
                     " §7Slayer Spawn Costs: §c$slayerSpawnCostFormat",
                     listOf("§7You paid §c$slayerSpawnCostFormat §7in total", "§7for starting the slayer quests."),
-                ),
+                ).toSearchable(),
             )
             profit += slayerSpawnCost
         }
 
         val slayerCompletedCount = data.slayerCompletedCount
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§7Bosses killed: §e${slayerCompletedCount.addSeparators()}",
                 listOf("§7You killed the $itemLogCategory boss", "§e${slayerCompletedCount.addSeparators()} §7times."),
-            ),
+            ).toSearchable(),
         )
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
+        add(tracker.addTotalProfit(profit, data.slayerCompletedCount, "boss"))
 
         tracker.addPriceFromButton(this)
     }
