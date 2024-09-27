@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils.mob
@@ -26,9 +27,11 @@ object AshfangManager {
 
     private val ashfangMobs = mutableSetOf<Mob>()
     var ashfang: Mob? = null
+        private set
     var lastSpawnTime = SimpleTimeMark.farPast()
-
-    fun isAshfangActive() = ashfang != null
+        private set
+    
+    val active get() = ashfang != null
 
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
@@ -69,10 +72,10 @@ object AshfangManager {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
-        if (!isAshfangActive()) return
-        if (!config.hide.fullNames) return
-        if (event.entity.mob !in ashfangMobs) return
-        event.cancel()
+        if (!active || !config.hide.fullNames) return
+        val mob = event.entity.mob ?: return
+        if (mob !in ashfangMobs) return
+        if (mob.baseEntity.isAtFullHealth()) event.cancel()
     }
 
     @SubscribeEvent

@@ -36,5 +36,5 @@ object AshfangNextResetCooldown {
         event.move(2, "ashfang.nextResetCooldownPos", "crimsonIsle.ashfang.nextResetCooldownPos")
     }
 
-    private fun isEnabled() = AshfangManager.isAshfangActive() && config.nextResetCooldown
+    private fun isEnabled() = AshfangManager.active && config.nextResetCooldown
 }

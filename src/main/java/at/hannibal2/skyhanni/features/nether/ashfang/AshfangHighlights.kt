@@ -38,7 +38,7 @@ object AshfangHighlights {
 
     @HandleEvent(onlyOnSkyblock = true, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onEntityJoin(event: EntityEnterWorldEvent<EntityArmorStand>) {
-        if (!AshfangManager.isAshfangActive()) return
+        if (!AshfangManager.active) return
         val entity = event.entity
         DelayedRun.runNextTick {
             when {
@@ -56,7 +56,7 @@ object AshfangHighlights {
 
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!AshfangManager.isAshfangActive()) return
+        if (!AshfangManager.active) return
 
         if (config.blazingSouls.enabled) {
             val color = config.blazingSouls.color.toChromaColor()
