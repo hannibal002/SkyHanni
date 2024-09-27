@@ -110,23 +110,19 @@ object PetAPI {
         val newPetLine = event.lines.getOrNull(1) ?: return
         if (newPetLine == pet?.rawPetName) return
 
-        petWidget.matchMatcher(newPetLine) {
-            pet = PetData(
-                group("name"),
-                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
-                NEUInternalName.NONE,
-                group("skin") != null,
-                group("level").toInt(),
-                0.0,
-                newPetLine,
-            )
+        event.lines.forEach { line ->
+            if (analyseWidgetPetLine(line)) return@forEach
+            if (analyseWidgetStringLine(line, newPetLine)) return@forEach
+            if (analyseWidgetXPLine(line)) return@forEach
         }
+    }
 
-        widgetString.matchMatcher(newPetLine) {
+    private fun analyseWidgetPetLine(line: String): Boolean {
+        widgetString.matchMatcher(line) {
             val string = group("string")
             if (string == "No pet selected") {
                 pet = null
-                return
+                return true
             }
             pet = pet?.let {
                 PetData(
@@ -139,12 +135,55 @@ object PetAPI {
                     it.rawPetName,
                 )
             }
+            return true
         }
+        return false
+    }
 
-
-        xpWidget.matchMatcher(newPetLine) {
-            //i don't feel like doing this right now
+    private fun analyseWidgetStringLine(line: String, newPetLine: String): Boolean {
+        petWidget.matchMatcher(line) {
+            val xp = levelToXP(
+                group("level").toInt(),
+                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
+                group("name").contains("Golden Dragon")
+            )
+            pet = PetData(
+                group("name"),
+                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
+                NEUInternalName.NONE,
+                group("skin") != null,
+                group("level").toInt(),
+                xp?.toDouble() ?: 0.0,
+                newPetLine,
+            )
+            return true
         }
+        return false
+    }
+
+    private fun analyseWidgetXPLine(line: String): Boolean {
+        xpWidget.matchMatcher(line) {
+            if (group("max") != null) return true
+
+            val overflow = group("overflow")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+            val currentXP = group("currentXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+
+            val xp = overflow + currentXP
+
+            pet = pet?.let {
+                PetData(
+                    it.name,
+                    it.rarity,
+                    it.petItem,
+                    it.hasSkin,
+                    it.level,
+                    levelToXP(it.level, it.rarity, it.name.contains("Golden Dragon"))?.plus(xp) ?: 0.0,
+                    it.rawPetName,
+                )
+            }
+            return true
+        }
+        return false
     }
 
     @SubscribeEvent
