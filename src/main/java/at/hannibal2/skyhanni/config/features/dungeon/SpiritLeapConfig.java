@@ -9,7 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SpiritLeapConfig {
     public final String defaultColor = "0:200:0:0:0";
-    public final String deadPlayerColor = "0:200:120:0:0";
+    public final String deadColor = "0:200:120:0:0";
 
     @Expose
     @ConfigOption(name = "Enable Spirit Leap Overlay", desc = "Enable Spirit Leap Overlay inside Dungeons.")
@@ -56,7 +56,7 @@ public class SpiritLeapConfig {
     @ConfigOption(name = "Reset Colors", desc = "Restores the class highlighter colors to their default settings.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable resetColors = () -> {
-        deadTeammateColor = deadPlayerColor;
+        deadTeammateColor = deadColor;
         archerClassColor = defaultColor;
         mageClassColor = defaultColor;
         berserkClassColor = defaultColor;
