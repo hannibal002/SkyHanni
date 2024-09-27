@@ -70,8 +70,8 @@ object DungeonSpiritLeapOverlay {
         return if (layout.isNotEmpty()) {
             Renderable.table(
                 layout,
-                xPadding = 15,
-                yPadding = 15,
+                xPadding = 18,
+                yPadding = 18,
                 horizontalAlign = HorizontalAlignment.CENTER,
                 verticalAlign = VerticalAlignment.CENTER
             )
@@ -141,7 +141,7 @@ object DungeonSpiritLeapOverlay {
                 ),
                 verticalAlign = VerticalAlignment.CENTER,
                 color = backgroundColor.toChromaColor(),
-                radius = 4,
+                radius = 7,
                 smoothness = 10,
                 padding = 5
             ),
