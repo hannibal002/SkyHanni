@@ -10,9 +10,9 @@ object UtilsPatterns {
     private val patternGroup = RepoPattern.group("utils")
 
     /** Examples:
-    §d§l§ka§r §d§l§d§lMYTHIC ACCESSORY §d§l§ka
-    §d§l§ka§r §d§l§d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
-    §c§l§ka§r §c§l§c§lVERY SPECIAL HATCESSORY §c§l§ka
+    §d§l§ka§r §d§lMYTHIC ACCESSORY §d§l§ka
+    §d§l§ka§r §d§lSHINY MYTHIC DUNGEON CHESTPLATE §d§l§ka
+    §c§l§ka§r §c§lVERY SPECIAL HATCESSORY §c§l§ka
     §6§lSHINY LEGENDARY DUNGEON BOOTS
     §6§lLEGENDARY DUNGEON BOOTS
     §5§lEPIC BOOTS
