@@ -130,14 +130,16 @@ object UnknownLinesHandler {
         SbPattern.carnivalAccuracyPattern,
         SbPattern.carnivalKillsPattern,
     )
+    private var remoteOnlyPatternsAdded = false
 
     fun handleUnknownLines() {
         val sidebarLines = CustomScoreboard.activeLines
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
-        if (::remoteOnlyPatterns.isInitialized) {
+        if (::remoteOnlyPatterns.isInitialized && !remoteOnlyPatternsAdded) {
             patternsToExclude.addAll(remoteOnlyPatterns)
+            remoteOnlyPatternsAdded = true
         }
 
         unknownLines = unknownLines.filterNot { line ->
