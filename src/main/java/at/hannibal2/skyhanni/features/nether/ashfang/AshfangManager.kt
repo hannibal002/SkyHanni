@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
 import at.hannibal2.skyhanni.utils.LorenzColor

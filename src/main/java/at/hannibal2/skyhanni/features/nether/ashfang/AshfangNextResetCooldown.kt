@@ -18,8 +18,8 @@ object AshfangNextResetCooldown {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (AshfangManager.lastSpawnTime.isFarPast()) return
         val nextSpawn = AshfangManager.lastSpawnTime + ashfangResetTime
-        if (nextSpawn.isFarPast()) return
 
         val format = if (nextSpawn.isInPast()) "§aNow!"
         else "§b${nextSpawn.timeUntil().format(TimeUnit.SECOND, showMilliSeconds = true)}"

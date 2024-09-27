@@ -158,13 +158,15 @@ object MobDetection {
 
     private fun canBeSeen(mob: Mob): Boolean {
         val isVisible = !mob.isInvisible() && mob.canBeSeen()
-        if (isVisible) when (mob.mobType) {
-            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
-            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
-            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
-            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
-            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
-            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        if (isVisible) {
+            when (mob.mobType) {
+                Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+                Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+                Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+                Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+                Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+            }.postAndCatch()
         }
         return isVisible
     }
