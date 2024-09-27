@@ -4,11 +4,8 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -49,6 +46,10 @@ object FannCost {
         "coin",
         """(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) Coins(?: \([1-5]% off\))?""",
     )
+    private val bitsPattern by patternGroup.pattern(
+        "bits",
+        """(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) Bits""",
+    )
     private val desiredLevelPatter by patternGroup.pattern(
         "slot24.name.level",
         "Desired Level: (200|1?[0-9]?[0-9])",
@@ -74,25 +75,29 @@ object FannCost {
             TrainingMode.DAY_COUNT -> {
                 if (trainingType != null) {
                     if (trainingType == TrainingType.FREE) return
-                    if (!showCoins) return
+                    if (!showCoins || !showBits) return
 
                     val totalExp = tooltip.getExpEarned() ?: return
-                    val coins = tooltip.getCoins()
-                    val coinPerExp = coins / totalExp
-                    tooltip.insertAfterCoin("   §6Coins/XP: ${coinPerExp.roundTo(2)}")
+                    val coinPerExp = tooltip.getCoins() / totalExp
+                    val xpPerBit = totalExp / tooltip.getBits()
+
+                    tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
+                    tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
                 }
             }
 
             TrainingMode.UNTIL_LEVEL -> {
                 if (trainingType != null) {
                     if (trainingType == TrainingType.FREE) return
-                    if (!showCoins) return
+                    if (!showCoins || !showBits) return
 
                     val dailyExp = tooltip.getDailyExp() ?: return
                     val duration = tooltip.getDuration() ?: return
-                    val coins = tooltip.getCoins()
-                    val coinPerExp = coins / (dailyExp * duration)
-                    tooltip.insertAfterCoin("   §6Coins/XP: ${coinPerExp.roundTo(2)}")
+                    val totalExp = dailyExp * duration
+                    val coinPerExp = tooltip.getCoins() / totalExp
+                    val xpPerBit = totalExp / tooltip.getBits()
+                    tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
+                    tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
                 }
             }
         }
@@ -112,11 +117,11 @@ object FannCost {
         }
     }
 
-    private fun MutableList<String>.insertAfterCoin(content: String) {
+    private fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
         val iter = this.listIterator()
         while (iter.hasNext()) {
             val line = iter.next().removeColor()
-            if (coinsPattern.matcher(line).find()) {
+            if (pattern.matcher(line).find()) {
                 iter.add(content)
             }
         }
@@ -137,6 +142,10 @@ object FannCost {
 
     private fun List<String>.getCoins(): Double {
         return coinsPattern.read(this) { it._toDouble() } ?: 0.0
+    }
+
+    private fun List<String>.getBits(): Double {
+        return bitsPattern.read(this) { it._toDouble() } ?: 1.0
     }
 
     private fun List<String>.getExpEarned(): Double? {
