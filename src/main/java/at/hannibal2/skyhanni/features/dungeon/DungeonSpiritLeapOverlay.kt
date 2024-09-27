@@ -34,9 +34,10 @@ object DungeonSpiritLeapOverlay {
 
     @SubscribeEvent
     fun onSpiritLeapGuiDraw(event: GuiContainerEvent.PreDraw) {
+        if (!isEnabled()) return
+
         val gui = event.gui
-        if (gui !is GuiChest || !isOverlayEnabled()) return
-        if (InventoryUtils.openInventoryName().removeColor() != "Spirit Leap") return
+        if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() != "Spirit Leap") return
 
         containerWidth = gui.width
         containerHeight = gui.height
@@ -64,8 +65,6 @@ object DungeonSpiritLeapOverlay {
         event.cancel()
     }
 
-    private fun isOverlayEnabled(): Boolean = config.enabled && DungeonAPI.inDungeon()
-
     private fun createSpiritLeapOverlay(): Renderable {
         val layout = leapRenderItems.take(4).chunked(2)
         return if (layout.isNotEmpty()) {
@@ -77,14 +76,18 @@ object DungeonSpiritLeapOverlay {
                 verticalAlign = VerticalAlignment.CENTER
             )
         } else {
-            Renderable.wrappedString(width = (containerWidth * 0.8).toInt(), text = "No targets available for leap.", scale = scaleFactor * 3)
+            Renderable.wrappedString(
+                width = (containerWidth * 0.8).toInt(),
+                text = "No targets available for leap.",
+                scale = scaleFactor * 3
+            )
         }
     }
 
     private fun createLeapItem(item: ItemStack, username: String, slotNumber: Int): Renderable {
         val player = DungeonAPI.getPlayerInfo(username)
         val classInfo = buildString {
-            if (player.dungeonClass != DungeonAPI.DungeonClass.UNKNOWN) {
+            if (player.dungeonClass != null) {
                 append(player.dungeonClass.scoreboardName)
                 if (config.showDungeonClassLevel) append(" ${player.classLevel}")
                 if (player.playerDead) append(" (Dead)")
@@ -101,9 +104,16 @@ object DungeonSpiritLeapOverlay {
 
         val playerInfoRenderable = Renderable.verticalContainer(
             listOf(
-                Renderable.wrappedString(username, width = (containerWidth * 0.2).toInt(), scale = scaleFactor + 1.5),
+                Renderable.wrappedString(
+                    username,
+                    width = (containerWidth * 0.25).toInt(),
+                    scale = scaleFactor + 1.5),
                 Renderable.placeholder(0, (containerHeight * 0.03).toInt()),
-                Renderable.wrappedString(classInfo, width = (containerWidth * 0.2).toInt(), scale = (scaleFactor * 0.9) + 1.1)
+                Renderable.wrappedString(
+                    classInfo,
+                    width = (containerWidth * 0.25).toInt(),
+                    scale = (scaleFactor * 0.9) + 1.1
+                )
             ),
             horizontalAlign = HorizontalAlignment.CENTER,
             verticalAlign = VerticalAlignment.CENTER
@@ -111,9 +121,9 @@ object DungeonSpiritLeapOverlay {
 
         val buttonLayout = Renderable.horizontalContainer(
             listOf(
-                Renderable.placeholder((containerWidth * 0.007).toInt(), 0),
+                Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
                 itemRenderable,
-                Renderable.placeholder((containerWidth * 0.009).toInt(), 0),
+                Renderable.placeholder((containerWidth * 0.01).toInt(), 0),
                 playerInfoRenderable
             ),
             verticalAlign = VerticalAlignment.CENTER
@@ -141,14 +151,20 @@ object DungeonSpiritLeapOverlay {
 
     private val deadTeammateColor = config.deadTeammateColor
 
-    private fun getClassColor(dungeonClass: DungeonAPI.DungeonClass): String {
+    private fun getClassColor(dungeonClass: DungeonAPI.DungeonClass?): String {
         return when (dungeonClass) {
             DungeonAPI.DungeonClass.ARCHER -> config.archerClassColor
             DungeonAPI.DungeonClass.MAGE -> config.mageClassColor
             DungeonAPI.DungeonClass.BERSERK -> config.berserkClassColor
             DungeonAPI.DungeonClass.TANK -> config.tankClassColor
             DungeonAPI.DungeonClass.HEALER -> config.healerClassColor
-            DungeonAPI.DungeonClass.UNKNOWN -> config.defaultColor
+            else -> config.defaultColor
         }
     }
+
+    private fun isEnabled() =
+        config.enabled &&
+        DungeonAPI.inDungeon() &&
+        DungeonAPI.started &&
+        !DungeonAPI.completed
 }

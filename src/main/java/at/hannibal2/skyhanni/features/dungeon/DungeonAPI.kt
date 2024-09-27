@@ -225,6 +225,7 @@ object DungeonAPI {
         playerClass = null
         playerClassLevel = -1
         completed = false
+        playerTeamClasses.clear()
         DungeonBlessings.reset()
     }
 
@@ -348,12 +349,11 @@ object DungeonAPI {
         HEALER("Healer"),
         MAGE("Mage"),
         TANK("Tank"),
-        UNKNOWN("Unknown");
+        ;
+
 
         companion object {
-            fun getByClassName(className: String): DungeonClass? {
-                return entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
-            }
+            fun getByClassName(className: String) = DungeonClass.entries.firstOrNull { it.scoreboardName.equals(className, ignoreCase = true) }
         }
     }
 
@@ -370,7 +370,6 @@ object DungeonAPI {
             fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
         }
     }
-
 
     @SubscribeEvent
     fun onBlockClick(event: BlockClickEvent) {
@@ -397,7 +396,7 @@ object DungeonAPI {
 
     data class TeamMember(
         val username: String,
-        val dungeonClass: DungeonClass = DungeonClass.UNKNOWN,
+        val dungeonClass: DungeonClass? = null,
         val classLevel: Int = 0,
         val playerDead: Boolean = false
     )
@@ -407,15 +406,14 @@ object DungeonAPI {
     fun getPlayerInfo(username: String): TeamMember =
         playerTeamClasses.find { it.username == username.removeColor() } ?: TeamMember(username)
 
-
     private val playerClassRegex by patternGroup.pattern(
-        "tablist.playerteam",
-        "§8\\[§.§.\\d+\\§.§.] §.§.(?<username>\\w+)[^\\(\\]]*§r§f\\(§r§d(§.§.)?(?<class>Archer|Mage|Berserk|Tank|Healer|DEAD)(?:\\s*(?<level>[IVXLCDM0]+)?§r§f)?\\)"
+        "dungeon.tablist.playerteam",
+        "§8\\[§.§.\\d+§.§.] §.§.(?<username>\\w+)[^(\\]]*§r§f\\(§r§d(§.§.)?(?<class>Archer|Mage|Berserk|Tank|Healer|DEAD)(?:\\s*(?<level>[IVXLCDM0]+)?§r§f)?\\)"
     )
 
     @SubscribeEvent
     fun onTabUpdate(event: TabListUpdateEvent) {
-        if (!inDungeon() && !started) return
+        if (!inDungeon() || !started || completed) return
 
         val updatedTeamMembers = mutableListOf<TeamMember>()
 
