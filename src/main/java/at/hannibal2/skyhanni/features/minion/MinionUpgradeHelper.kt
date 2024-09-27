@@ -71,20 +71,30 @@ object MinionUpgradeHelper {
         val itemPrice = itemName.asInternalName().getPriceOrNull() ?: 0.0
 
         val displayName = "§bGet required items"
+
         val lore = buildList {
             val itemsRemaining = itemsNeeded - itemsInSacks
+            val totalCost = itemsNeeded * itemPrice
+            val remainingCost = itemsRemaining * itemPrice
+
+            add("")
+
             if (itemsInSacks > 0) {
-                if (itemsRemaining > 0) {
-                    add("§7You have §a${itemsInSacks}§7x §b$itemName §7in your sacks")
-                } else {
-                    add("§7Retrieve §a${itemsNeeded}§7x §b$itemName §7from your sacks")
-                }
+                add("§7In sacks: §a${itemsInSacks}§7x §b$itemName")
             }
+
             if (itemsRemaining > 0) {
-                add("§7Buy §a${itemsRemaining}§7x §b$itemName §7from the Bazaar")
-                if (itemsInSacks > 0) add("§7Remaining Items Cost: §6${(itemsRemaining * itemPrice).shortFormat()} §7coins")
+                add("§7From Bazaar: §a${itemsRemaining}§7x §b$itemName")
+                add("§7Cost: §6${remainingCost.shortFormat()} §7coins")
+            } else {
+                add("§7All items in sacks")
             }
-            add("§7Total Cost: §6${(itemsNeeded * itemPrice).shortFormat()} §7coins")
+
+            add("")
+            add("§7Total: §6${totalCost.shortFormat()} §7coins")
+
+            add("")
+            add(if (itemsRemaining > 0) "§e§oClick to open Bazaar" else "§e§oClick to retrieve items from the sacks")
         }
 
         val diamondBlockItemStack = ItemStack(Item.getItemFromBlock(Blocks.diamond_block), 1)
