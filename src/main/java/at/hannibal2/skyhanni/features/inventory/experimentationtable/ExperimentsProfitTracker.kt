@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottleChatPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottlePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentRenewPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experimentsDropPattern
@@ -129,7 +130,7 @@ object ExperimentsProfitTracker {
     private fun LorenzChatEvent.handleDrop(reward: String) {
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
-            experienceBottlePattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
+            experienceBottleChatPattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"
             listOf("Metaphysical Serum", "Experiment The Fish").contains(reward) && ExperimentMessages.MISC.isSelected() -> "MISC_DROP"
             ExperimentMessages.ENCHANTMENTS.isSelected() -> "ENCHANT_DROP"
             else -> ""
@@ -143,7 +144,7 @@ object ExperimentsProfitTracker {
         }
 
         val internalName = NEUInternalName.fromItemNameOrNull(reward) ?: return
-        if (!experienceBottlePattern.matches(reward)) tracker.addItem(internalName, 1, false)
+        if (!experienceBottleChatPattern.matches(reward)) tracker.addItem(internalName, 1, false)
         else DelayedRun.runDelayed(100.milliseconds) { handleExpBottles(true) }
     }
 
@@ -155,7 +156,7 @@ object ExperimentsProfitTracker {
         ) return
         val stack = event.slot?.stack ?: return
 
-        experienceBottlePattern.matchMatcher(stack.displayName.removeColor()) {
+        if (experienceBottlePattern.matches(stack.getInternalName().asString())) {
             tracker.modify {
                 it.startCost -= calculateBottlePrice(stack.getInternalName())
             }
@@ -166,7 +167,7 @@ object ExperimentsProfitTracker {
     fun onItemClick(event: ItemClickEvent) {
         if (isEnabled() && event.clickType == ClickType.RIGHT_CLICK) {
             val item = event.itemInHand ?: return
-            if (experienceBottlePattern.matches(item.displayName.removeColor())) {
+            if (experienceBottlePattern.matches(item.getInternalName().asString())) {
                 lastSplashTime = SimpleTimeMark.now()
                 lastSplashes.add(item)
             }
