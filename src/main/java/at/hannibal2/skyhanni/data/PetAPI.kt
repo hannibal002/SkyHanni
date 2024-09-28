@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.PetChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,6 +13,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -68,6 +70,36 @@ object PetAPI {
         "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflow>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
     )
 
+    /**
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §6Scatha§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 99] §6Flying Fish§e! §a§lVIEW RULE
+     * REGEX-TEST: §cAutopet §eequipped your §7[Lvl 100] §dBlack Cat§d ✦§e! §a§lVIEW RULE
+     */
+    private val autopetMessage by patternGroup.pattern(
+        "chat.autopet",
+        "^§cAutopet §eequipped your §7(?<pet>\\[Lvl \\d{1,3}] §.[\\w ]+)(?:§. ✦)?§e! §a§lVIEW RULE\$"
+    )
+
+    /**
+     * REGEX-TEST: §r, §aEquip: §r, §7[Lvl 99] §r, §6Flying Fish
+     * REGEX-TEST: §r, §aEquip: §r, §e⭐ §r, §7[Lvl 100] §r, §dBlack Cat§r, §d ✦
+     * REGEX-TEST: §r, §aEquip: §r, §7[Lvl 47] §r, §5Lion
+     */
+    private val autopetHoverPet by patternGroup.pattern(
+        "chat.autopet.hover.pet",
+        "^§r, §aEquip: §r,(?: §e⭐ §r,)? §7\\[Lvl (?<level>\\d+)] §r, §(?<rarity>.)(?<pet>[\\w ]+)(?:§r, (?<skin>§. ✦))?\$"
+    )
+
+    /**
+     * REGEX-TEST: §r, §aHeld Item: §r, §9Mining Exp Boost§r]
+     * REGEX-TEST: §r, §aHeld Item: §r, §5Lucky Clover§r]
+     * REGEX-TEST: §r, §aHeld Item: §r, §5Fishing Exp Boost§r]
+     */
+    private val autopetHoverPetItem by patternGroup.pattern(
+        "chat.autopet.hover.item",
+        "^§r, §aHeld Item: §r, (?<item>§.[\\w -]+)§r]\$"
+    )
+
     private val ignoredPetStrings = listOf(
         "Archer",
         "Berserk",
@@ -105,6 +137,7 @@ object PetAPI {
 
     fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
+// ---
     @SubscribeEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
@@ -115,18 +148,24 @@ object PetAPI {
         var petItem = NEUInternalName.NONE
         var petXP: Double? = null
         event.lines.forEach { line ->
-            petItem = analyseWidgetStringLine(line)
-            if (petItem != NEUInternalName.NONE) return@forEach
-            petXP = analyseWidgetXPLine(line)
-            if (petXP == null) return@forEach
+            val tempPetItem = handleWidgetStringLine(line)
+            if (tempPetItem != NEUInternalName.NONE) {
+                petItem = tempPetItem
+                return@forEach
+            }
+            val tempPetXP = handleWidgetXPLine(line)
+            if (tempPetXP != null) {
+                petXP = tempPetXP
+                return@forEach
+            }
         }
 
         event.lines.forEach { line ->
-            if (analyseWidgetPetLine(line, petItem, petXP, newPetLine)) return@forEach
+            if (handleWidgetPetLine(line, petItem, petXP, newPetLine)) return@forEach
         }
     }
 
-    private fun analyseWidgetPetLine(line: String, petItem: NEUInternalName, petXP: Double?, newPetLine: String): Boolean {
+    private fun handleWidgetPetLine(line: String, petItem: NEUInternalName, petXP: Double?, newPetLine: String): Boolean {
         val xpOverLevel = petXP ?: 0.0
         petWidget.matchMatcher(line) {
             val xp = (levelToXP(
@@ -134,23 +173,24 @@ object PetAPI {
                 LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
                 group("name").contains("Golden Dragon")
             ))
-            val newPet = PetData(
-                group("name"),
-                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
-                petItem,
-                group("skin") != null,
-                group("level").toInt(),
-                (xp?.plus(xpOverLevel)) ?: 0.0,
-                newPetLine,
+
+            fireEvent(
+                PetData(
+                    group("name"),
+                    LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
+                    petItem,
+                    group("skin") != null,
+                    group("level").toInt(),
+                    (xp?.plus(xpOverLevel)) ?: 0.0,
+                    newPetLine,
+                )
             )
-            PetChangeEvent(pet, newPet).post()
-            pet = newPet
             return true
         }
         return false
     }
 
-    private fun analyseWidgetStringLine(line: String): NEUInternalName {
+    private fun handleWidgetStringLine(line: String): NEUInternalName {
         widgetString.matchMatcher(line) {
             val string = group("string")
             if (string == "No pet selected") {
@@ -163,7 +203,7 @@ object PetAPI {
         return NEUInternalName.NONE
     }
 
-    private fun analyseWidgetXPLine(line: String): Double? {
+    private fun handleWidgetXPLine(line: String): Double? {
         xpWidget.matchMatcher(line) {
             if (group("max") != null) return null
 
@@ -171,6 +211,60 @@ object PetAPI {
             val currentXP = group("currentXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
 
             return overflow + currentXP
+        }
+        return null
+    }
+
+    @SubscribeEvent
+    fun onAutopet(event: LorenzChatEvent) {
+        if (!autopetMessage.matches(event.message)) return
+
+        val hoverMessage = buildList {
+            event.chatComponent.hover?.siblings?.forEach {
+                add(it.formattedText)
+            }
+        }.toString().split("\n")
+
+        var petItem = NEUInternalName.NONE
+        for (it in hoverMessage) {
+            val item = handleAutopetItemMessage(it)
+            if (item != null) {
+                petItem = item
+                break
+            }
+        }
+        hoverMessage.forEach {
+            if (handleAutopetMessage(it, petItem)) return
+        }
+    }
+
+    private fun handleAutopetMessage(string: String, petItem: NEUInternalName): Boolean {
+        autopetHoverPet.matchMatcher(string) {
+            val level = group("level").toInt()
+            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
+            val petName = group("pet")
+            val hasSkin = group("skin") != null
+
+            val fakePetLine = "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (hasSkin) "§r${group("skin")}" else ""}"
+
+            val newPet = PetData(
+                petName,
+                rarity,
+                petItem,
+                hasSkin,
+                level,
+                levelToXP(level, rarity) ?: 0.0,
+                fakePetLine,
+            )
+            fireEvent(newPet)
+            return true
+        }
+        return false
+    }
+
+    private fun handleAutopetItemMessage(string: String): NEUInternalName? {
+        autopetHoverPetItem.matchMatcher(string) {
+            return NEUInternalName.fromItemNameOrNull(group("item"))
         }
         return null
     }
@@ -299,13 +393,13 @@ object PetAPI {
         1886700
     )
 
-    fun testLeveltoXP(input: Array<String>) {
+    fun testLevelToXP(input: Array<String>) {
         if (input.size == 3) {
             val level = input[0].toIntOrNull()
             val rarity = LorenzRarity.getByName(input[1])
             val isGoldenDragon = input[2].toBooleanStrictOrNull()
             if (level != null && rarity != null && isGoldenDragon != null) {
-                val xp: Int = levelToXP(level, rarity, isGoldenDragon) ?: run {
+                val xp: Double = levelToXP(level, rarity, isGoldenDragon) ?: run {
                     ChatUtils.userError("bad input. invalid rarity or level")
                     return
                 }
@@ -316,14 +410,14 @@ object PetAPI {
         ChatUtils.userError("bad usage. /shcalcpetxp <level> <rarity> <isGdrag>")
     }
 
-    private fun levelToXP(level: Int, rarity: LorenzRarity, isGoldenDragon: Boolean = false): Int? {
+    private fun levelToXP(level: Int, rarity: LorenzRarity, isGoldenDragon: Boolean = false): Double? {
         val rarityOffset = getRarityOffset(rarity) ?: return null
         if (!isValidLevel(level, isGoldenDragon)) return null
 
         return if (isGoldenDragon && level > 100) {
-            pet_levels.slice(0 + rarityOffset..<100 + rarityOffset - 1).sum() + getGdragXP(level - 100)
+            pet_levels.slice(0 + rarityOffset..<100 + rarityOffset - 1).sum() + getGoldenDragonXP(level - 100).toDouble()
         } else {
-            pet_levels.slice(0 + rarityOffset..<level + rarityOffset - 1).sum()
+            pet_levels.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
         }
     }
 
@@ -332,7 +426,7 @@ object PetAPI {
         else level in 1..100
     }
 
-    private fun getGdragXP(levelAbove100: Int): Int {
+    private fun getGoldenDragonXP(levelAbove100: Int): Int {
         return when (levelAbove100) {
             1 -> 0
             2 -> 5555
@@ -351,6 +445,11 @@ object PetAPI {
             ChatUtils.userError("bad rarity. ${rarity.name}")
             null
         }
+    }
+
+    private fun fireEvent(newPet: PetData?) {
+        PetChangeEvent(pet, newPet).post()
+        pet = newPet
     }
 
     @SubscribeEvent
@@ -376,95 +475,12 @@ object PetAPI {
         ChatUtils.debug("oldPet: ${event.oldPet}, newPet: ${event.newPet}")
     }
 
-
-    // {
-    //   "strikethrough": false,
-    //   "hoverEvent": {
-    //     "action": "show_text",
-    //     "value": {
-    //       "bold": false,
-    //       "italic": false,
-    //       "underlined": false,
-    //       "strikethrough": false,
-    //       "obfuscated": false,
-    //       "color": "red",
-    //       "extra": [
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "green",
-    //           "text": "When:\n"
-    //         },
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "gray",
-    //           "text": "You throw a fishing hook.\n\n"
-    //         },
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "green",
-    //           "text": "Equip: "
-    //         },
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "yellow",
-    //           "text": "⭐ "
-    //         },
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "gray",
-    //           "text": "[Lvl 100] "
-    //         },
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "gold",
-    //           "text": "Scatha\n"
-    //         },
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "green",
-    //           "text": "Held Item: "
-    //         },
-    //         {
-    //           "bold": false,
-    //           "italic": false,
-    //           "underlined": false,
-    //           "strikethrough": false,
-    //           "obfuscated": false,
-    //           "color": "blue",
-    //           "text": "Mining Exp Boost"
-    //         }
-    //       ],
-    //       "text": "Autopet Rule\n\n"
-    //     }
-    //   },
-    //   "text": "§cAutopet §eequipped your §7[Lvl 100] §6Scatha§e! §a§lVIEW RULE"
-    // }
+    private fun comparePet(input: PetData, other: PetData): Boolean {
+        return input.name == other.name &&
+            input.rarity == other.rarity &&
+            input.petItem == other.petItem &&
+            input.hasSkin == other.hasSkin &&
+            input.level == other.level &&
+            input.rawPetName == other.rawPetName
+    } //leaves xp out on purpose, because the data might not be up to date
 }

@@ -505,7 +505,7 @@ object Commands {
         registerCommand(
             "shcalcpetxp",
             "Gets the pet xp from a given level and rarity.",
-        ) { PetAPI.testLeveltoXP(it) }
+        ) { PetAPI.testLevelToXP(it) }
     }
 
     private fun developersCodingHelp() {
