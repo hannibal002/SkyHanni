@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.reflect.KMutableProperty0
+import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -27,13 +28,13 @@ import kotlin.time.DurationUnit
 @SkyHanniModule
 object BroodmotherFeatures {
 
-    enum class StageEntry(private val str: String, val minutes: Int) {
-        SLAIN("§eSlain", 10),
-        DORMANT("§eDormant", 9),
-        SOON("§6Soon", 6),
-        AWAKENING("§6Awakening", 3),
-        IMMINENT("§4Imminent", 1),
-        ALIVE("§4Alive!", 0);
+    enum class StageEntry(private val str: String, val duration: Duration) {
+        SLAIN("§eSlain", 10.minutes),
+        DORMANT("§eDormant", 9.minutes),
+        SOON("§6Soon", 6.minutes),
+        AWAKENING("§6Awakening", 3.minutes),
+        IMMINENT("§4Imminent", 1.minutes),
+        ALIVE("§4Alive!", 0.minutes);
 
         override fun toString() = str
     }
@@ -71,7 +72,7 @@ object BroodmotherFeatures {
         }
 
         val lastStage = lastStage ?: return
-        val timeUntilSpawn = currentStage?.minutes?.minutes ?: return
+        val timeUntilSpawn = currentStage?.duration ?: return
         broodmotherSpawnTime = SimpleTimeMark.now() + timeUntilSpawn
 
         if (currentStage == StageEntry.IMMINENT && config.imminentWarning) {
@@ -95,10 +96,12 @@ object BroodmotherFeatures {
         // don't send if user has config enabled for either of the alive messages
         // this is so that two messages aren't immediately sent upon joining a server
         if (!(currentStage == StageEntry.ALIVE && isAliveMessageEnabled())) {
-            val pluralize = StringUtils.pluralize(currentStage?.minutes ?: 0, "minute")
+            val duration = currentStage?.duration
+            val minutes = duration?.inWholeMinutes?.toInt() ?: 0
+            val pluralize = StringUtils.pluralize(minutes, "minute")
             var message = "The Broodmother's current stage in this server is ${currentStage.toString().replace("!", "")}§e."
-            if (currentStage?.minutes != 0) {
-                message += " It will spawn §bwithin ${currentStage?.minutes} $pluralize§e."
+            if (duration != 0.minutes) {
+                message += " It will spawn §bwithin $duration $pluralize§e."
             }
             ChatUtils.chat(message)
             return true
