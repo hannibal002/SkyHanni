@@ -143,107 +143,67 @@ object PowderChestTimer {
                 val y = if (loc.y <= LocationUtils.playerLocation().y) 1.25 else -0.25
                 event.drawString(
                     loc.add(y = y, x = 0.5, z = 0.5), time.timeUntil().format(TimeUnit.SECOND),
-                    seeThroughBlocks = false
+                    seeThroughBlocks = false,
                 )
             }
 
-            when (config.lineMode) {
-                PowderChestTimerConfig.LineMode.OLDEST -> {
-                    val sorted = chestSet.sortedBy { it.value.timeUntil() }
-                    if (sorted.isNotEmpty()) {
-                        val chestToConnect = sorted.take(config.drawLineToChestAmount)
-                        if (chestToConnect.isNotEmpty()) {
-                            val (firstPos, firstTime) = chestToConnect.first()
-                            event.draw3DLine(
-                                event.exactPlayerEyeLocation(),
-                                firstPos.getMiddle(),
-                                firstTime.timeUntil().getColorBasedOnTime(),
-                                3,
-                                true,
-                            )
+            val sorted = when (config.lineMode) {
+                PowderChestTimerConfig.LineMode.OLDEST -> chestSet.sortedBy { it.value.timeUntil() }
+                PowderChestTimerConfig.LineMode.NEAREST -> chestSet.sortedBy { it.key.distanceToPlayer() }
+                else -> continue
+            }
 
-                            for (i in 0 until chestToConnect.size - 1) {
-                                val (current, currentTime) = chestToConnect[i]
-                                val (next, _) = chestToConnect[i + 1]
+            if (sorted.isNotEmpty()) {
+                val chestToConnect = sorted.take(config.drawLineToChestAmount)
+                if (chestToConnect.isNotEmpty()) {
+                    val (firstPos, firstTime) = chestToConnect.first()
+                    event.draw3DLine(
+                        event.exactPlayerEyeLocation(),
+                        firstPos.getMiddle(),
+                        firstTime.timeUntil().getColorBasedOnTime(),
+                        3,
+                        true,
+                    )
 
-                                val currentUtil = currentTime.timeUntil()
+                    for (i in 0 until chestToConnect.size - 1) {
+                        val (current, currentTime) = chestToConnect[i]
+                        val (next, _) = chestToConnect[i + 1]
 
-                                val currentColor = currentUtil.getColorBasedOnTime()
+                        val currentUtil = currentTime.timeUntil()
+                        val currentColor = currentUtil.getColorBasedOnTime()
 
-                                event.draw3DLine(
-                                    current.getMiddle(),
-                                    next.getMiddle(),
-                                    currentColor,
-                                    3,
-                                    true,
-                                )
-                            }
-                        }
+                        event.draw3DLine(
+                            current.getMiddle(),
+                            next.getMiddle(),
+                            currentColor,
+                            3,
+                            true,
+                        )
                     }
                 }
-
-                PowderChestTimerConfig.LineMode.NEAREST -> {
-                    val sorted = chestSet.sortedBy { it.key.distanceToPlayer() }
-                    if (sorted.isNotEmpty()) {
-                        val chestToConnect = sorted.take(config.drawLineToChestAmount)
-                        if (chestToConnect.isNotEmpty()) {
-                            val (firstPos, firstTime) = chestToConnect.first()
-                            event.draw3DLine(
-                                event.exactPlayerEyeLocation(),
-                                firstPos.getMiddle(),
-                                firstTime.timeUntil().getColorBasedOnTime(),
-                                3,
-                                true,
-                            )
-
-                            for (i in 0 until chestToConnect.size - 1) {
-                                val (current, currentTime) = chestToConnect[i]
-                                val (next, _) = chestToConnect[i + 1]
-
-                                val currentUntil = currentTime.timeUntil()
-
-                                event.draw3DLine(
-                                    current.getMiddle(),
-                                    next.getMiddle(),
-                                    currentUntil.getColorBasedOnTime(),
-                                    3,
-                                    true,
-                                )
-                            }
-                        }
-                    }
-                }
-
-                else -> {}
             }
         }
     }
 
     private fun Color.toChatColor(): String {
-        return when (this) {
-            Color.RED -> "§4"
-            Color.GREEN -> "§a"
-            Color.ORANGE -> "§6"
-            else -> ""
+        return when {
+            red in 0..127 && green in 127..255 -> "§a"
+            red in 127..212 && green in 42..127 -> "§6"
+            red in 212..230 && green in 25..42 -> "§c"
+            red in 230..255 && green in 0..25 -> "§4"
+            else -> "§f"
         }
     }
 
     private fun Duration.getColorBasedOnTime(): Color {
-        val totalTime = inWholeSeconds
+        val maxDuration = 60.seconds
 
-        return when {
-            totalTime > 30 -> {
-                Color.GREEN
-            }
+        val ratio = (inWholeMilliseconds.toDouble() / maxDuration.inWholeMilliseconds).coerceIn(0.0, 1.0)
 
-            totalTime in 11..30 -> {
-                Color.ORANGE
-            }
+        val red = (255 * (1 - ratio)).toInt()
+        val green = (255 * ratio).toInt()
 
-            else -> {
-                Color.RED
-            }
-        }
+        return Color(red, green, 0)
     }
 
     private fun LorenzVec.getMiddle() = add(0.5, 0.5, 0.5)
