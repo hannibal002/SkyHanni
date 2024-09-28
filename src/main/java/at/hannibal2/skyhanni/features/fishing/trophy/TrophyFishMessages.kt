@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignFormat
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
+import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -14,10 +15,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.ordinal
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TrophyFishMessages {
@@ -49,6 +52,21 @@ object TrophyFishMessages {
         if (shouldBlockTrophyFish(rarity, amount)) {
             event.blockedReason = "low_trophy_fish"
             return
+        }
+        if (config.goldAlert) {
+            if (rawRarity == "gold") {
+                val text = "$displayName\n$displayRarity ${amount}!"
+                LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
+                if (config.playSound) SoundUtils.playBeepSound()
+            }
+        }
+
+        if (config.diamondAlert) {
+            if (rawRarity == "diamond") {
+                val text = "$displayName\n$displayRarity ${amount}!"
+                LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
+                if (config.playSound) SoundUtils.playBeepSound()
+            }
         }
 
         val original = event.chatComponent
