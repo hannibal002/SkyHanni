@@ -21,6 +21,10 @@ object RiftAPI {
 
     val farmingTool by lazy { "FARMING_WAND".asInternalName() }
 
+    private val blowgun by lazy  { "BERBERIS_BLOWGUN".asInternalName() }
+
+    val ItemStack.isBlowgun get() = getInternalName() == blowgun
+
     fun ItemStack.motesNpcPrice(): Double? {
         val baseMotes = motesPrice[getInternalName()] ?: return null
         val burgerStacks = config.motes.burgerStacks
@@ -28,9 +32,12 @@ object RiftAPI {
         return pricePer * stackSize
     }
 
+    var inRiftRace = false
+    var showButtons = false
+
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"
     fun inStillgoreChateau() = LorenzUtils.skyBlockArea.let { it == "Stillgore Château" || it == "Oubliette" }
     fun inDreadfarm() = LorenzUtils.skyBlockArea == "Dreadfarm"
-    fun inWestVillage() = LorenzUtils.skyBlockArea == "West Village"
+    fun inWestVillage() = LorenzUtils.skyBlockArea.let { it == "West Village" || it == "Infested House" }
 }

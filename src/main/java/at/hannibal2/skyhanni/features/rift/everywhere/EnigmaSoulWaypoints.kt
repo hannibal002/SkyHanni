@@ -89,6 +89,9 @@ object EnigmaSoulWaypoints {
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
             event.makePickblock()
+            if ("Buttons" in inventoryUnfound) {
+                RiftAPI.showButtons = !RiftAPI.showButtons
+            }
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
                 adding = false
@@ -106,6 +109,10 @@ object EnigmaSoulWaypoints {
         event.makePickblock()
         val name = split.last()
         if (!soulLocations.contains(name)) return
+
+        if (name == "Buttons") {
+            RiftAPI.showButtons = !RiftAPI.showButtons
+        }
 
         if (!trackedSouls.contains(name)) {
             ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
