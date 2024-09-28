@@ -81,7 +81,7 @@ object WoodenButtonsHelper {
         val graph = IslandGraphs.currentIslandGraph ?: return
 
         val closestNode = graph.nodes
-            .filter { it.tags.contains(GraphNodeTag.RIFT_BUTTONS) }
+            .filter { it.tags.contains(GraphNodeTag.RIFT_BUTTONS_QUEST) }
             .filter { node ->
                 val spotName = "${node.name}:${node.position}"
                 val buttonsAtSpot = buttonLocations[spotName] ?: return@filter false
