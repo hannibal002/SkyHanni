@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -19,7 +20,7 @@ object PrecisionMiningHighlight {
 
     @SubscribeEvent
     fun onParticle(event: ReceiveParticleEvent) {
-        if (!(IslandType.CRYSTAL_HOLLOWS.isInIsland() || IslandType.DWARVEN_MINES.isInIsland() || IslandType.MINESHAFT.isInIsland())) return
+        if (!MiningAPI.inCustomMiningIsland()) return
 
         if (event.type == EnumParticleTypes.VILLAGER_HAPPY) {
             lookingAt = true
