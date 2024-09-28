@@ -1,14 +1,14 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.jsonobjects.repo.PetsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.PetChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -39,7 +39,7 @@ object PetAPI {
     private var inPetMenu = false
 
     private var xpLeveling: List<Int> = listOf()
-    private var xpLevelingGoldenDragon: List<Int> = listOf()
+    private var xpLevelingCustom: List<Int> = listOf()
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -230,7 +230,7 @@ object PetAPI {
             val xp = (levelToXP(
                 group("level").toInt(),
                 LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
-                group("name").contains("Golden Dragon")
+                group("name")
             ))
 
             fireEvent(
@@ -312,7 +312,7 @@ object PetAPI {
                 petItem,
                 hasSkin,
                 level,
-                levelToXP(level, rarity) ?: 0.0,
+                levelToXP(level, rarity, petName) ?: 0.0,
                 fakePetLine,
             )
             fireEvent(newPet)
@@ -401,12 +401,12 @@ object PetAPI {
     }
 
     fun testLevelToXP(input: Array<String>) {
-        if (input.size == 3) {
+        if (input.size >= 3) {
             val level = input[0].toIntOrNull()
             val rarity = LorenzRarity.getByName(input[1])
-            val isGoldenDragon = input[2].toBooleanStrictOrNull()
-            if (level != null && rarity != null && isGoldenDragon != null) {
-                val xp: Double = levelToXP(level, rarity, isGoldenDragon) ?: run {
+            val petName = input.slice(2..<input.size).joinToString(" ")
+            if (level != null && rarity != null) {
+                val xp: Double = levelToXP(level, rarity, petName) ?: run {
                     ChatUtils.userError("bad input. invalid rarity or level")
                     return
                 }
@@ -417,11 +417,11 @@ object PetAPI {
         ChatUtils.userError("bad usage. /shcalcpetxp <level> <rarity> <isGdrag>")
     }
 
-    private fun levelToXP(level: Int, rarity: LorenzRarity, isGoldenDragon: Boolean = false): Double? {
-        val rarityOffset = getRarityOffset(rarity) ?: return null
-        if (!isValidLevel(level, isGoldenDragon)) return null
+    private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String = ""): Double? {
+        val rarityOffset = getRarityOffset(rarity, petName) ?: return null
+        if (!isValidLevel(level, petName == "Golden Dragon")) return null
 
-        return if (isGoldenDragon && level > 100) {
+        return if (petName == "Golden Dragon" && level > 100) {
             xpLeveling.slice(0 + rarityOffset..<100 + rarityOffset - 1).sum() + getGoldenDragonXP(level - 100).toDouble()
         } else {
             xpLeveling.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
@@ -434,19 +434,22 @@ object PetAPI {
     }
 
     private fun getGoldenDragonXP(levelAbove100: Int): Int {
-        return xpLevelingGoldenDragon.slice(0..<levelAbove100).sum()
+        return xpLevelingCustom.slice(0..<levelAbove100).sum() //todo fix
     }
 
-    private fun getRarityOffset(rarity: LorenzRarity): Int? = when (rarity) {
-        LorenzRarity.COMMON -> 0
-        LorenzRarity.UNCOMMON -> 6
-        LorenzRarity.RARE -> 11
-        LorenzRarity.EPIC -> 16
-        LorenzRarity.LEGENDARY -> 20
-        LorenzRarity.MYTHIC -> 20
-        else -> {
-            ChatUtils.userError("bad rarity. ${rarity.name}")
-            null
+    private fun getRarityOffset(rarity: LorenzRarity, pet: String = ""): Int? {
+        if (pet == "Bingo") return 0
+        return when (rarity) {
+            LorenzRarity.COMMON -> 0
+            LorenzRarity.UNCOMMON -> 6
+            LorenzRarity.RARE -> 11
+            LorenzRarity.EPIC -> 16
+            LorenzRarity.LEGENDARY -> 20
+            LorenzRarity.MYTHIC -> 20
+            else -> {
+                ChatUtils.userError("bad rarity. ${rarity.name}")
+                null
+            }
         }
     }
 
@@ -474,10 +477,12 @@ object PetAPI {
     }
 
     @SubscribeEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<PetsJson>("Pets")
-        xpLeveling = data.xpLeveling
-        xpLevelingGoldenDragon = data.xpLevelingGoldenDragon
+    fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
+        val data = event.getConstant<NEUPetsJson>("pets")
+        xpLeveling = data.pet_levels
+        val xpLevelingCustomJson = data.custom_pet_leveling.getAsJsonObject("GOLDEN_DRAGON").getAsJsonArray("pet_levels")
+
+        xpLevelingCustom = xpLevelingCustomJson.map { it.asInt }
     }
 
     @HandleEvent
