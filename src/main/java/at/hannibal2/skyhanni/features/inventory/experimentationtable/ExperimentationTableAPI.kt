@@ -123,6 +123,14 @@ object ExperimentationTableAPI {
     )
 
     /**
+     * REGEX-TEST: Remaining Clicks: 22
+     */
+    val remainingClicksPattern by patternGroup.pattern(
+        "clicks",
+        "Remaining Clicks: (?<clicks>\\d+)"
+    )
+
+    /**
      * REGEX-TEST: ☕ You renewed the experiment table! (1/3)
      */
     val experimentRenewPattern by patternGroup.pattern(
