@@ -302,13 +302,13 @@ object MobDetection {
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
                 MobData.logger.log(
-                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
-                        + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
-                        + "\n Position: ${retry.entity.getLorenzVec()}\n "
-                        + "DistanceC: ${
-                        entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
-                    }\n"
-                        + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
+                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n " +
+                        "is already Found: ${MobData.entityToMob[retry.entity] != null})." +
+                        "\n Position: ${retry.entity.getLorenzVec()}\n " +
+                        "DistanceC: ${
+                            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                        }\n" +
+                        "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
                         "}",
                 )
                 // Uncomment this to make it closed a loop

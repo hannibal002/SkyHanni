@@ -94,8 +94,7 @@ open class Enchant : Comparable<Enchant> {
         return if (this.isUltimate()) -1 else 1
     }
 
-    class Normal : Enchant() {
-    }
+    class Normal : Enchant()
 
     class Ultimate : Enchant() {
         override fun getFormat(level: Int, itemStack: ItemStack?) = "§d§l"
