@@ -58,6 +58,7 @@ private class UndetectedScoreboardLines(message: String) : Exception(message)
 object UnknownLinesHandler {
 
     internal lateinit var remoteOnlyPatterns: Array<Pattern>
+    private var remoteOnlyPatternsAdded = false
 
     fun handleUnknownLines() {
         with(ScoreboardPattern) {
@@ -179,8 +180,6 @@ object UnknownLinesHandler {
                 carnivalAccuracyPattern,
                 carnivalKillsPattern,
             )
-
-            var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
             if (::remoteOnlyPatterns.isInitialized && !remoteOnlyPatternsAdded) {
                     patternsToExclude.addAll(remoteOnlyPatterns)
