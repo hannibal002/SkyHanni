@@ -92,7 +92,7 @@ object WoodenButtonsHelper {
         if (closestNode != currentSpot) {
             currentSpot = closestNode
             currentSpot?.let {
-                IslandGraphs.pathFind(it.position, config.color.toChromaColor())
+                IslandGraphs.pathFind(it.position, "Button Spot", config.color.toChromaColor())
             }
         }
     }
@@ -147,7 +147,7 @@ object WoodenButtonsHelper {
         if (event.message == "§eYou've hit all §r§b56 §r§ewooden buttons!") {
             RiftAPI.allButtonsHit = true
             hitButtons.addAll(buttonLocations.values.flatten().filter { it !in hitButtons })
-            soulLocations["Buttons"]?.let { IslandGraphs.pathFind(it, config.color.toChromaColor()) }
+            soulLocations["Buttons"]?.let { IslandGraphs.pathFind(it, "Buttons Enigma Soul", config.color.toChromaColor()) }
         }
     }
 
