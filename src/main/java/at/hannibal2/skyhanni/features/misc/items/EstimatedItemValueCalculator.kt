@@ -62,6 +62,7 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
+// TODO split into smaler sub classes
 @Suppress("LargeClass")
 object EstimatedItemValueCalculator {
 
@@ -130,12 +131,13 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
-    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } && listOf(
-        "CHESTPLATE",
-        "LEGGINGS",
-        "HELMET",
-        "BOOTS",
-    ).any { internalName.endsWith(it) })
+    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } &&
+        listOf(
+            "CHESTPLATE",
+            "LEGGINGS",
+            "HELMET",
+            "BOOTS",
+        ).any { internalName.endsWith(it) })
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
