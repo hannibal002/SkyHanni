@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.PetChangeEvent
@@ -26,6 +28,8 @@ object PetAPI {
     )
 
     private var pet: PetData? = null
+
+    private var inPetMenu = false
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -112,14 +116,19 @@ object PetAPI {
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
 
     // Contains color code + name and for older SkyHanni users maybe also the pet level
+    @Deprecated(message = "use PetAPI.pet.name")
     var currentPet: String?
         get() = ProfileStorageData.profileSpecific?.currentPet?.takeIf { it.isNotEmpty() }
         set(value) {
             ProfileStorageData.profileSpecific?.currentPet = value
         }
 
+    @Deprecated(message = "use PetAPI.pet.rawPetName",
+        replaceWith = ReplaceWith("pet.name.contains(petName) ?: false", "at.hannibal2.skyhanni.data.PetAPI.pet")
+    )
     fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false
 
+    @Deprecated(message = "use PetAPI.pet.rawPetName")
     fun getCleanName(nameWithLevel: String): String? {
         petItemName.matchMatcher(nameWithLevel) {
             return group("name")
@@ -131,10 +140,12 @@ object PetAPI {
         return null
     }
 
+    @Deprecated(message = "use PetAPI.pet.level")
     fun getPetLevel(nameWithLevel: String): Int? = petItemName.matchMatcher(nameWithLevel) {
         group("level").toInt()
     }
 
+    @Deprecated(message = "use PetAPI.pet.name")
     fun hasPetName(name: String): Boolean = petItemName.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
 // ---
@@ -267,6 +278,16 @@ object PetAPI {
             return NEUInternalName.fromItemNameOrNull(group("item"))
         }
         return null
+    }
+
+    @SubscribeEvent
+    fun onOpenInventory(event: InventoryFullyOpenedEvent) {
+        inPetMenu = isPetMenu(event.inventoryName)
+    }
+
+    @SubscribeEvent
+    fun onCloseInventory(event: InventoryCloseEvent) {
+        inPetMenu = false
     }
 
     //taken from NEU
@@ -474,13 +495,4 @@ object PetAPI {
     fun onPetChange(event: PetChangeEvent) {
         ChatUtils.debug("oldPet: ${event.oldPet}, newPet: ${event.newPet}")
     }
-
-    private fun comparePet(input: PetData, other: PetData): Boolean {
-        return input.name == other.name &&
-            input.rarity == other.rarity &&
-            input.petItem == other.petItem &&
-            input.hasSkin == other.hasSkin &&
-            input.level == other.level &&
-            input.rawPetName == other.rawPetName
-    } //leaves xp out on purpose, because the data might not be up to date
 }
