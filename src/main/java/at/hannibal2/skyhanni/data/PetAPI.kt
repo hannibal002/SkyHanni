@@ -3,13 +3,18 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.PetChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -17,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -28,7 +34,6 @@ object PetAPI {
     )
 
     private var pet: PetData? = null
-
     private var inPetMenu = false
 
     /**
@@ -42,6 +47,36 @@ object PetAPI {
     private val neuRepoPetItemName by patternGroup.pattern(
         "item.name.neu.format",
         "(?:§f§f)?§7\\[Lvl (?:1➡(?:100|200)|\\{LVL})] (?<name>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §e⭐ §7[Lvl 100] §6Ender Dragon
+     * REGEX-TEST: §e⭐ §7[Lvl 100] §dBlack Cat§d ✦
+     * REGEX-TEST: §7[Lvl 100] §6Mole
+     */
+    private val petNameMenu by patternGroup.pattern(
+        "menu.pet.name",
+        "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$"
+    )
+
+    /**
+     * REGEX-TEST: §6Held Item: §9Mining Exp Boost
+     * REGEX-TEST: §6Held Item: §fAll Skills Exp Boost
+     * REGEX-TEST: §6Held Item: §9Dwarf Turtle Shelmet
+     */
+    private val petItemMenu by patternGroup.pattern(
+        "menu.pet.item",
+        "^§6Held Item: (?<item>§.[\\w -]+)\$"
+    )
+
+    /**
+     * REGEX-TEST: §7Progress to Level 45: §e94.4%
+     * REGEX-TEST: §8▸ 25,396,280 XP
+     * REGEX-TEST: §7Progress to Level 58: §e3.3%
+     */
+    private val petXPMenu by patternGroup.pattern(
+        "menu.pet.xp",
+        "§.(?:Progress to Level (?<level>\\d+): §e(?<percentage>[\\d.]+)%|▸ (?<totalXP>[\\d,.]+) XP)\$"
     )
 
     /**
@@ -128,7 +163,6 @@ object PetAPI {
     )
     fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false
 
-    @Deprecated(message = "use PetAPI.pet.rawPetName")
     fun getCleanName(nameWithLevel: String): String? {
         petItemName.matchMatcher(nameWithLevel) {
             return group("name")
@@ -153,7 +187,8 @@ object PetAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
 
-        val newPetLine = event.lines.getOrNull(1)?.removePrefix(" ") ?: return
+        val newPetLine = event.lines.getOrNull(1)?.removePrefix(" ") ?: return //TODO don't hardcode this
+        println("'${pet?.rawPetName}' '$newPetLine'")
         if (newPetLine == pet?.rawPetName) return
 
         var petItem = NEUInternalName.NONE
@@ -288,6 +323,59 @@ object PetAPI {
     @SubscribeEvent
     fun onCloseInventory(event: InventoryCloseEvent) {
         inPetMenu = false
+    }
+
+    @SubscribeEvent
+    fun onItemClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!inPetMenu) return
+        if (event.clickTypeEnum != GuiContainerEvent.ClickType.NORMAL) return
+        val category = event.item?.getItemCategoryOrNull() ?: return
+        if (category != ItemCategory.PET) return
+
+        parsePetAsItem(event.item)
+    }
+
+    private fun parsePetAsItem(item: ItemStack) {
+        val lore = item.getLore()
+
+        var level = 0
+        var rarity: LorenzRarity = LorenzRarity.ULTIMATE
+        var petName = ""
+        var petItem = NEUInternalName.NONE
+        var petXP = 0.0
+        var skin = ""
+
+        petNameMenu.matchMatcher(item.displayName) {
+            level = group("level").toInt()
+            rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
+            petName = group("name")
+            skin = group("skin") ?: ""
+        }
+
+        for (it in lore) {
+            petItemMenu.matchMatcher(it) {
+                petItem = NEUInternalName.fromItemNameOrNull(group("item")) ?: ErrorManager.skyHanniError(
+                    "Couldn't parse pet item name.",
+                    Pair("lore", it),
+                    Pair("item", group("item"))
+                )
+            }
+            petXPMenu.matchMatcher(it) {
+                petXP = group("totalXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+            }
+        }
+
+        val fakePetLine = "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (skin != "") "§r${skin}" else ""}"
+
+        fireEvent(PetData(
+            petName,
+            rarity,
+            petItem,
+            skin != "",
+            level,
+            petXP,
+            fakePetLine,
+        ))
     }
 
     //taken from NEU
