@@ -62,6 +62,8 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
+// TODO split into smaler sub classes
+@Suppress("LargeClass")
 object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
@@ -129,12 +131,13 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
-    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } && listOf(
-        "CHESTPLATE",
-        "LEGGINGS",
-        "HELMET",
-        "BOOTS",
-    ).any { internalName.endsWith(it) })
+    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } &&
+        listOf(
+            "CHESTPLATE",
+            "LEGGINGS",
+            "HELMET",
+            "BOOTS",
+        ).any { internalName.endsWith(it) })
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
@@ -738,7 +741,7 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
-        //todo use repo
+        // todo use repo
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
         val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
         val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
