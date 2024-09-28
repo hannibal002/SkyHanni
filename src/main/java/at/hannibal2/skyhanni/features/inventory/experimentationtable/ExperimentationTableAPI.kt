@@ -40,6 +40,7 @@ object ExperimentationTableAPI {
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }
 
+    // TODO: Add to repo
     private const val EXPERIMENTATION_TABLE_SKULL =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTUyOWF" +
             "iYzg4MzA5NTNmNGQ5MWVkZmZmMjQ2OTVhOWY2Mjc1OGZhNGM1MWIyOWFjMjQ2YzM3NDllYWFlODliMyJ9fX0="
