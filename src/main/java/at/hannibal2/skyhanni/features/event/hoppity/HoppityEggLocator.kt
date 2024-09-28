@@ -19,10 +19,10 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
@@ -249,7 +249,7 @@ object HoppityEggLocator {
         }.sortedBy { it.second }
 
         eggLocationWeights = sortedEggs.map {
-            it.second.round(3)
+            it.second.roundTo(3)
         }.take(5)
 
         val filteredEggs = sortedEggs.filter {
@@ -280,7 +280,7 @@ object HoppityEggLocator {
 
         val color = config.waypointColor.toChromaColor()
 
-        IslandGraphs.pathFind(location, color, condition = { config.showPathFinder })
+        IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { config.showPathFinder })
     }
 
     fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
@@ -333,7 +333,7 @@ object HoppityEggLocator {
         HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
             for ((i, location) in it.values.withIndex()) {
                 if (i == target) {
-                    IslandGraphs.pathFind(location)
+                    IslandGraphs.pathFind(location, "Hoppity Test")
                     return
                 }
             }

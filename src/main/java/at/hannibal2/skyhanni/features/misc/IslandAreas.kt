@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -41,9 +41,9 @@ object IslandAreas {
 
     private var nodes = mapOf<GraphNode, Double>()
     private var paths = mapOf<GraphNode, Graph>()
-    private var display: Renderable? = null
+    var display: Renderable? = null
     private var targetNode: GraphNode? = null
-    private var currentAreaName = ""
+    var currentAreaName = ""
     private val textInput = TextInput()
 
     @SubscribeEvent
@@ -81,7 +81,7 @@ object IslandAreas {
         nodes = finalNodes
     }
 
-    var hasMoved = false
+    private var hasMoved = false
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -103,7 +103,7 @@ object IslandAreas {
         }
     }
 
-    private fun updatePosition() {
+    fun updatePosition() {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
@@ -144,11 +144,6 @@ object IslandAreas {
             val isTarget = node.name == targetNode?.name
             val color = if (isTarget) LorenzColor.GOLD else tag.color
 
-            // trying to find a faster path to the existing target
-            if (isTarget && node != targetNode) {
-                ChatUtils.debug("Found a faster node, rerouting...")
-                setTarget(node)
-            }
             val coloredName = "${color.getChatColor()}${name}"
 
             var suffix = ""
@@ -159,12 +154,13 @@ object IslandAreas {
                 passedAreas.remove("null")
                 passedAreas.remove(currentAreaName)
                 // so show areas needed to pass thorough
+                // TODO show this pass through in the /shnavigate command
                 if (passedAreas.isNotEmpty()) {
 //                     suffix = " §7${passedAreas.joinToString(", ")}"
                 }
             }
 
-            val distance = difference.round(1)
+            val distance = difference.roundTo(1)
             val text = "${coloredName}§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {
@@ -268,9 +264,13 @@ object IslandAreas {
 
     private fun setTarget(node: GraphNode) {
         targetNode = node
+        val tag = node.getAreaTag() ?: return
+        val displayName = tag.color.getChatColor() + node.name
         val color = config.pathfinder.color.get().toChromaColor()
-        IslandGraphs.pathFind(
-            node.position, color,
+        node.pathFind(
+            displayName,
+            color,
+            allowRerouting = true,
             onFound = {
                 targetNode = null
                 updatePosition()
