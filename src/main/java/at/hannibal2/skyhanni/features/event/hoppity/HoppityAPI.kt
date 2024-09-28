@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -103,8 +104,18 @@ object HoppityAPI {
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
                 when (groupOrNull("name") ?: return@matchMatcher) {
-                    "Fish the Rabbit" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
-                    "El Dorado" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
+                    "Fish the Rabbit" -> {
+                        EggFoundEvent(STRAY, it.slotNumber, null).post()
+                        lastName = "§9Fish the Rabbit"
+                        lastMeal = STRAY
+                        attemptFireRabbitFound()
+                    }
+                    "El Dorado" -> {
+                        EggFoundEvent(STRAY, it.slotNumber, null).post()
+                        lastName = "§6El Dorado"
+                        lastMeal = STRAY
+                        attemptFireRabbitFound()
+                    }
                     else -> return@matchMatcher
                 }
             }
