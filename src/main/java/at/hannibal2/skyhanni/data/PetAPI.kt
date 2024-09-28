@@ -80,6 +80,14 @@ object PetAPI {
     )
 
     /**
+     * REGEX-TEST: §7§cClick to despawn!
+     */
+    private val petDespawnMenu by patternGroup.pattern(
+        "menu.pet.despawn",
+        "§7§cClick to despawn!"
+    )
+
+    /**
      * REGEX-TEST:  §r§7[Lvl 100] §r§dEndermite
      * REGEX-TEST:  §r§7[Lvl 200] §r§8[§r§6108§r§8§r§4✦§r§8] §r§6Golden Dragon
      * REGEX-TEST:  §r§7[Lvl 100] §r§dBlack Cat§r§d ✦
@@ -338,6 +346,15 @@ object PetAPI {
     private fun parsePetAsItem(item: ItemStack) {
         val lore = item.getLore()
 
+        if (lore.any { petDespawnMenu.matches(it) }) {
+            fireEvent(null)
+            return
+        }
+
+        getPetDataFromLore(item.displayName, lore)
+    }
+
+    private fun getPetDataFromLore(displayName: String, lore: List<String>) {
         var level = 0
         var rarity: LorenzRarity = LorenzRarity.ULTIMATE
         var petName = ""
@@ -345,27 +362,27 @@ object PetAPI {
         var petXP = 0.0
         var skin = ""
 
-        petNameMenu.matchMatcher(item.displayName) {
+        petNameMenu.matchMatcher(displayName) {
             level = group("level").toInt()
             rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
             petName = group("name")
             skin = group("skin") ?: ""
         }
 
-        for (it in lore) {
+        lore.forEach {
             petItemMenu.matchMatcher(it) {
                 petItem = NEUInternalName.fromItemNameOrNull(group("item")) ?: ErrorManager.skyHanniError(
                     "Couldn't parse pet item name.",
                     Pair("lore", it),
                     Pair("item", group("item"))
                 )
+                return@forEach
             }
             petXPMenu.matchMatcher(it) {
                 petXP = group("totalXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+                return@forEach
             }
         }
-
-        val fakePetLine = "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (skin != "") "§r${skin}" else ""}"
 
         fireEvent(PetData(
             petName,
@@ -374,7 +391,7 @@ object PetAPI {
             skin != "",
             level,
             petXP,
-            fakePetLine,
+            "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (skin != "") "§r${skin}" else ""}",
         ))
     }
 
