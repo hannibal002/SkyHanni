@@ -66,15 +66,11 @@ object ItemDisplayOverlayFeatures {
     private val config get() = SkyHanniMod.feature.inventory
 
     private val patternGroup = RepoPattern.group("inventory.item.overlay")
-    private val masterSkullPattern by patternGroup.pattern(
-        "masterskull",
-        "(.*)Master Skull - Tier .",
-    )
     private val masterSkullIDPattern by patternGroup.pattern(
         "masterskull.id",
         "MASTER_SKULL_TIER_(?<tier>\\d)",
     )
-    private val gardenVacuumPatterm by patternGroup.pattern(
+    private val gardenVacuumPattern by patternGroup.pattern(
         "vacuum",
         "§7Vacuum Bag: §6(?<amount>\\d*) Pests?",
     )
@@ -256,7 +252,7 @@ object ItemDisplayOverlayFeatures {
         }
 
         if (VACUUM_GARDEN.isSelected() && internalName in PestAPI.vacuumVariants && isOwnItem(lore)) {
-            lore.matchFirst(gardenVacuumPatterm) {
+            lore.matchFirst(gardenVacuumPattern) {
                 val pests = group("amount").formatLong()
                 return if (config.vacuumBagCap) {
                     if (pests > 39) "§640+" else "$pests"
