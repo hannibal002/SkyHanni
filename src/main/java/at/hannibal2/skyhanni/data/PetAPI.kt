@@ -233,17 +233,16 @@ object PetAPI {
                 group("name")
             ))
 
-            fireEvent(
-                PetData(
-                    group("name"),
-                    LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
-                    petItem,
-                    group("skin") != null,
-                    group("level").toInt(),
-                    (xp?.plus(xpOverLevel)) ?: 0.0,
-                    newPetLine,
-                )
+            val newPet = PetData(
+                group("name"),
+                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
+                petItem,
+                group("skin") != null,
+                group("level").toInt(),
+                (xp?.plus(xpOverLevel)) ?: 0.0,
+                newPetLine,
             )
+            fireEvent(newPet)
             return true
         }
         return false
