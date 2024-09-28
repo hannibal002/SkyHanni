@@ -24,13 +24,13 @@ import kotlin.math.min
 @SkyHanniModule
 object DungeonSpiritLeapOverlay {
     private val config get() = SkyHanniMod.feature.dungeon.spiritLeapOverlay
-    private val leapRenderItems: MutableList<Renderable> = mutableListOf()
 
     private var scaleFactor: Double = 1.0
     private var overlayPosition: Position? = null
-
     private var containerWidth = 0
     private var containerHeight = 0
+
+    data class PlayerStackInfo(val playerInfo: DungeonAPI.TeamMember?, val stack: ItemStack, val slotNumber: Int)
 
     @SubscribeEvent
     fun onSpiritLeapGuiDraw(event: GuiContainerEvent.PreDraw) {
@@ -38,34 +38,36 @@ object DungeonSpiritLeapOverlay {
 
         val gui = event.gui
         if (gui !is GuiChest || InventoryUtils.openInventoryName().removeColor() != "Spirit Leap") return
-
         containerWidth = gui.width
         containerHeight = gui.height
         scaleFactor = min(containerWidth, containerHeight).toDouble() / max(containerWidth, containerHeight).toDouble()
 
-        val chest = event.gui.inventorySlots as ContainerChest
-        leapRenderItems.clear()
+        val chest = gui.inventorySlots as ContainerChest
 
-        for ((slot, stack) in chest.getUpperItems()) {
-            val lore = stack.getLore()
-            if (lore.isNotEmpty()) {
-                val username = stack.displayName
-                leapRenderItems.add(createLeapItem(stack, username, slot.slotNumber))
+        val playerList = buildList {
+            for ((slot, stack) in chest.getUpperItems()) {
+                val lore = stack.getLore()
+                if (lore.isNotEmpty()) {
+                    val playerInfo = DungeonAPI.getPlayerInfo(stack.displayName)
+                    add(PlayerStackInfo(playerInfo, stack, slot.slotNumber))
+                }
             }
-        }
+        }.sortedBy { it.playerInfo?.dungeonClass?.ordinal }
 
-        val spiritLeapOverlay = createSpiritLeapOverlay()
+        val leapRenderItems = playerList.mapNotNull { createLeapItem(it) }
+        val spiritLeapOverlay = createSpiritLeapOverlay(leapRenderItems)
+
         overlayPosition = Position(
             (gui.width - spiritLeapOverlay.width) / 2,
             (gui.height - spiritLeapOverlay.height) / 2,
             false, true
-        )
-        overlayPosition?.renderRenderable(spiritLeapOverlay, posLabel = "Spirit Leap Overlay", addToGuiManager = false)
-
+        ).apply {
+            renderRenderable(spiritLeapOverlay, posLabel = "Spirit Leap Overlay", addToGuiManager = false)
+        }
         event.cancel()
     }
 
-    private fun createSpiritLeapOverlay(): Renderable {
+    private fun createSpiritLeapOverlay(leapRenderItems: List<Renderable>): Renderable {
         val layout = leapRenderItems.take(4).chunked(2)
         return if (layout.isNotEmpty()) {
             Renderable.table(
@@ -84,20 +86,19 @@ object DungeonSpiritLeapOverlay {
         }
     }
 
-    private fun createLeapItem(item: ItemStack, username: String, slotNumber: Int): Renderable {
-        val player = DungeonAPI.getPlayerInfo(username)
+    private fun createLeapItem(playerStackInfo: PlayerStackInfo): Renderable? {
+        val player = playerStackInfo.playerInfo ?: return null
         val classInfo = buildString {
-            if (player.dungeonClass != null) {
-                append(player.dungeonClass.scoreboardName)
+            player.dungeonClass?.let {
+                append(it.scoreboardName)
                 if (config.showDungeonClassLevel) append(" ${player.classLevel}")
                 if (player.playerDead) append(" (Dead)")
             }
         }
 
         val backgroundColor = if (player.playerDead) deadTeammateColor else getClassColor(player.dungeonClass)
-
         val itemRenderable = Renderable.drawInsideRoundedRect(
-            Renderable.itemStack(item, scale = (scaleFactor * 0.9) + 2.7),
+            Renderable.itemStack(playerStackInfo.stack, scale = scaleFactor * 0.9 + 2.7),
             color = Color(255, 255, 255, 100),
             radius = 5
         )
@@ -105,7 +106,7 @@ object DungeonSpiritLeapOverlay {
         val playerInfoRenderable = Renderable.verticalContainer(
             listOf(
                 Renderable.wrappedString(
-                    username,
+                    player.username,
                     width = (containerWidth * 0.25).toInt(),
                     scale = scaleFactor + 1.5),
                 Renderable.placeholder(0, (containerHeight * 0.03).toInt()),
@@ -145,7 +146,7 @@ object DungeonSpiritLeapOverlay {
                 smoothness = 10,
                 padding = 5
             ),
-            onClick = { InventoryUtils.clickSlot(slotNumber) }
+            onClick = { InventoryUtils.clickSlot(playerStackInfo.slotNumber) }
         )
     }
 
