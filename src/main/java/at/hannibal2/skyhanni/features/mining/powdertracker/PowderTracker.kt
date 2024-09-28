@@ -221,7 +221,6 @@ object PowderTracker {
             }
             it.rewards.addOrPut(reward, event.amount)
         }
-        tracker.update()
     }
 
     @SubscribeEvent
