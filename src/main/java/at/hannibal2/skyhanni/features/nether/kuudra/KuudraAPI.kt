@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -25,6 +26,26 @@ object KuudraAPI {
         "chat.complete",
         "§.\\s*(?:§.)*KUUDRA DOWN!"
     )
+
+    private val kuudraTiers = listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")
+
+    private val kuudraArmors: List<String>
+
+    init {
+        val kuudraSets = listOf("AURORA_", "CRIMSON_", "TERROR_", "HOLLOW_", "FERVOR_")
+        val armorPieces = listOf("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")
+        kuudraArmors = (kuudraTiers + "").flatMap { tier ->
+            kuudraSets.flatMap { set ->
+                armorPieces.map { piece ->
+                    "$set$tier$piece"
+                }
+            }
+        }
+    }
+
+    fun NEUInternalName.isKuudraArmor(): Boolean = asString() in kuudraArmors
+
+    fun NEUInternalName.getKuudraTier(): Int? = kuudraTiers.indexOfFirst { asString().startsWith(it) }.takeIf { it != -1 }?.let { it + 1 }
 
     var kuudraTier: Int? = null
     fun inKuudra() = kuudraTier != null
