@@ -44,9 +44,10 @@ jobs:
     #        -   name: Checkout code
     #            uses: actions/checkout@v4
     #        -   uses: ./.github/actions/setup-normal-workspace
-    #        -   name: Run detekt
+    #        # detektMain is a LOT slower than detekt, but it does type analysis
+    #        -   name: Run detekt main (w/typing analysis)
     #            run: |
-    #                ./gradlew detekt --stacktrace
+    #                ./gradlew detektMain --stacktrace
     #        -   name: Annotate detekt failures
     #            if: ${{ !cancelled() }}
     #            run: |
