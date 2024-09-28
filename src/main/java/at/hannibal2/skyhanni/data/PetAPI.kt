@@ -360,11 +360,25 @@ object PetAPI {
     }
 
     private fun getPetDataFromLore(displayName: String, lore: List<String>) {
+        val (name, rarity, _, _, level, _, skin) = parsePetName(displayName)
+        val (petItem, petXP) = parsePetLore(lore, Pair(rarity, name))
+
+        val newPet = PetData(
+            name,
+            rarity,
+            petItem,
+            skin != "",
+            level,
+            petXP,
+            "§r§7[Lvl $level] §r${rarity.chatColorCode}$name${if (skin != "") "§r${skin}" else ""}",
+        )
+        fireEvent(newPet)
+    }
+
+    private fun parsePetName(displayName: String): PetData {
         var level = 0
         var rarity: LorenzRarity = LorenzRarity.ULTIMATE
         var petName = ""
-        var petItem = NEUInternalName.NONE
-        var petXP = 0.0
         var skin = ""
 
         petNameMenu.matchMatcher(displayName) {
@@ -374,8 +388,23 @@ object PetAPI {
             skin = group("skin") ?: ""
         }
 
+        return PetData(
+            petName,
+            rarity,
+            NEUInternalName.NONE,
+            false,
+            level,
+            0.0,
+            skin
+        )
+    }
+
+    private fun parsePetLore(lore: List<String>, petInfo: Pair<LorenzRarity, String>): Pair<NEUInternalName, Double> {
+        var petItem = NEUInternalName.NONE
+        var petXP = 0.0
+
         lore.forEach {
-            petItemMenu.matchMatcher(it) {
+            if (petItem == NEUInternalName.NONE) petItemMenu.matchMatcher(it) {
                 petItem = NEUInternalName.fromItemNameOrNull(group("item")) ?: ErrorManager.skyHanniError(
                     "Couldn't parse pet item name.",
                     Pair("lore", it),
@@ -383,21 +412,20 @@ object PetAPI {
                 )
                 return@forEach
             }
-            petXPMenu.matchMatcher(it) {
-                petXP = group("totalXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+            if (petXP == 0.0) petXPMenu.matchMatcher(it) {
+                val totalXP = group("totalXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
+                val percentage = (group("percentage")?.toDoubleOrNull()?.div(100.0)) ?: 0.0
+
+                val fromXP = levelToXP(group("level")?.toIntOrNull()?.minus(1) ?: 1, petInfo.first, petInfo.second) ?: 0.0
+                val toXP = levelToXP(group("level")?.toIntOrNull() ?: 2, petInfo.first, petInfo.second) ?: 0.0
+
+                petXP = if (totalXP == 0.0) fromXP + ((toXP - fromXP) * percentage)
+                else totalXP
                 return@forEach
             }
         }
 
-        fireEvent(PetData(
-            petName,
-            rarity,
-            petItem,
-            skin != "",
-            level,
-            petXP,
-            "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (skin != "") "§r${skin}" else ""}",
-        ))
+        return Pair(petItem, petXP)
     }
 
     fun testLevelToXP(input: Array<String>) {
