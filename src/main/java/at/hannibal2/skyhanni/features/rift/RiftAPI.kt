@@ -34,6 +34,7 @@ object RiftAPI {
 
     var inRiftRace = false
     var showButtons = false
+    var allButtonsHit = false
 
     fun inLivingCave() = LorenzUtils.skyBlockArea == "Living Cave"
     fun inLivingStillness() = LorenzUtils.skyBlockArea == "Living Stillness"

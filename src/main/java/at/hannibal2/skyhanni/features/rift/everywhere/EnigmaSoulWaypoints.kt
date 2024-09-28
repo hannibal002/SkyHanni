@@ -36,7 +36,7 @@ object EnigmaSoulWaypoints {
 
     private val config get() = RiftAPI.config.enigmaSoulWaypoints
     private var inInventory = false
-    private var soulLocations = mapOf<String, LorenzVec>()
+    var soulLocations = mapOf<String, LorenzVec>()
     private val trackedSouls = mutableListOf<String>()
     private val inventoryUnfound = mutableListOf<String>()
     private var adding = true
@@ -118,7 +118,9 @@ object EnigmaSoulWaypoints {
             ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
             if (config.showPathFinder) {
                 soulLocations[name]?.let {
-                    IslandGraphs.pathFind(it, config.color.toChromaColor(), condition = { config.showPathFinder })
+                    if (name != "Buttons" || RiftAPI.allButtonsHit) {
+                        IslandGraphs.pathFind(it, config.color.toChromaColor(), condition = { config.showPathFinder })
+                    }
                 }
             }
             trackedSouls.add(name)
@@ -195,6 +197,9 @@ object EnigmaSoulWaypoints {
         if (closestSoul in trackedSouls) {
             trackedSouls.remove(closestSoul)
             ChatUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
+            if (closestSoul == "Buttons") {
+                RiftAPI.showButtons = false
+            }
         }
     }
 

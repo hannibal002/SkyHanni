@@ -1,30 +1,41 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftWoodenButtonsJson
+import at.hannibal2.skyhanni.data.model.GraphNode
+import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.isBlowgun
+import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLocations
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
-import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
+import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-
-// make sure hit buttons counts even when you aren't tracking the Buttons soul
-// this is required in case someone hits buttons and then later starts tracking souls (within same server)
-
-// onWorldChange empty hitButtons
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object WoodenButtonsHelper {
+
+    private val config get() = RiftAPI.config.enigmaSoulWaypoints
 
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
     /**
@@ -36,59 +47,129 @@ object WoodenButtonsHelper {
         "§eYou have hit §r§b\\d+/56 §r§eof the wooden buttons!"
     )
 
-    private var buttonLocations = mapOf<String, LorenzVec>()
-    private var hitButtons = mutableSetOf<String>()
-    private var lastHitButton: String? = null
+    private var buttonLocations = mutableMapOf<String, List<LorenzVec>>()
+    private var hitButtons = mutableSetOf<LorenzVec>()
+    private var lastHitButton: LorenzVec? = null
+    private var currentSpot: GraphNode? = null
+    private var lastBlowgunFire = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftWoodenButtonsJson>("RiftWoodenButtons")
-        val houses = data.houses
-        var index = 0
-        buttonLocations = buildMap {
-            for ((_, house) in houses) {
-                for (location in house) {
-                    this[index++.toString()] = location
-                }
+        buttonLocations = data.houses.flatMap { (houseName, spots) ->
+            spots.map { spot ->
+                "$houseName:${spot.position}" to spot.buttons
             }
-        }
-    }
-
-    @SubscribeEvent
-    fun onItemClick(event: ItemClickEvent) {
-        if (!RiftAPI.inRift()) return
-        if (event.clickType != ClickType.RIGHT_CLICK) return
-        if (event.itemInHand?.isBlowgun != true) return
-        ChatUtils.debug("Berberis blowgun fired with right click!")
-    }
-
-    @SubscribeEvent
-    fun onBlockClick(event: BlockClickEvent) {
-        if (!RiftAPI.inRift()) return
-
-        val location = event.position
-        if (location.getBlockAt() !== Blocks.wooden_button) return
-
-        val hitButton = buttonLocations.entries.find { it.value == location }?.key ?: return
-        lastHitButton = hitButton
-        ChatUtils.debug("New hit button: $lastHitButton")
-    }
-
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!RiftAPI.inRift()) return
-        buttonHitPattern.matchMatcher(event.message) {
-            lastHitButton?.let {
-                if (!hitButtons.contains(it)) {
-                    hitButtons.add(it)
-                    ChatUtils.debug("Added $lastHitButton to hit buttons.")
-                }
-            }
-        }
+        }.toMap().toMutableMap()
     }
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         hitButtons.clear()
+        RiftAPI.allButtonsHit = false
+        currentSpot = null
     }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        findClosestSpot()
+        checkBlowgunActivatedButtons()
+    }
+
+    private fun findClosestSpot() {
+        if (!showButtons()) return
+        val graph = IslandGraphs.currentIslandGraph ?: return
+
+        val closestNode = graph.nodes
+            .filter { it.tags.contains(GraphNodeTag.RIFT_BUTTONS) }
+            .filter { node ->
+                val spotName = "${node.name}:${node.position}"
+                val buttonsAtSpot = buttonLocations[spotName] ?: return@filter false
+                buttonsAtSpot.any { !hitButtons.contains(it) }
+            }
+            .minByOrNull { it.position.distanceToPlayer() }
+
+        if (closestNode != currentSpot) {
+            currentSpot = closestNode
+            currentSpot?.let {
+                IslandGraphs.pathFind(it.position, config.color.toChromaColor())
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onBlockClick(event: BlockClickEvent) {
+        if (!checkButtons()) return
+
+        val location = event.position
+        if (location.getBlockAt() == Blocks.wooden_button && !hitButtons.contains(location)) {
+            lastHitButton = event.position
+        }
+    }
+
+    @SubscribeEvent
+    fun onItemClick(event: ItemClickEvent) {
+        if (!checkButtons()) return
+        if (event.clickType != ClickType.RIGHT_CLICK) return
+        if (event.itemInHand?.isBlowgun != true) return
+        lastBlowgunFire = SimpleTimeMark.now()
+    }
+
+    private fun checkBlowgunActivatedButtons() {
+        if (lastBlowgunFire.passedSince() > 2.5.seconds) return
+        buttonLocations.values.flatten().forEach { buttonLocation ->
+            val blockState = buttonLocation.getBlockStateAt()
+            if (blockState.block is BlockButtonWood
+                && blockState.getValue(BlockButtonWood.POWERED) == true
+                && buttonLocation.canBeSeen(1..3)) {
+                if (lastHitButton != buttonLocation && !hitButtons.contains(buttonLocation)) {
+                    lastHitButton = buttonLocation
+                    addLastHitButton()
+                }
+            }
+        }
+    }
+
+    private fun addLastHitButton() {
+        if (!hitButtons.contains(lastHitButton)) {
+            lastHitButton?.let { hitButtons.add(it) }
+        }
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!checkButtons()) return
+
+        buttonHitPattern.matchMatcher(event.message) {
+            addLastHitButton()
+        }
+
+        if (event.message == "§eYou've hit all §r§b56 §r§ewooden buttons!") {
+            RiftAPI.allButtonsHit = true
+            hitButtons.addAll(buttonLocations.values.flatten().filter { it !in hitButtons })
+            soulLocations["Buttons"]?.let { IslandGraphs.pathFind(it, config.color.toChromaColor()) }
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+        if (!showButtons()) return
+
+        currentSpot?.let { spot ->
+            if (spot.position.distanceToPlayer() > 2.5) {
+                event.drawDynamicText(spot.position.add(y = 1), "Hit Buttons Here!", 1.5)
+            }
+
+            if (spot.position.distanceToPlayer() > 15.0) return
+            val spotName = "${spot.name}:${spot.position}"
+            buttonLocations[spotName]?.forEach { button ->
+                if (!hitButtons.contains(button)) {
+                    event.drawWaypointFilled(button, config.color.toChromaColor(), minimumAlpha = 0F)
+                }
+            }
+        }
+    }
+
+    private fun checkButtons() = RiftAPI.inRift() && !RiftAPI.allButtonsHit
+    private fun showButtons() = checkButtons() && RiftAPI.showButtons
 }

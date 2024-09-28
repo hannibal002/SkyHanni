@@ -48,7 +48,7 @@ object RiftRaceHelper {
             data.locations,
             data.shortCuts,
             detectionRange = 5.0,
-            goInOrder = true, // did i mess up? seems like you can't make your way backwards
+            goInOrder = true,
         )
         updateConfig()
     }
@@ -76,12 +76,12 @@ object RiftRaceHelper {
             RiftAPI.inRiftRace = true
         }
         if (event.message.startsWith("§3§lRIFT RACING §r§cRace cancelled!")) {
-            RiftAPI.inRiftRace = false
             parkourHelper?.reset()
+            RiftAPI.inRiftRace = false
         }
         raceFinishedPattern.matchMatcher(event.message) {
-            RiftAPI.inRiftRace = false
             parkourHelper?.reset()
+            RiftAPI.inRiftRace = false
         }
     }
 
