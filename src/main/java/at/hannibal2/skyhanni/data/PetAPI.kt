@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -510,10 +509,5 @@ object PetAPI {
         val xpLevelingCustomJson = data.custom_pet_leveling.getAsJsonObject("GOLDEN_DRAGON").getAsJsonArray("pet_levels")
 
         xpLevelingCustom = xpLevelingCustomJson.map { it.asInt }
-    }
-
-    @HandleEvent
-    fun onPetChange(event: PetChangeEvent) {
-        ChatUtils.debug("oldPet: ${event.oldPet}, newPet: ${event.newPet}")
     }
 }
