@@ -180,8 +180,11 @@ object UnknownLinesHandler {
                 carnivalKillsPattern,
             )
 
-            if (::remoteOnlyPatterns.isInitialized) {
-                patternsToExclude.addAll(remoteOnlyPatterns)
+            var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
+
+            if (::remoteOnlyPatterns.isInitialized && !remoteOnlyPatternsAdded) {
+                    patternsToExclude.addAll(remoteOnlyPatterns)
+                remoteOnlyPatternsAdded = true
             }
 
             unknownLines = unknownLines.filterNot { line ->
