@@ -152,7 +152,7 @@ object ChocolateFactoryStrayTracker {
         add(
             Renderable.hoverTips(
                 "§6§lStray Tracker",
-                tips = listOf("§a+§b${formattedExtraTime} §afrom strays§7"),
+                tips = listOf("§a+§b$formattedExtraTime §afrom strays§7"),
             ).toSearchable(),
         )
         HoppityAPI.hoppityRarities.forEach { rarity ->
@@ -169,7 +169,7 @@ object ChocolateFactoryStrayTracker {
 
         val colorCode = rarity.chatColorCode
         val lineHeader = "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"
-        val lineFormat = "${lineHeader}${caughtString}"
+        val lineFormat = "$lineHeader$caughtString"
 
         val renderable = rarityExtraChocMs?.let {
             var tip = "§a+§b$extraChocFormat §afrom $colorCode${rarity.toString().lowercase()} strays§7"

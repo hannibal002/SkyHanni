@@ -3,8 +3,6 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
@@ -39,11 +37,15 @@ val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
 // Minecraft configuration:
 loom {
-    if (this.isForgeLike)
+    if (this.isForgeLike) {
         forge {
-            pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
+            pack200Provider.set(
+                dev.architectury.pack200.java
+                    .Pack200Adapter(),
+            )
             mixinConfig("mixins.skyhanni.json")
         }
+    }
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -67,11 +69,12 @@ loom {
     }
 }
 
-if (target == ProjectTarget.MAIN)
+if (target == ProjectTarget.MAIN) {
     sourceSets.main {
         resources.destinationDirectory.set(kotlin.destinationDirectory)
         output.setResourcesDir(kotlin.destinationDirectory)
     }
+}
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
@@ -91,9 +94,11 @@ val headlessLwjgl by configurations.creating {
     isVisible = false
 }
 tasks.runClient {
-    this.javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-    })
+    this.javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion.set(target.minecraftVersion.javaLanguageVersion)
+        },
+    )
 }
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
@@ -104,8 +109,9 @@ dependencies {
     } else {
         mappings(target.mappingDependency)
     }
-    if (target.forgeDep != null)
+    if (target.forgeDep != null) {
         "forge"(target.forgeDep!!)
+    }
 
     // Discord RPC client
     shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
@@ -218,10 +224,11 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-if (target == ProjectTarget.MAIN)
+if (target == ProjectTarget.MAIN) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
+}
 
 if (target.parent == ProjectTarget.MAIN) {
     val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
@@ -338,27 +345,27 @@ publishing.publications {
 }
 
 // Detekt: TODO: Uncomment this when we're ready to enforce
-/*detekt {
-    buildUponDefaultConfig = true // preconfigure defaults
-    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-    baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
-    source.setFrom(project.sourceSets.named("main").map { it.allSource })
-}
-
-tasks.withType<Detekt>().configureEach {
-    reports {
-        html.required.set(true) // observe findings in your browser with structure and code snippets
-        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
-        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
-        md.required.set(true) // simple Markdown format
-    }
-}
-
-tasks.withType<Detekt>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
-}
-tasks.withType<DetektCreateBaselineTask>().configureEach {
-    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-    outputs.cacheIf { false } // Custom rules won't work if cached
-}*/
+// detekt {
+//     buildUponDefaultConfig = true // preconfigure defaults
+//     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
+//     baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+//     source.setFrom(project.sourceSets.named("main").map { it.allSource })
+// }
+//
+// tasks.withType<Detekt>().configureEach {
+//     reports {
+//         html.required.set(true) // observe findings in your browser with structure and code snippets
+//         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+//         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+//         md.required.set(true) // simple Markdown format
+//     }
+// }
+//
+// tasks.withType<Detekt>().configureEach {
+//     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+//     outputs.cacheIf { false } // Custom rules won't work if cached
+// }
+// tasks.withType<DetektCreateBaselineTask>().configureEach {
+//     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+//     outputs.cacheIf { false } // Custom rules won't work if cached
+// }
