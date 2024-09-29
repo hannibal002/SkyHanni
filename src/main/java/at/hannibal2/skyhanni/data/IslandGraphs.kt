@@ -391,7 +391,7 @@ object IslandGraphs {
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
         allowRerouting: Boolean = false,
-        condition: () -> Boolean = { true },
+        condition: () -> Boolean,
     ) {
         reset()
         currentTargetNode = this
@@ -415,7 +415,7 @@ object IslandGraphs {
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
         showGoalExact: Boolean = false,
-        condition: () -> Boolean = { true },
+        condition: () -> Boolean,
     ) {
         reset()
         shouldAllowRerouting = false
@@ -428,7 +428,7 @@ object IslandGraphs {
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
         showGoalExact: Boolean = false,
-        condition: () -> Boolean = { true },
+        condition: () -> Boolean,
     ) {
         currentTarget = location
         this.label = label

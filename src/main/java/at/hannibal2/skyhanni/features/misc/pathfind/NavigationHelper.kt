@@ -58,13 +58,12 @@ object NavigationHelper {
             val distance = distances[node]!!.roundTo(1)
             val component = "$name §e$distance".asComponent()
             component.onClick {
-//                 node.pathFind(label = node.name!!, allowRerouting = true)
-                node.pathFind(label = name, allowRerouting = true)
+                node.pathFind(label = name, allowRerouting = true, condition = { true })
                 sendNavigateMessage(name, goBack)
             }
             val tag = node.tags.first { it in allowedTags }
-            val d = "Name: $name\n§7Type: §r${tag.displayName}\n§7Distance: §e$distance blocks\n§eClick to start navigating!"
-            component.hover = d.asComponent()
+            val hoverText = "Name: $name\n§7Type: §r${tag.displayName}\n§7Distance: §e$distance blocks\n§eClick to start navigating!"
+            component.hover = hoverText.asComponent()
             component
         }
     }
