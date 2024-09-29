@@ -108,8 +108,9 @@ object ChocolateFactoryStrayTracker {
         "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
     )
 
-    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
         override fun reset() {
