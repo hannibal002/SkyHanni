@@ -58,7 +58,10 @@ object HoppityNpc {
             "New rabbits are available at §aHoppity's Shop§e!",
             config::hoppityShopReminder,
             actionName = "warp to hub",
-            action = { HypixelCommands.warp("hub") },
+            action = {
+                HypixelCommands.warp("hub")
+                //afterNextIslandwarpTtp hub: IslandGraphs.pathFind(hoppity)
+            },
         )
 
         lastReminderSent = SimpleTimeMark.now()

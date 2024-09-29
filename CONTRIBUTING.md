@@ -13,6 +13,7 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
 
 - Download IntelliJ from the [JetBrains Website](https://www.jetbrains.com/idea/download/).
     - Use the Community Edition. (Scroll down a bit.)
+- When you encounter any bug with IntelliJ, please make sure to use the version `2024.1.6`, not `2024.2.x` or above.
 
 ### Cloning the project
 
@@ -29,6 +30,7 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
         - Open the project.
 
 ### Setting up IntelliJ
+
 
 Once your project is imported into IntelliJ from the previous step, all dependencies like Minecraft, NEU, and so on should be automatically
 downloaded. If not, you might need to link the Gradle project in the Gradle tab (little elephant) on the right.
