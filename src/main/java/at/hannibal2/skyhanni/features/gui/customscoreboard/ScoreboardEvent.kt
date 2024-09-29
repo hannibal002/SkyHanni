@@ -412,7 +412,7 @@ private fun getActiveEventLine(): List<String> {
     val blockedEvents = listOf("Spooky Festival", "Carnival", "5th SkyBlock Anniversary", "New Year Celebration")
     if (blockedEvents.contains(currentActiveEvent.removeColor())) return emptyList()
 
-    val currentActiveEventTime = ScoreboardPattern.eventTimeEndsPattern.firstMatcher(TabWidget.EVENT.lines) {
+    val currentActiveEventTime = SbPattern.eventTimeEndsPattern.firstMatcher(TabWidget.EVENT.lines) {
         group("time")
     } ?: return emptyList()
 
@@ -424,7 +424,7 @@ private fun getActiveEventShowWhen(): Boolean =
 
 private fun getSoonEventLine(): List<String> {
     val soonActiveEvent = getTablistEvent() ?: return emptyList()
-    val soonActiveEventTime = ScoreboardPattern.eventTimeStartsPattern.firstMatcher(TabWidget.EVENT.lines) {
+    val soonActiveEventTime = SbPattern.eventTimeStartsPattern.firstMatcher(TabWidget.EVENT.lines) {
         group("time")
     } ?: return emptyList()
 
