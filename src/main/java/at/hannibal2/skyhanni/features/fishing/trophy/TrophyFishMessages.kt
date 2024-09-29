@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignFormat
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.fishing.TrophyFishCaughtEvent
-import at.hannibal2.skyhanni.features.fishing.SeaCreatureFeatures
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getTooltip
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -53,20 +52,14 @@ object TrophyFishMessages {
             event.blockedReason = "low_trophy_fish"
             return
         }
-        if (config.goldAlert) {
-            if (rawRarity == "gold") {
-                val text = "$displayName\n$displayRarity ${amount}!"
-                LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
-                if (config.playSound) SoundUtils.playBeepSound()
-            }
+        if (config.goldAlert && rawRarity == "gold") {
+            sendTitle(displayName, displayRarity, amount)
+            if (config.playSound) SoundUtils.playBeepSound()
         }
 
-        if (config.diamondAlert) {
-            if (rawRarity == "diamond") {
-                val text = "$displayName\n$displayRarity ${amount}!"
-                LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
-                if (config.playSound) SoundUtils.playBeepSound()
-            }
+        if (config.diamondAlert && rawRarity == "diamond") {
+            sendTitle(displayName, displayRarity, amount)
+            if (config.playSound) SoundUtils.playBeepSound()
         }
 
         val original = event.chatComponent
@@ -103,14 +96,23 @@ object TrophyFishMessages {
         }
     }
 
+    private fun sendTitle(displayName: String, displayRarity: String?, amount: Int) {
+        val text = "$displayName\n$displayRarity $amount!"
+        LorenzUtils.sendTitle(text, 3.seconds, 2.8, 7f)
+    }
+
     fun getInternalName(displayName: String): String {
         return displayName.replace("Obfuscated", "Obfuscated Fish")
             .replace("[- ]".toRegex(), "").lowercase().removeColor()
     }
 
     private fun shouldBlockTrophyFish(rarity: TrophyRarity, amount: Int) =
-        config.bronzeHider && rarity == TrophyRarity.BRONZE && amount != 1
-            || config.silverHider && rarity == TrophyRarity.SILVER && amount != 1
+        config.bronzeHider &&
+            rarity == TrophyRarity.BRONZE &&
+            amount != 1 ||
+            config.silverHider &&
+            rarity == TrophyRarity.SILVER &&
+            amount != 1
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
