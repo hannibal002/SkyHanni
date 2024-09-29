@@ -40,8 +40,7 @@ object TrophyFishMessages {
         } ?: return
 
         val internalName = getInternalName(displayName)
-        val rawRarity = displayRarity.lowercase().removeColor()
-        val rarity = TrophyRarity.getByName(rawRarity) ?: return
+        val rarity = TrophyRarity.getByName(displayRarity.lowercase().removeColor()) ?: return
 
         val trophyFishes = TrophyFishManager.fish ?: return
         val trophyFishCounts = trophyFishes.getOrPut(internalName) { mutableMapOf() }
@@ -52,12 +51,12 @@ object TrophyFishMessages {
             event.blockedReason = "low_trophy_fish"
             return
         }
-        if (config.goldAlert && rawRarity == "gold") {
+        if (config.goldAlert && rarity == TrophyRarity.GOLD) {
             sendTitle(displayName, displayRarity, amount)
             if (config.playSound) SoundUtils.playBeepSound()
         }
 
-        if (config.diamondAlert && rawRarity == "diamond") {
+        if (config.diamondAlert && rarity == TrophyRarity.DIAMOND) {
             sendTitle(displayName, displayRarity, amount)
             if (config.playSound) SoundUtils.playBeepSound()
         }
