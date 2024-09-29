@@ -95,7 +95,7 @@ object WoodenButtonsHelper {
         if (closestNode != currentSpot) {
             currentSpot = closestNode
             currentSpot?.let {
-                IslandGraphs.pathFind(it.position, "Button Spot", config.color.toChromaColor())
+                IslandGraphs.pathFind(it.position, "Button Spot", config.color.toChromaColor(), condition = { config.showPathFinder && config.showButtonsHelper })
             }
         }
     }
@@ -167,18 +167,18 @@ object WoodenButtonsHelper {
         val spot = currentSpot ?: return
         val distance = spot.position.distanceToPlayer()
         if (distance > 2.5) {
-            event.drawDynamicText(spot.position.add(y = 1), "Hit Buttons Here!", 1.5)
+            event.drawDynamicText(spot.position.add(y = 1), "Hit Buttons Here!", 1.25)
         }
 
         if (distance > 15.0) return
         val spotName = "${spot.name}:${spot.position}"
         buttonLocations[spotName]?.forEach { button ->
             if (!hitButtons.contains(button)) {
-                event.drawWaypointFilled(button, config.color.toChromaColor(), minimumAlpha = 0F)
+                event.drawWaypointFilled(button, config.color.toChromaColor(), inverseAlphaScale = true)
             }
         }
     }
 
     private fun checkButtons() = RiftAPI.inRift() && !RiftAPI.allButtonsHit
-    private fun showButtons() = checkButtons() && RiftAPI.showButtons
+    fun showButtons() = checkButtons() && RiftAPI.trackingButtons && config.showButtonsHelper
 }

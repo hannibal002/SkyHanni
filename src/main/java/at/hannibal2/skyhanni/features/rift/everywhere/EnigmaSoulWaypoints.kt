@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.features.rift.area.dreadfarm.WoodenButtonsHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -89,8 +90,8 @@ object EnigmaSoulWaypoints {
 
         if (event.slotId == 31 && inventoryUnfound.isNotEmpty()) {
             event.makePickblock()
-            if ("Buttons" in inventoryUnfound) {
-                RiftAPI.showButtons = !RiftAPI.showButtons
+            if (inventoryUnfound.contains("Buttons")) {
+                RiftAPI.trackingButtons = !RiftAPI.trackingButtons
             }
             if (adding) {
                 trackedSouls.addAll(inventoryUnfound)
@@ -111,14 +112,14 @@ object EnigmaSoulWaypoints {
         if (!soulLocations.contains(name)) return
 
         if (name == "Buttons") {
-            RiftAPI.showButtons = !RiftAPI.showButtons
+            RiftAPI.trackingButtons = !RiftAPI.trackingButtons
         }
 
         if (!trackedSouls.contains(name)) {
             ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
             if (config.showPathFinder) {
                 soulLocations[name]?.let {
-                    if (name != "Buttons" || RiftAPI.allButtonsHit) {
+                    if (!(name == "Buttons" && WoodenButtonsHelper.showButtons())) {
                         IslandGraphs.pathFind(it, "$name Enigma Soul", config.color.toChromaColor(), condition = { config.showPathFinder })
                     }
                 }
@@ -198,7 +199,7 @@ object EnigmaSoulWaypoints {
             trackedSouls.remove(closestSoul)
             ChatUtils.chat("§5Found the $closestSoul Enigma Soul!", prefixColor = "§5")
             if (closestSoul == "Buttons") {
-                RiftAPI.showButtons = false
+                RiftAPI.trackingButtons = false
             }
         }
     }
