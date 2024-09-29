@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuCarnivalTokenCostJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuMiscJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgrade
 import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -34,19 +36,29 @@ object CarnivalShopHelper {
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
 
-    private var eventShops = mutableListOf<EventShop>()
+    private var repoEventShops = mutableListOf<EventShop>()
     private var currentProgress: EventShopProgress? = null
     private var currentEventType: String = ""
     private var tokensOwned: Int = 0
     private var tokensNeeded: Int = 0
-    private var infoItemStack: ItemStack? = null
+    private var overviewInfoItemStack: ItemStack? = null
+    private var shopSpecificInfoItemStack: ItemStack? = null
 
     /**
-     * REGEX-TEST:
+     * REGEX-TEST: Your Tokens: §a1,234,567
+     * REGEX-TEST: Your Tokens: §a0
      */
     private val currentTokenCountPattern by patternGroup.pattern(
         "carnival.tokens.current",
         ".*§7Your Tokens: §a(?<tokens>[\\d,]*)"
+    )
+
+    /**
+     * REGEX-TEST: §8Souvenir Shop
+     */
+    private val souvenirShopInventoryPattern by patternGroup.pattern(
+        "carnival.souvenirshop",
+        "(?:§.)*Souvenir Shop"
     )
 
     data class EventShop(val shopName: String, val upgrades: List<NeuCarnivalTokenCostJson>)
@@ -58,7 +70,7 @@ object CarnivalShopHelper {
     )
 
     data class EventShopProgress(val shopName: String, val purchasedUpgrades: Map<String, Int>) {
-        private val eventShop = eventShops.find { it.shopName.equals(shopName, ignoreCase = true) }
+        private val eventShop = repoEventShops.find { it.shopName.equals(shopName, ignoreCase = true) }
         val remainingUpgrades: MutableList<EventShopUpgradeStatus> = eventShop?.upgrades?.map {
             val purchasedAmount = purchasedUpgrades[it.name] ?: 0
             EventShopUpgradeStatus(
@@ -68,6 +80,7 @@ object CarnivalShopHelper {
                 remainingCosts = it.costs.drop(purchasedAmount).toMutableList(),
             )
         }.orEmpty().toMutableList()
+        val remainingUpgradeSum = remainingUpgrades.sumOf { it.remainingCosts.sum() }
         val nonRepoUpgrades = purchasedUpgrades.filter { purchasedUpgrade ->
             eventShop?.upgrades?.none { it.name.equals(purchasedUpgrade.key, ignoreCase = true) } == true
         }
@@ -75,17 +88,29 @@ object CarnivalShopHelper {
 
     @SubscribeEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (!isEnabled() || eventShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
-        if (!eventShops.any { it.shopName.equals(event.inventory.name, ignoreCase = true) }) return
-        infoItemStack.let { event.replace(it) }
+        if (!isEnabled() || repoEventShops.isEmpty() || event.slot != CUSTOM_STACK_LOCATION) return
+        tryReplaceShopSpecificStack(event)
+        tryReplaceOverviewStack(event)
+    }
+
+    private fun tryReplaceShopSpecificStack(event: ReplaceItemEvent) {
+        if (currentProgress == null || !repoEventShops.any { it.shopName.equals(event.inventory.name, ignoreCase = true) }) return
+        shopSpecificInfoItemStack.let { event.replace(it) }
+    }
+
+    private fun tryReplaceOverviewStack(event: ReplaceItemEvent) {
+        if (!souvenirShopInventoryPattern.matches(event.inventory.name)) return
+        overviewInfoItemStack.let { event.replace(it) }
     }
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
-        eventShops = repoTokenShops.map { (key, value) ->
+        repoEventShops = repoTokenShops.map { (key, value) ->
             EventShop(key.replace("_", " "), value.values.toMutableList())
         }.toMutableList()
+        checkSavedProgress()
+        regenerateOverviewItemStack()
     }
 
     @SubscribeEvent
@@ -106,8 +131,62 @@ object CarnivalShopHelper {
         processInventoryEvent(event)
     }
 
-    private fun regenerateItemStack() {
-        infoItemStack = currentProgress?.let { progress ->
+    private fun checkSavedProgress() {
+        ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress?.let { storage ->
+            storage.keys.forEach { key ->
+                if (!repoEventShops.any { shop -> shop.shopName.equals(key, ignoreCase = true) }) {
+                    storage.remove(key)
+                }
+            }
+        }
+    }
+
+    private fun saveProgress() {
+        ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress?.let { storage ->
+            currentProgress?.let { progress ->
+                storage[progress.shopName] = progress.purchasedUpgrades
+            }
+        }
+    }
+
+    private fun MutableList<String>.addNeededRemainingTokens(cost: Int, extraFormatting: String? = null) {
+        this.add("")
+        this.add("§7Total Tokens Needed: §8${cost.addSeparators()}${extraFormatting.orEmpty()}")
+        val tokensNeeded = cost - tokensOwned
+        if (tokensOwned > 0) this.add("§7Tokens Owned: §8${tokensOwned.addSeparators()}")
+        if (tokensNeeded > 0) this.add("§7Additional Tokens Needed: §8${tokensNeeded.addSeparators()}${extraFormatting.orEmpty()}")
+        else this.addAll(listOf("", "§e§oYou have enough tokens!"))
+    }
+
+    private fun regenerateOverviewItemStack() {
+        if (repoEventShops.isEmpty()) return
+        overviewInfoItemStack = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress?.let { storage ->
+            createItemStack(
+                "NAME_TAG".asInternalName().getItemStack().item,
+                "§bRemaining Carnival Token Upgrades",
+                *buildList {
+                    var sumTokensNeeded = 0
+                    var foundShops = 0
+                    repoEventShops.forEach { repoShop ->
+                        storage[repoShop.shopName]?.let { purchasedUpgrades ->
+                            foundShops++
+                            val shopProgress = EventShopProgress(repoShop.shopName, purchasedUpgrades)
+                            when (shopProgress.remainingUpgradeSum) {
+                                0 -> add("§a${repoShop.shopName} §8- §aall upgrades purchased!")
+                                else -> add("§7${repoShop.shopName} §8- ${shopProgress.remainingUpgradeSum.addSeparators()} tokens needed.")
+                            }
+                            sumTokensNeeded += shopProgress.remainingUpgradeSum
+                        } ?: add ("§7${repoShop.shopName} §8- §copen shop to load...")
+                    }
+                    val extraFormatting = if (foundShops != repoEventShops.size) "*" else ""
+                    sumTokensNeeded.takeIf { it > 0 }?.let { addNeededRemainingTokens(it, extraFormatting) }
+                }.toTypedArray(),
+            )
+        }
+    }
+
+    private fun regenerateShopSpecificItemStack() {
+        shopSpecificInfoItemStack = currentProgress?.let { progress ->
             createItemStack(
                 "NAME_TAG".asInternalName().getItemStack().item,
                 "§bRemaining $currentEventType Token Upgrades",
@@ -123,14 +202,9 @@ object CarnivalShopHelper {
                                 }",
                             )
                         }
-                        add("")
-
-                        val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
-                        add("§7Sum Tokens Needed: §8${upgradeTotal.addSeparators()}")
+                        val upgradeTotal = progress.remainingUpgradeSum
                         tokensNeeded = upgradeTotal - tokensOwned
-                        if (tokensOwned > 0) add("§7Tokens Owned: §8${tokensOwned.addSeparators()}")
-                        if (tokensNeeded > 0) add("§7Additional Tokens Needed: §8${tokensNeeded.addSeparators()}")
-                        else addAll(listOf("", "§e§oYou have enough tokens!"))
+                        upgradeTotal.takeIf { it > 0 }?.let { addNeededRemainingTokens(it) }
                     }
 
                     if (progress.nonRepoUpgrades.any()) {
@@ -144,12 +218,14 @@ object CarnivalShopHelper {
     }
 
     private fun processInventoryEvent(event: InventoryOpenEvent) {
-        if (!isEnabled() || eventShops.isEmpty()) return
-        val matchingShop = eventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) } ?: return
+        if (!isEnabled() || repoEventShops.isEmpty()) return
+        val matchingShop = repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) } ?: return
         currentEventType = matchingShop.shopName
         processEventShopUpgrades(event.inventoryItems)
         processTokenShopFooter(event)
-        regenerateItemStack()
+        regenerateShopSpecificItemStack()
+        regenerateOverviewItemStack()
+        saveProgress()
     }
 
     private fun processTokenShopFooter(event: InventoryOpenEvent) {
