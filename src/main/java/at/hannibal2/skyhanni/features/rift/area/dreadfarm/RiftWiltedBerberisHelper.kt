@@ -58,10 +58,9 @@ object RiftWiltedBerberisHelper {
         }
     }
 
-    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? {
-        return list.filter { it.currentParticles.distanceSq(location) < 8 }
+    private fun nearestBerberis(location: LorenzVec): WiltedBerberis? =
+        list.filter { it.currentParticles.distanceSq(location) < 8 }
             .minByOrNull { it.currentParticles.distanceSq(location) }
-    }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
@@ -160,6 +159,9 @@ object RiftWiltedBerberisHelper {
     }
 
     private fun isEnabled() = RiftAPI.inRift() && RiftAPI.inDreadfarm() && config.enabled
-    private fun isMuteOthersSoundsEnabled() =
-        RiftAPI.inRift() && (RiftAPI.inDreadfarm() || RiftAPI.inWestVillage()) && !(hasFarmingToolInHand && isOnFarmland) && config.muteOthersSounds
+
+    private fun isMuteOthersSoundsEnabled() = RiftAPI.inRift() &&
+        config.muteOthersSounds &&
+        (RiftAPI.inDreadfarm() || RiftAPI.inWestVillage()) &&
+        !(hasFarmingToolInHand && isOnFarmland)
 }
