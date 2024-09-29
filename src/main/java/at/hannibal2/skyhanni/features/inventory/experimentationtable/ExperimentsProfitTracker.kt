@@ -59,7 +59,7 @@ object ExperimentsProfitTracker {
         { it.experimentation.experimentsProfitTracker },
     ) { drawDisplay(it) }
 
-    private var lastSplashes = mutableListOf<ItemStack>()
+    private val lastSplashes = mutableListOf<ItemStack>()
     private var lastSplashTime = SimpleTimeMark.farPast()
     private var lastBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
     private var currentBottlesInInventory = mutableMapOf<NEUInternalName, Int>()
@@ -183,12 +183,10 @@ object ExperimentsProfitTracker {
 
         if (inventoriesPattern.matches(event.inventoryName)) {
             var startCostTemp = 0
-            val iterator = lastSplashes.iterator()
-            while (iterator.hasNext()) {
-                val item = iterator.next()
+            for (item in lastSplashes) {
                 startCostTemp += calculateBottlePrice(item.getInternalName())
-                iterator.remove()
             }
+            lastSplashes.clear()
             tracker.modify {
                 it.startCost -= startCostTemp
             }
