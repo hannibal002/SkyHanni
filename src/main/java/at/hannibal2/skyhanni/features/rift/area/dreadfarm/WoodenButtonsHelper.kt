@@ -38,13 +38,14 @@ object WoodenButtonsHelper {
     private val config get() = RiftAPI.config.enigmaSoulWaypoints
 
     private val patternGroup = RepoPattern.group("rift.area.dreadfarm.buttons")
+
     /**
      * REGEX-TEST: §eYou have hit §r§b1/56 §r§eof the wooden buttons!
      * REGEX-TEST: §eYou have hit §r§b10/56 §r§eof the wooden buttons!
      */
     private val buttonHitPattern by patternGroup.pattern(
         "hit",
-        "§eYou have hit §r§b\\d+/56 §r§eof the wooden buttons!"
+        "§eYou have hit §r§b\\d+/56 §r§eof the wooden buttons!",
     )
 
     private var buttonLocations = mapOf<String, List<LorenzVec>>()
@@ -121,19 +122,19 @@ object WoodenButtonsHelper {
         if (lastBlowgunFire.passedSince() > 2.5.seconds) return
         buttonLocations.values.flatten().forEach { buttonLocation ->
             val blockState = buttonLocation.getBlockStateAt()
-            if (blockState.block is BlockButtonWood
-                && blockState.getValue(BlockButtonWood.POWERED) == true
-                && buttonLocation.canBeSeen(1..3)) {
-                if (lastHitButton != buttonLocation && !hitButtons.contains(buttonLocation)) {
-                    lastHitButton = buttonLocation
-                    addLastHitButton()
-                }
+            if (blockState.block is BlockButtonWood &&
+                blockState.getValue(BlockButtonWood.POWERED) == true &&
+                buttonLocation.canBeSeen(1..3) &&
+                lastHitButton != buttonLocation &&
+                !hitButtons.contains(buttonLocation)) {
+                lastHitButton = buttonLocation
+                addLastHitButton()
             }
         }
     }
 
     private fun addLastHitButton() {
-        if (!hitButtons.contains(lastHitButton)) {
+        if (lastHitButton !in hitButtons) {
             lastHitButton?.let { hitButtons.add(it) }
         }
     }
@@ -146,10 +147,16 @@ object WoodenButtonsHelper {
             addLastHitButton()
         }
 
-        if (event.message == "§eYou've hit all §r§b56 §r§ewooden buttons!") {
-            RiftAPI.allButtonsHit = true
-            hitButtons = buttonLocations.values.flatten().toMutableSet()
-            soulLocations["Buttons"]?.let { IslandGraphs.pathFind(it, "Buttons Enigma Soul", config.color.toChromaColor(), condition = { config.showPathFinder })  }
+        if (event.message != "§eYou've hit all §r§b56 §r§ewooden buttons!") return
+        RiftAPI.allButtonsHit = true
+        hitButtons = buttonLocations.values.flatten().toMutableSet()
+        soulLocations["Buttons"]?.let {
+            IslandGraphs.pathFind(
+                it,
+                "Buttons Enigma Soul",
+                config.color.toChromaColor(),
+                condition = { config.showPathFinder },
+            )
         }
     }
 
@@ -157,17 +164,17 @@ object WoodenButtonsHelper {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!showButtons()) return
 
-        currentSpot?.let { spot ->
-            if (spot.position.distanceToPlayer() > 2.5) {
-                event.drawDynamicText(spot.position.add(y = 1), "Hit Buttons Here!", 1.5)
-            }
+        val spot = currentSpot ?: return
+        val distance = spot.position.distanceToPlayer()
+        if (distance > 2.5) {
+            event.drawDynamicText(spot.position.add(y = 1), "Hit Buttons Here!", 1.5)
+        }
 
-            if (spot.position.distanceToPlayer() > 15.0) return
-            val spotName = "${spot.name}:${spot.position}"
-            buttonLocations[spotName]?.forEach { button ->
-                if (!hitButtons.contains(button)) {
-                    event.drawWaypointFilled(button, config.color.toChromaColor(), minimumAlpha = 0F)
-                }
+        if (distance > 15.0) return
+        val spotName = "${spot.name}:${spot.position}"
+        buttonLocations[spotName]?.forEach { button ->
+            if (!hitButtons.contains(button)) {
+                event.drawWaypointFilled(button, config.color.toChromaColor(), minimumAlpha = 0F)
             }
         }
     }

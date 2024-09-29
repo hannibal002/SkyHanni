@@ -73,7 +73,7 @@ object LivingCaveLivingMetalHelper {
         event.drawWaypointFilled(
             location,
             color,
-            seeThroughBlocks = location.distanceToPlayer() < 10
+            seeThroughBlocks = location.distanceToPlayer() < 10,
         )
     }
 

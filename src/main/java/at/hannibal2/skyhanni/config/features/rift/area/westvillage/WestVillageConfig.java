@@ -19,7 +19,7 @@ public class WestVillageConfig {
     @ConfigOption(name = "Gunther's Race", desc = "")
     @Accordion
     @Expose
-    public RiftRaceConfig riftRace = new RiftRaceConfig();
+    public GunthersRaceConfig gunthersRace = new GunthersRaceConfig();
 
     @ConfigOption(name = "Kloon Hacking", desc = "")
     @Accordion

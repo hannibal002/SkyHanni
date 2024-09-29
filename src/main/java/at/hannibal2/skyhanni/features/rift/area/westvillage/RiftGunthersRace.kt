@@ -17,16 +17,21 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-object RiftRaceHelper {
+object RiftGunthersRace {
 
-    private val config get() = RiftAPI.config.area.westVillage.riftRace
+    private val config get() = RiftAPI.config.area.westVillage.gunthersRace
     private var parkourHelper: ParkourHelper? = null
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.riftrace")
+
+    /**
+     * REGEX-TEST: §3§lRIFT RACING §r§eRace started! Good luck!
+     */
     private val raceStartedPattern by patternGroup.pattern(
         "start",
         "§3§lRIFT RACING §r§eRace started! Good luck!"
     )
+
     /**
      * REGEX-TEST: §3§lRIFT RACING §r§eRace finished in 00:36.539!
      * REGEX-TEST: §3§lRIFT RACING §r§eRace finished in §r§300:32.794§r§e! §r§3§lPERSONAL BEST!
@@ -35,6 +40,7 @@ object RiftRaceHelper {
         "finish",
         "§3§lRIFT RACING §r§eRace finished in \\d+:\\d+.\\d+!.*"
     )
+
     /**
      * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled!
      * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled! Time limit reached!
