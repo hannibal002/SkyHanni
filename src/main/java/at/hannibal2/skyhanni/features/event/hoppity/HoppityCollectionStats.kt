@@ -213,7 +213,7 @@ object HoppityCollectionStats {
             val newItemStack = if (config.rarityDyeRecolor) ItemStack(
                 Items.dye, 1,
                 when (rarity) {
-                    LorenzRarity.COMMON -> 7  // Light gray dye
+                    LorenzRarity.COMMON -> 7 // Light gray dye
                     LorenzRarity.UNCOMMON -> 10 // Lime dye
                     LorenzRarity.RARE -> 4 // Lapis lazuli
                     LorenzRarity.EPIC -> 5 // Purple dye
