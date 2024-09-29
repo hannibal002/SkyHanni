@@ -220,10 +220,10 @@ object CarnivalShopHelper {
 
     private fun processInventoryEvent(event: InventoryOpenEvent) {
         if (!isEnabled() || repoEventShops.isEmpty()) return
+        processTokenShopFooter(event)
         val matchingShop = repoEventShops.find { it.shopName.equals(event.inventoryName, ignoreCase = true) } ?: return
         currentEventType = matchingShop.shopName
         processEventShopUpgrades(event.inventoryItems)
-        processTokenShopFooter(event)
         regenerateShopSpecificItemStack()
         regenerateOverviewItemStack()
         saveProgress()
@@ -231,19 +231,7 @@ object CarnivalShopHelper {
 
     private fun processTokenShopFooter(event: InventoryOpenEvent) {
         val tokenFooterStack = event.inventoryItems[32]
-        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") {
-            ErrorManager.logErrorWithData(
-                NoSuchElementException(""),
-                "Could not read current Essence Count from inventory",
-                extraData = listOf(
-                    "inventoryName" to event.inventoryName,
-                    "tokenFooterStack" to tokenFooterStack?.displayName.orEmpty(),
-                    "populatedInventorySize" to event.inventoryItems.filter { it.value.hasDisplayName() }.size,
-                    "eventType" to event.javaClass.simpleName,
-                ).toTypedArray(),
-            )
-            return
-        }
+        if (tokenFooterStack === null || tokenFooterStack.displayName != "§eCarnival Tokens") return
         currentTokenCountPattern.firstMatcher(tokenFooterStack.getLore()) {
             tokensOwned = groupOrNull("tokens")?.formatInt() ?: 0
         }
