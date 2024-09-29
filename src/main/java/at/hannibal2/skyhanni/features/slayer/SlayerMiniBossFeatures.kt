@@ -79,6 +79,5 @@ object SlayerMiniBossFeatures {
         SVEN(EntityWolf::class.java, 45_000, 120_000, 480_000),
         VOIDLING(EntityEnderman::class.java, 8_400_000, 17_500_000, 52_500_000),
         INFERNAL(EntityBlaze::class.java, 12_000_000, 25_000_000, 75_000_000),
-        ;
     }
 }

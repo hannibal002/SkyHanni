@@ -53,7 +53,6 @@ object HighlightMiningCommissionMobs {
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
 
         // new commissions
-        ;
     }
 
     @SubscribeEvent
