@@ -333,7 +333,7 @@ object HoppityEggLocator {
         HoppityEggLocations.apiEggLocations[LorenzUtils.skyBlockIsland]?.let {
             for ((i, location) in it.values.withIndex()) {
                 if (i == target) {
-                    IslandGraphs.pathFind(location, "Hoppity Test")
+                    IslandGraphs.pathFind(location, "Hoppity Test", condition = { true })
                     return
                 }
             }
