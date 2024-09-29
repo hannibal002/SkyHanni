@@ -156,9 +156,10 @@ object ExperimentsProfitTracker {
         ) return
         val stack = event.slot?.stack ?: return
 
-        if (experienceBottlePattern.matches(stack.getInternalName().asString())) {
+        val internalName = stack.getInternalName()
+        if (internalName.isExpBottle()) {
             tracker.modify {
-                it.startCost -= calculateBottlePrice(stack.getInternalName())
+                it.startCost -= calculateBottlePrice(internalName)
             }
         }
     }
@@ -167,12 +168,14 @@ object ExperimentsProfitTracker {
     fun onItemClick(event: ItemClickEvent) {
         if (isEnabled() && event.clickType == ClickType.RIGHT_CLICK) {
             val item = event.itemInHand ?: return
-            if (experienceBottlePattern.matches(item.getInternalName().asString())) {
+            if (item.getInternalName().isExpBottle()) {
                 lastSplashTime = SimpleTimeMark.now()
                 lastSplashes.add(item)
             }
         }
     }
+
+    private fun NEUInternalName.isExpBottle() = experienceBottlePattern.matches(asString())
 
     @SubscribeEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
