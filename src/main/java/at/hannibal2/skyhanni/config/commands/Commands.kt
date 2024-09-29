@@ -72,6 +72,7 @@ import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.features.misc.discordrpc.DiscordRPCManager
 import at.hannibal2.skyhanni.features.misc.limbo.LimboTimeTracker
 import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatures
+import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
@@ -182,8 +183,10 @@ object Commands {
         )
         registerCommand("shremind", "Set a reminder for yourself") { ReminderManager.command(it) }
         registerCommand("shwords", "Opens the config list for modifying visual words") { openVisualWords() }
+        registerCommand("shnavigate", "Using path finder to go to locatons") { NavigationHelper.onCommand(it) }
     }
 
+    @Suppress("LongMethod")
     private fun usersNormal() {
         registerCommand(
             "shmarkplayer",
@@ -500,6 +503,7 @@ object Commands {
         ) { ScoreboardData.toggleMonitor() }
     }
 
+    @Suppress("LongMethod")
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }

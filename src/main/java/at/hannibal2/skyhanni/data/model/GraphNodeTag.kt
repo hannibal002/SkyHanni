@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 enum class GraphNodeTag(
     val internalName: String,
     val color: LorenzColor,
-    cleanName: String,
+    val cleanName: String,
     val description: String,
     val onlyIsland: IslandType? = null,
 ) {
@@ -17,7 +17,7 @@ enum class GraphNodeTag(
     AREA("area", LorenzColor.DARK_GREEN, "Area", "A big SkyBlock area."),
     SMALL_AREA("small_area", LorenzColor.GREEN, "Small Area", "A small SkyBlock area, e.g. a house."),
     POI("poi", LorenzColor.WHITE, "Point of Interest", "A relevant spot or a landmark on the map."),
-//     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
+    //     LAUNCH_PAD("launch", LorenzColor.WHITE, "Launch Pad", "Slime blocks sending you to another server."),
     TELEPORT("teleport", LorenzColor.BLUE, "Teleport", "A spot from/to teleport."),
 
     // on multiple islands
@@ -43,18 +43,36 @@ enum class GraphNodeTag(
     // Rift
     RIFT_ENIGMA("rift_enigma", LorenzColor.DARK_PURPLE, "Enigma Soul", "Enigma Souls in the Rift.", onlyIsland = IslandType.THE_RIFT),
     RIFT_EYE("rift_eye", LorenzColor.DARK_RED, "Rift Eye", "An Eye in the Rift to teleport to.", onlyIsland = IslandType.THE_RIFT),
-    RIFT_MONTEZUMA("rift_montezuma", LorenzColor.GRAY, "Montezuma Soul Piece", "A piece of the Montezuma Soul.", onlyIsland = IslandType.THE_RIFT),
+    RIFT_MONTEZUMA(
+        "rift_montezuma",
+        LorenzColor.GRAY,
+        "Montezuma Soul Piece",
+        "A piece of the Montezuma Soul.",
+        onlyIsland = IslandType.THE_RIFT,
+    ),
     RIFT_EFFIGY("rift_effigy", LorenzColor.RED, "Blood Effigies", "Locations of the Blood Effigies.", onlyIsland = IslandType.THE_RIFT),
 
     // Spider's Den
-    SPIDER_RELIC("SPIDER_RELIC", LorenzColor.DARK_PURPLE, "Spider's Relic", "An relic in the Spider's Den.", onlyIsland = IslandType.SPIDER_DEN),
+    SPIDER_RELIC(
+        "SPIDER_RELIC",
+        LorenzColor.DARK_PURPLE,
+        "Spider's Relic",
+        "An relic in the Spider's Den.",
+        onlyIsland = IslandType.SPIDER_DEN,
+    ),
 
     // Dwarven Mines
     MINES_EMISSARY("mines_emissary", LorenzColor.GOLD, "Mines Emissary", "An Emissary to the king.", onlyIsland = IslandType.DWARVEN_MINES),
     // commission areas
 
     // Crimson Isles
-    CRIMSON_MINIBOSS("crimson_miniboss", LorenzColor.RED, "Crimson Miniboss", "A Miniboss in the Crimson Isle.", onlyIsland = IslandType.CRIMSON_ISLE),
+    CRIMSON_MINIBOSS(
+        "crimson_miniboss",
+        LorenzColor.RED,
+        "Crimson Miniboss",
+        "A Miniboss in the Crimson Isle.",
+        onlyIsland = IslandType.CRIMSON_ISLE,
+    ),
 
     // The End
     END_GOLEM("end_golem", LorenzColor.RED, "Golem Spawn", "A spot where the golem can spawn in the End.", onlyIsland = IslandType.THE_END),

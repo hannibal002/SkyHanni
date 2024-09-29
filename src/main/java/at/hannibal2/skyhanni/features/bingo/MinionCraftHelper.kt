@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -197,12 +199,9 @@ object MinionCraftHelper {
             val output = recipe.output ?: continue
             if (!output.internalName.contains("_GENERATOR_")) continue
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (input in recipe.ingredients) {
-                val itemId = input.internalName
+            for ((itemId, count) in recipe.ingredients.toPrimitiveItemStacks()) {
                 if (minionId != itemId) {
-                    val count = input.count.toInt()
-                    val old = map.getOrDefault(itemId, 0)
-                    map[itemId] = old + count
+                    map.addOrPut(itemId, count)
                 }
             }
             var allDone = true

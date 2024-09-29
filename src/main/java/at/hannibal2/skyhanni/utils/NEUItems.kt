@@ -9,10 +9,12 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
@@ -62,6 +64,7 @@ object NEUItems {
             .registerTypeAdapter(
                 HypixelApiTrophyFish::class.java,
                 object : TypeAdapter<HypixelApiTrophyFish>() {
+                    @Suppress("EmptyFunctionBlock")
                     override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
                     override fun read(reader: JsonReader): HypixelApiTrophyFish {
@@ -308,8 +311,8 @@ object NEUItems {
             if (!recipe.isCraftingRecipe()) continue
 
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.getCachedIngredients()) {
-                val count = ingredient.count.toInt()
+            for (ingredient in recipe.getCachedIngredients().toPrimitiveItemStacks()) {
+                val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
                 if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
@@ -331,8 +334,7 @@ object NEUItems {
                     continue
                 }
 
-                val old = map.getOrDefault(internalItemId, 0)
-                map[internalItemId] = old + count
+                map.addOrPut(internalItemId, amount)
             }
             if (map.size != 1) continue
             val current = map.iterator().next().toPair()

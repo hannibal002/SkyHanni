@@ -301,11 +301,6 @@ object MineshaftPityDisplay {
 
         GEMSTONE(
             "Gemstone",
-            /*listOf(
-                OreType.RUBY, OreType.AMBER, OreType.AMETHYST, OreType.JADE,
-                OreType.SAPPHIRE, OreType.TOPAZ, OreType.JASPER, OreType.OPAL,
-                OreType.AQUAMARINE, OreType.CITRINE, OreType.ONYX, OreType.PERIDOT,
-            ),*/
             OreType.entries.filter { it.isGemstone() },
             4,
             ItemStack(Blocks.stained_glass, 1, EnumDyeColor.BLUE.metadata),

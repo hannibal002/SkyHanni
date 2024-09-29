@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
@@ -511,9 +512,7 @@ object ItemUtils {
 
     fun neededItems(recipe: PrimitiveRecipe): Map<NEUInternalName, Int> {
         val neededItems = mutableMapOf<NEUInternalName, Int>()
-        for (ingredient in recipe.ingredients) {
-            val material = ingredient.internalName
-            val amount = ingredient.count.toInt()
+        for ((material, amount) in recipe.ingredients.toPrimitiveItemStacks()) {
             neededItems.addOrPut(material, amount)
         }
         return neededItems

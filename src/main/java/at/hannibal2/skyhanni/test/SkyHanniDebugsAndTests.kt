@@ -117,6 +117,7 @@ object SkyHanniDebugsAndTests {
             testLocation = null
             ChatUtils.chat("reset test waypoint")
             IslandGraphs.stop()
+            return
         }
 
         val x = args[0].toDouble()
@@ -125,20 +126,19 @@ object SkyHanniDebugsAndTests {
         val location = LorenzVec(x, y, z)
         testLocation = location
         if (args.getOrNull(3) == "pathfind") {
-            IslandGraphs.pathFind(location)
+            IslandGraphs.pathFind(location, "/shtestwaypoint", showGoalExact = true, condition = { true })
         }
         ChatUtils.chat("set test waypoint")
     }
 
     fun testCommand(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            asyncTest()
+            asyncTest(args)
         }
     }
 
-    private fun asyncTest() {
-
-    }
+    @Suppress("EmptyFunctionBlock")
+    private fun asyncTest(args: Array<String>) {}
 
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
@@ -378,7 +378,7 @@ object SkyHanniDebugsAndTests {
                 add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
                 add("  §eitemName: '${internalName.itemName}§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 
@@ -388,7 +388,7 @@ object SkyHanniDebugsAndTests {
                 add("§einternal name: §7${internalName.asString()}")
                 add("§einternal name -> item name: '$itemName§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 
@@ -486,14 +486,15 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-    }
+    @Suppress("EmptyFunctionBlock")
+    fun onChat(event: LorenzChatEvent) {}
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             itemRenderDebug()
         }
 
@@ -528,7 +529,8 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             dragAbleTest()
         }
     }
