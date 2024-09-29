@@ -86,13 +86,15 @@ object GraphEditorBugFinder {
             }
             val closestForeignNode = closestForeignNodes.minBy { it.position.distanceSqToPlayer() }
             val closestNodeToForeignNode = closestCluster.minBy { it.position.distanceSq(closestForeignNode.position) }
-            closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED)
+            closestNodeToForeignNode.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
 
         println("found $bugs bugs!")
         this.errorsInWorld = errorsInWorld
         if (clusters.size <= 1) {
-            errorsInWorld.keys.minByOrNull { it.position.distanceSqToPlayer() }?.pathFind("Graph Editor Bug", Color.RED)
+            errorsInWorld.keys.minByOrNull {
+                it.position.distanceSqToPlayer()
+            }?.pathFind("Graph Editor Bug", Color.RED, condition = { isEnabled() })
         }
     }
 
