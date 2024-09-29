@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgrade
 import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addIfNotNull
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -50,15 +49,16 @@ object CarnivalShopHelper {
      */
     private val currentTokenCountPattern by patternGroup.pattern(
         "carnival.tokens.current",
-        ".*§7Your Tokens: §a(?<tokens>[\\d,]*)"
+        ".*§7Your Tokens: §a(?<tokens>[\\d,]*)",
     )
 
     /**
      * REGEX-TEST: §8Souvenir Shop
+     * REGEX-TEST: §8Carnival Perks
      */
-    private val souvenirShopInventoryPattern by patternGroup.pattern(
-        "carnival.souvenirshop",
-        "(?:§.)*Souvenir Shop"
+    private val overviewInventoryNamesPattern by patternGroup.pattern(
+        "carnival.overviewinventories",
+        "(?:§.)*(?:Souvenir Shop|Carnival Perks)",
     )
 
     data class EventShop(val shopName: String, val upgrades: List<NeuCarnivalTokenCostJson>)
@@ -99,7 +99,7 @@ object CarnivalShopHelper {
     }
 
     private fun tryReplaceOverviewStack(event: ReplaceItemEvent) {
-        if (!souvenirShopInventoryPattern.matches(event.inventory.name)) return
+        if (!overviewInventoryNamesPattern.matches(event.inventory.name)) return
         overviewInfoItemStack.let { event.replace(it) }
     }
 
@@ -163,8 +163,9 @@ object CarnivalShopHelper {
         overviewInfoItemStack = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress?.let { storage ->
             createItemStack(
                 "NAME_TAG".asInternalName().getItemStack().item,
-                "§bRemaining Carnival Token Upgrades",
+                "§bRemaining Event Shop Token Upgrades",
                 *buildList {
+                    add("")
                     var sumTokensNeeded = 0
                     var foundShops = 0
                     repoEventShops.forEach { repoShop ->
@@ -172,11 +173,11 @@ object CarnivalShopHelper {
                             foundShops++
                             val shopProgress = EventShopProgress(repoShop.shopName, purchasedUpgrades)
                             when (shopProgress.remainingUpgradeSum) {
-                                0 -> add("§a${repoShop.shopName} §8- §aall upgrades purchased!")
-                                else -> add("§7${repoShop.shopName} §8- ${shopProgress.remainingUpgradeSum.addSeparators()} tokens needed.")
+                                0 -> add("§a${repoShop.shopName}§7: §aall upgrades purchased!")
+                                else -> add("§7${repoShop.shopName}: §8${shopProgress.remainingUpgradeSum.addSeparators()} tokens needed")
                             }
                             sumTokensNeeded += shopProgress.remainingUpgradeSum
-                        } ?: add ("§7${repoShop.shopName} §8- §copen shop to load...")
+                        } ?: add("§7${repoShop.shopName}: §copen shop to load...")
                     }
                     val extraFormatting = if (foundShops != repoEventShops.size) "*" else ""
                     sumTokensNeeded.takeIf { it > 0 }?.let { addNeededRemainingTokens(it, extraFormatting) }
