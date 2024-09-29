@@ -118,9 +118,17 @@ object ExperimentationTableAPI {
     /**
      * REGEX-TEST: Titanic Experience Bottle
      */
+    val experienceBottleChatPattern by patternGroup.pattern(
+        "chat.xpbottle",
+        "(?:Colossal |Titanic |Grand |\\b)Experience Bottle",
+    )
+
+    /**
+     * REGEX-TEST: TITANIC_EXP_BOTTLE
+     */
     val experienceBottlePattern by patternGroup.pattern(
         "xpbottle",
-        "(?:Titanic |Grand |\\b)Experience Bottle",
+        "(?:COLOSSAL_|TITANIC_|GRAND_|\\b)EXP_BOTTLE",
     )
 
     /**

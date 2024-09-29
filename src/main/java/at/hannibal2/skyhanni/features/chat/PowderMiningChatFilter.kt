@@ -252,6 +252,7 @@ object PowderMiningChatFilter {
         "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
     )
 
+    @Suppress("CyclomaticComplexMethod")
     fun block(message: String): String? {
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"
@@ -358,7 +359,7 @@ object PowderMiningChatFilter {
                 else -> {
                     ErrorManager.logErrorWithData(
                         NoSuchElementException(),
-                        "Unknown Goblin Egg color detected in Powder Mining Filter: '${colorStr}' - please report this in the Discord!",
+                        "Unknown Goblin Egg color detected in Powder Mining Filter: '$colorStr' - please report this in the Discord!",
                         noStackTrace = true,
                     )
                     "no_filter"

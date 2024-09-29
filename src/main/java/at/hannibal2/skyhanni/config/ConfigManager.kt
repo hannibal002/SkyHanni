@@ -66,7 +66,8 @@ class ConfigManager {
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
         require(value.javaClass == type.clazz)
-        @Suppress("UNCHECKED_CAST") (type.property as KMutableProperty0<Any>).set(value)
+        @Suppress("UNCHECKED_CAST")
+        (type.property as KMutableProperty0<Any>).set(value)
         (jsonHolder as MutableMap<ConfigFileType, Any>)[type] = value
     }
 
