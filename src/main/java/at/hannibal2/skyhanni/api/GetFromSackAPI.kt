@@ -163,7 +163,7 @@ object GetFromSackAPI {
     }
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
-        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
+        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax$amount §9$item §efrom bazaar",
         onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!",
     )
 
