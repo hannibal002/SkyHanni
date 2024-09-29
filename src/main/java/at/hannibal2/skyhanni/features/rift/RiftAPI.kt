@@ -23,7 +23,8 @@ object RiftAPI {
 
     private val blowgun by lazy  { "BERBERIS_BLOWGUN".asInternalName() }
 
-    val ItemStack.isBlowgun get() = getInternalName() == blowgun
+    val ItemStack?.isBlowgun: Boolean
+        get() = this?.getInternalName() == blowgun
 
     fun ItemStack.motesNpcPrice(): Double? {
         val baseMotes = motesPrice[getInternalName()] ?: return null

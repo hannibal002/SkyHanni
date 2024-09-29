@@ -47,7 +47,7 @@ object WoodenButtonsHelper {
         "§eYou have hit §r§b\\d+/56 §r§eof the wooden buttons!"
     )
 
-    private var buttonLocations = mutableMapOf<String, List<LorenzVec>>()
+    private var buttonLocations = mapOf<String, List<LorenzVec>>()
     private var hitButtons = mutableSetOf<LorenzVec>()
     private var lastHitButton: LorenzVec? = null
     private var currentSpot: GraphNode? = null
@@ -55,12 +55,14 @@ object WoodenButtonsHelper {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<RiftWoodenButtonsJson>("RiftWoodenButtons")
-        buttonLocations = data.houses.flatMap { (houseName, spots) ->
-            spots.map { spot ->
-                "$houseName:${spot.position}" to spot.buttons
+        val data = event.getConstant<RiftWoodenButtonsJson>("rift/RiftWoodenButtons")
+        buttonLocations = mutableMapOf<String, List<LorenzVec>>().apply {
+            data.houses.forEach { (houseName, spots) ->
+                spots.forEach { spot ->
+                    this["$houseName House:${spot.position}"] = spot.buttons
+                }
             }
-        }.toMap().toMutableMap()
+        }
     }
 
     @SubscribeEvent
@@ -111,7 +113,7 @@ object WoodenButtonsHelper {
     fun onItemClick(event: ItemClickEvent) {
         if (!checkButtons()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
-        if (event.itemInHand?.isBlowgun != true) return
+        if (!event.itemInHand.isBlowgun) return
         lastBlowgunFire = SimpleTimeMark.now()
     }
 
@@ -146,8 +148,8 @@ object WoodenButtonsHelper {
 
         if (event.message == "§eYou've hit all §r§b56 §r§ewooden buttons!") {
             RiftAPI.allButtonsHit = true
-            hitButtons.addAll(buttonLocations.values.flatten().filter { it !in hitButtons })
-            soulLocations["Buttons"]?.let { IslandGraphs.pathFind(it, "Buttons Enigma Soul", config.color.toChromaColor()) }
+            hitButtons = buttonLocations.values.flatten().toMutableSet()
+            soulLocations["Buttons"]?.let { IslandGraphs.pathFind(it, "Buttons Enigma Soul", config.color.toChromaColor(), condition = { config.showPathFinder })  }
         }
     }
 

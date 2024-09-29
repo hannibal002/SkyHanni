@@ -23,12 +23,26 @@ object RiftRaceHelper {
     private var parkourHelper: ParkourHelper? = null
 
     private val patternGroup = RepoPattern.group("rift.area.westvillage.riftrace")
+    private val raceStartedPattern by patternGroup.pattern(
+        "start",
+        "§3§lRIFT RACING §r§eRace started! Good luck!"
+    )
     /**
      * REGEX-TEST: §3§lRIFT RACING §r§eRace finished in 00:36.539!
+     * REGEX-TEST: §3§lRIFT RACING §r§eRace finished in §r§300:32.794§r§e! §r§3§lPERSONAL BEST!
      */
     private val raceFinishedPattern by patternGroup.pattern(
         "finish",
-        "§3§lRIFT RACING §r§eRace finished in \\d+:\\d+.\\d+!"
+        "§3§lRIFT RACING §r§eRace finished in \\d+:\\d+.\\d+!.*"
+    )
+    /**
+     * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled!
+     * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled! Time limit reached!
+     * REGEX-TEST: §3§lRIFT RACING §r§cRace cancelled! You left the racing area!
+     */
+    private val raceCancelledPattern by patternGroup.pattern(
+        "cancel",
+        "§3§lRIFT RACING §r§cRace cancelled!.*"
     )
 
     @SubscribeEvent
@@ -43,7 +57,7 @@ object RiftRaceHelper {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        val data = event.getConstant<ParkourJson>("RiftRace")
+        val data = event.getConstant<ParkourJson>("rift/RiftRace")
         parkourHelper = ParkourHelper(
             data.locations,
             data.shortCuts,
@@ -72,10 +86,10 @@ object RiftRaceHelper {
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if (event.message == "§3§lRIFT RACING §r§eRace started! Good luck!") {
+        raceStartedPattern.matchMatcher(event.message) {
             RiftAPI.inRiftRace = true
         }
-        if (event.message.startsWith("§3§lRIFT RACING §r§cRace cancelled!")) {
+        raceCancelledPattern.matchMatcher(event.message) {
             parkourHelper?.reset()
             RiftAPI.inRiftRace = false
         }
