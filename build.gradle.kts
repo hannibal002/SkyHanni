@@ -346,7 +346,6 @@ publishing.publications {
     }
 }
 
-// Detekt: TODO: Uncomment this when we're ready to enforce
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
@@ -355,6 +354,10 @@ detekt {
 }
 
 tasks.withType<Detekt>().configureEach {
+    onlyIf {
+        false // TODO: Remove onlyIf when we're ready to enforce
+    }
+
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
