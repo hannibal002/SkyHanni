@@ -55,12 +55,12 @@ object SeaCreatureTracker {
         }
     }
 
-    private val nameAll: CategoryName = "All"
-    private var currentCategory: CategoryName = nameAll
+    private const val NAME_ALL: CategoryName = "All"
+    private var currentCategory: CategoryName = NAME_ALL
 
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
-        map[nameAll] = data.amount.size
+        map[NAME_ALL] = data.amount.size
         for ((category, names) in SeaCreatureManager.allVariants) {
             val amount = names.count { it in data.amount }
             if (amount > 0) {
@@ -103,7 +103,7 @@ object SeaCreatureTracker {
         val amounts = getCurrentCategories(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
-            currentCategory = nameAll
+            currentCategory = NAME_ALL
         }
 
         if (tracker.isInventoryOpen()) {
@@ -118,7 +118,7 @@ object SeaCreatureTracker {
             )
         }
 
-        return if (currentCategory == nameAll) {
+        return if (currentCategory == NAME_ALL) {
             { true }
         } else filterCurrentCategory()
     }
