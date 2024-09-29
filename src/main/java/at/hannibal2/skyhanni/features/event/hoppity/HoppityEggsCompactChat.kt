@@ -95,7 +95,7 @@ object HoppityEggsCompactChat {
             } ?: "?"
 
             val dupeNumberFormat = if (eventConfig.showDuplicateNumber) {
-                (HoppityCollectionStats.getRabbitCount(this.lastName) - 1).takeIf { it > 1}?.let {
+                (HoppityCollectionStats.getRabbitCount(this.lastName)).takeIf { it > 0 }?.let {
                     " §7(§b#$it§7)"
                 } ?: ""
             } else ""

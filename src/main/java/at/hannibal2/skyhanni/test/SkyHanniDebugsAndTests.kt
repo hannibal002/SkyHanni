@@ -126,7 +126,7 @@ object SkyHanniDebugsAndTests {
         val location = LorenzVec(x, y, z)
         testLocation = location
         if (args.getOrNull(3) == "pathfind") {
-            IslandGraphs.pathFind(location)
+            IslandGraphs.pathFind(location, "/shtestwaypoint", showGoalExact = true)
         }
         ChatUtils.chat("set test waypoint")
     }
@@ -493,7 +493,8 @@ object SkyHanniDebugsAndTests {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             itemRenderDebug()
         }
 
@@ -528,7 +529,8 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        @Suppress("ConstantConditionIf") if (false) {
+        @Suppress("ConstantConditionIf")
+        if (false) {
             dragAbleTest()
         }
     }

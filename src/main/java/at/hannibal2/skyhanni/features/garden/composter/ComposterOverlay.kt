@@ -564,18 +564,24 @@ object ComposterOverlay {
         }
     }
 
+    private val blockedItems = listOf(
+        "POTION_AFFINITY_TALISMAN",
+        "CROPIE_TALISMAN",
+        "SPEED_TALISMAN",
+        "SIMPLE_CARROT_CANDY",
+    )
+
+    private fun isBlockedArmor(internalName: String): Boolean {
+        return internalName.endsWith("_BOOTS") ||
+            internalName.endsWith("_HELMET") ||
+            internalName.endsWith("_CHESTPLATE") ||
+            internalName.endsWith("_LEGGINGS")
+    }
+
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
         for ((internalName, _) in NEUItems.allNeuRepoItems()) {
-            if (internalName == "POTION_AFFINITY_TALISMAN"
-                || internalName == "CROPIE_TALISMAN"
-                || internalName.endsWith("_BOOTS")
-                || internalName.endsWith("_HELMET")
-                || internalName.endsWith("_CHESTPLATE")
-                || internalName.endsWith("_LEGGINGS")
-                || internalName == "SPEED_TALISMAN"
-                || internalName == "SIMPLE_CARROT_CANDY"
-            ) continue
+            if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
 
             var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
             if (amount <= 9) continue

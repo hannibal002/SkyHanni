@@ -252,6 +252,7 @@ object PowderMiningChatFilter {
         "§r§[fa9][❤❈☘⸕✎✧] (?<tier>Rough|Flawed|Fine|Flawless) (?<gem>Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone( §r§8x(?<amount>[\\d,]+))?",
     )
 
+    @Suppress("CyclomaticComplexMethod")
     fun block(message: String): String? {
         // Generic "you uncovered a chest" message
         if (uncoverChestPattern.matches(message)) return "powder_mining_chest"

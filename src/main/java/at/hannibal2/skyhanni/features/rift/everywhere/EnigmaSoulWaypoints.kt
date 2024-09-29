@@ -111,7 +111,8 @@ object EnigmaSoulWaypoints {
             ChatUtils.chat("§5Tracking the $name Enigma Soul!", prefixColor = "§5")
             if (config.showPathFinder) {
                 soulLocations[name]?.let {
-                    IslandGraphs.pathFind(it, config.color.toChromaColor(), condition = { config.showPathFinder })
+
+                    IslandGraphs.pathFind(it, "$name Enigma Soul", config.color.toChromaColor(), condition = { config.showPathFinder })
                 }
             }
             trackedSouls.add(name)
