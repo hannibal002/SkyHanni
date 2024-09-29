@@ -82,7 +82,7 @@ object CarnivalShopHelper {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val repoTokenShops = event.readConstant<NeuMiscJson>("misc").carnivalTokenShops
+        val repoTokenShops = event.readConstant<NeuMiscJson>("carnivalshops").carnivalTokenShops
         eventShops = repoTokenShops.map { (key, value) ->
             EventShop(key.replace("_", " "), value.values.toMutableList())
         }.toMutableList()
