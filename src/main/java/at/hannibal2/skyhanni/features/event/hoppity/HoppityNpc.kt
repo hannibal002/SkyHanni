@@ -60,7 +60,7 @@ object HoppityNpc {
             actionName = "warp to hub",
             action = {
                 HypixelCommands.warp("hub")
-                //afterNextIslandwarpTtp hub: IslandGraphs.pathFind(hoppity)
+                // afterNextIslandwarpTtp hub: IslandGraphs.pathFind(hoppity)
             },
         )
 

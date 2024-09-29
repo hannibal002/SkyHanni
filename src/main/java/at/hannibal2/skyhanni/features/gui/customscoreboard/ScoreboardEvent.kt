@@ -373,9 +373,9 @@ private fun getWinterLines() = buildList {
 }
 
 private fun getWinterShowWhen(): Boolean = getSbLines().any {
-    SbPattern.winterEventStartPattern.matches(it)
-        || (SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
-        || SbPattern.winterWavePattern.matches(it)
+    SbPattern.winterEventStartPattern.matches(it) ||
+        (SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!")) ||
+        SbPattern.winterWavePattern.matches(it)
 }
 
 private fun getNewYearLines() = listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
