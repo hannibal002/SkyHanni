@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.isKuudraArmor
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
@@ -472,8 +473,8 @@ object EstimatedItemValueCalculator {
         var totalStars = inputStars
         val rawInternalName = internalName.asString()
         val (price, maxStars) = if (isKuudraSet(rawInternalName)) {
-            val tier = getKuudraTier(internalName)
-            totalStars += (tier + 1) * 10
+            val tier = internalName.getKuudraTier() ?: 0
+            totalStars += tier * 10
 
             var remainingStars = totalStars
 
@@ -485,7 +486,7 @@ object EstimatedItemValueCalculator {
 
             for ((id, prices) in EssenceItemUtils.itemPrices) {
                 if (!id.contains(removed)) continue
-                tiers[id] = getKuudraTier(id)
+                tiers[id] = (id.getKuudraTier() ?: 0) - 1
 
             }
             for ((id, tier) in tiers.sorted()) {
@@ -511,17 +512,6 @@ object EstimatedItemValueCalculator {
 
         return price to (havingStars to maxStars)
     }
-
-    private fun getKuudraTier(internalName: NEUInternalName): Int {
-        for (tier in kuudraUpgradeTiers) {
-            if (internalName.asString().contains(tier)) {
-                return kuudraUpgradeTiers.indexOf(tier)
-            }
-        }
-        return -1
-    }
-//     private fun getKuudraTier(internalName: NEUInternalName): Int? =
-//         kuudraUpgradeTiers.firstOrNull { it in internalName.toString() }?.let { kuudraUpgradeTiers.indexOf(it) }
 
     private fun getPriceFor(
         prices: Map<Int, EssenceItemUtils.EssenceUpgradePrice>,
