@@ -359,7 +359,7 @@ object PowderMiningChatFilter {
                 else -> {
                     ErrorManager.logErrorWithData(
                         NoSuchElementException(),
-                        "Unknown Goblin Egg color detected in Powder Mining Filter: '${colorStr}' - please report this in the Discord!",
+                        "Unknown Goblin Egg color detected in Powder Mining Filter: '$colorStr' - please report this in the Discord!",
                         noStackTrace = true,
                     )
                     "no_filter"

@@ -378,7 +378,7 @@ object SkyHanniDebugsAndTests {
                 add("§eitem name -> internalName: '§7${internalName.asString()}§e'")
                 add("  §eitemName: '${internalName.itemName}§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 
@@ -388,7 +388,7 @@ object SkyHanniDebugsAndTests {
                 add("§einternal name: §7${internalName.asString()}")
                 add("§einternal name -> item name: '$itemName§e'")
                 val price = internalName.getPriceOrNull()?.let { "§6" + it.addSeparators() } ?: "§7null"
-                add("  §eprice: '§6${price}§e'")
+                add("  §eprice: '§6$price§e'")
                 return@buildList
             }
 

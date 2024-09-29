@@ -144,7 +144,7 @@ object IslandAreas {
             val isTarget = node.name == targetNode?.name
             val color = if (isTarget) LorenzColor.GOLD else tag.color
 
-            val coloredName = "${color.getChatColor()}${name}"
+            val coloredName = "${color.getChatColor()}$name"
 
             var suffix = ""
             paths[node]?.let { path ->
@@ -161,7 +161,7 @@ object IslandAreas {
             }
 
             val distance = difference.roundTo(1)
-            val text = "${coloredName}§7: §e$distance$suffix"
+            val text = "$coloredName§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {
                 foundCurrentArea = true
