@@ -6,6 +6,8 @@ import at.skyhanni.sharedvariables.versionString
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 
 plugins {
     idea
@@ -345,27 +347,27 @@ publishing.publications {
 }
 
 // Detekt: TODO: Uncomment this when we're ready to enforce
-// detekt {
-//     buildUponDefaultConfig = true // preconfigure defaults
-//     config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
-//     baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
-//     source.setFrom(project.sourceSets.named("main").map { it.allSource })
-// }
-//
-// tasks.withType<Detekt>().configureEach {
-//     reports {
-//         html.required.set(true) // observe findings in your browser with structure and code snippets
-//         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
-//         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
-//         md.required.set(true) // simple Markdown format
-//     }
-// }
-//
-// tasks.withType<Detekt>().configureEach {
-//     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-//     outputs.cacheIf { false } // Custom rules won't work if cached
-// }
-// tasks.withType<DetektCreateBaselineTask>().configureEach {
-//     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
-//     outputs.cacheIf { false } // Custom rules won't work if cached
-// }
+detekt {
+    buildUponDefaultConfig = true // preconfigure defaults
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
+    baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+}
+
+tasks.withType<Detekt>().configureEach {
+    reports {
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+        md.required.set(true) // simple Markdown format
+    }
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
+}
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
+}
