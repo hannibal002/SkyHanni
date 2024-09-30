@@ -9,6 +9,8 @@ import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
+import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -40,7 +42,7 @@ object TimeOffset {
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        if (offsetMillis > 10 * 1000) {
+        if (abs(offsetMillis) > 10 * 1000) {
             val formatted = offsetMillis.toDuration(DurationUnit.MILLISECONDS).format()
             ChatUtils.userError("Your computer's clock is off by $formatted. Please update your time settings.")
         }
