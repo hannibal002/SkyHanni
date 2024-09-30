@@ -95,7 +95,7 @@ object CrownOfAvariceCounter {
     }
 
     private fun update() {
-        val coinsPerHour = calculateCoinsPerHour().addSeparators()
+        val coinsPerHour = calculateCoinsPerHour().toLong()
         val timeUntilMax = calculateTimeUntilMax()
         render = Renderable.verticalContainer(
             listOf(
@@ -105,8 +105,8 @@ object CrownOfAvariceCounter {
                         Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
                     ),
                 ),
-                Renderable.string("§aCoins Per Hour: §6$coinsPerHour"),
-                Renderable.string("§aTime until Max: §6$timeUntilMax")
+                Renderable.string("§aCoins Per Hour: §6${if (sessionStart.passedSince() < 10.seconds) "Calculating..." else coinsPerHour.addSeparators()}"),
+                Renderable.string("§aTime until Max: §6${if (sessionStart.passedSince() < 10.seconds) "Calculating..." else timeUntilMax}"),
             ),
         )
     }
@@ -127,6 +127,7 @@ object CrownOfAvariceCounter {
 
     private fun calculateTimeUntilMax(): String {
         val coinsPerHour = calculateCoinsPerHour()
+        if (coinsPerHour == 0.0) return "Forever..."
         val timeUntilMax = ((MAX_AVARICE - count) / coinsPerHour).hours
         return timeUntilMax.format()
     }
