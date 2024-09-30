@@ -69,36 +69,34 @@ object FannCost {
         if (!anvilPattern.matches(event.itemStack.displayName)) return
         val tooltip = event.toolTip
 
-        val trainingType = tooltip.getTrainingType()
+        val trainingType = tooltip.getTrainingType() ?: return
 
         when (trainingMode) {
             TrainingMode.DAY_COUNT -> {
-                if (trainingType != null) {
-                    if (trainingType == TrainingType.FREE) return
-                    if (!showCoins || !showBits) return
+                if (trainingType == TrainingType.FREE) return
+                if (!showCoins || !showBits) return
 
-                    val totalExp = tooltip.getExpEarned() ?: return
-                    val coinPerExp = tooltip.getCoins() / totalExp
-                    val xpPerBit = totalExp / tooltip.getBits()
+                val totalExp = tooltip.getExpEarned() ?: return
+                val coinPerExp = tooltip.getCoins() / totalExp
+                val xpPerBit = totalExp / tooltip.getBits()
 
-                    tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
-                    tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
-                }
+                tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
+
             }
 
             TrainingMode.UNTIL_LEVEL -> {
-                if (trainingType != null) {
-                    if (trainingType == TrainingType.FREE) return
-                    if (!showCoins || !showBits) return
+                if (trainingType == TrainingType.FREE) return
+                if (!showCoins || !showBits) return
 
-                    val dailyExp = tooltip.getDailyExp() ?: return
-                    val duration = tooltip.getDuration() ?: return
-                    val totalExp = dailyExp * duration
-                    val coinPerExp = tooltip.getCoins() / totalExp
-                    val xpPerBit = totalExp / tooltip.getBits()
-                    tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
-                    tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
-                }
+                val dailyExp = tooltip.getDailyExp() ?: return
+                val duration = tooltip.getDuration() ?: return
+                val totalExp = dailyExp * duration
+                val coinPerExp = tooltip.getCoins() / totalExp
+                val xpPerBit = totalExp / tooltip.getBits()
+                tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
+
             }
         }
     }
@@ -144,6 +142,7 @@ object FannCost {
         return coinsPattern.read(this) { it._toDouble() } ?: 0.0
     }
 
+    // In case of Bits not found, return 1 so the division is not by zero
     private fun List<String>.getBits(): Double {
         return bitsPattern.read(this) { it._toDouble() } ?: 1.0
     }
