@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.itemabilities
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -65,22 +66,18 @@ object CrownOfAvariceCounter {
         val item = event.itemStack
         if (item.getInternalNameOrNull() != internalName) return
         val coins = item.getCoinsOfAvarice() ?: return
+        if (count == 0L) count = coins
 
-        // difference between the last coins and the current coins
         val coinsDifference = coins - count
 
-        // if the difference between last coins and current coins is 0, it means nothing has changed
         if (coinsDifference == 0L) return
 
-        // if the difference is less than 0, it means that the player probably either changed the crown they are wearing
-        // or something bugged out, regardless it needs to reset the session
         if (coinsDifference < 0) {
             reset()
             count = coins
             return
         }
 
-        // if the player has been afk for too long, reset the session
         if (lastCoinUpdate.passedSince() > MAX_AFK_TIME) reset()
         lastCoinUpdate = SimpleTimeMark.now()
         coinsEarned += coinsDifference
@@ -92,6 +89,12 @@ object CrownOfAvariceCounter {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         reset()
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent){
+        reset()
+        count = InventoryUtils.getHelmet()?.getCoinsOfAvarice() ?: return
     }
 
     private fun update() {
