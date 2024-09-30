@@ -90,7 +90,7 @@ object VoltHighlighter {
         NO_VOLT,
         FRIENDLY,
         HOSTILE,
-        DOING_LIGHTNING
+        DOING_LIGHTNING,
     }
 
     private fun getVoltState(itemStack: ItemStack): VoltState {
