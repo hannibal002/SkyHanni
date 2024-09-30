@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -19,8 +20,12 @@ object WarpMenuUniques {
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
         get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf()
 
+    private val config get() = SkyHanniMod.feature.event.hoppityEggs
+
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
+        if (!config.uniquesWarpMenu) return
+        if (!HoppityAPI.isHoppityEvent()) return
         if (event.slot.inventory.name != "Fast Travel") return
 
         islandNamePattern.matchMatcher(event.slot.stack.displayName) {
@@ -31,9 +36,9 @@ object WarpMenuUniques {
             }
 
             val maxEggs = HoppityEggLocations.apiEggLocations[island]?.size ?: return
-            val actualEggs = collectedEggStorage[island]?.size ?: 0
+            val collectedEggs = collectedEggStorage[island]?.size ?: 0
 
-            event.toolTip.add("§7Collected: ${if (actualEggs == maxEggs) "§a" else ""}$actualEggs/$maxEggs")
+            event.toolTip.add("§7Collected: ${if (collectedEggs == maxEggs) "§a" else ""}$collectedEggs/$maxEggs")
         }
     }
 }
