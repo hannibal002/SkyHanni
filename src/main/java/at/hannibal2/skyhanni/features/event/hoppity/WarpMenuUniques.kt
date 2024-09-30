@@ -38,7 +38,9 @@ object WarpMenuUniques {
             val maxEggs = HoppityEggLocations.apiEggLocations[island]?.size ?: return
             val collectedEggs = collectedEggStorage[island]?.size ?: 0
 
-            event.toolTip.add("§7Collected: ${if (collectedEggs == maxEggs) "§a" else ""}$collectedEggs/$maxEggs")
+            if (collectedEggs == maxEggs && config.uniquesWarpMenuHideMax) return
+
+            event.toolTip.add(2, "§7Collected Eggs: ${if (collectedEggs == maxEggs) "§a" else ""}$collectedEggs/$maxEggs")
         }
     }
 }

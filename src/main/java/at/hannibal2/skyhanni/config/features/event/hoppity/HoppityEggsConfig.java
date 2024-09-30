@@ -217,4 +217,10 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean uniquesWarpMenu = true;
+
+    @Expose
+    @ConfigOption(name = "Hide when maxed", desc = "Stops the above feature from working when the island is complete.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean uniquesWarpMenuHideMax = true;
 }
