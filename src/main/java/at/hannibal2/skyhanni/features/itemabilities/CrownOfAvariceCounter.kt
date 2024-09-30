@@ -13,13 +13,16 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getCoinsOfAvarice
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -30,25 +33,69 @@ object CrownOfAvariceCounter {
     private val internalName = "CROWN_OF_AVARICE".asInternalName()
 
     private var render: Renderable? = null
+    private const val MAX_AVARICE = 1_000_000_000L
+    private val MAX_AFK_TIME = 2.minutes
+
+    private val isWearingCrown by RecalculatingValue(1.seconds) {
+        InventoryUtils.getHelmet()?.getInternalNameOrNull() == internalName
+    }
 
     private var count: Long = 0L
     private var coinsEarned: Long = 0L
-    private var timeSession: SimpleTimeMark = SimpleTimeMark(0)
+    private var sessionStart = SimpleTimeMark.farPast()
+    private var lastCoinUpdate = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if(!isEnabled()) return
+    fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
+        if (!isEnabled()) return
+        if (!isWearingCrown) return
         render?.let { config.position.renderRenderable(it, posLabel = "Crown of Avarice Counter") }
+    }
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!isEnabled()) return
+        if (!isWearingCrown) return
+        update()
     }
 
     @SubscribeEvent
     fun onInventoryUpdated(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() || event.slot != 5) return
-        val item = InventoryUtils.getHelmet() ?: return
+        val item = event.itemStack
         if (item.getInternalNameOrNull() != internalName) return
-        coinsEarned += calculateCoinDifference()
-        count = item.getCoinsOfAvarice() ?: return
-        val coinsPerHour = calculateCoinsPerHour().toLong().addSeparators()
+        val coins = item.getCoinsOfAvarice() ?: return
+
+        // difference between the last coins and the current coins
+        val coinsDifference = coins - count
+
+        // if the difference between last coins and current coins is 0, it means nothing has changed
+        if (coinsDifference == 0L) return
+
+        // if the difference is less than 0, it means that the player probably either changed the crown they are wearing
+        // or something bugged out, regardless it needs to reset the session
+        if (coinsDifference < 0) {
+            reset()
+            count = coins
+            return
+        }
+
+        // if the player has been afk for too long, reset the session
+        if (lastCoinUpdate.passedSince() > MAX_AFK_TIME) reset()
+        lastCoinUpdate = SimpleTimeMark.now()
+        coinsEarned += coinsDifference
+        count = coins
+
+        update()
+    }
+
+    @SubscribeEvent
+    fun onWorldChange(event: LorenzWorldChangeEvent) {
+        reset()
+    }
+
+    private fun update() {
+        val coinsPerHour = calculateCoinsPerHour().addSeparators()
         val timeUntilMax = calculateTimeUntilMax()
         render = Renderable.verticalContainer(
             listOf(
@@ -64,36 +111,23 @@ object CrownOfAvariceCounter {
         )
     }
 
-    @SubscribeEvent
-    fun onSecondPassed(event: SecondPassedEvent){
-        if(!isEnabled()) return
-        timeSession = timeSession.plus(1.seconds)
-    }
-
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent){
-        coinsEarned = 0L
-        timeSession = SimpleTimeMark.farPast()
-    }
-
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
 
-    private fun calculateCoinsPerHour() : Double {
-        var timeInHours = (timeSession.toMillis()/1000.0)/3600.0
+    private fun reset() {
+        coinsEarned = 0L
+        sessionStart = SimpleTimeMark.now()
+        lastCoinUpdate = SimpleTimeMark.now()
+    }
+
+    private fun calculateCoinsPerHour(): Double {
+        val timeInHours = sessionStart.passedSince().inPartialHours
         val coinsPerHour = if (timeInHours > 0) coinsEarned / timeInHours else 0.0
         return coinsPerHour
     }
 
-    private fun calculateTimeUntilMax() : String {
+    private fun calculateTimeUntilMax(): String {
         val coinsPerHour = calculateCoinsPerHour()
-        val maxAvarice = 1000000000.0
-        val timeUntilMax = ((maxAvarice-count)/coinsPerHour).hours
+        val timeUntilMax = ((MAX_AVARICE - count) / coinsPerHour).hours
         return timeUntilMax.format()
-    }
-
-    private fun calculateCoinDifference() : Long{
-        val item = InventoryUtils.getHelmet() ?: return 0L
-        val coinDifference = (item.getCoinsOfAvarice() ?: 0L) - count
-        return coinDifference
     }
 }
