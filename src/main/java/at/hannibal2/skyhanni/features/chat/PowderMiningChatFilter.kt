@@ -29,7 +29,7 @@ import java.util.regex.Pattern
 object PowderMiningChatFilter {
 
     private val config get() = SkyHanniMod.feature.chat.filterType.powderMining
-    private val gemstoneConfig get() = config.gemstoneFilterConfig
+    private val gemstoneConfig get() = config.gemstone
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 

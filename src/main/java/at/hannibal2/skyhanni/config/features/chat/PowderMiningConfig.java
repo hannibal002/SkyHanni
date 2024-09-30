@@ -111,7 +111,6 @@ public class PowderMiningConfig {
     @Expose
     @ConfigOption(name = "Gemstones", desc = "")
     @Accordion
-    // todo: remove config
-    public PowderMiningGemstoneConfig gemstoneFilterConfig = new PowderMiningGemstoneConfig();
+    public PowderMiningGemstoneConfig gemstone = new PowderMiningGemstoneConfig();
 
 }

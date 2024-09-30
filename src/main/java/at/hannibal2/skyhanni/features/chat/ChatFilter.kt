@@ -656,5 +656,7 @@ object ChatFilter {
                 }
             }
         }
+        event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
+        event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
     }
 }
