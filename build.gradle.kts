@@ -171,6 +171,9 @@ dependencies {
 
     implementation("net.hypixel:mod-api:0.3.1")
 
+    // getting clock offset
+    implementation("commons-net:commons-net:3.8.0")
+
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
