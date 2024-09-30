@@ -334,4 +334,10 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean userluckEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Yes please annoy me about pc time offset", desc ="i love annyoing chat warnins yes yes")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnAboutPcTimeOffset = true;
 }
