@@ -10,8 +10,11 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
+import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
+import net.minecraft.util.MovingObjectPosition
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -25,10 +28,19 @@ object PrecisionMiningHighlight {
     @SubscribeEvent
     fun onParticle(event: ReceiveParticleEvent) {
         if (!MiningAPI.inCustomMiningIsland() || !isEnabled()) return
-        if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY)) return
-        
+        if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
+            !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown) return
+
+        val b: MovingObjectPosition = Minecraft.getMinecraft().objectMouseOver
+        if (b.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
+
+        val aaBB = event.location.add(x = -0.1, y = -0.1, z = -0.1).axisAlignedTo(event.location.clone().add(0.1, 0.1, 0.1))
+
+        val block = b.blockPos.toLorenzVec().axisAlignedTo(b.blockPos.add(1, 1, 1).toLorenzVec())
+        if (!block.intersectsWith(aaBB)) return
+
         lookingAt = event.type == EnumParticleTypes.VILLAGER_HAPPY
-        lastParticle = event.location.add(x = -0.1, y = -0.1, z = -0.1).axisAlignedTo(event.location.clone().add(0.1, 0.1, 0.1))
+        lastParticle = aaBB
         deleteTime = 5.ticks.fromNow()
     }
 
