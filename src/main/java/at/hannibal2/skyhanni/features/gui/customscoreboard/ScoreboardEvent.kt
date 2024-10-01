@@ -534,7 +534,8 @@ private fun getCarnivalLines() = listOf(
         getSbLines().firstOrNull { pattern.matches(it) }
     }
 
-private fun getCarnivalShowWhen(): Boolean = SbPattern.carnivalPattern.anyMatches(getSbLines())
+private fun getCarnivalShowWhen() =
+    listOf(SbPattern.carnivalPattern, SbPattern.carnivalTokensPattern, SbPattern.carnivalTasksPattern).anyMatches(getSbLines())
 
 private fun getRiftLines() = getSbLines().filter { line ->
     RiftBloodEffigies.heartsPattern.matches(line) ||
