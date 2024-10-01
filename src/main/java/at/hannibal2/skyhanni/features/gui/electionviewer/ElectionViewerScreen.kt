@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
+import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -39,11 +40,16 @@ abstract class ElectionViewerScreen : GuiScreen() {
     open fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isInGui()) return
 
-        val buttons = createButtons()
-
         display?.let {
+            val scale = guiWidth / 624f
+
+            GlStateManager.pushMatrix()
+            GlStateManager.scale(scale, scale, scale)
+
             renderContent(it)
-            renderButtons(buttons)
+            renderButtons()
+
+            GlStateManager.popMatrix()
         }
     }
 
@@ -109,11 +115,10 @@ abstract class ElectionViewerScreen : GuiScreen() {
         )
 
     private fun renderContent(renderable: Renderable) {
-        val position = Position(
+        Position(
             windowWidth / 2 - guiWidth / 2 - padding,
             windowHeight / 2 - guiHeight / 2 - padding,
-        )
-        position.renderRenderable(
+        ).renderRenderable(
             Renderable.drawInsideRoundedRect(
                 Renderable.doubleLayered(
                     Renderable.placeholder(guiWidth, guiHeight),
@@ -127,12 +132,12 @@ abstract class ElectionViewerScreen : GuiScreen() {
         )
     }
 
-    private fun renderButtons(buttons: Renderable) {
-        val buttonPosition = Position(
+    private fun renderButtons() {
+        val buttons = createButtons()
+        Position(
             windowWidth / 2 - guiWidth / 2 - padding * 2 - buttons.width,
             windowHeight / 2,
-        )
-        buttonPosition.renderRenderable(
+        ).renderRenderable(
             buttons,
             posLabel = "Election Viewer - Buttons",
             addToGuiManager = false,
