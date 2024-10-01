@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlinx.coroutines.launch
@@ -11,12 +12,15 @@ import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ComputerTimeOffset {
     var offsetMillis: Duration? = null
         private set
+
+    private var lastCheckTime = SimpleTimeMark.farPast()
 
     private val offsetFixLinks by lazy {
         when {
@@ -30,6 +34,10 @@ object ComputerTimeOffset {
     }
 
     init {
+        checkOffset()
+    }
+
+    private fun checkOffset() {
         SkyHanniMod.coroutineScope.launch {
             offsetMillis = getNtpOffset("time.google.com")
             offsetMillis?.let {
@@ -61,6 +69,14 @@ object ComputerTimeOffset {
             offsetFixLinks ?: return,
             prefixColor = "§c",
         )
+    }
+
+    @SubscribeEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (lastCheckTime.passedSince() > 30.minutes) return
+
+        lastCheckTime = SimpleTimeMark.now()
+        checkOffset()
     }
 
     @SubscribeEvent
