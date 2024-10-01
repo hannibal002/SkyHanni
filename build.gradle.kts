@@ -172,7 +172,7 @@ dependencies {
     implementation("net.hypixel:mod-api:0.3.1")
 
     // getting clock offset
-    implementation("commons-net:commons-net:3.8.0")
+    shadowImpl("commons-net:commons-net:3.8.0")
 
     detektPlugins("org.notenoughupdates:detektrules:1.0.0")
     detektPlugins(project(":detekt"))
@@ -282,6 +282,7 @@ tasks.shadowJar {
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
+    relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")

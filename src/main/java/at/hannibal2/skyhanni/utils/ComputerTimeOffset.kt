@@ -9,7 +9,6 @@ import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
-import kotlin.math.abs
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
