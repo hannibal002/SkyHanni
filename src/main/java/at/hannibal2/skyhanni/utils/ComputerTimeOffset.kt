@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -58,15 +59,16 @@ object ComputerTimeOffset {
         timeInfo.computeDetails()
         timeInfo.offset.milliseconds
     } catch (e: Exception) {
-        e.printStackTrace()
+        if (LorenzUtils.inSkyBlock && config) ErrorManager.logErrorWithData(e, "Failed to get NTP offset")
+        else e.printStackTrace()
         null
     }
 
-    var lastSystemTime = System.currentTimeMillis()
-    var lastDetectedOffset = 1.seconds
+    private var lastSystemTime = System.currentTimeMillis()
+    private var lastDetectedOffset = 1.seconds
 
     private fun startMonitoringTimeChanges() {
-        thread(start = true) {
+        thread {
             while (true) {
                 Thread.sleep(1000)
                 detectTimeChange()
@@ -82,8 +84,8 @@ object ComputerTimeOffset {
         val expectedDuration = 1.seconds
         val deviation = timeDifference - expectedDuration
 
-        if (deviation.absoluteValue > 100.milliseconds && config) {
-            ChatUtils.chat("Offset changed from ${lastDetectedOffset.format()} to ${deviation.format()}")
+        if (deviation.absoluteValue > 1.seconds && config) {
+            ChatUtils.chat("Time Offset changed from ${lastDetectedOffset.format()} to ${deviation.format()}")
         }
         lastDetectedOffset = deviation
     }
