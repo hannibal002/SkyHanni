@@ -186,12 +186,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             entries.values.forEach(modifyFunction)
         }
 
-        fun tryModify(modifyFunction: (Data) -> Boolean): Boolean {
-            entries.values.forEach {
-                if (!modifyFunction(it)) return false
-            }
-            return true
-        }
+        fun tryModify(modifyFunction: (Data) -> Boolean): Boolean = entries.values.all(modifyFunction)
 
         fun get(displayMode: DisplayMode) = entries[displayMode] ?: ErrorManager.skyHanniError(
             "Unregistered display mode accessed on tracker",
