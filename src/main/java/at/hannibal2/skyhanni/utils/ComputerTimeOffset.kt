@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
+import kotlin.concurrent.thread
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -21,6 +22,8 @@ object ComputerTimeOffset {
         private set
 
     private var lastCheckTime = SimpleTimeMark.farPast()
+
+    private val config get() = SkyHanniMod.feature.misc.warnAboutPcTimeOffset
 
     private val offsetFixLinks by lazy {
         when {
@@ -35,6 +38,7 @@ object ComputerTimeOffset {
 
     init {
         checkOffset()
+        startMonitoringTimeChanges()
     }
 
     private fun checkOffset() {
@@ -58,9 +62,35 @@ object ComputerTimeOffset {
         null
     }
 
+    var lastSystemTime = System.currentTimeMillis()
+    var lastDetectedOffset = 1.seconds
+
+    private fun startMonitoringTimeChanges() {
+        thread(start = true) {
+            while (true) {
+                Thread.sleep(1000)
+                detectTimeChange()
+            }
+        }
+    }
+
+    private fun detectTimeChange() {
+        val currentSystemTime = System.currentTimeMillis()
+        val timeDifference = (currentSystemTime - lastSystemTime).milliseconds
+        lastSystemTime = currentSystemTime
+
+        val expectedDuration = 1.seconds
+        val deviation = timeDifference - expectedDuration
+
+        if (deviation.absoluteValue > 100.milliseconds && config) {
+            ChatUtils.chat("Offset changed from ${lastDetectedOffset.format()} to ${deviation.format()}")
+        }
+        lastDetectedOffset = deviation
+    }
+
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        if (!SkyHanniMod.feature.misc.warnAboutPcTimeOffset) return
+        if (!config) return
         val offsetMillis = offsetMillis ?: return
         if (offsetMillis.absoluteValue < 5.seconds) return
 
@@ -73,7 +103,7 @@ object ComputerTimeOffset {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (lastCheckTime.passedSince() > 30.minutes) return
+        if (lastCheckTime.passedSince() < 30.minutes) return
 
         lastCheckTime = SimpleTimeMark.now()
         checkOffset()
