@@ -550,12 +550,12 @@ object ItemUtils {
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
-        showRepoWarning()
+        showRepoWarning(name)
     }
 
-    private fun showRepoWarning() {
+    private fun showRepoWarning(item: String) {
         val text = listOf(
-            "§c§lMissing repo data",
+            "§c§lMissing repo data for item: $item",
             "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
             "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
             "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
