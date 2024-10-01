@@ -95,7 +95,12 @@ object WoodenButtonsHelper {
         if (closestNode != currentSpot) {
             currentSpot = closestNode
             currentSpot?.let {
-                IslandGraphs.pathFind(it.position, "Button Spot", config.color.toChromaColor(), condition = { config.showPathFinder && config.showButtonsHelper })
+                IslandGraphs.pathFind(
+                    it.position,
+                    "Button Spot",
+                    config.color.toChromaColor(),
+                    condition = { config.showPathFinder && config.showButtonsHelper },
+                )
             }
         }
     }
