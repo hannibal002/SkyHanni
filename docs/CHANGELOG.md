@@ -93,6 +93,8 @@
     + Shows attempts and XP since the last ULTRA-RARE.
 + Added Experiments Profit Tracker. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2171)
     + Tracks profits in Coins and Enchanting XP.
++ Added Ultimate Enchant Star. - Empa (https://github.com/hannibal002/SkyHanni/pull/2612)
+    + Shows a star on Enchanted Books with an Ultimate Enchant.
 
 #### Chat Features
 
@@ -134,6 +136,11 @@
     + Includes an option to warn you when to throw your rod.
     + Shows how weak the golden fish is, as a nametag.
     + Also works on Stranded.
++ Added an alert for Gold or Diamond Trophy Fish catches. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/2615)
+    + Displays a popup with the trophy name, rarity, and amount of the catch.
+    + Optionally, also plays a sound.+ Added an alert for Gold or Diamond Trophy Fish catches. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/2615)
+  + Displays a popup with the trophy name, rarity, and amount of the catch.
+  + Optionally, also plays a sound.
 
 #### Misc Features
 
@@ -200,6 +207,7 @@
 + Added exceptions to the enchant parser. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2254)
     + Stonk and non-mining tools with Efficiency 5 use the maximum enchant color.
 + Added a short cooldown between Experimentation Table Guardian Pet chat warnings. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2459)
++ Prevented the SB Menu from replacing items from Dungeons and Kuudra that are placed in the item pickup log. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2599)
 
 #### Chat Improvements
 
@@ -226,6 +234,7 @@
 
 + Made the "Line to Arachne" width configurable. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/2406)
 + Made the "Line to Miniboss" width configurable. - azurejelly (https://github.com/hannibal002/SkyHanni/pull/2406)
++ Added item cooldown support for Blaze Flares. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2601)+ Added item cooldown support for Blaze Flares. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2601)
 
 #### Config Improvements
 
@@ -264,6 +273,9 @@
 + Improved the performance of pathfinding logic in Area Navigation. - nea (https://github.com/hannibal002/SkyHanni/pull/2537)
 + Added a toggle to force the `en_US` locale for number formatting. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2563)
 + Queued GfS will now always fall back to a default amount if one is not specified. - Luna (https://github.com/hannibal002/SkyHanni/pull/2584)
++ Improved pathfinding. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2597)
+    + The line to the target no longer jumps around as much.
+    + Progress to the target now shows up in chat, displaying blocks remaining and percentage completed. Clicking on the chat message cancels the pathfinding.
 
 ### Fixes
 
@@ -296,6 +308,11 @@
 + Fixed Estimated Item Value incorrectly showing all Kuudra armor as starred. - Luna (https://github.com/hannibal002/SkyHanni/pull/2550)
 + Fixed Experiments Profit Tracker & Superpair Data. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2560)
 + Fixed price per unit for Stonk of Stonks auction not working for the bracket you are in. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2572)
++ Fixed bugs in the Experiments Profit Tracker. - ILike2WatchMemes (https://github.com/hannibal002/SkyHanni/pull/2594)
+    + Corrected the count for bottles applied while being inside the experimentation table.
+    + Fixed `/shedittracker` support not functioning properly.
++ Fixed an issue where the item stack size on Diamond/Golden Heads and Master Skulls could be incorrect. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2611)
++ Fixed item category detection for recombobulated items. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2608)
 
 #### Mining Fixes
 
@@ -320,6 +337,7 @@
 + Fixed some blocks in the Crystal Hollows being detected as Mithril instead of Hard Stone. - Luna (https://github.com/hannibal002/SkyHanni/pull/2580)
 + Fixed "Mining Commissions Block Color" causing OptiFine connected textures not to connect properly. - nopo (https://github.com/hannibal002/SkyHanni/pull/2577)
 + Fixed the Mineshaft Pity Counter not working in the Great Glacite Lake. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2565)
++ Fixed Powder Tracker inaccuracies. - Empa (https://github.com/hannibal002/SkyHanni/pull/2591)
 
 #### Scoreboard Fixes
 
@@ -342,6 +360,7 @@
 + Fixed a Custom Scoreboard error while in the Dojo. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2519)
 + Fixed a Custom Scoreboard error during M7 Dragons. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2510)
 + Fixed Custom Scoreboard error during the Raffle Event. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2545)
++ Fixed both the Custom Scoreboard Active and Starting Soon Tab List events being active simultaneously in the Garden. - Empa, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2592)
 
 #### Hoppity Fixes
 
@@ -351,6 +370,7 @@
 + Fixed minor formatting issues with Hoppity Event Summary. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2416)
 + Fixed Hoppity Event stats resetting. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2489)
 + Fixed an issue where Fish the Rabbit and El Dorado did not have compacted chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2488)
++ Fixed inconsistencies in Hoppity Duplicate Number counts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2595)
 
 #### Chat Fixes
 
@@ -382,6 +402,8 @@
 
 + Updated Ghost Counter bestiary tiers to reflect Hypixel reducing the max kills needed from 250K to 100K. - Luna (https://github.com/hannibal002/SkyHanni/pull/2533)
 + Fixed a case where the Broodmother countdown could be wildly inaccurate. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2513)
++ Fixed Flare Display spamming chat with negative values when the server is lagging. - Stella (https://github.com/hannibal002/SkyHanni/pull/2567)
++ Fixed a case where the Imminent stage did not update the Broodmother countdown. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2602)v
 
 #### The Carnival Fixes
 
@@ -480,6 +502,7 @@
     + These are added as a layer between SkyHanni and NEU so that we are not reliant on NEU functions.
 + Added Blossom Gradle plugin for token replacement in code. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2558)
     + `@MOD_VERSION@` is now a token that will be replaced.
++ Added `detekt` runner to the build process. - Daveed & nea (https://github.com/hannibal002/SkyHanni/pull/2547)
 
 ### Removed Features
 

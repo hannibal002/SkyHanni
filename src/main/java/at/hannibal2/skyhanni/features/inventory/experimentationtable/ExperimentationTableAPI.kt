@@ -35,12 +35,13 @@ object ExperimentationTableAPI {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
 
-        val entity = EntityUtils.getEntities<EntityArmorStand>().find { it.hasSkullTexture(experimentationTableSkull) } ?: return
+        val entity = EntityUtils.getEntities<EntityArmorStand>().find { it.hasSkullTexture(EXPERIMENTATION_TABLE_SKULL) } ?: return
         val vec = entity.getLorenzVec()
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }
 
-    private val experimentationTableSkull =
+    // TODO: Add to repo
+    private const val EXPERIMENTATION_TABLE_SKULL =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZTUyOWF" +
             "iYzg4MzA5NTNmNGQ5MWVkZmZmMjQ2OTVhOWY2Mjc1OGZhNGM1MWIyOWFjMjQ2YzM3NDllYWFlODliMyJ9fX0="
 
@@ -117,9 +118,17 @@ object ExperimentationTableAPI {
     /**
      * REGEX-TEST: Titanic Experience Bottle
      */
+    val experienceBottleChatPattern by patternGroup.pattern(
+        "chat.xpbottle",
+        "(?:Colossal |Titanic |Grand |\\b)Experience Bottle",
+    )
+
+    /**
+     * REGEX-TEST: TITANIC_EXP_BOTTLE
+     */
     val experienceBottlePattern by patternGroup.pattern(
         "xpbottle",
-        "(?:Titanic |Grand |\\b)Experience Bottle",
+        "(?:COLOSSAL_|TITANIC_|GRAND_|\\b)EXP_BOTTLE",
     )
 
     /**

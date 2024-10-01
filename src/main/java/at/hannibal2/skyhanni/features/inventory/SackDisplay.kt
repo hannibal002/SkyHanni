@@ -143,7 +143,7 @@ object SackDisplay {
                     add(
                         Renderable.hoverTips(
                             Renderable.string(
-                                "§d${magmaFish}",
+                                "§d$magmaFish",
                                 horizontalAlign = config.alignment
                             ),
                             listOf(
