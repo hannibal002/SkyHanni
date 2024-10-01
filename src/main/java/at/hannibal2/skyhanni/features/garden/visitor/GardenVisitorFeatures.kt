@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -51,6 +52,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -253,16 +255,13 @@ object GardenVisitorFeatures {
             ?.ingredients ?: emptySet()
         if (ingredients.isEmpty()) return
 
-        // TODO change key to NEUInternalName
-        val requiredIngredients = mutableMapOf<String, Int>()
-        for (ingredient in ingredients) {
-            val key = ingredient.internalName.asString()
-            requiredIngredients[key] =
-                requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
+        val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
+        for ((key, count) in ingredients.toPrimitiveItemStacks()) {
+            requiredIngredients.addOrPut(key, count)
         }
         var hasIngredients = true
         for ((key, value) in requiredIngredients) {
-            val sackItem = key.asInternalName().getAmountInSacks()
+            val sackItem = key.getAmountInSacks()
             if (sackItem < value * (amount - amountInSacks)) {
                 hasIngredients = false
                 break
@@ -683,7 +682,7 @@ object GardenVisitorFeatures {
                     add("shoppingList: '${visitor.shoppingList}'")
                 }
                 visitor.offer?.offerItem?.getInternalName()?.let {
-                    add("offer: '${it}'")
+                    add("offer: '$it'")
                 }
             }
         }

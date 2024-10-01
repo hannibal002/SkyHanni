@@ -30,7 +30,7 @@ enum class OreBlock(
     // MITHRIL
     LOW_TIER_MITHRIL(
         checkBlock = ::isLowTierMithril,
-        checkArea = { inDwarvenMines || inCrystalHollows || inGlacite },
+        checkArea = { inDwarvenMines || inGlacite },
     ),
     MID_TIER_MITHRIL(
         checkBlock = { it.block == Blocks.prismarine },
@@ -117,7 +117,7 @@ enum class OreBlock(
         checkArea = { inSpidersDen },
     ),
 
-    //END
+    // END
     END_STONE(
         checkBlock = { it.block == Blocks.end_stone },
         checkArea = { inEnd },

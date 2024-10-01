@@ -224,6 +224,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Can be enabled/disabled on the Item Number list.
 + Item Pickup Log. - catgirlseraid (https://github.com/hannibal002/SkyHanni/pull/1937)
 + Display the price per Stonk when taking the minimum bid in the Stonks Auction (Richard Menu). - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2195)
++ Added Ultimate Enchant Star. - Empa (https://github.com/hannibal002/SkyHanni/pull/2612)
+    + Shows a star on Enchanted Books with an Ultimate Enchant.
 
 </details>
 <details open><summary>
@@ -369,6 +371,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Includes an option to warn you when to throw your rod.
     + Shows how weak the golden fish is, as a nametag.
     + Also works on Stranded.
++ Added an alert for Gold or Diamond Trophy Fish catches. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/2615)
+    + Displays a popup with the trophy name, rarity, and amount of the catch.
+    + Optionally, also plays a sound.
 
 </details>
 <details open><summary>
@@ -1157,6 +1162,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Customizable GUI
     + Option to hide the chat messages
 + While on the Winter Island, show a timer until Jerry's Workshop closes. - hannibal2
++ Added a message to warp to Winter Island spawn when a Reindrake spawns. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2569)
 + **Custom Text Box** - CalMWolfs
     + Write fancy text into a gui element to show on your screen at all time
     + Supports color codes
@@ -1375,6 +1381,11 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Get a title warning when entering an area.
     + See area names in the world.
     + Does not yet work with Spider's Den and Dungeon Hub. Only partial support for Farming Islands and the Rift.
++ Added navigation command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2575)
+    + Use `/shnavigate <name>` to find interesting locations on your current SkyBlock island by searching for them.
+    + Displays a pathfinder to the location.
+    + Works with NPCs, points of interest, areas, slayer spots, emissaries, crimson mini-bosses, spots to mine ores, break crops, and kill mobs.
+    + Does not yet work with Spider's Den and Dungeon Hub (still needs to be mapped out).
 + Added `/gfs` to fix a broken Piggy Bank. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2150)
 + Added Broodmother spawn alert, countdown and stage change messages. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2325)
     + Countdown will not show until a spawning stage change is observed, and may be off by a few seconds.
