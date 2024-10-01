@@ -92,8 +92,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                 prefix = "§7$sourceStringPrefix: ",
                 getName = data.getSelectedBucket()?.toString() ?: nullBucketLabel,
                 onChange = {
-                    data.selectNextSequentialBucket()
-                    update()
+                    val nextBucket = data.getNextSequentialBucket()
+                    modify {
+                        it.selectBucket(nextBucket)
+                    }
                 },
             )
         }
