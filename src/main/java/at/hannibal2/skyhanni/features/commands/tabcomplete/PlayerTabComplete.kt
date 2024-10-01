@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.commands.tabcomplete
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
+import at.hannibal2.skyhanni.data.GuildAPI
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.jsonobjects.repo.VipVisitsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -31,7 +32,10 @@ object PlayerTabComplete {
         "pv" to listOf(), // NEU's Profile Viewer
         "shmarkplayer" to listOf(), // SkyHanni's Mark Player
 
-        "trade" to listOf(PlayerCategory.FRIENDS, PlayerCategory.PARTY),
+        "trade" to listOf(PlayerCategory.FRIENDS, PlayerCategory.PARTY, PlayerCategory.GUILD),
+
+        "guild" to listOf(PlayerCategory.FRIENDS, PlayerCategory.PARTY, PlayerCategory.ISLAND_PLAYERS),
+        "g" to listOf(PlayerCategory.FRIENDS, PlayerCategory.PARTY, PlayerCategory.ISLAND_PLAYERS),
     )
 
     @SubscribeEvent
@@ -49,6 +53,7 @@ object PlayerTabComplete {
         FRIENDS,
         ISLAND_PLAYERS,
         PARTY,
+        GUILD,
     }
 
     fun handleTabComplete(command: String): List<String>? {
@@ -68,6 +73,12 @@ object PlayerTabComplete {
 
             if (config.party && PlayerCategory.PARTY !in ignoredCategories) {
                 for (member in PartyAPI.partyMembers) {
+                    add(member)
+                }
+            }
+
+            if ((config.guild || command == "guild" || command == "g") && PlayerCategory.GUILD !in ignoredCategories) {
+                for (member in GuildAPI.getAllMembers()) {
                     add(member)
                 }
             }

@@ -36,6 +36,12 @@ public class TabCompleteConfig {
     public boolean party = true;
 
     @Expose
+    @ConfigOption(name = "Guild", desc = "Tab-complete Guild Members.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean guild = false;
+
+    @Expose
     @ConfigOption(name = "VIP Visits", desc = "Tab-complete the visit to special users with cake souls on it.")
     @ConfigEditorBoolean
     @FeatureToggle
