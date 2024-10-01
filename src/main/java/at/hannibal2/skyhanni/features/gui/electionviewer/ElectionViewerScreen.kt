@@ -12,7 +12,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiScreen
 import net.minecraft.client.gui.ScaledResolution
-import net.minecraft.client.renderer.GlStateManager
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -41,15 +40,8 @@ abstract class ElectionViewerScreen : GuiScreen() {
         if (!isInGui()) return
 
         display?.let {
-            val scale = guiWidth / 624f
-
-            GlStateManager.pushMatrix()
-            GlStateManager.scale(scale, scale, scale)
-
             renderContent(it)
             renderButtons()
-
-            GlStateManager.popMatrix()
         }
     }
 
