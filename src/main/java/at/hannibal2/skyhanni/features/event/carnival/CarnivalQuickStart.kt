@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MobUtils.mob
@@ -32,6 +33,7 @@ object CarnivalQuickStart {
     private val cowboy by repoGroup.pattern("cowboy", "Carnival Cowboy")
 
     private var lastChat = SimpleTimeMark.farPast()
+    private var lastClicked = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onEntityClick(event: EntityClickEvent) {
@@ -44,6 +46,8 @@ object CarnivalQuickStart {
             pirate.matches(mob.name) -> "carnival_pirateman"
             else -> return
         }
+        if (lastClicked.passedSince() < 1.seconds) return
+        lastClicked = SimpleTimeMark.now()
         HypixelCommands.npcOption(type, "r_2_1")
         event.cancel()
     }
