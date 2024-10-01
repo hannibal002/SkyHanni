@@ -33,8 +33,8 @@ object ComputerTimeOffset {
         SkyHanniMod.coroutineScope.launch {
             offsetMillis = getNtpOffset("time.google.com")
             offsetMillis?.let {
-                print("SkyHanni detected a time offset of ${it.format()}.")
-            } ?: print("SkyHanni failed to detect a time offset.")
+                println("SkyHanni detected a time offset of $it.")
+            } ?: println("SkyHanni failed to detect a time offset.")
         }
     }
 
@@ -65,8 +65,12 @@ object ComputerTimeOffset {
 
     @SubscribeEvent
     fun onDebugCollect(event: DebugDataCollectEvent) {
-        offsetMillis?.absoluteValue?.let { if (it < 100.milliseconds) return }
         event.title("Time Offset")
-        event.addData("$offsetMillis ms")
+        val relevant = offsetMillis?.absoluteValue?.let { it < 100.milliseconds } ?: true
+        if (relevant) {
+            event.addData(offsetMillis.toString())
+        } else {
+            event.addIrrelevant(offsetMillis.toString())
+        }
     }
 }
