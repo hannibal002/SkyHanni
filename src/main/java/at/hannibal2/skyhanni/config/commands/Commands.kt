@@ -8,9 +8,11 @@ import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.GuiEditManager
+import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.data.bazaar.HypixelBazaarFetcher
@@ -107,6 +109,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.ClientCommandHandler
+import kotlin.time.Duration
 
 object Commands {
 
@@ -573,6 +576,10 @@ object Commands {
             "shtestrainbow",
             "Sends a rainbow in chat",
         ) { ExtendedChatColor.testCommand() }
+        registerCommand(
+            "shtestnotification",
+            "Shows a test notification",
+        ) { NotificationManager.queueNotification(SkyHanniNotification(it.joinToString(" ").replace("\\n", "\n"), Duration.INFINITE)) }
         registerCommand(
             "shcopyinternalname",
             "Copies the internal name of the item in hand to the clipboard.",
