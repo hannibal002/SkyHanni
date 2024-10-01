@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.utils.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
@@ -29,13 +28,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         resetItems()
     }
 
-    fun addItem(internalName: NEUInternalName, stackSize: Int): Boolean {
-        ChatUtils.chat("selectedBucket: $selectedBucket" )
-        return selectedBucket?.let {
-            addItem(it, internalName, stackSize)
-            true
-        } ?: false
-    }
+    fun addItem(internalName: NEUInternalName, stackSize: Int): Boolean = selectedBucket?.let {
+        addItem(it, internalName, stackSize)
+        true
+    } ?: false
 
     fun addItem(bucket: E, internalName: NEUInternalName, stackSize: Int) {
         val bucketMap = bucketedItems.getOrPut(bucket) { HashMap() }
