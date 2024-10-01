@@ -187,6 +187,7 @@ object Commands {
         registerCommand("shnavigate", "Using path finder to go to locatons") { NavigationHelper.onCommand(it) }
     }
 
+    @Suppress("LongMethod")
     private fun usersNormal() {
         registerCommand(
             "shmarkplayer",
@@ -503,6 +504,7 @@ object Commands {
         ) { ScoreboardData.toggleMonitor() }
     }
 
+    @Suppress("LongMethod")
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
