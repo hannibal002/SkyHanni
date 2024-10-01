@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.remainingClicksPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -20,8 +21,8 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
-@SkyHanniModule
 // TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
+@SkyHanniModule
 object SuperpairDataDisplay {
 
     private val config get() = SkyHanniMod.feature.inventory.experimentationTable
@@ -34,7 +35,6 @@ object SuperpairDataDisplay {
         POWERUP,
         MATCH,
         PAIR
-        ;
     }
 
     private val sideSpaces1 = listOf(17, 18, 26, 27, 35, 36)
@@ -71,9 +71,11 @@ object SuperpairDataDisplay {
 
         val clicksItem = InventoryUtils.getItemAtSlotIndex(4)
 
+        // TODO add variable name to indicate what is going on here
         if (uncoveredItems.none { it.value.index == event.slotId && it.key == uncoveredItems.keys.max() }) {
-            if (clicksItem != null)
+            if (clicksItem != null) {
                 remainingClicksPattern.matchMatcher(clicksItem.displayName.removeColor()) { if (group("clicks").toInt() == 0) return }
+            }
 
             handleItem(event.slotId)
         }
@@ -88,8 +90,7 @@ object SuperpairDataDisplay {
 
         if (isWaiting(itemName)) return@runDelayed
 
-        if (uncoveredItems.none { it.key == uncovered && it.value.index == slot })
-            uncoveredItems[uncovered + 1] = itemData
+        if (uncoveredItems.none { it.key == uncovered && it.value.index == slot }) uncoveredItems[uncovered + 1] = itemData
 
         when {
             isPowerUp(reward) -> handlePowerUp(itemData, uncovered + 1)
@@ -99,13 +100,15 @@ object SuperpairDataDisplay {
         val since = clicksSinceSeparator(uncoveredItems)
 
         val lastReward = uncoveredItems.entries.last().value.reward
-        if ((since >= 2 || (since == -1 && uncoveredItems.size >= 2)) && lastReward != "Instant Find")
-            uncoveredItems[uncovered + 2] = emptySuperpairItem
+        // TODO use repo patterns for "Instant Find"
+        if ((since >= 2 || (since == -1 && uncoveredItems.size >= 2)) && lastReward != "Instant Find") uncoveredItems[uncovered + 2] =
+            emptySuperpairItem
 
         display = drawDisplay()
     }
 
     private fun handlePowerUp(item: SuperpairItem, uncovered: Int) {
+        // TODO use repo patterns for "Instant Find"
         if (item.reward != "Instant Find") uncoveredItems.remove(uncovered)
 
         val itemData = FoundData(item = item)
@@ -118,6 +121,7 @@ object SuperpairDataDisplay {
         if (isWaiting(last.reward)) return
 
         when {
+            // TODO use repo patterns for "Instant Find"
             last.reward == "Instant Find" -> handleInstantFind(item, uncovered)
             hasFoundPair(item, last) -> handleFoundPair(item, last)
             hasFoundMatch(item) -> handleFoundMatch(item)
@@ -152,19 +156,24 @@ object SuperpairDataDisplay {
     }
 
     private fun handleFoundMatch(item: SuperpairItem) {
+        // TODO better name
         val match = uncoveredItems.values.find { it.index != item.index && it.sameAs(item) } ?: return
 
         found.entries.forEach {
             when {
                 it.key.isAnyOf(FoundType.MATCH, FoundType.PAIR) -> {
+                    // TODO extract logic in some way
                     if (it.value.any { data ->
-                            anyDuplicates(search = data.first?.index ?: -1, item.index, match.index) ||
-                                anyDuplicates(search = data.second?.index ?: -1, item.index, match.index)
-                        }) return
+                            (data.first?.index ?: -1).equalsOneOf(item.index, match.index) ||
+                                (data.second?.index
+                                    ?: -1).equalsOneOf(item.index, match.index)
+                        }) {
+                        return
+                    }
                 }
 
                 it.key == FoundType.NORMAL -> it.value.removeIf { data ->
-                    anyDuplicates(search = data.item?.index ?: -1, item.index, match.index)
+                    (data.item?.index ?: -1).equalsOneOf(item.index, match.index)
                 }
 
                 else -> {}
@@ -176,15 +185,15 @@ object SuperpairDataDisplay {
     }
 
     private fun handleNormalReward(item: SuperpairItem) {
-        found.entries.forEach {
+        for ((key, value) in found.entries) {
             when {
-                it.key.isAnyOf(FoundType.MATCH, FoundType.PAIR) -> {
-                    if (it.value.any { data ->
-                            anyDuplicates(search = item.index, data.first?.index ?: -1, data.second?.index ?: -1)
+                key.isAnyOf(FoundType.MATCH, FoundType.PAIR) -> {
+                    if (value.any { data ->
+                            item.index.equalsOneOf(data.first?.index ?: -1, data.second?.index ?: -1)
                         }) return
                 }
 
-                else -> if (it.value.any { data ->
+                else -> if (value.any { data ->
                         (data.item?.index ?: -1) == item.index && data.item?.sameAs(item) == true
                     }) return
             }
@@ -246,12 +255,14 @@ object SuperpairDataDisplay {
         second: SuperpairItem,
     ) = first.index != second.index && first.sameAs(second)
 
+    // TODO extract logic greatly
     private fun hasFoundMatch(firstItem: SuperpairItem) =
         uncoveredItems.any { it.value.index != firstItem.index && it.value.sameAs(firstItem) } &&
             found.entries.none {
-                it.key.isAnyOf(FoundType.PAIR, FoundType.MATCH) && it.value.any { data ->
-                    anyDuplicates(search = firstItem.index, data.first?.index ?: -1, data.second?.index ?: -1)
-                }
+                it.key.isAnyOf(FoundType.PAIR, FoundType.MATCH) &&
+                    it.value.any { data ->
+                        firstItem.index.equalsOneOf(data.first?.index ?: -1, data.second?.index ?: -1)
+                    }
             }
 
     private fun isPowerUp(reward: String) = ExperimentationTableAPI.powerUpPattern.matches(reward)
@@ -259,6 +270,7 @@ object SuperpairDataDisplay {
     private fun isReward(reward: String) =
         ExperimentationTableAPI.rewardPattern.matches(reward) || ExperimentationTableAPI.powerUpPattern.matches(reward)
 
+    // TODO use repo patterns instead
     private fun isWaiting(itemName: String) =
         listOf("Click any button!", "Click a second button!", "Next button is instantly rewarded!").contains(itemName)
 
@@ -268,13 +280,11 @@ object SuperpairDataDisplay {
     }
 
     private fun isOutOfBounds(slot: Int, experiment: Experiment): Boolean =
-        slot <= experiment.startSlot || slot >= experiment.endSlot ||
+        slot <= experiment.startSlot ||
+            slot >= experiment.endSlot ||
             (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
-    private fun anyDuplicates(search: Any, vararg toSearch: Any) = search in toSearch
-
-    private fun SuperpairItem.sameAs(other: SuperpairItem) =
-        this.reward == other.reward && this.damage == other.damage
+    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this?.damage == other.damage
 
     private fun isEnabled() =
         IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay && ExperimentationTableAPI.getCurrentExperiment() != null
