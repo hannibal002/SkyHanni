@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -129,14 +128,11 @@ object IslandAreas {
     }
 
     private fun buildDisplay() = buildList<Searchable> {
-        val closedNote = IslandGraphs.closedNote ?: return@buildList
-        val playerDiff = closedNote.position.distanceToPlayer()
-
         var foundCurrentArea = false
         var foundAreas = 0
 
         for ((node, diff) in nodes) {
-            val difference = diff + playerDiff
+            val difference = diff
             val tag = node.getAreaTag() ?: continue
 
             val name = node.name ?: continue
@@ -160,7 +156,7 @@ object IslandAreas {
                 }
             }
 
-            val distance = difference.roundTo(1)
+            val distance = difference.roundTo(0).toInt()
             val text = "$coloredName§7: §e$distance$suffix"
 
             if (!foundCurrentArea) {
@@ -270,11 +266,11 @@ object IslandAreas {
         node.pathFind(
             displayName,
             color,
-            allowRerouting = true,
             onFound = {
                 targetNode = null
                 updatePosition()
             },
+            allowRerouting = true,
             condition = { config.pathfinder.enabled },
         )
         hasMoved = true

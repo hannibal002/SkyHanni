@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -39,7 +38,6 @@ import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
-import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
@@ -104,8 +102,9 @@ object IslandGraphs {
 
     val existsForThisIsland get() = currentIslandGraph != null
 
+    private var pathfindClosedNote: GraphNode? = null
     var closedNote: GraphNode? = null
-    var secondClosedNote: GraphNode? = null
+    private var secondClosedNote: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
@@ -115,7 +114,6 @@ object IslandGraphs {
     private var totalDistance = 0.0
     private var color = Color.WHITE
     private var shouldAllowRerouting = false
-    private var showGoalExact = false
     private var onFound: () -> Unit = {}
     private var goal: GraphNode? = null
         set(value) {
@@ -223,6 +221,7 @@ object IslandGraphs {
 
     private fun reset() {
         stop()
+        pathfindClosedNote = null
         closedNote = null
     }
 
@@ -236,7 +235,7 @@ object IslandGraphs {
     }
 
     private fun handleTick() {
-        val prevClosed = closedNote
+        val prevClosed = pathfindClosedNote
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
@@ -252,39 +251,39 @@ object IslandGraphs {
         val graph = currentIslandGraph ?: return
         val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
         val newClosest = sortedNodes.first()
-        if (closedNote == newClosest) return
-        if (onCurrentPath()) return
+        if (pathfindClosedNote == newClosest) return
+        val newPath = !onCurrentPath()
 
         closedNote = newClosest
         secondClosedNote = sortedNodes.getOrNull(1)
         onNewNote()
-        hasMoved = false
         if (newClosest == prevClosed) return
-        findNewPath()
+        if (newPath) {
+            pathfindClosedNote = closedNote
+            findNewPath()
+        }
     }
 
     private fun onCurrentPath(): Boolean {
         val path = fastestPath ?: return false
         val closest = path.nodes.minBy { it.position.distanceSqToPlayer() }
         val distance = closest.position.distanceToPlayer()
-        if (distance > 5) return false
+        if (distance > 7) return false
 
-        if (distance < 3) {
-            val index = path.nodes.indexOf(closest)
-            val newNodes = path.drop(index)
-            val newGraph = Graph(newNodes)
-            fastestPath = newGraph
-            newNodes.getOrNull(1)?.let {
-                secondClosedNote = it
-            }
-            setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
+        val index = path.nodes.indexOf(closest)
+        val newNodes = path.drop(index)
+        val newGraph = Graph(newNodes)
+        fastestPath = newGraph
+        newNodes.getOrNull(1)?.let {
+            secondClosedNote = it
         }
+        setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
         return true
     }
 
     private fun findNewPath() {
         val goal = IslandGraphs.goal ?: return
-        val closest = closedNote ?: return
+        val closest = pathfindClosedNote ?: return
 
         val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
@@ -337,7 +336,7 @@ object IslandGraphs {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
         if (setPath) {
-            this.fastestPath = Graph(cutByMaxDistance(nodes, 3.0))
+            this.fastestPath = Graph(cutByMaxDistance(nodes, 2.0))
         }
 
         val diff = fastestPath.getOrNull(1)?.let {
@@ -357,12 +356,12 @@ object IslandGraphs {
 
     private fun tryRerouting() {
         val target = currentTargetNode ?: return
-        val closest = closedNote ?: return
+        val closest = pathfindClosedNote ?: return
         val map = GraphUtils.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
         val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
             ChatUtils.debug("Rerouting navigation..")
-            newTarget.pathFind(label, color, onFound, allowRerouting = true, condition)
+            newTarget.pathFind(label, color, onFound, allowRerouting = true, condition = condition)
         }
     }
 
@@ -396,7 +395,7 @@ object IslandGraphs {
         reset()
         currentTargetNode = this
         shouldAllowRerouting = allowRerouting
-        pathFind0(location = position, label, color, onFound, showGoalExact = false, condition)
+        pathFind0(location = position, label, color, onFound, condition)
     }
 
     /**
@@ -406,7 +405,6 @@ object IslandGraphs {
      * @param label The name of the naviation goal in chat.
      * @param color The color of the lines in world.
      * @param onFound The callback that gets fired when the goal is reached.
-     * @param showGoalExact Wether the exact location should be shown as a waypoint, as well as shwoing a line from last node to the goal location.
      * @param condition The pathfinding stops when the condition is no longer valid.
      */
     fun pathFind(
@@ -414,12 +412,11 @@ object IslandGraphs {
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
-        showGoalExact: Boolean = false,
         condition: () -> Boolean,
     ) {
         reset()
         shouldAllowRerouting = false
-        pathFind0(location, label, color, onFound, showGoalExact, condition)
+        pathFind0(location, label, color, onFound, condition)
     }
 
     private fun pathFind0(
@@ -427,14 +424,12 @@ object IslandGraphs {
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
-        showGoalExact: Boolean = false,
         condition: () -> Boolean,
     ) {
         currentTarget = location
         this.label = label
         this.color = color
         this.onFound = onFound
-        this.showGoalExact = showGoalExact
         this.condition = condition
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
@@ -473,26 +468,27 @@ object IslandGraphs {
         var path = fastestPath ?: return
 
         if (path.nodes.size > 1) {
-            val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 5 else 7
+            val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5
             path = Graph(path.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
         }
-//         graph = skipNodes(graph) ?: graph
 
+        // maybe reuse for debuggin
+//         for ((a, b) in path.nodes.zipWithNext()) {
+//             val diff = a.position.distance(b.position)
+//             event.drawString(a.position, "diff: ${diff.roundTo(1)}")
+//         }
         event.draw3DPathWithWaypoint(
             path,
             color,
             6,
             true,
-            bezierPoint = 2.0,
+            bezierPoint = 0.6,
             textSize = 1.0,
-            markLastBlock = showGoalExact,
         )
 
-        if (showGoalExact) {
-            val targetLocation = currentTarget ?: return
-            val lastNode = path.nodes.last().position
-            event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
-        }
+        val targetLocation = currentTarget ?: return
+        val lastNode = path.nodes.lastOrNull()?.position ?: return
+        event.draw3DLine(lastNode.add(0.5, 0.5, 0.5), targetLocation.add(0.5, 0.5, 0.5), color, 4, true)
     }
 
     // TODO move into new utils class
@@ -523,48 +519,5 @@ object IslandGraphs {
         }
 
         return locations.map { GraphNode(index++, it) }
-    }
-
-    // trying to find a faster node-path, if the future nodes are in line of sight and gratly beneift the current path
-    private fun skipNodes(graph: Graph): Graph? {
-        val closedNode = closedNote ?: return null
-
-        val playerEyeLocation = LocationUtils.playerEyeLocation()
-        val playerY = playerEyeLocation.y - 1
-
-        val distanceToPlayer = closedNode.position.distanceToPlayer()
-        val skipNodeDistance = distanceToPlayer > 8
-        val maxSkipDistance = if (skipNodeDistance) 50.0 else 20.0
-
-        val nodes = graph.nodes
-        val potentialSkip =
-            nodes.lastOrNull { it.position.canBeSeen(maxSkipDistance, -1.0) && abs(it.position.y - playerY) <= 2 } ?: return null
-
-        val angleSkip = if (potentialSkip == nodes.first()) {
-            false
-        } else {
-            val v1 = potentialSkip.position - playerEyeLocation
-            val v2 = nodes.first().position - playerEyeLocation
-            val v = v1.angleInRad(v2)
-            v > 1
-        }
-
-        if (!skipNodeDistance && !angleSkip) return null
-
-        val list = mutableListOf<GraphNode>()
-        list.add(potentialSkip)
-
-        var passed = false
-        for (node in nodes) {
-            if (passed) {
-                list.add(node)
-            } else {
-                if (node == potentialSkip) {
-                    passed = true
-                }
-            }
-        }
-
-        return Graph(list)
     }
 }
