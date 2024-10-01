@@ -205,7 +205,6 @@ open class SkyHanniTracker<Data : TrackerData>(
         TOTAL("Total"),
         SESSION("This Session"),
         MAYOR("This Mayor"),
-        ;
     }
 
     enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {

@@ -148,6 +148,7 @@ object CorpseTracker {
         tracker.resetCommand()
     }
 
-    fun isEnabled() =
-        LorenzUtils.inSkyBlock && config.enabled && (IslandType.MINESHAFT.isInIsland() || (!config.onlyInMineshaft && MiningAPI.inGlacialTunnels()))
+    fun isEnabled() = LorenzUtils.inSkyBlock &&
+        config.enabled &&
+        (IslandType.MINESHAFT.isInIsland() || (!config.onlyInMineshaft && MiningAPI.inGlacialTunnels()))
 }

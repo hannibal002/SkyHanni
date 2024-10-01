@@ -28,12 +28,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
         resetItems()
     }
 
-    fun addItem(internalName: NEUInternalName, stackSize: Int): Boolean {
-        return selectedBucket?.let {
-            addItem(it, internalName, stackSize)
-            true
-        } ?: false
-    }
+    fun addItem(internalName: NEUInternalName, stackSize: Int): Boolean = selectedBucket?.let {
+        addItem(it, internalName, stackSize)
+        true
+    } ?: false
 
     fun addItem(bucket: E, internalName: NEUInternalName, stackSize: Int) {
         val bucketMap = bucketedItems.getOrPut(bucket) { HashMap() }
@@ -66,10 +64,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : TrackerData() {
             ?: (this.javaClass.genericSuperclass as? ParameterizedTypeImpl)?.actualTypeArguments?.firstOrNull()?.let { type ->
                 (type as? Class<E>)?.enumConstants
             } ?: ErrorManager.skyHanniError(
-                "Unable to retrieve enum constants for E in BucketedItemTrackerData",
-                "selectedBucket" to selectedBucket,
-                "dataClass" to this.javaClass.superclass.name,
-            )
+            "Unable to retrieve enum constants for E in BucketedItemTrackerData",
+            "selectedBucket" to selectedBucket,
+            "dataClass" to this.javaClass.superclass.name,
+        )
     }
 
     @Expose
