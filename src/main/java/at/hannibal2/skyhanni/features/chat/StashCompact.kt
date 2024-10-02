@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -20,18 +21,20 @@ object StashCompact {
 
     /**
      * REGEX-TEST: §f                 §7You have §3226 §7materials stashed away!
+     * REGEX-TEST: §f                 §7You have §31,000 §7items stashed away!
      */
     private val materialCountPattern by patternGroup.pattern(
         "material.count",
-        "§f *§7You have §3(?<count>[\\d,]) §7materials stashed away!.*",
+        "§f *§7You have §3(?<count>[\\d,]+) (§.)+(?<type>item|material)s? stashed away!.*",
     )
 
     /**
      * REGEX-TEST: §f               §8(This totals 1 type of material stashed!)
+     * REGEX-TEST: §f               §8(This totals 2 types of items stashed!)
      */
     private val differingMaterialsCountPattern by patternGroup.pattern(
         "differing.materials.count",
-        "§f *§8(This totals (?<count>[\\d,]) type of material stashed!).*",
+        "§f *§8(This totals (?<count>[\\d,]+) type of (§.)+(?<type>item|material)s? stashed!).*",
     )
 
     /**
@@ -39,22 +42,38 @@ object StashCompact {
      */
     private val pickupStashPattern by patternGroup.pattern(
         "pickup.stash",
-        "§f *§3§l>>> §3§lCLICK HERE§b to pick them up! §3§l<<<.*",
+        "§f *§3§l>>> §3§lCLICK HERE§b to pick (?:them|it) up! §3§l<<<.*",
     )
+
+    /**
+     * REGEX-TEST: §eOne or more items didn't fit in your inventory and were added to your item stash! §6Click here to pick them up!
+     * REGEX-TEST: §eOne or more materials didn't fit in your inventory and were added to your material stash! §6Click here to pick them up!
+     */
+    private val genericAddedToStashPattern by patternGroup.pattern(
+        "generic",
+        "§eOne or more (?:item|material)s? didn't fit in your inventory and were added to your (?:item|material) stash! §6Click here §eto pick them up!"
+    )
+
     //</editor-fold>
 
     private val config get() = SkyHanniMod.feature.chat
 
     private var lastMaterialCount = 0
     private var lastDifferingMaterialsCount = 0
+    private var lastType = ""
 
     private var lastSentMaterialCount = 0
     private var lastSentDifferingMaterialsCount = 0
+    private var lastSentType = ""
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!config.compactStashWarnings) return
-        val message = event.message
+        if (!isEnabled()) return
+
+        genericAddedToStashPattern.matchMatcher(event.message) {
+            event.blockedReason = "stash_compact"
+        }
+
         materialCountPattern.matchMatcher(event.message) {
             groupOrNull("count")?.replace(",", "")?.toIntOrNull()?.let { count ->
                 lastMaterialCount = count
@@ -66,22 +85,27 @@ object StashCompact {
             groupOrNull("count")?.replace(",", "")?.toIntOrNull()?.let { count ->
                 lastDifferingMaterialsCount = count
             }
+            groupOrNull("type")?.let { type ->
+                lastType = type
+            }
             event.blockedReason = "stash_compact"
         }
 
-        if(pickupStashPattern.matches(message)) {
+        if(pickupStashPattern.matches(event.message)) {
             event.blockedReason = "stash_compact"
             if (lastMaterialCount != lastSentMaterialCount || lastDifferingMaterialsCount != lastSentDifferingMaterialsCount) {
                 sendCompactedStashMessage()
                 lastSentMaterialCount = lastMaterialCount
                 lastSentDifferingMaterialsCount = lastDifferingMaterialsCount
+                lastSentType = lastType
             }
         }
     }
 
     private fun sendCompactedStashMessage() {
+        if (config.compactStashWarnings == ChatConfig.StashCompactType.HIDE) return
         ChatUtils.clickableChat(
-            "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, "material")} in stash, " +
+            "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, lastType)} in stash, " +
                 "§8totalling $lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}. " +
                 "§3Click to pickup§7.",
             onClick = {
@@ -89,4 +113,6 @@ object StashCompact {
             }
         )
     }
+
+    private fun isEnabled() = config.compactStashWarnings != ChatConfig.StashCompactType.NONE
 }

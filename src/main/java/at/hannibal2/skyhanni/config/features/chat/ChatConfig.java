@@ -6,6 +6,7 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
@@ -145,7 +146,24 @@ public class ChatConfig {
 
     @Expose
     @ConfigOption(name = "Compact Stash Warnings", desc = "Compact the Stash warnings into a single line of text.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean compactStashWarnings = true;
+    @ConfigEditorDropdown
+    public StashCompactType compactStashWarnings = StashCompactType.COMPACT;
+
+    public enum StashCompactType {
+        NONE("None (Show all)"),
+        COMPACT("Compact"),
+        HIDE("Hide Completely"),
+        ;
+
+        private final String name;
+
+        StashCompactType(String name) {
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+    }
 }
