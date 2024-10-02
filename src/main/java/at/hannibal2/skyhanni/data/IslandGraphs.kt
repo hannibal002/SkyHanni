@@ -109,8 +109,7 @@ object IslandGraphs {
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
     private var label = ""
-    private var distanceViaNodes = 0.0
-    private var distanceToNextNode = 0.0
+    private var lastDistance = 0.0
     private var totalDistance = 0.0
     private var color = Color.WHITE
     private var shouldAllowRerouting = false
@@ -228,8 +227,8 @@ object IslandGraphs {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        handleTick()
         if (event.isMod(2)) {
+            handleTick()
             checkMoved()
         }
     }
@@ -273,12 +272,19 @@ object IslandGraphs {
         val index = path.nodes.indexOf(closest)
         val newNodes = path.drop(index)
         val newGraph = Graph(newNodes)
-        fastestPath = newGraph
+        fastestPath = skipIfCloser(newGraph)
         newNodes.getOrNull(1)?.let {
             secondClosestNode = it
         }
         setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
         return true
+    }
+
+    private fun skipIfCloser(graph: Graph): Graph = if (graph.nodes.size > 1) {
+        val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5
+        Graph(graph.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
+    } else {
+        graph
     }
 
     private fun findNewPath() {
@@ -306,8 +312,6 @@ object IslandGraphs {
     private fun Graph.totalLenght(): Double = nodes.zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
 
     private fun handlePositionChange() {
-        val secondClosestNode = secondClosestNode ?: return
-        distanceToNextNode = secondClosestNode.position.distanceToPlayer()
         updateChat()
     }
 
@@ -330,19 +334,15 @@ object IslandGraphs {
     }
 
     private fun setFastestPath(path: Pair<Graph, Double>, setPath: Boolean = true) {
+        // TODO cleanup
         val (fastestPath, distance) = path.takeIf { it.first.isNotEmpty() } ?: return
         val nodes = fastestPath.nodes.toMutableList()
         if (Minecraft.getMinecraft().thePlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
         if (setPath) {
-            this.fastestPath = Graph(cutByMaxDistance(nodes, 2.0))
+            this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
         }
-
-        val diff = fastestPath.getOrNull(1)?.let {
-            fastestPath.first().position.distance(it.position)
-        } ?: 0.0
-        this.distanceViaNodes = distance - diff
         updateChat()
     }
 
@@ -371,9 +371,8 @@ object IslandGraphs {
         fastestPath = null
         currentTargetNode = null
         label = ""
-        distanceToNextNode = 0.0
-        distanceViaNodes = 0.0
         totalDistance = 0.0
+        lastDistance = 0.0
     }
 
     /**
@@ -440,9 +439,18 @@ object IslandGraphs {
 
     private fun updateChat() {
         if (label == "") return
-        val finalDistance = distanceViaNodes + distanceToNextNode
-        if (finalDistance == 0.0) return
-        val distance = finalDistance.roundTo(1)
+        val path = fastestPath ?: return
+        var distance = 0.0
+        for ((a, b) in path.zipWithNext()) {
+            distance += a.position.distance(b.position)
+        }
+        val distanceToPlayer = path.first().position.distanceToPlayer()
+        distance += distanceToPlayer
+        distance = distance.roundTo(1)
+
+        if (distance == lastDistance) return
+        lastDistance = distance
+        if (distance == 0.0) return
         if (totalDistance == 0.0 || distance > totalDistance) {
             totalDistance = distance
         }
@@ -465,12 +473,7 @@ object IslandGraphs {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
-        var path = fastestPath ?: return
-
-        if (path.nodes.size > 1) {
-            val hideNearby = if (Minecraft.getMinecraft().thePlayer.onGround) 3 else 5
-            path = Graph(path.nodes.takeLastWhile { it.position.distanceToPlayer() > hideNearby })
-        }
+        val path = fastestPath ?: return
 
         // maybe reuse for debuggin
 //         for ((a, b) in path.nodes.zipWithNext()) {
