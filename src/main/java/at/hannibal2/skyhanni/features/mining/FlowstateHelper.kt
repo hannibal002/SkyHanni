@@ -100,6 +100,7 @@ object FlowstateHelper {
             FlowstateElements.SPEED.create()
         }
         FlowstateElements.TIMER.create()
+        FlowstateElements.COMPACT.create()
         display = config.appearance.map { it.renderable }
     }
 
@@ -124,7 +125,7 @@ object FlowstateHelper {
         if (!config.colorfulTimer) return "§6"
         return when (timeRemaining) {
             in 0.seconds..2.seconds -> "§c"
-            in 2.seconds..5.seconds -> "§6§#§f§c§7§a§2§5§/"
+            in 2.seconds..5.seconds -> "§#§e§c§7§b§3§6§/"
             in 5.seconds..7.seconds -> "§e"
             in 7.seconds..10.seconds -> "§a"
             else -> "§6"
@@ -148,16 +149,21 @@ object FlowstateHelper {
 
 enum class FlowstateElements(val label: String, var renderable: Renderable = Renderable.string("")) {
     TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
-    TIMER("Time Remaining: §b6.71"),
+    TIMER("Time Remaining: §b9.71"),
     STREAK("Streak: §7234"),
     SPEED("§6+600⸕"),
+    COMPACT("§7x40 §6+120⸕ §b(9.71)"),
     ;
 
     override fun toString() = label
 
+    private val config get() = SkyHanniMod.feature.mining.flowstateHelper
+
     fun create() {
         when (this) {
             TIMER -> {
+                if (this !in config.appearance) return
+
                 var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
                 if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
 
@@ -169,10 +175,32 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
                     }")
             }
             STREAK -> {
+                if (this !in config.appearance) return
+
                 val textColor = if (blockBreakStreak < 200) "§7" else "§f"
                 renderable = Renderable.string("Streak: $textColor$blockBreakStreak")
             }
-            SPEED -> renderable = Renderable.string("§6+${getSpeedBonus()}⸕")
+            SPEED -> {
+                if (this !in config.appearance) return
+
+                renderable = Renderable.string("§6+${getSpeedBonus()}⸕")
+            }
+            COMPACT -> {
+                if (this !in config.appearance) return
+
+                var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
+                if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
+
+                renderable = Renderable.string(
+                    "§7x$blockBreakStreak " +
+                        "§6+${getSpeedBonus()}⸕ " +
+                        "${getTimerColor(timeRemaining)}${
+                            timeRemaining.format(
+                                TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true
+                            )
+                        }"
+                )
+            }
             else -> return
         }
     }
