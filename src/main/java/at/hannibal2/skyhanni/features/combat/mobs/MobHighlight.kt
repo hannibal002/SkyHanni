@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.getBlockInHand
 import at.hannibal2.skyhanni.utils.EntityUtils.highlight
+import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.matchesHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -32,8 +34,7 @@ object MobHighlight {
     @SubscribeEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inSkyBlock || !config.corruptedMobHighlight) return
-        val mob = event.entity.mob ?: return
-        if (mob.isCorrupted && config.corruptedMobHighlight) mob.highlight(LorenzColor.DARK_PURPLE) // if mob gets corrupted after spawn
+        if (event.entity.isCorrupted()) event.entity.highlight(LorenzColor.DARK_PURPLE)
     }
 
     // Mob detection isn't used here to allow for highlighting Zealots from further away.
@@ -64,10 +65,11 @@ object MobHighlight {
 
             name == "Arachne's Keeper" && config.arachneKeeperHighlight -> LorenzColor.DARK_BLUE
             name == "Arachne's Brood" && config.arachneBossHighlighter -> LorenzColor.GOLD
-            name == "Arachne" && config.arachneBossHighlighter -> LorenzColor.RED.also { arachne = mob }
-
-            mob.isRunic && config.runicMobHighlighter -> LorenzColor.LIGHT_PURPLE
-            mob.isCorrupted && config.corruptedMobHighlight -> LorenzColor.DARK_PURPLE // if mob spawns already corrupted
+            name == "Arachne" && config.arachneBossHighlighter -> {
+                arachne = mob
+                LorenzColor.RED
+            }
+            //mob.isRunic && config.runicMobHighlighter -> LorenzColor.LIGHT_PURPLE
 
             else -> return
         }
