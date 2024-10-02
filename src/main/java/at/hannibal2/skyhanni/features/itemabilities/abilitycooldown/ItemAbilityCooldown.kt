@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.mapKeysNotNull
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -22,8 +23,8 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.between
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
@@ -35,18 +36,19 @@ import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
-class ItemAbilityCooldown {
+@SkyHanniModule
+object ItemAbilityCooldown {
 
     private val config get() = SkyHanniMod.feature.inventory.itemAbilities
 
     private val patternGroup = RepoPattern.group("item.abilities.cooldown")
     private val youAlignedOthersPattern by patternGroup.pattern(
         "alignedother",
-        "§eYou aligned §r§a.* §r§eother player(s)?!"
+        "§eYou aligned §r§a.* §r§eother player(s)?!",
     )
     private val youBuffedYourselfPattern by patternGroup.pattern(
         "buffedyourself",
-        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength"
+        "§aYou buffed yourself for §r§c\\+\\d+❁ Strength",
     )
 
     private var lastAbility = ""
@@ -55,6 +57,10 @@ class ItemAbilityCooldown {
     private val WEIRD_TUBA = "WEIRD_TUBA".asInternalName()
     private val WEIRDER_TUBA = "WEIRDER_TUBA".asInternalName()
     private val VOODOO_DOLL_WILTED = "VOODOO_DOLL_WILTED".asInternalName()
+    private val WARNING_FLARE = "WARNING_FLARE".asInternalName()
+    private val ALERT_FLARE = "ALERT_FLARE".asInternalName()
+    private val SOS_FLARE = "SOS_FLARE".asInternalName()
+
 
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
@@ -85,7 +91,7 @@ class ItemAbilityCooldown {
                     val internalName = InventoryUtils.getItemInHand()?.getInternalName() ?: return
                     if (!internalName.equalsOneOf(
                             "SHADOW_FURY".asInternalName(),
-                            "STARRED_SHADOW_FURY".asInternalName()
+                            "STARRED_SHADOW_FURY".asInternalName(),
                         )
                     ) return
 
@@ -166,16 +172,34 @@ class ItemAbilityCooldown {
                 ItemAbility.STAFF_OF_THE_VOLCANO.sound()
             }
             // Holy Ice
-            event.soundName == "random.drink" && event.pitch.round(1) == 1.8f && event.volume == 1.0f -> {
+            event.soundName == "random.drink" && event.pitch.roundTo(1) == 1.8f && event.volume == 1.0f -> {
                 ItemAbility.HOLY_ICE.sound()
             }
             // Royal Pigeon
             event.soundName == "mob.bat.idle" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.ROYAL_PIGEON.sound()
             }
-
+            // Wand of Strength
             event.soundName == "random.eat" && event.pitch == 0.4920635f && event.volume == 1.0f -> {
                 ItemAbility.WAND_OF_STRENGTH.sound()
+            }
+            // Tactical Insertion
+            event.soundName == "fire.ignite" && event.pitch == 0.74603176f && event.volume == 1.0f -> {
+                ItemAbility.TACTICAL_INSERTION.activate(LorenzColor.DARK_PURPLE, 3_000)
+            }
+
+            event.soundName == "mob.zombie.remedy" && event.pitch == 1.8888888f && event.volume == 0.7f -> {
+                ItemAbility.TACTICAL_INSERTION.activate(null, 17_000)
+            }
+            // Blaze Slayer Flares
+            event.soundName == "fireworks.launch" && event.pitch == 1.0f && event.volume == 3.0f -> {
+                val recent = InventoryUtils.recentItemsInHand.values
+                if (WARNING_FLARE in recent || ALERT_FLARE in recent) {
+                    ItemAbility.ALERT_FLARE.sound()
+                }
+                if (SOS_FLARE in recent) {
+                    ItemAbility.SOS_FLARE.sound()
+                }
             }
         }
     }
@@ -267,7 +291,7 @@ class ItemAbilityCooldown {
         items = abilityItems.entries.associateByTo(
             mutableMapOf(),
             { it.key.getIdentifier() },
-            { kp -> kp.value.map { createItemText(it) } }
+            { kp -> kp.value.map { createItemText(it) } },
         ).mapKeysNotNull { it.key }
 
     }
@@ -355,8 +379,8 @@ class ItemAbilityCooldown {
         if (message == "§dCreeper Veil §r§aActivated!") {
             ItemAbility.WITHER_CLOAK.activate(LorenzColor.LIGHT_PURPLE)
         }
-        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)"
-            || message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
+        if (message == "§dCreeper Veil §r§cDe-activated! §r§8(Expired)" ||
+            message == "§cNot enough mana! §r§dCreeper Veil §r§cDe-activated!"
         ) {
             ItemAbility.WITHER_CLOAK.activate()
         }

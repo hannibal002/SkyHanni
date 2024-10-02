@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson.ShortCut
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourShortCut
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
@@ -18,11 +18,12 @@ import kotlin.time.Duration.Companion.seconds
 
 class ParkourHelper(
     val locations: List<LorenzVec>,
-    private val shortCuts: List<ShortCut>,
+    private val shortCuts: List<ParkourShortCut>,
     val platformSize: Double = 1.0,
     val detectionRange: Double = 1.0,
     val depth: Boolean = true,
     val onEndReach: () -> Unit = {},
+    val goInOrder: Boolean = false,
 ) {
 
     private var current = -1
@@ -58,9 +59,9 @@ class ParkourHelper(
                     for ((index, location) in locations.withIndex()) {
                         val onGround = Minecraft.getMinecraft().thePlayer.onGround
                         val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
-                        if (closeEnough && onGround) {
-                            current = index
-                        }
+                        if (!(closeEnough && onGround)) continue
+                        if (goInOrder && (index < current - 1 || index > current + 1)) continue
+                        current = index
                     }
                 }
 

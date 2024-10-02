@@ -23,10 +23,10 @@ object NoBitsWarning {
         if (isWarningEnabled() && event.bitsAvailable == 0) {
 
             ChatUtils.clickableChat(
-                "§bNo Bits Available! §eClick to run /bz booster cookie.",
+                "§bNo Bits Available! §eClick to buy booster cookies on the bazaar.",
                 onClick = {
                     HypixelCommands.bazaar("booster cookie")
-                }
+                }, "§eClick to run /bz booster cookie!"
             )
             LorenzUtils.sendTitle("§bNo Bits Available", 5.seconds)
             if (config.notificationSound) SoundUtils.repeatSound(100, 10, createSound("note.pling", 0.6f))

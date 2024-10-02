@@ -1,22 +1,23 @@
 package at.hannibal2.skyhanni.features.garden.farming.lane
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.farming.FarmingLaneSwitchEvent
+import at.hannibal2.skyhanni.events.garden.farming.FarmingLaneSwitchEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.getValue
 import at.hannibal2.skyhanni.features.garden.farming.lane.FarmingLaneAPI.setValue
 import at.hannibal2.skyhanni.features.misc.MovementSpeedDisplay
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -51,7 +52,7 @@ object FarmingLaneFeatures {
         ;
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFarmingLaneSwitch(event: FarmingLaneSwitchEvent) {
         display = emptyList()
     }
@@ -75,7 +76,7 @@ object FarmingLaneFeatures {
 
         if (config.distanceDisplay) {
             display = buildList {
-                add("§7Distance until switch: §e${currentDistance.round(1)}")
+                add("§7Distance until switch: §e${currentDistance.roundTo(1)}")
 
                 val normal = movementState == MovementState.NORMAL
                 val color = if (normal) "§b" else "§8"
@@ -151,7 +152,7 @@ object FarmingLaneFeatures {
     private var sameSpeedCounter = 0
 
     private fun calculateSpeed(): Boolean {
-        val speed = MovementSpeedDisplay.speed.round(2)
+        val speed = MovementSpeedDisplay.speed.roundTo(2)
         movementState = calculateMovementState(speed)
         if (movementState != MovementState.NORMAL) return false
 

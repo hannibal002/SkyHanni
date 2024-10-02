@@ -3,23 +3,25 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ArachneChatMessageHider {
+@SkyHanniModule
+object ArachneChatMessageHider {
 
     private val config get() = SkyHanniMod.feature.chat
     private var hideArachneDeadMessage = false
 
     private val patternGroup = RepoPattern.group("chat.arachne")
-    private val arachneCallingPattern by patternGroup.pattern(
+    val arachneCallingPattern by patternGroup.pattern(
         "calling",
         "§4☄ §r.* §r§eplaced an §r§9Arachne's Calling§r§e!.*"
     )
-    private val arachneCrystalPattern by patternGroup.pattern(
+    val arachneCrystalPattern by patternGroup.pattern(
         "crystal",
         "§4☄ §r.* §r§eplaced an Arachne Crystal! Something is awakening!"
     )

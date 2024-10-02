@@ -20,6 +20,7 @@ import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+// @SkyHanniModule
 object Year300RaffleEvent {
 
     private val config get() = SkyHanniMod.feature.event.century

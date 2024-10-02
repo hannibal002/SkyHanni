@@ -88,11 +88,11 @@ class MobFinder {
         else -> {
             when (entity) {
                 /*
-                     * Note that the order does matter here.
-                     * For example, if you put EntityZombie before EntityPigZombie,
-                     * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
-                     * Please take this into consideration if you are to modify this.
-                    */
+                 * Note that the order does matter here.
+                 * For example, if you put EntityZombie before EntityPigZombie,
+                 * EntityPigZombie will never be reached because EntityPigZombie extends EntityZombie.
+                 * Please take this into consideration if you are to modify this.
+                 */
                 is EntityOtherPlayerMP -> tryAddEntityOtherPlayerMP(entity)
                 is EntityIronGolem -> tryAddEntityIronGolem(entity)
                 is EntityPigZombie -> tryAddEntityPigZombie(entity)
@@ -356,7 +356,7 @@ class MobFinder {
         }
 
         entity.hasMaxHealth(1_500_000) -> {
-            EntityResult(bossType = BossType.GAIA_CONSTURUCT)
+            EntityResult(bossType = BossType.GAIA_CONSTRUCT)
         }
 
         entity.hasMaxHealth(100_000_000) -> {
@@ -392,8 +392,8 @@ class MobFinder {
     }
 
     private fun tryAddEntityMagmaCube(entity: EntityLivingBase) = when {
-        entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")
-            && entity.hasMaxHealth(200_000_000, true) -> {
+        entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ") &&
+            entity.hasMaxHealth(200_000_000, true) -> {
             EntityResult(bossType = BossType.NETHER_MAGMA_BOSS, ignoreBlocks = true)
         }
 
@@ -427,6 +427,11 @@ class MobFinder {
                 entity.hasMaxHealth(30_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_2)
                 entity.hasMaxHealth(900_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_3)
                 entity.hasMaxHealth(2_400_000, true) -> return EntityResult(bossType = BossType.SLAYER_SPIDER_4)
+            }
+        }
+        if (entity.hasNameTagWith(1, "[§7Lv12§8] §4Broodmother")) {
+            if (entity.hasMaxHealth(6000)) {
+                return EntityResult(bossType = BossType.BROODMOTHER)
             }
         }
         checkArachne(entity as EntitySpider)?.let { return it }

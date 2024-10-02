@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.ChatConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -10,11 +11,12 @@ import java.util.regex.Pattern
 
 private typealias MessageTypes = ChatConfig.DungeonMessageTypes
 
-class DungeonChatFilter {
+@SkyHanniModule
+object DungeonChatFilter {
 
     private val config get() = SkyHanniMod.feature.chat
 
-    /// <editor-fold desc="Patterns, Messages, and Maps">
+    // <editor-fold desc="Patterns, Messages, and Maps">
     // TODO USE SH-REPO
     private val endPatterns = listOf(
         "(.*) §r§eunlocked §r§d(.*) Essence §r§8x(.*)§r§e!".toPattern(),
@@ -138,9 +140,12 @@ class DungeonChatFilter {
     private val pickupMessages = listOf(
         "§fYou found a §r§dWither Essence§r§f! Everyone gains an extra essence!"
     )
+
+    /**
+     * REGEX-TEST: §a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
+     * REGEX-TEST: §a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
+     */
     private val startPatterns = listOf(
-        //§a[Berserk] §r§fMelee Damage §r§c48%§r§f -> §r§a88%
-        //§a[Berserk] §r§fWalk Speed §r§c38§r§f -> §r§a68
         "§a(.*) §r§f(.*) §r§c(.*)§r§f -> §r§a(.*)".toPattern()
     )
     private val startMessages = listOf(
@@ -186,7 +191,7 @@ class DungeonChatFilter {
     private val messagesEndsWithMap: Map<MessageTypes, List<String>> = mapOf(
         MessageTypes.END to endMessagesEndWith,
     )
-    /// </editor-fold>
+    // </editor-fold>
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

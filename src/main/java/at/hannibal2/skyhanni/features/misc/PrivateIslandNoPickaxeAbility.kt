@@ -4,14 +4,16 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.WorldClickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class PrivateIslandNoPickaxeAbility {
+@SkyHanniModule
+object PrivateIslandNoPickaxeAbility {
 
-    val config get() = SkyHanniMod.feature.mining
+    private val config get() = SkyHanniMod.feature.mining
 
     @SubscribeEvent
     fun onClick(event: WorldClickEvent) {
@@ -19,12 +21,10 @@ class PrivateIslandNoPickaxeAbility {
         if (!config.privateIslandNoPickaxeAbility) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
 
-        when (event.itemInHand?.getItemCategoryOrNull()) {
-            ItemCategory.GAUNTLET, ItemCategory.PICKAXE, ItemCategory.DRILL -> {
-                event.isCanceled = true
-            }
-
-            else -> {}
+        if (event.itemInHand?.getItemCategoryOrNull()?.let {
+                ItemCategory.miningTools.contains(it)
+            } == true) {
+            event.cancel()
         }
     }
 }

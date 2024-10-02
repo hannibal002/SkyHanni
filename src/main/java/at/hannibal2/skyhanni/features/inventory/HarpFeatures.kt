@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
@@ -43,15 +44,15 @@ object HarpFeatures {
     private val patternGroup = RepoPattern.group("harp")
     private val inventoryTitlePattern by patternGroup.pattern(
         "inventory",
-        "Harp.*"
+        "Harp.*",
     )
     private val menuTitlePattern by patternGroup.pattern(
         "menu",
-        "Melody.*"
+        "Melody.*",
     )
     private val songSelectedPattern by patternGroup.pattern(
         "song.selected",
-        "§aSong is selected!"
+        "§aSong is selected!",
     )
 
     private fun isHarpGui(chestName: String) = inventoryTitlePattern.matches(chestName)
@@ -76,7 +77,7 @@ object HarpFeatures {
                 37 + index,
                 2,
                 3,
-                Minecraft.getMinecraft().thePlayer
+                Minecraft.getMinecraft().thePlayer,
             ) // middle clicks > left clicks
             lastClick = SimpleTimeMark.now()
             break
@@ -130,7 +131,7 @@ object HarpFeatures {
         unSetGUIScale()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
         if (!config.guiScale) return
         unSetGUIScale()
@@ -174,13 +175,13 @@ object HarpFeatures {
         event.container.inventory.filterNotNull().indexOfFirst {
             songSelectedPattern.anyMatches(it.getLore())
         }.takeIf { it != -1 }?.let {
-            event.isCanceled = true
+            event.cancel()
             Minecraft.getMinecraft().playerController.windowClick(
                 event.container.windowId,
                 it,
                 event.clickedButton,
                 event.clickType,
-                Minecraft.getMinecraft().thePlayer
+                Minecraft.getMinecraft().thePlayer,
             )
         }
     }
@@ -212,6 +213,6 @@ object HarpFeatures {
         if (!config.hideMelodyTooltip) return
         if (!isHarpGui(InventoryUtils.openInventoryName())) return
         if (event.slot.inventory !is ContainerLocalMenu) return
-            event.cancel()
+        event.cancel()
     }
 }

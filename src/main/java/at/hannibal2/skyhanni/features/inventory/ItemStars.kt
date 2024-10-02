@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -14,7 +15,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class ItemStars {
+@SkyHanniModule
+object ItemStars {
 
     private val config get() = SkyHanniMod.feature.inventory
 
@@ -51,8 +53,8 @@ class ItemStars {
         val data = event.getConstant<ItemsJson>("Items")
         armorNames.clear()
         tiers.clear()
-        armorNames.addAll(data.crimson_armors)
-        for (tier in data.crimson_tiers) {
+        armorNames.addAll(data.crimsonArmors)
+        for (tier in data.crimsonTiers) {
             tiers[tier.key] = tier.value
         }
     }

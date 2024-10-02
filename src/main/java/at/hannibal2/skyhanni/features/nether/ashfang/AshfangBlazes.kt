@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -22,7 +23,8 @@ import net.minecraft.entity.monster.EntityBlaze
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class AshfangBlazes {
+@SkyHanniModule
+object AshfangBlazes {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.ashfang
 
@@ -91,7 +93,7 @@ class AshfangBlazes {
         if (!entity.hasCustomName()) return
         if (entity.isDead) return
         if (entity in blazeArmorStand.values) {
-            event.isCanceled = true
+            event.cancel()
         }
     }
 

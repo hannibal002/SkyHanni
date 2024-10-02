@@ -34,7 +34,7 @@ object ViewRecipeCommand {
             group("item").uppercase().replace(" ", "_")
         } ?: return
 
-        event.isCanceled = true
+        event.cancel()
         HypixelCommands.viewRecipe(item)
     }
 

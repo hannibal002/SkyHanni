@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -15,13 +16,29 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class HighlightPlaceableNpcs {
+@SkyHanniModule
+object HighlightPlaceableNpcs {
 
     private val config get() = SkyHanniMod.feature.misc.stranded
 
-    private val locationPattern by RepoPattern.pattern(
-        "stranded.highlightplacement.location",
-        "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]"
+    private val patternGroup = RepoPattern.group("stranded.highlightplacement")
+
+    // TODO Please add regex tests
+    private val locationPattern by patternGroup.pattern(
+        "location",
+        "§7Location: §f\\[§e\\d+§f, §e\\d+§f, §e\\d+§f]",
+    )
+
+    // TODO Please add regex tests
+    private val clickToSetPattern by RepoPattern.pattern(
+        "clicktoset",
+        "§7§eClick to set the location of this NPC!",
+    )
+
+    // TODO Please add regex tests
+    private val clickToSpawnPattern by RepoPattern.pattern(
+        "clicktospawn",
+        "§elocation!",
     )
 
     private var inInventory = false
@@ -67,7 +84,9 @@ class HighlightPlaceableNpcs {
 
     private fun isPlaceableNpc(lore: List<String>): Boolean {
         // Checking if NPC & placeable
-        if (lore.isEmpty() || !(lore.last() == "§ethis NPC!" || lore.last() == "§eyour location!")) {
+        if (lore.isEmpty() ||
+            !(clickToSetPattern.matches(lore.last()) ||
+                clickToSpawnPattern.matches(lore.last()))) {
             return false
         }
 

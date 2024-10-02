@@ -4,9 +4,10 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MiningAPI.inColdIsland
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.NumberUtil
-import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
@@ -15,7 +16,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 
-class ColdOverlay {
+@SkyHanniModule
+object ColdOverlay {
 
     private val config get() = SkyHanniMod.feature.mining.coldOverlay
 
@@ -40,7 +42,7 @@ class ColdOverlay {
         GlStateManager.translate(0f, 0f, -500f)
         GlStateManager.color(1f, 1f, 1f, alpha)
 
-        RenderUtils.drawTexturedRect(0f, 0f)
+        GuiRenderUtils.drawTexturedRect(0f, 0f)
         GL11.glDepthMask(true)
 
         GlStateManager.popMatrix()

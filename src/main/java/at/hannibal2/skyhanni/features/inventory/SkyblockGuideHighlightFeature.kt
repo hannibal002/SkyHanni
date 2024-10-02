@@ -5,23 +5,24 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.intellij.lang.annotations.Language
 
 val patternGroup = RepoPattern.group("skyblockguide.highlight")
 
-private const val keyPrefixInventory = "inventory"
-private const val keyPrefixCondition = "condition"
+private const val KEY_PREFIX_INVENTORY = "inventory"
+private const val KEY_PREFIX_CONDITION = "condition"
 
 class SkyblockGuideHighlightFeature private constructor(
     private val config: () -> Boolean,
@@ -43,8 +44,8 @@ class SkyblockGuideHighlightFeature private constructor(
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
     ) : this(
         config,
-        patternGroup.pattern("$key.$keyPrefixInventory", inventory),
-        patternGroup.pattern("$key.$keyPrefixCondition", loreCondition),
+        patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
+        patternGroup.pattern("$key.$KEY_PREFIX_CONDITION", loreCondition),
         onSlotClicked,
         onTooltip
     )
@@ -58,7 +59,7 @@ class SkyblockGuideHighlightFeature private constructor(
         onTooltip: (LorenzToolTipEvent) -> Unit = {},
     ) : this(
         config,
-        patternGroup.pattern("$key.$keyPrefixInventory", inventory),
+        patternGroup.pattern("$key.$KEY_PREFIX_INVENTORY", inventory),
         loreCondition,
         onSlotClicked,
         onTooltip
@@ -68,6 +69,7 @@ class SkyblockGuideHighlightFeature private constructor(
         objectList.add(this)
     }
 
+    @SkyHanniModule
     companion object {
 
         private val skyblockGuideConfig get() = SkyHanniMod.feature.inventory.skyblockGuideConfig
@@ -98,7 +100,8 @@ class SkyblockGuideHighlightFeature private constructor(
             if (!isEnabled()) return
             if (activeObject == null) return
 
-            event.gui.inventorySlots.inventorySlots.filter { missing.contains(it.slotNumber) }
+            event.gui.inventorySlots.inventorySlots
+                .filter { missing.contains(it.slotNumber) }
                 .forEach { it highlight LorenzColor.RED }
         }
 
@@ -129,13 +132,13 @@ class SkyblockGuideHighlightFeature private constructor(
         }
 
         private val taskOnlyCompleteOncePattern =
-            patternGroup.pattern("$keyPrefixCondition.once", "§7§eThis task can only be completed once!")
-        private val xPattern = patternGroup.pattern("$keyPrefixCondition.x", "§c ?✖.*")
+            patternGroup.pattern("$KEY_PREFIX_CONDITION.once", "§7§eThis task can only be completed once!")
+        private val xPattern = patternGroup.pattern("$KEY_PREFIX_CONDITION.x", "§c ?✖.*")
         private val totalProgressPattern =
-            patternGroup.pattern("$keyPrefixCondition.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
+            patternGroup.pattern("$KEY_PREFIX_CONDITION.total", "§7Total Progress: §3\\d{1,2}(?:\\.\\d)?%")
         private val categoryProgressPattern =
             patternGroup.pattern(
-                "$keyPrefixCondition.category",
+                "$KEY_PREFIX_CONDITION.category",
                 "§7Progress to Complete Category: §6\\d{1,2}(?:\\.\\d)?%"
             )
 

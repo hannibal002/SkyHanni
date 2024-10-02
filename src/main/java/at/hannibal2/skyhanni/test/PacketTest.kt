@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.test
 
-import at.hannibal2.skyhanni.events.PacketEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -32,8 +34,6 @@ import net.minecraft.network.play.server.S1DPacketEntityEffect
 import net.minecraft.network.play.server.S20PacketEntityProperties
 import net.minecraft.network.play.server.S28PacketEffect
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object PacketTest {
@@ -59,9 +59,7 @@ object PacketTest {
 
     private fun sendEntityPacketData(id: Int) {
         ChatUtils.chat("Packet Entity Data: $id")
-        entityMap[id]?.forEach {
-            it.print()
-        }
+        entityMap[id]?.forEach { it.print() }
         println("End of Data")
     }
 
@@ -70,8 +68,8 @@ object PacketTest {
         ChatUtils.chat("Packet test: $enabled")
     }
 
-    @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
+    @HandleEvent
+    fun onSendPacket(event: PacketSentEvent) {
         if (!enabled) return
 
         val packet = event.packet
@@ -91,8 +89,8 @@ object PacketTest {
         println("Send: $packetName")
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onPacketReceive(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onPacketReceive(event: PacketReceivedEvent) {
         if (!enabled) return
         val packet = event.packet
         packet.print()
@@ -189,7 +187,7 @@ object PacketTest {
     }
 
     private fun getDistance(location: LorenzVec?): Double {
-        return location?.distanceToPlayer()?.round(1) ?: 0.0
+        return location?.distanceToPlayer()?.roundTo(1) ?: 0.0
     }
 
     private fun getLocation(packet: Packet<*>, entity: Entity?): LorenzVec? {

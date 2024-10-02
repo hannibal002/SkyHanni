@@ -5,12 +5,12 @@ import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import com.google.gson.JsonElement
-import io.github.moulberry.notenoughupdates.util.ApiUtil
-import io.github.moulberry.notenoughupdates.util.MinecraftExecutor
 import io.github.notenoughupdates.moulconfig.observer.Property
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import moe.nea.libautoupdate.CurrentVersion
@@ -113,7 +113,7 @@ object UpdateManager {
                 } else if (forceDownload) {
                     ChatUtils.chat("§aSkyHanni didn't find a new update.")
                 }
-            }, MinecraftExecutor.OnThread)
+            }, DelayedRun.onThread)
     }
 
     fun queueUpdate() {
@@ -130,7 +130,7 @@ object UpdateManager {
             potentialUpdate!!.executePreparedUpdate()
             ChatUtils.chat("Download of update complete. ")
             ChatUtils.chat("§aThe update will be installed after your next restart.")
-        }, MinecraftExecutor.OnThread)
+        }, DelayedRun.onThread)
     }
 
     private val context = UpdateContext(
@@ -161,7 +161,7 @@ object UpdateManager {
         context.cleanup()
         UpdateUtils.patchConnection {
             if (it is HttpsURLConnection) {
-                ApiUtil.patchHttpsRequest(it)
+                APIUtils.patchHttpsRequest(it)
             }
         }
     }

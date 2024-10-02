@@ -9,14 +9,15 @@ import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.SeaCreatureManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.addButton
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
@@ -54,12 +55,12 @@ object SeaCreatureTracker {
         }
     }
 
-    private val nameAll: CategoryName = "All"
-    private var currentCategory: CategoryName = nameAll
+    private const val NAME_ALL: CategoryName = "All"
+    private var currentCategory: CategoryName = NAME_ALL
 
     private fun getCurrentCategories(data: Data): Map<CategoryName, Int> {
         val map = mutableMapOf<CategoryName, Int>()
-        map[nameAll] = data.amount.size
+        map[NAME_ALL] = data.amount.size
         for ((category, names) in SeaCreatureManager.allVariants) {
             val amount = names.count { it in data.amount }
             if (amount > 0) {
@@ -70,14 +71,14 @@ object SeaCreatureTracker {
         return map
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§7Sea Creature Tracker:")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§7Sea Creature Tracker:")
 
         val filter: (String) -> Boolean = addCategories(data)
         val realAmount = data.amount.filter { filter(it.key) }
 
         val total = realAmount.sumAllValues()
-        realAmount.entries.sortedByDescending { it.value }.forEach { (name, amount) ->
+        for ((name, amount) in realAmount.entries.sortedByDescending { it.value }) {
             val displayName = SeaCreatureManager.allFishingMobs[name]?.displayName ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Sea Creature Tracker can not display a name correctly",
@@ -93,16 +94,16 @@ object SeaCreatureTracker {
                 " §7$percentage"
             } else ""
 
-            addAsSingletonList(" §7- §e${amount.addSeparators()} $displayName$percentageSuffix")
+            addSearchString(" §7- §e${amount.addSeparators()} $displayName$percentageSuffix", displayName)
         }
-        addAsSingletonList(" §7- §e${total.addSeparators()} §7Total Sea Creatures")
+        addSearchString(" §7- §e${total.addSeparators()} §7Total Sea Creatures")
     }
 
-    private fun MutableList<List<Any>>.addCategories(data: Data): (String) -> Boolean {
+    private fun MutableList<Searchable>.addCategories(data: Data): (String) -> Boolean {
         val amounts = getCurrentCategories(data)
         val list = amounts.keys.toList()
         if (currentCategory !in list) {
-            currentCategory = nameAll
+            currentCategory = NAME_ALL
         }
 
         if (tracker.isInventoryOpen()) {
@@ -117,7 +118,7 @@ object SeaCreatureTracker {
             )
         }
 
-        return if (currentCategory == nameAll) {
+        return if (currentCategory == NAME_ALL) {
             { true }
         } else filterCurrentCategory()
     }

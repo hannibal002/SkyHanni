@@ -32,7 +32,7 @@ import static at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCou
 public class GhostCounterConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the ghost counter (invisible creepers in the Dwarven Mines The Mist area).")
+    @ConfigOption(name = "Enabled", desc = "Enable the ghost counter (invisible creepers within The Mist in the Dwarven Mines)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
@@ -126,7 +126,7 @@ public class GhostCounterConfig {
     public TextFormattingConfig textFormatting = new TextFormattingConfig();
 
     @Expose
-    @ConfigOption(name = "Extra space", desc = "Space between each line of text.")
+    @ConfigOption(name = "Extra Spaces", desc = "Spaces between each line of text.")
     @ConfigEditorSlider(
         minValue = -5,
         maxValue = 10,
@@ -134,7 +134,7 @@ public class GhostCounterConfig {
     public int extraSpace = 1;
 
     @Expose
-    @ConfigOption(name = "Pause Timer", desc = "How many seconds does it wait before pausing.")
+    @ConfigOption(name = "Pause Timer", desc = "How many seconds to wait before pausing.")
     @ConfigEditorSlider(
         minValue = 1,
         maxValue = 20,
@@ -148,7 +148,7 @@ public class GhostCounterConfig {
     public boolean onlyOnMist = true;
 
     @Expose
-    @ConfigOption(name = "Maxed Bestiary", desc = "Show progress to max bestiary instead of next level.")
+    @ConfigOption(name = "Max Bestiary", desc = "Show progress to max bestiary instead of next level.")
     @ConfigEditorBoolean
     public boolean showMax = false;
 
