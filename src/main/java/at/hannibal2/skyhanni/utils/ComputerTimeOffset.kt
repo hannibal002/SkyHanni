@@ -19,8 +19,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object ComputerTimeOffset {
-    var offsetMillis: Duration? = null
-        private set
+    private var offsetMillis: Duration? = null
 
     private var lastCheckTime = SimpleTimeMark.farPast()
 
@@ -31,6 +30,7 @@ object ComputerTimeOffset {
             OSUtils.isWindows ->
                 @Suppress("ktlint:standard:max-line-length")
                 "https://support.microsoft.com/en-us/windows/how-to-set-your-time-and-time-zone-dfaa7122-479f-5b98-2a7b-fa0b6e01b261"
+
             OSUtils.isLinux -> "https://unix.stackexchange.com/a/79116"
             OSUtils.isMac -> "https://support.apple.com/guide/mac-help/set-the-date-and-time-automatically-mchlp2996/mac"
             else -> null
@@ -84,8 +84,8 @@ object ComputerTimeOffset {
         val expectedDuration = 1.seconds
         val deviation = timeDifference - expectedDuration
 
-        if (deviation.absoluteValue > 1.seconds && config) {
-            ChatUtils.chat("Time Offset changed from ${lastDetectedOffset.format()} to ${deviation.format()}")
+        if (deviation.absoluteValue > 1.seconds) {
+            lastCheckTime = SimpleTimeMark.farPast()
         }
         lastDetectedOffset = deviation
     }
@@ -97,7 +97,8 @@ object ComputerTimeOffset {
         if (offsetMillis.absoluteValue < 5.seconds) return
 
         ChatUtils.clickableLinkChat(
-            "Your computer's clock is off by ${offsetMillis.format()}. Please update your time settings. Click here for instructions.",
+            "Your computer's clock is off by ${offsetMillis.absoluteValue.format()}. " +
+                "Please update your time settings. Click here for instructions.",
             offsetFixLinks ?: return,
             prefixColor = "§c",
         )
