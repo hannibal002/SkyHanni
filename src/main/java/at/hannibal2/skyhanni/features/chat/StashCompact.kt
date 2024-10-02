@@ -49,9 +49,10 @@ object StashCompact {
      * REGEX-TEST: §eOne or more items didn't fit in your inventory and were added to your item stash! §6Click here to pick them up!
      * REGEX-TEST: §eOne or more materials didn't fit in your inventory and were added to your material stash! §6Click here to pick them up!
      */
+    @Suppress("MaxLineLength")
     private val genericAddedToStashPattern by patternGroup.pattern(
         "generic",
-        "§eOne or more (?:item|material)s? didn't fit in your inventory and were added to your (?:item|material) stash! §6Click here §eto pick them up!"
+        "§eOne or more (?:item|material)s? didn't fit in your inventory and were added to your (?:item|material) stash! §6Click here §eto pick them up!",
     )
 
     //</editor-fold>
@@ -91,7 +92,7 @@ object StashCompact {
             event.blockedReason = "stash_compact"
         }
 
-        if(pickupStashPattern.matches(event.message)) {
+        if (pickupStashPattern.matches(event.message)) {
             event.blockedReason = "stash_compact"
             if (lastMaterialCount != lastSentMaterialCount || lastDifferingMaterialsCount != lastSentDifferingMaterialsCount) {
                 sendCompactedStashMessage()
@@ -103,16 +104,17 @@ object StashCompact {
     }
 
     private fun sendCompactedStashMessage() {
-        if (config.compactStashWarnings == ChatConfig.StashCompactType.HIDE) return
+        if (config.stashWarnings == ChatConfig.StashHandlerType.HIDE) return
         ChatUtils.clickableChat(
             "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, lastType)} in stash, " +
                 "§8totalling $lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}. " +
                 "§3Click to pickup§7.",
             onClick = {
                 HypixelCommands.pickupStash()
-            }
+            },
+            prefix = false,
         )
     }
 
-    private fun isEnabled() = config.compactStashWarnings != ChatConfig.StashCompactType.NONE
+    private fun isEnabled() = config.stashWarnings != ChatConfig.StashHandlerType.NONE
 }

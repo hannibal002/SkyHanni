@@ -145,19 +145,19 @@ public class ChatConfig {
     public boolean petRarityDropMessage = true;
 
     @Expose
-    @ConfigOption(name = "Compact Stash Warnings", desc = "Compact the Stash warnings into a single line of text.")
+    @ConfigOption(name = "Stash Warnings", desc = "Compact or hide warnings relating to items/materials in your stash.")
     @ConfigEditorDropdown
-    public StashCompactType compactStashWarnings = StashCompactType.COMPACT;
+    public StashHandlerType stashWarnings = StashHandlerType.COMPACT;
 
-    public enum StashCompactType {
+    public enum StashHandlerType {
         NONE("None (Show all)"),
-        COMPACT("Compact"),
+        COMPACT("Compact Messages"),
         HIDE("Hide Completely"),
         ;
 
         private final String name;
 
-        StashCompactType(String name) {
+        StashHandlerType(String name) {
             this.name = name;
         }
 
