@@ -54,12 +54,6 @@ public class TabCompleteConfig {
     public boolean gfsSack = true;
 
     @Expose
-    @ConfigOption(name = "Party Commands", desc = "Tab-complete commonly used party commands.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean partyCommands = true;
-
-    @Expose
     @ConfigOption(name = "View Recipe", desc = "Tab-complete item IDs in the the Hypixel command §e/viewrecipe§7. Only items with recipes are tab completed.")
     @ConfigEditorBoolean
     @FeatureToggle

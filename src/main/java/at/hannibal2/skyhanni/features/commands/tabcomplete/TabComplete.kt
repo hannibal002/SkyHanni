@@ -18,16 +18,16 @@ object TabComplete {
             var command = splits.first().lowercase()
             if (command.startsWith("/")) {
                 command = command.substring(1)
-                customTabComplete(command)?.let {
+                customTabComplete(event.leftOfCursor.substring(1), command)?.let {
                     event.addSuggestions(it)
                 }
             }
         }
     }
 
-    private fun customTabComplete(command: String): List<String>? {
+    private fun customTabComplete(fullCommand: String, command: String): List<String>? {
         GetFromSacksTabComplete.handleTabComplete(command)?.let { return it }
-        PlayerTabComplete.handleTabComplete(command)?.let { return it }
+        PlayerTabComplete.handleTabComplete(fullCommand)?.let { return it }
         CollectionTracker.handleTabComplete(command)?.let { return it }
         PartyCommands.customTabComplete(command)?.let { return it }
         ViewRecipeCommand.customTabComplete(command)?.let { return it }
