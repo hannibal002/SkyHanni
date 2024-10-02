@@ -53,7 +53,7 @@ object IslandAreas {
         hasMoved = true
     }
 
-    fun noteMoved() {
+    fun nodeMoved() {
         SkyHanniMod.coroutineScope.launch {
             updateNodes()
         }
@@ -62,9 +62,9 @@ object IslandAreas {
     private fun updateNodes() {
         if (!isEnabled()) return
         val graph = IslandGraphs.currentIslandGraph ?: return
-        val closedNote = IslandGraphs.closedNote ?: return
+        val closestNode = IslandGraphs.closestNode ?: return
 
-        val (paths, map) = GraphUtils.findFastestPaths(graph, closedNote) { it.getAreaTag() != null }
+        val (paths, map) = GraphUtils.findFastestPaths(graph, closestNode) { it.getAreaTag() != null }
         this.paths = paths
 
         val finalNodes = mutableMapOf<GraphNode, Double>()

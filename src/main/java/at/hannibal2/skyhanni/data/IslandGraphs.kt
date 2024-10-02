@@ -102,9 +102,9 @@ object IslandGraphs {
 
     val existsForThisIsland get() = currentIslandGraph != null
 
-    private var pathfindClosedNote: GraphNode? = null
-    var closedNote: GraphNode? = null
-    private var secondClosedNote: GraphNode? = null
+    private var pathfindClosestNode: GraphNode? = null
+    var closestNode: GraphNode? = null
+    private var secondClosestNode: GraphNode? = null
 
     private var currentTarget: LorenzVec? = null
     private var currentTargetNode: GraphNode? = null
@@ -213,7 +213,7 @@ object IslandGraphs {
 
         // calling various update functions to make swtiching between deep caverns and glacite tunnels bareable
         handleTick()
-        IslandAreas.noteMoved()
+        IslandAreas.nodeMoved()
         DelayedRun.runDelayed(150.milliseconds) {
             IslandAreas.updatePosition()
         }
@@ -221,8 +221,8 @@ object IslandGraphs {
 
     private fun reset() {
         stop()
-        pathfindClosedNote = null
-        closedNote = null
+        pathfindClosestNode = null
+        closestNode = null
     }
 
     @SubscribeEvent
@@ -235,7 +235,7 @@ object IslandGraphs {
     }
 
     private fun handleTick() {
-        val prevClosed = pathfindClosedNote
+        val prevClosest = pathfindClosestNode
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
@@ -251,15 +251,15 @@ object IslandGraphs {
         val graph = currentIslandGraph ?: return
         val sortedNodes = graph.sortedBy { it.position.distanceSqToPlayer() }
         val newClosest = sortedNodes.first()
-        if (pathfindClosedNote == newClosest) return
+        if (pathfindClosestNode == newClosest) return
         val newPath = !onCurrentPath()
 
-        closedNote = newClosest
-        secondClosedNote = sortedNodes.getOrNull(1)
-        onNewNote()
-        if (newClosest == prevClosed) return
+        closestNode = newClosest
+        secondClosestNode = sortedNodes.getOrNull(1)
+        onNewNode()
+        if (newClosest == prevClosest) return
         if (newPath) {
-            pathfindClosedNote = closedNote
+            pathfindClosestNode = closestNode
             findNewPath()
         }
     }
@@ -275,7 +275,7 @@ object IslandGraphs {
         val newGraph = Graph(newNodes)
         fastestPath = newGraph
         newNodes.getOrNull(1)?.let {
-            secondClosedNote = it
+            secondClosestNode = it
         }
         setFastestPath(newGraph to newGraph.totalLenght(), setPath = false)
         return true
@@ -283,7 +283,7 @@ object IslandGraphs {
 
     private fun findNewPath() {
         val goal = IslandGraphs.goal ?: return
-        val closest = pathfindClosedNote ?: return
+        val closest = pathfindClosestNode ?: return
 
         val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
@@ -306,7 +306,7 @@ object IslandGraphs {
     private fun Graph.totalLenght(): Double = nodes.zipWithNext().sumOf { (a, b) -> a.position.distance(b.position) }
 
     private fun handlePositionChange() {
-        val secondClosestNode = secondClosedNote ?: return
+        val secondClosestNode = secondClosestNode ?: return
         distanceToNextNode = secondClosestNode.position.distanceToPlayer()
         updateChat()
     }
@@ -346,9 +346,9 @@ object IslandGraphs {
         updateChat()
     }
 
-    private fun onNewNote() {
+    private fun onNewNode() {
         // TODO create an event
-        IslandAreas.noteMoved()
+        IslandAreas.nodeMoved()
         if (shouldAllowRerouting) {
             tryRerouting()
         }
@@ -356,7 +356,7 @@ object IslandGraphs {
 
     private fun tryRerouting() {
         val target = currentTargetNode ?: return
-        val closest = pathfindClosedNote ?: return
+        val closest = pathfindClosestNode ?: return
         val map = GraphUtils.findAllShortestDistances(closest).distances.filter { it.key.sameNameAndTags(target) }
         val newTarget = map.sorted().keys.firstOrNull() ?: return
         if (newTarget != target) {
