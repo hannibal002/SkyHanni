@@ -6,8 +6,6 @@ import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
-import at.hannibal2.skyhanni.data.model.findShortestPathAsGraph
-import at.hannibal2.skyhanni.data.model.toJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
@@ -15,6 +13,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -581,7 +580,7 @@ object GraphEditor {
         val current = compiled.firstOrNull { it.position == savedCurrent.position } ?: return
         val goal = compiled.firstOrNull { it.position == savedActive.position } ?: return
 
-        val path = compiled.findShortestPathAsGraph(current, goal)
+        val path = GraphUtils.findShortestPathAsGraph(current, goal)
 
         val inGraph = path.map { nodes[it.id] }
         highlightedNodes.addAll(inGraph)
@@ -600,7 +599,7 @@ object GraphEditor {
         ghostPosition = null
     }
 
-    private fun prune() { //TODO fix
+    private fun prune() { // TODO fix
         val hasNeighbours = nodes.associateWith { false }.toMutableMap()
         edges.forEach {
             hasNeighbours[it.node1] = true
