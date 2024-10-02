@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.commands
 import net.minecraft.command.ICommandSender
 import net.minecraft.util.BlockPos
 
+// TODO: Gravy's dm
 class CommandBuilder(val name: String) {
     var description: String = ""
     var category: CommandCategory = CommandCategory.MAIN
