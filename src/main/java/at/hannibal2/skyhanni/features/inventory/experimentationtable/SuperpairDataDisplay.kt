@@ -57,9 +57,10 @@ object SuperpairDataDisplay {
     @SubscribeEvent
     fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
-        if (ExperimentationTableAPI.getCurrentExperiment() == null) {
+        if (InventoryUtils.openInventoryName() == "Experimentation Table") {
             // Render here so they can move it around.
             config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
+            return
         }
 
         if (display.isEmpty()) display = drawDisplay()
