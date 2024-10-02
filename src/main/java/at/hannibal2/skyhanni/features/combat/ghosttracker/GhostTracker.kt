@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.combat.ghosttracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDrops
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -246,13 +247,7 @@ object GhostTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        //allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghost_drops
-        allowedDrops = listOf(
-            SORROW,
-            "PLASMA".asInternalName(),
-            "VOLTA".asInternalName(),
-            "GHOST_BOOTS".asInternalName(),
-        )
+        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghost_drops
     }
 
     @SubscribeEvent
