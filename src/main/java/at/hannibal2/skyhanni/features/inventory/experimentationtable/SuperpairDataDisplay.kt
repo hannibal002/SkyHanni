@@ -60,8 +60,8 @@ object SuperpairDataDisplay {
         if (InventoryUtils.openInventoryName() == "Experimentation Table") {
             // Render here so they can move it around.
             config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
-            return
         }
+        if (ExperimentationTableAPI.getCurrentExperiment() == null) return
 
         if (display.isEmpty()) display = drawDisplay()
 
