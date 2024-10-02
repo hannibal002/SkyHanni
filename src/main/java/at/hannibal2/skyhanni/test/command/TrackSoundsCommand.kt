@@ -40,7 +40,7 @@ object TrackSoundsCommand {
     // TODO write abstract code for this and TrackParticlesCommand
     fun command(args: Array<String>) {
         if (!LorenzUtils.inSkyBlock) {
-            ChatUtils.userError("This command does only work in SkyBlock!")
+            ChatUtils.userError("This command only works in SkyBlock!")
             return
         }
 
