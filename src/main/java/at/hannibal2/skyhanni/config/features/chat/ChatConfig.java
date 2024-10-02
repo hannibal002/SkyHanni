@@ -142,4 +142,10 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petRarityDropMessage = true;
+
+    @Expose
+    @ConfigOption(name = "Compact Stash Warnings", desc = "Compact the Stash warnings into a single line of text.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean compactStashWarnings = true;
 }
