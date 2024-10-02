@@ -43,10 +43,11 @@ object ComputerTimeOffset {
     }
 
     private fun checkOffset() {
+        val wasOffsetBefore = (offsetMillis?.absoluteValue ?: 0.seconds) > 5.seconds
         SkyHanniMod.coroutineScope.launch {
             offsetMillis = getNtpOffset("time.google.com")
             offsetMillis?.let {
-                tryDisplayOffset()
+                tryDisplayOffset(wasOffsetBefore)
             }
         }
     }
@@ -89,10 +90,15 @@ object ComputerTimeOffset {
         }
     }
 
-    private fun tryDisplayOffset() {
+    private fun tryDisplayOffset(wasOffsetBefore: Boolean) {
         if (!config || !LorenzUtils.onHypixel) return
         val offsetMillis = offsetMillis ?: return
-        if (offsetMillis.absoluteValue < 5.seconds) return
+        if (offsetMillis.absoluteValue < 5.seconds) {
+            if (wasOffsetBefore) {
+                ChatUtils.chat("Congratulations! Your computer's clock is now accurate.")
+            }
+            return
+        }
 
         ChatUtils.clickableLinkChat(
             "Your computer's clock is off by ${offsetMillis.absoluteValue.format()}.\n" +
