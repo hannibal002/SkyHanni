@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
@@ -79,6 +80,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DebugCommand
 import at.hannibal2.skyhanni.test.PacketTest
 import at.hannibal2.skyhanni.test.SkyBlockIslandTest
@@ -104,10 +106,8 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
-import net.minecraft.command.ICommandSender
-import net.minecraft.util.BlockPos
-import net.minecraftforge.client.ClientCommandHandler
 
+@SkyHanniModule
 object Commands {
 
     private val openMainMenu: (Array<String>) -> Unit = {
@@ -122,57 +122,31 @@ object Commands {
         }
     }
 
-    // command -> description
-    private val commands = mutableListOf<CommandInfo>()
+    val commands = mutableListOf<CommandBuilder>()
 
-    enum class CommandCategory(val color: String, val categoryName: String, val description: String) {
-        MAIN("§6", "Main Command", "Most useful commands of SkyHanni"),
-        USERS_NORMAL("§e", "Normal Command", "Normal Command for everyone to use"),
-        USERS_BUG_FIX("§f", "User Bug Fix", "A Command to fix small bugs"),
-        DEVELOPER_CODING_HELP(
-            "§5",
-            "Developer Coding Help",
-            "A Command that can help with developing new features. §cIntended for developers only!",
-        ),
-        DEVELOPER_DEBUG_FEATURES(
-            "§9",
-            "Developer Debug Features",
-            "A Command that is useful for monitoring/debugging existing features. §cIntended for developers only!",
-        ),
-        INTERNAL("§8", "Internal Command", "A Command that should §cnever §7be called manually!"),
-        SHORTENED_COMMANDS("§b", "Shortened Commands", "Commands that shorten or improve existing Hypixel commands!")
-    }
+    @HandleEvent
+    fun registerCommands(event: RegisterCommandsEvent) {
+        usersMain(event)
 
-    class CommandInfo(val name: String, val description: String, val category: CommandCategory)
-
-    private var currentCategory = CommandCategory.MAIN
-
-    fun init() {
-        currentCategory = CommandCategory.MAIN
-        usersMain()
-
-        currentCategory = CommandCategory.USERS_NORMAL
         usersNormal()
 
-        currentCategory = CommandCategory.USERS_BUG_FIX
         usersBugFix()
 
-        currentCategory = CommandCategory.DEVELOPER_CODING_HELP
         developersCodingHelp()
 
-        currentCategory = CommandCategory.DEVELOPER_DEBUG_FEATURES
         developersDebugFeatures()
 
-        currentCategory = CommandCategory.INTERNAL
         internalCommands()
 
-        currentCategory = CommandCategory.SHORTENED_COMMANDS
         shortenedCommands()
     }
 
-    private fun usersMain() {
-        registerCommand("sh", "Opens the main SkyHanni config", openMainMenu)
-        registerCommand("skyhanni", "Opens the main SkyHanni config", openMainMenu)
+    private fun usersMain(event: RegisterCommandsEvent) {
+        event.register("sh") {
+            aliases = listOf("skyhanni")
+            description = "Opens the main SkyHanni config"
+            callback = openMainMenu
+        }
         registerCommand("ff", "Opens the Farming Fortune Guide") { openFortuneGuide() }
         registerCommand("shcommands", "Shows this list") { HelpCommand.onCommand(it, commands) }
         registerCommand0(
@@ -683,41 +657,10 @@ object Commands {
         }
     }
 
-    private fun registerCommand(rawName: String, description: String, function: (Array<String>) -> Unit) {
-        val name = rawName.lowercase()
-        if (commands.any { it.name == name }) {
-            error("The command '$name is already registered!'")
-        }
-        ClientCommandHandler.instance.registerCommand(SimpleCommand(name, createCommand(function)))
-        commands.add(CommandInfo(name, description, currentCategory))
-    }
-
-    private fun registerCommand0(
-        name: String,
-        description: String,
-        function: (Array<String>) -> Unit,
-        autoComplete: ((Array<String>) -> List<String>) = { listOf() },
-    ) {
-        val command = SimpleCommand(
-            name,
-            createCommand(function),
-            object : SimpleCommand.TabCompleteRunnable {
-                override fun tabComplete(
-                    sender: ICommandSender?,
-                    args: Array<String>?,
-                    pos: BlockPos?,
-                ): List<String> {
-                    return autoComplete(args ?: emptyArray())
-                }
-            },
-        )
-        ClientCommandHandler.instance.registerCommand(command)
-        commands.add(CommandInfo(name, description, currentCategory))
-    }
-
-    private fun createCommand(function: (Array<String>) -> Unit) = object : SimpleCommand.ProcessCommandRunnable() {
-        override fun processCommand(sender: ICommandSender?, args: Array<String>?) {
-            if (args != null) function(args.asList().toTypedArray())
+    fun onCommand(event: RegisterCommandsEvent) {
+        event.register("a") {
+            description = "a"
+            category = CommandCategory.MAIN
         }
     }
 }
