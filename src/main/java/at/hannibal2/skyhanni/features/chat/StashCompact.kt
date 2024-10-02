@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -80,7 +81,9 @@ object StashCompact {
 
     private fun sendCompactedStashMessage() {
         ChatUtils.clickableChat(
-            "§7You have §3${lastMaterialCount} §7materials in stash, §8totalling $lastDifferingMaterialsCount types. §3Click to pickup§7.",
+            "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, "material")} in stash, " +
+                "§8totalling $lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}. " +
+                "§3Click to pickup§7.",
             onClick = {
                 HypixelCommands.pickupStash()
             }
