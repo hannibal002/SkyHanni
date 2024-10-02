@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.features.bingo.card.nextstephelper.BingoNextStepHel
 import at.hannibal2.skyhanni.features.chat.ColorFormattingHelper
 import at.hannibal2.skyhanni.features.chat.translation.Translator
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil
+import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker
 import at.hannibal2.skyhanni.features.commands.HelpCommand
 import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
@@ -214,14 +214,10 @@ object Commands {
             "Clearing the total slayer profit for the current slayer type",
         ) { SlayerProfitTracker.clearProfitCommand(it) }
         registerCommand(
-            "shimportghostcounterdata",
-            "Manually importing the ghost counter data from GhostCounterV3",
-        ) { GhostUtil.importCTGhostCounterData() }
-        registerCommand(
             "shclearfarmingitems",
             "Clear farming items saved for the Farming Fortune Guide",
         ) { clearFarmingItems() }
-        registerCommand("shresetghostcounter", "Resets the ghost counter") { GhostUtil.reset() }
+        registerCommand("shresetghosttracker", "Resets the ghost counter") { GhostTracker.reset() }
         registerCommand("shresetpowdertracker", "Resets the Powder Tracker") { PowderTracker.resetCommand() }
         registerCommand("shresetdicertracker", "Resets the Dicer Drop Tracker") { DicerRngDropTracker.resetCommand() }
         registerCommand("shresetcorpsetracker", "Resets the Glacite Mineshaft Corpse Tracker") { CorpseTracker.resetCommand() }

@@ -482,6 +482,7 @@ public class ProfileSpecificStorage {
         public VinylType activeVinyl = null;
     }
 
+    // TODO: Merge data with GhostProfitTracker at a later date
     @Expose
     public GhostCounter ghostCounter = new GhostCounter();
 
