@@ -881,11 +881,4 @@ object Commands {
             UpdateManager.checkUpdate(true, updateStream)
         }
     }
-
-    fun onCommand(event: RegisterCommandsEvent) {
-        event.register("a") {
-            description = "a"
-            category = CommandCategory.MAIN
-        }
-    }
 }
