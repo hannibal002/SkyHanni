@@ -207,9 +207,14 @@ object PetAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
 
-        val newPetLine = event.lines.getOrNull(1)?.removePrefix(" ") ?: return //TODO don't hardcode this
-        println("'${pet?.rawPetName}' '$newPetLine'")
-        if (newPetLine == pet?.rawPetName) return
+        var newPetLine = ""
+        for (line in event.lines) {
+            if (petWidget.matches(line)) {
+                newPetLine = line
+                break
+            }
+        }
+        if (newPetLine == pet?.rawPetName || newPetLine == "") return
 
         var petItem = NEUInternalName.NONE
         var petXP: Double? = null
