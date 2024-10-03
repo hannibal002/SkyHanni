@@ -128,7 +128,7 @@ object Commands {
     fun registerCommands(event: RegisterCommandsEvent) {
         usersMain(event)
         usersNormal(event)
-        //TODO: usersNormalClearTracker(event)
+        usersNormalClearTracker(event)
         usersBugFix(event)
         developersCodingHelp(event)
         developersDebugFeatures(event)
@@ -179,6 +179,10 @@ object Commands {
             description = "Tracks your collection gain over time"
             callback = { CollectionTracker.command(it) }
         }
+        event.register("shimportghostcounterdata") {
+            description = "Manually importing the ghost counter data from GhostCounterV3"
+            callback = { GhostUtil.importCTGhostCounterData() }
+        }
         event.register("shcroptime") {
             description =
                 "Calculates with your current crop per second speed how long you need to farm a crop to collect this amount of items"
@@ -196,54 +200,6 @@ object Commands {
             description = "Manually sets the crop start location"
             callback = { GardenStartLocation.setLocationCommand() }
         }
-        event.register("shclearslayerprofits") {
-            description = "Clearing the total slayer profit for the current slayer type"
-            callback = { SlayerProfitTracker.clearProfitCommand(it) }
-        }
-        event.register("shimportghostcounterdata") {
-            description = "Manually importing the ghost counter data from GhostCounterV3"
-            callback = { GhostUtil.importCTGhostCounterData() }
-        }
-        event.register("shclearfarmingitems") {
-            description = "Clear farming items saved for the Farming Fortune Guide"
-            callback = { clearFarmingItems() }
-        }
-        event.register("shresetghostcounter") {
-            description = "Resets the ghost counter"
-            callback = { GhostUtil.reset() }
-        }
-        event.register("shresetpowdertracker") {
-            description = "Resets the Powder Tracker"
-            callback = { PowderTracker.resetCommand() }
-        }
-        event.register("shresetdicertracker") {
-            description = "Resets the Dicer Drop Tracker"
-            callback = { DicerRngDropTracker.resetCommand() }
-        }
-        event.register("shresetcorpsetracker") {
-            description = "Resets the Glacite Mineshaft Corpse Tracker"
-            callback = { CorpseTracker.resetCommand() }
-        }
-        event.register("shresetendernodetracker") {
-            description = "Resets the Ender Node Tracker"
-            callback = { EnderNodeTracker.resetCommand() }
-        }
-        event.register("shresetarmordroptracker") {
-            description = "Resets the Armor Drop Tracker"
-            callback = { ArmorDropTracker.resetCommand() }
-        }
-        event.register("shresetfrozentreasuretracker") {
-            description = "Resets the Frozen Treasure Tracker"
-            callback = { FrozenTreasureTracker.resetCommand() }
-        }
-        event.register("shresetfishingtracker") {
-            description = "Resets the Fishing Profit Tracker"
-            callback = { FishingProfitTracker.resetCommand() }
-        }
-        event.register("shresetvisitordrops") {
-            description = "Reset the Visitors Drop Statistics"
-            callback = { GardenVisitorDropStatistics.resetCommand() }
-        }
         event.register("shbingotoggle") {
             description = "Toggle the bingo card display mode"
             callback = { BingoCardDisplay.toggleCommand() }
@@ -253,8 +209,8 @@ object Commands {
             callback = { FarmingWeightDisplay.lookUpCommand(it) }
         }
         event.register("shcopytranslation") {
-            description =
-                "Copy the English translation of a message in another language to the clipboard. Uses a 2 letter language code that can be found at the end of a translation message."
+            description = "Copy the English translation of a message in another language to the clipboard. " +
+                "Uses a 2 letter language code that can be found at the end of a translation message."
             callback = { Translator.fromEnglish(it) }
         }
         event.register("shtranslate") {
@@ -268,38 +224,6 @@ object Commands {
         event.register("shsensreduce") {
             description = "Lowers the mouse sensitivity for easier small adjustments (for farming)"
             callback = { SensitivityReducer.manualToggle() }
-        }
-        event.register("shresetvermintracker") {
-            description = "Resets the Vermin Tracker"
-            callback = { VerminTracker.resetCommand() }
-        }
-        event.register("shresetdianaprofittracker") {
-            description = "Resets the Diana Profit Tracker"
-            callback = { DianaProfitTracker.resetCommand() }
-        }
-        event.register("shresetpestprofittracker") {
-            description = "Resets the Pest Profit Tracker"
-            callback = { PestProfitTracker.resetCommand() }
-        }
-        event.register("shresetexperimentsprofittracker") {
-            description = "Resets the Experiments Profit Tracker"
-            callback = { ExperimentsProfitTracker.resetCommand() }
-        }
-        event.register("shresetmythologicalcreaturetracker") {
-            description = "Resets the Mythological Creature Tracker"
-            callback = { MythologicalCreatureTracker.resetCommand() }
-        }
-        event.register("shresetseacreaturetracker") {
-            description = "Resets the Sea Creature Tracker"
-            callback = { SeaCreatureTracker.resetCommand() }
-        }
-        event.register("shresetstrayrabbittracker") {
-            description = "Resets the Stray Rabbit Tracker"
-            callback = { ChocolateFactoryStrayTracker.resetCommand() }
-        }
-        event.register("shresetexcavatortracker") {
-            description = "Resets the Fossil Excavator Profit Tracker"
-            callback = { ExcavatorProfitTracker.resetCommand() }
         }
         event.register("shfandomwiki") {
             description = "Searches the fandom wiki with SkyHanni's own method."
@@ -372,6 +296,85 @@ object Commands {
         }
     }
 
+    private fun usersNormalClearTracker(event: RegisterCommandsEvent) {
+        event.register("shclearslayerprofits") {
+            description = "Clearing the total slayer profit for the current slayer type"
+            callback = { SlayerProfitTracker.clearProfitCommand(it) }
+        }
+        event.register("shclearfarmingitems") {
+            description = "Clear farming items saved for the Farming Fortune Guide"
+            callback = { clearFarmingItems() }
+        }
+        event.register("shresetghostcounter") {
+            description = "Resets the ghost counter"
+            callback = { GhostUtil.reset() }
+        }
+        event.register("shresetpowdertracker") {
+            description = "Resets the Powder Tracker"
+            callback = { PowderTracker.resetCommand() }
+        }
+        event.register("shresetdicertracker") {
+            description = "Resets the Dicer Drop Tracker"
+            callback = { DicerRngDropTracker.resetCommand() }
+        }
+        event.register("shresetcorpsetracker") {
+            description = "Resets the Glacite Mineshaft Corpse Tracker"
+            callback = { CorpseTracker.resetCommand() }
+        }
+        event.register("shresetendernodetracker") {
+            description = "Resets the Ender Node Tracker"
+            callback = { EnderNodeTracker.resetCommand() }
+        }
+        event.register("shresetarmordroptracker") {
+            description = "Resets the Armor Drop Tracker"
+            callback = { ArmorDropTracker.resetCommand() }
+        }
+        event.register("shresetfrozentreasuretracker") {
+            description = "Resets the Frozen Treasure Tracker"
+            callback = { FrozenTreasureTracker.resetCommand() }
+        }
+        event.register("shresetfishingtracker") {
+            description = "Resets the Fishing Profit Tracker"
+            callback = { FishingProfitTracker.resetCommand() }
+        }
+        event.register("shresetvisitordrops") {
+            description = "Reset the Visitors Drop Statistics"
+            callback = { GardenVisitorDropStatistics.resetCommand() }
+        }
+        event.register("shresetvermintracker") {
+            description = "Resets the Vermin Tracker"
+            callback = { VerminTracker.resetCommand() }
+        }
+        event.register("shresetdianaprofittracker") {
+            description = "Resets the Diana Profit Tracker"
+            callback = { DianaProfitTracker.resetCommand() }
+        }
+        event.register("shresetpestprofittracker") {
+            description = "Resets the Pest Profit Tracker"
+            callback = { PestProfitTracker.resetCommand() }
+        }
+        event.register("shresetexperimentsprofittracker") {
+            description = "Resets the Experiments Profit Tracker"
+            callback = { ExperimentsProfitTracker.resetCommand() }
+        }
+        event.register("shresetmythologicalcreaturetracker") {
+            description = "Resets the Mythological Creature Tracker"
+            callback = { MythologicalCreatureTracker.resetCommand() }
+        }
+        event.register("shresetseacreaturetracker") {
+            description = "Resets the Sea Creature Tracker"
+            callback = { SeaCreatureTracker.resetCommand() }
+        }
+        event.register("shresetstrayrabbittracker") {
+            description = "Resets the Stray Rabbit Tracker"
+            callback = { ChocolateFactoryStrayTracker.resetCommand() }
+        }
+        event.register("shresetexcavatortracker") {
+            description = "Resets the Fossil Excavator Profit Tracker"
+            callback = { ExcavatorProfitTracker.resetCommand() }
+        }
+    }
+
     private fun usersBugFix(event: RegisterCommandsEvent) {
         event.register("shupdaterepo") {
             description = "Download the SkyHanni repo again"
@@ -437,7 +440,7 @@ object Commands {
             description = "Updates the mod to the specified update stream."
             callback = { forceUpdate(it) }
         }
-        event.register("shUpdateBazaarPrices") {
+        event.register("shupdatebazaarprices") {
             description = "Forcefully updating the bazaar prices right now."
             callback = { HypixelBazaarFetcher.fetchNow() }
         }
@@ -518,8 +521,8 @@ object Commands {
             callback = { ItemPriceUtils.debugItemPrice(it) }
         }
         event.register("shdebugscoreboard") {
-            description =
-                "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update."
+            description = "Monitors the scoreboard changes: " +
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
             callback = { ScoreboardData.toggleMonitor() }
         }
     }
@@ -671,7 +674,6 @@ object Commands {
             description = "Internal command for chat click actions"
             callback = { ChatClickActionManager.onCommand(it) }
         }
-
     }
 
     private fun shortenedCommands(event: RegisterCommandsEvent) {
