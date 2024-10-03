@@ -569,4 +569,8 @@ object StringUtils {
             false
         }
     }
+
+    fun optionalAn(string: String): String {
+        return if (string[0] in "aeiou") "an" else "a"
+    }
 }
