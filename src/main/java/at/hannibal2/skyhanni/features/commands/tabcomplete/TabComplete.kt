@@ -14,14 +14,12 @@ object TabComplete {
     @SubscribeEvent
     fun handleTabComplete(event: TabCompletionEvent) {
         val splits = event.leftOfCursor.split(" ")
-        if (splits.size > 1) {
-            var command = splits.first().lowercase()
-            if (command.startsWith("/")) {
-                command = command.substring(1)
-                customTabComplete(event.leftOfCursor.substring(1), command)?.let {
-                    event.addSuggestions(it)
-                }
-            }
+        if (splits.size <= 1) return
+        var command = splits.first().lowercase()
+        if (!command.startsWith("/")) return
+        command = command.substring(1)
+        customTabComplete(event.leftOfCursor.substring(1), command)?.let {
+            event.addSuggestions(it)
         }
     }
 

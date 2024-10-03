@@ -22,8 +22,8 @@ object PlayerTabComplete {
     private val friendsEntry = lazyEntry { FriendAPI.getAllFriends().map { it.name } }
     private val partyMembersEntry = lazyEntry { PartyAPI.partyMembers }
     private val guildMembersEntry = lazyEntry { GuildAPI.getAllMembers() }
-    private val vipVisitsEntry = LazySuggestionEntry { vipVisits }
-    private val islandPlayersEntry = LazySuggestionEntry { EntityUtils.getPlayerEntities().map { it.name } }
+    private val vipVisitsEntry = lazyEntry { vipVisits }
+    private val islandPlayersEntry = lazyEntry { EntityUtils.getPlayerEntities().map { it.name } }
 
     private val suggestions = SuggestionProvider.build {
         parent("f", "friend") {
