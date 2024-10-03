@@ -233,8 +233,10 @@ class RepoManager(private val configLocation: File) {
             if (unsuccessfulConstants.isNotEmpty()) {
                 val text = mutableListOf<IChatComponent>()
                 text.add(
-                    ("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
-                        "Please report this error on the Discord!").asComponent(),
+                    (
+                        "§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                            "Please report this error on the Discord!"
+                        ).asComponent(),
                 )
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())

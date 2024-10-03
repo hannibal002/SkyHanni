@@ -85,8 +85,11 @@ object HighlightPlaceableNpcs {
     private fun isPlaceableNpc(lore: List<String>): Boolean {
         // Checking if NPC & placeable
         if (lore.isEmpty() ||
-            !(clickToSetPattern.matches(lore.last()) ||
-                clickToSpawnPattern.matches(lore.last()))) {
+            !(
+                clickToSetPattern.matches(lore.last()) ||
+                    clickToSpawnPattern.matches(lore.last())
+                )
+        ) {
             return false
         }
 

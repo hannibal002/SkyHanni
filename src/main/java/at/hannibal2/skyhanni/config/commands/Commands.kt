@@ -507,7 +507,9 @@ object Commands {
     private fun developersCodingHelp() {
         registerCommand("shrepopatterns", "See where regexes are loaded from") { RepoPatternGui.open() }
         registerCommand("shtest", "Unused test command.") { SkyHanniDebugsAndTests.testCommand(it) }
-        registerCommand("shtestrabbitpaths", "Tests pathfinding to rabbit eggs. Use a number 0-14.") { HoppityEggLocator.testPathfind(it) }
+        registerCommand("shtestrabbitpaths", "Tests pathfinding to rabbit eggs. Use a number 0-14.") {
+            HoppityEggLocator.testPathfind(it)
+        }
         registerCommand(
             "shtestitem",
             "test item internal name resolving",

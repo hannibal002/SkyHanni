@@ -1140,8 +1140,10 @@ interface Renderable {
                     renderY += yShift
                 }
                 @Suppress("SpacingAroundCurly")
-                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                    ?: yOffsets.size) - 1
+                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
+                    yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                        ?: yOffsets.size
+                    ) - 1
 
                 val range2 = if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
                     range.first..range.last() + 1

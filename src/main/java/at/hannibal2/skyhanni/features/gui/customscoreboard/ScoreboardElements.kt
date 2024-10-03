@@ -370,10 +370,11 @@ private fun getTitleDisplayPair(): List<ScoreboardElementType> {
     }
 
     return if (displayConfig.titleAndFooter.useCustomTitle) {
-        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
-            .replace("&", "§")
-            .split("\\n")
-            .map { it to alignment }
+        listOf(
+            displayConfig.titleAndFooter.customTitle.get().toString()
+                .replace("&", "§")
+                .split("\\n")
+                .map { it to alignment }
         ).flatten()
     } else {
         listOf(ScoreboardData.objectiveTitle to alignment)
@@ -603,15 +604,16 @@ private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getPowerDisplayPair() = listOf(
-    (MaxwellAPI.currentPower?.let {
-        val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
-        if (displayConfig.displayNumbersFirst) {
-            "§a${it.replace(" Power", "")} Power $mp"
-        } else {
-            "Power: §a$it $mp"
-        }
-    }
-        ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT,
+    (
+        MaxwellAPI.currentPower?.let {
+            val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
+            if (displayConfig.displayNumbersFirst) {
+                "§a${it.replace(" Power", "")} Power $mp"
+            } else {
+                "Power: §a$it $mp"
+            }
+        } ?: "§cOpen \"Your Bags\"!"
+        ) to HorizontalAlignment.LEFT,
 )
 
 private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
@@ -659,10 +661,11 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair() = listOf(
-    "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
-        if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
-    }
-        ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT,
+    "§dCookie Buff§f: " + (
+        BitsAPI.cookieBuffTime?.let {
+            if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
+        } ?: "§cOpen SbMenu!"
+        ) to HorizontalAlignment.LEFT,
 )
 
 private fun getCookieShowWhen(): Boolean {
@@ -863,7 +866,9 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (unconfirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
     amountOfUnknownLines = unconfirmedUnknownLines.size
 
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unconfirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unconfirmedUnknownLines.map {
+        it to HorizontalAlignment.LEFT
+    }
 }
 
 private fun getExtraShowWhen(): Boolean {

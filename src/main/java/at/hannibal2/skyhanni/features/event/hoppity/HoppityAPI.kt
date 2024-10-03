@@ -58,7 +58,9 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
+    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
+        it.chatColorCode == rabbit.substring(0, 2)
+    }
 
     /**
      * REGEX-TEST: §f1st Chocolate Milestone
