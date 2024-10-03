@@ -23,7 +23,7 @@ class SuggestionProvider {
     }
 
     fun getSuggestions(command: String): List<String> {
-        val arguments = command.split(" ")
+        val arguments = command.lowercase().split(" ")
         val last = arguments.lastOrNull() ?: ""
         val suggestions = mutableListOf<String>()
         if (arguments.size != 1) {
@@ -31,7 +31,7 @@ class SuggestionProvider {
         } else {
             entry.forEach { suggestions.addAll(it.suggestions) }
         }
-        return suggestions.filter { it.startsWith(last) }
+        return suggestions.filter { it.startsWith(last, ignoreCase = true) }
     }
 
     companion object {
