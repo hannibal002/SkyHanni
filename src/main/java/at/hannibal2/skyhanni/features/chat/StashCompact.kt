@@ -31,7 +31,8 @@ object StashCompact {
     /**
      * REGEX-TEST: §f               §8(This totals 1 type of material stashed!)
      * REGEX-TEST: §f               §8(This totals 2 types of items stashed!)
-     * REGEX-TEST: §f               §8(This totals 1 type of material stashed!)
+     * REGEX-TEST: §f               §8(This totals 3 types of materials stashed!)
+     * REGEX-TEST: §f               §8(This totals 4 types of items stashed!)
      */
     private val differingMaterialsCountPattern by patternGroup.pattern(
         "differing.materials.count",
