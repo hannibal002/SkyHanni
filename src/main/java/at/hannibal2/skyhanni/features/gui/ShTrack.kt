@@ -369,7 +369,7 @@ object ShTrack {
         }
     }
 
-    private val gson = BaseGsonBuilder.gson().registerTypeAdapter(
+    private val gson = BaseGsonBuilder.gson().registerTypeHierarchyAdapter(
         TrackingElement::class.java,
         object : TypeAdapter<TrackingElement<*>>() {
             override fun write(out: JsonWriter, value: TrackingElement<*>) {
