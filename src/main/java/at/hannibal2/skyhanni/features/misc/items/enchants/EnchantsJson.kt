@@ -5,12 +5,15 @@ import com.google.gson.annotations.Expose
 
 class EnchantsJson {
     @Expose
+    @Suppress("VariableNaming")
     var NORMAL: HashMap<String, Enchant.Normal> = hashMapOf()
 
     @Expose
+    @Suppress("VariableNaming")
     var ULTIMATE: HashMap<String, Enchant.Ultimate> = hashMapOf()
 
     @Expose
+    @Suppress("VariableNaming")
     var STACKING: HashMap<String, Enchant.Stacking> = hashMapOf()
 
     fun getFromLore(passedLoreName: String): Enchant {

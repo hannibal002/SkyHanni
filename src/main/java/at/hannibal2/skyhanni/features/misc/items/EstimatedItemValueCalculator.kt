@@ -490,12 +490,12 @@ object EstimatedItemValueCalculator {
 
             val tiers = mutableMapOf<NEUInternalName, Int>()
 
-            for ((id, prices) in EssenceItemUtils.itemPrices) {
+            for ((id, _) in EssenceItemUtils.itemPrices) {
                 if (!id.contains(removed)) continue
                 tiers[id] = getKuudraTier(id)
 
             }
-            for ((id, tier) in tiers.sorted()) {
+            for ((id, _) in tiers.sorted()) {
                 val prices = EssenceItemUtils.itemPrices[id]!!
                 maxStars += prices.size
                 if (remainingStars <= 0) continue
