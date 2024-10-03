@@ -4,10 +4,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
 enum class PowderChestReward(val displayName: String, pattern: String) {
 
-    MITHRIL_POWDER(
-        "§aMithril Powder",
-        " {4}§r§2Mithril Powder(?: §r§8x(?<amount>.*))?",
-    ),
     GEMSTONE_POWDER(
         "§dGemstone Powder",
         " {4}§r§dGemstone Powder(?: §r§8x(?<amount>.*))?",
