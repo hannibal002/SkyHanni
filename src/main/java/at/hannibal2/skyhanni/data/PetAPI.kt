@@ -151,6 +151,14 @@ object PetAPI {
         "^§r, §aHeld Item: §r, (?<item>§.[\\w -]+)§r]\$"
     )
 
+    /**
+     * REGEX-TEST: §aYour pet is now holding §r§9Bejeweled Collar§r§a.
+     */
+    private val petItemMessage by patternGroup.pattern(
+        "chat.pet.item.equip",
+        "^§aYour pet is now holding §r(?<petItem>§.[\\w -]+)§r§a\\.\$"
+    )
+
     private val ignoredPetStrings = listOf(
         "Archer",
         "Berserk",
@@ -273,25 +281,35 @@ object PetAPI {
     }
 
     @SubscribeEvent
-    fun onAutopet(event: LorenzChatEvent) {
-        if (!autopetMessage.matches(event.message)) return
+    fun onChat(event: LorenzChatEvent) {
+        if (autopetMessage.matches(event.message)) {
+            val hoverMessage = buildList {
+                event.chatComponent.hover?.siblings?.forEach {
+                    add(it.formattedText)
+                }
+            }.toString().split("\n")
 
-        val hoverMessage = buildList {
-            event.chatComponent.hover?.siblings?.forEach {
-                add(it.formattedText)
+            var petItem = NEUInternalName.NONE
+            for (it in hoverMessage) {
+                val item = handleAutopetItemMessage(it)
+                if (item != null) {
+                    petItem = item
+                    break
+                }
             }
-        }.toString().split("\n")
-
-        var petItem = NEUInternalName.NONE
-        for (it in hoverMessage) {
-            val item = handleAutopetItemMessage(it)
-            if (item != null) {
-                petItem = item
-                break
+            hoverMessage.forEach {
+                if (handleAutopetMessage(it, petItem)) return
             }
+            return
         }
-        hoverMessage.forEach {
-            if (handleAutopetMessage(it, petItem)) return
+        petItemMessage.matchMatcher(event.message) {
+            val item = NEUInternalName.fromItemNameOrNull(group("petItem")) ?: ErrorManager.skyHanniError(
+                "Couldn't parse pet item name.",
+                Pair("message", event.message),
+                Pair("item", group("petItem"))
+            )
+            val newPet = pet?.copy(petItem = item) ?: return
+            fireEvent(newPet)
         }
     }
 
