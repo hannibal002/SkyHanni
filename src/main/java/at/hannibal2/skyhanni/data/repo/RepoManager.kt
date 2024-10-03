@@ -166,8 +166,8 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Void?> {
-        val comp = CompletableFuture<Void?>()
+    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Unit?> {
+        val comp = CompletableFuture<Unit?>()
         if (!atomicShouldManuallyReload.get()) return comp
         ErrorManager.resetCache()
         DelayedRun.onThread.execute {
