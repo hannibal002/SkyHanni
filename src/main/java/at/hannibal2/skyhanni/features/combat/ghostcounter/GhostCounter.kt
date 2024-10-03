@@ -379,7 +379,7 @@ object GhostCounter {
                 }
                 percent = 100f.coerceAtMost(percent)
                 if (!parse) {
-                    sb.append(" (").append(String.format("%.2f", percent)).append("%)")
+                    sb.append(" (").append(String.format(Locale.US, "%.2f", percent)).append("%)")
                 } else {
                     sb.append(" (").append(nf.format(currentSkillXp))
                     if (totalSkillXp != 0) {
