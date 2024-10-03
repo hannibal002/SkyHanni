@@ -33,7 +33,7 @@ public class ZombieShootoutConfig {
     @Expose
     @ConfigOption(name = "Colored Line", desc = "Display a colored line to lamps.")
     @ConfigEditorBoolean
-    public boolean coloredLine = true;
+    public boolean coloredLines = true;
 
     @Expose
     @ConfigOption(name = "Lamp Timer", desc = "Show time until current lamp disappears.")
