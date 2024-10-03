@@ -5,7 +5,7 @@ interface SuggestionEntry {
     val suggestions: List<String>
 
     fun isEntryFor(argument: String): Boolean {
-        return argument.lowercase() in this.suggestions.map { it.lowercase() }
+        return this.suggestions.any { it.equals(argument, ignoreCase = true) }
     }
 }
 
