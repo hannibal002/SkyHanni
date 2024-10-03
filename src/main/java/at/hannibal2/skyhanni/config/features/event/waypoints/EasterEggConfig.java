@@ -9,14 +9,13 @@ public class EasterEggConfig {
 
     @Expose
     @ConfigOption(name = "Egg Waypoints", desc = "Show all Easter Egg waypoints.\n" +
-        "Coordinates by §bSorkoPiko§7. (last updated: 2024)")
+        "§eCoordinates may not always be up to date! §7(Last updated: 2024)")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean allWaypoints = false;
 
     @Expose
-    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to Baskets #18, #27, and #30.\n" +
-        "Coordinates by §bSorkoPiko§7 and §bErymanthus§7.")
+    @ConfigOption(name = "Entrance Waypoints", desc = "Show helper waypoints to baskets.")
     @ConfigEditorBoolean
     public boolean allEntranceWaypoints = false;
 
