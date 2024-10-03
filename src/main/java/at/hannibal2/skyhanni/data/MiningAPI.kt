@@ -51,6 +51,12 @@ object MiningAPI {
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
+
+    /**
+     * REGEX-TEST: Heat: §6IMMUNE
+     * REGEX-TEST: Heat: §c14♨
+     * REGEX-TEST: Heat: §c0♨
+     */
     val heatPattern by group.pattern(
         "heat.scoreboard",
         "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
@@ -61,7 +67,6 @@ object MiningAPI {
     /**
      * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
      */
-
     private val pickobulusUsePattern by pickbobulusGroup.pattern(
         "use",
         "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
