@@ -14,8 +14,10 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -27,6 +29,11 @@ object BasketWaypoints {
     private var closest: EventWaypoint? = null
     private var isHalloween: Boolean = false
 
+    private val foundBasketMessage by RepoPattern.pattern(
+        "event.lobby.halloween.basket.found",
+        "^(?:§.)+You(?: already)? found (?:a|this) Candy Basket!(?: (?:§.)+\\((?:§.)+(?<current>\\d+)(?:§.)+/(?:§.)+(?<max>\\d+)(?:§.)+\\))?\$"
+    )
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!config.allWaypoints) return
@@ -34,8 +41,7 @@ object BasketWaypoints {
 
         if (!isEnabled()) return
 
-        val message = event.message
-        if (message.startsWith("§a§lYou found a Candy Basket! §r") || message == "§cYou already found this Candy Basket!") {
+        if (foundBasketMessage.matches(event.message)) {
             val basket = waypointList.minByOrNull { it.position.distanceSqToPlayer() }!!
             basket.isFound = true
             if (closest == basket) {
@@ -51,13 +57,11 @@ object BasketWaypoints {
 
         isHalloween = checkScoreboardHalloweenSpecific()
 
-        if (isHalloween) {
-            if (config.onlyClosest) {
-                if (closest == null) {
-                    val notFoundBaskets = waypointList.filter { !it.isFound }
-                    if (notFoundBaskets.isEmpty()) return
-                    closest = notFoundBaskets.minByOrNull { it.position.distanceSqToPlayer() }
-                }
+        if (isHalloween && config.onlyClosest) {
+            if (closest == null) {
+                val notFoundBaskets = waypointList.filter { !it.isFound }
+                if (notFoundBaskets.isEmpty()) return
+                closest = notFoundBaskets.minByOrNull { it.position.distanceSqToPlayer() }
             }
         }
     }
