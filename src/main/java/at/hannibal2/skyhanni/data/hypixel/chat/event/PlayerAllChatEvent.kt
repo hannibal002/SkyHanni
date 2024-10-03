@@ -46,7 +46,7 @@ class PlayerAllChatEvent(
      */
     @ApiStatus.Internal
     constructor() : this(null, null, null, "",
-                         ComponentSpan.empty(), ComponentSpan.empty(), ChatComponentText(""))
+        ComponentSpan.empty(), ComponentSpan.empty(), ChatComponentText(""))
 
     /**
      * This method is required if [setup] is present.
