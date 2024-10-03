@@ -31,10 +31,11 @@ object StashCompact {
     /**
      * REGEX-TEST: §f               §8(This totals 1 type of material stashed!)
      * REGEX-TEST: §f               §8(This totals 2 types of items stashed!)
+     * REGEX-TEST: §f               §8(This totals 1 type of material stashed!)
      */
     private val differingMaterialsCountPattern by patternGroup.pattern(
         "differing.materials.count",
-        "§f *§8(This totals (?<count>[\\d,]+) type of (§.)+(?<type>item|material)s? stashed!).*",
+        "§f *§8\\(This totals (?<count>[\\d,]+) types? of (?<type>item|material)s? stashed!\\).*",
     )
 
     /**
@@ -94,7 +95,10 @@ object StashCompact {
 
         if (pickupStashPattern.matches(event.message)) {
             event.blockedReason = "stash_compact"
-            if (lastMaterialCount != lastSentMaterialCount || lastDifferingMaterialsCount != lastSentDifferingMaterialsCount) {
+            if (lastMaterialCount != lastSentMaterialCount ||
+                lastDifferingMaterialsCount != lastSentDifferingMaterialsCount ||
+                lastType != lastSentType
+            ) {
                 sendCompactedStashMessage()
                 lastSentMaterialCount = lastMaterialCount
                 lastSentDifferingMaterialsCount = lastDifferingMaterialsCount
