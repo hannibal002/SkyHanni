@@ -293,7 +293,7 @@ object SuperpairDataDisplay {
             slot >= experiment.endSlot ||
             (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
-    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this?.damage == other.damage
+    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
 
     private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay
 }

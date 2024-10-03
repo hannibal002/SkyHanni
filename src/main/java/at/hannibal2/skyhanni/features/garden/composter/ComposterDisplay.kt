@@ -49,7 +49,7 @@ object ComposterDisplay {
         val pattern by lazy { rawPattern.toPattern() }
 
         fun addToList(map: Map<DataType, String>): List<Any> {
-            return listOf(displayItem, map[this]!!)
+            return map[this]?.let { listOf(displayItem, it) } ?: emptyList()
         }
     }
 
