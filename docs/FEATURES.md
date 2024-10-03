@@ -841,6 +841,10 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Crafting Room Helper. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2178)
     + Shows a holographic mob at the location where the mob is present in the real room inside the Mirrorverse in Rift.
 + Added Rift Time Real-Time Nametag Format. - Empa (https://github.com/hannibal002/SkyHanni/pull/2015)
++ Added a helper for tracking the Buttons Enigma Soul in the Rift. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
+    + Using pathfinding to guide the player to the nearest spot with unpressed buttons and highlights them.
++ Added a route helper for Gunther's Rift Race in the West Village. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
++ Added the ability to mute Wilted Berberis sounds when not farming. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2616)
 
 </details>
 <details open><summary>
