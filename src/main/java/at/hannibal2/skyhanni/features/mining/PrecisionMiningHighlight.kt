@@ -34,7 +34,7 @@ object PrecisionMiningHighlight {
         val b: MovingObjectPosition = Minecraft.getMinecraft().objectMouseOver
         if (b.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
-        val aaBB = event.location.add(x = -0.1, y = -0.1, z = -0.1).axisAlignedTo(event.location.clone().add(0.1, 0.1, 0.1))
+        val aaBB = event.location.add(x = -0.12, y = -0.12, z = -0.12).axisAlignedTo(event.location.clone().add(0.12, 0.12, 0.12))
 
         val block = b.blockPos.toLorenzVec().axisAlignedTo(b.blockPos.add(1, 1, 1).toLorenzVec())
         if (!block.intersectsWith(aaBB)) return
