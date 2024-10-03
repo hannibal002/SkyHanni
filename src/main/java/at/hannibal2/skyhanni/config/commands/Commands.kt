@@ -148,7 +148,7 @@ object Commands {
         }
         event.register("shcommands") {
             description = "Shows this list"
-            callback = { HelpCommand.onCommand(it, commands) }
+            callback = { HelpCommand.onCommand(it) }
         }
         event.register("shdefaultoptions") {
             description = "Select default options"
