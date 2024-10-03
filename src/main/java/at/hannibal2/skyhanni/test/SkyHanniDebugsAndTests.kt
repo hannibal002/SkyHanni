@@ -126,7 +126,7 @@ object SkyHanniDebugsAndTests {
         val location = LorenzVec(x, y, z)
         testLocation = location
         if (args.getOrNull(3) == "pathfind") {
-            IslandGraphs.pathFind(location, "/shtestwaypoint", showGoalExact = true, condition = { true })
+            IslandGraphs.pathFind(location, "/shtestwaypoint", condition = { true })
         }
         ChatUtils.chat("set test waypoint")
     }
@@ -138,7 +138,8 @@ object SkyHanniDebugsAndTests {
     }
 
     @Suppress("EmptyFunctionBlock")
-    private fun asyncTest(args: Array<String>) {}
+    private fun asyncTest(args: Array<String>) {
+    }
 
     fun findNullConfig(args: Array<String>) {
         println("start null finder")
@@ -327,9 +328,15 @@ object SkyHanniDebugsAndTests {
         val x = (location.x + 0.001).roundTo(1)
         val y = (location.y + 0.001).roundTo(1)
         val z = (location.z + 0.001).roundTo(1)
-        if (args.size == 1 && args[0].equals("json", false)) {
-            OSUtils.copyToClipboard("\"$x:$y:$z\"")
-            return
+        if (args.size == 1) {
+            if (args[0].equals("json", false)) {
+                OSUtils.copyToClipboard("\"$x:$y:$z\"")
+                return
+            }
+            if (args[0].equals("pathfind", false)) {
+                OSUtils.copyToClipboard("`/shtestwaaypoint $x $y $z pathfind`")
+                return
+            }
         }
 
         OSUtils.copyToClipboard("LorenzVec($x, $y, $z)")
@@ -487,7 +494,8 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: LorenzChatEvent) {}
+    fun onChat(event: LorenzChatEvent) {
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -578,8 +586,7 @@ object SkyHanniDebugsAndTests {
         }.editCopy {
             this.add(
                 0,
-                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }
-                    .toList(),
+                generateSequence(scale) { it + 0.1 }.take(25).map { Renderable.string(it.roundTo(1).toString()) }.toList(),
             )
         }
         config.debugItemPos.renderRenderables(

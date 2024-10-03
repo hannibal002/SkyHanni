@@ -373,9 +373,9 @@ private fun getWinterLines() = buildList {
 }
 
 private fun getWinterShowWhen(): Boolean = getSbLines().any {
-    SbPattern.winterEventStartPattern.matches(it)
-        || (SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
-        || SbPattern.winterWavePattern.matches(it)
+    SbPattern.winterEventStartPattern.matches(it) ||
+        (SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!")) ||
+        SbPattern.winterWavePattern.matches(it)
 }
 
 private fun getNewYearLines() = listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
@@ -534,7 +534,8 @@ private fun getCarnivalLines() = listOf(
         getSbLines().firstOrNull { pattern.matches(it) }
     }
 
-private fun getCarnivalShowWhen(): Boolean = SbPattern.carnivalPattern.anyMatches(getSbLines())
+private fun getCarnivalShowWhen() =
+    listOf(SbPattern.carnivalPattern, SbPattern.carnivalTokensPattern, SbPattern.carnivalTasksPattern).anyMatches(getSbLines())
 
 private fun getRiftLines() = getSbLines().filter { line ->
     RiftBloodEffigies.heartsPattern.matches(line) ||
