@@ -58,7 +58,7 @@ public class MarkedPlayerConfig {
         public boolean usePrefix = true;
 
         @Expose
-        @ConfigOption(name = "Join Message", desc = "Configure the message when someone join.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
+        @ConfigOption(name = "Join Message", desc = "Configure the message when someone joins.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
         @ConfigEditorText
         public String joinMessage = "&&b%s &&ajoined your lobby.";
 
