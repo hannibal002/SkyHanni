@@ -293,7 +293,7 @@ class RepoManager(private val configLocation: File) {
     private fun getDownloadUrl(commitId: String?): String {
         val repoUser = config.location.user
         val repoName = config.location.name
-        return String.format(Locale.US,"https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
+        return String.format(Locale.US, "https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
     }
 
     @Throws(IOException::class)
