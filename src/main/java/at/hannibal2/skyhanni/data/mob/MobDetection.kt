@@ -339,7 +339,7 @@ object MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        getRetry(entity)?.apply { this.entity = entity }
+        getRetry(entity)?.entity = entity
         MobData.currentEntityLiving.refreshReference(entity)
         MobData.previousEntityLiving.refreshReference(entity)
         // update map
