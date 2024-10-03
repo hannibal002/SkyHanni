@@ -86,7 +86,7 @@ object PestParticleWaypoint {
         val yellow = LorenzVec(0.8, 0.8, 0.0)
         val redPest = LorenzVec(0.8, 0.4, 0.0)
         val redPlot = LorenzVec(0.8, 0.0, 0.0)
-        isPointingToPest = when (event.offset.round(5)) {
+        isPointingToPest = when (event.offset.roundTo(5)) {
             redPlot -> false
             redPest, yellow, darkYellow -> true
             else -> return
@@ -150,7 +150,7 @@ object PestParticleWaypoint {
             waypoint,
             color,
             3,
-            false
+            false,
         )
     }
 
