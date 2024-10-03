@@ -63,7 +63,7 @@ public class MarkedPlayerConfig {
         public String joinMessage = "&&b%s &&ajoined your lobby.";
 
         @Expose
-        @ConfigOption(name = "Left Message", desc = "Configure the message when someone leave.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
+        @ConfigOption(name = "Left Message", desc = "Configure the message when someone leaves.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
         @ConfigEditorText
         public String leftMessage = "&&b%s &&cleft your lobby.";
     }
