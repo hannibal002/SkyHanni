@@ -72,7 +72,7 @@ object TunnelsMaps {
             field = value
         }
 
-    private var closedNote: GraphNode? = null
+    private var closestNode: GraphNode? = null
     private var path: Pair<Graph, Double>? = null
 
     private var possibleLocations = mapOf<String, List<GraphNode>>()
@@ -94,11 +94,11 @@ object TunnelsMaps {
             return it
         }
 
-        val closed = closedNote ?: return null
+        val closest = closestNode ?: return null
         val list = possibleLocations[name] ?: return null
 
         val offCooldown = list.filter { cooldowns[it]?.isInPast() != false }
-        val best = offCooldown.minByOrNull { GraphUtils.findShortestDistance(closed, it) } ?: list.minBy {
+        val best = offCooldown.minByOrNull { GraphUtils.findShortestDistance(closest, it) } ?: list.minBy {
             cooldowns[it] ?: SimpleTimeMark.farPast()
         }
         if (cooldowns[best]?.isInPast() != false) {
@@ -394,11 +394,11 @@ object TunnelsMaps {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
         if (checkGoalReached()) return
-        val prevClosed = closedNote
-        closedNote = graph.minBy { it.position.distanceSqToPlayer() }
-        val closest = closedNote ?: return
+        val prevclosest = closestNode
+        closestNode = graph.minBy { it.position.distanceSqToPlayer() }
+        val closest = closestNode ?: return
         val goal = goal ?: return
-        if (closest == prevClosed && goal == prevGoal) return
+        if (closest == prevclosest && goal == prevGoal) return
         val (path, distance) = GraphUtils.findShortestPathAsGraphWithDistance(closest, goal)
         val first = path.firstOrNull()
         val second = path.getOrNull(1)
@@ -454,7 +454,7 @@ object TunnelsMaps {
             true,
             bezierPoint = 2.0,
             textSize = config.textSize.toDouble(),
-            showNoteNames = true,
+            showNodeNames = true,
         )
         event.drawDynamicText(
             if (config.distanceFirst) {
@@ -511,8 +511,8 @@ object TunnelsMaps {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (closedNote == null) return // Value that must be none null if it was active
-        closedNote = null
+        if (closestNode == null) return // Value that must be none null if it was active
+        closestNode = null
         clearPath()
         cooldowns.clear()
         goalReached = false
