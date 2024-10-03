@@ -94,7 +94,7 @@ object BactePhase {
         val bacte = bacte ?: return
         event.drawDynamicText(
             bacte.baseEntity.getLorenzVec().add(-0.5, 0.0, -0.5),
-            "Phase: ${currentPhase.displayName}",
+            "${currentPhase.displayName}/${BactePhase.PHASE_5.displayName} Bacte",
             1.0,
         )
     }
