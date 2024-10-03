@@ -111,14 +111,14 @@ object HoppityAPI {
                         EggFoundEvent(STRAY, it.slotNumber).post()
                         lastName = "§9Fish the Rabbit"
                         lastMeal = STRAY
-                        duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line)}
+                        duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
                     "El Dorado" -> {
                         EggFoundEvent(STRAY, it.slotNumber).post()
                         lastName = "§6El Dorado"
                         lastMeal = STRAY
-                        duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line)}
+                        duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
                     else -> return@matchMatcher
