@@ -92,6 +92,16 @@ object PetAPI {
     )
 
     /**
+     * REGEX-TEST: §7To Select Process (Slot #2)
+     * REGEX-TEST: §7To Select Process (Slot #4)
+     * REGEX-TEST: §7To Select Process (Slot #7)
+     */
+    private val forgeBackMenu by patternGroup.pattern(
+        "menu.forge.goback",
+        "§7To Select Process \\(Slot #\\d\\)"
+    )
+
+    /**
      * REGEX-TEST:  §r§7[Lvl 100] §r§dEndermite
      * REGEX-TEST:  §r§7[Lvl 200] §r§8[§r§6108§r§8§r§4✦§r§8] §r§6Golden Dragon
      * REGEX-TEST:  §r§7[Lvl 100] §r§dBlack Cat§r§d ✦
@@ -168,6 +178,7 @@ object PetAPI {
         "➡",
     )
 
+    @Deprecated(message = "use PetAPI.inPetMenu")
     fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
 
     // Contains color code + name and for older SkyHanni users maybe also the pet level
@@ -351,7 +362,17 @@ object PetAPI {
 
     @SubscribeEvent
     fun onOpenInventory(event: InventoryFullyOpenedEvent) {
-        inPetMenu = isPetMenu(event.inventoryName)
+        if (!isPetMenu(event.inventoryName)) {
+            inPetMenu = false
+            return
+        }
+        val goBackLore = event.inventoryItems[48]?.getLore() ?: emptyList()
+        if (goBackLore.any { forgeBackMenu.matches(it) }) {
+            inPetMenu = false
+            return
+        }
+
+        inPetMenu = true
     }
 
     @SubscribeEvent
