@@ -57,7 +57,9 @@ abstract class LorenzEvent : Event() {
                 if (printError && errors <= visibleErrors) {
                     val callerName = listener.toString().split(" ")[1].split("@")[0].split(".").last()
                     val errorName = throwable::class.simpleName ?: "error"
-                    val message = "Caught an $errorName in $callerName at $eventName: ${throwable.message}"
+                    var aOrAn = "a"
+                    if (errorName[0] in "aeiou") aOrAn = "an"
+                    val message = "Caught $aOrAn $errorName in $callerName at $eventName: ${throwable.message}"
                     ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = ignoreErrorCache)
                 }
                 onError(throwable)
