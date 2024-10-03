@@ -109,13 +109,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
 object Commands {
-
-    private val openMainMenu: (Array<String>) -> Unit = {
-        if (it.isNotEmpty()) {
-            if (it[0].lowercase() == "gui") {
+    private fun openMainMenu(args: Array<String>) {
+        if (args.isNotEmpty()) {
+            if (args[0].lowercase() == "gui") {
                 GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
             } else {
-                ConfigGuiManager.openConfigGui(it.joinToString(" "))
+                ConfigGuiManager.openConfigGui(args.joinToString(" "))
             }
         } else {
             ConfigGuiManager.openConfigGui()
@@ -140,7 +139,7 @@ object Commands {
         event.register("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"
-            callback { openMainMenu }
+            callback { openMainMenu(it) }
         }
         event.register("ff") {
             description = "Opens the Farming Fortune Guide"
