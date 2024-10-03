@@ -48,7 +48,7 @@ public class MarkedPlayerConfig {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Players List", desc = "Players list you want to be notified for.\n§cCase sensitive, separated by comma.")
+        @ConfigOption(name = "Players List", desc = "The list of players you want to be notified for.\n§cCase sensitive, separated by commas.")
         @ConfigEditorText
         public Property<String> playersList = Property.of("hypixel,Minikloon");
 
