@@ -359,7 +359,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        false // TODO: Remove onlyIf when we're ready to enforce
+        true // TODO: Remove onlyIf when we're ready to enforce
     }
 
     reports {
