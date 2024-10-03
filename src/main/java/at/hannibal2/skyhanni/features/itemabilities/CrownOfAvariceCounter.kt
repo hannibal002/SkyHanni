@@ -92,7 +92,7 @@ object CrownOfAvariceCounter {
     }
 
     @SubscribeEvent
-    fun onIslandChange(event: IslandChangeEvent){
+    fun onIslandChange(event: IslandChangeEvent) {
         reset()
         count = InventoryUtils.getHelmet()?.getCoinsOfAvarice() ?: return
     }
@@ -108,7 +108,9 @@ object CrownOfAvariceCounter {
                         Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
                     ),
                 ),
-                Renderable.string("§aCoins Per Hour: §6${if (sessionStart.passedSince() < 10.seconds) "Calculating..." else coinsPerHour.addSeparators()}"),
+                Renderable.string(
+                    "§aCoins Per Hour: §6${if (sessionStart.passedSince() < 10.seconds) "Calculating..." else coinsPerHour.addSeparators()}"
+                ),
                 Renderable.string("§aTime until Max: §6${if (sessionStart.passedSince() < 10.seconds) "Calculating..." else timeUntilMax}"),
             ),
         )
