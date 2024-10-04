@@ -35,7 +35,7 @@ object EntityData {
     private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
 
-    private val ignoredEntities = listOf(
+    private val ignoredEntities = setOf(
         EntityArmorStand::class.java,
         EntityXPOrb::class.java,
         EntityItem::class.java,
