@@ -223,7 +223,8 @@ object SkyHanniConfigSearchResetCommand {
                 val className = obj.getClassName()
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
-                if (obj !is Runnable && objectName.startsWith(className) && (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
+                if (obj !is Runnable && objectName.startsWith(className) &&
+                    (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
                         objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage"))
                 ) {
                     "<category>"
@@ -275,7 +276,9 @@ object SkyHanniConfigSearchResetCommand {
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
             @Suppress("ComplexCondition")
-            if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long && newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum) {
+            if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long &&
+                newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum
+            ) {
                 map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }
         }

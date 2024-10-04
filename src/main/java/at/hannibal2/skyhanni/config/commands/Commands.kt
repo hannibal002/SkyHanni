@@ -252,7 +252,8 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "Copy the English translation of a message in another language to the clipboard.\n" + "Uses a 2 letter language code that can be found at the end of a translation message.",
+            "Copy the English translation of a message in another language to the clipboard.\n" +
+                "Uses a 2 letter language code that can be found at the end of a translation message.",
         ) { Translator.fromEnglish(it) }
         registerCommand(
             "shtranslate",
@@ -499,7 +500,8 @@ object Commands {
         ) { ItemPriceUtils.debugItemPrice(it) }
         registerCommand(
             "shdebugscoreboard",
-            "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update.",
+            "Monitors the scoreboard changes: Prints the raw scoreboard lines in " +
+                "the console after each update, with time since last update.",
         ) { ScoreboardData.toggleMonitor() }
     }
 
@@ -591,7 +593,9 @@ object Commands {
         ) { TitleManager.command(it) }
         registerCommand(
             "shresetconfig",
-            "Reloads the config manager and rendering processors of MoulConfig. " + "This §cWILL RESET §7your config, but also updating the java config files " + "(names, description, orderings and stuff).",
+            "Reloads the config manager and rendering processors of MoulConfig. " +
+                "This §cWILL RESET §7your config, but also updating the java config files " +
+                "(names, description, orderings and stuff).",
         ) { SkyHanniDebugsAndTests.resetConfigCommand() }
         registerCommand(
             "shreadcropmilestonefromclipboard",

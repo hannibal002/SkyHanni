@@ -563,7 +563,8 @@ object GardenNextJacobContest {
                     newContests[timeMark + contestDuration] = FarmingContest(timeMark + contestDuration, crops)
                 }
             } else {
-                ChatUtils.chat("This year's contests aren't available to fetch automatically yet, please load them from your calendar or wait 10 minutes.")
+                ChatUtils.chat("This year's contests aren't available to fetch automatically yet, " +
+                    "please load them from your calendar or wait 10 minutes.")
                 ChatUtils.clickableChat(
                     "Click here to open your calendar!",
                     onClick = { HypixelCommands.calendar() },

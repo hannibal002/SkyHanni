@@ -181,7 +181,10 @@ object EntityUtils {
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
         if (Minecraft.getMinecraft()
                 .isOnMainThread()
-        ) it else it.toMutableList() // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization, but *does* make crashes because of it rarer.
+        ) it
+        // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
+        //  but *does* make crashes because of it rarer.
+        else it.toMutableList()
     }?.asSequence()?.filterNotNull() ?: emptySequence()
 
     fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft()?.theWorld?.loadedTileEntityList?.let {

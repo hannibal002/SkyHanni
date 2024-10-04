@@ -167,7 +167,8 @@ object BingoNextStepHelper {
                     }
                 }
             }
-            if (currentStep is PartialProgressItemsStep && currentStep.displayName == RHYS_TASK_NAME && event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r") {
+            if (currentStep is PartialProgressItemsStep && currentStep.displayName == RHYS_TASK_NAME &&
+                event.message == "§e[NPC] §dRhys§f: §rThank you for the items!§r") {
                 currentStep.amountHavingHidden -= 10
             }
         }

@@ -151,7 +151,10 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                 onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.removeItem(data.getSelectedBucket(), internalName)
-                        ChatUtils.chat("Removed $cleanName §efrom $name${if (data.getSelectedBucket() != null) " (${data.getSelectedBucket()})" else ""}")
+                        ChatUtils.chat("Removed $cleanName §efrom $name" +
+                            if (data.getSelectedBucket() != null) " (${data.getSelectedBucket()})"
+                            else ""
+                        )
                     } else {
                         modify {
                             it.toggleItemHide(data.getSelectedBucket(), internalName)
