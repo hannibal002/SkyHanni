@@ -216,6 +216,7 @@ object KingTalismanHelper {
 
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles
+            update(kingCircles.toMutableList())
         }
     }
 }
