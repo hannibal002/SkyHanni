@@ -17,7 +17,7 @@ public class OptimalSpeedConfig {
     public boolean showOnHUD = false;
 
     @Expose
-    @ConfigOption(name = "Warning Title", desc = "Warn via title when you don't have the optimal speed.")
+    @ConfigOption(name = "Wrong Speed Warning", desc = "Warn via title and chat message when you don't have the optimal speed.")
     @ConfigEditorBoolean
     public boolean warning = false;
 
@@ -26,6 +26,11 @@ public class OptimalSpeedConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean signEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Compact GUI", desc = "Compact the Rancher Boots GUI only showing crop icons")
+    @ConfigEditorBoolean
+    public boolean compactRancherGui = false;
 
     @Expose
     @ConfigLink(owner = OptimalSpeedConfig.class, field = "signEnabled")

@@ -11,10 +11,12 @@ import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiEditSign
+import at.hannibal2.skyhanni.test.SkyBlockIslandTest
 import at.hannibal2.skyhanni.test.TestBingo
 import at.hannibal2.skyhanni.utils.ChatUtils.lastButtonClicked
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.capAtMinecraftLength
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -57,7 +59,7 @@ object LorenzUtils {
     /**
      * Consider using [IslandType.isInIsland] instead
      */
-    val skyBlockIsland get() = HypixelData.skyBlockIsland
+    val skyBlockIsland get() = SkyBlockIslandTest.testIsland ?: HypixelData.skyBlockIsland
 
     val skyBlockArea get() = if (inSkyBlock) HypixelData.skyBlockArea else null
 
@@ -99,23 +101,11 @@ object LorenzUtils {
         return originalMessage.stripHypixelMessage()
     }
 
-    fun Double.round(decimals: Int): Double {
-        var multiplier = 1.0
-        repeat(decimals) { multiplier *= 10 }
-        val result = kotlin.math.round(this * multiplier) / multiplier
-        val a = result.toString()
-        val b = toString()
-        return if (a.length > b.length) this else result
-    }
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
+    fun Double.round(decimals: Int) = this.roundTo(decimals)
 
-    fun Float.round(decimals: Int): Float {
-        var multiplier = 1.0
-        repeat(decimals) { multiplier *= 10 }
-        val result = kotlin.math.round(this * multiplier) / multiplier
-        val a = result.toString().length
-        val b = toString().length
-        return if (a > b) this else result.toFloat()
-    }
+    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(decimals)"))
+    fun Float.round(decimals: Int) = this.roundTo(decimals)
 
     // TODO replace all calls with regex
     @Deprecated("Do not use complicated string operations", ReplaceWith("Regex"))
@@ -125,7 +115,7 @@ object LorenzUtils {
     val EntityLivingBase.baseMaxHealth: Int
         get() = this.getEntityAttribute(SharedMonsterAttributes.maxHealth).baseValue.toInt()
 
-    // TODO create extenstion function
+    // TODO create extension function
     fun formatPercentage(percentage: Double): String = formatPercentage(percentage, "0.00")
 
     fun formatPercentage(percentage: Double, format: String?): String =
@@ -299,7 +289,8 @@ object LorenzUtils {
 
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
-    fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && islandTypes.any { it.isInIsland() }
+    fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
+    fun inAnyIsland(islandTypes: Collection<IslandType>) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
 
     fun GuiContainerEvent.SlotClickEvent.makeShiftClick() {
         if (this.clickedButton == 1 && slot?.stack?.getItemCategoryOrNull() == ItemCategory.SACK) return
@@ -316,11 +307,7 @@ object LorenzUtils {
     }
 
     // TODO move into mayor api
-    private val recalculateDerpy =
-        RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
-
-    // TODO move into mayor api
-    val isDerpy get() = recalculateDerpy.getValue()
+    val isDerpy by RecalculatingValue(1.seconds) { Perk.DOUBLE_MOBS_HP.isActive }
 
     // TODO move into mayor api
     fun Int.derpy() = if (isDerpy) this / 2 else this

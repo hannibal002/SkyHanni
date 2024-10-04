@@ -196,7 +196,7 @@ object GardenVisitorDropStatistics {
 
         for (reward in VisitorReward.entries) {
             val count = rewardsCount[reward] ?: 0
-            if (config.displayIcons) {// Icons
+            if (config.displayIcons) { // Icons
                 val stack = reward.itemStack
                 if (config.displayNumbersFirst)
                     add(listOf("§b${count.addSeparators()} ", stack))
@@ -228,7 +228,7 @@ object GardenVisitorDropStatistics {
         return "$amount"
     }
 
-    //todo this should just save when changed not once a second
+    // todo this should just save when changed not once a second
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         saveAndUpdate()
@@ -247,22 +247,26 @@ object GardenVisitorDropStatistics {
 
     fun resetCommand() {
         val storage = GardenAPI.storage?.visitorDrops ?: return
-        ChatUtils.clickableChat("Click here to reset Visitor Drops Statistics.", onClick = {
-            acceptedVisitors = 0
-            deniedVisitors = 0
-            totalVisitors = 0
-            coinsSpent = 0
-            storage.copper = 0
-            storage.bits = 0
-            storage.farmingExp = 0
-            storage.gardenExp = 0
-            storage.gemstonePowder = 0
-            storage.mithrilPowder = 0
-            storage.visitorRarities = arrayListOf(0, 0, 0, 0, 0)
-            storage.rewardsCount = mapOf<VisitorReward, Int>()
-            ChatUtils.chat("Visitor Drop Statistics reset!")
-            saveAndUpdate()
-        })
+        ChatUtils.clickableChat(
+            "Click here to reset Visitor Drops Statistics.",
+            onClick = {
+                acceptedVisitors = 0
+                deniedVisitors = 0
+                totalVisitors = 0
+                coinsSpent = 0
+                storage.copper = 0
+                storage.bits = 0
+                storage.farmingExp = 0
+                storage.gardenExp = 0
+                storage.gemstonePowder = 0
+                storage.mithrilPowder = 0
+                storage.visitorRarities = arrayListOf(0, 0, 0, 0, 0)
+                storage.rewardsCount = mapOf<VisitorReward, Int>()
+                ChatUtils.chat("Visitor Drop Statistics reset!")
+                saveAndUpdate()
+            },
+            "§eClick to reset!",
+        )
     }
 
     @SubscribeEvent

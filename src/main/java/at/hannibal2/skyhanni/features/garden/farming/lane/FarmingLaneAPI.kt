@@ -43,6 +43,7 @@ object FarmingLaneAPI {
 
     private fun warnNoLane(crop: CropType?) {
         if (crop == null || currentLane != null) return
+        if (crop in config.ignoredCrops) return
         if (!GardenAPI.hasFarmingToolInHand()) return
         if (FarmingLaneCreator.detection) return
         if (!config.distanceDisplay && !config.laneSwitchNotification.enabled) return
@@ -52,9 +53,8 @@ object FarmingLaneAPI {
 
         ChatUtils.clickableChat(
             "No ${crop.cropName} lane defined yet! Use §e/shlanedetection",
-            onClick = {
-                FarmingLaneCreator.commandLaneDetection()
-            }
+            onClick = { FarmingLaneCreator.commandLaneDetection() },
+            "§eClick to run /shlanedetection!",
         )
     }
 

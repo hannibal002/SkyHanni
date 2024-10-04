@@ -46,7 +46,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -143,7 +143,7 @@ object MinionFeatures {
         if (!config.lastClickedMinion.display) return
 
         val special = config.lastClickedMinion.color
-        val color = Color(SpecialColour.specialToChromaRGB(special), true)
+        val color = Color(SpecialColor.specialToChromaRGB(special), true)
 
         val loc = lastMinion
         if (loc != null) {
@@ -298,7 +298,7 @@ object MinionFeatures {
             System.currentTimeMillis() - lastClicked
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
-        //§7Held Coins: §b151,389
+        // §7Held Coins: §b151,389
         // TODO use regex
         val coins = line.split(": §b")[1].formatDouble()
 

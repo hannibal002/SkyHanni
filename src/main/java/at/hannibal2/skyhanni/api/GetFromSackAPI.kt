@@ -42,11 +42,11 @@ object GetFromSackAPI {
     private val patternGroup = RepoPattern.group("gfs.chat")
     private val fromSacksChatPattern by patternGroup.pattern(
         "from",
-        "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory."
+        "§aMoved §r§e(?<amount>\\d+) (?<item>.+)§r§a from your Sacks to your inventory.",
     )
     private val missingChatPattern by patternGroup.pattern(
         "missing",
-        "§cYou have no (?<item>.+) in your Sacks!"
+        "§cYou have no (?<item>.+) in your Sacks!",
     )
 
     fun getFromSack(item: NEUInternalName, amount: Int) = getFromSack(item.makePrimitiveStack(amount))
@@ -58,10 +58,10 @@ object GetFromSackAPI {
     fun getFromChatMessageSackItems(
         item: PrimitiveItemStack,
         text: String = "§lCLICK HERE§r§e to grab §ax${item.amount} §9${item.itemName}§e from sacks!",
-    ) =
-        ChatUtils.clickableChat(text, onClick = {
-            getFromSack(item)
-        })
+        hover: String = "§eClick to get from sacks!",
+    ) = ChatUtils.clickableChat(
+        text, onClick = { getFromSack(item) }, hover,
+    )
 
     fun getFromSlotClickedSackItems(items: List<PrimitiveItemStack>, slotIndex: Int) = addToInventory(items, slotIndex)
 
@@ -148,7 +148,7 @@ object GetFromSackAPI {
 
         when (result) {
             CommandResult.VALID -> getFromSack(stack ?: return)
-            CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> <amount>")
+            CommandResult.WRONG_ARGUMENT -> ChatUtils.userError("Missing arguments! Usage: /getfromsacks <name/id> [amount]")
             CommandResult.WRONG_IDENTIFIER -> ChatUtils.userError("Couldn't find an item with this name or identifier!")
             CommandResult.WRONG_AMOUNT -> ChatUtils.userError("Invalid amount!")
             CommandResult.INTERNAL_ERROR -> {}
@@ -163,29 +163,34 @@ object GetFromSackAPI {
     }
 
     private fun bazaarMessage(item: String, amount: Int, isRemaining: Boolean = false) = ChatUtils.clickableChat(
-        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax${amount} §9$item §efrom bazaar",
-        onClick = { HypixelCommands.bazaar(item.removeColor()) }
+        "§lCLICK §r§eto get the ${if (isRemaining) "remaining " else ""}§ax$amount §9$item §efrom bazaar",
+        onClick = { HypixelCommands.bazaar(item.removeColor()) }, "§eClick to find on the bazaar!",
     )
 
     private fun commandValidator(args: List<String>): Pair<CommandResult, PrimitiveItemStack?> {
-        if (args.size <= 1) {
-            return CommandResult.WRONG_ARGUMENT to null
-        }
+        if (args.isEmpty()) return CommandResult.WRONG_ARGUMENT to null
 
-        var amountString = args.last()
+        // The last parameter could be "2*3". This does not support ending with ")", but it is good enough
+        val argsNull = !args.last().last().isDigit()
+        val arguments = if (argsNull) {
+            args + config.defaultAmountGFS.toString()
+        } else args
+
+        var amountString = arguments.last()
         amountString = NEUCalculator.calculateOrNull(amountString)?.toString() ?: amountString
 
         if (!amountString.isDouble()) return CommandResult.WRONG_AMOUNT to null
 
-        val itemString = args.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
+        val itemString = arguments.dropLast(1).joinToString(" ").uppercase().replace(':', '-')
+        val replacedString = itemString.replace("_", " ")
 
         val item = when {
             SackAPI.sackListInternalNames.contains(itemString) -> itemString.asInternalName()
-            SackAPI.sackListNames.contains(itemString) -> NEUInternalName.fromItemNameOrNull(itemString) ?: run {
+            SackAPI.sackListNames.contains(replacedString) -> NEUInternalName.fromItemNameOrNull(replacedString) ?: run {
                 ErrorManager.logErrorStateWithData(
                     "Couldn't resolve item name",
                     "Query failed",
-                    "itemName" to itemString
+                    "itemName" to itemString,
                 )
                 return CommandResult.INTERNAL_ERROR to null
             }
