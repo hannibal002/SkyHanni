@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI
@@ -217,7 +218,7 @@ object HypixelData {
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
     private val jsonBracketPattern = "^\\{.+}".toPattern()
 
-    //todo convert to proper json object
+    // todo convert to proper json object
     fun checkForLocraw(message: String) {
         jsonBracketPattern.matchMatcher(message.removeColor()) {
             try {
@@ -319,8 +320,13 @@ object HypixelData {
             loop@ for (line in ScoreboardData.sidebarLinesFormatted) {
                 skyblockAreaPattern.matchMatcher(line) {
                     val originalLocation = group("area").removeColor()
-                    skyBlockArea = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
+                    val area = LocationFixData.fixLocation(skyBlockIsland) ?: originalLocation
                     skyBlockAreaWithSymbol = line.trim()
+                    if (area != skyBlockArea) {
+                        val previousArea = skyBlockArea
+                        skyBlockArea = area
+                        ScoreboardAreaChangeEvent(area, previousArea).post()
+                    }
                     break@loop
                 }
             }

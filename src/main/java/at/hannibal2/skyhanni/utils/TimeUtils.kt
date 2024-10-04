@@ -19,6 +19,7 @@ object TimeUtils {
         showMilliSeconds: Boolean = this in -1.seconds..1.seconds,
         longName: Boolean = false,
         maxUnits: Int = -1,
+        showSmallerUnits: Boolean = false,
     ): String {
         var millis = inWholeMilliseconds
         val parts = mutableMapOf<TimeUnit, Int>()
@@ -31,10 +32,19 @@ object TimeUtils {
             }
         }
 
+        val largestNonZeroUnit = parts.firstNotNullOfOrNull { if (it.value != 0) it.key else null } ?: TimeUnit.SECOND
+
+        if (absoluteValue < 1.seconds) {
+            val formattedMillis = (millis / 100).toInt()
+            return "0.${formattedMillis}s"
+        }
+
         var currentUnits = 0
         val result = buildString {
             for ((unit, value) in parts) {
-                if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
+                val showUnit = value != 0 || (showSmallerUnits && unit.factor <= largestNonZeroUnit.factor)
+
+                if (showUnit) {
                     val formatted = value.addSeparators()
                     val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
                         val formattedMillis = (millis / 100).toInt()

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.mixins.hooks.ItemStackCachedData
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -46,8 +47,10 @@ object SkyBlockItemModifierUtils {
     fun ItemStack.getManaDisintegrators() = getAttributeInt("mana_disintegrator_count")
 
     fun ItemStack.getDungeonStarCount() = if (isDungeonItem()) {
-        getAttributeInt("upgrade_level") ?: getAttributeInt("dungeon_item_level")
+        getStarCount() ?: getAttributeInt("dungeon_item_level")
     } else null
+
+    fun ItemStack.getStarCount() = getAttributeInt("upgrade_level")
 
     private fun ItemStack.isDungeonItem() = getLore().any { it.contains("DUNGEON ") }
 
@@ -191,6 +194,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getNewYearCake() = getAttributeInt("new_years_cake")
 
+    fun ItemStack.getPersonalCompactorActive() = getAttributeByte("PERSONAL_DELETOR_ACTIVE") == 1.toByte()
+
     fun ItemStack.getEnchantments(): Map<String, Int>? = getExtraAttributes()
         ?.takeIf { it.hasKey("enchantments") }
         ?.run {
@@ -253,7 +258,7 @@ object SkyBlockItemModifierUtils {
         list
     }
 
-    private fun ItemStack.getAttributeString(label: String) =
+    fun ItemStack.getAttributeString(label: String) =
         getExtraAttributes()?.getString(label)?.takeUnless { it.isBlank() }
 
     private fun ItemStack.getAttributeInt(label: String) =
@@ -262,11 +267,13 @@ object SkyBlockItemModifierUtils {
     private fun ItemStack.getAttributeLong(label: String) =
         getExtraAttributes()?.getLong(label)?.takeUnless { it == 0L }
 
-    private fun ItemStack.getAttributeBoolean(label: String): Boolean {
-        return getExtraAttributes()?.getBoolean(label) ?: false
-    }
+    private fun ItemStack.getAttributeBoolean(label: String) =
+        getExtraAttributes()?.getBoolean(label) ?: false
 
-    fun ItemStack.getExtraAttributes() = tagCompound?.getCompoundTag("ExtraAttributes")
+    private fun ItemStack.getAttributeByte(label: String) =
+        getExtraAttributes()?.getByte(label) ?: 0
+
+    fun ItemStack.getExtraAttributes() = tagCompound?.extraAttributes
 
     class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
 

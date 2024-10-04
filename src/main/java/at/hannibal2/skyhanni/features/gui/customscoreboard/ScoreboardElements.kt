@@ -64,6 +64,8 @@ internal var unconfirmedUnknownLines = listOf<String>()
 internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
 
 private fun onRemoval(line: String) {
+    if (!LorenzUtils.inSkyBlock) return
+    if (!unconfirmedUnknownLines.contains(line)) return
     if (line !in unconfirmedUnknownLines) return
     unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
     confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
@@ -360,17 +362,23 @@ enum class ScoreboardElement(
     }
 }
 
-private fun getTitleDisplayPair(): List<ScoreboardElementType> =
-    if (displayConfig.titleAndFooter.useHypixelTitleAnimation) {
-        listOf(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-    } else {
-        listOf(
-            displayConfig.titleAndFooter.customTitle.get().toString()
-                .replace("&", "§")
-                .split("\\n")
-                .map { it to displayConfig.titleAndFooter.alignTitleAndFooter },
-        ).flatten()
+private fun getTitleDisplayPair(): List<ScoreboardElementType> {
+    val alignment = displayConfig.titleAndFooter.alignTitleAndFooter
+
+    if (!LorenzUtils.inSkyBlock && !displayConfig.titleAndFooter.useCustomTitleOutsideSkyBlock) {
+        return listOf(ScoreboardData.objectiveTitle to alignment)
     }
+
+    return if (displayConfig.titleAndFooter.useCustomTitle) {
+        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
+            .replace("&", "§")
+            .split("\\n")
+            .map { it to alignment }
+        ).flatten()
+    } else {
+        listOf(ScoreboardData.objectiveTitle to alignment)
+    }
+}
 
 private fun getProfileDisplayPair() = listOf(
     CustomScoreboardUtils.getProfileTypeSymbol() + HypixelData.profileName.firstLetterUppercase()
@@ -483,8 +491,8 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
-    && CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
+private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
+    CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
     val cold = -MiningAPI.cold
@@ -731,7 +739,7 @@ private fun getQuiverShowWhen(): Boolean {
 }
 
 private fun getPowderDisplayPair() = buildList {
-    val powderTypes = HotmAPI.Powder.values()
+    val powderTypes = HotmAPI.PowderType.values()
     if (informationFilteringConfig.hideEmptyLines && powderTypes.all { it.getTotal() == 0L }) {
         return listOf("<hidden>" to HorizontalAlignment.LEFT)
     }
