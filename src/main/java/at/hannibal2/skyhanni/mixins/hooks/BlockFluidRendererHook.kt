@@ -10,8 +10,8 @@ object BlockFluidRendererHook {
 
     @JvmStatic
     fun replaceLava(): Boolean {
-        if (!LorenzUtils.inSkyBlock || !config.enabled) return false
-        if (config.onlyInCrimsonIsle && !IslandType.CRIMSON_ISLE.isInIsland()) return false
+        if (!LorenzUtils.inSkyBlock || !config.enabled.get()) return false
+        if (config.onlyInCrimsonIsle.get() && !IslandType.CRIMSON_ISLE.isInIsland()) return false
         return true
     }
 }
