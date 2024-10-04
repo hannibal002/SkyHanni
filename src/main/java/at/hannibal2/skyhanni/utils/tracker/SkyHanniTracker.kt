@@ -49,7 +49,7 @@ open class SkyHanniTracker<Data : TrackerData>(
 
     fun isInventoryOpen() = inventoryOpen
 
-    fun resetCommand() = ChatUtils.clickableChat(
+    open fun resetCommand() = ChatUtils.clickableChat(
         "Are you sure you want to reset your total $name? Click here to confirm.",
         onClick = {
             reset(DisplayMode.TOTAL, "Reset total $name!")
@@ -69,6 +69,13 @@ open class SkyHanniTracker<Data : TrackerData>(
         val sharedTracker = getSharedTracker() ?: return
         sharedTracker.modify(mode, modifyFunction)
         update()
+    }
+
+    fun tryModify(modifyFunction: (Data) -> Boolean): Boolean {
+        val sharedTracker = getSharedTracker() ?: return false
+        val success = sharedTracker.tryModify(modifyFunction)
+        update()
+        return success
     }
 
     fun renderDisplay(position: Position) {

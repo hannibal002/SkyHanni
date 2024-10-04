@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.SlayerAPI
+import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchableSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
@@ -33,9 +34,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     }
 
     fun addItemToSelectedBucket(internalName: NEUInternalName, amount: Int, command: Boolean = false) {
-        val addSuccess: Boolean = getSharedTracker()?.tryModify {
+        val addSuccess: Boolean = tryModify {
             it.addItem(internalName, amount)
-        } ?: false
+        }
 
         if (!addSuccess) {
             ChatUtils.chat(
@@ -58,11 +59,22 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             it.get(DisplayMode.SESSION).getItemsProp()[internalName]!!.hidden = hidden
         }
 
+        if (command) {
+            TrackerManager.commandEditTrackerSuccess = true
+            val displayName = internalName.itemName
+            if (amount > 0) {
+                ChatUtils.chat("Manually added to $name: §r$displayName §7(${amount}x§7)")
+            } else {
+                ChatUtils.chat("Manually removed from $name: §r$displayName §7(${-amount}x§7)")
+            }
+            return
+        }
+
         val (itemName, price) = SlayerAPI.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat && !command) {
+        if (config.warnings.chat && price >= config.warnings.minimumChat) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
-        if (config.warnings.title && price >= config.warnings.minimumTitle && !command) {
+        if (config.warnings.title && price >= config.warnings.minimumTitle) {
             LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
         }
     }
