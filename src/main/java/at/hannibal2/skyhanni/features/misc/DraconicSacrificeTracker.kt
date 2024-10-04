@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -15,6 +15,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.Searchable
+import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
@@ -75,18 +77,18 @@ object DraconicSacrificeTracker {
         var sacrifiedItemsMap: MutableMap<String, Long> = mutableMapOf()
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§5§lDraconic Sacrifice Profit Tracker")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§5§lDraconic Sacrifice Profit Tracker")
         val profit = tracker.drawItems(data, { true }, this)
 
-        addAsSingletonList(
+        add(
             Renderable.hoverTips(
                 "§b${data.itemsSacrifice.addSeparators()} §6Items Sacrified",
                 data.sacrifiedItemsMap.map { (key, value) -> "$key: §b$value" },
-            ),
+            ).toSearchable()
         )
 
-        addAsSingletonList(tracker.addTotalProfit(profit, data.itemsSacrifice, "sacrifice"))
+        add(tracker.addTotalProfit(profit, data.itemsSacrifice, "sacrifice"))
 
         tracker.addPriceFromButton(this)
     }
@@ -96,7 +98,7 @@ object DraconicSacrificeTracker {
         sacrificeLoot.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = group("item")
-            tracker.addItem("ESSENCE_DRAGON".asInternalName(), amount)
+            tracker.addItem("ESSENCE_DRAGON".asInternalName(), amount, command = false)
             tracker.modify {
                 it.itemsSacrifice += 1
                 it.sacrifiedItemsMap.addOrPut(item, 1)
@@ -107,7 +109,7 @@ object DraconicSacrificeTracker {
             val item = group("item")
             val amount = groupOrNull("amount")?.toInt() ?: 1
             val internalName = NEUInternalName.fromItemNameOrNull(item) ?: return
-            tracker.addItem(internalName, amount)
+            tracker.addItem(internalName, amount, command = false)
         }
         tracker.update()
     }
