@@ -11,6 +11,16 @@ class MixinPatcherFontRendererHookHook {
         fun overridePatcherFontRenderer(string: String, shadow: Boolean, cir: CallbackInfoReturnable<Boolean>) {
             if (!LorenzUtils.onHypixel) return
 
+            if (ChromaManager.config.allChroma) {
+                cir.returnValue = false
+                return
+            }
+
+            if (string == FontRendererHook.chromaPreviewText) {
+                cir.returnValue = false
+                return
+            }
+
             if (string.contains("§#§")) {
                 cir.returnValue = false
                 return
