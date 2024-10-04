@@ -47,12 +47,12 @@ public class HoppityCallWarningConfig {
     public Runnable sounds = () -> OSUtils.openBrowser("https://www.minecraftforum.net/forums/mapping-and-modding-java-edition/mapping-and-modding-tutorials/2213619-1-8-all-playsound-sound-arguments");
 
     @Expose
-    @ConfigOption(name = "Ensure Coins Pre-Pickup", desc = "Block selecting opening Hoppity's trade menu if you do not have enough coins in your purse.")
+    @ConfigOption(name = "Ensure Coins Pre-Trade", desc = "Block opening Hoppity's abiphone trade menu if you do not have enough coins in your purse.")
     @ConfigEditorBoolean
     public boolean ensureCoins = true;
 
     @Expose
-    @ConfigOption(name = "Coin Threshold", desc = "The amount of coins you need to have in your purse to be able to open Hoppity's trade menu.")
+    @ConfigOption(name = "Coin Threshold", desc = "The amount of coins you need to have in your purse to be able to open Hoppity's abiphone trade menu.")
     @ConfigEditorSlider(minValue = 250000, maxValue = 5000000, minStep = 250000)
     public int coinThreshold = 5000000;
 }
