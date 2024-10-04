@@ -215,7 +215,7 @@ object KingTalismanHelper {
         if (!MiningAPI.inDwarvenMines) return
 
         if (talismanPattern.matches(event.message)) {
-            storage?.kingsTalkedTo = kingCircles
+            storage?.kingsTalkedTo = kingCircles.toMutableList()
             update(kingCircles.toMutableList())
         }
     }
