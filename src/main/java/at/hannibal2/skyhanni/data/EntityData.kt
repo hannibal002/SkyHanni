@@ -31,7 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
 @SkyHanniModule
 object EntityData {
 
-    private val maxHealthMap = mutableMapOf<EntityLivingBase, Int>()
+    private val maxHealthMap = mutableMapOf<Int, Int>()
     private val nametagCache = TimeLimitedCache<Entity, ChatComponentText>(50.milliseconds)
     private val healthDisplayCache = TimeLimitedCache<String, String>(50.milliseconds)
 
@@ -48,9 +48,10 @@ object EntityData {
     fun onTick(event: LorenzTickEvent) {
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) { // this completely ignores the ignored entities list?
             val maxHealth = entity.baseMaxHealth
-            val oldMaxHealth = maxHealthMap.getOrDefault(entity, -1)
+            val id = entity.entityId
+            val oldMaxHealth = maxHealthMap.getOrDefault(id, -1)
             if (oldMaxHealth != maxHealth) {
-                maxHealthMap[entity] = maxHealth
+                maxHealthMap[id] = maxHealth
                 EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).postAndCatch()
             }
         }
@@ -58,7 +59,7 @@ object EntityData {
 
     @HandleEvent
     fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<EntityLivingBase>) {
-        maxHealthMap -= event.entity
+        maxHealthMap -= event.entity.entityId
     }
 
     @SubscribeEvent
