@@ -20,7 +20,7 @@ public class ChromaConfig {
     public boolean chromaPreview = false;
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Toggle SkyHanni's chroma. §e(Disables Patcher's Optimized Font Renderer while enabled)")
+    @ConfigOption(name = "Enabled", desc = "Toggle SkyHanni's chroma.")
     @ConfigEditorBoolean
     @FeatureToggle
     public Property<Boolean> enabled = Property.of(false);
