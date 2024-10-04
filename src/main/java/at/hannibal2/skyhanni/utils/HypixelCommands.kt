@@ -158,6 +158,10 @@ object HypixelCommands {
         send("cb $uuid")
     }
 
+    fun bank() {
+        send("bank")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function
