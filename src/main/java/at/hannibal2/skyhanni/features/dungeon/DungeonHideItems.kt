@@ -151,7 +151,7 @@ object DungeonHideItems {
         }
 
         if (config.hideHealerFairy) {
-            // Healer Fairy texture is stored in id 0, not id 4 for some reasos.
+            // Healer Fairy texture is stored in id 0, not id 4 for some reasons.
             if (entity.inventory[0]?.getSkullTexture() == HEALER_FAIRY_TEXTURE) {
                 event.cancel()
                 return
@@ -194,10 +194,10 @@ object DungeonHideItems {
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(60))
-            {
-                shouldColorMovingSkull(entity)
-            }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity,
+                LorenzColor.GOLD.toColor().withAlpha(60)
+            ) { shouldColorMovingSkull(entity) }
         }
     }
 

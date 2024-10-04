@@ -21,27 +21,27 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
+import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
 import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.XP_NEEDED_FOR_60
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.getColorForLevel
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
+import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.interpolate
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.Quad
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import at.hannibal2.skyhanni.utils.SpecialColour
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -50,7 +50,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -128,8 +127,8 @@ object SkillProgress {
             maxWidth = 182
             Renderable.progressBar(
                 percent = factor.toDouble(),
-                startColor = Color(SpecialColour.specialToChromaRGB(color)),
-                endColor = Color(SpecialColour.specialToChromaRGB(color)),
+                startColor = color.toChromaColor(),
+                endColor = color.toChromaColor(),
                 texture = barConfig.texturedBar.usedTexture.get(),
                 useChroma = barConfig.useChroma.get(),
             )
@@ -139,8 +138,8 @@ object SkillProgress {
             val factor = skillExpPercentage.coerceAtMost(1.0)
             Renderable.progressBar(
                 percent = factor,
-                startColor = Color(SpecialColour.specialToChromaRGB(color)),
-                endColor = Color(SpecialColour.specialToChromaRGB(color)),
+                startColor = color.toChromaColor(),
+                endColor = color.toChromaColor(),
                 width = maxWidth,
                 height = barConfig.regularBar.height,
                 useChroma = barConfig.useChroma.get(),
@@ -193,7 +192,7 @@ object SkillProgress {
     )
 
     @HandleEvent
-    fun onLevelUp(event: SkillOverflowLevelupEvent) {
+    fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
         val skillName = event.skill.displayName
@@ -350,7 +349,7 @@ object SkillProgress {
                 )
             } else {
                 val tips = buildList {
-                    add("§6Level: §b${level}")
+                    add("§6Level: §b$level")
                     add("§6Current XP: §b${currentXp.addSeparators()}")
                     add("§6Needed XP: §b${currentXpMax.addSeparators()}")
                     add("§6Total XP: §b${totalXp.addSeparators()}")
@@ -462,7 +461,7 @@ object SkillProgress {
                 Quad(skill.level, skill.currentXp, skill.currentXpMax, skill.totalXp)
 
         val matchColor = config.skillColorConfig.matchBarColor.get()
-        val color = Color(SpecialColour.specialToChromaRGB(SkillType.getBarColor(activeSkill)))
+        val color = SkillType.getBarColor(activeSkill).toChromaColor()
 
         if (config.showLevel.get()) {
             val colorLevel = if (config.skillColorConfig.scalingColorLevel.get()) getColorForLevel(level) else "§d"
@@ -502,8 +501,8 @@ object SkillProgress {
                     } else "§6"
 
                     if (config.usePercentage.get()) {
-                        val percentString = if (matchColor) "(${percent.roundToPrecision(2)}%)" else {
-                            "§7($percentColor${percent.roundToPrecision(2)}%§7)"
+                        val percentString = if (matchColor) "(${percent.roundTo(2)}%)" else {
+                            "§7($percentColor${percent.roundTo(2)}%§7)"
                         }
                         append(percentString)
                     } else {
@@ -578,8 +577,7 @@ object SkillProgress {
             xpInfo.xpGainQueue.removeLast()
         }
 
-        var totalGain = 0f
-        for (f in xpInfo.xpGainQueue) totalGain += f
+        val totalGain = xpInfo.xpGainQueue.sum()
 
         xpInfo.xpGainHour = totalGain * (60 * 60) / xpInfo.xpGainQueue.size
         xpInfo.isActive = true

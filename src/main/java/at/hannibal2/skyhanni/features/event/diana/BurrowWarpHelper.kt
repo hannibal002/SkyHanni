@@ -12,8 +12,8 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -104,11 +104,11 @@ object BurrowWarpHelper {
         debug?.add("warpPoint: ${warpPoint.displayName}")
 
         val playerDistance = playerLocation.distance(target)
-        debug?.add("playerDistance: ${playerDistance.round(1)}")
+        debug?.add("playerDistance: ${playerDistance.roundTo(1)}")
         val warpDistance = warpPoint.distance(target)
-        debug?.add("warpDistance: ${warpDistance.round(1)}")
+        debug?.add("warpDistance: ${warpDistance.roundTo(1)}")
         val difference = playerDistance - warpDistance
-        debug?.add("difference: ${difference.round(1)}")
+        debug?.add("difference: ${difference.roundTo(1)}")
         val setWarpPoint = difference > 10
         debug?.add("setWarpPoint: $setWarpPoint")
         currentWarp = if (setWarpPoint) warpPoint else null
@@ -137,6 +137,7 @@ object BurrowWarpHelper {
         DA("Dark Auction", LorenzVec(91, 74, 173), 2),
         MUSEUM("Museum", LorenzVec(-75, 76, 81), 2),
         WIZARD("Wizard", LorenzVec(42.5, 122.0, 69.0), 5, { config.ignoredWarps.wizard }),
+        STONKS("Stonks", LorenzVec(-52.5, 70.0, -49.5), 5, { config.ignoredWarps.stonks }),
         ;
 
         fun distance(other: LorenzVec): Double = other.distance(location) + extraBlocks

@@ -123,7 +123,7 @@ object SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
-                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/${to}§7)")
+                ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/$to§7)")
                 lastItemDroppedTime = SimpleTimeMark.now()
             }
             if (blockChat) {
@@ -145,11 +145,11 @@ object SlayerRngMeterDisplay {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
-        readRngmeterInventory(event)
+        readRngMeterInventory(event)
         readSlayerInventory(event)
     }
 
-    private fun readRngmeterInventory(event: InventoryFullyOpenedEvent) {
+    private fun readRngMeterInventory(event: InventoryFullyOpenedEvent) {
         val name = inventoryNamePattern.matchMatcher(event.inventoryName) {
             group("name")
         } ?: return
@@ -205,9 +205,12 @@ object SlayerRngMeterDisplay {
     }
 
     private fun makeLink(text: String) =
-        Renderable.clickAndHover(text, listOf("§eClick to open RNG Meter Inventory."), onClick = {
-            HypixelCommands.showRng("slayer", SlayerAPI.getActiveSlayer()?.rngName)
-        })
+        Renderable.clickAndHover(
+            text, listOf("§eClick to open RNG Meter Inventory."),
+            onClick = {
+                HypixelCommands.showRng("slayer", SlayerAPI.activeSlayer?.rngName)
+            },
+        )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""

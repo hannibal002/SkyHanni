@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LocationUtils.rayIntersects
@@ -12,6 +13,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 
+@SkyHanniModule
 object MobUtils {
     val defaultArmorStandName by RepoPattern.pattern("armorstand.default", "Armou?r Stand")
 
@@ -23,10 +25,10 @@ object MobUtils {
     fun getArmorStandByRangeAll(entity: Entity, range: Double) =
         EntityUtils.getEntitiesNearby<EntityArmorStand>(entity.getLorenzVec(), range)
 
-    fun getClosedArmorStand(entity: Entity, range: Double) =
+    fun getClosestArmorStand(entity: Entity, range: Double) =
         getArmorStandByRangeAll(entity, range).sortedBy { it.distanceTo(entity) }.firstOrNull()
 
-    fun getClosedArmorStandWithName(entity: Entity, range: Double, name: String) =
+    fun getClosestArmorStandWithName(entity: Entity, range: Double, name: String) =
         getArmorStandByRangeAll(entity, range).filter { it.cleanName().startsWith(name) }
             .sortedBy { it.distanceTo(entity) }.firstOrNull()
 
@@ -69,9 +71,10 @@ object MobUtils {
         val pos = entity.getPositionEyes(partialTicks).toLorenzVec() + offset
         val look = entity.getLook(partialTicks).toLorenzVec().normalize()
         val possibleEntities = MobData.entityToMob.filterKeys {
-            it !is EntityArmorStand && it.entityBoundingBox.rayIntersects(
-                pos, look
-            )
+            it !is EntityArmorStand &&
+                it.entityBoundingBox.rayIntersects(
+                    pos, look
+                )
         }.values
         if (possibleEntities.isEmpty()) return null
         return possibleEntities.distinct().sortedBy { it.baseEntity.distanceTo(pos) }
