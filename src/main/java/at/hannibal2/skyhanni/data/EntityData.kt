@@ -57,8 +57,8 @@ object EntityData {
     }
 
     @HandleEvent
-    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<Entity>) {
-        maxHealthMap.remove(event.entity)
+    fun onEntityLeaveWorld(event: EntityLeaveWorldEvent<EntityLivingBase>) {
+        maxHealthMap -= event.entity
     }
 
     @SubscribeEvent
