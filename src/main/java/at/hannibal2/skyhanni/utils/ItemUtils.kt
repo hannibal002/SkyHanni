@@ -21,7 +21,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.common.collect.Lists
 import io.github.moulberry.notenoughupdates.util.NotificationHandler
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.init.Items
@@ -498,13 +497,15 @@ object ItemUtils {
         val statusText = if (enabled) "Currently ON" else "Currently OFF"
         val damage = if (enabled) 13 else 14
         val stack = ItemStack(Blocks.stained_hardened_clay)
-        return Utils.createItemStack(
+        return createItemStack(
             stack.item,
             "$colorCode$featureName $statusText",
-            damage,
-            "§8(From SkyHanni)",
-            "",
-            "§7§eClick to toggle!"
+            listOf(
+                "§8(From SkyHanni)",
+                "",
+                "§7§eClick to toggle!",
+            ),
+            damage = damage,
         )
     }
 
