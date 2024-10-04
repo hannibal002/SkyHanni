@@ -80,7 +80,7 @@ public class ChromaConfig {
     public Runnable resetSettings = ChromaManager::resetChromaSettings;
 
     @Expose
-    @ConfigOption(name = "Everything Chroma", desc = "Render §4§l§oALL §r§7text in chroma. §e(Some enchants may appear white with SBA enchant parsing)")
+    @ConfigOption(name = "Everything Chroma", desc = "Render §4§l§oALL §r§7text in chroma. §e(Disables Patcher's Optimized Font Renderer while enabled)")
     @ConfigEditorBoolean
     public boolean allChroma = false;
 
