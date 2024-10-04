@@ -12,14 +12,14 @@ import java.util.List;
 public class AtomHitBoxConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show Exes, Wais and Zees HitBox.")
+    @ConfigOption(name = "Enabled", desc = "Show Exes, Wais and Zees hitbox.")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
     @Expose
     @ConfigOption(
         name = "Select Atoms",
-        desc = "Select atoms you want to show the hitbox for .."
+        desc = "Select atoms you want to show the hitbox for."
     )
     @ConfigEditorDraggableList
     public List<AtomsEntries> atomsEntries = new ArrayList<>(Arrays.asList(
