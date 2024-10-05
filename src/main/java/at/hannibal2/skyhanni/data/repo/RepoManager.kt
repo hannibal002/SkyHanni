@@ -26,6 +26,8 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.URL
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
@@ -37,6 +39,7 @@ class RepoManager(private val configLocation: File) {
     val repoLocation: File = File(configLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.farPast()
+    private var repoDownLoadFailed = false
 
     companion object {
 
@@ -44,6 +47,7 @@ class RepoManager(private val configLocation: File) {
 
         val successfulConstants = mutableListOf<String>()
         val unsuccessfulConstants = mutableListOf<String>()
+        var usingBackupRepo = false
 
         private var lastConstant: String? = null
 
@@ -62,7 +66,11 @@ class RepoManager(private val configLocation: File) {
     fun loadRepoInformation() {
         atomicShouldManuallyReload.set(true)
         if (config.repoAutoUpdate) {
-            fetchRepository(false).thenRun(this::reloadRepository)
+            fetchRepository(false).thenRun {
+                if (repoDownLoadFailed) {
+                    switchToBackupRepo()
+                }
+            }.thenRun { reloadRepository() }
         } else {
             reloadRepository()
         }
@@ -100,7 +108,10 @@ class RepoManager(private val configLocation: File) {
                         "currentCommitJSON" to currentCommitJSON,
                     )
                 }
-                if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) return@supplyAsync false
+                if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) {
+                    repoDownLoadFailed = true
+                    return@supplyAsync false
+                }
                 val file = File(configLocation, "repo")
                 if (file.exists() &&
                     currentCommitJSON?.get("sha")?.asString == latestRepoCommit &&
@@ -140,6 +151,7 @@ class RepoManager(private val configLocation: File) {
                         "url" to url,
                         "command" to command,
                     )
+                    repoDownLoadFailed = true
                     return@supplyAsync false
                 }
                 RepoUtils.unzipIgnoreFirstFolder(
@@ -147,12 +159,7 @@ class RepoManager(private val configLocation: File) {
                     repoLocation.absolutePath,
                 )
                 if (currentCommitJSON == null || currentCommitJSON["sha"].asString != latestRepoCommit) {
-                    val newCurrentCommitJSON = JsonObject()
-                    newCurrentCommitJSON.addProperty("sha", latestRepoCommit)
-                    try {
-                        writeJson(newCurrentCommitJSON, File(configLocation, "currentCommit.json"))
-                    } catch (ignored: IOException) {
-                    }
+                    writeCurrentCommit(latestRepoCommit)
                 }
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(
@@ -160,6 +167,7 @@ class RepoManager(private val configLocation: File) {
                     "Failed to download SkyHanni Repo",
                     "command" to command,
                 )
+                repoDownLoadFailed = true
             }
             true
         }
@@ -201,6 +209,15 @@ class RepoManager(private val configLocation: File) {
             }
         }
         return comp
+    }
+
+    private fun writeCurrentCommit(commit: String?) {
+        val newCurrentCommitJSON = JsonObject()
+        newCurrentCommitJSON.addProperty("sha", commit)
+        try {
+            writeJson(newCurrentCommitJSON, File(configLocation, "currentCommit.json"))
+        } catch (ignored: IOException) {
+        }
     }
 
     @SubscribeEvent
@@ -344,6 +361,29 @@ class RepoManager(private val configLocation: File) {
         if (config.location.user.isEmpty() || config.location.name.isEmpty() || config.location.branch.isEmpty()) {
             ChatUtils.userError("Invalid Repo settings detected, resetting default settings.")
             resetRepositoryLocation()
+        }
+    }
+
+    // Code taken from NotEnoughUpdates
+    private fun switchToBackupRepo() {
+        usingBackupRepo = true
+        println("Attempting to switch to backup repo")
+
+        try {
+            repoLocation.mkdirs()
+            val destinationFile = File(repoLocation, "sh-repo-main.zip").apply { createNewFile() }
+            val destinationPath = destinationFile.toPath()
+
+            val inputStream = RepoManager::class.java.classLoader.getResourceAsStream("assets/skyhanni/repo.zip")
+                ?: throw IOException("Failed to find backup repo")
+
+            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING)
+            RepoUtils.unzipIgnoreFirstFolder(destinationPath.toAbsolutePath().toString(), repoLocation.absolutePath)
+            writeCurrentCommit("backup-repo")
+
+            println("Successfully switched to backup repo")
+        } catch (e: Exception) {
+            ErrorManager.logErrorWithData(e, "Failed to switch to backup repo")
         }
     }
 }
