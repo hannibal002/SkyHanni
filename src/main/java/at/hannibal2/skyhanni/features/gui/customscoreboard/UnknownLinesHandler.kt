@@ -235,7 +235,6 @@ object UnknownLinesHandler {
             }
         }
 
-        // not tested
         if (lastRecentAlarmWarning.passedSince() > 30.minutes) {
             val recentAlarms = allUnknownLines.filter { it.firstFound.passedSince() < 6.seconds }
             if (recentAlarms.size >= 5) {
