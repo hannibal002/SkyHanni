@@ -57,10 +57,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import kotlin.time.Duration.Companion.minutes
 
-// internal var confirmedUnknownLines = listOf<String>()
-// internal var unconfirmedUnknownLines = listOf<String>()
-// internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
-
 internal var allUnknownLines = listOf<UnknownLine>()
 
 internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 20.minutes }
