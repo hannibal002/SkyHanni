@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.PurseAPI
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -133,7 +134,7 @@ object UnknownLinesHandler {
     private var remoteOnlyPatternsAdded = false
 
     fun handleUnknownLines() {
-        val sidebarLines = CustomScoreboard.activeLines
+        val sidebarLines = ScoreboardData.sidebarLinesFormatted
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 

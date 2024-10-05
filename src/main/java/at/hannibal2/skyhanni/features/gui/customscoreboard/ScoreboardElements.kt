@@ -78,7 +78,7 @@ private fun onRemoval(line: String) {
         "Unknown Lines" to confirmedUnknownLines,
         "Island" to LorenzUtils.skyBlockIsland,
         "Area" to HypixelData.skyBlockArea,
-        "Full Scoreboard" to CustomScoreboard.activeLines,
+        "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
         noStackTrace = true,
         betaOnly = true,
     )
@@ -389,7 +389,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
     var purse = PurseAPI.currentPurse.formatNum()
 
     if (!displayConfig.hideCoinsDifference) {
-        val earned = getGroupFromPattern(CustomScoreboard.activeLines, PurseAPI.coinsPattern, "earned")
+        val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.coinsPattern, "earned")
         if (earned != null) purse += " §7(§e+$earned§7)§6"
     }
 
@@ -492,7 +492,7 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
-    CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
     val cold = -MiningAPI.cold
@@ -507,7 +507,7 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT) &&
-    CustomScoreboard.activeLines.any { ScoreboardPattern.coldPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
     val northStars = getNorthStars()?.formatNum() ?: "0"
@@ -550,7 +550,7 @@ private fun getIslandDisplayPair() =
 private fun getLocationDisplayPair() = buildList {
     HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }
 
-    CustomScoreboard.activeLines.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
 }
 
@@ -568,12 +568,12 @@ fun getPlayerAmountDisplayPair() = buildList {
 
 private fun getVisitDisplayPair() =
     listOf(
-        CustomScoreboard.activeLines.first { ScoreboardPattern.visitingPattern.matches(it) } to
+        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.visitingPattern.matches(it) } to
             HorizontalAlignment.LEFT,
     )
 
 private fun getVisitShowWhen() =
-    CustomScoreboard.activeLines.any { ScoreboardPattern.visitingPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.visitingPattern.matches(it) }
 
 private fun getDateDisplayPair() =
     listOf(
@@ -582,7 +582,7 @@ private fun getDateDisplayPair() =
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     val symbol =
-        getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol") ?: ""
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
             .formatted(
@@ -671,7 +671,7 @@ private fun getCookieShowWhen(): Boolean {
 }
 
 private fun getObjectiveDisplayPair() = buildList {
-    val formattedLines = CustomScoreboard.activeLines
+    val formattedLines = ScoreboardData.sidebarLinesFormatted
     val objective = formattedLines.firstOrNull { ScoreboardPattern.objectivePattern.matches(it) }
     if (objective != null) {
         add(objective to HorizontalAlignment.LEFT)
@@ -690,7 +690,7 @@ private fun getObjectiveDisplayPair() = buildList {
 }
 
 private fun getObjectiveShowWhen(): Boolean =
-    ScoreboardPattern.objectivePattern.anyMatches(CustomScoreboard.activeLines)
+    ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
 private fun getSlayerDisplayPair(): List<ScoreboardElementType> = buildList {
     add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT)

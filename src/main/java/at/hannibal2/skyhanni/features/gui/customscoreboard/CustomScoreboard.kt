@@ -50,11 +50,6 @@ object CustomScoreboard {
     private var cache = emptyList<ScoreboardElementType>()
     private const val GUI_NAME = "Custom Scoreboard"
 
-    // Cached scoreboard data, only update after no change for 300ms
-    var activeLines = emptyList<String>()
-
-    // Most recent scoreboard state, not in use until cached
-    private var mostRecentLines = emptyList<String>()
     private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
 
     @SubscribeEvent
@@ -115,14 +110,13 @@ object CustomScoreboard {
 
         // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
         var dirty = false
-        if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
-            activeLines = mostRecentLines
+        if (lastScoreboardUpdate.passedSince() > 250.milliseconds) {
             lastScoreboardUpdate = SimpleTimeMark.farFuture()
             dirty = true
         }
 
         // Creating the lines
-        if (event.isMod(5) || dirty) {
+        if (dirty) {
             display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
@@ -135,7 +129,6 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        mostRecentLines = event.scoreboard
         lastScoreboardUpdate = SimpleTimeMark.now()
     }
 
@@ -160,12 +153,12 @@ object CustomScoreboard {
 
     private fun addAllNonSkyBlockLines() = buildList {
         addAll(ScoreboardElement.TITLE.getVisiblePair())
-        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
     }
 
     private fun addDefaultSkyBlockLines() = buildList {
         add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
     }
 
     private fun addCustomSkyBlockLines() = buildList<ScoreboardElementType> {
@@ -175,7 +168,8 @@ object CustomScoreboard {
 
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == "<empty>" &&
+                lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
