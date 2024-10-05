@@ -96,6 +96,12 @@ val headlessLwjgl by configurations.creating {
     isTransitive = false
     isVisible = false
 }
+
+val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.branch = "main"
+}
+
 tasks.runClient {
     this.javaLauncher.set(
         javaToolchains.launcherFor {
@@ -379,9 +385,4 @@ tasks.withType<Detekt>().configureEach {
 tasks.withType<DetektCreateBaselineTask>().configureEach {
     jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
     outputs.cacheIf { false } // Custom rules won't work if cached
-}
-
-val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
-    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
-    this.branch = "main"
 }
