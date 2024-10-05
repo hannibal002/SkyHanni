@@ -22,7 +22,7 @@ abstract class DownloadBackupRepo : DefaultTask() {
 
     @TaskAction
     fun downloadRepo() {
-        val downloadUrl = URL("https://github.com/Hannibal002/SkyHanni-REPO/archive/refs/heads/$branch.zip")
+        val downloadUrl = URL("https://github.com/hannibal002/SkyHanni-Repo/archive/refs/heads/$branch.zip")
         val file = repoFile
         file.parentFile.mkdirs()
         file.outputStream().use { out ->
