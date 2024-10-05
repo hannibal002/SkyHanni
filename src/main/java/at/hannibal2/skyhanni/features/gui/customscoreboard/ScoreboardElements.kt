@@ -55,11 +55,11 @@ import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 internal var allUnknownLines = listOf<UnknownLine>()
 
-internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 20.minutes }
+internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 3.seconds }
 
 internal class UnknownLine(val line: String) {
     val firstFound = SimpleTimeMark.now()
