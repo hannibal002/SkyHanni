@@ -571,6 +571,7 @@ object StringUtils {
     }
 
     fun optionalAn(string: String): String {
+        if (string.isEmpty()) return ""
         return if (string[0] in "aeiou") "an" else "a"
     }
 }
