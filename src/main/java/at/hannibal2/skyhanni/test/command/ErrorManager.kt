@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.RepoErrorData
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.json.fromJson
-import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -166,7 +166,7 @@ object ErrorManager {
             finalMessage += "§c."
         }
 
-        var hideError = false;
+        var hideError = false
         for (repoError in repoErrors) {
             for (s in repoError.messageStartsWith ?: listOf()) {
                 if (rawMessage.startsWith(s)) {
@@ -198,14 +198,7 @@ object ErrorManager {
 
     }
 
-    class RepoErrorData {
-        @Expose var messageExact: List<String>? = null
-        @Expose var messageStartsWith: List<String>? = null
-        @Expose var replaceMessage: String? = null
-        @Expose lateinit var affectedVersions: List<String>
-    }
-
-    var repoErrors: List<RepoErrorData> = listOf()
+    private var repoErrors: List<RepoErrorData> = listOf()
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
