@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -10,8 +11,8 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
-import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import io.github.moulberry.notenoughupdates.util.kotlin.fromJson
+import at.hannibal2.skyhanni.utils.json.fromJson
+import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -198,15 +199,10 @@ object ErrorManager {
     }
 
     class RepoErrorData {
-        var messageExact: List<String>? = null
-        var messageStartsWith: List<String>? = null
-        var replaceMessage: String? = null
-        lateinit var affectedVersions: List<String>
-
-
-        override fun toString(): String {
-            return "$messageExact $messageStartsWith $replaceMessage"
-        }
+        @Expose var messageExact: List<String>? = null
+        @Expose var messageStartsWith: List<String>? = null
+        @Expose var replaceMessage: String? = null
+        @Expose lateinit var affectedVersions: List<String>
     }
 
     var repoErrors: List<RepoErrorData> = listOf()
@@ -220,7 +216,7 @@ object ErrorManager {
                     it != null && it.isFile && it.canRead()
                 }
                 .map {
-                    NotEnoughUpdates.INSTANCE.manager.gson.fromJson<RepoErrorData>(it.readText())
+                    ConfigManager.gson.fromJson<RepoErrorData>(it.readText())
                 }.filter {
                     SkyHanniMod.version in it.affectedVersions
                 }
