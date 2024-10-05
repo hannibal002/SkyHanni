@@ -106,7 +106,7 @@ object KingTalismanHelper {
             return
         }
 
-        update(kingsTalkedTo)
+        update()
         display = if (nearby) allKingsDisplay else Collections.singletonList(farDisplay)
     }
 
@@ -139,12 +139,13 @@ object KingTalismanHelper {
         val kingsTalkedTo = storage.kingsTalkedTo
         if (currentKing !in kingsTalkedTo) {
             kingsTalkedTo.add(currentKing)
-            update(kingsTalkedTo)
+            update()
             display = allKingsDisplay
         }
     }
 
-    private fun update(kingsTalkedTo: MutableList<String>) {
+    private fun update() {
+        val kingsTalkedTo = storage?.kingsTalkedTo ?: return
         if (kingsTalkedTo.size == kingCircles.size) {
             allKingsDisplay = Collections.singletonList("§eAll Kings found.")
             farDisplay = ""
@@ -227,7 +228,7 @@ object KingTalismanHelper {
 
         if (talismanPattern.matches(event.message)) {
             storage?.kingsTalkedTo = kingCircles.toMutableList()
-            update(kingCircles.toMutableList())
+            update()
         }
     }
 }
