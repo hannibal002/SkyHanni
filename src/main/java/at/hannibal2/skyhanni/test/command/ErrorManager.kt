@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.test.command
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -8,9 +10,13 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import io.github.moulberry.notenoughupdates.NotEnoughUpdates
+import io.github.moulberry.notenoughupdates.util.kotlin.fromJson
 import net.minecraft.client.Minecraft
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
+@SkyHanniModule
 object ErrorManager {
 
     // random id -> error message
@@ -158,12 +164,69 @@ object ErrorManager {
         if (finalMessage.last() !in ".?!") {
             finalMessage += "§c."
         }
-        ChatUtils.clickableChat(
-            "§c[SkyHanni-${SkyHanniMod.version}]: $finalMessage Click here to copy the error into the clipboard.",
-            onClick = { copyError(randomId) },
-            "§eClick to copy!",
-            prefix = false,
-        )
+
+        var hideError = false;
+        for (repoError in repoErrors) {
+            for (s in repoError.messageStartsWith ?: listOf()) {
+                if (rawMessage.startsWith(s)) {
+                    hideError = true
+                }
+            }
+            for (s in repoError.messageExact ?: listOf()) {
+                if (rawMessage == s) {
+                    hideError = true
+                }
+            }
+            if (hideError) {
+                if (repoError.replaceMessage != null) {
+                    finalMessage = repoError.replaceMessage!!
+                    hideError = false
+                }
+                break
+            }
+        }
+
+        if (!hideError) {
+            ChatUtils.clickableChat(
+                "§c[SkyHanni-${SkyHanniMod.version}]: $finalMessage Click here to copy the error into the clipboard.",
+                onClick = { copyError(randomId) },
+                "§eClick to copy!",
+                prefix = false,
+            )
+        }
+
+    }
+
+    class RepoErrorData {
+        var messageExact: List<String>? = null
+        var messageStartsWith: List<String>? = null
+        var replaceMessage: String? = null
+        lateinit var affectedVersions: List<String>
+
+
+        override fun toString(): String {
+            return "$messageExact $messageStartsWith $replaceMessage"
+        }
+    }
+
+    var repoErrors: List<RepoErrorData> = listOf()
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val chatErrors = event.repoLocation.resolve("chat_errors")
+        repoErrors = if (chatErrors.exists()) {
+            chatErrors.listFiles()
+                .filter {
+                    it != null && it.isFile && it.canRead()
+                }
+                .map {
+                    NotEnoughUpdates.INSTANCE.manager.gson.fromJson<RepoErrorData>(it.readText())
+                }.filter {
+                    SkyHanniMod.version in it.affectedVersions
+                }
+        } else {
+            listOf()
+        }
     }
 
     private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {
