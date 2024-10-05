@@ -39,8 +39,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
@@ -50,41 +48,28 @@ import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.minutes
 
-internal var confirmedUnknownLines = listOf<String>()
-internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
+// internal var confirmedUnknownLines = listOf<String>()
+// internal var unconfirmedUnknownLines = listOf<String>()
+// internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
 
-private fun onRemoval(line: String) {
-    if (!LorenzUtils.inSkyBlock) return
-    if (!unconfirmedUnknownLines.contains(line)) return
-    if (line !in unconfirmedUnknownLines) return
-    unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
-    confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
-    if (!config.unknownLinesWarning) return
-    val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
-    val message = "CustomScoreboard detected $pluralize"
-    ErrorManager.logErrorWithData(
-        CustomScoreboardUtils.UndetectedScoreboardLines(message),
-        message,
-        "Unknown Lines" to confirmedUnknownLines,
-        "Island" to LorenzUtils.skyBlockIsland,
-        "Area" to HypixelData.skyBlockArea,
-        "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
-        noStackTrace = true,
-        betaOnly = true,
-    )
+internal var allUnknownLines = listOf<UnknownLine>()
+
+internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 20.minutes }
+
+internal class UnknownLine(val line: String) {
+    val firstFound = SimpleTimeMark.now()
+    var lastFound = SimpleTimeMark.now()
+    var lastWarned = SimpleTimeMark.farPast()
 }
-
-internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
     private val displayPair: () -> List<ScoreboardElementType>,
@@ -860,15 +845,10 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> = listOf(
 ).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
-    if (unconfirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
-    amountOfUnknownLines = unconfirmedUnknownLines.size
+    val lines = recentUnknownLines()
+    if (lines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unconfirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + lines.map { it.line to HorizontalAlignment.LEFT }
 }
 
-private fun getExtraShowWhen(): Boolean {
-    if (unconfirmedUnknownLines.isEmpty()) {
-        amountOfUnknownLines = 0
-    }
-    return unconfirmedUnknownLines.isNotEmpty()
-}
+private fun getExtraShowWhen(): Boolean = recentUnknownLines().isNotEmpty()

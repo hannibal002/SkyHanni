@@ -33,7 +33,7 @@ object ScoreboardPattern {
     )
     val copperPattern by mainSb.pattern(
         "copper",
-        "^(§.)*Copper: (§.)*(?<copper>[\\d,]+).*$",
+        "^(§.)*Copperr: (§.)*(?<copper>[\\d,]+).*$",
     )
     val locationPattern by mainSb.pattern(
         "location",

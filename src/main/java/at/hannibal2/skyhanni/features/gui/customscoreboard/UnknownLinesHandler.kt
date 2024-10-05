@@ -1,16 +1,22 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
+import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
 
 object UnknownLinesHandler {
@@ -206,19 +212,53 @@ object UnknownLinesHandler {
         /*
          * Handle broken scoreboard lines
          */
-        confirmedUnknownLines = confirmedUnknownLines.filter { it in unknownLines }
+        if (unknownLines.isEmpty()) return
 
-        unknownLines = unknownLines.filter { it !in confirmedUnknownLines }
-
-        unconfirmedUnknownLines = unknownLines
-
-        unknownLines = unknownLines.filter { it !in unknownLinesSet }
-
-        unknownLines.forEach {
-            if (LorenzUtils.inSkyBlock) {
-                ChatUtils.debug("Unknown Scoreboard line: '$it'")
+        for (line in unknownLines) {
+            val unknownLine = allUnknownLines.firstOrNull { it.line == line }
+            if (unknownLine == null) {
+                if (LorenzUtils.inSkyBlock) {
+                    ChatUtils.debug("Unknown Scoreboard line: '$line'")
+                }
+                allUnknownLines = allUnknownLines.editCopy {
+                    add(UnknownLine(line))
+                }
+            } else {
+                unknownLine.lastFound = SimpleTimeMark.now()
+                val firstFoundSince = unknownLine.firstFound.passedSince()
+                val lastWarnedSince = unknownLine.lastWarned.passedSince()
+                if (firstFoundSince > 3.seconds && lastWarnedSince > 30.minutes) {
+                    unknownLine.lastWarned = SimpleTimeMark.now()
+                    warn(line, "same line active for 3 seconds")
+                    continue
+                }
             }
-            unknownLinesSet.add(it)
         }
+
+        // not tested
+        if (lastRecentAlarmWarning.passedSince() > 30.minutes) {
+            val recentAlarms = allUnknownLines.filter { it.firstFound.passedSince() < 6.seconds }
+            if (recentAlarms.size >= 5) {
+                warn(recentAlarms.first().line, "5 different lines in 5 seconds")
+            }
+        }
+    }
+
+    var lastRecentAlarmWarning = SimpleTimeMark.farPast()
+
+    private fun warn(line: String, reason: String) {
+        ErrorManager.logErrorWithData(
+            // line inclucded in chat message to not cache a previous message
+            CustomScoreboardUtils.UndetectedScoreboardLines(line),
+            "CustomScoreboard detected a unknown line: '$line'",
+            "Unknown Line" to line,
+            "reason" to reason,
+            "Island" to LorenzUtils.skyBlockIsland,
+            "Area" to HypixelData.skyBlockArea,
+            "Full Scoreboard" to ScoreboardData.sidebarLinesFormatted,
+            noStackTrace = true,
+            betaOnly = true,
+        )
+
     }
 }
