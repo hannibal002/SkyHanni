@@ -35,10 +35,21 @@ object KingTalismanHelper {
     private val storage get() = ProfileStorageData.profileSpecific?.mining
 
     private val patternGroup = RepoPattern.group("mining.kingtalisman")
+
+    /**
+     * REGEX-TEST: §6§lKing Brammor
+     * REGEX-TEST: §6§lKing Emkam
+     * REGEX-TEST: §6§lKing Kevin
+     * REGEX-TEST: §6§lKing Redros
+     */
     private val kingPattern by patternGroup.pattern(
         "king",
         "§6§lKing (?<name>.*)"
     )
+
+    /**
+     * REGEX-TEST: §7You have received a §r§fKing Talisman§r§7!
+     */
     private val talismanPattern by patternGroup.pattern(
         "talisman",
         "§7You have received a §r§fKing Talisman§r§7!"
