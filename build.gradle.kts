@@ -150,9 +150,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // August 27, 2024, 4:30 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.3
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.3:all") {
+    // October 3, 2024, 11:43 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
