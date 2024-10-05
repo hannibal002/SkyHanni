@@ -50,7 +50,7 @@ object WikiManager {
         }
         if (message == ("/wikithis")) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                ChatUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.userError("You must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, config.autoOpenWiki)
@@ -79,7 +79,7 @@ object WikiManager {
 
     fun otherWikiCommands(args: Array<String>, useFandom: Boolean, wikithis: Boolean = false) {
         if (wikithis && !LorenzUtils.inSkyBlock) {
-            ChatUtils.chat("§cYou must be in SkyBlock to do this!")
+            ChatUtils.userError("You must be in SkyBlock to do this!")
             return
         }
 
@@ -88,7 +88,7 @@ object WikiManager {
 
         if (wikithis) {
             val itemInHand = InventoryUtils.getItemInHand() ?: run {
-                ChatUtils.chat("§cYou must be holding an item to use this command!")
+                ChatUtils.userError("You must be holding an item to use this command!")
                 return
             }
             wikiTheItem(itemInHand, false, useFandom = useFandom)
@@ -102,8 +102,10 @@ object WikiManager {
     }
 
     fun sendWikiMessage(
-        search: String = "", displaySearch: String = search,
-        autoOpen: Boolean = config.autoOpenWiki, useFandom: Boolean = config.useFandom
+        search: String = "",
+        displaySearch: String = search,
+        autoOpen: Boolean = config.autoOpenWiki,
+        useFandom: Boolean = config.useFandom,
     ) {
         val wiki = if (useFandom) "SkyBlock Fandom Wiki" else "Official SkyBlock Wiki"
         val urlPrefix = if (useFandom) FANDOM_URL_PREFIX else OFFICIAL_URL_PREFIX
