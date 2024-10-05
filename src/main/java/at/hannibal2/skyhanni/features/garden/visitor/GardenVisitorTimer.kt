@@ -38,10 +38,10 @@ object GardenVisitorTimer {
 
     private val timePattern by RepoPattern.pattern(
         "garden.visitor.timer.time.new",
-        " Next Visitor: §r(?<info>.*)"
+        " Next Visitor: §r(?<info>.*)",
     )
 
-    private var display = Renderable.string("")
+    private var display: Renderable? = null
     private var lastMillis = 0.seconds
     private var sixthVisitorArrivalTime = SimpleTimeMark.farPast()
     private var visitorJustArrived = false
@@ -67,7 +67,7 @@ object GardenVisitorTimer {
 
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        display = Renderable.string("")
+        display = null
         lastMillis = 0.seconds
         sixthVisitorArrivalTime = SimpleTimeMark.farPast()
         visitorJustArrived = false
@@ -99,12 +99,7 @@ object GardenVisitorTimer {
                 millis = TimeUtils.getDuration(timeInfo)
             }
         } ?: run {
-            display = Renderable.clickAndHover(
-                "§cVisitor time info not in tab list",
-                listOf("§eClick to teleport to the barn!"),
-                onClick = { HypixelCommands.teleportToPlot("barn") }
-            )
-
+            display = createDisplayText("§cVisitor time info not in tab list")
             return
         }
 
@@ -147,7 +142,7 @@ object GardenVisitorTimer {
         if (lastMillis == Duration.INFINITE) {
             ErrorManager.logErrorStateWithData(
                 "Found Visitor Timer bug, reset value", "lastMillis was infinite",
-                "lastMillis" to lastMillis
+                "lastMillis" to lastMillis,
             )
             lastMillis = 0.seconds
         }
@@ -175,12 +170,14 @@ object GardenVisitorTimer {
             "Next in §$formatColor$formatDuration$extraSpeed"
         }
         val visitorLabel = if (visitorsAmount == 1) "visitor" else "visitors"
-        display = Renderable.clickAndHover(
-            "§b$visitorsAmount $visitorLabel §7($next§7)",
-            listOf("§eClick to teleport to the barn!"),
-            onClick = { HypixelCommands.teleportToPlot("barn") }
-        )
+        display = createDisplayText("§b$visitorsAmount $visitorLabel §7($next§7)")
     }
+
+    private fun createDisplayText(text: String) = Renderable.clickAndHover(
+        text,
+        listOf("§eClick to teleport to the barn!"),
+        onClick = { HypixelCommands.teleportToPlot("barn") },
+    )
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
