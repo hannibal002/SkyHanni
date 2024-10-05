@@ -244,8 +244,6 @@ object UnknownLinesHandler {
         }
     }
 
-    var lastRecentAlarmWarning = SimpleTimeMark.farPast()
-
     private fun warn(line: String, reason: String) {
         ErrorManager.logErrorWithData(
             // line inclucded in chat message to not cache a previous message

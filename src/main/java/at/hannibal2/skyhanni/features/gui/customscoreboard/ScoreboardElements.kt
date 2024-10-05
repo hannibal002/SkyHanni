@@ -58,6 +58,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import kotlin.time.Duration.Companion.seconds
 
 internal var allUnknownLines = listOf<UnknownLine>()
+internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()
 
 internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 3.seconds }
 
