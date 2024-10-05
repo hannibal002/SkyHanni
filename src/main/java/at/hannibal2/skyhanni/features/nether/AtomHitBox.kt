@@ -4,7 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.crimsonisle.AtomHitBoxConfig.AtomsEntries
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -20,19 +22,31 @@ import java.awt.Color
 object AtomHitBox {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.atomHitBox
+    private var atomsList = mapOf<EntityArmorStand, Atom>()
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
+        atomsList = atomsList.editCopy {
+            entries.removeIf {
+                !it.key.isEntityAlive
+            }
+        }
+        for ((entity, atom) in atomsList) {
+            RenderUtils.drawWireframeBoundingBox_nea(entity.entityBoundingBox, atom.color, event.partialTicks)
+            event.drawDynamicText(entity.getLorenzVec(), atom.displayName, 1.0, ignoreBlocks = false)
+        }
+    }
 
-        for (mob in Atom.entries) {
-            if (mob.entry.isSelected()) {
-                for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
-                    if (!entity.hasSkullTexture(mob.texture)) continue
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (!isEnabled()) return
 
-                    RenderUtils.drawWireframeBoundingBox_nea(entity.entityBoundingBox, mob.color, event.partialTicks)
-                    event.drawDynamicText(entity.getLorenzVec(), mob.displayName, 1.0, ignoreBlocks = false)
-                }
+        for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
+            val atom = Atom.entries.firstOrNull { entity.hasSkullTexture(it.texture) } ?: continue
+            if (!atom.entry.isSelected()) continue
+            atomsList = atomsList.editCopy {
+                this[entity] = atom
             }
         }
     }
