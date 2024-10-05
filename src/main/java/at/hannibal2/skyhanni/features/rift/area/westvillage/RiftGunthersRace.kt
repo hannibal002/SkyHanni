@@ -110,7 +110,8 @@ object RiftGunthersRace {
 
     @SubscribeEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!(isEnabled() && config.hidePlayers)) return
+        if (!isEnabled()) return
+        if (!config.hidePlayers) return
         if (!RiftAPI.inRiftRace) return
 
         val entity = event.entity
