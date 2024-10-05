@@ -591,10 +591,11 @@ object RenderUtils {
     }
 
     fun Position.renderRenderable(
-        renderable: Renderable,
+        renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        if (renderable == null) return
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {

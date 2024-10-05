@@ -38,7 +38,7 @@ class RepoManager(private val configLocation: File) {
     private var latestRepoCommit: String? = null
     val repoLocation: File = File(configLocation, "repo")
     private var error = false
-    private var lastRepoUpdate = SimpleTimeMark.farPast()
+    private var lastRepoUpdate = SimpleTimeMark.now()
     private var repoDownLoadFailed = false
 
     companion object {
