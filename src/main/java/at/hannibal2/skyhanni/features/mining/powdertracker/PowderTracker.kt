@@ -199,7 +199,7 @@ object PowderTracker {
         }
 
         for (reward in PowderChestReward.entries) {
-            if (reward == PowderChestReward.MITHRIL_POWDER || reward == PowderChestReward.GEMSTONE_POWDER) continue
+            if (reward == PowderChestReward.GEMSTONE_POWDER) continue
             reward.chatPattern.matchMatcher(msg) {
                 tracker.modify {
                     val count = it.rewards[reward] ?: 0
@@ -217,7 +217,6 @@ object PowderTracker {
         tracker.modify {
             val reward = when (event.powder) {
                 HotmAPI.PowderType.GEMSTONE -> PowderChestReward.GEMSTONE_POWDER
-                HotmAPI.PowderType.MITHRIL -> PowderChestReward.MITHRIL_POWDER
                 else -> return@modify
             }
             it.rewards.addOrPut(reward, event.amount)
@@ -275,6 +274,17 @@ object PowderTracker {
             }
             newList
         }
+
+        event.transform(61, "mining.powderTracker.textFormat") { element ->
+            val newList = JsonArray()
+            for (entry in element.asJsonArray) {
+                if (entry is JsonNull) continue
+                if (entry.asString.let { it != "MITHRIL_POWDER" }) {
+                    newList.add(entry)
+                }
+            }
+            newList
+        }
     }
 
     @SubscribeEvent
@@ -297,7 +307,6 @@ object PowderTracker {
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
         calculate(data, gemstoneInfo, PowderChestReward.GEMSTONE_POWDER)
-        calculate(data, mithrilInfo, PowderChestReward.MITHRIL_POWDER)
         calculate(data, diamondEssenceInfo, PowderChestReward.DIAMOND_ESSENCE)
         calculate(data, goldEssenceInfo, PowderChestReward.GOLD_ESSENCE)
         calculateChest(data)

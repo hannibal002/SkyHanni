@@ -14,7 +14,7 @@ jobs:
             -   name: label
                 env:
                     TITLE: ${{ github.event.pull_request.title }}
-                    LABEL: Bug Fix - Sooner than Very Soon
+                    LABEL: Bug Fix
                 uses: actions/github-script@v7
                 with:
                     github-token: ${{ secrets.GITHUB_TOKEN}}
