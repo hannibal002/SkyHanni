@@ -79,16 +79,8 @@ object SeaCreatureTracker {
         val realAmount = data.amount.filter { filter(it.key) }
 
         val total = realAmount.sumAllValues()
-        for ((name, amount) in realAmount.entries.sortedByDescending { it.value }) {
-            val displayName = SeaCreatureManager.allFishingMobs[name]?.displayName ?: run {
-                ErrorManager.logErrorStateWithData(
-                    "Sea Creature Tracker can not display a name correctly",
-                    "Could not find sea creature by name",
-                    "SeaCreatureManager.allFishingMobs.keys" to SeaCreatureManager.allFishingMobs.keys,
-                    "name" to name
-                )
-                name
-            }
+        for ((displayName, amount) in realAmount.entries.sortedByDescending { it.value }) {
+
 
             val percentageSuffix = if (config.showPercentage.get()) {
                 val percentage = LorenzUtils.formatPercentage(amount.toDouble() / total)
