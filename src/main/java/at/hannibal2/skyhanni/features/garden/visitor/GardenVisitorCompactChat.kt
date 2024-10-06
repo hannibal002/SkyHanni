@@ -56,7 +56,7 @@ object GardenVisitorCompactChat {
     )
 
     private var visitorAcceptedChat = mutableListOf<String>()
-    private var visitorNameFormatted = "";
+    private var visitorNameFormatted = ""
     private var rewardsList = mutableListOf<String>()
 
     @SubscribeEvent

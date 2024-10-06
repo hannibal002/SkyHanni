@@ -56,11 +56,6 @@ object CustomScoreboard {
 
     private const val GUI_NAME = "Custom Scoreboard"
 
-    // Cached scoreboard data, only update after no change for 300ms
-    var activeLines = emptyList<String>()
-
-    // Most recent scoreboard state, not in use until cached
-    private var mostRecentLines = emptyList<String>()
     private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
 
     @SubscribeEvent
@@ -112,14 +107,13 @@ object CustomScoreboard {
 
         // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
         var dirty = false
-        if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
-            activeLines = mostRecentLines
+        if (lastScoreboardUpdate.passedSince() > 250.milliseconds) {
             lastScoreboardUpdate = SimpleTimeMark.farFuture()
             dirty = true
         }
 
         // Creating the lines
-        if (event.isMod(5) || dirty) {
+        if (dirty) {
             display = createLines().removeEmptyLinesFromEdges().createRenderable()
             if (TabListData.fullyLoaded) {
                 cache = display
@@ -132,7 +126,6 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        mostRecentLines = event.scoreboard
         lastScoreboardUpdate = SimpleTimeMark.now()
     }
 
@@ -260,9 +253,9 @@ object CustomScoreboard {
                             "${entry.element.getLines().map { it.display }}",
                     )
                 }
-                pastUnknownLines.toSet().takeIfNotEmpty()?.let { set ->
+                allUnknownLines.toSet().takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
-                    set.forEach { add("   $it") }
+                    set.forEach { add("   ${it.line}") }
                 }
             }
         }

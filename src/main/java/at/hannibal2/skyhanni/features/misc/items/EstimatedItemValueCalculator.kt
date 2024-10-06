@@ -742,9 +742,12 @@ object EstimatedItemValueCalculator {
         val map = mutableMapOf<String, Double>()
 
         // todo use repo
-        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
-        val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
-        val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
+        val tieredEnchants =
+            listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
+        val onlyTierOnePrices =
+            listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
+        val onlyTierFivePrices =
+            listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
