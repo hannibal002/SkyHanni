@@ -784,6 +784,11 @@ private fun getMayorDisplayPair() = buildList {
     }
 
     if (!mayorConfig.showExtraMayor) return@buildList
+    addAll(addMinister())
+    addAll(addPerkpocalypseMayor())
+}
+
+private fun addMinister() = buildList {
     val ministerName = MayorAPI.currentMinister?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
     add(ministerName to HorizontalAlignment.LEFT)
 
@@ -792,7 +797,9 @@ private fun getMayorDisplayPair() = buildList {
             add(" §7- §e${perk.perkName}" to HorizontalAlignment.LEFT)
         }
     }
+}
 
+private fun addPerkpocalypseMayor() = buildList {
     val jerryExtraMayor = MayorAPI.jerryExtraMayor
     val extraMayor = jerryExtraMayor.first ?: return@buildList
 
