@@ -2,13 +2,10 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.BitsAPI
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
-import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.features.combat.SpidersDenAPI
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.config
 import at.hannibal2.skyhanni.features.misc.ServerRestartTitle
 import at.hannibal2.skyhanni.features.rift.area.stillgorechateau.RiftBloodEffigies
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -18,15 +15,22 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SizeLimitedSet
-import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
-import com.google.common.cache.RemovalCause
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as SbPattern
+
+internal var allUnknownLines = listOf<UnknownLine>()
+internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()
+
+internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 3.seconds }
+
+internal class UnknownLine(val line: String) {
+    val firstFound = SimpleTimeMark.now()
+    var lastFound = SimpleTimeMark.now()
+    var lastWarned = SimpleTimeMark.farPast()
+}
 
 object UnknownLinesHandler {
 
@@ -94,7 +98,7 @@ object UnknownLinesHandler {
         SbPattern.reformingPattern,
         SbPattern.bossHealthPattern,
         SbPattern.bossHealthBarPattern,
-        SbPattern.broodmotherPattern,
+        SpidersDenAPI.broodmotherPattern,
         SbPattern.bossHPPattern,
         SbPattern.bossDamagePattern,
         SbPattern.slayerQuestPattern,
@@ -123,7 +127,7 @@ object UnknownLinesHandler {
         SbPattern.wtfAreThoseLinesPattern,
         SbPattern.timeLeftPattern,
         SbPattern.darkAuctionCurrentItemPattern,
-        SbPattern.coldPattern,
+        MiningAPI.coldPattern,
         SbPattern.riftHotdogTitlePattern,
         SbPattern.riftHotdogEatenPattern,
         SbPattern.mineshaftNotStartedPattern,
@@ -153,73 +157,69 @@ object UnknownLinesHandler {
 
         var unknownLines = sidebarLines.map { it.removeResets() }.filter { it.isNotBlank() }.filter { it.trim().length > 3 }
 
-            if (::remoteOnlyPatterns.isInitialized && !remoteOnlyPatternsAdded) {
-                    patternsToExclude.addAll(remoteOnlyPatterns)
-                remoteOnlyPatternsAdded = true
-            }
+        if (::remoteOnlyPatterns.isInitialized && !remoteOnlyPatternsAdded) {
+            patternsToExclude.addAll(remoteOnlyPatterns)
+            remoteOnlyPatternsAdded = true
+        }
+        unknownLines = unknownLines.filterNot { line ->
+            patternsToExclude.any { pattern -> pattern.matches(line) }
+        }
 
-            unknownLines = unknownLines.filterNot { line ->
-                if (line in confirmedLinesCache) return@filterNot true
-                val matches = patternsToExclude.any { pattern -> pattern.matches(line) }
-                if (matches) confirmedLinesCache += line
-                matches
-            }
+        /**
+         * Remove Known Text
+         **/
+        // Remove objectives
+        val objectiveLine = sidebarLines.firstOrNull { SbPattern.objectivePattern.matches(it) } ?: "Objective"
 
-            /**
-             * Remove Known Text
-             **/
-            // Remove objectives
-            val objectiveLine = sidebarLines.firstOrNull { objectivePattern.matches(it) } ?: "Objective"
+        unknownLines = unknownLines.filter { line ->
+            val nextLine = sidebarLines.nextAfter(objectiveLine)
+            val secondNextLine = sidebarLines.nextAfter(objectiveLine, 2)
+            val thirdNextLine = sidebarLines.nextAfter(objectiveLine, 3)
 
-            unknownLines = unknownLines.filter { line ->
-                val nextLine = sidebarLines.nextAfter(objectiveLine)
-                val secondNextLine = sidebarLines.nextAfter(objectiveLine, 2)
-                val thirdNextLine = sidebarLines.nextAfter(objectiveLine, 3)
+            line != nextLine && line != secondNextLine && line != thirdNextLine && !SbPattern.thirdObjectiveLinePattern.matches(line)
+        }
 
-                line != nextLine && line != secondNextLine && line != thirdNextLine && !thirdObjectiveLinePattern.matches(line)
-            }
-
-            // Remove jacobs contest
-            for (i in 1..3) {
-                unknownLines = unknownLines.filter {
-                    sidebarLines.nextAfter(
-                        sidebarLines.firstOrNull { line ->
-                            jacobsContestPattern.matches(line)
-                        } ?: "§eJacob's Contest",
-                        i,
-                    ) != it
-                }
-            }
-
-            // Remove slayer
-            for (i in 1..2) {
-                unknownLines = unknownLines.filter {
-                    sidebarLines.nextAfter(
-                        sidebarLines.firstOrNull { line ->
-                            slayerQuestPattern.matches(line)
-                        } ?: "Slayer Quest",
-                        i,
-                    ) != it
-                }
-            }
-
-            // remove trapper mob location
+        // Remove jacobs contest
+        for (i in 1..3) {
             unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
-                        mobLocationPattern.matches(line)
-                    } ?: "Tracker Mob Location:",
+                        SbPattern.jacobsContestPattern.matches(line)
+                    } ?: "§eJacob's Contest",
+                    i,
                 ) != it
             }
+        }
 
-            // da
+        // Remove slayer
+        for (i in 1..2) {
             unknownLines = unknownLines.filter {
                 sidebarLines.nextAfter(
                     sidebarLines.firstOrNull { line ->
-                        darkAuctionCurrentItemPattern.matches(line)
-                    } ?: "Current Item:",
+                        SbPattern.slayerQuestPattern.matches(line)
+                    } ?: "Slayer Quest",
+                    i,
                 ) != it
             }
+        }
+
+        // remove trapper mob location
+        unknownLines = unknownLines.filter {
+            sidebarLines.nextAfter(
+                sidebarLines.firstOrNull { line ->
+                    SbPattern.mobLocationPattern.matches(line)
+                } ?: "Tracker Mob Location:",
+            ) != it
+        }
+
+        // da
+        unknownLines = unknownLines.filter {
+            sidebarLines.nextAfter(
+                sidebarLines.firstOrNull { line ->
+                    SbPattern.darkAuctionCurrentItemPattern.matches(line)
+                } ?: "Current Item:",
+            ) != it
+        }
 
         /*
          * Handle broken scoreboard lines
@@ -257,8 +257,8 @@ object UnknownLinesHandler {
 
     private fun warn(line: String, reason: String) {
         ErrorManager.logErrorWithData(
-            // line inclucded in chat message to not cache a previous message
-            CustomScoreboardUtils.UndetectedScoreboardLines(line),
+            // line included in chat message to not cache a previous message
+            Exception(line),
             "CustomScoreboard detected a unknown line: '$line'",
             "Unknown Line" to line,
             "reason" to reason,
