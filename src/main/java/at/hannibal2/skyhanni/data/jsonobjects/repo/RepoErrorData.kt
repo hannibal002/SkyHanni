@@ -13,6 +13,6 @@ data class RepoErrorData(
     @Expose @SerializedName("replace_message") var replaceMessage: String?,
     @Expose @SerializedName("affected_versions") var affectedVersions: List<String> = listOf(),
 ) {
-    val messageExact by lazy { rawMessageExact ?: emptyList() }
-    val messageStartsWith by lazy { rawMessageStartsWith ?: emptyList() }
+    val messageExact get() = rawMessageExact ?: emptyList()
+    val messageStartsWith get() = rawMessageStartsWith ?: emptyList()
 }

@@ -171,9 +171,6 @@ object ErrorManager {
 
     private fun buildFinalMessage(message: String): String? {
         var finalMessage = message
-        if (finalMessage.last() !in ".?!") {
-            finalMessage += "§c."
-        }
         val rawMessage = message.removeColor()
 
         var hideError = false
@@ -197,6 +194,9 @@ object ErrorManager {
             }
         }
 
+        if (finalMessage.last() !in ".?!") {
+            finalMessage += "§c."
+        }
         return if (hideError) null else finalMessage
     }
 
