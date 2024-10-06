@@ -190,6 +190,10 @@ object ErrorManager {
                     finalMessage = it
                     hideError = false
                 }
+                repoError.customMessage?.let {
+                    ChatUtils.userError(it)
+                    return null
+                }
                 break
             }
         }
