@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.config.features.mining;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -17,32 +16,6 @@ public class CrystalHighlighterConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
-
-    @Expose
-    @ConfigOption(
-        name = "Display Type",
-        desc = "Choose the display type for the highlighted boxes."
-    )
-    @ConfigEditorDropdown
-    public DisplayType displayType = DisplayType.CRYSTAL_COLORS;
-
-    public enum DisplayType {
-        CRYSTAL_COLORS("Crystal Colors"),
-        CHROMA("Chroma"),
-        BLACK("Black"),
-        ;
-
-        private final String str;
-
-        DisplayType(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-    }
 
     @Expose
     @ConfigOption(
