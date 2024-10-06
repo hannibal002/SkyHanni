@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -119,6 +120,9 @@ object HypixelData {
     var skyBlock = false
     var skyBlockIsland = IslandType.UNKNOWN
     var serverId: String? = null
+    private var lastSuccessfulServerIdFetchTime = SimpleTimeMark.farPast()
+    private var lastSuccessfulServerIdFetchType: String? = null
+    private var failedServerIdFetchCounter = 0
 
     // Ironman, Stranded and Bingo
     var noTrade = false
@@ -159,22 +163,54 @@ object HypixelData {
 
         TabWidget.SERVER.matchMatcherFirstLine {
             serverId = group("serverid")
+            lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
+            lastSuccessfulServerIdFetchType = "tab list"
+            failedServerIdFetchCounter = 0
             return
         }
 
         ScoreboardData.sidebarLinesFormatted.matchFirst(serverIdScoreboardPattern) {
             val serverType = if (group("servertype") == "M") "mega" else "mini"
             serverId = "$serverType${group("serverid")}"
+            lastSuccessfulServerIdFetchTime = SimpleTimeMark.now()
+            lastSuccessfulServerIdFetchType = "scoreboard"
+            failedServerIdFetchCounter = 0
             return
         }
 
+        failedServerIdFetchCounter++
+        if (failedServerIdFetchCounter < 3) return
         ErrorManager.logErrorWithData(
             Exception("NoServerId"),
             "Could not find server id",
+            "failedServerIdFetchCounter" to failedServerIdFetchCounter,
+            "lastSuccessfulServerIdFetchTime" to lastSuccessfulServerIdFetchTime,
+            "lastSuccessfulServerIdFetchType" to lastSuccessfulServerIdFetchType,
             "islandType" to LorenzUtils.skyBlockIsland,
             "tablist" to TabListData.getTabList(),
             "scoreboard" to ScoreboardData.sidebarLinesFormatted,
         )
+    }
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Server ID")
+        val id = serverId
+        if (id == null) {
+            event.addData {
+                add("server id is null!")
+                add("failedServerIdFetchCounter: $failedServerIdFetchCounter")
+                add("")
+                add("last successful fetch time: $lastSuccessfulServerIdFetchTime")
+                add("last successful fetch type: $lastSuccessfulServerIdFetchType")
+            }
+        } else {
+            event.addIrrelevant {
+                add("Server id: '$id'")
+                add("fetch time: $lastSuccessfulServerIdFetchTime")
+                add("fetch type: $lastSuccessfulServerIdFetchType")
+            }
+        }
     }
 
     fun getPlayersOnCurrentServer(): Int {
