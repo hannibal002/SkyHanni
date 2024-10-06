@@ -64,6 +64,8 @@ import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
+// TODO split into smaler sub classes
+@Suppress("LargeClass")
 object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
@@ -724,10 +726,13 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
-        //todo use repo
-        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
-        val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
-        val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
+        // todo use repo
+        val tieredEnchants =
+            listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
+        val onlyTierOnePrices =
+            listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
+        val onlyTierFivePrices =
+            listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
@@ -903,11 +908,11 @@ object EstimatedItemValueCalculator {
 
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
-        return "§b$name ${second} Shard"
+        return "§b$name $second Shard"
     }
 
     fun Pair<String, Int>.getAttributePrice(): Double? = EstimatedItemValueCalculator.getPriceOrCompositePriceForAttribute(
-        "ATTRIBUTE_SHARD+ATTRIBUTE_" + first,
+        "ATTRIBUTE_SHARD+ATTRIBUTE_$first",
         second,
     )
 }
