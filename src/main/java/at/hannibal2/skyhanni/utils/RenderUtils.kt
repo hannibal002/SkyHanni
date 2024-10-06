@@ -591,10 +591,11 @@ object RenderUtils {
     }
 
     fun Position.renderRenderable(
-        renderable: Renderable,
+        renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        if (renderable == null) return
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
@@ -1279,7 +1280,7 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
-        showNoteNames: Boolean = false,
+        showNodeNames: Boolean = false,
         markLastBlock: Boolean = true,
     ) {
         if (path.isEmpty()) return
@@ -1302,7 +1303,7 @@ object RenderUtils {
                 bezierPoint,
             )
         }
-        if (showNoteNames) {
+        if (showNodeNames) {
             path.filter { it.name?.isNotEmpty() == true }.forEach {
                 this.drawDynamicText(it.position, it.name!!, textSize)
             }

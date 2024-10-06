@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -29,9 +30,28 @@ object HypixelBazaarFetcher {
     private const val HIDDEN_FAILED_ATTEMPTS = 3
 
     var latestProductInformation = mapOf<NEUInternalName, BazaarData>()
+    private var lastSuccessfulFetch = SimpleTimeMark.farPast()
     private var nextFetchTime = SimpleTimeMark.farPast()
     private var failedAttempts = 0
     private var nextFetchIsManual = false
+
+    @SubscribeEvent
+    fun onDebugDataCollect(event: DebugDataCollectEvent) {
+        event.title("Bazaar Fetching")
+
+        val data = listOf(
+            "failedAttempts: $failedAttempts",
+            "nextFetchIsManual: $nextFetchIsManual",
+            "nextFetchTime: ${nextFetchTime.timeUntil()}",
+            "lastSuccessfulFetch: ${lastSuccessfulFetch.passedSince()}",
+        )
+
+        if (failedAttempts == 0) {
+            event.addIrrelevant(data)
+        } else {
+            event.addData(data)
+        }
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -51,6 +71,7 @@ object HypixelBazaarFetcher {
             if (response.success) {
                 latestProductInformation = process(response.products)
                 failedAttempts = 0
+                lastSuccessfulFetch = SimpleTimeMark.now()
             } else {
                 val rawResponse = jsonResponse.toString()
                 onError(fetchType, Exception("success=false, cause=${response.cause}"), rawResponse)
