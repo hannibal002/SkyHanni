@@ -184,6 +184,7 @@
 + Added Area Navigation support to Glacite Tunnels. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2544)
 + Updated wording in mineshaft pity breakdown ("efficient miner" -> "spread"). - luna (https://github.com/hannibal002/SkyHanni/pull/2633)
 + Improved the wording of the Mining Event data error chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2671)
++ Added Mining Effects (Powder Pumpkin, Filet O' Fortune, and Chilled Pristine Potato) to the Non-God Effect Display. - jani (https://github.com/hannibal002/SkyHanni/pull/2677)
 
 #### Diana Improvements
 
@@ -201,6 +202,7 @@
 + Added an opacity slider for the Custom Background Image in the Custom Scoreboard. - Empa (https://github.com/hannibal002/SkyHanni/pull/1837)
 + Added an Undo message when auto alignment inCustom Scoreboard gets disabled. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2402)
 + Added an option to show SkyBlock time on the custom scoreboard rounded to 10 minutes, similar to the vanilla scoreboard. - Luna (https://github.com/hannibal002/SkyHanni/pull/2443)
++ Reduced the frequency of scoreboard errors being displayed. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2672)
 
 #### Inventory Improvements
 
@@ -292,6 +294,8 @@
 + Improved the way pathfinding lines are rendered. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2634)
 + Automatically starts pathfinding after clicking on SkyHanni reminder chat messages about Carnival Reminder, Hoppity NPC, City Project, and account/profile upgrades. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2635)
 + Greatly improved performance by optimizing SkyHanni Chroma support for Patcher Font Renderer. - nopo (https://github.com/hannibal002/SkyHanni/pull/2666)
++ "Could not find server id" errors are now less common. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2680)
++ Clarified the wording of Bazaar Data Loading error messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2681)
 
 ### Fixes
 
@@ -335,6 +339,7 @@
     + Fixed enchanting XP detection.
 + Fixed Minister in Calendar Perk description sometimes not using the gray color. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2632)
 + Fixed highlighting items in one's own inventory for some Bazaar features, e.g., in the "click to re-order" feature. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2640)
++ Automatically remove incorrect Account/Profile Upgrade warnings by talking to Elizabeth. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2674)
 
 #### Mining Fixes
 
@@ -363,6 +368,7 @@
 + Fixed Jasper gemstones not being addressed in the Powder Mining filter. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2618)
 + Fixed the King Talisman Tracker sometimes not displaying the correct data. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2663)
 + Fixed the Powder Tracker not tracking items correctly. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2645)
++ Fixed an error in Powder Tracker. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2678)
 
 #### Scoreboard Fixes
 
@@ -386,6 +392,8 @@
 + Fixed a Custom Scoreboard error during M7 Dragons. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2510)
 + Fixed Custom Scoreboard error during the Raffle Event. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2545)
 + Fixed both the Custom Scoreboard Active and Starting Soon Tab List events being active simultaneously in the Garden. - Empa, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2592)
++ Fixed Custom Scoreboard not showing the Perkpocalypse Mayor. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2683)
++ Fixed some scoreboard error messages appearing in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2672)
 
 #### Hoppity Fixes
 
@@ -407,6 +415,7 @@
 ####  Commands Fixes
 
 + Fixed the command `/shtps` printing nothing if the TPS display was currently showing nothing. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2446)
++ Fixed "/viewrecipe command replace" breaking pages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2679)
 
 #### Dungeon Fixes
 
@@ -474,6 +483,8 @@
 + Fixed item trackers displaying removed item names incorrectly. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2620)
 + Fixed some messages from Pablo NPC not being detected. - Luna (https://github.com/hannibal002/SkyHanni/pull/2636)
 + Fixed SkyHanni re-downloading the repository on every launch. - nopo (https://github.com/hannibal002/SkyHanni/pull/2669)
++ Fixed unknown Perkpocalypse Mayor chat spam. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2683)
++ Fixed the wiki keybind searching for "null" on items with no internal name. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2682)
 
 ### Technical Details
 
@@ -548,6 +559,9 @@
 + Added Bazaar Fetch information to `/shdebug`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2675)
 + Removed the password from the download source check. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2649)
 + Added a missing SkyBlock check for debug commands `/shtrackparticles` and `/shtracksounds`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2641)
++ Prepared for later migration of correct config name of Plhlegblast. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2684)
++ Added the ability to disable SkyHanni errors via repo configuration. - nopo (https://github.com/hannibal002/SkyHanni/pull/2668)
++ Added current server ID and fetch data to the `/shdebug` command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2680)
 
 ### Removed Features
 
