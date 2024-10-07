@@ -296,6 +296,7 @@
 + Greatly improved performance by optimizing SkyHanni Chroma support for Patcher Font Renderer. - nopo (https://github.com/hannibal002/SkyHanni/pull/2666)
 + "Could not find server id" errors are now less common. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2680)
 + Clarified the wording of Bazaar Data Loading error messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2681)
++ Indicate in the CF menu when the chocolate amount has reached the cap and is therefore halted. - hannibal2  (https://github.com/hannibal002/SkyHanni/pull/2688)
 
 ### Fixes
 
@@ -394,6 +395,7 @@
 + Fixed both the Custom Scoreboard Active and Starting Soon Tab List events being active simultaneously in the Garden. - Empa, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2592)
 + Fixed Custom Scoreboard not showing the Perkpocalypse Mayor. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2683)
 + Fixed some scoreboard error messages appearing in chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2672)
++ Fixed the custom scoreboard not updating when the Hypixel scoreboard is not updating. - hannibal2  (https://github.com/hannibal002/SkyHanni/pull/2685)
 
 #### Hoppity Fixes
 
@@ -405,6 +407,8 @@
 + Fixed an issue where Fish the Rabbit and El Dorado did not have compacted chat messages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2488)
 + Fixed inconsistencies in Hoppity Duplicate Number counts. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2595)
 + Fixed Fish the Rabbit and El Dorado incorrectly counting as unique rabbits during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2627)
++ Fixed Hoppity Collection Display not updating the rabbit count in some cases, e.g., when collecting rabbits on alpha or manually changing the config values. - hannibal2  (https://github.com/hannibal002/SkyHanni/pull/2686)
++ Fixed the chocolate count increasing in other menus even when production is halted. - hannibal2  (https://github.com/hannibal002/SkyHanni/pull/2688)
 
 #### Chat Fixes
 
@@ -562,6 +566,7 @@
 + Prepared for later migration of correct config name of Plhlegblast. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2684)
 + Added the ability to disable SkyHanni errors via repo configuration. - nopo (https://github.com/hannibal002/SkyHanni/pull/2668)
 + Added current server ID and fetch data to the `/shdebug` command. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2680)
++ Added more `/shdebug` checks for aspects like OS, Java version, and launcher. - hannibal2  (https://github.com/hannibal002/SkyHanni/pull/2691)
 
 ### Removed Features
 
