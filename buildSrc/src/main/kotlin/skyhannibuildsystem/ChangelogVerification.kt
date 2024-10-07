@@ -1,3 +1,5 @@
+package skyhannibuildsystem
+
 import at.hannibal2.changelog.SkyHanniChangelogBuilder
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
