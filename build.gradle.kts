@@ -3,11 +3,11 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 
 plugins {
     idea
@@ -102,6 +102,13 @@ tasks.runClient {
         },
     )
 }
+
+tasks.register("checkPrDescription", ChangelogVerification::class) {
+    this.outputDirectory.set(layout.buildDirectory)
+    this.prTitle = project.findProperty("prTitle") as String
+    this.prBody = project.findProperty("prBody") as String
+}
+
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
