@@ -182,7 +182,7 @@
 + Added an option to hide all tooltips inside the Fossil Excavator. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2579)
 + Added support for using the Pickobulus ability for the Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2540)
 + Added Area Navigation support to Glacite Tunnels. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2544)
-+ Updated wording in mineshaft pity breakdown ("efficient miner" -> "spread"). - luna (https://github.com/hannibal002/SkyHanni/pull/2633)
++ Updated wording in mineshaft pity breakdown ("efficient miner" -> "spread"). - Luna (https://github.com/hannibal002/SkyHanni/pull/2633)
 + Improved the wording of the Mining Event data error chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2671)
 + Added Mining Effects (Powder Pumpkin, Filet O' Fortune, and Chilled Pristine Potato) to the Non-God Effect Display. - jani (https://github.com/hannibal002/SkyHanni/pull/2677)
 
@@ -435,7 +435,7 @@
 
 #### Garden Fixes
 
-+ Fixed outdated Dicer gemstone fortune in FF guide. - Not_a_cow (https://github.com/hannibal002/SkyHanni/pull/2499)
++ Fixed outdated Dicer gemstone fortune in FF guide. - not_a_cow (https://github.com/hannibal002/SkyHanni/pull/2499)
 + Fixed some garden messages not being blocked. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2532)
 + Fixed active sprays not being removed from the GUI when using a washer. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2532)
 
