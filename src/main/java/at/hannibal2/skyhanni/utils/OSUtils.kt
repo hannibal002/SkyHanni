@@ -12,7 +12,7 @@ object OSUtils {
         SOLARIS,
         WINDOWS,
         MACOS,
-        UNKNOWN
+        UNKNOWN,
     }
 
     fun getOperatingSystemRaw(): String = System.getProperty("os.name")
