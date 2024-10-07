@@ -266,7 +266,7 @@ object ChatUtils {
 
 
     fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
-        ChatUtils.clickableChat(
+        clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
             onClick = {
                 if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
