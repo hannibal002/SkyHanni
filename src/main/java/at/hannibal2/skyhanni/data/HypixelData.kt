@@ -195,6 +195,11 @@ object HypixelData {
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Server ID")
+        if (!LorenzUtils.inSkyBlock) {
+            event.addIrrelevant("not in sb")
+            return
+        }
+
         val id = serverId
         if (id == null) {
             event.addData {
