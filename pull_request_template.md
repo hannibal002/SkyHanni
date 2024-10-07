@@ -1,6 +1,6 @@
 <!-- remove all unused parts 
 
-The title of your PR should be descriptive and concise. It should be in the format of `Type: Description`. For example, `Feature: Add new command` or `Fix: Bug in command`. If there are multiple types of changes these can be separated by an ampersand. For example, `Feature & Fix: Add new command and fix bug in command`.
+The title of your PR should be descriptive and concise. It should be in the format of `Type: Description`. For example, `Feature: Add new command` or `Fix: Bug in command`. If there are multiple types of changes these can be separated by a plus. For example, `Feature + Fix: Add new command and fix bug in command`.
 
 ## PR Reviews
 
