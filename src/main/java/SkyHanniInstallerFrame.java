@@ -590,7 +590,6 @@ public class SkyHanniInstallerFrame extends JFrame implements ActionListener, Mo
     }
 
     public OperatingSystem getOperatingSystem() {
-
         String osName = System.getProperty("os.name").toLowerCase(Locale.US);
         if (osName.contains("win")) {
             return OperatingSystem.WINDOWS;
