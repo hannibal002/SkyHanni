@@ -47,7 +47,7 @@ abstract class ChangelogVerification : DefaultTask() {
             errorFile.appendText("I have detected some issues with your pull request:\n\n")
 
             if (bodyErrors.isNotEmpty()) {
-                errorFile.appendText("Body issues:\n${bodyErrors.joinToString("\n") { it.formatLine() }}\n\n")
+                errorFile.appendText("Body issues:\n${bodyErrors.joinToString("\n") { "${it.message}${it.formatLine()}" }}\n\n")
             }
             if (titleErrors.isNotEmpty()) {
                 errorFile.appendText("Title issues:\n${titleErrors.joinToString("\n") { it.message }}\n\n")
