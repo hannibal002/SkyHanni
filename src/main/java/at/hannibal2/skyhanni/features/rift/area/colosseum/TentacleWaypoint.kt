@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
@@ -84,7 +83,9 @@ object TentacleWaypoint {
     }
 
     @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldChangeEvent) = tentacles.clear()
+    fun onWorldSwitch(event: LorenzWorldChangeEvent) {
+        tentacles.clear()
+    }
 
     fun isEnabled() = RiftAPI.inRift() && RiftAPI.inColosseum() && config.tentacleWaypoints
 
