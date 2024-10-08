@@ -23,43 +23,104 @@ object FannCost {
 
     private val patternGroup = RepoPattern.group("fann.inventory")
 
-
+    /**
+     * REGEX-TEST: Training Slot 1
+     * REGEX-TEST: Training Slot 2
+     * REGEX-TEST: Training Slot 3
+     */
     private val trainingSlotInventoryPattern by patternGroup.pattern(
         "training",
         "Training Slot [1-3]",
     )
+
+    /**
+     * REGEX-TEST: §aBegin Training
+     */
     private val anvilPattern by patternGroup.pattern(
         "anvil",
         "§aBegin Training",
     )
+
+    /**
+     * REGEX-TEST: Will earn a total of 1,000,000 EXP.
+     * REGEX-TEST: Will earn a total of 2 EXP
+     * REGEX-TEST: Will earn a total of 1,000 EXP
+     */
     private val expEarnedPattern by patternGroup.pattern(
         "exp.total",
         "Will earn a total of (\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) EXP\\.?",
     )
+
+    /**
+     * REGEX-TEST: EXP Per Day: 1,000
+     * REGEX-TEST: EXP Per Day: 1,230,000 (+3.4%)
+     * REGEX-TEST: EXP Per Day: 1,623,000 (+9.1%)
+     * REGEX-TEST: EXP Per Day: 1
+     */
     private val dailyExpPattern by patternGroup.pattern(
         "exp.daily",
         "EXP Per Day: ([\\d,]+)(?: \\(\\+\\d{1,2}(\\.\\d{1,2})?%\\))?",
     )
+
+    /**
+     * REGEX-TEST: Will take: 1d 0h 0m 0s
+     * REGEX-TEST: Will take: 3d 11h 10m 35s
+     * REGEX-TEST: Will take: 0d 0h 0m 1s
+     * REGEX-TEST: Will take: 493d 19h 49m 59s
+     */
     private val durationPattern by patternGroup.pattern(
         "training.duration.pattern",
         "Will take: (?<day>\\d+)d (?<hr>\\d{1,2})h (?<min>\\d{1,2})m (?<sec>\\d{1,2})s",
     )
+
+    /**
+     * REGEX-TEST: 6,749,742 Coins
+     * REGEX-TEST: 13,492,398.8 Coins
+     * REGEX-TEST: 1,000,000.3 Coins (1% off)
+     * REGEX-TEST: 12,345,678 Coins (5% off)
+     */
     private val coinsPattern by patternGroup.pattern(
         "coin",
         "(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Coins(?: \\([1-5]% off\\))?",
     )
+
+    /**
+     * REGEX-TEST: 5,024.3 Bits
+     * REGEX-TEST: 1,000 Bits
+     * REGEX-TEST: 139 Bits
+     */
     private val bitsPattern by patternGroup.pattern(
         "bits",
         "(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Bits",
     )
+
+    /**
+     * REGEX-TEST: Desired Level: 200
+     * REGEX-TEST: Desired Level: 100
+     * REGEX-TEST: Desired Level: 99
+     * REGEX-TEST: Desired Level: 4
+     */
     private val desiredLevelPatter by patternGroup.pattern(
         "slot24.name.level",
         "Desired Level: (200|1?[0-9]?[0-9])",
     )
+
+    /**
+     * REGEX-TEST: User Input
+     */
     private val userInputPattern by patternGroup.pattern(
         "slot24.name.input",
         "User Input",
     )
+
+    /**
+     * REGEX-TEST: Type: Free
+     * REGEX-TEST: Type: Light
+     * REGEX-TEST: Type: Moderate
+     * REGEX-TEST: Type: Expert
+     * REGEX-TEST: Type: Ultra
+     * REGEX-TEST: Type: Turbo!
+     */
     private val trainingTypePattern by patternGroup.pattern(
         "training.type",
         "Type: (Free|Light|Moderate|Expert|Ultra|Turbo!)",
