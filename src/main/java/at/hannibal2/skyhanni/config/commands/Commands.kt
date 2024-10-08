@@ -163,7 +163,7 @@ object Commands {
             callback { openVisualWords() }
         }
         event.register("shnavigate") {
-            description = "Using path finder to go to locatons"
+            description = "Using path finder to go to locations"
             callback { NavigationHelper.onCommand(it) }
         }
     }
@@ -292,7 +292,7 @@ object Commands {
             callback { FarmingLaneCreator.commandLaneDetection() }
         }
         event.register("shignore") {
-            description = "Add/Remove a user from your blackist"
+            description = "Add/Remove a user from your blacklist"
             category = CommandCategory.USERS_NORMAL
             callback { PartyChatCommands.blacklist(it) }
         }
