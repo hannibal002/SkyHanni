@@ -10,10 +10,10 @@ import org.lwjgl.input.Keyboard;
 public class FocusModeConfig {
 
     @Expose
-    @ConfigOption(name = "Enable", desc = "In focus mode you only see the name of the item instead of the whole description.")
+    @ConfigOption(name = "Enabled", desc = "In focus mode you only see the name of the item instead of the whole description.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enable = false;
+    public boolean enabled = false;
 
     @Expose
     @ConfigOption(name = "Toggle Key", desc = "Key to toggle the focus mode on and off.")
