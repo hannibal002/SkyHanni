@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobFilter.isSkyBlockMob
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHurtEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -81,6 +82,9 @@ object TentacleWaypoint {
             )
         }
     }
+
+    @SubscribeEvent
+    fun onWorldSwitch(event: LorenzWorldChangeEvent) = tentacles.clear()
 
     fun isEnabled() = RiftAPI.inRift() && RiftAPI.inColosseum() && config.tentacleWaypoints
 
