@@ -85,7 +85,7 @@ public class InventoryConfig {
     public PersonalCompactorConfig personalCompactor = new PersonalCompactorConfig();
 
     @Expose
-    @ConfigOption(name = "Focus Mode",desc="")
+    @ConfigOption(name = "Focus Mode", desc="")
     @Accordion
     public FocusModeConfig focusMode = new FocusModeConfig();
 
