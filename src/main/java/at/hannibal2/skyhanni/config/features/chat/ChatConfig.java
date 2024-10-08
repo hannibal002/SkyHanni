@@ -6,7 +6,6 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import org.lwjgl.input.Keyboard;
@@ -143,27 +142,4 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petRarityDropMessage = true;
-
-    @Expose
-    @ConfigOption(name = "Stash Warnings", desc = "Compact or hide warnings relating to items/materials in your stash.")
-    @ConfigEditorDropdown
-    public StashHandlerType stashWarnings = StashHandlerType.COMPACT;
-
-    public enum StashHandlerType {
-        NONE("None (Show all)"),
-        COMPACT("Compact Messages"),
-        HIDE("Hide Completely"),
-        ;
-
-        private final String name;
-
-        StashHandlerType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
 }

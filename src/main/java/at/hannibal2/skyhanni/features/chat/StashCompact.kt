@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.chat.ChatConfig
+import at.hannibal2.skyhanni.config.features.chat.StashConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -59,7 +60,7 @@ object StashCompact {
 
     //</editor-fold>
 
-    private val config get() = SkyHanniMod.feature.chat
+    private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
 
     private var lastMaterialCount = 0
     private var lastDifferingMaterialsCount = 0
@@ -109,17 +110,18 @@ object StashCompact {
     }
 
     private fun sendCompactedStashMessage() {
-        if (config.stashWarnings == ChatConfig.StashHandlerType.HIDE) return
+        if (config.stashWarnings == StashConfig.StashHandlerType.HIDE) return
         ChatUtils.clickableChat(
             "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, lastType)} in stash, " +
                 "§8totalling $lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}§7. " +
                 "§3Click to pickup§7.",
             onClick = {
-                HypixelCommands.pickupStash()
+                if (config.useViewStash) HypixelCommands.viewStash(lastType)
+                else HypixelCommands.pickupStash()
             },
             prefix = false,
         )
     }
 
-    private fun isEnabled() = config.stashWarnings != ChatConfig.StashHandlerType.NONE
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.stashWarnings != StashConfig.StashHandlerType.NONE
 }
