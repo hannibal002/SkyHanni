@@ -2,10 +2,12 @@ package at.hannibal2.skyhanni.features.misc.pathfind
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
-import at.hannibal2.skyhanni.data.model.findShortestDistance
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
+import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
@@ -56,12 +58,12 @@ object NavigationHelper {
             val distance = distances[node]!!.roundTo(1)
             val component = "$name §e$distance".asComponent()
             component.onClick {
-                IslandGraphs.pathFind(node.position)
+                node.pathFind(label = name, allowRerouting = true, condition = { true })
                 sendNavigateMessage(name, goBack)
             }
             val tag = node.tags.first { it in allowedTags }
-            component.hover =
-                ("§eClick to start navigating to\n" + "§7Type: §r${tag.displayName}\n" + "§7Distance: §e$distance blocks").asComponent()
+            val hoverText = "Name: $name\n§7Type: §r${tag.displayName}\n§7Distance: §e$distance blocks\n§eClick to start navigating!"
+            component.hover = hoverText.asComponent()
             component
         }
     }
@@ -78,6 +80,8 @@ object NavigationHelper {
         for (node in distances.sorted().keys) {
             // hiding areas that are none
             if (node.name == "no_area") continue
+            // no need to navigate to the current area
+            if (node.name == IslandAreas.currentAreaName) continue
             val tag = node.tags.first { it in allowedTags }
             val name = "${node.name} §7(${tag.displayName}§7)"
             if (name in names) continue
@@ -90,7 +94,7 @@ object NavigationHelper {
         searchTerm: String,
     ): Map<GraphNode, Double> {
         val graph = IslandGraphs.currentIslandGraph ?: return emptyMap()
-        val closedNote = IslandGraphs.closedNote ?: return emptyMap()
+        val closestNode = IslandGraphs.closestNode ?: return emptyMap()
 
         val nodes = graph.nodes
         val distances = mutableMapOf<GraphNode, Double>()
@@ -99,7 +103,7 @@ object NavigationHelper {
             val remainingTags = node.tags.filter { it in allowedTags }
             if (remainingTags.isEmpty()) continue
             if (name.lowercase().contains(searchTerm)) {
-                distances[node] = graph.findShortestDistance(closedNote, node)
+                distances[node] = GraphUtils.findShortestDistance(closestNode, node)
             }
             if (remainingTags.size != 1) {
                 println("found node with invalid amount of tags: ${node.name} (${remainingTags.map { it.cleanName }}")

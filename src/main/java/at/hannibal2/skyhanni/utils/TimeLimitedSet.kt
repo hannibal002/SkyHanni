@@ -27,7 +27,7 @@ class TimeLimitedSet<T : Any>(
 
     fun clear() = cache.clear()
 
-    fun toSet(): Set<T> = cache.keys().toSet()
+    fun toSet(): Set<T> = HashSet(cache.keys())
 
     override fun iterator(): Iterator<T> = toSet().iterator()
 }
