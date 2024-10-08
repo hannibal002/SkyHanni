@@ -31,5 +31,5 @@ object FocusMode {
         toggle = !toggle
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && InventoryUtils.inContainer() && config.enable
+    fun isEnabled() = LorenzUtils.inSkyBlock && InventoryUtils.inContainer() && config.enabled
 }
