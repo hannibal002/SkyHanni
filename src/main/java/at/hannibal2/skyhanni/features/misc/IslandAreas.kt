@@ -276,5 +276,5 @@ object IslandAreas {
         hasMoved = true
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.let { it.pathfinder.enabled || it.enterTitle || it.inWorld }
+    fun isEnabled() = LorenzUtils.inSkyBlock
 }
