@@ -1,6 +1,6 @@
 # SkyHanni - Change Log
 
-## Version 0.27 (in Beta)
+## Version 0.27
 
 ### New Features
 
@@ -182,14 +182,14 @@
 + Added an option to hide all tooltips inside the Fossil Excavator. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2579)
 + Added support for using the Pickobulus ability for the Mineshaft Pity Display. - Empa (https://github.com/hannibal002/SkyHanni/pull/2540)
 + Added Area Navigation support to Glacite Tunnels. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2544)
-+ Updated wording in mineshaft pity breakdown ("efficient miner" -> "spread"). - luna (https://github.com/hannibal002/SkyHanni/pull/2633)
++ Updated wording in mineshaft pity breakdown ("efficient miner" -> "spread"). - Luna (https://github.com/hannibal002/SkyHanni/pull/2633)
 + Improved the wording of the Mining Event data error chat message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2671)
 + Added Mining Effects (Powder Pumpkin, Filet O' Fortune, and Chilled Pristine Potato) to the Non-God Effect Display. - jani (https://github.com/hannibal002/SkyHanni/pull/2677)
 
 #### Diana Improvements
 
 + Added /warp stonks to the Burrow Warp Helper. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2399)
-+ Added per-election season Diana Trackers. - !nea (https://github.com/hannibal002/SkyHanni/pull/2487)
++ Added per-election season Diana Trackers. - nea (https://github.com/hannibal002/SkyHanni/pull/2487)
     + This includes the Diana Profit Tracker and the Mythological Creature Tracker.
     + The data is stored moving forward, but there is currently no way to view anything other than the current year.
 + Changed the Diana Profit Tracker and Mythological Creature Tracker to always be visible when holding the Ancestral Spade in hand, even if Diana is not the mayor. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2496)
@@ -435,7 +435,7 @@
 
 #### Garden Fixes
 
-+ Fixed outdated Dicer gemstone fortune in FF guide. - Not_a_cow (https://github.com/hannibal002/SkyHanni/pull/2499)
++ Fixed outdated Dicer gemstone fortune in FF guide. - not_a_cow (https://github.com/hannibal002/SkyHanni/pull/2499)
 + Fixed some garden messages not being blocked. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2532)
 + Fixed active sprays not being removed from the GUI when using a washer. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2532)
 
@@ -456,7 +456,7 @@
 
 #### Fishing Fixes
 
-+ Fixed error messages while using the Chum Bucket Hider feature. - nea89 (https://github.com/hannibal002/SkyHanni/pull/2587)
++ Fixed error messages while using the Chum Bucket Hider feature. - nea (https://github.com/hannibal002/SkyHanni/pull/2587)
 + Fixed the Trophy Fish Title displaying an undefined character in the format. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2670)
 
 #### Rift Fixes
@@ -520,7 +520,7 @@
 + Changed RenderableTooltips to be more consistent with the vanilla ones. - Empa (https://github.com/hannibal002/SkyHanni/pull/1869)
 + Improved error logging for enchant parser. - Vixid (https://github.com/hannibal002/SkyHanni/pull/2454)
 + Added renderable search box. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2475)
-+ Added the ability to add more optional display modes to trackers. - !nea (https://github.com/hannibal002/SkyHanni/pull/2487)
++ Added the ability to add more optional display modes to trackers. - nea (https://github.com/hannibal002/SkyHanni/pull/2487)
     + These extra trackers still need to provide their own storage.
 + Added perk descriptions to mayor perks. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2342)
     + These are loaded when checking the active mayor/minister from the API, so most of the perks will initially have no description.

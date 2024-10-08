@@ -400,8 +400,8 @@ object EstimatedItemValueCalculator {
     private fun addBookwormBook(stack: ItemStack, list: MutableList<String>): Double {
         val count = stack.getBookwormBookCount() ?: return 0.0
 
-        val tfHardcodedItemAgain = "BOOKWORM_BOOK".asInternalName()
-        val price = tfHardcodedItemAgain.getPrice() * count
+        val bookwormBook = "BOOKWORM_BOOK".asInternalName()
+        val price = bookwormBook.getPrice() * count
         list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 §7(§6" + price.shortFormat() + "§7)")
         return price
     }
