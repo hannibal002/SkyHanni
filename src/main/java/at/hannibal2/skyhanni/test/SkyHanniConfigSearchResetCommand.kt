@@ -23,7 +23,7 @@ object SkyHanniConfigSearchResetCommand {
 
     fun command(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            ChatUtils.chat(runCommand(args), false)
+            ChatUtils.chat(runCommand(args))
         }
         lastCommand = args
     }
