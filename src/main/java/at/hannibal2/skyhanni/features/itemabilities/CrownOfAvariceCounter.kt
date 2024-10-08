@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.itemabilities
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -45,6 +44,7 @@ object CrownOfAvariceCounter {
     private var coinsEarned: Long = 0L
     private var sessionStart = SimpleTimeMark.farPast()
     private var lastCoinUpdate = SimpleTimeMark.farPast()
+    private val isSessionActive get(): Boolean = sessionStart.passedSince() < 10.seconds
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -87,11 +87,6 @@ object CrownOfAvariceCounter {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
-        reset()
-    }
-
-    @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
         reset()
         count = InventoryUtils.getHelmet()?.getCoinsOfAvarice() ?: return
@@ -100,20 +95,24 @@ object CrownOfAvariceCounter {
     private fun update() {
         val coinsPerHour = calculateCoinsPerHour().toLong()
         val timeUntilMax = calculateTimeUntilMax()
-        render = Renderable.verticalContainer(
-            listOf(
-                Renderable.horizontalContainer(
-                    listOf(
-                        Renderable.itemStack(internalName.getItemStack()),
-                        Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
-                    ),
+        val list = buildList {
+            add(Renderable.horizontalContainer(
+                listOf(
+                    Renderable.itemStack(internalName.getItemStack()),
+                    Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
                 ),
-                Renderable.string(
-                    "§aCoins Per Hour: §6${if (sessionStart.passedSince() < 10.seconds) "Calculating..." else coinsPerHour.addSeparators()}"
-                ),
-                Renderable.string("§aTime until Max: §6${if (sessionStart.passedSince() < 10.seconds) "Calculating..." else timeUntilMax}"),
-            ),
-        )
+            ))
+
+            if (config.perHour) {
+                add(Renderable.string(
+                    "§aCoins Per Hour: §6${if (isSessionActive) "Calculating..." else coinsPerHour.addSeparators()}"
+                ))
+            }
+            if (config.time) {
+                add(Renderable.string("§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax}"))
+            }
+        }
+        render = Renderable.verticalContainer(list)
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enable
