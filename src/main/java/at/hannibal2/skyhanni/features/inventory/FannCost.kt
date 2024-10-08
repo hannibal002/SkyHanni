@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.features.inventory
 
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -22,6 +22,8 @@ object FannCost {
     private var trainingMode: TrainingMode = TrainingMode.DAY_COUNT
 
     private val patternGroup = RepoPattern.group("fann.inventory")
+
+
     private val trainingSlotInventoryPattern by patternGroup.pattern(
         "training",
         "Training Slot [1-3]",
@@ -32,23 +34,23 @@ object FannCost {
     )
     private val expEarnedPattern by patternGroup.pattern(
         "exp.total",
-        """Will earn a total of (\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) EXP\.?""",
+        "Will earn a total of (\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) EXP\\.?",
     )
     private val dailyExpPattern by patternGroup.pattern(
         "exp.daily",
-        """EXP Per Day: ([\d,]+)(?: \(\+\d{1,2}(\.\d{1,2})?%\))?""",
+        "EXP Per Day: ([\\d,]+)(?: \\(\\+\\d{1,2}(\\.\\d{1,2})?%\\))?",
     )
     private val durationPattern by patternGroup.pattern(
         "training.duration.pattern",
-        """Will take: (?<day>\d+)d (?<hr>\d{1,2})h (?<min>\d{1,2})m (?<sec>\d{1,2})s""",
+        "Will take: (?<day>\\d+)d (?<hr>\\d{1,2})h (?<min>\\d{1,2})m (?<sec>\\d{1,2})s",
     )
     private val coinsPattern by patternGroup.pattern(
         "coin",
-        """(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) Coins(?: \([1-5]% off\))?""",
+        "(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Coins(?: \\([1-5]% off\\))?",
     )
     private val bitsPattern by patternGroup.pattern(
         "bits",
-        """(\d{1,3}(?:,\d{3})*(?:\.\d+)?|\d+\.?\d*) Bits""",
+        "(\\d{1,3}(?:,\\d{3})*(?:\\.\\d+)?|\\d+\\.?\\d*) Bits",
     )
     private val desiredLevelPatter by patternGroup.pattern(
         "slot24.name.level",
@@ -104,15 +106,15 @@ object FannCost {
     @SubscribeEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!trainingSlotInventoryPattern.matches(event.inventoryName.removeColor())) return
-        val slot24 = event.inventoryItems[24]
-        if (slot24 != null) {
-            val name = slot24.displayName.removeColor()
-            if (desiredLevelPatter.matches(name)) {
-                trainingMode = TrainingMode.UNTIL_LEVEL
-            } else if (userInputPattern.matches(name)) {
-                trainingMode = TrainingMode.DAY_COUNT
-            }
+        val slot24 = event.inventoryItems[24] ?: return
+
+        val name = slot24.displayName.removeColor()
+        if (desiredLevelPatter.matches(name)) {
+            trainingMode = TrainingMode.UNTIL_LEVEL
+        } else if (userInputPattern.matches(name)) {
+            trainingMode = TrainingMode.DAY_COUNT
         }
+
     }
 
     private fun MutableList<String>.insertLineAfter(pattern: Pattern, content: String) {
@@ -167,10 +169,10 @@ object FannCost {
             val matcher = durationPattern.matcher(linePlain)
             if (matcher.find()) {
                 // Extract the named groups and convert them to integers
-                val days = matcher.getIntOrZero("day")
-                val hours = matcher.getIntOrZero("hr")
-                val minutes = matcher.getIntOrZero("min")
-                val seconds = matcher.getIntOrZero("sec")
+                val days = matcher.groupOrNull("day")?.toInt() ?: 0
+                val hours = matcher.groupOrNull("hr")?.toInt() ?: 0
+                val minutes = matcher.groupOrNull("min")?.toInt() ?: 0
+                val seconds = matcher.groupOrNull("sec")?.toInt() ?: 0
 
                 // Calculate the total duration in days
                 val totalDays = days + hours / 24.0 + minutes / 1440.0 + seconds / 86400.0
@@ -182,17 +184,13 @@ object FannCost {
         return null  // Return null if no valid duration is found
     }
 
-    private fun Matcher.getIntOrZero(key: String): Int {
-        return this.group(key)?.toInt() ?: 0
-    }
-
     private fun String._toDouble(): Double {
         return this.replace(",", "").toDouble()
     }
 
     private enum class TrainingMode {
         DAY_COUNT,
-        UNTIL_LEVEL
+        UNTIL_LEVEL,
     }
 
     private enum class TrainingType(val type: String) {
