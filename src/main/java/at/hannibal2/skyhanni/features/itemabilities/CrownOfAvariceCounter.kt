@@ -126,8 +126,7 @@ object CrownOfAvariceCounter {
 
     private fun calculateCoinsPerHour(): Double {
         val timeInHours = sessionStart.passedSince().inPartialHours
-        val coinsPerHour = if (timeInHours > 0) coinsEarned / timeInHours else 0.0
-        return coinsPerHour
+        return if (timeInHours > 0) coinsEarned / timeInHours else 0.0
     }
 
     private fun calculateTimeUntilMax(): String {
