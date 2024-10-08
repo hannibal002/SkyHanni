@@ -1,4 +1,4 @@
-package at.skyhanni.sharedvariables
+package skyhannibuildsystem
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
