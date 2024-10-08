@@ -103,6 +103,9 @@ public class ProfileSpecificStorage {
         public long currentChocolate = 0;
 
         @Expose
+        public long maxChocolate = 0;
+
+        @Expose
         public long chocolateThisPrestige = 0;
 
         @Expose
