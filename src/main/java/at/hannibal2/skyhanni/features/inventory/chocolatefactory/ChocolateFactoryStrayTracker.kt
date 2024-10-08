@@ -100,6 +100,7 @@ object ChocolateFactoryStrayTracker {
         "§7You caught a stray §6§lGolden Rabbit§7! §7You gained §6\\+5 Chocolate §7until the §7end of the SkyBlock year!",
     )
 
+    // TODO: Fix this pattern so it doesn't only match duplicates.
     /**
      * REGEX-TEST: §7You caught a stray §9Fish the Rabbit§7! §7You have already found §9Fish the §9Rabbit§7, so you received §655,935,257 §6Chocolate§7!
      */
@@ -108,8 +109,25 @@ object ChocolateFactoryStrayTracker {
         "§7You caught a stray (?<color>§.)Fish the Rabbit§7! §7You have already found (?:§.)?Fish the (?:§.)?Rabbit§7, so you received §6(?<amount>[\\d,]*) (?:§6)?Chocolate§7!",
     )
 
-    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker })
-    { drawDisplay(it) }
+    /**
+     * REGEX-TEST: §7You have already found §9Fish the
+     */
+    val duplicatePseudoStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.pseudoduplicate",
+        "(?:§.)*You have already found.*",
+    )
+
+    /**
+     * REGEX-TEST: §7already have captured him before
+     */
+    val duplicateDoradoStrayPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "stray.doradoduplicate",
+        "(?:§.)*already have captured him before.*",
+    )
+
+    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
         override fun reset() {

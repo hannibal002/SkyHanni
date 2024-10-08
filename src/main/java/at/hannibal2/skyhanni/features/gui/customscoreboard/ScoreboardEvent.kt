@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.combat.SpidersDenAPI.isAtTopOfNest
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -29,7 +30,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as 
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
-private fun getSbLines(): List<String> = CustomScoreboard.activeLines
+private fun getSbLines(): List<String> = ScoreboardData.sidebarLinesFormatted
 
 enum class ScoreboardEvent(
     private val displayLine: () -> List<String>,
@@ -373,9 +374,9 @@ private fun getWinterLines() = buildList {
 }
 
 private fun getWinterShowWhen(): Boolean = getSbLines().any {
-    SbPattern.winterEventStartPattern.matches(it)
-        || (SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!"))
-        || SbPattern.winterWavePattern.matches(it)
+    SbPattern.winterEventStartPattern.matches(it) ||
+        (SbPattern.winterNextWavePattern.matches(it) && !it.endsWith("Soon!")) ||
+        SbPattern.winterWavePattern.matches(it)
 }
 
 private fun getNewYearLines() = listOf(getSbLines().first { SbPattern.newYearPattern.matches(it) })
@@ -534,7 +535,8 @@ private fun getCarnivalLines() = listOf(
         getSbLines().firstOrNull { pattern.matches(it) }
     }
 
-private fun getCarnivalShowWhen(): Boolean = SbPattern.carnivalPattern.anyMatches(getSbLines())
+private fun getCarnivalShowWhen() =
+    listOf(SbPattern.carnivalPattern, SbPattern.carnivalTokensPattern, SbPattern.carnivalTasksPattern).anyMatches(getSbLines())
 
 private fun getRiftLines() = getSbLines().filter { line ->
     RiftBloodEffigies.heartsPattern.matches(line) ||

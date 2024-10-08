@@ -101,7 +101,7 @@ object FlareDisplay {
                     }
                 }
             }
-            if (remainingTime !in 5.seconds..0.seconds) continue
+            if (remainingTime !in 0.seconds..5.seconds) continue
             val message = "$name §eexpires in: §b${remainingTime.inWholeSeconds}s"
             when (config.alertType) {
                 FlareConfig.AlertType.CHAT -> {

@@ -639,20 +639,20 @@ object ComposterOverlay {
             add("currentOrganicMatterItem: $currentOrganicMatterItem")
             add("currentFuelItem: $currentFuelItem")
 
-            println(" ")
+            add(" ")
             val composterUpgrades = ComposterAPI.composterUpgrades
             if (composterUpgrades == null) {
-                println("composterUpgrades is null")
+                add("composterUpgrades is null")
             } else {
                 for ((a, b) in composterUpgrades) {
-                    println("upgrade $a: $b")
+                    add("upgrade $a: $b")
                 }
             }
 
-            println(" ")
+            add(" ")
             val tabListData = ComposterAPI.tabListData
             for ((a, b) in tabListData) {
-                println("tabListData $a: $b")
+                add("tabListData $a: $b")
             }
         }
     }

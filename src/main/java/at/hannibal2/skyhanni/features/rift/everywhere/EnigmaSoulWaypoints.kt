@@ -120,7 +120,11 @@ object EnigmaSoulWaypoints {
             if (config.showPathFinder) {
                 soulLocations[name]?.let {
                     if (!(name == "Buttons" && WoodenButtonsHelper.showButtons())) {
-                        IslandGraphs.pathFind(it, "$name Enigma Soul", config.color.toChromaColor(), condition = { config.showPathFinder })
+                        IslandGraphs.pathFind(
+                            it,
+                            "$name Enigma Soul",
+                            config.color.toChromaColor(),
+                            condition = { config.showPathFinder })
                     }
                 }
             }
