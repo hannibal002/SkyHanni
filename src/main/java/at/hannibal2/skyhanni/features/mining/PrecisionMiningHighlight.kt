@@ -21,45 +21,49 @@ import java.awt.Color
 @SkyHanniModule
 object PrecisionMiningHighlight {
 
-    var lastParticle: AxisAlignedBB? = null
-    var lookingAt: Boolean = false
-    var deleteTime: SimpleTimeMark? = null
+    private val config get() = SkyHanniMod.feature.mining.highlightPrecisionMiningParticles
+
+    private var lastParticle: AxisAlignedBB? = null
+    private var lookingAtParticle: Boolean = false
+    private var deleteTime: SimpleTimeMark? = null
 
     @SubscribeEvent
     fun onParticle(event: ReceiveParticleEvent) {
-        if (!MiningAPI.inCustomMiningIsland() || !isEnabled()) return
+        if (!isEnabled()) return
         if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
             !Minecraft.getMinecraft().gameSettings.keyBindAttack.isKeyDown) return
 
-        val b: MovingObjectPosition = Minecraft.getMinecraft().objectMouseOver
-        if (b.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
+        val mouseOverObject = Minecraft.getMinecraft().objectMouseOver
+        if (mouseOverObject.typeOfHit != MovingObjectPosition.MovingObjectType.BLOCK) return
 
-        val aaBB = event.location.add(x = -0.12, y = -0.12, z = -0.12).axisAlignedTo(event.location.clone().add(0.12, 0.12, 0.12))
+        val particleBoundingBox = event.location.add(-0.12, -0.12, -0.12)
+            .axisAlignedTo(event.location.clone().add(0.12, 0.12, 0.12))
 
-        val block = b.blockPos.toLorenzVec().axisAlignedTo(b.blockPos.add(1, 1, 1).toLorenzVec())
-        if (!block.intersectsWith(aaBB)) return
+        val blockBoundingBox = mouseOverObject.blockPos.toLorenzVec()
+            .axisAlignedTo(mouseOverObject.blockPos.add(1, 1, 1).toLorenzVec())
+        if (!blockBoundingBox.intersectsWith(particleBoundingBox)) return
 
-        lookingAt = event.type == EnumParticleTypes.VILLAGER_HAPPY
-        lastParticle = aaBB
+        lookingAtParticle = event.type == EnumParticleTypes.VILLAGER_HAPPY
+        lastParticle = particleBoundingBox
         deleteTime = 5.ticks.fromNow()
     }
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
-        val p = lastParticle ?: return
+        val particleBoundingBox = lastParticle ?: return
 
-        event.drawFilledBoundingBox_nea(p, if (lookingAt) Color.GREEN else Color.CYAN)
+        event.drawFilledBoundingBox_nea(particleBoundingBox, if (lookingAtParticle) Color.GREEN else Color.CYAN)
     }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         lastParticle ?: return
-        val d = deleteTime ?: return
-        if (d.isInPast()) {
+        val deletionTime = deleteTime ?: return
+        if (deletionTime.isInPast()) {
             deleteTime = null
             lastParticle = null
         }
     }
 
-    fun isEnabled() = SkyHanniMod.feature.mining.highlightPrecisionMiningParticles
+    fun isEnabled() = MiningAPI.inCustomMiningIsland() && config
 }
