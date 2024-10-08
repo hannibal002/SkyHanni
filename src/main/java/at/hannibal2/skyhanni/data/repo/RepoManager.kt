@@ -26,7 +26,6 @@ import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import java.net.URL
 import java.nio.charset.StandardCharsets
-import java.util.Locale
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.time.Duration.Companion.minutes
@@ -289,13 +288,13 @@ class RepoManager(private val configLocation: File) {
         val repoUser = config.location.user
         val repoName = config.location.name
         val repoBranch = config.location.branch
-        return String.format(Locale.US, "https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
+        return "https://api.github.com/repos/$repoUser/$repoName/commits/$repoBranch"
     }
 
     private fun getDownloadUrl(commitId: String?): String {
         val repoUser = config.location.user
         val repoName = config.location.name
-        return String.format(Locale.US, "https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
+        return "https://github.com/$repoUser/$repoName/archive/$commitId.zip"
     }
 
     @Throws(IOException::class)

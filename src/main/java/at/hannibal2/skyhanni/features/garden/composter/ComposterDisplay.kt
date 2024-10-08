@@ -72,7 +72,6 @@ object ComposterDisplay {
         val newDisplay = mutableListOf<List<Any>>()
         newDisplay.addAsSingletonList("§bComposter")
 
-
         newDisplay.add(DataType.TIME_LEFT.addToList(tabListData))
 
         val list = mutableListOf<Any>()
