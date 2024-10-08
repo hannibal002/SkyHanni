@@ -199,7 +199,7 @@ object FannCost {
     }
 
     private fun List<String>.getCoins(): Double {
-        return coinsPattern.read(this) { it._toDouble() } ?: 0.0
+        return coinsPattern.read(this) { it.formatDouble() } ?: 0.0
     }
 
     // In case of Bits not found, return 1 so the division is not by zero
