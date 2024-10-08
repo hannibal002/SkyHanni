@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -133,32 +134,28 @@ object FannCost {
         val tooltip = event.toolTip
 
         val trainingType = tooltip.getTrainingType() ?: return
+        if (trainingType == TrainingType.FREE) return
+        if (!showCoins || !showBits) return
 
         when (trainingMode) {
             TrainingMode.DAY_COUNT -> {
-                if (trainingType == TrainingType.FREE) return
-                if (!showCoins || !showBits) return
-
                 val totalExp = tooltip.getExpEarned() ?: return
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
 
-                tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
+                tooltip.insertLineAfter(coinsPattern, "§6➜Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "§b➜XP/Bit: ${xpPerBit.roundTo(2)}")
 
             }
 
             TrainingMode.UNTIL_LEVEL -> {
-                if (trainingType == TrainingType.FREE) return
-                if (!showCoins || !showBits) return
-
                 val dailyExp = tooltip.getDailyExp() ?: return
                 val duration = tooltip.getDuration() ?: return
                 val totalExp = dailyExp * duration
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
-                tooltip.insertLineAfter(coinsPattern, "   §6Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "   §6XP/Bit: ${xpPerBit.roundTo(2)}")
+                tooltip.insertLineAfter(coinsPattern, "§6➜Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "§b➜XP/Bit: ${xpPerBit.roundTo(2)}")
 
             }
         }
@@ -207,15 +204,15 @@ object FannCost {
 
     // In case of Bits not found, return 1 so the division is not by zero
     private fun List<String>.getBits(): Double {
-        return bitsPattern.read(this) { it._toDouble() } ?: 1.0
+        return bitsPattern.read(this) { it.formatDouble() } ?: 1.0
     }
 
     private fun List<String>.getExpEarned(): Double? {
-        return expEarnedPattern.read(this) { it._toDouble() }
+        return expEarnedPattern.read(this) { it.formatDouble() }
     }
 
     private fun List<String>.getDailyExp(): Double? {
-        return dailyExpPattern.read(this) { it._toDouble() }
+        return dailyExpPattern.read(this) { it.formatDouble() }
     }
 
     private fun List<String>.getTrainingType(): TrainingType? {
