@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUItems
@@ -70,7 +69,7 @@ object WikiManager {
 
     private fun wikiTheItem(item: ItemStack, autoOpen: Boolean, useFandom: Boolean = config.useFandom) {
         val itemDisplayName =
-            item.itemName.replace("§a✔ ", "").replace("§c✖ ", "")
+            item.displayName.replace("§a✔ ", "").replace("§c✖ ", "")
         val internalName = item.getInternalName().asString()
         val wikiUrlSearch = if (internalName != "NONE") internalName else itemDisplayName.removeColor()
 

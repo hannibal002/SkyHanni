@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.features.combat.SpidersDenAPI.isAtTopOfNest
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -29,7 +30,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern as 
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
-private fun getSbLines(): List<String> = CustomScoreboard.activeLines
+private fun getSbLines(): List<String> = ScoreboardData.sidebarLinesFormatted
 
 enum class ScoreboardEvent(
     private val displayLine: () -> List<String>,
