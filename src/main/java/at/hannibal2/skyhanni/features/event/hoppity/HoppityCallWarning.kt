@@ -143,7 +143,7 @@ object HoppityCallWarning {
 
     @SubscribeEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
-        if (!config.ensureCoins) return
+        if (!LorenzUtils.inSkyBlock || !config.ensureCoins) return
         if (!pickupOutgoingCommandPattern.matches(event.message)) return
         if (commandSentTimer.passedSince() < 5.seconds) return
         if (PurseAPI.getPurse() >= config.coinThreshold) return
