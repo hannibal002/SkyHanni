@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -37,12 +38,17 @@ object GuardianReminder {
     fun onInventory(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Experimentation Table") return
-        if (ExperimentationTableAPI.petNamePattern.matches(PetAPI.currentPet)) return
-
         lastInventoryOpen = SimpleTimeMark.now()
+
+        DelayedRun.runDelayed(200.milliseconds, ::warn)
+    }
+
+    private fun warn() {
+        if (ExperimentationTableAPI.petNamePattern.matches(PetAPI.currentPet)) return
 
         if (lastWarn.passedSince() < 5.seconds) return
         lastWarn = SimpleTimeMark.now()
+
         ChatUtils.clickToActionOrDisable(
             "Use a §9§lGuardian Pet §efor more Exp in the Experimentation Table.",
             config::guardianReminder,
