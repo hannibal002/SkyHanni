@@ -37,7 +37,7 @@ object HypixelBazaarFetcher {
 
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Bazaar Fetching")
+        event.title("Bazaar Data Fetcher from API")
 
         val data = listOf(
             "failedAttempts: $failedAttempts",
@@ -119,13 +119,20 @@ object HypixelBazaarFetcher {
             e.printStackTrace()
         } else {
             nextFetchTime = SimpleTimeMark.now() + 15.minutes
-            ErrorManager.logErrorWithData(
-                e,
-                userMessage,
-                "fetchType" to fetchType,
-                "failedAttempts" to failedAttempts,
-                "rawResponse" to rawResponse,
-            )
+            if (rawResponse == null || rawResponse.toString() == "{}") {
+                ChatUtils.chat(
+                    "§cFailed loading Bazaar Price data!\n" +
+                        "Please wait until the Hypixel API is sending correct data again! There is nothing else to do at the moment.",
+                )
+            } else {
+                ErrorManager.logErrorWithData(
+                    e,
+                    userMessage,
+                    "fetchType" to fetchType,
+                    "failedAttempts" to failedAttempts,
+                    "rawResponse" to rawResponse,
+                )
+            }
         }
     }
 
