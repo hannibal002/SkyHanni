@@ -35,7 +35,7 @@ enum class TranslatableLanguage(private val englishName: String, private val nat
     PUNJABI("Punjabi", "ਪੰਜਾਬੀ", "pa"), // Significant in India and Pakistan
 
     // 5. need better name
-    UNKNOWN("Unknown Language", "", ""),
+    UNKNOWN("Other", "", ""),
     ;
 
     // Limit to 20 characters so that the text is not too small in the config
