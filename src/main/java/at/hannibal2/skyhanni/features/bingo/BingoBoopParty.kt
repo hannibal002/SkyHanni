@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-object BoopParty {
+object BingoBoopParty {
 
     val config get() = SkyHanniMod.feature.event.bingo.boopParty
     val patternGroup = RepoPattern.group("bingo")
