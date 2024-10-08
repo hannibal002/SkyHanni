@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBookwormBookCount
@@ -98,6 +99,7 @@ object EstimatedItemValueCalculator {
         ::addManaDisintegrators,
         ::addPolarvoidBook,
         ::addBookwormBook,
+        ::addPocketSackInASack,
 
         // cosmetic
         ::addHelmetSkin,
@@ -390,6 +392,15 @@ object EstimatedItemValueCalculator {
         val polarvoidBook = "POLARVOID_BOOK".asInternalName()
         val price = polarvoidBook.getPrice() * count
         list.add("§7Polarvoid: §e$count§7/§e5 §7(§6" + price.shortFormat() + "§7)")
+        return price
+    }
+
+    private fun addPocketSackInASack(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getAppliedPocketSackInASack() ?: return 0.0
+
+        val pocketSackInASack = "POCKET_SACK_IN_A_SACK".asInternalName()
+        val price = pocketSackInASack.getPrice() * count
+        list.add("§7Pocket Sack-in-a-Sack: §e$count§7/§e3 §7(§6" + price.shortFormat() + "§7)")
         return price
     }
 
