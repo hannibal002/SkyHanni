@@ -143,8 +143,8 @@ object FannCost {
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
 
-                tooltip.insertLineAfter(coinsPattern, "§6➜Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "§b➜XP/Bit: ${xpPerBit.roundTo(2)}")
+                tooltip.insertLineAfter(coinsPattern, "§6 ➜ Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "§b ➜ XP/Bit: ${xpPerBit.roundTo(2)}")
 
             }
 
@@ -154,8 +154,8 @@ object FannCost {
                 val totalExp = dailyExp * duration
                 val coinPerExp = tooltip.getCoins() / totalExp
                 val xpPerBit = totalExp / tooltip.getBits()
-                tooltip.insertLineAfter(coinsPattern, "§6➜Coins/XP: ${coinPerExp.roundTo(2)}")
-                tooltip.insertLineAfter(bitsPattern, "§b➜XP/Bit: ${xpPerBit.roundTo(2)}")
+                tooltip.insertLineAfter(coinsPattern, "§6 ➜ Coins/XP: ${coinPerExp.roundTo(2)}")
+                tooltip.insertLineAfter(bitsPattern, "§b ➜ XP/Bit: ${xpPerBit.roundTo(2)}")
 
             }
         }
@@ -198,6 +198,9 @@ object FannCost {
         return null
     }
 
+    /* todo: can also return <pattern>.firstMatcher(this) { group(1)?.formatDouble() }
+        however, current impl solely depends on the pattern being colorless
+     * */
     private fun List<String>.getCoins(): Double {
         return coinsPattern.read(this) { it.formatDouble() } ?: 0.0
     }
@@ -226,20 +229,17 @@ object FannCost {
             val linePlain = line.removeColor()
             val matcher = durationPattern.matcher(linePlain)
             if (matcher.find()) {
-                // Extract the named groups and convert them to integers
                 val days = matcher.groupOrNull("day")?.toInt() ?: 0
                 val hours = matcher.groupOrNull("hr")?.toInt() ?: 0
                 val minutes = matcher.groupOrNull("min")?.toInt() ?: 0
                 val seconds = matcher.groupOrNull("sec")?.toInt() ?: 0
 
-                // Calculate the total duration in days
                 val totalDays = days + hours / 24.0 + minutes / 1440.0 + seconds / 86400.0
 
-                // Return the total duration as a Double representing days
                 return totalDays
             }
         }
-        return null  // Return null if no valid duration is found
+        return null
     }
 
     private enum class TrainingMode {
