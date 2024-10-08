@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.tweaker;
 
+import at.hannibal2.skyhanni.utils.OSUtils;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -32,7 +34,7 @@ public class DownloadSourceChecker {
     };
 
     public static void init() {
-        if (!TweakerUtils.isOnWindows()) return;
+        if (!OSUtils.INSTANCE.isWindows()) return;
         URI host = getDangerousHost();
         if (host != null) {
             openMenu(host);

@@ -74,7 +74,7 @@ object TpsCounter {
 
     fun tpsCommand() {
         if (display.isEmpty()) {
-            ChatUtils.chat("§cNo tps data available, make sure you have the setting on.")
+            ChatUtils.userError("No tps data available, make sure you have the setting on.")
             return
         }
         ChatUtils.chat(display)
@@ -101,7 +101,8 @@ object TpsCounter {
         config.tpsDisplayPosition.renderString(display, posLabel = "Tps Display")
     }
 
-    private fun isEnabled() = LorenzUtils.onHypixel && config.tpsDisplay &&
+    private fun isEnabled() = LorenzUtils.onHypixel &&
+        config.tpsDisplay &&
         (LorenzUtils.inSkyBlock || OutsideSbFeature.TPS_DISPLAY.isSelected())
 
     @SubscribeEvent

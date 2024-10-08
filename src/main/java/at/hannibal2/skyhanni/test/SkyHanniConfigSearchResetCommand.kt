@@ -23,7 +23,7 @@ object SkyHanniConfigSearchResetCommand {
 
     fun command(args: Array<String>) {
         SkyHanniMod.coroutineScope.launch {
-            ChatUtils.chat(runCommand(args), false)
+            ChatUtils.chat(runCommand(args))
         }
         lastCommand = args
     }
@@ -223,7 +223,8 @@ object SkyHanniConfigSearchResetCommand {
                 val className = obj.getClassName()
                 if (!classFilter(className)) continue
                 val objectName = obj.getObjectName()
-                if (obj !is Runnable && objectName.startsWith(className) &&
+                if (obj !is Runnable &&
+                    objectName.startsWith(className) &&
                     (objectName.startsWith("at.hannibal2.skyhanni.config.features.") ||
                         objectName.startsWith("at.hannibal2.skyhanni.config.storage.Storage"))
                 ) {
@@ -276,9 +277,14 @@ object SkyHanniConfigSearchResetCommand {
             val newObj = field.makeAccessible().get(obj)
             map[fieldName] = newObj
             @Suppress("ComplexCondition")
-            if (newObj != null && newObj !is Boolean && newObj !is String && newObj !is Long &&
-                newObj !is Int && newObj !is Double && newObj !is Position && !newObj.javaClass.isEnum
-            ) {
+            if (newObj != null &&
+                newObj !is Boolean &&
+                newObj !is String &&
+                newObj !is Long &&
+                newObj !is Int &&
+                newObj !is Double &&
+                newObj !is Position &&
+                !newObj.javaClass.isEnum) {
                 map.putAll(loadAllFields(fieldName, newObj, depth + 1))
             }
         }
