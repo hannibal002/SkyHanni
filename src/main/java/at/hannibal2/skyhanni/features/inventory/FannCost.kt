@@ -242,10 +242,6 @@ object FannCost {
         return null  // Return null if no valid duration is found
     }
 
-    private fun String._toDouble(): Double {
-        return this.replace(",", "").toDouble()
-    }
-
     private enum class TrainingMode {
         DAY_COUNT,
         UNTIL_LEVEL,
