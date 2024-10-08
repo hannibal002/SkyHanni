@@ -1,8 +1,13 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.SoundUtils
+import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
+import java.awt.Color
 
 internal object RenderableUtils {
 
@@ -32,6 +37,12 @@ internal object RenderableUtils {
             buffer += (row.maxOfOrNull { it?.height ?: 0 } ?: 0) + yPadding
             buffer
         } ?: listOf(yPadding))
+    }
+
+    fun calculateAlignmentXOffset(width: Int, xSpace: Int, alignment: HorizontalAlignment) = when (alignment) {
+        HorizontalAlignment.CENTER -> (xSpace - width) / 2
+        HorizontalAlignment.RIGHT -> xSpace - width
+        else -> 0
     }
 
     private fun calculateAlignmentXOffset(renderable: Renderable, xSpace: Int) = when (renderable.horizontalAlign) {
@@ -72,4 +83,51 @@ internal object RenderableUtils {
         GlStateManager.translate(0f, -yOffset.toFloat(), 0f)
         return yOffset
     }
+
+    @Suppress("NOTHING_TO_INLINE")
+    inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
+        val fontRenderer = Minecraft.getMinecraft().fontRendererObj
+        GlStateManager.translate(1.0, 1.0, 0.0)
+        GlStateManager.scale(scale, scale, 1.0)
+        fontRenderer.drawStringWithShadow(text, 0f, 0f, color.rgb)
+        GlStateManager.scale(inverseScale, inverseScale, 1.0)
+        GlStateManager.translate(-1.0, -1.0, 0.0)
+    }
+
+    // TODO move to RenderableUtils
+    inline fun MutableList<Searchable>.addButton(
+        prefix: String,
+        getName: String,
+        crossinline onChange: () -> Unit,
+        tips: List<String> = emptyList(),
+    ) {
+        val onClick = {
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
+                onChange()
+                SoundUtils.playClickSound()
+                ChatUtils.lastButtonClicked = System.currentTimeMillis()
+            }
+        }
+        add(
+            Renderable.horizontalContainer(
+                buildList {
+                    addString(prefix)
+                    addString("§a[")
+                    if (tips.isEmpty()) {
+                        add(Renderable.link("§e$getName", false, onClick))
+                    } else {
+                        add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
+                    }
+                    addString("§a]")
+                },
+            ).toSearchable(),
+        )
+    }
+}
+
+internal abstract class RenderableWrapper internal constructor(protected val content: Renderable) : Renderable {
+    override val width = content.width
+    override val height = content.height
+    override val horizontalAlign = content.horizontalAlign
+    override val verticalAlign = content.verticalAlign
 }

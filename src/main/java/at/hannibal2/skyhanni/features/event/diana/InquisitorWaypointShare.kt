@@ -49,7 +49,7 @@ object InquisitorWaypointShare {
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
 
-    //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
+    // Support for https://www.chattriggers.com/modules/v/inquisitorchecker
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
@@ -108,7 +108,7 @@ object InquisitorWaypointShare {
         inquisitorsNearby = emptyList()
     }
 
-    val inquisitorTime = mutableListOf<SimpleTimeMark>()
+    private val inquisitorTime = mutableListOf<SimpleTimeMark>()
 
     @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {
@@ -153,11 +153,12 @@ object InquisitorWaypointShare {
             sendInquisitor()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message = "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+            val message = "§l§bYou found an Inquisitor! Click §l§chere §l§bor press §c$keyName to share the location!"
             ChatUtils.clickableChat(
                 message, onClick = {
                     sendInquisitor()
                 },
+                "§eClick to share!",
                 oneTimeClick = true
             )
         }
@@ -194,13 +195,13 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("Inquisitor dead!")
     }
 
-    fun sendInquisitor() {
+    private fun sendInquisitor() {
         if (!isEnabled()) return
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
-            ChatUtils.error("No Inquisitor Found!")
+            ChatUtils.debug("Trying to send inquisitor via chat, but no Inquisitor is nearby.")
             return
         }
 

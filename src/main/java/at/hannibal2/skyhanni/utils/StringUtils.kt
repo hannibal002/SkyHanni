@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorChatComponentText
 import at.hannibal2.skyhanni.utils.GuiRenderUtils.darkenColor
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.findAll
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.GuiUtilRenderComponents
 import net.minecraft.event.ClickEvent
@@ -25,8 +26,9 @@ object StringUtils {
     private val whiteSpacePattern = "^\\s*|\\s*$".toPattern()
     private val resetPattern = "(?i)§R".toPattern()
     private val sFormattingPattern = "(?i)§S".toPattern()
-    private val stringColourPattern = "§[0123456789abcdef].*".toPattern()
+    private val stringColorPattern = "§[0123456789abcdef].*".toPattern()
     private val asciiPattern = "[^\\x00-\\x7F]".toPattern()
+    private val minecraftColorCodesPattern = "(?i)(§[0-9a-fklmnor])+".toPattern()
 
     fun String.trimWhiteSpaceAndResets(): String = whiteSpaceResetPattern.matcher(this).replaceAll("")
     fun String.trimWhiteSpace(): String = whiteSpacePattern.matcher(this).replaceAll("")
@@ -194,7 +196,7 @@ object StringUtils {
     }
 
     fun getColor(string: String, default: Int, darker: Boolean = true): Int {
-        val matcher = stringColourPattern.matcher(string)
+        val matcher = stringColorPattern.matcher(string)
         if (matcher.matches()) {
             val colorInt = Minecraft.getMinecraft().fontRendererObj.getColorCode(string[1])
             return if (darker) {
@@ -230,18 +232,19 @@ object StringUtils {
 
     fun String.removeWordsAtEnd(i: Int) = split(" ").dropLast(i).joinToString(" ")
 
-    fun String.splitLines(width: Int): String {
-        val fr = Minecraft.getMinecraft().fontRendererObj
-        return GuiUtilRenderComponents.splitText(
-            ChatComponentText(this), width, fr, false, false
-        ).joinToString("\n") {
-            val text = it.formattedText
-            val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
-            formatCode.matchAt(text, 0)?.let { matcher ->
-                val codes = matcher.value.replace("\\s".toRegex(), "")
-                codes + text.removeRange(matcher.range)
-            } ?: text
-        }
+    fun String.splitLines(width: Int): String = GuiUtilRenderComponents.splitText(
+        ChatComponentText(this),
+        width,
+        Minecraft.getMinecraft().fontRendererObj,
+        false,
+        false,
+    ).joinToString("\n") {
+        val text = it.formattedText
+        val formatCode = Regex("(?:§[a-f0-9l-or]|\\s)*")
+        formatCode.matchAt(text, 0)?.let { matcher ->
+            val codes = matcher.value.replace("\\s".toRegex(), "")
+            codes + text.removeRange(matcher.range)
+        } ?: text
     }
 
     /**
@@ -267,7 +270,7 @@ object StringUtils {
     }
 
     fun progressBar(percentage: Double, steps: Int = 24): Any {
-        //'§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
+        // '§5§o§2§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §f§l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §l§m §r §e348,144.3§6/§e936k'
         val prefix = "§5§o§2"
         val step = "§l§m "
         val missing = "§f"
@@ -380,6 +383,10 @@ object StringUtils {
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
     fun generateRandomId() = UUID.randomUUID().toString()
+
+    fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
+
+    fun String.insert(pos: Int, char: Char): String = this.substring(0, pos) + char + this.substring(pos)
 
     fun replaceIfNeeded(
         original: ChatComponentText,
@@ -550,7 +557,21 @@ object StringUtils {
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 
-    fun String.width(): Int {
-        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+
+    fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
+
+    fun String.isValidUuid(): Boolean {
+        return try {
+            UUID.fromString(this)
+            true
+        } catch (e: IllegalArgumentException) {
+            false
+        }
+    }
+
+    fun optionalAn(string: String): String {
+        if (string.isEmpty()) return ""
+        return if (string[0] in "aeiou") "an" else "a"
     }
 }

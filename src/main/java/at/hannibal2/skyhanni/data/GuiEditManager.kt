@@ -78,14 +78,14 @@ object GuiEditManager {
     }
 
     @JvmStatic
-    fun add(position: Position, posLabel: String, x: Int, y: Int) {
+    fun add(position: Position, posLabel: String, width: Int, height: Int) {
         var name = position.internalName
         if (name == null) {
             name = if (posLabel == "none") "none " + UUID.randomUUID() else posLabel
             position.internalName = name
         }
         currentPositions[name] = position
-        currentBorderSize[posLabel] = Pair(x, y)
+        currentBorderSize[posLabel] = Pair(width, height)
     }
 
     private var lastHotkeyReminded = SimpleTimeMark.farPast()
@@ -95,14 +95,14 @@ object GuiEditManager {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
             currentPositions.values().toList(),
             2,
-            Minecraft.getMinecraft().currentScreen as? GuiContainer
+            Minecraft.getMinecraft().currentScreen as? GuiContainer,
         )
         if (hotkeyReminder && lastHotkeyReminded.passedSince() > 30.minutes) {
             lastHotkeyReminded = SimpleTimeMark.now()
             ChatUtils.chat(
                 "§eTo edit hidden GUI elements:\n" +
                     " §7- §e1. Set a key in /sh edit.\n" +
-                    " §7- §e2. Click that key while the GUI element is visible."
+                    " §7- §e2. Click that key while the GUI element is visible.",
             )
         }
     }
@@ -144,4 +144,5 @@ object GuiEditManager {
     }
 }
 
+// TODO remove
 class Vector2i(val x: Int, val y: Int)

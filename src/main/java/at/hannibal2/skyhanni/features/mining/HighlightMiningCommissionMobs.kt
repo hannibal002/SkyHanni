@@ -40,7 +40,9 @@ object HighlightMiningCommissionMobs {
         TREASURE_HOARDER("Treasure Hoarder Puncher", { it.name == "Treasuer Hunter" }), // typo is intentional
 
         // Crystal Hollows
-        AUTOMATON("Automaton Slayer", { it is EntityIronGolem }),
+        AUTOMATON("Automaton Slayer", {
+            it is EntityIronGolem && (it.hasMaxHealth(15_000) || it.hasMaxHealth(20_000))
+        }),
         TEAM_TREASURITE_MEMBER("Team Treasurite Member Slayer", { it.name == "Team Treasurite" }),
         YOG("Yog Slayer", { it is EntityMagmaCube && it.hasMaxHealth(35_000) }),
         THYST("Thyst Slayer", { it is EntityEndermite && it.hasMaxHealth(5_000) }),
@@ -51,7 +53,6 @@ object HighlightMiningCommissionMobs {
         CH_GOBLIN_SLAYER("Goblin Slayer", { it.name == "Weakling " }),
 
         // new commissions
-        ;
     }
 
     @SubscribeEvent
@@ -65,8 +66,7 @@ object HighlightMiningCommissionMobs {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
                     LorenzColor.YELLOW.toColor().withAlpha(127)
-                )
-                { isEnabled() && type in active }
+                ) { isEnabled() && type in active }
             }
         }
     }
@@ -97,8 +97,7 @@ object HighlightMiningCommissionMobs {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
                     LorenzColor.YELLOW.toColor().withAlpha(127)
-                )
-                { isEnabled() && type in active }
+                ) { isEnabled() && type in active }
             }
         }
     }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.SortingTypeEntry
@@ -17,16 +16,18 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -82,7 +83,7 @@ object SackDisplay {
         val sortedPairs = sort(sackItems)
         val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
         list.addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
-        val table = mutableListOf<List<Renderable>>()
+        val table = mutableMapOf<List<Renderable>, String?>()
         for ((itemName, item) in sortedPairs) {
             val (internalName, colorCode, total, magmaFish) = item
             val stored = item.stored
@@ -92,7 +93,7 @@ object SackDisplay {
             totalPrice += price
             if (rendered >= config.itemToShow) continue
             if (stored == 0 && !config.showEmpty) continue
-            table.add(buildList {
+            table[buildList {
                 addString(" §7- ")
                 addItemStack(internalName)
                 // TODO move replace into itemName
@@ -112,13 +113,13 @@ object SackDisplay {
                     NumberFormatEntry.DEFAULT -> {
                         addAlignedNumber("$colorCode${stored.addSeparators()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.shortFormat()}")
                     }
 
                     NumberFormatEntry.FORMATTED -> {
-                        addAlignedNumber("$colorCode${NumberUtil.format(stored)}")
+                        addAlignedNumber("$colorCode${stored.shortFormat()}")
                         addString("§7/")
-                        addAlignedNumber("§b${NumberUtil.format(total)}")
+                        addAlignedNumber("§b${total.shortFormat()}")
                     }
 
                     NumberFormatEntry.UNFORMATTED -> {
@@ -142,7 +143,7 @@ object SackDisplay {
                     add(
                         Renderable.hoverTips(
                             Renderable.string(
-                                "§d${magmaFish}",
+                                "§d$magmaFish",
                                 horizontalAlign = config.alignment
                             ),
                             listOf(
@@ -152,14 +153,14 @@ object SackDisplay {
                             ),
                         )
                     )
-                    //TOOD add cache
+                    // TODO add cache
                     addItemStack("MAGMA_FISH".asInternalName())
                 }
                 if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
-            })
+            }] = itemName
             rendered++
         }
-        list.add(Renderable.table(table))
+        list.add(table.buildSearchableTable())
 
         if (SackAPI.isTrophySack) list.addString("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
         return totalPrice
@@ -174,7 +175,7 @@ object SackDisplay {
             else -> sackItems.sortedByDescending { it.second.stored }
         }.toMap().toMutableMap()
 
-        sortedPairs.toList().forEach { (k, v) ->
+        for ((k, v) in sortedPairs.toList()) {
             if (v.stored == 0 && !config.showEmpty) {
                 sortedPairs.remove(k)
             }
@@ -206,11 +207,11 @@ object SackDisplay {
         )
 
         if (config.showPrice) {
-            list.addSelector<PriceFrom>(" ",
-                getName = { type -> type.displayName },
-                isCurrent = { it.ordinal == config.priceFrom.ordinal }, // todo avoid ordinal
+            list.addSelector<ItemPriceSource>(" ",
+                getName = { type -> type.sellName },
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceFrom = SackDisplayConfig.PriceFrom.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update(false)
                 })
             list.addButton(
@@ -230,10 +231,10 @@ object SackDisplay {
     private fun drawRunesDisplay(list: MutableList<Renderable>) {
         if (SackAPI.runeItem.isEmpty()) return
         list.addString("§7Runes:")
-        val table = mutableListOf<List<Renderable>>()
+        val table = mutableMapOf<List<Renderable>, String?>()
         for ((name, rune) in sort(SackAPI.runeItem.toList())) {
             val (stack, lv1, lv2, lv3) = rune
-            table.add(buildList {
+            table[buildList {
                 addString(" §7- ")
                 stack?.let { addItemStack(it) }
                 add(
@@ -246,19 +247,19 @@ object SackDisplay {
                 addAlignedNumber("§e$lv1")
                 addAlignedNumber("§e$lv2")
                 addAlignedNumber("§e$lv3")
-            })
+            }] = name
         }
-        list.add(Renderable.table(table))
+        list.add(table.buildSearchableTable())
     }
 
     private fun drawGemstoneDisplay(list: MutableList<Renderable>): Long {
         if (SackAPI.gemstoneItem.isEmpty()) return 0L
         list.addString("§7Gemstones:")
         var totalPrice = 0L
-        val table = mutableListOf<List<Renderable>>()
+        val table = mutableMapOf<List<Renderable>, String?>()
         for ((name, gem) in sort(SackAPI.gemstoneItem.toList())) {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
-            table.add(buildList {
+            table[buildList {
                 addString(" §7- ")
                 addItemStack(internalName)
                 add(Renderable.optionalLink(
@@ -274,9 +275,10 @@ object SackDisplay {
                 val price = roughprice + flawedprice + fineprice
                 totalPrice += price
                 if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
-            })
+            }] = name
         }
-        list.add(Renderable.table(table))
+
+        list.add(table.buildSearchableTable())
         return totalPrice
     }
 
@@ -285,7 +287,7 @@ object SackDisplay {
     }
 
     private fun format(price: Long) = if (config.priceFormat == PriceFormatEntry.FORMATTED) {
-        NumberUtil.format(price)
+        price.shortFormat()
     } else {
         price.addSeparators()
     }
@@ -297,26 +299,17 @@ object SackDisplay {
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
         PRICE_ASC("Price A", "Price Ascending"),
-        ;
-    }
-
-    enum class PriceFrom(val displayName: String) {
-        BAZAAR("Bazaar Price"),
-        NPC("NPC Price"),
-        ;
     }
 
     enum class PriceFormat(val displayName: String) {
-        FORMATED("Formatted"),
-        UNFORMATED("Unformatted"),
-        ;
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted"),
     }
 
     enum class NumberFormat(val displayName: String) {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
         UNFORMATTED("Unformatted"),
-        ;
     }
 
     @SubscribeEvent
@@ -326,9 +319,6 @@ object SackDisplay {
         }
         event.transform(15, "inventory.sackDisplay.priceFormat") { element ->
             ConfigUtils.migrateIntToEnum(element, PriceFormatEntry::class.java)
-        }
-        event.transform(15, "inventory.sackDisplay.priceFrom") { element ->
-            ConfigUtils.migrateIntToEnum(element, SackDisplayConfig.PriceFrom::class.java)
         }
         event.transform(15, "inventory.sackDisplay.sortingType") { element ->
             ConfigUtils.migrateIntToEnum(element, SortingTypeEntry::class.java)

@@ -13,13 +13,13 @@ import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -86,7 +86,7 @@ object PestParticleWaypoint {
         val yellow = LorenzVec(0.8, 0.8, 0.0)
         val redPest = LorenzVec(0.8, 0.4, 0.0)
         val redPlot = LorenzVec(0.8, 0.0, 0.0)
-        isPointingToPest = when (event.offset.round(5)) {
+        isPointingToPest = when (event.offset.roundTo(5)) {
             redPlot -> false
             redPest, yellow, darkYellow -> true
             else -> return
@@ -150,7 +150,7 @@ object PestParticleWaypoint {
             waypoint,
             color,
             3,
-            false
+            false,
         )
     }
 

@@ -164,7 +164,7 @@ object VisitorAPI {
         REFUSED("§cRefused", LorenzColor.RED.toColor().withAlpha(60)),
     }
 
-    fun visitorsInTabList(tabList: List<String>): MutableList<String> {
+    fun visitorsInTabList(tabList: List<String>): List<String> {
         var visitorCount = 0
         var found = false
         var visitorsRemaining = 0
@@ -201,7 +201,7 @@ object VisitorAPI {
         val pricePerCopper = pricePerCopper ?: error("pricePerCopper is null")
         val totalPrice = totalPrice ?: error("totalPrice is null")
         val totalReward = totalReward ?: error("totalReward is null")
-        val loss = totalPrice - totalReward;
+        val loss = totalPrice - totalReward
         return when {
             preventRefusing && hasReward() != null -> VisitorBlockReason.RARE_REWARD
             preventRefusingNew && offersAccepted == 0 -> VisitorBlockReason.NEVER_ACCEPTED

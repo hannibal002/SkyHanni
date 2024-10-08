@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.visitor
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.VisitorBlockBehaviour
+import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GardenVisitor
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
-import io.github.moulberry.notenoughupdates.util.SBInfo
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
@@ -57,25 +57,24 @@ object HighlightVisitorsOutsideOfGarden {
     }
 
     private fun isVisitor(entity: Entity): Boolean {
-        val mode = SBInfo.getInstance().getLocation()
+        // todo migrate to Skyhanni IslandType
+        val mode = HypixelData.mode
         val possibleJsons = visitorJson[mode] ?: return false
         val skinOrType = getSkinOrTypeFor(entity)
         return possibleJsons.any {
-            (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1)
-                && it.skinOrType == skinOrType
+            (it.position == null || it.position.distance(entity.position.toLorenzVec()) < 1) &&
+                it.skinOrType == skinOrType
         }
     }
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.highlightVisitors) return
+        val color = LorenzColor.DARK_RED.toColor().withAlpha(50)
         EntityUtils.getEntities<EntityLivingBase>()
             .filter { it !is EntityArmorStand && isVisitor(it) }
             .forEach {
-                RenderLivingEntityHelper.setEntityColor(
-                    it,
-                    LorenzColor.DARK_RED.toColor().withAlpha(50)
-                ) { config.highlightVisitors }
+                RenderLivingEntityHelper.setEntityColor(it, color) { config.highlightVisitors }
             }
     }
 
