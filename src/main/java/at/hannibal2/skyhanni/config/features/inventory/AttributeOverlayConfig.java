@@ -20,7 +20,7 @@ public class AttributeOverlayConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown")
+    @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown.")
     @ConfigEditorDraggableList
     public List<AttributeAPI.AttributeType> attributesList = new ArrayList<>(AttributeAPI.AttributeType.getEntries());
 
@@ -41,7 +41,7 @@ public class AttributeOverlayConfig {
             "§c want to suggest changes, please do so in the discord."
     )
     @ConfigEditorBoolean
-    public boolean highlightGoodrolls = true;
+    public boolean highlightGoodRolls = true;
 
     @Expose
     @ConfigOption(name = "Hide non Good Rolls", desc = "Hides attributes that are not considered good rolls.")

@@ -55,7 +55,7 @@ object AttributeAPI {
         FISHING_SPEED("Fishing Speed", "fishing_speed", "FS"),
         HUNTER("Hunter", "hunter", "HU"),
         TROPHY_HUNTER("Trophy Hunter", "trophy_hunter", "TH"),
-        UNKNOWN("Unknown", "unknown", "??")
+        UNKNOWN("Unknown", "unknown", "??"),
         ;
 
         override fun toString() = displayName
