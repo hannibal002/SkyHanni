@@ -4,18 +4,17 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.FarmingContestEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.ScoreboardChangeEvent
+import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.prettyRound
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.NumberUtil.prettyRound
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -77,14 +76,14 @@ object JacobContestStatsSummary {
     }
 
     @SubscribeEvent
-    fun onScoreBoardUpdate(event: ScoreboardChangeEvent) {
+    fun onScoreBoardUpdate(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
         if (!FarmingContestAPI.inContest) return
 
         var timeLeft = 0L
         var amount = 0L
 
-        for (line in event.newList) {
+        for (line in event.scoreboard) {
             scoreboardContestTimeLeftPattern.matchMatcher(line) {
                 timeLeft = TimeUtils.getDuration(group("time")).inWholeSeconds
             }
@@ -121,7 +120,7 @@ object JacobContestStatsSummary {
         val duration = startTimeIrl.passedSince()
         val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
         val timeParticipated = duration.format()
-        val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
+        val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).roundTo(2)
         val formattedPercent = (percent?.times(100))?.prettyRound(1)
         val position = if (percent == null) "§eNo data yet" else "Top $medalColor$formattedPercent%"
 
@@ -162,7 +161,7 @@ object JacobContestStatsSummary {
                 val cropName = event.crop.cropName
                 val duration = startTimeIrl.passedSince()
                 val durationInSeconds = duration.toDouble(DurationUnit.SECONDS)
-                val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).round(2)
+                val blocksPerSecond = (blocksBroken.toDouble() / durationInSeconds).roundTo(2)
                 val time = startTimeIrl.passedSince().format()
                 val formattedPercent = (percent?.times(100))?.prettyRound(1)
                 val position = if (percent == null) "§eNo data yet" else "Top $medalColor$formattedPercent%"
