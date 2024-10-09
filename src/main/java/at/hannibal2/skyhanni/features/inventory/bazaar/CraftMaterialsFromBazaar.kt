@@ -29,10 +29,6 @@ object CraftMaterialsFromBazaar {
     private val config get() = SkyHanniMod.feature.inventory.bazaar
 
     private val materialSlots = listOf(10, 11, 12, 19, 20, 21, 28, 29, 30)
-    private val inventoryPattern by RepoPattern.pattern(
-        "inventory.recipe.title",
-        ".* Recipe"
-    )
 
     private var inRecipeInventory = false
     private var purchasing = false
@@ -43,11 +39,11 @@ object CraftMaterialsFromBazaar {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        val correctInventoryName = inventoryPattern.matches(event.inventoryName)
         val items = event.inventoryItems
         val correctItem = items[23]?.name == "§aCrafting Table"
+        val correctSuperCraftItem = items[32]?.name == "§aSupercraft"
 
-        inRecipeInventory = correctInventoryName && correctItem && !purchasing
+        inRecipeInventory = correctSuperCraftItem && correctItem &&  !purchasing
         if (!inRecipeInventory) return
 
         val recipeName = items[25]?.itemName ?: return
