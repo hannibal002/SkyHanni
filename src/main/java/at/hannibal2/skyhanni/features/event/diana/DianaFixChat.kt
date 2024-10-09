@@ -102,7 +102,7 @@ object DianaFixChat {
         }
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.HUB])
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return

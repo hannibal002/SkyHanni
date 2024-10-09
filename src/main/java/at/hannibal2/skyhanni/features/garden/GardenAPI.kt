@@ -213,7 +213,7 @@ object GardenAPI {
 
     private var lastLocation: LorenzVec? = null
 
-    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
         val blockState = event.getBlockState
         val cropBroken = blockState.getCropType() ?: return

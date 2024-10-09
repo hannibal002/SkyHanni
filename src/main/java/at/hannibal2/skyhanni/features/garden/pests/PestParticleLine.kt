@@ -35,7 +35,7 @@ object PestParticleLine {
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
     private val locations = mutableListOf<MutableList<ParticleLocation>>()
 
-    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (PestAPI.hasVacuumInHand()) {

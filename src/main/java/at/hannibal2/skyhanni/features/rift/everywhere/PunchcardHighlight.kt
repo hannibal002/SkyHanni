@@ -170,7 +170,7 @@ object PunchcardHighlight {
         }
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.THE_RIFT])
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPunch(event: EntityClickEvent) {
         val entity = event.clickedEntity
         if (entity !is AbstractClientPlayer) return

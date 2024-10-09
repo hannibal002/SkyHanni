@@ -361,7 +361,7 @@ object DungeonAPI {
         }
     }
 
-    @HandleEvent(onlyOnIslands = [IslandType.CATACOMBS])
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onBlockClick(event: BlockClickEvent) {
         if (event.clickType != ClickType.RIGHT_CLICK) return
 

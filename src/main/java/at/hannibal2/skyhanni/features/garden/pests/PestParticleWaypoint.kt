@@ -49,7 +49,7 @@ object PestParticleWaypoint {
     private var isPointingToPest = false
     private var color: Color? = null
 
-    @HandleEvent(onlyOnIslands = [IslandType.GARDEN])
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (PestAPI.hasVacuumInHand()) {
