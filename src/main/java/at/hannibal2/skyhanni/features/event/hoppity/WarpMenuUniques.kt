@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -12,18 +13,25 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object WarpMenuUniques {
+
+    /**
+     * REGEX-TEST: §bSkyBlock Hub
+     * REGEX-TEST: §aThe Barn§7 - §bSpawn
+     * REGEX-TEST: §aCrystal Hollows§7 - §bEntrance
+     */
     private val islandNamePattern by RepoPattern.pattern(
         "inventory.warpmenu.island.name",
         "^§[ab](?<name>[\\w ']+)(?:§7 - §b.*)?\$"
     )
 
-    private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>
-        get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf()
+    private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>?
+        get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations
 
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
 
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
+        if (!LorenzUtils.inSkyBlock) return
         if (!config.uniquesWarpMenu) return
         if (!HoppityAPI.isHoppityEvent()) return
         if (event.slot.inventory.name != "Fast Travel") return
@@ -36,7 +44,7 @@ object WarpMenuUniques {
             }
 
             val maxEggs = HoppityEggLocations.apiEggLocations[island]?.size ?: return
-            val collectedEggs = collectedEggStorage[island]?.size ?: 0
+            val collectedEggs = collectedEggStorage?.get(island)?.size ?: return
 
             if (collectedEggs == maxEggs && config.uniquesWarpMenuHideMax) return
 
