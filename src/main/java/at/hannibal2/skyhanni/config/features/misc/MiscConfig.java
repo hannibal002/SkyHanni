@@ -15,6 +15,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
 
 import java.util.ArrayList;
@@ -41,6 +42,10 @@ public class MiscConfig {
     @Expose
     @Category(name = "Stranded", desc = "Features for the Stranded game mode.")
     public StrandedConfig stranded = new StrandedConfig();
+
+    @Expose
+    @Category(name = "Area Navigation", desc = "Helps navigate to different areas on the current island.")
+    public AreaNavigationConfig areaNavigation = new AreaNavigationConfig();
 
     @ConfigOption(name = "Hide Armor", desc = "")
     @Accordion
@@ -141,6 +146,9 @@ public class MiscConfig {
     public Position collectionCounterPos = new Position(10, 10, false, true);
 
     @Expose
+    public Position carryPosition = new Position(10, 10, false, true);
+
+    @Expose
     @ConfigOption(name = "Brewing Stand Overlay", desc = "Display the item names directly inside the Brewing Stand.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -219,6 +227,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Account Upgrade Reminder", desc = "Remind you to claim community shop account and profile upgrades when complete.")
     @ConfigEditorBoolean
+    @SearchTag("Elizabeth Community Center")
     @FeatureToggle
     public boolean accountUpgradeReminder = true;
 
@@ -317,8 +326,23 @@ public class MiscConfig {
     public boolean maintainGameVolume = false;
 
     @Expose
+    @ConfigOption(name = "GFS Piggy Bank", desc = "When your Piggy Bank breaks, send a chat warning to get enchanted pork from sacks.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean gfsPiggyBank = true;
+
+    @Expose
     @ConfigOption(name = "SkyHanni User Luck", desc = "Shows SkyHanni User Luck in the SkyBlock Stats.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean userluckEnabled = true;
+
+    @Expose
+    @ConfigOption(name = "Computer Time Offset Warning",
+        desc = "Sends a Chat Warning if your computer time is not synchronized with the actual time.\n" +
+        "§cMaking sure your computer time is correct is important for SkyHanni to display times correctly."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean warnAboutPcTimeOffset = true;
 }
