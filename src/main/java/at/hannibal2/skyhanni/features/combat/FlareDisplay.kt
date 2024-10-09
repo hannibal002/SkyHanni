@@ -32,7 +32,6 @@ import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import java.time.Instant
 import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -130,7 +129,9 @@ object FlareDisplay {
 
                 else -> {}
             }
-            if (config.expireSound) { SoundUtils.playPlingSound() }
+            if (config.expireSound) {
+                SoundUtils.playPlingSound()
+            }
             if (remainingTime < 0.seconds) {
                 activeWarning = false
             }
@@ -202,7 +203,7 @@ object FlareDisplay {
             0,
             minecraft.displayWidth,
             minecraft.displayHeight,
-            (alpha shl 24) or  (config.flashColor.toChromaColorInt() and 0xFFFFFF),
+            (alpha shl 24) or (config.flashColor.toChromaColorInt() and 0xFFFFFF),
         )
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
