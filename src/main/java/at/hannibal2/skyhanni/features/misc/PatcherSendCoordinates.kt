@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -68,7 +69,7 @@ object PatcherSendCoordinates {
 
         for (beacon in patcherBeacon) {
             val location = beacon.location
-            val distance = location.distance(LocationUtils.playerLocation())
+            val distance = location.distanceToPlayer()
             val formattedDistance = distance.toInt().addSeparators()
 
             event.drawColor(location, LorenzColor.DARK_GREEN, alpha = 1f)
