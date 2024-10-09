@@ -43,7 +43,9 @@ object WarpMenuUniques {
                 else -> IslandType.getByNameOrNull(name) ?: return
             }
 
-            val maxEggs = HoppityEggLocations.apiEggLocations[island]?.size ?: return
+            val maxEggs = if (HoppityEggLocations.apiEggLocations[island]?.size != null) {
+                15
+            } else return
             val collectedEggs = collectedEggStorage?.get(island)?.size ?: return
 
             if (collectedEggs == maxEggs && config.uniquesWarpMenuHideMax) return
