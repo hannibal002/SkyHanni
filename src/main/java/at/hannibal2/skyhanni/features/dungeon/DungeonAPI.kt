@@ -509,7 +509,7 @@ object DungeonAPI {
     }
 
     private fun changePhase(newPhase: DungeonPhase) {
-        DungeonPhaseChangeEvent(newPhase)
+        DungeonPhaseChangeEvent(newPhase).post()
         dungeonPhase = newPhase
     }
 }

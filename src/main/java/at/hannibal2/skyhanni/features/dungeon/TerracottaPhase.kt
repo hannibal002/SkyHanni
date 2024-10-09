@@ -16,20 +16,19 @@ object TerracottaPhase {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
-        if (isActive() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
+        if (isEnabled() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.cancel()
         }
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (isActive() && config.hideParticles) {
+        if (isEnabled() && config.hideParticles) {
             event.cancel()
         }
     }
 
-    private fun isActive() = isEnabled() && DungeonAPI.dungeonPhase == DungeonAPI.DungeonPhase.F6_TERRACOTTA
-
     private fun isEnabled() =
-        DungeonAPI.inDungeon() && DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F6
+        DungeonAPI.inDungeon() && DungeonAPI.inBossRoom && DungeonAPI.getCurrentBoss() == DungeonFloor.F6 &&
+            DungeonAPI.dungeonPhase == DungeonAPI.DungeonPhase.F6_TERRACOTTA
 }
