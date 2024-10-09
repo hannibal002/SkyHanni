@@ -4,13 +4,12 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
-import at.hannibal2.skyhanni.data.GuiEditManager.getDummySize
 import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
@@ -19,11 +18,11 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -41,6 +40,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
+import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -51,6 +51,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
+@Suppress("LargeClass")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {
@@ -93,6 +94,15 @@ object RenderUtils {
 
     infix fun RenderGuiItemOverlayEvent.highlight(color: Color) {
         highlight(color, x, y)
+    }
+
+    fun getMouseX(): Int {
+        return Mouse.getX() * GuiScreenUtils.scaledWindowWidth / Minecraft.getMinecraft().displayWidth
+    }
+
+    fun getMouseY(): Int {
+        val height = GuiScreenUtils.scaledWindowHeight
+        return height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
     }
 
     fun highlight(color: Color, x: Int, y: Int) {
@@ -504,8 +514,8 @@ object RenderUtils {
     fun Position.transform(): Pair<Int, Int> {
         GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
         GlStateManager.scale(effectiveScale, effectiveScale, 1F)
-        val x = ((Utils.getMouseX() - getAbsX()) / effectiveScale).toInt()
-        val y = ((Utils.getMouseY() - getAbsY()) / effectiveScale).toInt()
+        val x = ((getMouseX() - getAbsX()) / effectiveScale).toInt()
+        val y = ((getMouseY() - getAbsY()) / effectiveScale).toInt()
         return x to y
     }
 
@@ -541,37 +551,6 @@ object RenderUtils {
         return renderer.getStringWidth(display)
     }
 
-    // Aligns using the width of element to render
-    private fun Position.renderString0(
-        string: String?,
-        offsetX: Int = 0,
-        offsetY: Int = 0,
-        alignmentEnum: HorizontalAlignment,
-    ): Int {
-        val display = "§f$string"
-        GlStateManager.pushMatrix()
-        transform()
-        val minecraft = Minecraft.getMinecraft()
-        val renderer = minecraft.renderManager.fontRenderer
-        val width = this.getDummySize().x / this.scale
-
-        GlStateManager.translate(offsetX + 1.0, offsetY + 1.0, 0.0)
-
-        val strLen: Int = renderer.getStringWidth(string)
-        val x2 = when (alignmentEnum) {
-            HorizontalAlignment.LEFT -> offsetX.toFloat()
-            HorizontalAlignment.CENTER -> offsetX + width / 2f - strLen / 2f
-            HorizontalAlignment.RIGHT -> offsetX + width - strLen.toFloat()
-            else -> offsetX.toFloat()
-        }
-        GL11.glTranslatef(x2, 0f, 0f)
-        renderer.drawStringWithShadow(display, 0f, 0f, 0)
-
-        GlStateManager.popMatrix()
-
-        return renderer.getStringWidth(display)
-    }
-
     fun Position.renderStrings(list: List<String>, extraSpace: Int = 0, posLabel: String) {
         if (list.isEmpty()) return
 
@@ -579,25 +558,6 @@ object RenderUtils {
         var longestX = 0
         for (s in list) {
             val x = renderString0(s, offsetY = offsetY, centered = false)
-            if (x > longestX) {
-                longestX = x
-            }
-            offsetY += 10 + extraSpace
-        }
-        GuiEditManager.add(this, posLabel, longestX, offsetY)
-    }
-
-    fun Position.renderStringsAlignedWidth(
-        list: List<Pair<String, HorizontalAlignment>>,
-        extraSpace: Int = 0,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-
-        var offsetY = 0
-        var longestX = 0
-        for (pair in list) {
-            val x = renderString0(pair.first, offsetY = offsetY, alignmentEnum = pair.second)
             if (x > longestX) {
                 longestX = x
             }
@@ -631,10 +591,11 @@ object RenderUtils {
     }
 
     fun Position.renderRenderable(
-        renderable: Renderable,
+        renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        if (renderable == null) return
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
@@ -697,7 +658,7 @@ object RenderUtils {
 
     /**
      * Accepts a single line to print.
-     * This  line is a list of things to print. Can print String or ItemStack objects.
+     * This line is a list of things to print. Can print String or ItemStack objects.
      */
     @Deprecated("use List<Renderable>", ReplaceWith(""))
     fun Position.renderSingleLineWithItems(
@@ -1132,6 +1093,7 @@ object RenderUtils {
     fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        PatcherFixes.onPlayerEyeLine()
         return exactLocation(player) + add
     }
 
@@ -1318,6 +1280,8 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
+        showNodeNames: Boolean = false,
+        markLastBlock: Boolean = true,
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
@@ -1339,11 +1303,15 @@ object RenderUtils {
                 bezierPoint,
             )
         }
-        path.filter { it.name?.isNotEmpty() == true }.forEach {
-            this.drawDynamicText(it.position, it.name!!, textSize)
+        if (showNodeNames) {
+            path.filter { it.name?.isNotEmpty() == true }.forEach {
+                this.drawDynamicText(it.position, it.name!!, textSize)
+            }
         }
-        val last = path.last()
-        drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        if (markLastBlock) {
+            val last = path.last()
+            drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        }
     }
 
     class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
@@ -1621,7 +1589,11 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun LorenzRenderWorldEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
     ) {
         GlStateManager.disableCull()
 
@@ -1658,6 +1630,27 @@ object RenderUtils {
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
         GlStateManager.enableCull()
+    }
+
+    fun LorenzRenderWorldEvent.drawHitbox(
+        boundingBox: AxisAlignedBB,
+        lineWidth: Int,
+        color: Color,
+        depth: Boolean,
+    ) {
+        val cornersTop = boundingBox.getCorners(boundingBox.maxY)
+        val cornersBottom = boundingBox.getCorners(boundingBox.minY)
+
+        // Draw lines for the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersTop[i], cornersTop[(i + 1) % 4], color, lineWidth, depth)
+            this.draw3DLine(cornersBottom[i], cornersBottom[(i + 1) % 4], color, lineWidth, depth)
+        }
+
+        // Draw lines connecting the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersBottom[i], cornersTop[i], color, lineWidth, depth)
+        }
     }
 
     fun chromaColor(
@@ -1737,7 +1730,7 @@ object RenderUtils {
     fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
         // if radius is 0 then just draw a normal textured rect
         if (radius <= 0) {
-            Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
             return
         }
 
@@ -1756,7 +1749,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
 
-        Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
@@ -1857,6 +1850,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    // todo merge with the one in GuiRenderUtils
     fun drawGradientRect(
         left: Int,
         top: Int,
@@ -1894,13 +1888,6 @@ object RenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
-    }
-
-    // TODO move off of neu function
-    fun drawTexturedRect(x: Float, y: Float) {
-        with(ScaledResolution(Minecraft.getMinecraft())) {
-            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
-        }
     }
 
     fun getAlpha(): Float {

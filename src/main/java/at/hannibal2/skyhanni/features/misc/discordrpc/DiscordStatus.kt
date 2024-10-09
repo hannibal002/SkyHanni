@@ -56,7 +56,7 @@ var beenAfkFor = SimpleTimeMark.now()
 
 fun getPetDisplay(): String = PetAPI.currentPet?.let {
     val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2)
+    val petName = it.substring(2).removeColor()
     val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
 
     "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
@@ -86,7 +86,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     NONE({ null }),
 
     LOCATION({
-        var location = LorenzUtils.skyBlockArea?.removeColor() ?: "invalid"
+        var location = LorenzUtils.skyBlockArea ?: "invalid"
         val island = LorenzUtils.skyBlockIsland
 
         if (location == "Your Island") location = "Private Island"
@@ -344,5 +344,4 @@ enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatu
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
     DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
     AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
-    ;
 }

@@ -20,11 +20,11 @@ import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.pests.PestType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -234,7 +234,7 @@ object FarmingWeightDisplay {
         }
 
         val totalWeight = (localWeight + weight)
-        return "§e" + totalWeight.round(2).addSeparators()
+        return "§e" + totalWeight.roundTo(2).addSeparators()
     }
 
     private fun getRankGoal(): Int {
@@ -326,7 +326,7 @@ object FarmingWeightDisplay {
             " §7(§b$format§7)"
         } else ""
 
-        val weightFormat = weightUntilOvertake.round(2).addSeparators()
+        val weightFormat = weightUntilOvertake.roundTo(2).addSeparators()
         val text = "§e$weightFormat$timeFormat §7behind §b$nextName"
         return if (showRankGoal) {
             Renderable.string(text)
@@ -372,8 +372,8 @@ object FarmingWeightDisplay {
     private fun isEtaEnabled() = config.overtakeETA
 
     fun addCrop(crop: CropType, addedCounter: Int) {
-        //Prevent div-by-0 errors
-        if (addedCounter == 0) return;
+        // Prevent div-by-0 errors
+        if (addedCounter == 0) return
 
         val before = getExactWeight()
         localCounter[crop] = crop.getLocalCounter() + addedCounter
@@ -447,7 +447,7 @@ object FarmingWeightDisplay {
         val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
         val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -477,7 +477,7 @@ object FarmingWeightDisplay {
     private fun loadWeight(localProfile: String) {
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         var error: Throwable? = null
 
@@ -511,7 +511,7 @@ object FarmingWeightDisplay {
             "Error loading user farming weight\n" +
                 "§eLoading the farming weight data from elitebot.dev failed!\n" +
                 "§eYou can re-enter the garden to try to fix the problem.\n" +
-                "§cIf this message repeats, please report it on Discord!\n",
+                "§cIf this message repeats, please report it on Discord",
             "url" to url,
             "apiResponse" to apiResponse,
             "localProfile" to localProfile,
@@ -573,7 +573,7 @@ object FarmingWeightDisplay {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = APIUtil.getJSONResponse(url)
+        val apiResponse = APIUtils.getJSONResponse(url)
 
         try {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)

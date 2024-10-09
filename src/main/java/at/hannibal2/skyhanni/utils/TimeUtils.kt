@@ -19,6 +19,7 @@ object TimeUtils {
         showMilliSeconds: Boolean = this in -1.seconds..1.seconds,
         longName: Boolean = false,
         maxUnits: Int = -1,
+        showSmallerUnits: Boolean = false,
     ): String {
         var millis = inWholeMilliseconds
         val parts = mutableMapOf<TimeUnit, Int>()
@@ -31,10 +32,19 @@ object TimeUtils {
             }
         }
 
+        val largestNonZeroUnit = parts.firstNotNullOfOrNull { if (it.value != 0) it.key else null } ?: TimeUnit.SECOND
+
+        if (absoluteValue < 1.seconds) {
+            val formattedMillis = (millis / 100).toInt()
+            return "0.${formattedMillis}s"
+        }
+
         var currentUnits = 0
         val result = buildString {
             for ((unit, value) in parts) {
-                if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
+                val showUnit = value != 0 || (showSmallerUnits && unit.factor <= largestNonZeroUnit.factor)
+
+                if (showUnit) {
                     val formatted = value.addSeparators()
                     val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
                         val formattedMillis = (millis / 100).toInt()
@@ -104,10 +114,16 @@ object TimeUtils {
         dayAndMonthElement: Boolean = true,
         yearElement: Boolean = true,
         hoursAndMinutesElement: Boolean = true,
+        timeFormat24h: Boolean = false,
+        exactMinutes: Boolean = true,
     ): String {
-        val hour = (this.hour + 11) % 12 + 1
-        val timeOfDay = if (this.hour > 11) "pm" else "am"
-        val minute = this.minute.toString().padStart(2, '0')
+        val hour = if (timeFormat24h) this.hour else (this.hour + 11) % 12 + 1
+        val timeOfDay = if (!timeFormat24h) {
+            if (this.hour > 11) "pm" else "am"
+        } else ""
+        val minute = this.minute.let {
+            if (exactMinutes) it else it - (it % 10)
+        }.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
         val day = this.day
         val daySuffix = SkyBlockTime.daySuffix(day)
@@ -160,3 +176,8 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }
+
+val Duration.inPartialSeconds: Double get() = inWholeMilliseconds.toDouble() / 1000
+val Duration.inPartialMinutes: Double get() = inPartialSeconds / 60
+val Duration.inPartialHours: Double get() = inPartialSeconds / 3600
+val Duration.inPartialDays: Double get() = inPartialSeconds / 86_400

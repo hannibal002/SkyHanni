@@ -164,12 +164,6 @@ public class GardenConfig {
     public boolean burrowingSporesNotification = true;
 
     @Expose
-    @ConfigOption(name = "Wild Strawberry", desc = "Show a notification when a Wild Strawberry Dye drops while farming.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean wildStrawberryDyeNotification = true;
-
-    @Expose
     @ConfigOption(
         name = "FF for Contest",
         desc = "Show the minimum needed Farming Fortune for reaching each medal in Jacob's Farming Contest inventory."
@@ -212,6 +206,15 @@ public class GardenConfig {
         minStep = 0.1f
     )
     public double jacobContestCustomBpsValue = 19.9;
+
+    @Expose
+    @ConfigOption(
+        name = "Personal Best Increase FF",
+        desc = "Show in chat how much more FF you get from farming contest personal best bonus after beating the previous record."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean contestPersonalBestIncreaseFF = true;
 
     @Expose
     public Position cropSpeedMeterPos = new Position(278, -236, false, true);
