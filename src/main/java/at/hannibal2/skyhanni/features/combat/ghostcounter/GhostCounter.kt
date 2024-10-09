@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGho
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
@@ -48,7 +50,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -56,7 +58,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.moulberry.notenoughupdates.util.XPInformation
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FilenameUtils
@@ -72,7 +73,8 @@ object GhostCounter {
     val config get() = SkyHanniMod.feature.combat.ghostCounter
     val storage get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
-    var ghostCounterV3File = File(FilenameUtils.separatorsToSystem("./config/ChatTriggers/modules/GhostCounterV3/.persistantData.json"))
+    var ghostCounterV3File =
+        File(FilenameUtils.separatorsToSystem("./config/ChatTriggers/modules/GhostCounterV3/.persistantData.json"))
 
     private val patternGroup = RepoPattern.group("combat.ghostcounter")
     private val skillXPPattern by patternGroup.pattern(
@@ -155,7 +157,7 @@ object GhostCounter {
             0.0 -> "0"
             else -> {
                 val mf = (((storage?.totalMF!! / Option.TOTALDROPS.get()) + Math.ulp(1.0)) * 100) / 100
-                mf.roundToPrecision(2).toString()
+                mf.roundTo(2).toString()
             }
         }
 
@@ -241,7 +243,7 @@ object GhostCounter {
             }
         }
 
-        addAsSingletonList(Utils.chromaStringByColourCode(textFormatting.titleFormat.replace("&", "§")))
+        addAsSingletonList(textFormatting.titleFormat.replace("&", "§"))
         addAsSingletonList(textFormatting.ghostKilledFormat.formatText(KILLS))
         addAsSingletonList(textFormatting.sorrowsFormat.formatText(Option.SORROWCOUNT))
         addAsSingletonList(textFormatting.ghostSinceSorrowFormat.formatText(Option.GHOSTSINCESORROW.getInt()))
@@ -332,13 +334,17 @@ object GhostCounter {
             }
         }
 
-        inMist = LorenzUtils.skyBlockArea == "The Mist"
         update()
 
         if (event.repeatSeconds(2)) {
             calculateXP()
             calculateETA()
         }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        inMist = IslandAreas.currentAreaName == "The Mist"
     }
 
     @SubscribeEvent

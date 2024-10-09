@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -19,11 +18,11 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -41,6 +40,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
+import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -51,6 +51,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
+@Suppress("LargeClass")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {
@@ -93,6 +94,15 @@ object RenderUtils {
 
     infix fun RenderGuiItemOverlayEvent.highlight(color: Color) {
         highlight(color, x, y)
+    }
+
+    fun getMouseX(): Int {
+        return Mouse.getX() * GuiScreenUtils.scaledWindowWidth / Minecraft.getMinecraft().displayWidth
+    }
+
+    fun getMouseY(): Int {
+        val height = GuiScreenUtils.scaledWindowHeight
+        return height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
     }
 
     fun highlight(color: Color, x: Int, y: Int) {
@@ -504,8 +514,8 @@ object RenderUtils {
     fun Position.transform(): Pair<Int, Int> {
         GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
         GlStateManager.scale(effectiveScale, effectiveScale, 1F)
-        val x = ((Utils.getMouseX() - getAbsX()) / effectiveScale).toInt()
-        val y = ((Utils.getMouseY() - getAbsY()) / effectiveScale).toInt()
+        val x = ((getMouseX() - getAbsX()) / effectiveScale).toInt()
+        val y = ((getMouseY() - getAbsY()) / effectiveScale).toInt()
         return x to y
     }
 
@@ -581,10 +591,11 @@ object RenderUtils {
     }
 
     fun Position.renderRenderable(
-        renderable: Renderable,
+        renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        if (renderable == null) return
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
@@ -1269,7 +1280,8 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
-        showNoteNames: Boolean = false
+        showNodeNames: Boolean = false,
+        markLastBlock: Boolean = true,
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
@@ -1291,13 +1303,15 @@ object RenderUtils {
                 bezierPoint,
             )
         }
-        if (showNoteNames) {
+        if (showNodeNames) {
             path.filter { it.name?.isNotEmpty() == true }.forEach {
                 this.drawDynamicText(it.position, it.name!!, textSize)
             }
         }
-        val last = path.last()
-        drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        if (markLastBlock) {
+            val last = path.last()
+            drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        }
     }
 
     class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
@@ -1575,7 +1589,11 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun LorenzRenderWorldEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
     ) {
         GlStateManager.disableCull()
 
@@ -1712,7 +1730,7 @@ object RenderUtils {
     fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
         // if radius is 0 then just draw a normal textured rect
         if (radius <= 0) {
-            Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
             return
         }
 
@@ -1731,7 +1749,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
 
-        Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
@@ -1832,6 +1850,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    // todo merge with the one in GuiRenderUtils
     fun drawGradientRect(
         left: Int,
         top: Int,
@@ -1869,13 +1888,6 @@ object RenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
-    }
-
-    // TODO move off of neu function
-    fun drawTexturedRect(x: Float, y: Float) {
-        with(ScaledResolution(Minecraft.getMinecraft())) {
-            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
-        }
     }
 
     fun getAlpha(): Float {
