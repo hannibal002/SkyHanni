@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -143,6 +143,7 @@ object MayorAPI {
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
+                replaceSameMessage = true,
             )
         }
     }
@@ -170,7 +171,7 @@ object MayorAPI {
             } ?: false
         } ?: return
 
-        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }) ?: return
+        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }, 2) ?: return
         // This is the first Perk of the Perkpocalypse Mayor
         val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
@@ -216,7 +217,7 @@ object MayorAPI {
 
         SkyHanniMod.coroutineScope.launch {
             val url = "https://api.hypixel.net/v2/resources/skyblock/election"
-            val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
+            val jsonObject = withContext(dispatcher) { APIUtils.getJSONResponse(url) }
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launch
             val map = mutableMapOf<Int, MayorCandidate>()

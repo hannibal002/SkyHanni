@@ -20,15 +20,16 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRawCraftCostOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAbilityScrolls
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getArmorDye
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBookwormBookCount
@@ -58,11 +59,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasJalapenoBook
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasWoodSingularity
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
-import io.github.moulberry.notenoughupdates.recipes.Ingredient
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.util.Locale
 
+// TODO split into smaler sub classes
+@Suppress("LargeClass")
 object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
@@ -97,6 +99,7 @@ object EstimatedItemValueCalculator {
         ::addManaDisintegrators,
         ::addPolarvoidBook,
         ::addBookwormBook,
+        ::addPocketSackInASack,
 
         // cosmetic
         ::addHelmetSkin,
@@ -130,12 +133,13 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
-    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } && listOf(
-        "CHESTPLATE",
-        "LEGGINGS",
-        "HELMET",
-        "BOOTS",
-    ).any { internalName.endsWith(it) })
+    private fun isKuudraSet(internalName: String) = (kuudraSets.any { internalName.contains(it) } &&
+        listOf(
+            "CHESTPLATE",
+            "LEGGINGS",
+            "HELMET",
+            "BOOTS",
+        ).any { internalName.endsWith(it) })
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
@@ -391,11 +395,20 @@ object EstimatedItemValueCalculator {
         return price
     }
 
+    private fun addPocketSackInASack(stack: ItemStack, list: MutableList<String>): Double {
+        val count = stack.getAppliedPocketSackInASack() ?: return 0.0
+
+        val pocketSackInASack = "POCKET_SACK_IN_A_SACK".asInternalName()
+        val price = pocketSackInASack.getPrice() * count
+        list.add("§7Pocket Sack-in-a-Sack: §e$count§7/§e3 §7(§6" + price.shortFormat() + "§7)")
+        return price
+    }
+
     private fun addBookwormBook(stack: ItemStack, list: MutableList<String>): Double {
         val count = stack.getBookwormBookCount() ?: return 0.0
 
-        val tfHardcodedItemAgain = "BOOKWORM_BOOK".asInternalName()
-        val price = tfHardcodedItemAgain.getPrice() * count
+        val bookwormBook = "BOOKWORM_BOOK".asInternalName()
+        val price = bookwormBook.getPrice() * count
         list.add("§7Bookworm's Favorite Book: §e$count§7/§e5 §7(§6" + price.shortFormat() + "§7)")
         return price
     }
@@ -499,11 +512,6 @@ object EstimatedItemValueCalculator {
                 if (remainingStars <= 0) continue
 
                 val price = getPriceFor(prices, remainingStars) ?: return null
-                println(" ")
-                println("price for $id ($remainingStars)")
-                println("price.itemPrice: ${price.itemPrice}")
-                println("essencePrice: ${price.essencePrice}")
-                println("itemPrice: ${price.itemPrice}")
                 finalPrice = finalPrice?.let { it + price } ?: price
                 remainingStars -= prices.size
             }
@@ -744,10 +752,13 @@ object EstimatedItemValueCalculator {
         var totalPrice = 0.0
         val map = mutableMapOf<String, Double>()
 
-        //todo use repo
-        val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
-        val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
-        val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
+        // todo use repo
+        val tieredEnchants =
+            listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
+        val onlyTierOnePrices =
+            listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
+        val onlyTierFivePrices =
+            listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
         val internalName = stack.getInternalName()
         for ((rawName, rawLevel) in enchantments) {
@@ -889,12 +900,12 @@ object EstimatedItemValueCalculator {
 
             val previousTotal = totalPrice
             for (ingredients in slot.value) {
-                val ingredient = Ingredient(NEUItems.manager, ingredients)
+                val ingredient = PrimitiveIngredient(ingredients)
 
-                totalPrice += if (ingredient.isCoins) {
+                totalPrice += if (ingredient.isCoin()) {
                     ingredient.count
                 } else {
-                    ingredient.internalItemId.asInternalName().getPrice() * ingredient.count
+                    ingredient.internalName.getPrice() * ingredient.count
                 }
             }
 
@@ -923,11 +934,11 @@ object EstimatedItemValueCalculator {
 
     fun Pair<String, Int>.getAttributeName(): String {
         val name = first.fixMending().allLettersFirstUppercase()
-        return "§b$name ${second} Shard"
+        return "§b$name $second Shard"
     }
 
     fun Pair<String, Int>.getAttributePrice(): Double? = EstimatedItemValueCalculator.getPriceOrCompositePriceForAttribute(
-        "ATTRIBUTE_SHARD+ATTRIBUTE_" + first,
+        "ATTRIBUTE_SHARD+ATTRIBUTE_$first",
         second,
     )
 }

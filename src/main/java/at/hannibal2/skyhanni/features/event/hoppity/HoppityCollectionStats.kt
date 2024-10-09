@@ -22,11 +22,11 @@ import at.hannibal2.skyhanni.utils.KSerializable
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
@@ -213,7 +213,7 @@ object HoppityCollectionStats {
             val newItemStack = if (config.rarityDyeRecolor) ItemStack(
                 Items.dye, 1,
                 when (rarity) {
-                    LorenzRarity.COMMON -> 7  // Light gray dye
+                    LorenzRarity.COMMON -> 7 // Light gray dye
                     LorenzRarity.UNCOMMON -> 10 // Lime dye
                     LorenzRarity.RARE -> 4 // Lapis lazuli
                     LorenzRarity.EPIC -> 5 // Purple dye
@@ -262,7 +262,7 @@ object HoppityCollectionStats {
                     else -> "" // Never happens
                 }
 
-                //List indexing is weird
+                // List indexing is weird
                 existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount"
                 existingLore[replaceIndex] = "§7all-time §6Chocolate."
                 return existingLore
@@ -435,7 +435,7 @@ object HoppityCollectionStats {
                 add("§7Total Rabbits Found: §a${displayFound + displayDuplicates}")
                 add("")
                 add("§7Chocolate Per Second: §a${displayChocolatePerSecond.addSeparators()}")
-                add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.round(3)}")
+                add("§7Chocolate Multiplier: §a${displayChocolateMultiplier.roundTo(3)}")
             }
             table.add(
                 DisplayTableEntry(
@@ -505,7 +505,11 @@ object HoppityCollectionStats {
 
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
 
-            if (!found) continue
+            if (!found) {
+                // if the config has wrong data, remove it
+                loggedRabbits.remove(itemName)
+                continue
+            }
 
             val duplicates = duplicatesFoundPattern.firstMatcher(itemLore) {
                 group("duplicates").formatInt()
