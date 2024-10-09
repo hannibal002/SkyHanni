@@ -6,7 +6,7 @@ on:
 
 jobs:
     verify-changelog:
-        if: github.event.pull_request.state == 'open'
+        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id
         runs-on: ubuntu-latest
 
         steps:
