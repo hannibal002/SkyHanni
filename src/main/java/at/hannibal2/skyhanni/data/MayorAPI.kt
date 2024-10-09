@@ -143,6 +143,7 @@ object MayorAPI {
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
+                replaceSameMessage = true,
             )
         }
     }
