@@ -17,10 +17,8 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -43,7 +41,7 @@ object CraftMaterialsFromBazaar {
         val correctItem = items[23]?.name == "§aCrafting Table"
         val correctSuperCraftItem = items[32]?.name == "§aSupercraft"
 
-        inRecipeInventory = correctSuperCraftItem && correctItem &&  !purchasing
+        inRecipeInventory = correctSuperCraftItem && correctItem && !purchasing
         if (!inRecipeInventory) return
 
         val recipeName = items[25]?.itemName ?: return
