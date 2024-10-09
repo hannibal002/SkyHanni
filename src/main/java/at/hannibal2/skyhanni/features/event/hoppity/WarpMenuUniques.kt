@@ -21,7 +21,7 @@ object WarpMenuUniques {
      */
     private val islandNamePattern by RepoPattern.pattern(
         "inventory.warpmenu.island.name",
-        "^§[ab](?<name>[\\w ']+)(?:§7 - §b.*)?\$"
+        "§[ab](?<name>[\\w ']+)(?:§7 - §b.*)?",
     )
 
     private val collectedEggStorage: MutableMap<IslandType, MutableSet<LorenzVec>>?
@@ -36,22 +36,23 @@ object WarpMenuUniques {
         if (!HoppityAPI.isHoppityEvent()) return
         if (event.slot.inventory.name != "Fast Travel") return
 
-        islandNamePattern.matchMatcher(event.slot.stack.displayName) {
-            val island = when (val name = group("name")) {
-                "SkyBlock Hub" -> IslandType.HUB
-                "The Barn" -> IslandType.THE_FARMING_ISLANDS
-                else -> IslandType.getByNameOrNull(name) ?: return
-            }
-            if (island == IslandType.DUNGEON_HUB) return
+        val name = islandNamePattern.matchMatcher(event.slot.stack.displayName) {
+            group("name")
+        } ?: return
 
-            val maxEggs = if (HoppityEggLocations.apiEggLocations[island]?.size != null) {
-                15
-            } else return
-            val collectedEggs = collectedEggStorage?.get(island)?.size ?: 0
-
-            if (collectedEggs == maxEggs && config.uniquesWarpMenuHideMax) return
-
-            event.toolTip.add(2, "§7Collected Eggs: ${if (collectedEggs == maxEggs) "§a" else ""}$collectedEggs/$maxEggs")
+        val island = when (name) {
+            "SkyBlock Hub" -> IslandType.HUB
+            "The Barn" -> IslandType.THE_FARMING_ISLANDS
+            else -> IslandType.getByNameOrNull(name) ?: return
         }
+        if (island == IslandType.DUNGEON_HUB) return
+
+        if (HoppityEggLocations.apiEggLocations[island]?.size == null) return
+        val maxEggs = 15
+        val collectedEggs = collectedEggStorage?.get(island)?.size ?: 0
+
+        if (collectedEggs >= maxEggs && config.uniquesWarpMenuHideMax) return
+
+        event.toolTip.add(2, "§7Collected Hoppity Eggs: ${if (collectedEggs == maxEggs) "§a" else ""}$collectedEggs/$maxEggs")
     }
 }
