@@ -48,7 +48,7 @@ public class MarkedPlayerConfig {
         public boolean enabled = false;
 
         @Expose
-        @ConfigOption(name = "Players List", desc = "Players list you want to be notified for.\n§cCase sensitive, separated by comma.")
+        @ConfigOption(name = "Players List", desc = "The list of players you want to be notified for.\n§cCase sensitive, separated by commas.")
         @ConfigEditorText
         public Property<String> playersList = Property.of("hypixel,Minikloon");
 
@@ -58,12 +58,12 @@ public class MarkedPlayerConfig {
         public boolean usePrefix = true;
 
         @Expose
-        @ConfigOption(name = "Join Message", desc = "Configure the message when someone join.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
+        @ConfigOption(name = "Join Message", desc = "Configure the message when someone joins.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
         @ConfigEditorText
         public String joinMessage = "&&b%s &&ajoined your lobby.";
 
         @Expose
-        @ConfigOption(name = "Left Message", desc = "Configure the message when someone leave.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
+        @ConfigOption(name = "Left Message", desc = "Configure the message when someone leaves.\n&& is replaced with the minecraft color code §.\n%s is replaced with the player name.")
         @ConfigEditorText
         public String leftMessage = "&&b%s &&cleft your lobby.";
     }
