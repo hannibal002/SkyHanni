@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.Text
 import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
@@ -91,7 +92,8 @@ class EventHandler<T : SkyHanniEvent> private constructor(val name: String, priv
                 errors++
                 if (errors <= 3) {
                     val errorName = throwable::class.simpleName ?: "error"
-                    val message = "Caught an $errorName in ${listener.name} at $name: ${throwable.message}"
+                    val aOrAn = StringUtils.optionalAn(errorName)
+                    val message = "Caught $aOrAn $errorName in ${listener.name} at $name: ${throwable.message}"
                     ErrorManager.logErrorWithData(throwable, message, ignoreErrorCache = onError != null)
                 }
                 onError?.invoke(throwable)
