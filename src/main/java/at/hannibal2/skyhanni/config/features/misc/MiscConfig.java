@@ -116,6 +116,7 @@ public class MiscConfig {
     @Expose
     @ConfigOption(name = "Dragonic Sacrifice Tracker", desc = "")
     @Accordion
+
     public DraconicSacrificeTrackerConfig draconicSacrificeTracker = new DraconicSacrificeTrackerConfig();
     @ConfigOption(name = "Reminders", desc = "")
     @Accordion

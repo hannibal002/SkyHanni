@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NumberUtil
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -29,10 +28,21 @@ object DraconicSacrificeTracker {
 
     private val config get() = SkyHanniMod.feature.misc.draconicSacrificeTracker
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
+
+    /**
+     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Boots §r§einto §r§d3 Dragon Essence§r§e!
+     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§5Ender Helmet §r§einto §r§d3 Dragon Essence§r§e!
+     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Old Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
+     * REGEX-TEST: §c§lSACRIFICE! §r§eYou turned §r§6Wise Dragon Helmet §r§einto §r§d25 Dragon Essence§r§e!
+     */
     private val sacrificeLoot by patternGroup.pattern(
         "sacrifice",
         "§c§lSACRIFICE! §r§eYou turned §r(?<item>.*) §r§einto §r§d(?<amount>\\d+) Dragon Essence§r§e!",
     )
+
+    /**
+     * REGEX-TEST: §c§lBONUS LOOT! §r§eYou also received §r§817x §r§5Wise Dragon Fragment §r§efrom your sacrifice!
+     */
     private val bonusLoot by patternGroup.pattern(
         "bonus",
         "§c§lBONUS LOOT! §r§eYou also received §r(?:§\\w(?<amount>\\d+)?x)?(?: §r)?(?<item>.*) §r§efrom your sacrifice!",
@@ -47,12 +57,12 @@ object DraconicSacrificeTracker {
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
-            sacrifiedItemsMap.clear()
-            itemsSacrifice = 0
+            sacrificedItemsMap.clear()
+            itemsSacrificed = 0
         }
 
         override fun getDescription(timesGained: Long): List<String> {
-            val percentage = timesGained.toDouble() / itemsSacrifice
+            val percentage = timesGained.toDouble() / itemsSacrificed
             val dropRate = LorenzUtils.formatPercentage(percentage.coerceAtMost(1.0))
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
@@ -63,7 +73,7 @@ object DraconicSacrificeTracker {
         override fun getCoinName(item: TrackedItem) = "§dDragon Essence"
 
         override fun getCoinDescription(item: TrackedItem): List<String> {
-            val essences = NumberUtil.format(item.totalAmount)
+            val essences = item.totalAmount.addSeparators()
             return listOf(
                 "§7Sacrificed items give you dragon essence.",
                 "§7You got §6$essences essence §7that way.",
@@ -71,10 +81,10 @@ object DraconicSacrificeTracker {
         }
 
         @Expose
-        var itemsSacrifice = 0L
+        var itemsSacrificed = 0L
 
         @Expose
-        var sacrifiedItemsMap: MutableMap<String, Long> = mutableMapOf()
+        var sacrificedItemsMap: MutableMap<String, Long> = mutableMapOf()
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -83,12 +93,12 @@ object DraconicSacrificeTracker {
 
         add(
             Renderable.hoverTips(
-                "§b${data.itemsSacrifice.addSeparators()} §6Items Sacrified",
-                data.sacrifiedItemsMap.map { (key, value) -> "$key: §b$value" },
+                "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrified",
+                data.sacrificedItemsMap.map { (key, value) -> "$key: §b$value" },
             ).toSearchable()
         )
 
-        add(tracker.addTotalProfit(profit, data.itemsSacrifice, "sacrifice"))
+        add(tracker.addTotalProfit(profit, data.itemsSacrificed, "sacrifice"))
 
         tracker.addPriceFromButton(this)
     }
@@ -100,8 +110,8 @@ object DraconicSacrificeTracker {
             val item = group("item")
             tracker.addItem("ESSENCE_DRAGON".asInternalName(), amount, command = false)
             tracker.modify {
-                it.itemsSacrifice += 1
-                it.sacrifiedItemsMap.addOrPut(item, 1)
+                it.itemsSacrificed += 1
+                it.sacrificedItemsMap.addOrPut(item, 1)
             }
         }
 
