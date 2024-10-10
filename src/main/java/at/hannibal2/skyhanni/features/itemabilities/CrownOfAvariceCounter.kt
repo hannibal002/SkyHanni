@@ -96,17 +96,21 @@ object CrownOfAvariceCounter {
         val coinsPerHour = calculateCoinsPerHour().toLong()
         val timeUntilMax = calculateTimeUntilMax()
         val list = buildList {
-            add(Renderable.horizontalContainer(
-                listOf(
-                    Renderable.itemStack(internalName.getItemStack()),
-                    Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
+            add(
+                Renderable.horizontalContainer(
+                    listOf(
+                        Renderable.itemStack(internalName.getItemStack()),
+                        Renderable.string("§6" + if (config.shortFormat) count.shortFormat() else count.addSeparators()),
+                    ),
                 ),
-            ))
+            )
 
             if (config.perHour) {
-                add(Renderable.string(
-                    "§aCoins Per Hour: §6${if (isSessionActive) "Calculating..." else coinsPerHour.addSeparators()}"
-                ))
+                add(
+                    Renderable.string(
+                        "§aCoins Per Hour: §6${if (isSessionActive) "Calculating..." else coinsPerHour.addSeparators()}",
+                    ),
+                )
             }
             if (config.time) {
                 add(Renderable.string("§aTime until Max: §6${if (isSessionActive) "Calculating..." else timeUntilMax}"))
