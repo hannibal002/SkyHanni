@@ -21,7 +21,7 @@ object SoundResponse {
     REGEX-TEST: MEow
     REGEX-TEST: §ameow
     REGEX-TEST: hello §ameow
-     * */
+     */
     private val meow by repoGroup.pattern("meow", "(?:^|^.* )(?: |§.)*(?i)meow(?: |§.)*(?:\$| .*\$)")
     private val bark by repoGroup.pattern("bark", "(?:^|^.* )(?: |§.)*(?i)(?:bark|arf|woof)(?: |§.)*(?:\$| .*\$)")
 
