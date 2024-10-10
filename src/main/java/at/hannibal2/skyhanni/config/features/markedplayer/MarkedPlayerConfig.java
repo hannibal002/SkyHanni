@@ -53,7 +53,7 @@ public class MarkedPlayerConfig {
         public Property<String> playersList = Property.of("hypixel,Minikloon");
 
         @Expose
-        @ConfigOption(name = "Use Prefix", desc = "Should the [SkyHanni] prefix should be in the join/leave message ?")
+        @ConfigOption(name = "Use Prefix", desc = "Should the [SkyHanni] prefix be included in the join/leave message?")
         @ConfigEditorBoolean
         public boolean usePrefix = true;
 
