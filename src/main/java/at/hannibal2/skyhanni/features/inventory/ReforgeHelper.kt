@@ -236,7 +236,7 @@ object ReforgeHelper {
         this.addAll(list)
     }
 
-    private fun getReforgeColour(reforge: ReforgeAPI.Reforge) = when {
+    private fun getReforgeColor(reforge: ReforgeAPI.Reforge) = when {
         currentReforge == reforge -> "§6"
         reforgeToSearch == reforge -> "§3"
         reforge.isReforgeStone -> "§9"
@@ -244,7 +244,7 @@ object ReforgeHelper {
     }
 
     private fun getReforgeView(itemRarity: LorenzRarity): (ReforgeAPI.Reforge) -> Renderable = { reforge ->
-        val text = getReforgeColour(reforge) + reforge.name
+        val text = getReforgeColor(reforge) + reforge.name
         val tips = getReforgeTips(reforge, itemRarity)
         val onHover = if (!isInHexReforgeMenu) {
             {}
@@ -379,8 +379,6 @@ object ReforgeHelper {
                 colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
                 inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
-
-                //?.get(reforgeItem)?. = hoverColor
             }
             hoveredReforge = null
         }
