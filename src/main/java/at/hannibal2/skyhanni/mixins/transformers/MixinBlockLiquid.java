@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.mixins.transformers;
 
-import at.hannibal2.skyhanni.mixins.hooks.BlockFluidRendererHook;
+import at.hannibal2.skyhanni.features.fishing.LavaReplacement;
 import net.minecraft.client.renderer.BlockFluidRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import org.spongepowered.asm.mixin.Mixin;
@@ -18,8 +18,8 @@ public abstract class MixinBlockLiquid {
         method = "renderFluid",
         at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockLiquid;colorMultiplier(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)I")
     )
-    TextureAtlasSprite[] replacerenderedFluid(TextureAtlasSprite[] value) {
-        if (BlockFluidRendererHook.replaceLava()) {
+    TextureAtlasSprite[] replaceRenderedFluid(TextureAtlasSprite[] value) {
+        if (LavaReplacement.INSTANCE.replaceLava()) {
             return this.atlasSpritesWater;
         }
         return value;
