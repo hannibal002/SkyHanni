@@ -251,8 +251,8 @@ object CakeTracker {
         tracker.update()
     }
 
-    private fun getDisplayTypeToggle(): List<Searchable> {
-        val displayToggleRenderables = mutableListOf<Searchable>()
+    private fun buildDisplayTypeToggle(): Renderable {
+        val displayToggleRenderables = mutableListOf<Renderable>()
         val ownedString =
             if (config.displayType == CakeTrackerDisplayType.OWNED_CAKES) "§7§l[§r §a§nOwned§r §7§l]"
             else "§aOwned"
@@ -265,18 +265,18 @@ object CakeTracker {
                 ownedString,
                 { setDisplayType(CakeTrackerDisplayType.OWNED_CAKES) },
                 condition = { config.displayType != CakeTrackerDisplayType.OWNED_CAKES },
-            ).toSearchable()
+            )
         )
-        displayToggleRenderables.addSearchString(" §7§l- §r")
+        displayToggleRenderables.add(Renderable.string(" §7§l- §r"))
         displayToggleRenderables.add(
             Renderable.optionalLink(
                 missingString,
                 { setDisplayType(CakeTrackerDisplayType.MISSING_CAKES) },
                 condition = { config.displayType != CakeTrackerDisplayType.MISSING_CAKES },
-            ).toSearchable()
+            )
         )
 
-        return displayToggleRenderables
+        return Renderable.horizontalContainer(displayToggleRenderables)
     }
 
     private fun setDisplayOrderType(type: CakeTrackerDisplayOrderType) {
@@ -286,8 +286,8 @@ object CakeTracker {
         tracker.update()
     }
 
-    private fun getDisplayOrderTypeToggle(): List<Searchable> {
-        val displayOrderToggleRenderables = mutableListOf<Searchable>()
+    private fun buildOrderTypeToggle(): Renderable {
+        val displayOrderToggleRenderables = mutableListOf<Renderable>()
         val newestString =
             if (config.displayOrderType == CakeTrackerDisplayOrderType.NEWEST_FIRST) "§7§l[§r §a§nNewest First§r §7§l]"
             else "§aNewest First"
@@ -300,18 +300,18 @@ object CakeTracker {
                 newestString,
                 { setDisplayOrderType(CakeTrackerDisplayOrderType.NEWEST_FIRST) },
                 condition = { config.displayOrderType != CakeTrackerDisplayOrderType.NEWEST_FIRST },
-            ).toSearchable()
+            )
         )
-        displayOrderToggleRenderables.addSearchString(" §7§l- §r")
+        displayOrderToggleRenderables.add(Renderable.string(" §7§l- §r"))
         displayOrderToggleRenderables.add(
             Renderable.optionalLink(
                 oldestString,
                 { setDisplayOrderType(CakeTrackerDisplayOrderType.OLDEST_FIRST) },
                 condition = { config.displayOrderType != CakeTrackerDisplayOrderType.OLDEST_FIRST },
-            ).toSearchable()
+            )
         )
 
-        return displayOrderToggleRenderables
+        return Renderable.horizontalContainer(displayOrderToggleRenderables)
     }
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -321,8 +321,8 @@ object CakeTracker {
                 tips = listOf("§aHave§7: §a${data.cakesOwned.count()}§7, §cMissing§7: §c${data.cakesMissing.count()}"),
             ).toSearchable(),
         )
-        addAll(getDisplayTypeToggle())
-        addAll(getDisplayOrderTypeToggle())
+        add(buildDisplayTypeToggle().toSearchable("Display Type"))
+        add(buildOrderTypeToggle().toSearchable("Order Type"))
 
         val cakeList = when (config.displayType) {
             CakeTrackerDisplayType.OWNED_CAKES -> data.cakesOwned
@@ -362,7 +362,7 @@ object CakeTracker {
             if (start != end) cakeRanges.add(CakeRange(start, end))
             else cakeRanges.add(CakeRange(start))
 
-            cakeRanges.forEach { add(it.getRenderable(config.displayType).toSearchable()) }
+            cakeRanges.forEach { add(it.getRenderable(config.displayType).toSearchable("${it.start}")) }
         }
     }
 
