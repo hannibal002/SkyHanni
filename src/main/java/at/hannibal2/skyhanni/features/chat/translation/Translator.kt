@@ -143,30 +143,6 @@ object Translator {
     fun toEnglish(args: Array<String>) {
         toNativeLanguage(args)
     }
-
-    private fun getTranslationFromEnglish(message: String, lang: String): String {
-        val url =
-            "https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=$lang&dt=t&q=" +
-                URLEncoder.encode(message, "UTF-8")
-
-        val layer1 = getJSONResponse(url).asJsonArray
-        if (layer1.size() < 1) return "Error!"
-        val layer2 = layer1[0] as? JsonArray
-
-        val firstSentence = (layer2?.get(0) as? JsonArray)?.get(0).toString()
-        var messageToSend = firstSentence.substring(0, firstSentence.length - 1)
-        if (layer2 != null) {
-            for (sentenceIndex in 1..<layer2.size()) {
-                val sentence = (layer2.get(sentenceIndex) as JsonArray).get(0).toString()
-                val sentenceWithoutQuotes = sentence.substring(1, sentence.length - 1)
-                messageToSend = "$messageToSend$sentenceWithoutQuotes"
-            }
-        }
-        // The first translated sentence only has 1 extra char at the end, but sentences after it
-        // need 1 at the front and 1 at the end removed in the substring
-        messageToSend = messageToSend.substring(1, messageToSend.length)
-        return URLDecoder.decode(messageToSend, "UTF-8").replace("\\", "")
-    }
     
     @Deprecated("Use fromNativeLanguage() instead", ReplaceWith("Translator.fromNativeLanguage(args)"))
     fun fromEnglish(args: Array<String>) {
