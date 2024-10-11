@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -13,23 +14,39 @@ object SoundResponse {
 
     private val config get() = SkyHanniMod.feature.chat.soundResponse
 
-    private val repoGroup = RepoPattern.group("chat.sound.response")
-
-    /** REGEX-TEST: meow
-    REGEX-TEST:  meow
-    REGEX-TEST:  meow
-    REGEX-TEST: MEow
-    REGEX-TEST: §ameow
-    REGEX-TEST: hello §ameow
-     */
-    private val meow by repoGroup.pattern("meow", "(?:^|^.* )(?: |§.)*(?i)meow(?: |§.)*(?:\$| .*\$)")
-    private val bark by repoGroup.pattern("bark", "(?:^|^.* )(?: |§.)*(?i)(?:bark|arf|woof)(?: |§.)*(?:\$| .*\$)")
+    init {
+        SoundResponseTypes.entries.forEach { it.pattern }
+    }
 
     @SubscribeEvent
     fun onLorenzChat(event: LorenzChatEvent) {
-        when {
-            config.meow && meow.matches(event.message) -> SoundUtils.playMeowSound()
-            config.bark && bark.matches(event.message) -> SoundUtils.playBarkSound()
+        for (soundType in SoundResponseTypes.entries) {
+            if (!config.soundResponses.contains(soundType)) continue
+            if (soundType.pattern.matches(event.message)) {
+                soundType.sound.playSound()
+                return
+            }
         }
     }
+}
+
+private const val START_PATTERN = "(?:^|^.* )(?: |§.)*(?i)"
+private const val END_PATTERN = "(?: |§.|!|\\?|\\.)*(?:\$| .*\$)"
+
+enum class SoundResponseTypes(soundLocation: String, triggersOn: List<String>) {
+    CAT("mob.cat.meow", listOf("meow")),
+    DOG("mob.wolf.bark", listOf("bark", "arf", "woof")),
+    SHEEP("mob.sheep.say", listOf("baa", "baah", "baaa", "baaaa", "baaaaa")),
+    COW("mob.cow.say", listOf("moo", "mooo", "moooo")),
+    PIG("mob.pig.say", listOf("oink")),
+    CHICKEN("mob.chicken.say", listOf("cluck")),
+    ;
+
+    val sound by lazy { SoundUtils.createSound(soundLocation, 1f) }
+
+    // creates a pattern that looks for if the message contains any of the triggerOn strings but as a full word
+    val pattern by RepoPattern.pattern(
+        "chat.sound.response" + name.lowercase(),
+        "$START_PATTERN(?:${triggersOn.joinToString("|")})$END_PATTERN",
+    )
 }
