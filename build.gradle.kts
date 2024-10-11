@@ -8,6 +8,7 @@ import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import skyhannibuildsystem.ChangelogVerification
 import skyhannibuildsystem.DownloadBackupRepo
 
 plugins {
@@ -109,6 +110,13 @@ tasks.runClient {
         },
     )
 }
+
+tasks.register("checkPrDescription", ChangelogVerification::class) {
+    this.outputDirectory.set(layout.buildDirectory)
+    this.prTitle = project.findProperty("prTitle") as String
+    this.prBody = project.findProperty("prBody") as String
+}
+
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
