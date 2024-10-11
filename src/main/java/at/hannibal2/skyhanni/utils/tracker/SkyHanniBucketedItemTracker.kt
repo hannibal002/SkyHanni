@@ -59,9 +59,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             lists.addSearchableSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.sellName },
-                isCurrent = { it?.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceSource = it?.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
+                    config.priceSource = it.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
                     update()
                 },
             )

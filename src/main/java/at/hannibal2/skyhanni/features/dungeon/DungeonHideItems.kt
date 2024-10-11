@@ -209,8 +209,9 @@ object DungeonHideItems {
     }
 
     private fun shouldColorMovingSkull(entity: Entity) =
-        SkyHanniMod.feature.dungeon.highlightSkeletonSkull &&
-            movingSkeletonSkulls[entity]?.let { it + 200 > System.currentTimeMillis() } ?: false
+        SkyHanniMod.feature.dungeon.highlightSkeletonSkull && movingSkeletonSkulls[entity]?.let {
+            it + 200 > System.currentTimeMillis()
+        } ?: falsee
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

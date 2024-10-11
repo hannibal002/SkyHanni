@@ -284,7 +284,7 @@ object ChatFilter {
         "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
-        "§rUnknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
+        "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
     )
 
     private val skymallMessages = listOf(

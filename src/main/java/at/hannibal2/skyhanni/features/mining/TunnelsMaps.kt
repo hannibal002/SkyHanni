@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.Graph
@@ -366,9 +367,11 @@ object TunnelsMaps {
 
     private fun toCompactGemstoneName(it: Map.Entry<String, List<GraphNode>>): Renderable = Renderable.clickAndHover(
         Renderable.string(
-            (it.key.getFirstColorCode()?.let { "§$it" } ?: "") + ("ROUGH_".plus(
-                it.key.removeColor().removeSuffix("stone"),
-            ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()),
+            (it.key.getFirstColorCode()?.let { "§$it" } ?: "") + (
+                "ROUGH_".plus(
+                    it.key.removeColor().removeSuffix("stone"),
+                ).asInternalName().itemName.takeWhile { it != ' ' }.removeColor()
+                ),
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
@@ -482,7 +485,7 @@ object TunnelsMaps {
         nextSpotKey(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled() || !config.leftClickPigeon) return
         if (event.clickType != ClickType.LEFT_CLICK) return

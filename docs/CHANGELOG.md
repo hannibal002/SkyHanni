@@ -1,5 +1,55 @@
 # SkyHanni - Change Log
 
+## Version 0.28 (in Beta)
+
+### New Features
+
+#### Hoppity Features
+
++ Added an easier way to check your unique Hoppity Eggs collected on each island. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2625)
+    +  Shows your progress in the Warp Menu.
+    +  Can be automatically hidden when an island is complete.
+
+#### Inventory Features
+
++ Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
+    +  In Focus Mode, only the name of the item is displayed instead of the full description.
+
+### Improvements
+
+#### Inventory Improvements
+
++ Added Pocket Sack-in-a-Sack support to Estimated Item Value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2698)
+
+#### Chat and Command Improvements
+
++ Replaced repeated SkyHanni messages with the previous message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2700)
++ Added support for Guilds in player-related tab completions. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
++ Added support for all Guild and Friend commands in tab completions. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
+
+### Fixes
+
+#### Fishing Fixes
+
++ Fixed fishing displays showing in dungeons. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2697)
+
+#### Inventory Fixes
+
++ Fixed "No Guardian Pet warning" not supporting Pet Rule "On open Experimentation Table". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2699)
++ Fixed an error with compact experiment rewards chat messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2702)
+
+#### Combat Fixes
+
++ Fixed Ghost Counter display appearing while in incorrect areas on the map. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2696)
+
+### Technical Details
+
++ Assigned 'backend' label to PRs with 'backend' in the title. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2690)
+    +  This does not change the functionality of the current bug fix label.
++ Added SuggestionProvider. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
+    +  This new class simplifies building suggestion trees.
++ Added Stats API. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2253)
+
 ## Version 0.27
 
 ### New Features

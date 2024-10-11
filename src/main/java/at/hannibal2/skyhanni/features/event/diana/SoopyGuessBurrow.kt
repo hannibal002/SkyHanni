@@ -176,7 +176,8 @@ object SoopyGuessBurrow {
                     }
 
                     val (a, b, c) = solveEquationThing(
-                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1), LorenzVec(
+                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
+                        LorenzVec(
                             slopeThing[slopeThing.size - 5],
                             slopeThing[slopeThing.size - 3],
                             slopeThing[slopeThing.size - 1]

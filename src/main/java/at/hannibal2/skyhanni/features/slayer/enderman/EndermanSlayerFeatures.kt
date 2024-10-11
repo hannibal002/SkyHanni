@@ -24,12 +24,11 @@ import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -138,12 +137,11 @@ object EndermanSlayerFeatures {
                 val skullLocation = event.exactLocation(skull)
                 if (skullLocation.distanceToPlayer() > 20) continue
                 if (!skullLocation.canBeSeen()) continue
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
-                    skullLocation.add(y = 1),
+                event.drawLineToEye(
+                    skullLocation.up(),
                     LorenzColor.GOLD.toColor(),
                     3,
-                    true,
+                    true
                 )
             }
         }
@@ -159,8 +157,7 @@ object EndermanSlayerFeatures {
 
             if (beaconConfig.showLine) {
                 val beaconLocation = event.exactLocation(beacon)
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
+                event.drawLineToEye(
                     beaconLocation.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,
@@ -174,8 +171,7 @@ object EndermanSlayerFeatures {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {
-                event.draw3DLine(
-                    event.exactPlayerEyeLocation(),
+                event.drawLineToEye(
                     location.add(0.5, 1.0, 0.5),
                     beaconConfig.lineColor.toChromaColor(),
                     beaconConfig.lineWidth,

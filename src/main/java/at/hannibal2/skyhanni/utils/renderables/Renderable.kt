@@ -565,7 +565,7 @@ interface Renderable {
                     for ((index, renderable) in row.withIndex()) {
                         GlStateManager.pushMatrix()
                         GlStateManager.translate(xOffsets[index].toFloat(), yOffsets[rowIndex].toFloat(), 0F)
-                        renderable?.renderXYAligned(
+                        renderable.renderXYAligned(
                             posX + xOffsets[index],
                             posY + yOffsets[rowIndex],
                             xOffsets[index + 1] - xOffsets[index] - emptySpaceX,
@@ -1145,8 +1145,10 @@ interface Renderable {
                     renderY += yShift
                 }
                 @Suppress("SpacingAroundCurly")
-                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                    ?: yOffsets.size) - 1
+                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
+                    yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                        ?: yOffsets.size
+                    ) - 1
 
                 val range2 = if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
                     range.first..range.last() + 1

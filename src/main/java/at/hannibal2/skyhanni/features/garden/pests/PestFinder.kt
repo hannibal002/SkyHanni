@@ -158,8 +158,8 @@ object PestFinder {
         val isInaccurate = plot.isPestCountInaccurate
         val location = playerLocation.copy(x = middle.x, z = middle.z)
         event.drawWaypointFilled(location, LorenzColor.RED.toColor())
-        val text = "§e" + (if (isInaccurate) "?" else
-            pests
+        val text = "§e" + (
+            if (isInaccurate) "?" else pests
             ) + " §c$pestsName §7in §b$plotName"
         event.drawDynamicText(
             location, text, 1.5,

@@ -170,7 +170,7 @@ object GriffinBurrowParticleFinder {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return

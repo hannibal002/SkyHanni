@@ -98,8 +98,8 @@ object HoppityEventSummary {
 
         if (year < currentYear || (year == currentYear && !isSpring) && config.eventSummary.enabled) {
             sendStatsMessage(stats, year)
-            (ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
-                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization."))
+            ProfileStorageData.profileSpecific?.hoppityEventStats?.get(year)?.also { it.summarized = true }
+                ?: ErrorManager.skyHanniError("Could not save summarization state in Hoppity Event Summarization.")
         }
     }
 
@@ -131,6 +131,10 @@ object HoppityEventSummary {
         )
     }
 
+    private fun HoppityEventStats.getMilestoneCount(): Int =
+        (mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
+            (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
+
     private val summaryOperationList by lazy {
         buildMap<HoppityStat, (sb: StringBuilder, stats: HoppityEventStats, year: Int) -> Unit> {
             put(HoppityStat.MEAL_EGGS_FOUND) { sb, stats, year ->
@@ -155,8 +159,7 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.MILESTONE_RABBITS) { sb, stats, _ ->
-                ((stats.mealsFound[HoppityEggType.CHOCOLATE_FACTORY_MILESTONE] ?: 0) +
-                    (stats.mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)).takeIf { it > 0 }?.let {
+                stats.getMilestoneCount().takeIf { it > 0 }?.let {
                     sb.appendHeadedLine("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7.")
                 }
             }

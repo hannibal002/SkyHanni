@@ -429,10 +429,12 @@ object ScoreboardPattern {
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
     /**
      * REGEX-TEST: §eProtect Elle §7(§a98%§7)
+     * REGEX-TEST: §fFish 1 Flyfish §c✖
+     * REGEX-TEST: §fFish 1 Skeleton Fish §c✖
      */
     val thirdObjectiveLinePattern by miscSb.pattern(
         "thirdobjectiveline",
-        "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)",
+        "(\\s*§.\\(§.\\w+§.\\/§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔])",
     )
 
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
