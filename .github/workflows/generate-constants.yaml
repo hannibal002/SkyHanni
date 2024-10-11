@@ -45,7 +45,7 @@ jobs:
                 with:
                     repository: ${{ env.data_repo }}
                     branch: main
-            -   uses: actions/download-artifact@v3
+            -   uses: actions/download-artifact@v4
                 name: Upload generated repo regexes
                 with:
                     name: Repo Regexes
