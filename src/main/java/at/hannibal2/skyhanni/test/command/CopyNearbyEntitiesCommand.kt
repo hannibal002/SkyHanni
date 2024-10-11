@@ -259,6 +259,6 @@ object CopyNearbyEntitiesCommand {
         }
     }
 
-    private fun EntityLivingBase.asString() =
+    fun EntityLivingBase.asString() =
         this.entityId.toString() + " - " + this.javaClass.simpleName + " \"" + this.name + "\""
 }

@@ -29,6 +29,7 @@ import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityGiantZombie
 import net.minecraft.entity.monster.EntityGuardian
+import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntitySnowman
 import net.minecraft.entity.monster.EntityWitch
 import net.minecraft.entity.monster.EntityZombie
@@ -330,6 +331,8 @@ object MobFilter {
             }
         } else when (LorenzUtils.skyBlockIsland) {
             IslandType.CRIMSON_ISLE -> when {
+                (baseEntity is EntitySlime && extraEntityList.firstOrNull() is EntityPig) -> MobResult.illegal // Matriach Stomach (Heavy Pearl fix)
+                (baseEntity is EntityPig && extraEntityList.firstOrNull() is EntityPig) -> MobResult.illegal // Matriach Tongue
                 else -> null
             }
 

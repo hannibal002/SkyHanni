@@ -1,9 +1,11 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.asString
 import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
@@ -183,6 +185,8 @@ class Mob(
         fullEntityList().associateWith { this }
 
     internal fun internalAddEntity(entity: EntityLivingBase) {
+        if (config.mobDetection.logInternals)
+            MobData.logger.log("Internal Add: ${entity.asString()} of ${baseEntity.asString()}")
         internalRemoveColor()
         if (baseEntity.entityId > entity.entityId) {
             extraEntitiesList.add(0, baseEntity)
@@ -196,7 +200,10 @@ class Mob(
     }
 
     internal fun internalAddEntity(entities: Collection<EntityLivingBase>) {
+        // TODO remember why the drop 1 exists
         val list = entities.drop(1).toMutableList().apply { add(baseEntity) }
+        if (config.mobDetection.logInternals)
+            MobData.logger.log("Internal Add: ${list.map { it.asString() }} of ${baseEntity.asString()}")
         internalRemoveColor()
         extraEntitiesList.addAll(0, list)
         baseEntity = entities.first()
@@ -207,6 +214,8 @@ class Mob(
     }
 
     internal fun internalUpdateOfEntity(entity: EntityLivingBase) {
+        if (config.mobDetection.logInternals)
+            MobData.logger.log("Update: ${entity.asString()} of ${baseEntity.asString()}")
         internalRemoveColor()
         when (entity.entityId) {
             baseEntity.entityId -> {
@@ -232,5 +241,9 @@ class Mob(
         if (other !is Mob) return false
 
         return id == other.id
+    }
+
+    companion object {
+        private val config get() = SkyHanniMod.feature.dev.mobDebug
     }
 }
