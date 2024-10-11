@@ -392,7 +392,7 @@ object SkillAPI {
                     ChatUtils.chat("§bSkill Custom Goal Level")
                     val map = storage?.filter { it.value.customGoalLevel != 0 } ?: return
                     if (map.isEmpty()) {
-                        ChatUtils.chat("§cYou haven't set any custom goals yet!")
+                        ChatUtils.userError("You haven't set any custom goals yet!")
                     }
                     map.forEach { (skill, data) ->
                         ChatUtils.chat("§e${skill.displayName}: §b${data.customGoalLevel}")
@@ -486,7 +486,8 @@ object SkillAPI {
             1 -> listOf("levelwithxp", "xpforlevel", "goal")
             2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
                 strings,
-                SkillType.entries.map { it.displayName })
+                SkillType.entries.map { it.displayName }
+            )
             else
                 listOf()
 
@@ -502,7 +503,8 @@ object SkillAPI {
                 "§6/shskills goal - §bView your current goal",
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
                 "",
-            ).joinToString("\n"), prefix = false
+            ).joinToString("\n"),
+            prefix = false
         )
     }
 
