@@ -433,7 +433,7 @@ object ScoreboardPattern {
      */
     val thirdObjectiveLinePattern by miscSb.pattern(
         "thirdobjectiveline",
-        "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔])",
+        "(\\s*§.\\(§.\\w+§.\\/§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔])",
     )
 
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
