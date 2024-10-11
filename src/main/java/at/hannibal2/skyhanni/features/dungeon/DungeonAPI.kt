@@ -222,7 +222,6 @@ object DungeonAPI {
         playerClassLevel = -1
         completed = false
         DungeonBlessings.reset()
-        dungeonPhase = null
     }
 
     @SubscribeEvent
@@ -237,7 +236,6 @@ object DungeonAPI {
         }
 
         if (!LorenzUtils.inSkyBlock) return
-        handlePhaseMessage(event.message)
         killPattern.matchMatcher(event.message.removeColor()) {
             val bossCollections = bossStorage ?: return
             val boss = DungeonFloor.byBossName(group("boss"))
