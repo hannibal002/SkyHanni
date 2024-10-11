@@ -16,11 +16,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object GoldenGoblinHighlight {
 
-    private val config get() = SkyHanniMod.feature.mining.highlightYourGoldenGoblin
+    private val config get() = SkyHanniMod.feature.mining
 
     private val goblinPattern by RepoPattern.pattern("mining.mob.golden.goblin", "Golden Goblin|Diamond Goblin")
 
-    private fun isEnabled() = LorenzUtils.inMiningIsland() && config
+    private fun isEnabled() = LorenzUtils.inMiningIsland() && config.highlightYourGoldenGoblin
 
     private val timeOut = 10.seconds
 
@@ -52,6 +52,9 @@ object GoldenGoblinHighlight {
         lastChatMessage = SimpleTimeMark.farPast()
         lastGoblinSpawn = SimpleTimeMark.farPast()
         lastGoblin?.highlight(LorenzColor.GREEN.toColor())
+        if(config.lineToYourGoldenGoblin){
+            lastGoblin?.lineToPlayer(LorenzColor.GREEN.toColor())
+        }
         lastGoblin = null
     }
 

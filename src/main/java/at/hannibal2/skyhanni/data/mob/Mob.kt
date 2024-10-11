@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.LineToMobHandler
 import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
@@ -233,4 +234,6 @@ class Mob(
 
         return id == other.id
     }
+
+    fun lineToPlayer(color: Color, lineWidth : Int = 2,depth : Boolean = true) = LineToMobHandler.register(this,color,lineWidth,depth)
 }
