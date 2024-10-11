@@ -243,8 +243,10 @@ object MobFilter {
                 baseEntity,
                 armorStand,
                 extraEntityList,
-            ) else (MobFactories.basic(baseEntity, armorStand, extraEntityList)
-                ?: MobFactories.dojo(baseEntity, armorStand))
+            ) else (
+                MobFactories.basic(baseEntity, armorStand, extraEntityList)
+                    ?: MobFactories.dojo(baseEntity, armorStand)
+                )
 
     private fun noArmorStandMobs(baseEntity: EntityLivingBase): MobResult? = when {
         baseEntity is EntityBat -> createBat(baseEntity)

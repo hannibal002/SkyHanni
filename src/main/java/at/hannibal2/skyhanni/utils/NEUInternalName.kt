@@ -62,6 +62,7 @@ class NEUInternalName private constructor(private val internalName: String) {
 
     override fun hashCode(): Int = internalName.hashCode()
 
+    @Suppress("WrongEqualsTypeParameter")
     fun equals(other: String) = internalName == other
 
     fun contains(other: String) = internalName.contains(other)
