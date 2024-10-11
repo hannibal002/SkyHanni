@@ -74,6 +74,11 @@ public class MiningConfig {
     public MineshaftPityDisplayConfig mineshaftPityDisplay = new MineshaftPityDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Crystal Nucleus Crystal Highlights", desc = "")
+    @Accordion
+    public CrystalHighlighterConfig crystalHighlighter = new CrystalHighlighterConfig();
+
+    @Expose
     @ConfigOption(name = "Flowstate Helper", desc = "")
     @Accordion
     public FlowstateHelperConfig flowstateHelper = new FlowstateHelperConfig();
@@ -101,4 +106,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightYourGoldenGoblin = true;
+
+    @Expose
+    @ConfigOption(name = "Precision Mining Helper", desc = "Draws a box over the Precision Mining particles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightPrecisionMiningParticles = false;
 }

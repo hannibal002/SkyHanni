@@ -91,7 +91,7 @@ object EasterEggWaypoints {
     /*
         Title:
         §e§lHYPIXEL
-        
+
         '§703/14/24  §8L30A'
         '  '
         'Rank: §bMVP§d+§b'
