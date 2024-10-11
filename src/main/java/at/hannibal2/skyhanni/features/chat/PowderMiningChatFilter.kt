@@ -33,6 +33,7 @@ object PowderMiningChatFilter {
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
+    // TODO rename to "openedRewards" ?
     private var unclosedRewards = false
 
     /**
@@ -309,7 +310,8 @@ object PowderMiningChatFilter {
         return null
     }
 
-    private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
+    private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> =
+        emptyMap()
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {

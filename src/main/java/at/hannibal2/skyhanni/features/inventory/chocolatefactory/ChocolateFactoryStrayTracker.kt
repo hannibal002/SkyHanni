@@ -125,8 +125,9 @@ object ChocolateFactoryStrayTracker {
         "(?:§.)*already have captured him before.*",
     )
 
-    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("Stray Tracker", { Data() }, { it.chocolateFactory.strayTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
         override fun reset() {

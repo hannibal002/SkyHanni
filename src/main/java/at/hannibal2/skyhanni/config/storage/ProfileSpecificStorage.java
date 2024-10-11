@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.data.model.SkyblockStat;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker;
@@ -104,6 +105,9 @@ public class ProfileSpecificStorage {
         public long currentChocolate = 0;
 
         @Expose
+        public long maxChocolate = 0;
+
+        @Expose
         public long chocolateThisPrestige = 0;
 
         @Expose
@@ -200,6 +204,9 @@ public class ProfileSpecificStorage {
         @Expose
         public Map<CarnivalGoal, Boolean> goals = new HashMap<>();
     }
+
+    @Expose
+    public Map<SkyblockStat,Double> stats = new HashMap<>(SkyblockStat.getEntries().size());
 
     @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
