@@ -125,6 +125,16 @@ public class MiscConfig {
     public LastServersConfig lastServers = new LastServersConfig();
 
     @Expose
+    @ConfigOption(name = "Hide Far Entities", desc = "")
+    @Accordion
+    public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
+
+    @Expose
+    @ConfigOption(name = "Replace All Sounds", desc = "")
+    @Accordion
+    public ReplaceAllSoundsConfig replaceAllSounds = new ReplaceAllSoundsConfig();
+
+    @Expose
     @ConfigOption(name = "Show Outside SkyBlock", desc = "Show these features outside of SkyBlock.")
     @ConfigEditorDraggableList
     public Property<List<OutsideSbFeature>> showOutsideSB = Property.of(new ArrayList<>());
@@ -313,11 +323,6 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean unknownPerkpocalypseMayorWarning = true;
-
-    @ConfigOption(name = "Hide Far Entities", desc = "")
-    @Accordion
-    @Expose
-    public HideFarEntitiesConfig hideFarEntities = new HideFarEntitiesConfig();
 
     @Expose
     @ConfigOption(name = "Maintain Volume During Warnings", desc = "Do not change game volume levels when warning sounds are played.")
