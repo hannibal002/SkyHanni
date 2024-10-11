@@ -1362,7 +1362,7 @@ object RenderUtils {
         }
 
         fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
-            draw3DLine(inverseView, lorenzVec, color, lineWidth, depth)
+            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), lorenzVec, color, lineWidth, depth)
 
         fun drawBezier2(
             p1: LorenzVec,

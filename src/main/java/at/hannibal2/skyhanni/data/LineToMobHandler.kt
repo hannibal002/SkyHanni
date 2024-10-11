@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
-import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -14,16 +13,16 @@ import java.awt.Color
 object LineToMobHandler {
 
     data class Settings(
-        val color : Color,
-        val width : Int,
-        val depth : Boolean
+        val color: Color,
+        val width: Int,
+        val depth: Boolean,
     )
 
-    private val map = mutableMapOf<Mob,Settings>()
+    private val map = mutableMapOf<Mob, Settings>()
 
-    fun register(mob: Mob,color: Color,width: Int,depth: Boolean) = register(mob,Settings(color,width,depth))
+    fun register(mob: Mob, color: Color, width: Int, depth: Boolean) = register(mob, Settings(color, width, depth))
 
-    fun register(mob: Mob,settings: Settings){
+    fun register(mob: Mob, settings: Settings) {
         map[mob] = settings
     }
 
@@ -34,11 +33,12 @@ object LineToMobHandler {
 
     @SubscribeEvent
     fun onLorenzRenderWorld(event: LorenzRenderWorldEvent) {
-        if(!LorenzUtils.inSkyBlock) return
-        if(map.isEmpty()) return
+        if (!LorenzUtils.inSkyBlock) return
+        if (map.isEmpty()) return
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {
-            map.forEach { (mob, settings) ->
-                draw3DLineFromPlayer(mob.baseEntity.getLorenzVec(),settings.color,settings.width,settings.depth)
+            for ((mob, settings) in map) {
+                if (!mob.canBeSeen()) continue
+                draw3DLineFromPlayer(mob.centerCords, settings.color, settings.width, settings.depth)
             }
         }
     }
