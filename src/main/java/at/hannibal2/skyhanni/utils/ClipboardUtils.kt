@@ -32,8 +32,10 @@ object ClipboardUtils {
         delay(11)
         getClipboard(retries - 1)
     } else {
-        ErrorManager.logErrorStateWithData("can not read clipboard",
-            "clipboard can not be accessed after 20 retries")
+        ErrorManager.logErrorStateWithData(
+            "can not read clipboard",
+            "clipboard can not be accessed after 20 retries"
+        )
         null
     }
 

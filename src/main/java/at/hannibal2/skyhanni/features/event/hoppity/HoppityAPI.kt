@@ -58,7 +58,9 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
+    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
+        it.chatColorCode == rabbit.substring(0, 2)
+    }
 
     /**
      * REGEX-TEST: §f1st Chocolate Milestone
@@ -111,14 +113,14 @@ object HoppityAPI {
                         EggFoundEvent(STRAY, it.slotNumber).post()
                         lastName = "§9Fish the Rabbit"
                         lastMeal = STRAY
-                        duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line)}
+                        duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
                     "El Dorado" -> {
                         EggFoundEvent(STRAY, it.slotNumber).post()
                         lastName = "§6El Dorado"
                         lastMeal = STRAY
-                        duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line)}
+                        duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
                     else -> return@matchMatcher
