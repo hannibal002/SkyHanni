@@ -208,7 +208,7 @@ object HoppityEggLocator {
         lastParticlePosition = null
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
