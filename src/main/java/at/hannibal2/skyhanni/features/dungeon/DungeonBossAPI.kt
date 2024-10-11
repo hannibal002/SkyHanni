@@ -29,6 +29,9 @@ object DungeonBossAPI {
         F7_GOLDOR_5,
         F7_NECRON,
         M7_WITHER_KING,
+        ;
+
+        fun isCurrent(): Boolean = bossPhase == this
     }
 
     private val patternGroup = RepoPattern.group("dungeon.boss.message")

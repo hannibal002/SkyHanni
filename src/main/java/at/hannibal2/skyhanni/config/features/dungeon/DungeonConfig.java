@@ -139,7 +139,7 @@ public class DungeonConfig {
     public boolean shadowAssassinJumpNotifier = false;
 
     @Expose
-    @ConfigOption(name = "Terminal Waypoints", desc = "Displays Waypoints in the F7/M7 Goldor Phase")
+    @ConfigOption(name = "Terminal Waypoints", desc = "Displays Waypoints in the F7/M7 Goldor Phase.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean terminalWaypoints = false;
