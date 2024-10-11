@@ -52,7 +52,7 @@ object ChocolateFactoryBlockOpen {
                 if (it.timeUntil() > 0.seconds) return
                 event.cancelOpen()
                 ChatUtils.clickToActionOrDisable(
-                    "§cBlocked opening the Chocolate Factory without a §dBooster Cookie §cequipped!",
+                    "§cBlocked opening the Chocolate Factory without a §dBooster Cookie §cactive!",
                     config::boosterCookieRequirement,
                     actionName = "open bazaar",
                     action = { HypixelCommands.bazaar("Booster Cookie") },
