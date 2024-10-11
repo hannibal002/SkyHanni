@@ -217,15 +217,15 @@ object Commands {
             callback { FarmingWeightDisplay.lookUpCommand(it) }
         }
         event.register("shcopytranslation") {
-            description = "Copy the English translation of a message in another language to the clipboard. " +
-                "Uses a 2 letter language code that can be found at the end of a translation message."
+            description = "Copy the translation of a message in another language to your clipboard.\n" +
+                "Uses a language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_NORMAL
-            callback { Translator.fromEnglish(it) }
+            callback { Translator.fromNativeLanguage(it) }
         }
         event.register("shtranslate") {
-            description = "Translate a message in another language to English"
+            description = "Translate a message in another language your language."
             category = CommandCategory.USERS_NORMAL
-            callback { Translator.toEnglish(it) }
+            callback { Translator.toNativeLanguage(it) }
         }
         event.register("shmouselock") {
             description = "Lock/Unlock the mouse so it will no longer rotate the player (for farming)"
@@ -782,6 +782,11 @@ object Commands {
             description = "Resets the mineshaft pity display stats"
             category = CommandCategory.DEVELOPER_CODING_HELP
             callback { MineshaftPityDisplay.fullResetCounter() }
+        }
+        event.register("shtranslateadvanced") {
+            description = "Translates a message in an inputted language to another inputted language."
+            category = CommandCategory.DEVELOPER_CODING_HELP
+            callback { Translator.translateAdvancedCommand(it) }
         }
     }
 
