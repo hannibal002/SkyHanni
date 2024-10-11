@@ -80,7 +80,11 @@ object EndermanSlayerFeatures {
                 }
             }
 
-            if (config.highlightNukekebi && entity.inventory.any { it?.getSkullTexture() == NUKEKUBI_SKULL_TEXTURE } && entity !in nukekubiSkulls) {
+            if (config.highlightNukekebi &&
+                entity.inventory.any {
+                    it?.getSkullTexture() == NUKEKUBI_SKULL_TEXTURE
+                } && entity !in nukekubiSkulls
+            ) {
                 nukekubiSkulls.add(entity)
                 RenderLivingEntityHelper.setEntityColor(
                     entity,

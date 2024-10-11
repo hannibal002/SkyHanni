@@ -38,6 +38,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 //#endif
 
 @SkyHanniModule
+@Suppress("ImportOrdering")
 object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")

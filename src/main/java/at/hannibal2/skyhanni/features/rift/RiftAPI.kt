@@ -21,7 +21,7 @@ object RiftAPI {
 
     val farmingTool by lazy { "FARMING_WAND".asInternalName() }
 
-    private val blowgun by lazy  { "BERBERIS_BLOWGUN".asInternalName() }
+    private val blowgun by lazy { "BERBERIS_BLOWGUN".asInternalName() }
 
     val ItemStack?.isBlowgun: Boolean
         get() = this?.getInternalName() == blowgun

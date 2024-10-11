@@ -124,7 +124,8 @@ object EnigmaSoulWaypoints {
                             it,
                             "$name Enigma Soul",
                             config.color.toChromaColor(),
-                            condition = { config.showPathFinder })
+                            condition = { config.showPathFinder }
+                        )
                     }
                 }
             }

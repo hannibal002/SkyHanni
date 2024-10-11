@@ -85,12 +85,15 @@ object BingoCardDisplay {
 
         if (BingoAPI.bingoGoals.isEmpty()) {
             newList.add(Renderable.string("§6Bingo Goals:"))
-            newList.add(Renderable.clickAndHover("§cOpen the §e/bingo §ccard.",
-                listOf("Click to run §e/bingo"),
-                onClick = {
-                    HypixelCommands.bingo()
-                }
-            ))
+            newList.add(
+                Renderable.clickAndHover(
+                    "§cOpen the §e/bingo §ccard.",
+                    listOf("Click to run §e/bingo"),
+                    onClick = {
+                        HypixelCommands.bingo()
+                    }
+                )
+            )
         } else {
             if (!config.hideCommunityGoals.get()) {
                 newList.addCommunityGoals()

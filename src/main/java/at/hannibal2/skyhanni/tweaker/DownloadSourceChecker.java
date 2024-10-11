@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.tweaker;
 
+import at.hannibal2.skyhanni.utils.OSUtils;
+
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -18,15 +20,6 @@ public class DownloadSourceChecker {
     private static final String GITHUB_REPO = "511310721";
     private static final String GITHUB_REPO_TEXT = "repo_id=" + GITHUB_REPO;
     private static final String MODRINTH_URL = "/data/byNkmv5G/";
-    private static final String THE_PASSWORD = "danger";
-
-    private static final String[] PASSWORD_POPUP = {
-        "If someone asks you to type in here,",
-        "",
-        "the likelihood of them ratting you is high!",
-        "",
-        "Enter the password:"
-    };
 
     private static final String[] SECURITY_POPUP = {
         "The file you are trying to run is hosted on a non-trusted domain.",
@@ -41,7 +34,7 @@ public class DownloadSourceChecker {
     };
 
     public static void init() {
-        if (!TweakerUtils.isOnWindows()) return;
+        if (!OSUtils.INSTANCE.isWindows()) return;
         URI host = getDangerousHost();
         if (host != null) {
             openMenu(host);
@@ -76,17 +69,6 @@ public class DownloadSourceChecker {
         ));
 
         JPanel buttons = new JPanel();
-
-        buttons.add(TweakerUtils.createButton(
-            "Skip (Trusted Users Only)",
-            () -> {
-                String password = JOptionPane.showInputDialog(frame, String.join("\n", PASSWORD_POPUP));
-                if (password != null && password.equals(THE_PASSWORD)) {
-                    close.set(false);
-                    frame.dispatchEvent(new WindowEvent(frame, WindowEvent.WINDOW_CLOSING));
-                }
-            }
-        ));
 
         buttons.add(TweakerUtils.createButton(
             "Close",

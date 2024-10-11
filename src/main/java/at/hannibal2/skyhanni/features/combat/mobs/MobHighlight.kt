@@ -41,8 +41,7 @@ object MobHighlight {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_PURPLE.toColor().withAlpha(127)
-            )
-            { config.corruptedMobHighlight }
+            ) { config.corruptedMobHighlight }
         }
     }
 
@@ -56,16 +55,14 @@ object MobHighlight {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_BLUE.toColor().withAlpha(127)
-            )
-            { config.arachneKeeperHighlight }
+            ) { config.arachneKeeperHighlight }
         }
 
         if (config.corleoneHighlighter && maxHealth == 1_000_000 && entity is EntityOtherPlayerMP && entity.name == "Team Treasurite") {
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.DARK_PURPLE.toColor().withAlpha(127)
-            )
-            { config.corleoneHighlighter }
+            ) { config.corleoneHighlighter }
         }
 
         if (entity is EntityEnderman) {
@@ -77,8 +74,7 @@ object MobHighlight {
                     RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
                         LorenzColor.DARK_AQUA.toColor().withAlpha(127)
-                    )
-                    { config.zealotBruiserHighlighter }
+                    ) { config.zealotBruiserHighlighter }
                 }
             }
 
@@ -88,8 +84,7 @@ object MobHighlight {
                     RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                         entity,
                         LorenzColor.GREEN.toColor().withAlpha(127)
-                    )
-                    { config.chestZealotHighlighter }
+                    ) { config.chestZealotHighlighter }
                 }
             }
 
@@ -98,8 +93,7 @@ object MobHighlight {
                 RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                     entity,
                     LorenzColor.DARK_RED.toColor().withAlpha(50)
-                )
-                { config.specialZealotHighlighter }
+                ) { config.specialZealotHighlighter }
             }
         }
 
@@ -151,12 +145,16 @@ object MobHighlight {
     }
 
     private fun markArachneMinis(entity: EntityLivingBase) {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(50))
-        { config.arachneBossHighlighter }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            entity,
+            LorenzColor.GOLD.toColor().withAlpha(50)
+        ) { config.arachneBossHighlighter }
     }
 
     private fun markArachne(entity: EntityLivingBase) {
-        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.RED.toColor().withAlpha(50))
-        { config.arachneBossHighlighter }
+        RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+            entity,
+            LorenzColor.RED.toColor().withAlpha(50)
+        ) { config.arachneBossHighlighter }
     }
 }

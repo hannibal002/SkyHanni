@@ -282,7 +282,9 @@ object HoppityEggLocator {
         IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { config.showPathFinder })
     }
 
-    fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any { it.distance(location) < 5.0 }
+    fun isValidEggLocation(location: LorenzVec): Boolean = HoppityEggLocations.islandLocations.any {
+        it.distance(location) < 5.0
+    }
 
     private fun ReceiveParticleEvent.isVillagerParticle() = type == EnumParticleTypes.VILLAGER_HAPPY && speed == 0.0f && count == 1
 
