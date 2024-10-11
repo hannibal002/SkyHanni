@@ -29,6 +29,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -165,7 +166,8 @@ object HoppityAPI {
         eggFoundPattern.matchMatcher(event.message) {
             resetRabbitData()
             lastMeal = getEggType(event)
-            lastMeal?.let { EggFoundEvent(it, note = groupOrNull("note")).post() }
+            val note = groupOrNull("note")?.removeColor()
+            lastMeal?.let { EggFoundEvent(it, note = note).post() }
             attemptFireRabbitFound()
         }
 
