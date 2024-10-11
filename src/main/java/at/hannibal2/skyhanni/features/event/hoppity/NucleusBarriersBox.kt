@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -15,6 +17,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object NucleusBarriersBox {
     private val config get() = SkyHanniMod.feature.mining.crystalHighlighter
+
+    private var inNucleus = false
 
     private enum class Crystal(val color: LorenzColor, val boundingBox: AxisAlignedBB) {
         AMBER(
@@ -55,6 +59,11 @@ object NucleusBarriersBox {
     }
 
     @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        inNucleus = IslandAreas.currentAreaName == "Crystal Nucleus"
+    }
+
+    @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
@@ -67,7 +76,6 @@ object NucleusBarriersBox {
         }
     }
 
-    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() &&
-        (HoppityAPI.isHoppityEvent() || !config.onlyDuringHoppity) &&
-        config.enabled
+    private fun isEnabled() =
+        IslandType.CRYSTAL_HOLLOWS.isInIsland() && (HoppityAPI.isHoppityEvent() || !config.onlyDuringHoppity) && config.enabled && inNucleus
 }
