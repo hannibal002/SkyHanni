@@ -45,7 +45,7 @@ abstract class ChangelogVerification : DefaultTask() {
 
             // Export errors so that they can be listed in the PR comment
             val errorFile = File(outputDirectory.get().asFile, "changelog_errors.txt")
-            println("path: ${errorFile.path}")
+            println("saved error file to: ${errorFile.path}")
 
             errorFile.appendText("I have detected some issues with your pull request:\n\n")
 
