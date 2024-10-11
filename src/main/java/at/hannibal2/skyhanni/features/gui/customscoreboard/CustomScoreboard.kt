@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -56,7 +57,7 @@ object CustomScoreboard {
 
     private const val GUI_NAME = "Custom Scoreboard"
 
-    private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
+    private var nextScoreboardUpdate = SimpleTimeMark.farFuture()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -79,9 +80,7 @@ object CustomScoreboard {
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
         if (event.guiName == GUI_NAME) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
-                    verticalAlignment != VerticalAlignment.DONT_ALIGN
-                ) {
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN || verticalAlignment != VerticalAlignment.DONT_ALIGN) {
                     val tempHori = horizontalAlignment
                     val tempVert = verticalAlignment
 
@@ -105,15 +104,9 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
-        var dirty = false
-        if (lastScoreboardUpdate.passedSince() > 250.milliseconds) {
-            lastScoreboardUpdate = SimpleTimeMark.farFuture()
-            dirty = true
-        }
-
-        // Creating the lines
-        if (dirty) {
+        if (dirty || nextScoreboardUpdate.isInPast()) {
+            nextScoreboardUpdate = 250.milliseconds.fromNow()
+            dirty = false
             display = createLines().removeEmptyLinesFromEdges().createRenderable()
             if (TabListData.fullyLoaded) {
                 cache = display
@@ -126,7 +119,7 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        lastScoreboardUpdate = SimpleTimeMark.now()
+        dirty = true
     }
 
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
