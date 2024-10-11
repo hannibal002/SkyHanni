@@ -163,7 +163,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     ITEM({
         InventoryUtils.getItemInHand()?.let {
-            String.format("Holding ${it.displayName.removeColor()}")
+            String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
         } ?: "No item in hand"
     }),
 

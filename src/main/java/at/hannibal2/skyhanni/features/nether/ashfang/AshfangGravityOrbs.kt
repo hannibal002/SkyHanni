@@ -52,7 +52,7 @@ object AshfangGravityOrbs {
 
             if (orbLocation.distance(playerLocation) < 15) {
                 // TODO find way to dynamically change color
-                event.drawString(orbLocation.add(y = 2.5), "§cGravity Orb")
+                event.drawString(orbLocation.up(2.5), "§cGravity Orb")
             }
         }
     }
