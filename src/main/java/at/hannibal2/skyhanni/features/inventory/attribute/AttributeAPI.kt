@@ -58,7 +58,7 @@ object AttributeAPI {
         UNKNOWN("Unknown", "unknown", "??"),
         ;
 
-        override fun toString() = displayName
+        override fun toString() = "§b$displayName"
 
         companion object {
 
