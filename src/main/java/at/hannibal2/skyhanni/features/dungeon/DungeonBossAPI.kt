@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.events.DungeonBossPhaseChangeEvent
+import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonFloor
@@ -153,7 +154,12 @@ object DungeonBossAPI {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        dungeonFloor = null
+        dungeonPhase = null
+    }
+
+    @SubscribeEvent
+    fun onDungeonEnd(event: DungeonCompleteEvent) {
+        dungeonPhase = null
     }
 
     @SubscribeEvent
