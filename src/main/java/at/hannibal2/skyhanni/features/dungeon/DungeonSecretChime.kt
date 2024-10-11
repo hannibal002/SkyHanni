@@ -17,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DungeonSecretChime {
     private val config get() = SkyHanniMod.feature.dungeon.secretChime
-    private var dungeonSecretItems = listOf<NEUInternalName>()
+    private var dungeonSecretItems = setOf<NEUInternalName>()
 
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
@@ -35,14 +35,14 @@ object DungeonSecretChime {
     }
 
     @SubscribeEvent
-    fun onBatKill(event: MobEvent.DeSpawn) {
+    fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (isEnabled() && event.mob.name == "Dungeon Secret Bat") {
             playSound()
         }
     }
 
     @SubscribeEvent
-    fun onSecretItemPickup(event: ItemAddEvent) {
+    fun onItemAdd(event: ItemAddEvent) {
         if (isEnabled() && event.internalName in dungeonSecretItems) {
             playSound()
         }
