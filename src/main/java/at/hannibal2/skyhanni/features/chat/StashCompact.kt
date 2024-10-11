@@ -105,7 +105,7 @@ object StashCompact {
         ChatUtils.clickableChat(
             "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, lastType)} in stash, " +
                 "§8totalling $lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}§7. " +
-                "§3Click to ${if(config.useViewStash) "view stash" else "pickup stash"}p§7.",
+                "§3Click to ${if(config.useViewStash) "view stash" else "pickup stash"}§7.",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(lastType)
                 else HypixelCommands.pickupStash()
