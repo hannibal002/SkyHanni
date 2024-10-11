@@ -23,6 +23,15 @@ object ScoreboardElementMayor : ScoreboardElement() {
         }
 
         if (!mayorConfig.showExtraMayor) return@buildList
+        addAll(addMinister())
+        addAll(addJerryMayor())
+    }
+
+    override val configLine = "§2Diana §7(§e4d 12h§7)\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
+
+    override fun showIsland() = !RiftAPI.inRift()
+
+    private fun addMinister() = buildList {
         val ministerName = MayorAPI.currentMinister?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
         add(ministerName)
 
@@ -31,7 +40,9 @@ object ScoreboardElementMayor : ScoreboardElement() {
                 add(" §7- §e${perk.perkName}")
             }
         }
+    }
 
+    private fun addJerryMayor() = buildList {
         val jerryExtraMayor = MayorAPI.jerryExtraMayor
         val extraMayor = jerryExtraMayor.first ?: return@buildList
 
@@ -42,10 +53,6 @@ object ScoreboardElementMayor : ScoreboardElement() {
 
         add(extraMayorName + extraTimeTillNextMayor)
     }
-
-    override val configLine = "§2Diana §7(§e4d 12h§7)\n §7- §eLucky!\n §7- §eMythological Ritual\n §7- §ePet XP Buff"
-
-    override fun showIsland() = !RiftAPI.inRift()
 }
 
 // click: open /calendar
