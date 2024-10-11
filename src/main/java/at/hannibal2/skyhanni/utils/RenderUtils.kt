@@ -650,8 +650,11 @@ object RenderUtils {
     ) {
         if (list.isEmpty()) return
 
-        val render =
-            list.map { it.map { Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it") } }
+        val render = list.map { listEntry ->
+            listEntry.map {
+                Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it")
+            }
+        }
 
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
@@ -1097,6 +1100,15 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    fun LorenzRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
+        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        return exactLocation(player) + add
+    }
+
+    fun LorenzRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
+    }
+
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
@@ -1323,11 +1335,11 @@ object RenderUtils {
                 }
             } else {
                 val pathLines = path.zipWithNext()
-                pathLines.forEachIndexed { index, it ->
-                    val reduce = it.second.minus(it.first).normalize().times(bezierPoint)
+                pathLines.forEachIndexed { index, pathLine ->
+                    val reduce = pathLine.second.minus(pathLine.first).normalize().times(bezierPoint)
                     draw3DLine(
-                        if (index != 0) it.first + reduce else it.first,
-                        if (index != pathLines.lastIndex) it.second - reduce else it.second,
+                        if (index != 0) pathLine.first + reduce else pathLine.first,
+                        if (index != pathLines.lastIndex) pathLine.second - reduce else pathLine.second,
                         color,
                         lineWidth,
                         depth,

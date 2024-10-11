@@ -625,7 +625,9 @@ object Commands {
         event.register("shtestrabbitpaths") {
             description = "Tests pathfinding to rabbit eggs. Use a number 0-14."
             category = CommandCategory.DEVELOPER_CODING_HELP
-            callback { HoppityEggLocator.testPathfind(it) }
+            callback {
+            HoppityEggLocator.testPathfind(it)
+        }
         }
         event.register("shtestitem") {
             description = "test item internal name resolving"

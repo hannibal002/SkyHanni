@@ -90,7 +90,7 @@ object FortuneUpgrades {
     private fun getEquipmentUpgrades() {
         val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in FarmingItems.equip) {
-            val item = piece.getItem() ?: return
+            val item = piece.getItem()
             // todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
             val enchantments = item.getEnchantments() ?: emptyMap()

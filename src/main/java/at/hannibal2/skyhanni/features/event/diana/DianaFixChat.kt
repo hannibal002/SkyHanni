@@ -73,7 +73,8 @@ object DianaFixChat {
                         HypixelCommands.particleQuality("high")
                         errorCounter = 0
                         ChatUtils.chat("Now try again!")
-                    })
+                    }
+                )
             }
         } else {
             if (!hasSetToggleMusic) {
@@ -87,7 +88,8 @@ object DianaFixChat {
                             HypixelCommands.toggleMusic()
                             errorCounter = 0
                             ChatUtils.chat("Now try again, please!")
-                        })
+                        }
+                    )
                 }
             } else {
                 ErrorManager.logErrorStateWithData(
