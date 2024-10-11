@@ -65,7 +65,7 @@ object PowderMiningChatFilter {
      */
     private val breakingPowerPattern by patternGroup.pattern(
         "warning.breakingpower",
-        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!.+",
+        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine .+",
     )
 
     /**
