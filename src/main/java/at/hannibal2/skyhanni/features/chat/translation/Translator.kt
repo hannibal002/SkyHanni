@@ -111,11 +111,12 @@ object Translator {
      * ]
      */
 
-    private fun getJSONResponse(urlString: String) =
-        APIUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
+    private fun getJSONResponse(urlString: String) = APIUtils.getJSONResponseAsElement(urlString, false, "Google Translate API")
 
     fun getTranslation(
-        message: String, targetLanguage: String, sourceLanguage: String = "auto"
+        message: String,
+        targetLanguage: String,
+        sourceLanguage: String = "auto",
     ): Array<String>? {
         // TODO add &dj=1 to use named json
         val url = "https://translate.googleapis.com/translate_a/single?client=gtx&dt=t&sl=$sourceLanguage&tl=$targetLanguage&q=" +
@@ -139,9 +140,14 @@ object Translator {
     }
 
     @Deprecated("Use toNativeLanguage() instead", ReplaceWith("Translator.toNativeLanguage(args)"))
-    fun toEnglish(args: Array<String>) { toNativeLanguage(args) }
+    fun toEnglish(args: Array<String>) {
+        toNativeLanguage(args)
+    }
+
     @Deprecated("Use fromNativeLanguage() instead", ReplaceWith("Translator.fromNativeLanguage(args)"))
-    fun fromEnglish(args: Array<String>) { fromNativeLanguage(args) }
+    fun fromEnglish(args: Array<String>) {
+        fromNativeLanguage(args)
+    }
 
     fun toNativeLanguage(args: Array<String>) {
         val message = args.joinToString(" ").removeColor()
@@ -158,7 +164,7 @@ object Translator {
             ChatUtils.clickableChat(
                 "Found translation: §f$translatedMessage",
                 onClick = { OSUtils.copyToClipboard(translatedMessage) },
-                "§eClick to copy!\n§eOriginal message: §f$message §7(Language: $detectedLanguage)"
+                "§eClick to copy!\n§eOriginal message: §f$message §7(Language: $detectedLanguage)",
             )
         }
     }
@@ -176,7 +182,7 @@ object Translator {
             ChatUtils.clickableChat(
                 "Copied §f$language §etranslation to clipboard: §f$translation",
                 onClick = { OSUtils.copyToClipboard(translation) },
-                "§eClick to copy!\n§eOriginal message: §f$message"
+                "§eClick to copy!\n§eOriginal message: §f$message",
             )
         }
     }
@@ -192,12 +198,12 @@ object Translator {
 
         val translation = getTranslation(message, sourceLanguage, targetLanguage)
         val translatedMessage = translation?.get(0) ?: "Error!"
-        val detectedLanguage = if(sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
+        val detectedLanguage = if (sourceLanguage == "auto") " ${translation?.get(1) ?: "Error!"}" else ""
 
         ChatUtils.clickableChat(
             "Found translation from sl: $sourceLanguage: §f$translatedMessage §7(tl: $targetLanguage)",
             onClick = { OSUtils.copyToClipboard(translatedMessage) },
-            "§eClick to copy!\n§eOriginal message: §f$message §7(sl: $sourceLanguage$detectedLanguage)"
+            "§eClick to copy!\n§eOriginal message: §f$message §7(sl: $sourceLanguage$detectedLanguage)",
         )
     }
 

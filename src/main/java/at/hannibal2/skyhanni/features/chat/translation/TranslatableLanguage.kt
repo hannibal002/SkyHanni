@@ -34,7 +34,7 @@ enum class TranslatableLanguage(private val englishName: String, private val nat
     TAGALOG("Tagalog", "Tagalog", "tl"), // Major language in the Philippines
     PUNJABI("Punjabi", "ਪੰਜਾਬੀ", "pa"), // Significant in India and Pakistan
 
-    // 5. need better name
+    // 5. Other Language
     UNKNOWN("Other", "", ""),
     ;
 
