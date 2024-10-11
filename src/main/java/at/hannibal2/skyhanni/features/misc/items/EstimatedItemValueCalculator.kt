@@ -445,7 +445,7 @@ object EstimatedItemValueCalculator {
         var totalStars = stack.getDungeonStarCount() ?: stack.getStarCount() ?: 0
 
         starChange.takeIf { it != 0 }?.let {
-            list.add("change: $it")
+            list.add("[Debug] added stars: $it")
             totalStars += it
         }
 
