@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
-import at.hannibal2.skyhanni.events.DungeonPhaseChangeEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -59,7 +58,6 @@ object DungeonAPI {
     var playerClass: DungeonClass? = null
     var playerClassLevel = -1
     var isUniqueClass = false
-    var dungeonPhase: DungeonPhase? = null
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
@@ -385,141 +383,5 @@ object DungeonAPI {
             else -> return
         }
         DungeonBlockClickEvent(position, blockType).post()
-    }
-
-    enum class DungeonPhase {
-        F6_TERRACOTTA,
-        F6_GIANTS,
-        F6_SADAN,
-        F7_MAXOR,
-        F7_STORM,
-        F7_GOLDOR_1,
-        F7_GOLDOR_2,
-        F7_GOLDOR_3,
-        F7_GOLDOR_4,
-        F7_GOLDOR_5,
-        F7_NECRON,
-        M7_WITHER_KING,
-    }
-
-    private val phasePatternGroup = RepoPattern.group("dungeon.boss.message")
-
-    /**
-     * REGEX-TEST: §c[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\? Sadan\?!
-     */
-    private val terracottaStartPattern by phasePatternGroup.pattern(
-        "f6.terracotta",
-        "§c\\[BOSS] Sadan§r§f: So you made it all the way here\\.\\.\\. Now you wish to defy me\\? Sadan\\?!",
-    )
-
-    /**
-     * REGEX-TEST: §c[BOSS] Sadan§r§f: ENOUGH!
-     */
-    private val giantsStartPattern by phasePatternGroup.pattern(
-        "f6.giants",
-        "§c\\[BOSS] Sadan§r§f: ENOUGH!",
-    )
-
-    /**
-     * REGEX-TEST: §c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect.
-     */
-    private val sadanStartPattern by phasePatternGroup.pattern(
-        "f6.sadan",
-        "§c\\[BOSS] Sadan§r§f: You did it\\. I understand now, you have earned my respect\\.",
-    )
-
-    /**
-     * REGEX-TEST: §4[BOSS] Maxor§r§c: §r§cWELL! WELL! WELL! LOOK WHO'S HERE!
-     */
-    private val maxorStartPattern by phasePatternGroup.pattern(
-        "f7.maxor",
-        "§4\\[BOSS] Maxor§r§c: §r§cWELL! WELL! WELL! LOOK WHO'S HERE!",
-    )
-
-    /**
-     * REGEX-TEST: §4[BOSS] Storm§r§c: §r§cPathetic Maxor, just like expected.
-     */
-    private val stormStartPattern by phasePatternGroup.pattern(
-        "f7.storm",
-        "§4\\[BOSS] Storm§r§c: §r§cPathetic Maxor, just like expected\\.",
-    )
-
-    /**
-     * REGEX-TEST: §4[BOSS] Goldor§r§c: §r§cWho dares trespass into my domain?
-     */
-    private val goldorStartPattern by phasePatternGroup.pattern(
-        "f7.goldor.start",
-        "§4\\[BOSS] Goldor§r§c: §r§cWho dares trespass into my domain\\?",
-    )
-
-    /**
-     * REGEX-TEST: §bmartimavocado§r§a activated a lever! (§r§c7§r§a/7)
-     * REGEX-TEST: §bmartimavocado§r§a completed a device! (§r§c3§r§a/8)
-     * REGEX-TEST: §bmartimavocado§r§a activated a terminal! (§r§c4§r§a/7)
-     */
-    private val goldorTerminalPattern by phasePatternGroup.pattern(
-        "f7.goldor.terminalcomplete",
-        "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)",
-    )
-
-    /**
-     * REGEX-TEST: §aThe Core entrance is opening!
-     */
-    private val goldor5StartPattern by phasePatternGroup.pattern(
-        "f7.goldor.5",
-        "§aThe Core entrance is opening!",
-    )
-
-    /**
-     * REGEX-TEST: §4[BOSS] Necron§r§c: §r§cYou went further than any human before, congratulations.
-     */
-    private val necronStartPattern by phasePatternGroup.pattern(
-        "f7.necron.start",
-        "§4\\[BOSS] Necron§r§c: §r§cYou went further than any human before, congratulations\\.",
-    )
-
-    /**
-     * REGEX-TEST: §4[BOSS] Necron§r§c: §r§cAll this, for nothing...
-     */
-    private val witherKingStartPattern by phasePatternGroup.pattern(
-        "m7.witherking",
-        "§4\\[BOSS] Necron§r§c: §r§cAll this, for nothing\\.\\.\\.",
-    )
-
-    private fun handlePhaseMessage(message: String) {
-        if (dungeonFloor == "F6" || dungeonFloor == "M6") when { //move to enum
-            terracottaStartPattern.matches(message) -> changePhase(DungeonPhase.F6_TERRACOTTA)
-            giantsStartPattern.matches(message) -> changePhase(DungeonPhase.F6_GIANTS)
-            sadanStartPattern.matches(message) -> changePhase(DungeonPhase.F6_SADAN)
-        }
-
-        if (dungeonFloor == "F7" || dungeonFloor == "M7") { //move to enum
-            goldorTerminalPattern.matchMatcher(message) {
-                val currentTerminal = group("currentTerminal").toIntOrNull() ?: return
-                val totalTerminals = group("total").toIntOrNull() ?: return
-                if (currentTerminal != totalTerminals) return
-                changePhase(
-                    when (dungeonPhase) {
-                        DungeonPhase.F7_GOLDOR_1 -> DungeonPhase.F7_GOLDOR_2
-                        DungeonPhase.F7_GOLDOR_2 -> DungeonPhase.F7_GOLDOR_3
-                        DungeonPhase.F7_GOLDOR_3 -> DungeonPhase.F7_GOLDOR_4
-                        else -> return
-                    },
-                )
-            }
-            when {
-                maxorStartPattern.matches(message) -> changePhase(DungeonPhase.F7_MAXOR)
-                stormStartPattern.matches(message) -> changePhase(DungeonPhase.F7_STORM)
-                goldorStartPattern.matches(message) -> changePhase(DungeonPhase.F7_GOLDOR_1)
-                goldor5StartPattern.matches(message) -> changePhase(DungeonPhase.F7_GOLDOR_5)
-                necronStartPattern.matches(message) -> changePhase(DungeonPhase.F7_NECRON)
-                witherKingStartPattern.matches(message) -> if (dungeonPhase != null) changePhase(DungeonPhase.M7_WITHER_KING)
-            }
-        }
-    }
-
-    private fun changePhase(newPhase: DungeonPhase) {
-        DungeonPhaseChangeEvent(newPhase).post()
-        dungeonPhase = newPhase
     }
 }
