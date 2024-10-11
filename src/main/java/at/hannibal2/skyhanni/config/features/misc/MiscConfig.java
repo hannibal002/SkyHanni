@@ -114,7 +114,7 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
-    @ConfigOption(name = "Dragonic Sacrifice Tracker", desc = "")
+    @ConfigOption(name = "Draconic Sacrifice Tracker", desc = "")
     @Accordion
     public DraconicSacrificeTrackerConfig draconicSacrificeTracker = new DraconicSacrificeTrackerConfig();
 
