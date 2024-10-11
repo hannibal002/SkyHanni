@@ -131,7 +131,8 @@ object WoodenButtonsHelper {
                 blockState.getValue(BlockButtonWood.POWERED) == true &&
                 buttonLocation.canBeSeen(1..3) &&
                 lastHitButton != buttonLocation &&
-                !hitButtons.contains(buttonLocation)) {
+                !hitButtons.contains(buttonLocation)
+            ) {
                 lastHitButton = buttonLocation
                 addLastHitButton()
             }
