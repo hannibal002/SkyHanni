@@ -154,12 +154,12 @@ object DungeonBossAPI {
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
-        dungeonPhase = null
+        bossPhase = null
     }
 
     @SubscribeEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
-        dungeonPhase = null
+        bossPhase = null
     }
 
     @SubscribeEvent
