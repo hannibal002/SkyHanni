@@ -35,7 +35,9 @@ object ExperimentationTableAPI {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
 
-        val entity = EntityUtils.getEntities<EntityArmorStand>().find { it.hasSkullTexture(EXPERIMENTATION_TABLE_SKULL) } ?: return
+        val entity = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.hasSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        } ?: return
         val vec = entity.getLorenzVec()
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }

@@ -27,7 +27,7 @@ object RiftUpsideDownParkour {
             data.locations.map { it.add(-1.0, -1.0, -1.0) }, // TODO remove offset. change repo instead
             data.shortCuts,
             platformSize = 2.0,
-            detectionRange = 2.0
+            detectionRange = 2.0,
         )
         updateConfig()
     }

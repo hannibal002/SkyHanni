@@ -32,5 +32,5 @@ object TerracottaPhase {
         DungeonAPI.inDungeon() &&
             DungeonAPI.inBossRoom &&
             DungeonAPI.getCurrentBoss() == DungeonFloor.F6 &&
-            DungeonBossAPI.dungeonPhase == DungeonBossAPI.DungeonPhase.F6_TERRACOTTA
+            DungeonBossAPI.bossPhase == DungeonBossAPI.DungeonBossPhase.F6_TERRACOTTA
 }

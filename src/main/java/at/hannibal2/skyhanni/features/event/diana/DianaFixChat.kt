@@ -1,7 +1,9 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
@@ -73,7 +75,8 @@ object DianaFixChat {
                         HypixelCommands.particleQuality("high")
                         errorCounter = 0
                         ChatUtils.chat("Now try again!")
-                    })
+                    }
+                )
             }
         } else {
             if (!hasSetToggleMusic) {
@@ -87,7 +90,8 @@ object DianaFixChat {
                             HypixelCommands.toggleMusic()
                             errorCounter = 0
                             ChatUtils.chat("Now try again, please!")
-                        })
+                        }
+                    )
                 }
             } else {
                 ErrorManager.logErrorStateWithData(
@@ -100,7 +104,7 @@ object DianaFixChat {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
