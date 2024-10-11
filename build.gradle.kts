@@ -3,9 +3,12 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import skyhannibuildsystem.ChangelogVerification
 
 plugins {
     idea
@@ -18,30 +21,11 @@ plugins {
     kotlin("plugin.power-assert")
     `maven-publish`
     id("moe.nea.shot") version "1.0.0"
+    id("io.gitlab.arturbosch.detekt")
+    id("net.kyori.blossom")
 }
 
 val target = ProjectTarget.values().find { it.projectPath == project.path }!!
-
-repositories {
-    mavenCentral()
-    mavenLocal()
-    maven("https://maven.minecraftforge.net") {
-        metadataSources {
-            artifact() // We love missing POMs
-        }
-    }
-    maven("https://repo.spongepowered.org/maven/") // mixin
-    maven("https://pkgs.dev.azure.com/djtheredstoner/DevAuth/_packaging/public/maven/v1") // DevAuth
-    maven("https://jitpack.io") { // NotEnoughUpdates (compiled against)
-        content {
-            includeGroupByRegex("(com|io)\\.github\\..*")
-        }
-    }
-    maven("https://repo.nea.moe/releases") // libautoupdate
-    maven("https://maven.notenoughupdates.org/releases") // NotEnoughUpdates (dev env)
-    maven("https://repo.hypixel.net/repository/Hypixel/") // mod-api
-    maven("https://maven.teamresourceful.com/repository/thatgravyboat/") // DiscordIPC
-}
 
 // Toolchains:
 java {
@@ -56,11 +40,15 @@ val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
 // Minecraft configuration:
 loom {
-    if (this.isForgeLike)
+    if (this.isForgeLike) {
         forge {
-            pack200Provider.set(dev.architectury.pack200.java.Pack200Adapter())
+            pack200Provider.set(
+                dev.architectury.pack200.java
+                    .Pack200Adapter(),
+            )
             mixinConfig("mixins.skyhanni.json")
         }
+    }
     mixin {
         useLegacyMixinAp.set(true)
         defaultRefmapName.set("mixins.skyhanni.refmap.json")
@@ -84,11 +72,12 @@ loom {
     }
 }
 
-if (target == ProjectTarget.MAIN)
+if (target == ProjectTarget.MAIN) {
     sourceSets.main {
         resources.destinationDirectory.set(kotlin.destinationDirectory)
         output.setResourcesDir(kotlin.destinationDirectory)
     }
+}
 
 val shadowImpl: Configuration by configurations.creating {
     configurations.implementation.get().extendsFrom(this)
@@ -108,10 +97,19 @@ val headlessLwjgl by configurations.creating {
     isVisible = false
 }
 tasks.runClient {
-    this.javaLauncher.set(javaToolchains.launcherFor {
-        languageVersion.set(target.minecraftVersion.javaLanguageVersion)
-    })
+    this.javaLauncher.set(
+        javaToolchains.launcherFor {
+            languageVersion.set(target.minecraftVersion.javaLanguageVersion)
+        },
+    )
 }
+
+tasks.register("checkPrDescription", ChangelogVerification::class) {
+    this.outputDirectory.set(layout.buildDirectory)
+    this.prTitle = project.findProperty("prTitle") as String
+    this.prBody = project.findProperty("prBody") as String
+}
+
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
@@ -121,8 +119,9 @@ dependencies {
     } else {
         mappings(target.mappingDependency)
     }
-    if (target.forgeDep != null)
+    if (target.forgeDep != null) {
         "forge"(target.forgeDep!!)
+    }
 
     // Discord RPC client
     shadowImpl("com.jagrosh:DiscordIPC:0.5.3") {
@@ -159,9 +158,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // June 3, 2024, 9:30 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.0
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.0:all") {
+    // October 3, 2024, 11:43 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
@@ -177,10 +176,17 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    testImplementation("org.junit.jupiter:junit-jupiter:5.10.0")
+    testImplementation("org.junit.jupiter:junit-jupiter:5.11.0")
     testImplementation("io.mockk:mockk:1.12.5")
 
     implementation("net.hypixel:mod-api:0.3.1")
+
+    // getting clock offset
+    shadowImpl("commons-net:commons-net:3.8.0")
+
+    detektPlugins("org.notenoughupdates:detektrules:1.0.0")
+    detektPlugins(project(":detekt"))
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.23.7")
 }
 
 afterEvaluate {
@@ -231,10 +237,11 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
-if (target == ProjectTarget.MAIN)
+if (target == ProjectTarget.MAIN) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
+}
 
 if (target.parent == ProjectTarget.MAIN) {
     val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
@@ -285,6 +292,7 @@ tasks.shadowJar {
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
+    relocate("org.apache.commons.net", "at.hannibal2.skyhanni.deps.commons.net")
 }
 tasks.jar {
     archiveClassifier.set("nodeps")
@@ -312,12 +320,18 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
         onlyIf { false }
     }
 }
+
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
     vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
+
+blossom {
+    replaceToken("@MOD_VERSION@", version)
+}
+
 val sourcesJar by tasks.creating(Jar::class) {
     destinationDirectory.set(layout.buildDirectory.dir("badjars"))
     archiveClassifier.set("src")
@@ -342,4 +356,33 @@ publishing.publications {
             }
         }
     }
+}
+
+detekt {
+    buildUponDefaultConfig = true // preconfigure defaults
+    config.setFrom(rootProject.layout.projectDirectory.file("detekt/detekt.yml")) // point to your custom config defining rules to run, overwriting default behavior
+    baseline = file(layout.projectDirectory.file("detekt/baseline.xml")) // a way of suppressing issues before introducing detekt
+    source.setFrom(project.sourceSets.named("main").map { it.allSource })
+}
+
+tasks.withType<Detekt>().configureEach {
+    onlyIf {
+        false // TODO: Remove onlyIf when we're ready to enforce
+    }
+
+    reports {
+        html.required.set(true) // observe findings in your browser with structure and code snippets
+        xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
+        sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with GitHub Code Scanning
+        md.required.set(true) // simple Markdown format
+    }
+}
+
+tasks.withType<Detekt>().configureEach {
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
+}
+tasks.withType<DetektCreateBaselineTask>().configureEach {
+    jvmTarget = target.minecraftVersion.formattedJavaLanguageVersion
+    outputs.cacheIf { false } // Custom rules won't work if cached
 }

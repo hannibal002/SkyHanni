@@ -198,6 +198,11 @@ public class HoppityEggsConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
+    @ConfigEditorBoolean
+    public boolean showDuplicateNumber = false;
+
+    @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
@@ -206,4 +211,15 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Show uniques in Warp Menu", desc = "Shows your unique eggs in the Warp Menu during the hoppity event.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean uniquesWarpMenu = true;
+
+    @Expose
+    @ConfigOption(name = "Hide when maxed", desc = "Stops the above feature from working when the island is complete.")
+    @ConfigEditorBoolean
+    public boolean uniquesWarpMenuHideMax = true;
 }

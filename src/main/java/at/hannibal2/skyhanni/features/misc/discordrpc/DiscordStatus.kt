@@ -163,7 +163,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
 
     ITEM({
         InventoryUtils.getItemInHand()?.let {
-            String.format("Holding ${it.displayName.removeColor()}")
+            String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
         } ?: "No item in hand"
     }),
 
@@ -344,5 +344,4 @@ enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatu
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
     DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
     AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
-    ;
 }
