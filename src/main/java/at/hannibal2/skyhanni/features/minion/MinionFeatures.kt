@@ -360,7 +360,7 @@ object MinionFeatures {
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
         for (minion in minions) {
-            val location = minion.key.add(y = 1.0)
+            val location = minion.key.up()
             if (location.distanceToPlayer() > 50) continue
 
             val lastEmptied = minion.value.lastClicked
@@ -371,14 +371,14 @@ object MinionFeatures {
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName
-                event.drawString(location.add(y = 0.65), name, true)
+                event.drawString(location.up(0.65), name, true)
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
                 val passedSince = SimpleTimeMark(lastEmptied).passedSince()
                 val format = passedSince.format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(y = 1.15), text, true)
+                event.drawString(location.up(1.15), text, true)
             }
         }
     }
