@@ -30,7 +30,9 @@ import kotlin.time.Duration.Companion.seconds
 object FlowstateHelper {
     private val config get() = SkyHanniMod.feature.mining.flowstateHelper
     var streakEndTimer = SimpleTimeMark.farPast()
+        private set
     var blockBreakStreak = 0
+        private set
 
     private var display: List<Renderable>? = null
     private var displayDirty = false
