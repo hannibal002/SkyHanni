@@ -71,7 +71,12 @@ object EstimatedItemValueCalculator {
 
     private val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
-    var starChange = 0
+    var starChange
+        get() = if (SkyHanniMod.feature.dev.debug.enabled) starChange_ else 0
+        set(value) {
+            starChange_ = value
+        }
+    private var starChange_ = 0
 
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
