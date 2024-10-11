@@ -71,6 +71,7 @@ object EstimatedItemValueCalculator {
     private val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     var starChange = 0
+        get() = if (SkyHanniMod.feature.dev.debug.enabled) field else 0
 
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -434,7 +435,7 @@ object EstimatedItemValueCalculator {
         var totalStars = stack.getDungeonStarCount() ?: stack.getStarCount() ?: 0
 
         starChange.takeIf { it != 0 }?.let {
-            list.add("change: $it")
+            list.add("[Debug] added stars: $it")
             totalStars += it
         }
 
