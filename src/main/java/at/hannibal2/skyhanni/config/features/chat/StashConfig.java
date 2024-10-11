@@ -1,34 +1,28 @@
 package at.hannibal2.skyhanni.config.features.chat;
 
+import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class StashConfig {
 
     @Expose
-    @ConfigOption(name = "Stash Warnings", desc = "Compact or hide warnings relating to items/materials in your stash.")
-    @ConfigEditorDropdown
-    public StashHandlerType stashWarnings = StashHandlerType.COMPACT;
+    @ConfigOption(name = "Stash Warnings", desc = "Compact warnings relating to items/materials in your stash.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean enabled = true;
 
-    public enum StashHandlerType {
-        NONE("None (Use Hypixel messages)"),
-        COMPACT("Compact Messages"),
-        HIDE("Hide Completely"),
-        ;
+    @Expose
+    @ConfigOption(name = "Hide Duplicate Warnings", desc = "Hide duplicate warnings for previously reported stash counts.")
+    @ConfigEditorBoolean
+    public boolean hideDuplicateCounts = true;
 
-        private final String name;
-
-        StashHandlerType(String name) {
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return name;
-        }
-    }
+    @Expose
+    @ConfigOption(name = "Hide Low Warnings", desc = "Hide warnings with a total count below this number.")
+    @ConfigEditorSlider(minValue = 0, maxValue = 1000000, minStep = 100)
+    public int hideLowWarningsThreshold = 0;
 
     @Expose
     @ConfigOption(name = "Use /ViewStash", desc = "Use /viewstash [type] instead of /pickupstash.")

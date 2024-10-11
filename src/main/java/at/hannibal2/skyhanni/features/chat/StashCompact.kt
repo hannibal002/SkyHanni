@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.config.features.chat.StashConfig
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -57,7 +56,6 @@ object StashCompact {
         "generic",
         "§eOne or more (?:item|material)s? didn't fit in your inventory and were added to your (?:item|material) stash! §6Click here §eto pick them up!",
     )
-
     //</editor-fold>
 
     private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
@@ -67,7 +65,6 @@ object StashCompact {
     private var lastType = ""
 
     private var lastSentMaterialCount = 0
-    private var lastSentDifferingMaterialsCount = 0
     private var lastSentType = ""
 
     @SubscribeEvent
@@ -97,31 +94,27 @@ object StashCompact {
 
         if (pickupStashPattern.matches(event.message)) {
             event.blockedReason = "stash_compact"
-            if (lastMaterialCount != lastSentMaterialCount ||
-                lastDifferingMaterialsCount != lastSentDifferingMaterialsCount ||
-                lastType != lastSentType
-            ) {
-                sendCompactedStashMessage()
-                lastSentMaterialCount = lastMaterialCount
-                lastSentDifferingMaterialsCount = lastDifferingMaterialsCount
-                lastSentType = lastType
-            }
+            if (lastMaterialCount <= config.hideLowWarningsThreshold) return
+            if (config.hideDuplicateCounts && lastMaterialCount == lastSentMaterialCount && lastType == lastSentType) return
+
+            sendCompactedStashMessage()
         }
     }
 
     private fun sendCompactedStashMessage() {
-        if (config.stashWarnings == StashConfig.StashHandlerType.HIDE) return
         ChatUtils.clickableChat(
             "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, lastType)} in stash, " +
                 "§8totalling $lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}§7. " +
-                "§3Click to pickup§7.",
+                "§3Click to ${if(config.useViewStash) "view stash" else "pickup stash"}p§7.",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(lastType)
                 else HypixelCommands.pickupStash()
             },
             prefix = false,
         )
+        lastSentMaterialCount = lastMaterialCount
+        lastSentType = lastType
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.stashWarnings != StashConfig.StashHandlerType.NONE
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }
