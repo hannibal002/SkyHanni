@@ -57,6 +57,16 @@ object InquisitorWaypointShare {
         "party.inquisitorchecker",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
     )
+
+    // Support for maybe odin, not sure what
+    /**
+     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     */
+    private val odinPattern by patternGroup.pattern(
+        "party.odin",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!"
+    )
+
     private val diedPattern by patternGroup.pattern(
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
@@ -233,6 +243,11 @@ object InquisitorWaypointShare {
         if (packet.type.toInt() != 0) return
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
+            if (detectFromChat()) {
+                event.cancel()
+            }
+        }
+        odinPattern.matchMatcher(message) {
             if (detectFromChat()) {
                 event.cancel()
             }
