@@ -27,11 +27,10 @@ public class AttributeOverlayConfig {
     @Expose
     @ConfigOption(
         name = "Min Level",
-        desc = "Minimum level to show the attributes of.\n" +
-            "(Overridden by Highlight Good Rolls)"
+        desc = "Minimum level to show the attributes of."
     )
-    @ConfigEditorSlider(minValue = 0, maxValue = 10, minStep = 1)
-    public int minimumLevel = 0;
+    @ConfigEditorSlider(minValue = 1, maxValue = 10, minStep = 1)
+    public int minimumLevel = 1;
 
     @Expose
     @ConfigOption(
@@ -42,6 +41,14 @@ public class AttributeOverlayConfig {
     )
     @ConfigEditorBoolean
     public boolean highlightGoodRolls = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Good Rolls Override Level",
+        desc = "Makes it so that Good Rolls are always shown no matter the attribute level."
+    )
+    @ConfigEditorBoolean
+    public boolean goodRollsOverrideLevel = true;
 
     @Expose
     @ConfigOption(name = "Hide non Good Rolls", desc = "Hides attributes that are not considered good rolls.")
