@@ -22,6 +22,7 @@ object LavaReplacement {
         }
     }
 
+    @JvmStatic
     fun replaceLava(): Boolean {
         if (!LorenzUtils.inSkyBlock || !config.enabled.get()) return false
         if (config.onlyInCrimsonIsle.get() && !IslandType.CRIMSON_ISLE.isInIsland()) return false

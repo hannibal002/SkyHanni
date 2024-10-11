@@ -19,7 +19,7 @@ public abstract class MixinBlockLiquid {
         at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockLiquid;colorMultiplier(Lnet/minecraft/world/IBlockAccess;Lnet/minecraft/util/BlockPos;)I")
     )
     TextureAtlasSprite[] replaceRenderedFluid(TextureAtlasSprite[] value) {
-        if (LavaReplacement.INSTANCE.replaceLava()) {
+        if (LavaReplacement.replaceLava()) {
             return this.atlasSpritesWater;
         }
         return value;
