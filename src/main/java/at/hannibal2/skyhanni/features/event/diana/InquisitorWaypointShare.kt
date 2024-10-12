@@ -58,7 +58,6 @@ object InquisitorWaypointShare {
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
     )
 
-    // Support for maybe odin, not sure what
     /**
      * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
      */
