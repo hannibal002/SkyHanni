@@ -15,11 +15,10 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -59,11 +58,11 @@ object DungeonLividFinder {
         val chatColor = color.getChatColor()
 
         lividArmorStand = EntityUtils.getEntities<EntityArmorStand>()
-            .firstOrNull { it.name.startsWith("${chatColor}﴾ ${chatColor}§lLivid") }
+            .firstOrNull { it.name.startsWith("$chatColor﴾ $chatColor§lLivid") }
 
         if (event.isMod(20)) {
             if (lividArmorStand == null) {
-            val amountArmorStands = EntityUtils.getEntities<EntityArmorStand>().filter { it.name.contains("Livid") }.count()
+                val amountArmorStands = EntityUtils.getEntities<EntityArmorStand>().count { it.name.contains("Livid") }
                 if (amountArmorStands >= 8) {
                     ErrorManager.logErrorStateWithData(
                         "Could not find livid",
@@ -134,17 +133,16 @@ object DungeonLividFinder {
         if (!config.enabled) return
 
         val livid = getLividAlive() ?: return
-        val location = livid.getLorenzVec().add(-0.5, 0.0, -0.5)
-
         val lorenzColor = color ?: return
-
-        event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
+        val location = event.exactLocation(livid)
 
         if (location.distanceSqToPlayer() < 50) return
 
+        event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
+
         val color = lorenzColor.toColor()
-        event.draw3DLine(event.exactPlayerEyeLocation(), location.add(0.5, 0.0, 0.5), color, 3, true)
-        event.drawWaypointFilled(location, color, beacon = false, seeThroughBlocks = true)
+        event.drawLineToEye(location, color, 3, true)
+        event.drawWaypointFilled(location.add(-0.5, 0.0, -0.5), color, beacon = false, seeThroughBlocks = true)
     }
 
     @SubscribeEvent
