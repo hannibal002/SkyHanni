@@ -254,12 +254,12 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "Copy the English translation of a message in another language to the clipboard.\n" + "Uses a 2 letter language code that can be found at the end of a translation message.",
-        ) { Translator.fromEnglish(it) }
+            "Copy the translation of a message in another language to your clipboard.\n" + "Uses a language code that can be found at the end of a translation message.",
+        ) { Translator.fromNativeLanguage(it) }
         registerCommand(
             "shtranslate",
-            "Translate a message in another language to English.",
-        ) { Translator.toEnglish(it) }
+            "Translate a message in another language to your language.",
+        ) { Translator.toNativeLanguage(it) }
         registerCommand(
             "shmouselock",
             "Lock/Unlock the mouse so it will no longer rotate the player (for farming)",
@@ -621,6 +621,10 @@ object Commands {
             "shresetmineshaftpitystats",
             "Resets the mineshaft pity display stats",
         ) { MineshaftPityDisplay.fullResetCounter() }
+        registerCommand(
+            "shtranslateadvanced",
+            "Translates a message in an inputted language to another inputted language.",
+        ) { Translator.translateAdvancedCommand(it) }
     }
 
     private fun internalCommands() {

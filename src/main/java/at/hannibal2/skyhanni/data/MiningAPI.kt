@@ -171,7 +171,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
