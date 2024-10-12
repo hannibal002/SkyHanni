@@ -132,9 +132,6 @@ object FlareDisplay {
             if (config.expireSound) {
                 SoundUtils.playPlingSound()
             }
-            if (remainingTime < 0.seconds) {
-                activeWarning = false
-            }
         }
         display = newDisplay ?: emptyList()
     }
