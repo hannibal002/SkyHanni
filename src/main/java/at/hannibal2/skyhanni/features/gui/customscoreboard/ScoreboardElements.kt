@@ -39,8 +39,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getHeat
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getMotes
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.getNorthStars
-import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAdvancedMiningIsland
@@ -50,41 +48,25 @@ import at.hannibal2.skyhanni.utils.NumberUtil.percentageColor
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.TabListData
-import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
 import kotlin.time.Duration.Companion.seconds
 
-internal var confirmedUnknownLines = listOf<String>()
-internal var unconfirmedUnknownLines = listOf<String>()
-internal var unknownLinesSet = TimeLimitedSet<String>(1.seconds) { onRemoval(it) }
+internal var allUnknownLines = listOf<UnknownLine>()
+internal var lastRecentAlarmWarning = SimpleTimeMark.farPast()
 
-private fun onRemoval(line: String) {
-    if (!LorenzUtils.inSkyBlock) return
-    if (!unconfirmedUnknownLines.contains(line)) return
-    if (line !in unconfirmedUnknownLines) return
-    unconfirmedUnknownLines = unconfirmedUnknownLines.filterNot { it == line }
-    confirmedUnknownLines = confirmedUnknownLines.editCopy { add(line) }
-    if (!config.unknownLinesWarning) return
-    val pluralize = pluralize(confirmedUnknownLines.size, "unknown line", withNumber = true)
-    val message = "CustomScoreboard detected $pluralize"
-    ErrorManager.logErrorWithData(
-        CustomScoreboardUtils.UndetectedScoreboardLines(message),
-        message,
-        "Unknown Lines" to confirmedUnknownLines,
-        "Island" to LorenzUtils.skyBlockIsland,
-        "Area" to HypixelData.skyBlockArea,
-        "Full Scoreboard" to CustomScoreboard.activeLines,
-        noStackTrace = true,
-        betaOnly = true,
-    )
+internal fun recentUnknownLines() = allUnknownLines.filter { it.lastFound.passedSince() < 3.seconds }
+
+internal class UnknownLine(val line: String) {
+    val firstFound = SimpleTimeMark.now()
+    var lastFound = SimpleTimeMark.now()
+    var lastWarned = SimpleTimeMark.farPast()
 }
-
-internal var amountOfUnknownLines = 0
 
 enum class ScoreboardElement(
     private val displayPair: () -> List<ScoreboardElementType>,
@@ -370,10 +352,11 @@ private fun getTitleDisplayPair(): List<ScoreboardElementType> {
     }
 
     return if (displayConfig.titleAndFooter.useCustomTitle) {
-        listOf(displayConfig.titleAndFooter.customTitle.get().toString()
-            .replace("&", "§")
-            .split("\\n")
-            .map { it to alignment }
+        listOf(
+            displayConfig.titleAndFooter.customTitle.get().toString()
+                .replace("&", "§")
+                .split("\\n")
+                .map { it to alignment }
         ).flatten()
     } else {
         listOf(ScoreboardData.objectiveTitle to alignment)
@@ -389,7 +372,7 @@ private fun getPurseDisplayPair(): List<ScoreboardElementType> {
     var purse = PurseAPI.currentPurse.formatNum()
 
     if (!displayConfig.hideCoinsDifference) {
-        val earned = getGroupFromPattern(CustomScoreboard.activeLines, PurseAPI.coinsPattern, "earned")
+        val earned = getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, PurseAPI.coinsPattern, "earned")
         if (earned != null) purse += " §7(§e+$earned§7)§6"
     }
 
@@ -491,8 +474,8 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
     )
 }
 
-private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS)
-    && CustomScoreboard.activeLines.any { ScoreboardPattern.heatPattern.matches(it) }
+private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
     val cold = -MiningAPI.cold
@@ -507,7 +490,7 @@ private fun getColdDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getColdShowWhen() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT) &&
-    CustomScoreboard.activeLines.any { ScoreboardPattern.coldPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.coldPattern.matches(it) }
 
 private fun getNorthStarsDisplayPair(): List<ScoreboardElementType> {
     val northStars = getNorthStars()?.formatNum() ?: "0"
@@ -550,7 +533,7 @@ private fun getIslandDisplayPair() =
 private fun getLocationDisplayPair() = buildList {
     HypixelData.skyBlockAreaWithSymbol?.let { add(it to HorizontalAlignment.LEFT) }
 
-    CustomScoreboard.activeLines.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.firstOrNull { ScoreboardPattern.plotPattern.matches(it) }
         ?.let { add(it to HorizontalAlignment.LEFT) }
 }
 
@@ -568,12 +551,12 @@ fun getPlayerAmountDisplayPair() = buildList {
 
 private fun getVisitDisplayPair() =
     listOf(
-        CustomScoreboard.activeLines.first { ScoreboardPattern.visitingPattern.matches(it) } to
+        ScoreboardData.sidebarLinesFormatted.first { ScoreboardPattern.visitingPattern.matches(it) } to
             HorizontalAlignment.LEFT,
     )
 
 private fun getVisitShowWhen() =
-    CustomScoreboard.activeLines.any { ScoreboardPattern.visitingPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.visitingPattern.matches(it) }
 
 private fun getDateDisplayPair() =
     listOf(
@@ -582,7 +565,7 @@ private fun getDateDisplayPair() =
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     val symbol =
-        getGroupFromPattern(CustomScoreboard.activeLines, ScoreboardPattern.timePattern, "symbol") ?: ""
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol") ?: ""
     return listOf(
         "§7" + SkyBlockTime.now()
             .formatted(
@@ -603,15 +586,16 @@ private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getPowerDisplayPair() = listOf(
-    (MaxwellAPI.currentPower?.let {
-        val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
-        if (displayConfig.displayNumbersFirst) {
-            "§a${it.replace(" Power", "")} Power $mp"
-        } else {
-            "Power: §a$it $mp"
-        }
-    }
-        ?: "§cOpen \"Your Bags\"!") to HorizontalAlignment.LEFT,
+    (
+        MaxwellAPI.currentPower?.let {
+            val mp = if (maxwellConfig.showMagicalPower) "§7(§6${MaxwellAPI.magicalPower?.addSeparators()}§7)" else ""
+            if (displayConfig.displayNumbersFirst) {
+                "§a${it.replace(" Power", "")} Power $mp"
+            } else {
+                "Power: §a$it $mp"
+            }
+        } ?: "§cOpen \"Your Bags\"!"
+        ) to HorizontalAlignment.LEFT,
 )
 
 private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
@@ -659,10 +643,11 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
 private fun getPowerShowWhen() = !inAnyIsland(IslandType.THE_RIFT)
 
 private fun getCookieDisplayPair() = listOf(
-    "§dCookie Buff§f: " + (BitsAPI.cookieBuffTime?.let {
-        if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
-    }
-        ?: "§cOpen SbMenu!") to HorizontalAlignment.LEFT,
+    "§dCookie Buff§f: " + (
+        BitsAPI.cookieBuffTime?.let {
+            if (!BitsAPI.hasCookieBuff()) "§cNot Active" else it.timeUntil().format(maxUnits = 2)
+        } ?: "§cOpen SbMenu!"
+        ) to HorizontalAlignment.LEFT,
 )
 
 private fun getCookieShowWhen(): Boolean {
@@ -671,7 +656,7 @@ private fun getCookieShowWhen(): Boolean {
 }
 
 private fun getObjectiveDisplayPair() = buildList {
-    val formattedLines = CustomScoreboard.activeLines
+    val formattedLines = ScoreboardData.sidebarLinesFormatted
     val objective = formattedLines.firstOrNull { ScoreboardPattern.objectivePattern.matches(it) }
     if (objective != null) {
         add(objective to HorizontalAlignment.LEFT)
@@ -690,7 +675,7 @@ private fun getObjectiveDisplayPair() = buildList {
 }
 
 private fun getObjectiveShowWhen(): Boolean =
-    ScoreboardPattern.objectivePattern.anyMatches(CustomScoreboard.activeLines)
+    ScoreboardPattern.objectivePattern.anyMatches(ScoreboardData.sidebarLinesFormatted)
 
 private fun getSlayerDisplayPair(): List<ScoreboardElementType> = buildList {
     add((if (SlayerAPI.hasActiveSlayerQuest()) "Slayer Quest" else "<hidden>") to HorizontalAlignment.LEFT)
@@ -802,6 +787,11 @@ private fun getMayorDisplayPair() = buildList {
     }
 
     if (!mayorConfig.showExtraMayor) return@buildList
+    addAll(addMinister())
+    addAll(addPerkpocalypseMayor())
+}
+
+private fun addMinister() = buildList {
     val ministerName = MayorAPI.currentMinister?.mayorName?.let { MayorAPI.mayorNameWithColorCode(it) } ?: return@buildList
     add(ministerName to HorizontalAlignment.LEFT)
 
@@ -810,7 +800,9 @@ private fun getMayorDisplayPair() = buildList {
             add(" §7- §e${perk.perkName}" to HorizontalAlignment.LEFT)
         }
     }
+}
 
+private fun addPerkpocalypseMayor() = buildList {
     val jerryExtraMayor = MayorAPI.jerryExtraMayor
     val extraMayor = jerryExtraMayor.first ?: return@buildList
 
@@ -860,15 +852,12 @@ private fun getFooterDisplayPair(): List<ScoreboardElementType> = listOf(
 ).flatten()
 
 private fun getExtraDisplayPair(): List<ScoreboardElementType> {
-    if (unconfirmedUnknownLines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
-    amountOfUnknownLines = unconfirmedUnknownLines.size
+    val lines = recentUnknownLines()
+    if (lines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + unconfirmedUnknownLines.map { it to HorizontalAlignment.LEFT }
-}
-
-private fun getExtraShowWhen(): Boolean {
-    if (unconfirmedUnknownLines.isEmpty()) {
-        amountOfUnknownLines = 0
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + lines.map { 
+      it.line to HorizontalAlignment.LEFT 
     }
-    return unconfirmedUnknownLines.isNotEmpty()
 }
+
+private fun getExtraShowWhen(): Boolean = recentUnknownLines().isNotEmpty()

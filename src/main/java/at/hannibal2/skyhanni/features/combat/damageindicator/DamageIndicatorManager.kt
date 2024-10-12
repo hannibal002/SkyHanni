@@ -67,6 +67,8 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
+// TODO cut class into smaller pieces
+@Suppress("LargeClass")
 object DamageIndicatorManager {
 
     private var mobFinder: MobFinder? = null
@@ -74,7 +76,6 @@ object DamageIndicatorManager {
     private val config get() = SkyHanniMod.feature.combat.damageIndicator
 
     private val enderSlayerHitsNumberPattern = ".* §[5fd]§l(?<hits>\\d+) Hits?".toPattern()
-
 
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
@@ -288,7 +289,7 @@ object DamageIndicatorManager {
             BossType.SLAYER_BLAZE_QUAZII_3,
             BossType.SLAYER_BLAZE_QUAZII_4,
 
-                // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
+            // TODO f3/m3 4 guardians, f2/m2 4 boss room fighters
             -> true
 
             else -> false
@@ -366,8 +367,8 @@ object DamageIndicatorManager {
                 getCustomHealth(entityData, health, entity, maxHealth) ?: return null
             }
 
-            if (data.containsKey(entity.uniqueID)) {
-                val lastHealth = data[entity.uniqueID]!!.lastHealth
+            data[entity.uniqueID]?.let {
+                val lastHealth = it.lastHealth
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
 

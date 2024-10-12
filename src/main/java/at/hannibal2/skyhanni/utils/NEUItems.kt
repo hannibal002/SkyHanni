@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
@@ -64,6 +66,7 @@ object NEUItems {
             .registerTypeAdapter(
                 HypixelApiTrophyFish::class.java,
                 object : TypeAdapter<HypixelApiTrophyFish>() {
+                    @Suppress("EmptyFunctionBlock")
                     override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
                     override fun read(reader: JsonReader): HypixelApiTrophyFish {
@@ -258,7 +261,16 @@ object NEUItems {
 
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 
-        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        try {
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        } catch (e: Exception) {
+            println(" ")
+            println("item: $item")
+            println("name: ${item.name}")
+            println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+            println(" ")
+            e.printStackTrace()
+        }
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
