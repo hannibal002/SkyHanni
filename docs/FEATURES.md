@@ -226,6 +226,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Display the price per Stonk when taking the minimum bid in the Stonks Auction (Richard Menu). - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2195)
 + Added Ultimate Enchant Star. - Empa (https://github.com/hannibal002/SkyHanni/pull/2612)
     + Shows a star on Enchanted Books with an Ultimate Enchant.
++ Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
+    +  In Focus Mode, only the name of the item is displayed instead of the full description.
 
 </details>
 <details open><summary>
@@ -374,6 +376,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added an alert for Gold or Diamond Trophy Fish catches. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/2615)
     + Displays a popup with the trophy name, rarity, and amount of the catch.
     + Optionally, also plays a sound.
++ Added Lava Replacement. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1885)
+    +  Replaces the lava texture with the water texture.
+    +  Primarily used for lava fishing in the Crimson Isle, but can be used anywhere else if the option is enabled.
 
 </details>
 <details open><summary>
@@ -909,6 +914,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added a "Get from Sack" button in the forge recipe menu to retrieve ingredients. - minhperry (https://github.com/hannibal002/SkyHanni/pull/2106)
 + Added Tracker for Glacite Corpses. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2306)
     + Tracks overall loot and loot per type.
++ Added Precision Mining Highlighter. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2614)
+    +  Draws a box over the Precision Mining particles.
++ Added highlighting boxes to Crystal Nucleus crystals during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2598)
 
 </details>
 <details open><summary>
@@ -1005,6 +1013,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Abi = Dark Green.
 + Added a toggle to highlight found rabbits in Hoppity's Collection menu. - the1divider (https://github.com/hannibal002/SkyHanni/pull/2438)
 + Added the ability to change the color of missing rabbit dyes in Hoppity's Collection to reflect rabbit rarity. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2522)
++ Added an easier way to check your unique Hoppity Eggs collected on each island. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2625)
+    +  Shows your progress in the Warp Menu.
+    +  Can be automatically hidden when an island is complete.
 
 ### The Carnival
 
