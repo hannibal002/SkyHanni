@@ -26,7 +26,6 @@ abstract class LorenzEvent : Event() {
         this::class.simpleName!!
     }
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postAndCatch() = postAndCatchAndBlock {}
 
     companion object {
@@ -39,7 +38,6 @@ abstract class LorenzEvent : Event() {
         val isInGuardedEventHandler get() = eventHandlerDepth > 0 || PlatformUtils.isDevEnvironment
     }
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postAndCatchAndBlock(
         printError: Boolean = true,
         stopOnFirstError: Boolean = false,
@@ -75,7 +73,7 @@ abstract class LorenzEvent : Event() {
                 ),
             )
         }
-        return if (isCancelable) isCanceled else false
+        return isCancelable && isCanceled
     }
 
     private fun getListeners(): Array<out IEventListener> {
@@ -83,10 +81,8 @@ abstract class LorenzEvent : Event() {
         return listenerList.getListeners(accessorEventBus.busId)
     }
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun postWithoutCatch() = MinecraftForge.EVENT_BUS.post(this)
 
-    @Deprecated("Use SkyHanniEvent instead", ReplaceWith(""))
     fun cancel() {
         isCanceled = true
     }
