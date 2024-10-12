@@ -23,14 +23,14 @@ jobs:
             -   uses: ./.github/actions/setup-normal-workspace
             -   name: Build with Gradle
                 run: ./gradlew assemble -x test --stacktrace
-            -   uses: actions/upload-artifact@v3
+            -   uses: actions/upload-artifact@v4
                 name: Upload development build
                 with:
                     name: "Development Build"
                     path: build/libs/*.jar
             -   name: Test with Gradle
                 run: ./gradlew test
-            -   uses: actions/upload-artifact@v3
+            -   uses: actions/upload-artifact@v4
                 name: "Upload test report"
                 if: ${{ !cancelled() }}
                 with:
@@ -44,14 +44,15 @@ jobs:
     #        -   name: Checkout code
     #            uses: actions/checkout@v4
     #        -   uses: ./.github/actions/setup-normal-workspace
-    #        -   name: Run detekt
+    #        # detektMain is a LOT slower than detekt, but it does type analysis
+    #        -   name: Run detekt main (w/typing analysis)
     #            run: |
-    #                ./gradlew detekt --stacktrace
+    #                ./gradlew detektMain --stacktrace
     #        -   name: Annotate detekt failures
     #            if: ${{ !cancelled() }}
     #            run: |
     #                chmod +x .github/scripts/process_detekt_sarif.sh
-    #                ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/detekt.sarif
+    #                ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
     
 
     preprocess:
