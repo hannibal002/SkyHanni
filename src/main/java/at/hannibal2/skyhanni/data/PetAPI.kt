@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -14,16 +15,22 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import com.google.gson.Gson
+import com.google.gson.JsonObject
+import com.google.gson.annotations.SerializedName
 import net.minecraft.item.ItemStack
+import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -38,7 +45,8 @@ object PetAPI {
     private var inPetMenu = false
 
     private var xpLeveling: List<Int> = listOf()
-    private var xpLevelingCustom: List<Int> = listOf()
+    private var xpLevelingCustom: JsonObject? = null
+    private var petRarityOffset = mapOf<LorenzRarity, Int>()
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -218,14 +226,14 @@ object PetAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
 
-        var newPetLine = ""
+        var newPetLine: String? = null
         for (line in event.lines) {
             if (petWidgetPattern.matches(line)) {
-                newPetLine = line
+                newPetLine = line.removePrefix(" ")
                 break
             }
         }
-        if (newPetLine == pet?.rawPetName || newPetLine == "") return
+        if (newPetLine == pet?.rawPetName || newPetLine == null) return
 
         var petItem = NEUInternalName.NONE
         var petXP: Double? = null
@@ -398,18 +406,18 @@ object PetAPI {
             return
         }
 
-        getPetDataFromLore(item.displayName, lore)
+        getPetDataFromItem(item)
     }
 
-    private fun getPetDataFromLore(displayName: String, lore: List<String>) {
-        val (name, rarity, _, _, level, _, skin) = parsePetName(displayName)
-        val (petItem, petXP) = parsePetLore(lore, Pair(rarity, name))
+    private fun getPetDataFromItem(item: ItemStack) {
+        val (_, rarity, petItem, _, _, petXP, _) = parsePetNBT(item.extraAttributes)
+        val (name, _, _, hasSkin, level, _, skin) = parsePetName(item.displayName)
 
         val newPet = PetData(
             name,
             rarity,
             petItem,
-            skin != "",
+            hasSkin,
             level,
             petXP,
             "§r§7[Lvl $level] §r${rarity.chatColorCode}$name${if (skin != "") "§r${skin}" else ""}",
@@ -417,57 +425,44 @@ object PetAPI {
         fireEvent(newPet)
     }
 
+    private fun parsePetNBT(nbt: NBTTagCompound): PetData {
+        val jsonString = nbt.getTag("petInfo").toString()
+            .replace("\\", "")
+            .removePrefix("\"")
+            .removeSuffix("\"")
+        val petInfo = Gson().fromJson(jsonString, PetNBT::class.java)
+
+        return PetData(
+            "",
+            LorenzRarity.getByName(petInfo.tier) ?: LorenzRarity.ULTIMATE,
+            petInfo.heldItem?.asInternalName() ?: NEUInternalName.NONE,
+            petInfo.skin != null,
+            0,
+            petInfo.exp,
+            ""
+        )
+    }
+
     private fun parsePetName(displayName: String): PetData {
+        var name = ""
         var level = 0
-        var rarity: LorenzRarity = LorenzRarity.ULTIMATE
-        var petName = ""
         var skin = ""
 
         petNameMenuPattern.matchMatcher(displayName) {
+            name = group("name") ?: ""
             level = group("level").toInt()
-            rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
-            petName = group("name")
             skin = group("skin") ?: ""
         }
 
         return PetData(
-            petName,
-            rarity,
+            name,
+            LorenzRarity.SUPREME,
             NEUInternalName.NONE,
-            false,
+            skin != "",
             level,
             0.0,
             skin
         )
-    }
-
-    private fun parsePetLore(lore: List<String>, petInfo: Pair<LorenzRarity, String>): Pair<NEUInternalName, Double> {
-        var petItem = NEUInternalName.NONE
-        var petXP = 0.0
-
-        lore.forEach {
-            if (petItem == NEUInternalName.NONE) petItemMenuPattern.matchMatcher(it) {
-                petItem = NEUInternalName.fromItemNameOrNull(group("item")) ?: ErrorManager.skyHanniError(
-                    "Couldn't parse pet item name.",
-                    Pair("lore", it),
-                    Pair("item", group("item"))
-                )
-                return@forEach
-            }
-            if (petXP == 0.0) petXPMenuPattern.matchMatcher(it) {
-                val totalXP = group("totalXP")?.replace(",", "")?.toDoubleOrNull() ?: 0.0
-                val percentage = (group("percentage")?.toDoubleOrNull()?.div(100.0)) ?: 0.0
-
-                val fromXP = levelToXP(group("level")?.toIntOrNull()?.minus(1) ?: 1, petInfo.first, petInfo.second) ?: 0.0
-                val toXP = levelToXP(group("level")?.toIntOrNull() ?: 2, petInfo.first, petInfo.second) ?: 0.0
-
-                petXP = if (totalXP == 0.0) fromXP + ((toXP - fromXP) * percentage)
-                else totalXP
-                return@forEach
-            }
-        }
-
-        return Pair(petItem, petXP)
     }
 
     fun testLevelToXP(input: Array<String>) {
@@ -504,28 +499,40 @@ object PetAPI {
     }
 
     private fun getGoldenDragonXP(levelAbove100: Int): Int {
-        return xpLevelingCustom.slice(0..<levelAbove100).sum() //todo fix
+        val overflowLevels = xpLevelingCustom?.getAsJsonObject("GOLDEN_DRAGON")?.getAsJsonArray()?.map { it.asInt } ?: listOf()
+        return overflowLevels.slice(0..<levelAbove100).sum()
     }
 
     private fun getRarityOffset(rarity: LorenzRarity, pet: String = ""): Int? {
-        if (pet == "Bingo") return 0
-        return when (rarity) {
-            LorenzRarity.COMMON -> 0
-            LorenzRarity.UNCOMMON -> 6
-            LorenzRarity.RARE -> 11
-            LorenzRarity.EPIC -> 16
-            LorenzRarity.LEGENDARY -> 20
-            LorenzRarity.MYTHIC -> 20
-            else -> {
-                ChatUtils.userError("bad rarity. ${rarity.name}")
-                null
+        val customLeveling = xpLevelingCustom?.getAsJsonObject(pet.replace(" ", "_").uppercase())?.getAsJsonObject("rarity_offset")
+        return if (customLeveling == null) {
+            when (rarity) {
+                LorenzRarity.COMMON -> 0
+                LorenzRarity.UNCOMMON -> 6
+                LorenzRarity.RARE -> 11
+                LorenzRarity.EPIC -> 16
+                LorenzRarity.LEGENDARY -> 20
+                LorenzRarity.MYTHIC -> 20
+                else -> {
+                    ChatUtils.userError("bad rarity. ${rarity.name}")
+                    null
+                }
             }
+        } else {
+            customLeveling.entrySet().associate { (rarity, offset) ->
+                (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
+            }[rarity]
         }
     }
 
     private fun fireEvent(newPet: PetData?) {
-        PetChangeEvent(pet, newPet).post()
+        val oldPet = pet
         pet = newPet
+        if (SkyHanniMod.feature.dev.debug.petEventMessages) {
+            ChatUtils.debug(oldPet.toString())
+            ChatUtils.debug(newPet.toString())
+        }
+        PetChangeEvent(oldPet, newPet).post()
     }
 
     @SubscribeEvent
@@ -550,8 +557,27 @@ object PetAPI {
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NEUPetsJson>("pets")
         xpLeveling = data.pet_levels
-        val xpLevelingCustomJson = data.custom_pet_leveling.getAsJsonObject("GOLDEN_DRAGON").getAsJsonArray("pet_levels")
+        val xpLevelingCustomJson = data.custom_pet_leveling.getAsJsonObject()
 
-        xpLevelingCustom = xpLevelingCustomJson.map { it.asInt }
+        xpLevelingCustom = xpLevelingCustomJson
+
+        petRarityOffset = data.pet_rarity_offset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
+            (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
+        }
     }
 }
+
+data class PetNBT(
+    @SerializedName("type") val type: String,
+    @SerializedName("active") val active: Boolean,
+    @SerializedName("exp") val exp: Double,
+    @SerializedName("tier") val tier: String,
+    @SerializedName("hideInfo") val hideInfo: Boolean,
+    @SerializedName("heldItem") val heldItem: String?,
+    @SerializedName("candyUsed") val candyUsed: Int,
+    @SerializedName("skin") val skin: String?,
+    @SerializedName("uuid") val uuid: String,
+    @SerializedName("uniqueId") val uniqueId: String,
+    @SerializedName("hideRightClick") val hideRightClick: Boolean,
+    @SerializedName("noMove") val noMove: Boolean
+)

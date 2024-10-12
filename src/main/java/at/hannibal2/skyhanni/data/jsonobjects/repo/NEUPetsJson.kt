@@ -6,4 +6,5 @@ import com.google.gson.annotations.Expose
 data class NEUPetsJson(
     @Expose val pet_levels: List<Int>,
     @Expose val custom_pet_leveling: JsonObject,
+    @Expose val pet_rarity_offset: JsonObject,
 )
