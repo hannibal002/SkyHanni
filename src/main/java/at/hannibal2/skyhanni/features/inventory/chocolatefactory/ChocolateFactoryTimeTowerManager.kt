@@ -22,6 +22,7 @@ object ChocolateFactoryTimeTowerManager {
     private val profileStorage get() = ChocolateFactoryAPI.profileStorage
 
     private var lastTimeTowerWarning = SimpleTimeMark.farPast()
+    private var warnedAboutLatestCharge = false
     private var wasTimeTowerRecentlyActive = false
 
     @SubscribeEvent
@@ -52,12 +53,13 @@ object ChocolateFactoryTimeTowerManager {
                 profileStorage.currentTimeTowerUses++
                 nextCharge += ChocolateFactoryAPI.timeTowerChargeDuration()
                 profileStorage.nextTimeTower = nextCharge
+                warnedAboutLatestCharge = false
             }
         }
 
         if (currentCharges() < maxCharges()) {
             if (!config.timeTowerWarning || timeTowerActive()) return
-            if (lastTimeTowerWarning.passedSince() < 5.minutes) return
+            if (warnedAboutLatestCharge) return
             ChatUtils.clickableChat(
                 "Your Time Tower has an available charge §7(${timeTowerCharges()})§e. " +
                     "Click here to use one.",
@@ -66,7 +68,7 @@ object ChocolateFactoryTimeTowerManager {
             )
             SoundUtils.playBeepSound()
             lastTimeTowerWarning = SimpleTimeMark.now()
-            return
+            warnedAboutLatestCharge = true
         }
         checkTimeTowerWarning(false)
     }
