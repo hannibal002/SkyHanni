@@ -144,6 +144,7 @@ object MayorAPI {
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
+                replaceSameMessage = true,
             )
         }
     }
@@ -171,7 +172,7 @@ object MayorAPI {
             } ?: false
         } ?: return
 
-        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }) ?: return
+        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }, 2) ?: return
         // This is the first Perk of the Perkpocalypse Mayor
         val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 

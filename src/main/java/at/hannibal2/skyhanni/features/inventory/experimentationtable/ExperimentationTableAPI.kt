@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -35,7 +36,9 @@ object ExperimentationTableAPI {
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
 
-        val entity = EntityUtils.getEntities<EntityArmorStand>().find { it.hasSkullTexture(EXPERIMENTATION_TABLE_SKULL) } ?: return
+        val entity = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.hasSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        } ?: return
         val vec = entity.getLorenzVec()
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }
@@ -69,7 +72,7 @@ object ExperimentationTableAPI {
      */
     val rewardPattern by patternGroup.pattern(
         "rewards",
-        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment The Fish",
+        "\\d{1,3}k Enchanting Exp|Enchanted Book|(?:Titanic |Grand |\\b)Experience Bottle|Metaphysical Serum|Experiment the Fish",
     )
 
     /**
@@ -132,6 +135,14 @@ object ExperimentationTableAPI {
     )
 
     /**
+     * REGEX-TEST: Remaining Clicks: 22
+     */
+    val remainingClicksPattern by patternGroup.pattern(
+        "clicks",
+        "Remaining Clicks: (?<clicks>\\d+)"
+    )
+
+    /**
      * REGEX-TEST: ☕ You renewed the experiment table! (1/3)
      */
     val experimentRenewPattern by patternGroup.pattern(
@@ -159,8 +170,10 @@ object ExperimentationTableAPI {
      * REGEX-TEST: §dGuardian
      * REGEX-TEST: §9Guardian§e
      */
-    val petNamePattern by patternGroup.pattern(
+    private val petNamePattern by patternGroup.pattern(
         "guardianpet",
         "§[956d]Guardian.*",
     )
+
+    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetAPI.currentPet)
 }

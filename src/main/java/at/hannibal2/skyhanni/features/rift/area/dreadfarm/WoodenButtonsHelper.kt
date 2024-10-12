@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.jsonobjects.repo.RiftWoodenButtonsJson
@@ -95,12 +96,17 @@ object WoodenButtonsHelper {
         if (closestNode != currentSpot) {
             currentSpot = closestNode
             currentSpot?.let {
-                IslandGraphs.pathFind(it.position, "Button Spot", config.color.toChromaColor(), condition = { config.showPathFinder && config.showButtonsHelper })
+                IslandGraphs.pathFind(
+                    it.position,
+                    "Button Spot",
+                    config.color.toChromaColor(),
+                    condition = { config.showPathFinder && config.showButtonsHelper },
+                )
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!checkButtons()) return
 
@@ -110,7 +116,7 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemClick(event: ItemClickEvent) {
         if (!checkButtons()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -126,7 +132,8 @@ object WoodenButtonsHelper {
                 blockState.getValue(BlockButtonWood.POWERED) == true &&
                 buttonLocation.canBeSeen(1..3) &&
                 lastHitButton != buttonLocation &&
-                !hitButtons.contains(buttonLocation)) {
+                !hitButtons.contains(buttonLocation)
+            ) {
                 lastHitButton = buttonLocation
                 addLastHitButton()
             }

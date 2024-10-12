@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundP
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -24,8 +26,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -55,7 +59,9 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
+    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
+        it.chatColorCode == rabbit.substring(0, 2)
+    }
 
     /**
      * REGEX-TEST: §f1st Chocolate Milestone
@@ -108,12 +114,14 @@ object HoppityAPI {
                         EggFoundEvent(STRAY, it.slotNumber).post()
                         lastName = "§9Fish the Rabbit"
                         lastMeal = STRAY
+                        duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
                     "El Dorado" -> {
                         EggFoundEvent(STRAY, it.slotNumber).post()
                         lastName = "§6El Dorado"
                         lastMeal = STRAY
+                        duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
                     else -> return@matchMatcher
@@ -160,7 +168,8 @@ object HoppityAPI {
         eggFoundPattern.matchMatcher(event.message) {
             resetRabbitData()
             lastMeal = getEggType(event)
-            lastMeal?.let { EggFoundEvent(it, note = groupOrNull("note")).post() }
+            val note = groupOrNull("note")?.removeColor()
+            lastMeal?.let { EggFoundEvent(it, note = note).post() }
             attemptFireRabbitFound()
         }
 
