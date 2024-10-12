@@ -194,15 +194,17 @@ object DungeonHideItems {
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.GOLD.toColor().withAlpha(60))
-            {
-                shouldColorMovingSkull(entity)
-            }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity,
+                LorenzColor.GOLD.toColor().withAlpha(60)
+            ) { shouldColorMovingSkull(entity) }
         }
     }
 
     private fun shouldColorMovingSkull(entity: Entity) =
-        SkyHanniMod.feature.dungeon.highlightSkeletonSkull && movingSkeletonSkulls[entity]?.let { it + 200 > System.currentTimeMillis() } ?: false
+        SkyHanniMod.feature.dungeon.highlightSkeletonSkull && movingSkeletonSkulls[entity]?.let {
+            it + 200 > System.currentTimeMillis()
+        } ?: false
 
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {

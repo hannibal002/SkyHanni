@@ -33,6 +33,7 @@ object PowderMiningChatFilter {
 
     val patternGroup = RepoPattern.group("filter.powdermining")
 
+    // TODO rename to "openedRewards" ?
     private var unclosedRewards = false
 
     /**
@@ -61,10 +62,11 @@ object PowderMiningChatFilter {
 
     /**
      * REGEX-TEST: §cYou need a tool with a §r§aBreaking Power §r§cof §r§66§r§c to mine Ruby Gemstone Block§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!
+     * REGEX-TEST: §cYou need a tool with a §r§aBreaking Power §r§cof §r§64§r§c to mine Mithril§r§c! Speak to §r§dFragilis §r§cby the entrance to the Crystal Hollows to learn more!
      */
     private val breakingPowerPattern by patternGroup.pattern(
         "warning.breakingpower",
-        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine (Ruby|Amethyst|Jade|Amber|Sapphire|Topaz) Gemstone Block§r§c!.+",
+        "§cYou need a tool with a §r§aBreaking Power §r§cof (?:§.)*\\d+§r§c to mine .+",
     )
 
     /**
@@ -309,7 +311,8 @@ object PowderMiningChatFilter {
         return null
     }
 
-    private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> = emptyMap()
+    private var rewardPatterns: Map<Pair<Pattern, PowderMiningFilterConfig.SimplePowderMiningRewardTypes>, String> =
+        emptyMap()
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     fun onRepoReload(event: RepositoryReloadEvent) {

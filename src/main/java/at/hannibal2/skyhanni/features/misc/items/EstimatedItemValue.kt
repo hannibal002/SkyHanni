@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -39,7 +40,7 @@ import kotlin.math.roundToLong
 @SkyHanniModule
 object EstimatedItemValue {
 
-    val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
+    val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
@@ -90,13 +91,14 @@ object EstimatedItemValue {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
 
-        // TODO add "is debug enabled" check once users notice this easteregg
-        if (Keyboard.KEY_RIGHT.isKeyClicked()) {
-            EstimatedItemValueCalculator.starChange += 1
-            cache.clear()
-        } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
-            EstimatedItemValueCalculator.starChange -= 1
-            cache.clear()
+        if (SkyHanniMod.feature.dev.debug.enabled) {
+            if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+                EstimatedItemValueCalculator.starChange += 1
+                cache.clear()
+            } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
+                EstimatedItemValueCalculator.starChange -= 1
+                cache.clear()
+            }
         }
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
