@@ -39,7 +39,7 @@ class RepoManager(private val configLocation: File) {
     val repoLocation: File = File(configLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.now()
-    private var repoDownLoadFailed = false
+    private var repoDownloadFailed = false
 
     companion object {
 
@@ -67,7 +67,7 @@ class RepoManager(private val configLocation: File) {
         atomicShouldManuallyReload.set(true)
         if (config.repoAutoUpdate) {
             fetchRepository(false).thenRun {
-                if (repoDownLoadFailed) {
+                if (repoDownloadFailed) {
                     switchToBackupRepo()
                 }
             }.thenRun { reloadRepository() }
@@ -109,7 +109,7 @@ class RepoManager(private val configLocation: File) {
                     )
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) {
-                    repoDownLoadFailed = true
+                    repoDownloadFailed = true
                     return@supplyAsync false
                 }
                 val file = File(configLocation, "repo")
@@ -151,7 +151,7 @@ class RepoManager(private val configLocation: File) {
                         "url" to url,
                         "command" to command,
                     )
-                    repoDownLoadFailed = true
+                    repoDownloadFailed = true
                     return@supplyAsync false
                 }
                 RepoUtils.unzipIgnoreFirstFolder(
@@ -167,7 +167,7 @@ class RepoManager(private val configLocation: File) {
                     "Failed to download SkyHanni Repo",
                     "command" to command,
                 )
-                repoDownLoadFailed = true
+                repoDownloadFailed = true
             }
             true
         }
