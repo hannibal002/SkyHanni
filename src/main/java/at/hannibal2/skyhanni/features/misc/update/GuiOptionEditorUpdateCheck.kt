@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import io.github.moulberry.notenoughupdates.itemeditor.GuiElementButton
+import at.hannibal2.skyhanni.config.core.elements.GuiElementButton
 import io.github.notenoughupdates.moulconfig.gui.GuiOptionEditor
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import io.github.notenoughupdates.moulconfig.processor.ProcessedOption
