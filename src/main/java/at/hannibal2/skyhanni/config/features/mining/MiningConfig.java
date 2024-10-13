@@ -103,8 +103,7 @@ public class MiningConfig {
     public boolean highlightYourGoldenGoblin = true;
 
     @Expose
-
-    @ConfigOption(name = "Line to your Golden Goblin", desc = "Also makes a line to your goblin. Needs the option above to work.")
+    @ConfigOption(name = "Line to your Golden Goblin", desc = "Also makes a line to your goblin. §eNeeds the option above to work.")
     @ConfigEditorBoolean
     public boolean lineToYourGoldenGoblin = false;
 
@@ -112,5 +111,4 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightPrecisionMiningParticles = false;
-
 }

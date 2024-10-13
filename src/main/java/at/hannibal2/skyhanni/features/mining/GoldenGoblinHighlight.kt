@@ -48,12 +48,15 @@ object GoldenGoblinHighlight {
     }
 
     private fun handle() {
+        // TODO merge the two time objects into one
         if (lastChatMessage.passedSince() > timeOut || lastGoblinSpawn.passedSince() > timeOut) return
         lastChatMessage = SimpleTimeMark.farPast()
         lastGoblinSpawn = SimpleTimeMark.farPast()
-        lastGoblin?.highlight(LorenzColor.GREEN.toColor())
-        if(config.lineToYourGoldenGoblin){
-            lastGoblin?.lineToPlayer(LorenzColor.GREEN.toColor())
+
+        val goblin = lastGoblin ?: return
+        goblin.highlight(LorenzColor.GREEN.toColor())
+        if (config.lineToYourGoldenGoblin) {
+            goblin.lineToPlayer(LorenzColor.GREEN.toColor())
         }
         lastGoblin = null
     }
