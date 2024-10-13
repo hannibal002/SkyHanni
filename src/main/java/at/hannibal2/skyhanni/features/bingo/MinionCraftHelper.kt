@@ -98,7 +98,8 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
+    private fun loadFromInventory(mainInventory: Array<ItemStack?>):
+        Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
         val minions = mutableMapOf<String, NEUInternalName>()
@@ -144,7 +145,8 @@ object MinionCraftHelper {
                     if (ingredientInternalName == internalName) return true
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
-                    if (primitiveStack.internalName == ingredientPrimitive.internalName && primitiveStack.amount < ingredientPrimitive.amount) return true
+                    if (primitiveStack.internalName == ingredientPrimitive.internalName &&
+                        primitiveStack.amount < ingredientPrimitive.amount) return true
                 }
             }
         }
