@@ -91,7 +91,6 @@ object FlowstateHelper {
         if (config.autoHide < 0) return false
         val time = 10.seconds - config.autoHide.seconds
         return (streakEndTimer - time).isInPast()
-//         if (displayMaxed && timeSinceMax.passedSince() > autoHide) return true
     }
 
     private fun createDisplay() {

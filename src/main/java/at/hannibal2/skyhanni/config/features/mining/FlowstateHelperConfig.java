@@ -38,7 +38,7 @@ public class FlowstateHelperConfig {
         maxValue = 30,
         minStep = 1
     )
-    public int autoHide = 5;
+    public int autoHide = 10;
 
     @Expose
     @ConfigLink(owner = FlowstateHelperConfig.class, field = "enabled")
