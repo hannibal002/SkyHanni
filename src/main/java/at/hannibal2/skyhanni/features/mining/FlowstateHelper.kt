@@ -43,7 +43,7 @@ object FlowstateHelper {
 
     private val pickobulusPattern by RepoPattern.pattern(
         "mining.pickobulus.blockdestroy",
-        "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!"
+        "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!",
     )
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -86,12 +86,7 @@ object FlowstateHelper {
         }
 
         display?.let {
-            config.position.renderRenderables(
-                it,
-                1,
-                "Flowstate Helper",
-                true
-            )
+            config.position.renderRenderables(it, extraSpace = 1, "Flowstate Helper")
         }
     }
 
@@ -147,8 +142,6 @@ object FlowstateHelper {
     }
 }
 
-
-
 enum class FlowstateElements(val label: String, var renderable: Renderable = Renderable.string("")) {
     TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
     TIMER("Time Remaining: §b9.71"),
@@ -162,47 +155,44 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
     private val config get() = SkyHanniMod.feature.mining.flowstateHelper
 
     fun create() {
-        when (this) {
-            TIMER -> {
-                if (this !in config.appearance) return
+        if (this !in config.appearance) return
 
+        renderable = when (this) {
+            TIMER -> {
                 var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
                 if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
 
-                renderable = Renderable.string(
+                Renderable.string(
                     "Time Remaining: ${getTimerColor(timeRemaining)}${
                         timeRemaining.format(
-                            TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true
+                            TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true,
                         )
-                    }")
+                    }",
+                )
             }
+
             STREAK -> {
-                if (this !in config.appearance) return
-
                 val textColor = if (blockBreakStreak < 200) "§7" else "§f"
-                renderable = Renderable.string("Streak: $textColor$blockBreakStreak")
+                Renderable.string("Streak: $textColor$blockBreakStreak")
             }
+
             SPEED -> {
-                if (this !in config.appearance) return
-
-                renderable = Renderable.string("§6+${getSpeedBonus()}⸕")
+                Renderable.string("§6+${getSpeedBonus()}⸕")
             }
-            COMPACT -> {
-                if (this !in config.appearance) return
 
+            COMPACT -> {
                 var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
                 if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
 
-                renderable = Renderable.string(
-                    "§7x$blockBreakStreak " +
-                        "§6+${getSpeedBonus()}⸕ " +
-                        "${getTimerColor(timeRemaining)}${
-                            timeRemaining.format(
-                                TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true
-                            )
-                        }"
+                Renderable.string(
+                    "§7x$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ " + "${getTimerColor(timeRemaining)}${
+                        timeRemaining.format(
+                            TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true,
+                        )
+                    }",
                 )
             }
+
             else -> return
         }
     }
@@ -210,7 +200,7 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
     companion object {
         @JvmField
         val defaultOption = listOf(
-            TITLE, TIMER, STREAK, SPEED
+            TITLE, TIMER, STREAK, SPEED,
         )
     }
 }

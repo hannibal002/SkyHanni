@@ -14,7 +14,7 @@ import java.util.List;
 
 public class FlowstateHelperConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Shows stats for the Flowstate enchantment.")
+    @ConfigOption(name = "Enabled", desc = "Shows stats for the Flowstate enchantment on Mining Tools.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
@@ -30,7 +30,7 @@ public class FlowstateHelperConfig {
     public boolean colorfulTimer = false;
 
     @Expose
-    @ConfigOption(name = "Autohide", desc = "Automatically hides the GUI after a certain time idle, in seconds.")
+    @ConfigOption(name = "Auto Hide", desc = "Automatically hides the GUI after a certain time idle, in seconds.")
     @ConfigEditorSlider(
         minValue = -1,
         maxValue = 30,
