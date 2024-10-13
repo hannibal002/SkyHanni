@@ -74,6 +74,11 @@ public class MiningConfig {
     public MineshaftPityDisplayConfig mineshaftPityDisplay = new MineshaftPityDisplayConfig();
 
     @Expose
+    @ConfigOption(name = "Crystal Nucleus Crystal Highlights", desc = "")
+    @Accordion
+    public CrystalHighlighterConfig crystalHighlighter = new CrystalHighlighterConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -98,7 +103,14 @@ public class MiningConfig {
     public boolean highlightYourGoldenGoblin = true;
 
     @Expose
+
     @ConfigOption(name = "Line to your Golden Goblin", desc = "Also makes a line to your goblin. Needs the option above to work.")
     @ConfigEditorBoolean
     public boolean lineToYourGoldenGoblin = false;
+
+    @ConfigOption(name = "Precision Mining Helper", desc = "Draws a box over the Precision Mining particles.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean highlightPrecisionMiningParticles = false;
+
 }

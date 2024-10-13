@@ -1,6 +1,101 @@
 # SkyHanni - Change Log
 
-## Version 0.27 (in Beta)
+## Version 0.28 (in Beta)
+
+### New Features
+
+#### Hoppity Features
+
++ Added an easier way to check your unique Hoppity Eggs collected on each island. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2625)
+    +  Shows your progress in the Warp Menu.
+    +  Can be automatically hidden when an island is complete.
+
+#### Inventory Features
+
++ Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
+    +  In Focus Mode, only the name of the item is displayed instead of the full description.
+
+#### Fishing Features
+
++ Added Lava Replacement. - HiZe (https://github.com/hannibal002/SkyHanni/pull/1885)
+    +  Replaces the lava texture with the water texture.
+    +  Primarily used for lava fishing in the Crimson Isle, but can be used anywhere else if the option is enabled.
+
+#### Mining Features
+
++ Added Precision Mining Highlighter. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2614)
+    +  Draws a box over the Precision Mining particles.
++ Added highlighting boxes to Crystal Nucleus crystals during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2598)
+
+### Improvements
+
+#### Inventory Improvements
+
++ Added Pocket Sack-in-a-Sack support to Estimated Item Value. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2698)
+
+#### Chat and Command Improvements
+
++ Replaced repeated SkyHanni messages with the previous message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2700)
++ Added support for Guilds in player-related tab completions. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
++ Added support for all Guild and Friend commands in tab completions. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
+
+#### Combat Improvements
+
++ Added Totem of Corruption and Enrager to the Ability Cooldown feature. - DungeonHub (https://github.com/hannibal002/SkyHanni/pull/2706)
+
+#### Misc Improvements
+
++ Added distance display to waypoints created by Patcher's Send Coords feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2704)
+
+### Fixes
+
+#### Dungeon Fixes
+
++ Fixed Magical Power resetting to 0 when opening "Your Bags" in the Catacombs. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2710)
+
+#### Fishing Fixes
+
++ Fixed fishing displays showing in dungeons. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2697)
+
+#### Inventory Fixes
+
++ Fixed "No Guardian Pet warning" not supporting Pet Rule "On open Experimentation Table". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2699)
++ Fixed an error with compact experiment rewards chat messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2702)
++ Fixed Craft Materials Bazaar not working with long item names. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2703)
++ Fixed the debug feature that allows you to add/remove stars being enabled by default. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2715)
+
+#### Combat Fixes
+
++ Fixed Ghost Counter display appearing while in incorrect areas on the map. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2696)
+
+#### Custom Scoreboard Fixes
+
++ Fixed Custom Scoreboard not showing the Second Barbarian Quest. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2709)
+
+#### Hoppity Fixes
+
++ Fixed the chocolate egg share message sometimes displaying the wrong location name. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2711)
+
+#### Commands Fixes
+
++ Fixed /shtranslate not working in most cases. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2693)
+
+### Technical Details
+
++ Assigned 'backend' label to PRs with 'backend' in the title. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2690)
+    +  This does not change the functionality of the current bug fix label.
++ Added SuggestionProvider. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
+    +  This new class simplifies building suggestion trees.
++ Added Stats API. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2253)
++ Cleaned up LorenzVec and added drawLineToEye. - Empa (https://github.com/hannibal002/SkyHanni/pull/2056)
++ Added SkyHanni event inheritance. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2047)
++ Added /shtranslateadvanced command. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2693)
+    +  Allows specifying both the source and target language.
++ Added changelog verification. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2692)
+    +  This action ensures your PR is in the correct format so that it can be used by the release notes tool.
++ Added dungeon phase detection. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1865)
+
+## Version 0.27
 
 ### New Features
 

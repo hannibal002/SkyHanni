@@ -126,7 +126,7 @@ object SensitivityReducer {
 
     fun manualToggle() {
         if (isToggled) {
-            ChatUtils.chat("This command is disabled while the Sensitivity is lowered.")
+            ChatUtils.userError("This command is disabled while the Sensitivity is lowered!")
             return
         }
         isManualToggle = !isManualToggle

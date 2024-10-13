@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -19,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 import java.util.UUID
@@ -113,7 +115,7 @@ class Mob(
 
     fun canBeSeen() = baseEntity.canBeSeen()
 
-    fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
 
     private var highlightColor: Color? = null
 
@@ -156,9 +158,11 @@ class Mob(
         relativeBoundingBox =
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
-        owner = (ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
-        } else null)?.let { MobUtils.OwnerShip(it) }
+        owner = (
+            ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
+                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+            } else null
+            )?.let { MobUtils.OwnerShip(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
@@ -166,15 +170,16 @@ class Mob(
             MobData.externRemoveOfRetryAmount += it
         }
 
-    fun updateBoundingBox() {
+    private fun updateBoundingBox() {
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
     }
 
-    private fun makeRelativeBoundingBox() =
-        (baseEntity.entityBoundingBox.union(
+    private fun makeRelativeBoundingBox() = (
+        baseEntity.entityBoundingBox.union(
             extraEntities.filter { it !is EntityArmorStand }
                 .mapNotNull { it.entityBoundingBox },
-        ))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+        )
+        )?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
