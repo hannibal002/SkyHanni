@@ -263,10 +263,12 @@ object PetAPI {
                 LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
                 group("name")
             ))
+            val petName = group("name")
+            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
 
             val newPet = PetData(
-                group("name"),
-                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
+                petNametoInternalName(petName, rarity),
+                rarity,
                 petItem,
                 group("skin") != null,
                 group("level").toInt(),
@@ -347,7 +349,7 @@ object PetAPI {
             val fakePetLine = "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (hasSkin) "§r${group("skin")}" else ""}"
 
             val newPet = PetData(
-                petName,
+                petNametoInternalName(petName, rarity),
                 rarity,
                 petItem,
                 hasSkin,
@@ -433,7 +435,7 @@ object PetAPI {
         val petInfo = Gson().fromJson(jsonString, PetNBT::class.java)
 
         return PetData(
-            "",
+            NEUInternalName.NONE,
             LorenzRarity.getByName(petInfo.tier) ?: LorenzRarity.ULTIMATE,
             petInfo.heldItem?.asInternalName() ?: NEUInternalName.NONE,
             petInfo.skin != null,
@@ -445,23 +447,25 @@ object PetAPI {
 
     private fun parsePetName(displayName: String): PetData {
         var name = ""
+        var rarity = LorenzRarity.ULTIMATE
         var level = 0
         var skin = ""
 
         petNameMenuPattern.matchMatcher(displayName) {
             name = group("name") ?: ""
+            rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
             level = group("level").toInt()
             skin = group("skin") ?: ""
         }
 
         return PetData(
-            name,
-            LorenzRarity.SUPREME,
+            petNametoInternalName(name, rarity),
+            rarity,
             NEUInternalName.NONE,
             skin != "",
             level,
             0.0,
-            skin
+            skin,
         )
     }
 
@@ -483,7 +487,7 @@ object PetAPI {
     }
 
     private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String = ""): Double? {
-        val newPetName = petName.replace(" ", "_").uppercase()
+        val newPetName = petNametoFakeInternalName(petName)
         val petObject = xpLevelingCustom?.getAsJsonObject(newPetName)
 
         val rarityOffset = getRarityOffset(rarity, petObject?.getAsJsonObject("rarity_offset")) ?: return null
@@ -528,9 +532,10 @@ object PetAPI {
     private fun fireEvent(newPet: PetData?) {
         val oldPet = pet
         pet = newPet
+        if (oldPet.arePetsEqual(newPet)) return
         if (SkyHanniMod.feature.dev.debug.petEventMessages) {
-            ChatUtils.debug(oldPet.toString())
-            ChatUtils.debug(newPet.toString())
+            ChatUtils.debug(oldPet.toString().replace("§", "&"))
+            ChatUtils.debug(newPet.toString().replace("§", "&"))
         }
         PetChangeEvent(oldPet, newPet).post()
     }
@@ -564,6 +569,26 @@ object PetAPI {
         petRarityOffset = data.pet_rarity_offset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
             (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
         }
+    }
+
+    private fun petNametoFakeInternalName(petName: String): String {
+        return when (petName.uppercase()) {
+            "T-REX" -> "TYRANNOSAURUS"
+            else -> petName.uppercase().replace(" ", "_")
+        }
+    }
+
+    private fun petNametoInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
+        return "${petNametoFakeInternalName(petName)};${rarity.id}".asInternalName()
+    }
+
+    fun PetData?.arePetsEqual(pet2: PetData?): Boolean {
+        return this?.name == pet2?.name &&
+            this?.rarity == this?.rarity &&
+            this?.petItem == this?.petItem &&
+            this?.hasSkin == this?.hasSkin &&
+            this?.level == this?.level &&
+            this?.rawPetName == this?.rawPetName
     }
 }
 
