@@ -27,6 +27,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -82,7 +83,7 @@ object SackDisplay {
         val sortedPairs = sort(sackItems)
         val amountShowing = if (config.itemToShow > sortedPairs.size) sortedPairs.size else config.itemToShow
         list.addString("§7Items in Sacks: §o(Rendering $amountShowing of ${sortedPairs.size} items)")
-        val table = mutableListOf<List<Renderable>>()
+        val table = mutableMapOf<List<Renderable>, String?>()
         for ((itemName, item) in sortedPairs) {
             val (internalName, colorCode, total, magmaFish) = item
             val stored = item.stored
@@ -92,74 +93,76 @@ object SackDisplay {
             totalPrice += price
             if (rendered >= config.itemToShow) continue
             if (stored == 0 && !config.showEmpty) continue
-            table.add(buildList {
-                addString(" §7- ")
-                addItemStack(internalName)
-                // TODO move replace into itemName
-                val nameText = Renderable.optionalLink(
-                    itemName.replace("§k", ""),
-                    onClick = {
-                        if (!SackAPI.isTrophySack) {
-                            BazaarApi.searchForBazaarItem(itemName)
+            table[
+                buildList {
+                    addString(" §7- ")
+                    addItemStack(internalName)
+                    // TODO move replace into itemName
+                    val nameText = Renderable.optionalLink(
+                        itemName.replace("§k", ""),
+                        onClick = {
+                            if (!SackAPI.isTrophySack) {
+                                BazaarApi.searchForBazaarItem(itemName)
+                            }
+                        },
+                        highlightsOnHoverSlots = listOf(slot)
+                    ) { !NEUItems.neuHasFocus() }
+                    add(nameText)
+
+
+                    when (config.numberFormat) {
+                        NumberFormatEntry.DEFAULT -> {
+                            addAlignedNumber("$colorCode${stored.addSeparators()}")
+                            addString("§7/")
+                            addAlignedNumber("§b${total.shortFormat()}")
                         }
-                    },
-                    highlightsOnHoverSlots = listOf(slot)
-                ) { !NEUItems.neuHasFocus() }
-                add(nameText)
 
+                        NumberFormatEntry.FORMATTED -> {
+                            addAlignedNumber("$colorCode${stored.shortFormat()}")
+                            addString("§7/")
+                            addAlignedNumber("§b${total.shortFormat()}")
+                        }
 
-                when (config.numberFormat) {
-                    NumberFormatEntry.DEFAULT -> {
-                        addAlignedNumber("$colorCode${stored.addSeparators()}")
-                        addString("§7/")
-                        addAlignedNumber("§b${total.shortFormat()}")
+                        NumberFormatEntry.UNFORMATTED -> {
+                            addAlignedNumber("$colorCode${stored.addSeparators()}")
+                            addString("§7/")
+                            addAlignedNumber("§b${total.addSeparators()}")
+                        }
+
+                        else -> {
+                            addAlignedNumber("$colorCode${stored.addSeparators()}")
+                            addString("§7/")
+                            addAlignedNumber("§b${total.addSeparators()}")
+                        }
                     }
 
-                    NumberFormatEntry.FORMATTED -> {
-                        addAlignedNumber("$colorCode${stored.shortFormat()}")
-                        addString("§7/")
-                        addAlignedNumber("§b${total.shortFormat()}")
-                    }
+                    // TODO change color of amount if full
+                    // if (colorCode == "§a") addString("§c§l(Full!)")
 
-                    NumberFormatEntry.UNFORMATTED -> {
-                        addAlignedNumber("$colorCode${stored.addSeparators()}")
-                        addString("§7/")
-                        addAlignedNumber("§b${total.addSeparators()}")
-                    }
-
-                    else -> {
-                        addAlignedNumber("$colorCode${stored.addSeparators()}")
-                        addString("§7/")
-                        addAlignedNumber("§b${total.addSeparators()}")
-                    }
-                }
-
-                // TODO change color of amount if full
-//                 if (colorCode == "§a") addString("§c§l(Full!)")
-
-                if (SackAPI.isTrophySack && magmaFish > 0) {
-                    totalMagmaFish += magmaFish
-                    add(
-                        Renderable.hoverTips(
-                            Renderable.string(
-                                "§d${magmaFish}",
-                                horizontalAlign = config.alignment
-                            ),
-                            listOf(
-                                "§6Magmafish: §b${magmaFish.addSeparators()}",
-                                "§6Magmafish value: §b${price / magmaFish}",
-                                "§6Magmafish per: §b${magmaFish / stored}"
-                            ),
+                    if (SackAPI.isTrophySack && magmaFish > 0) {
+                        totalMagmaFish += magmaFish
+                        add(
+                            Renderable.hoverTips(
+                                Renderable.string(
+                                    "§d$magmaFish",
+                                    horizontalAlign = config.alignment
+                                ),
+                                listOf(
+                                    "§6Magmafish: §b${magmaFish.addSeparators()}",
+                                    "§6Magmafish value: §b${price / magmaFish}",
+                                    "§6Magmafish per: §b${magmaFish / stored}"
+                                ),
+                            )
                         )
-                    )
-                    //TOOD add cache
-                    addItemStack("MAGMA_FISH".asInternalName())
+                        // TODO add cache
+                        addItemStack("MAGMA_FISH".asInternalName())
+                    }
+                    if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
                 }
-                if (config.showPrice && price != 0L) addAlignedNumber("§6${format(price)}")
-            })
+            ] = itemName
             rendered++
         }
-        list.add(Renderable.table(table))
+        list.add(table.buildSearchableTable())
 
         if (SackAPI.isTrophySack) list.addString("§cTotal Magmafish: §6${totalMagmaFish.addSeparators()}")
         return totalPrice
@@ -186,13 +189,15 @@ object SackDisplay {
         val name = SortType.entries[config.sortingType.ordinal].longName // todo avoid ordinal
         list.addString("§7Sorted By: §c$name")
 
-        list.addSelector<SortType>(" ",
+        list.addSelector<SortType>(
+            " ",
             getName = { type -> type.shortName },
             isCurrent = { it.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
             onChange = {
                 config.sortingType = SortingTypeEntry.entries[it.ordinal] // todo avoid ordinals
                 update(false)
-            })
+            }
+        )
 
         list.addButton(
             prefix = "§7Number format: ",
@@ -206,13 +211,15 @@ object SackDisplay {
         )
 
         if (config.showPrice) {
-            list.addSelector<ItemPriceSource>(" ",
+            list.addSelector<ItemPriceSource>(
+                " ",
                 getName = { type -> type.sellName },
                 isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
                     config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
                     update(false)
-                })
+                }
+            )
             list.addButton(
                 prefix = "§7Price Format: ",
                 getName = PriceFormat.entries[config.priceFormat.ordinal].displayName, // todo avoid ordinal
@@ -230,53 +237,60 @@ object SackDisplay {
     private fun drawRunesDisplay(list: MutableList<Renderable>) {
         if (SackAPI.runeItem.isEmpty()) return
         list.addString("§7Runes:")
-        val table = mutableListOf<List<Renderable>>()
+        val table = mutableMapOf<List<Renderable>, String?>()
         for ((name, rune) in sort(SackAPI.runeItem.toList())) {
             val (stack, lv1, lv2, lv3) = rune
-            table.add(buildList {
-                addString(" §7- ")
-                stack?.let { addItemStack(it) }
-                add(
-                    Renderable.optionalLink(
-                        name,
-                        onClick = {},
-                        highlightsOnHoverSlots = listOf(rune.slot)
+            table[
+                buildList {
+                    addString(" §7- ")
+                    stack?.let { addItemStack(it) }
+                    add(
+                        Renderable.optionalLink(
+                            name,
+                            onClick = {},
+                            highlightsOnHoverSlots = listOf(rune.slot)
+                        )
                     )
-                )
-                addAlignedNumber("§e$lv1")
-                addAlignedNumber("§e$lv2")
-                addAlignedNumber("§e$lv3")
-            })
+                    addAlignedNumber("§e$lv1")
+                    addAlignedNumber("§e$lv2")
+                    addAlignedNumber("§e$lv3")
+                }
+            ] = name
         }
-        list.add(Renderable.table(table))
+        list.add(table.buildSearchableTable())
     }
 
     private fun drawGemstoneDisplay(list: MutableList<Renderable>): Long {
         if (SackAPI.gemstoneItem.isEmpty()) return 0L
         list.addString("§7Gemstones:")
         var totalPrice = 0L
-        val table = mutableListOf<List<Renderable>>()
+        val table = mutableMapOf<List<Renderable>, String?>()
         for ((name, gem) in sort(SackAPI.gemstoneItem.toList())) {
             val (internalName, rough, flawed, fine, roughprice, flawedprice, fineprice) = gem
-            table.add(buildList {
-                addString(" §7- ")
-                addItemStack(internalName)
-                add(Renderable.optionalLink(
-                    name,
-                    onClick = {
-                        BazaarApi.searchForBazaarItem(name.dropLast(1))
-                    },
-                    highlightsOnHoverSlots = listOf(gem.slot)
-                ) { !NEUItems.neuHasFocus() })
-                addAlignedNumber(rough.addSeparators())
-                addAlignedNumber("§a${flawed.addSeparators()}")
-                addAlignedNumber("§9${fine.addSeparators()}")
-                val price = roughprice + flawedprice + fineprice
-                totalPrice += price
-                if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
-            })
+            table[
+                buildList {
+                    addString(" §7- ")
+                    addItemStack(internalName)
+                    add(
+                        Renderable.optionalLink(
+                            name,
+                            onClick = {
+                                BazaarApi.searchForBazaarItem(name.dropLast(1))
+                            },
+                            highlightsOnHoverSlots = listOf(gem.slot)
+                        ) { !NEUItems.neuHasFocus() }
+                    )
+                    addAlignedNumber(rough.addSeparators())
+                    addAlignedNumber("§a${flawed.addSeparators()}")
+                    addAlignedNumber("§9${fine.addSeparators()}")
+                    val price = roughprice + flawedprice + fineprice
+                    totalPrice += price
+                    if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
+                }
+            ] = name
         }
-        list.add(Renderable.table(table))
+
+        list.add(table.buildSearchableTable())
         return totalPrice
     }
 
@@ -297,20 +311,17 @@ object SackDisplay {
         STORED_ASC("Stored A", "Stored Ascending"),
         PRICE_DESC("Price D", "Price Descending"),
         PRICE_ASC("Price A", "Price Ascending"),
-        ;
     }
 
     enum class PriceFormat(val displayName: String) {
-        FORMATED("Formatted"),
-        UNFORMATED("Unformatted"),
-        ;
+        FORMATTED("Formatted"),
+        UNFORMATTED("Unformatted"),
     }
 
     enum class NumberFormat(val displayName: String) {
         DEFAULT("Default"),
         FORMATTED("Formatted"),
         UNFORMATTED("Unformatted"),
-        ;
     }
 
     @SubscribeEvent

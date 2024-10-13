@@ -41,6 +41,8 @@ object InventoryUtils {
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
 
+    fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
@@ -54,12 +56,15 @@ object InventoryUtils {
     fun getItemsInHotbar() =
         getItemsInOwnInventoryWithNull()?.sliceArray(0..8)?.filterNotNull() ?: emptyList()
 
-    fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean) =
+    fun containsInLowerInventory(predicate: (ItemStack) -> Boolean): Boolean =
+        countItemsInLowerInventory(predicate) > 0
+
+    fun countItemsInLowerInventory(predicate: (ItemStack) -> Boolean): Int =
         getItemsInOwnInventory().filter { predicate(it) }.sumOf { it.stackSize }
 
     fun inStorage() = openInventoryName().let {
-        (it.contains("Storage") && !it.contains("Rift Storage"))
-            || it.contains("Ender Chest") || it.contains("Backpack")
+        (it.contains("Storage") && !it.contains("Rift Storage")) ||
+            it.contains("Ender Chest") || it.contains("Backpack")
     }
 
     fun getItemInHand(): ItemStack? = Minecraft.getMinecraft().thePlayer.heldItem

@@ -6,9 +6,9 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -40,7 +40,7 @@ object PowderPerHotmPerk {
         if (indexOfCost == -1) return
 
         val powderFor10Levels =
-            perk.calculateTotalCost(perk.rawLevel + 10) - perk.calculateTotalCost(perk.rawLevel)
+            perk.calculateTotalCost((perk.rawLevel + 10).coerceAtMost(perk.maxLevel)) - perk.calculateTotalCost(perk.rawLevel)
 
         event.toolTip.add(indexOfCost + 2, "§7Powder for 10 levels: §e${powderFor10Levels.addSeparators()}")
     }
@@ -48,7 +48,7 @@ object PowderPerHotmPerk {
     private fun handlePowderSpend(perk: HotmData): String {
         val currentPowderSpend = perk.calculateTotalCost(perk.rawLevel)
         val maxPowderNeeded = perk.totalCostMaxLevel
-        val percentage = (currentPowderSpend.fractionOf(maxPowderNeeded) * 100).round(2)
+        val percentage = (currentPowderSpend.fractionOf(maxPowderNeeded) * 100).roundTo(2)
 
         return when (config.powderSpentDesign) {
             PowderSpentDesign.NUMBER -> {
@@ -85,6 +85,5 @@ object PowderPerHotmPerk {
         override fun toString() = str
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory &&
-        (config.powderSpent || config.powderFor10Levels)
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory && (config.powderSpent || config.powderFor10Levels)
 }

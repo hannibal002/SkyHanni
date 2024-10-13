@@ -21,7 +21,7 @@ object TrophyFishAPI {
                 |${TrophyRarity.BRONZE.formattedString}: ${formatCount(counts, TrophyRarity.BRONZE)}
                 |
                 |§7Total: ${bestFishObtained.formatCode}${counts.values.sum().addSeparators()}
-            """.trimMargin()
+        """.trimMargin()
     }
 
     private fun formatCount(counts: Map<TrophyRarity, Int>, rarity: TrophyRarity): String {

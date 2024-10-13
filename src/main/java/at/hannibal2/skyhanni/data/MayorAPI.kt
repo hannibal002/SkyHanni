@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
@@ -63,17 +64,18 @@ object MayorAPI {
     /**
      * REGEX-TEST: Calendar and Events
      */
-    private val calendarGuiPattern by group.pattern(
+    val calendarGuiPattern by group.pattern(
         "calendar.gui",
         "Calendar and Events",
     )
 
     /**
      * REGEX-TEST: §dMayor Jerry
+     * REGEX-TEST: §cMayor Aatrox
      */
-    private val jerryHeadPattern by group.pattern(
-        "jerry.head",
-        "§dMayor Jerry",
+    private val mayorHeadPattern by group.pattern(
+        "mayor.head",
+        "§.Mayor (?<name>.*)",
     )
 
     /**
@@ -141,6 +143,7 @@ object MayorAPI {
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
+                replaceSameMessage = true,
             )
         }
     }
@@ -152,6 +155,7 @@ object MayorAPI {
         if (electionOverPattern.matches(event.message)) {
             lastMayor = currentMayor
             currentMayor = Mayor.UNKNOWN
+            currentMinister = null
         }
     }
 
@@ -161,9 +165,13 @@ object MayorAPI {
 
         if (!calendarGuiPattern.matches(event.inventoryName)) return
 
-        val stack: ItemStack = event.inventoryItems.values.firstOrNull { jerryHeadPattern.matches(it.displayName) } ?: return
+        val stack: ItemStack = event.inventoryItems.values.firstOrNull {
+            mayorHeadPattern.matchMatcher(it.displayName) {
+                group("name") == "Jerry"
+            } ?: false
+        } ?: return
 
-        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }) ?: return
+        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }, 2) ?: return
         // This is the first Perk of the Perkpocalypse Mayor
         val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
@@ -179,17 +187,21 @@ object MayorAPI {
         jerryExtraMayor = jerryMayor to expireTime
     }
 
+    fun SkyBlockTime.getElectionYear(): Int {
+        var mayorYear = year
+
+        // Check if this year's election has not happened yet
+        if (month < ELECTION_END_MONTH || (day < ELECTION_END_DAY && month == ELECTION_END_MONTH)) {
+            // If so, the current mayor is still from last year's election
+            mayorYear--
+        }
+        return mayorYear
+    }
+
     private fun calculateNextMayorTime(): SimpleTimeMark {
         val now = SkyBlockTime.now()
-        var mayorYear = now.year
 
-        // Check if either the month is already over or the day after 27th in the third month
-        if (now.month > ELECTION_END_MONTH || (now.day >= ELECTION_END_DAY && now.month == ELECTION_END_MONTH)) {
-            // If so, the next mayor will be in the next year
-            mayorYear++
-        }
-
-        return SkyBlockTime(mayorYear, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
+        return SkyBlockTime(now.getElectionYear() + 1, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
     }
 
     private fun getTimeTillNextMayor() {
@@ -205,7 +217,7 @@ object MayorAPI {
 
         SkyHanniMod.coroutineScope.launch {
             val url = "https://api.hypixel.net/v2/resources/skyblock/election"
-            val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
+            val jsonObject = withContext(dispatcher) { APIUtils.getJSONResponse(url) }
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launch
             val map = mutableMapOf<Int, MayorCandidate>()
@@ -247,7 +259,7 @@ object MayorAPI {
         event.addIrrelevant {
             add("Current Mayor: ${currentMayor?.name ?: "Unknown"}")
             add("Active Perks: ${currentMayor?.activePerks}")
-            add("Last Update: $lastUpdate (${lastUpdate.passedSince()} ago)")
+            add("Last Update: ${lastUpdate.formattedDate("EEEE, MMM d h:mm a")} (${lastUpdate.passedSince()} ago)")
             add("Time Till Next Mayor: ${nextMayorTimestamp.timeUntil()}")
             add("Current Minister: ${currentMinister?.name ?: "Unknown"}")
             add("Current Minister Perk: ${currentMinister?.activePerks}")

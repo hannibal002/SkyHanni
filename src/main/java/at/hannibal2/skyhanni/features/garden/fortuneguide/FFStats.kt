@@ -77,7 +77,7 @@ object FFStats {
             in dicerCrops -> {
                 FortuneStats.SUNDER.set(FarmingFortuneDisplay.getSunderFortune(tool), 75.0)
                 FortuneStats.REFORGE.set(FarmingFortuneDisplay.reforgeFortune, 20.0)
-                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 20.0)
+                FortuneStats.GEMSTONE.set(FarmingFortuneDisplay.gemstoneFortune, 30.0)
             }
 
             CropType.MUSHROOM -> {

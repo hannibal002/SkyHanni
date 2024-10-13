@@ -288,7 +288,9 @@ object ReforgeHelper {
             } else emptyList()
         }
 
-        val addedEffect = getReforgeEffect(reforge, itemRarity)?.let { listOf(renderableString(addEffectText)) + it } ?: emptyList()
+        val addedEffect = getReforgeEffect(reforge, itemRarity)?.let {
+            listOf(renderableString(addEffectText)) + it
+        } ?: emptyList()
 
         return listOf(renderableString("§6Reforge Stats")) + stats + removedEffect + addedEffect + click
     }
@@ -379,8 +381,6 @@ object ReforgeHelper {
                 colorReforgeStone(hoverColor, hoveredReforge?.rawReforgeStoneName ?: "Random Basic Reforge")
             } else {
                 inventoryContainer?.getSlot(reforgeItem)?.highlight(hoverColor)
-
-                //?.get(reforgeItem)?. = hoverColor
             }
             hoveredReforge = null
         }
@@ -416,15 +416,17 @@ object ReforgeHelper {
 
     private fun SkyblockStatList.print(appliedReforge: SkyblockStatList? = null): List<Renderable> {
         val diff = appliedReforge?.takeIf { config.showDiff }?.let { this - it }
-        val main = ((diff ?: this).mapNotNull {
-            val key = it.key
-            val value = this[key] ?: 0.0
-            buildList<Renderable> {
-                add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
-                diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
-                add(renderableString(key.iconWithName))
+        val main = (
+            (diff ?: this).mapNotNull {
+                val key = it.key
+                val value = this[key] ?: 0.0
+                buildList {
+                    add(renderableString("§9${value.toStringWithPlus().removeSuffix(".0")}"))
+                    diff?.get(key)?.let { add(renderableString((if (it < 0) "§c" else "§a") + it.toStringWithPlus().removeSuffix(".0"))) }
+                    add(renderableString(key.iconWithName))
+                }
             }
-        })
+            )
         val table = Renderable.table(main, 5)
         return listOf(table)
     }

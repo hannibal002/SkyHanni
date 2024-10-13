@@ -246,13 +246,17 @@ object ScoreboardPattern {
         "raffleuseless",
         "^(Find tickets on the|ground and bring them|to the raffle box)$",
     )
+
+    /**
+     * REGEX-TEST: Tickets: §a8 §7(17.4%)
+     */
     val raffleTicketsPattern by miningSb.pattern(
         "raffletickets",
-        "^Tickets: §a\\d+ §7\\(\\d{1,3}\\.\\d%\\)$",
+        "Tickets: §a\\d+ §7\\(\\d+(\\.\\d)?%\\)",
     )
     val rafflePoolPattern by miningSb.pattern(
         "rafflepool",
-        "^Pool: §6\\d+§8/500$",
+        "Pool: §6\\d+",
     )
     val mithrilUselessPattern by miningSb.pattern(
         "mithriluseless",
@@ -274,8 +278,13 @@ object ScoreboardPattern {
         "uselessgoblin",
         "^§7Kill goblins!$",
     )
+
+    /**
+     * REGEX-TEST: Remaining: §a1 goblin
+     * REGEX-TEST: Remaining: §a2 goblins
+     */
     val remainingGoblinPattern by miningSb.pattern(
-        "remaininggoblin", "^Remaining: §a\\d+ goblins$",
+        "remaininggoblin", "^Remaining: §a\\d+ goblins?$",
     )
     val yourGoblinKillsPattern by miningSb.pattern(
         "yourgoblin", "^Your kills: §c\\d+ ☠( §a\\(\\+\\d+\\))?$",
@@ -303,9 +312,13 @@ object ScoreboardPattern {
         "magmaboss",
         "^§7Boss: §[c6e]\\d{1,3}%$",
     )
+
+    /**
+     * REGEX-TEST: §7Damage Soaked:§629,446 §e(+271
+     */
     val damageSoakedPattern by combatSb.pattern(
         "damagesoaked",
-        "^§7Damage Soaked:",
+        "^§7Damage Soaked:.*",
     )
     val killMagmasPattern by combatSb.pattern(
         "killmagmas",
@@ -364,27 +377,40 @@ object ScoreboardPattern {
     )
     val dojoChallengePattern by miscSb.pattern(
         "dojochallenge",
-        "^(§.)*Challenge: (§.)*(?<challenge>[\\w ]+)$",
+        "(§.)*Challenge: (§.)*(?<challenge>[\\w ]+)",
     )
     val dojoDifficultyPattern by miscSb.pattern(
         "dojodifficulty",
-        "^(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)$",
+        "(§.)*Difficulty: (§.)*(?<difficulty>[\\w ]+)",
     )
     val dojoPointsPattern by miscSb.pattern(
         "dojopoints",
-        "^(§.)*Points: (§.)*[\\w.]+ ?(§7\\(§.*§7\\))?\$",
+        "(§.)*Points: (§.)*[\\w.]+.*",
     )
+
+    /**
+     * There should be a space at the end of the test, Intellij keeps removing it
+     * REGEX-TEST: Time: §a20s
+     */
     val dojoTimePattern by miscSb.pattern(
         "dojotime",
-        "^(§.)*Time: (§.)*[\\w.]+( §7\\(§.*§7\\))?$",
+        "(§.)*Time: (§.)*[\\w.]+.*",
     )
     val objectivePattern by miscSb.pattern(
         "objective",
-        "^(§.)*(Objective|Quest).*",
+        "(§.)*(Objective|Quest).*",
     )
     val queuePattern by miscSb.pattern(
         "queued",
         "Queued:.*",
+    )
+
+    /**
+     * REGEX-TEST: Tier: §eFloor VI
+     */
+    val queueTierPattern by miscSb.pattern(
+        "queuetier",
+        "Tier: §e.*",
     )
     val queuePositionPattern by miscSb.pattern(
         "queueposition",
@@ -402,10 +428,12 @@ object ScoreboardPattern {
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
     /**
      * REGEX-TEST: §eProtect Elle §7(§a98%§7)
+     * REGEX-TEST: §fFish 1 Flyfish §c✖
+     * REGEX-TEST: §fFish 1 Skeleton Fish §c✖
      */
     val thirdObjectiveLinePattern by miscSb.pattern(
         "thirdobjectiveline",
-        "(\\s*§.\\(§.\\w+§./§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him)",
+        "(\\s*§.\\(§.\\w+§.\\/§.\\w+§.\\)|§f Mages.*|§f Barbarians.*|§edefeat Kuudra|§eand stun him|§.Fish \\d .*[fF]ish §.[✖✔])",
     )
 
     // collection of lines that just randomly exist and I have no clue how on earth to effectively remove them
@@ -489,6 +517,23 @@ object ScoreboardPattern {
         "Clues: §.\\d+/\\d+",
     )
 
+    /**
+     * REGEX-TEST: §eFirst Up
+     * REGEX-TEST: Find and talk with Barry
+     */
+    val barryProtestorsQuestlinePattern by riftSb.pattern(
+        "protestors.quest",
+        "§eFirst Up|Find and talk with Barry",
+    )
+
+    /**
+     * REGEX-TEST: Protestors handled: §b5/7
+     */
+    val barryProtestorsHandledPattern by riftSb.pattern(
+        "protestors.handled",
+        "Protestors handled: §b\\d+\\/\\d+",
+    )
+
     private val carnivalSb = scoreboardGroup.group("carnival")
 
     /**
@@ -501,12 +546,12 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §3§lCatch a Fish
-     * REGEX-TEST: §6§lFruit Diggin§6§lg
-     * REGEX-TEST: §c§lZombie Shoot§c§lout
+     * REGEX-TEST: §6§lFruit Digging
+     * REGEX-TEST: §c§lZombie Shootout
      */
     val carnivalTasksPattern by carnivalSb.pattern(
         "tasks",
-        "§.§l(?:Catch a Fish|Fruit Diggin|Zombie Shoot)(?:§.§l(?:g|out))?",
+        "§.§l(?:Catch a Fish|Fruit Digging|Zombie Shootout)",
     )
 
     /**

@@ -16,6 +16,11 @@ public class DungeonConfig {
     public HighlightClickedBlocksConfig clickedBlocks = new HighlightClickedBlocksConfig();
 
     @Expose
+    @ConfigOption(name = "Secret Chime", desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons.")
+    @Accordion
+    public SecretChimeConfig secretChime = new SecretChimeConfig();
+
+    @Expose
     @ConfigOption(name = "Milestones Display", desc = "Show the current milestone in Dungeons.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -132,6 +137,12 @@ public class DungeonConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean shadowAssassinJumpNotifier = false;
+
+    @Expose
+    @ConfigOption(name = "Terminal Waypoints", desc = "Displays Waypoints in the F7/M7 Goldor Phase.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean terminalWaypoints = false;
 
     @Expose
     @ConfigOption(name = "Dungeon Races Guide", desc = "")

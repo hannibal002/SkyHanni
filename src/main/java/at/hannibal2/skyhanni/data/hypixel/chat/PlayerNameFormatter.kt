@@ -125,32 +125,38 @@ object PlayerNameFormatter {
     fun onPrivateChat(event: PrivateMessageChatEvent) {
         if (!isEnabled()) return
         event.chatComponent =
-            StringUtils.replaceIfNeeded(event.chatComponent, Text.text("§d${event.direction}") {
-                appendText(" ")
-                appendSibling(nameFormat(event.authorComponent))
-                appendText("§f: ")
-                appendSibling(event.messageComponent.intoComponent())
-            }) ?: return
+            StringUtils.replaceIfNeeded(
+                event.chatComponent,
+                Text.text("§d${event.direction}") {
+                    appendText(" ")
+                    appendSibling(nameFormat(event.authorComponent))
+                    appendText("§f: ")
+                    appendSibling(event.messageComponent.intoComponent())
+                }
+            ) ?: return
     }
 
     @SubscribeEvent
     fun onPlayerShowItemChat(event: PlayerShowItemChatEvent) {
         if (!isEnabled()) return
-        event.chatComponent = StringUtils.replaceIfNeeded(event.chatComponent, Text.text("") {
-            appendSibling(
-                nameFormat(
-                    event.authorComponent,
-                    levelColor = event.levelComponent?.sampleStyleAtStart()?.color?.toString(),
-                    level = event.levelComponent
+        event.chatComponent = StringUtils.replaceIfNeeded(
+            event.chatComponent,
+            Text.text("") {
+                appendSibling(
+                    nameFormat(
+                        event.authorComponent,
+                        levelColor = event.levelComponent?.sampleStyleAtStart()?.color?.toString(),
+                        level = event.levelComponent
+                    )
                 )
-            )
 
-            appendText(" ")
-            appendSibling(event.action.intoComponent().changeColor(LorenzColor.GRAY))
+                appendText(" ")
+                appendSibling(event.action.intoComponent().changeColor(LorenzColor.GRAY))
 
-            appendText(" ")
-            appendSibling(event.item.intoComponent())
-        }) ?: return
+                appendText(" ")
+                appendSibling(event.item.intoComponent())
+            }
+        ) ?: return
     }
 
     private fun nameFormat(
@@ -214,7 +220,7 @@ object PlayerNameFormatter {
         val color = rawColor ?: return null
         val level = rawLevel?.getText() ?: error("level is null, color is not null")
         val levelData = "$color$level"
-        val result = if (config.hideLevelBrackets) levelData else "§8[${levelData}§8]"
+        val result = if (config.hideLevelBrackets) levelData else "§8[$levelData§8]"
         return result.applyFormattingFrom(rawLevel)
     }
 

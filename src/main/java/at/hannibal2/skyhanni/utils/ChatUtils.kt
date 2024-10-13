@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.command
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.prefix
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.url
 import at.hannibal2.skyhanni.utils.compat.getFormattedTextCompat
 import net.minecraft.client.Minecraft
@@ -110,6 +111,7 @@ object ChatUtils {
      * @param expireAt When the click action should expire, default never
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
+     * @param replaceSameMessage Replace the old message with this new message if they are identical
      *
      * @see CHAT_PREFIX
      */
@@ -121,13 +123,29 @@ object ChatUtils {
         prefix: Boolean = true,
         prefixColor: String = "§e",
         oneTimeClick: Boolean = false,
+        replaceSameMessage: Boolean = false,
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(Text.text(msgPrefix + message) {
-            this.onClick(expireAt, oneTimeClick, onClick)
-            this.hover = hover.asComponent()
-        })
+
+        val rawText = msgPrefix + message
+        val text = Text.text(rawText) {
+                this.onClick(expireAt, oneTimeClick, onClick)
+                this.hover = hover.asComponent()
+            }
+        if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(rawText))
+        } else {
+            chat(text)
+        }
     }
+
+    val uniqueMessageIdStorage = mutableMapOf<String, Int>()
+
+    fun getUniqueMessageIdForString(string: String) = uniqueMessageIdStorage.getOrPut(string) { getUniqueMessageId() }
+
+    var lastUniqueMessageId = 123242
+
+    fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -148,12 +166,14 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
-        chat(Text.text(msgPrefix + message) {
-            this.hover = Text.multiline(hover)
-            if (command != null) {
-                this.command = command
+        chat(
+            Text.text(msgPrefix + message) {
+                this.hover = Text.multiline(hover)
+                if (command != null) {
+                    this.command = command
+                }
             }
-        })
+        )
     }
 
     /**
@@ -176,10 +196,12 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(Text.text(msgPrefix + message) {
-            this.url = url
-            this.hover = "$prefixColor$hover".asComponent()
-        })
+        chat(
+            Text.text(msgPrefix + message) {
+                this.url = url
+                this.hover = "$prefixColor$hover".asComponent()
+            }
+        )
         if (autoOpen) OSUtils.openBrowser(url)
     }
 
@@ -258,8 +280,9 @@ object ChatUtils {
         return this
     }
 
+
     fun clickToActionOrDisable(message: String, option: KMutableProperty0<*>, actionName: String, action: () -> Unit) {
-        ChatUtils.clickableChat(
+        clickableChat(
             "$message\n§e[CLICK to $actionName or disable this feature]",
             onClick = {
                 if (KeyboardManager.isShiftKeyDown() || KeyboardManager.isModifierKeyDown()) {
@@ -269,7 +292,8 @@ object ChatUtils {
                 }
             },
             hover = "§eClick to $actionName!\n" +
-                "§eShift-Click to disable this feature!",
+                "§eShift-Click or Control-Click to disable this feature!",
+            replaceSameMessage = true,
         )
     }
 }
