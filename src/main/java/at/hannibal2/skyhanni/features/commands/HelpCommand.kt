@@ -15,7 +15,7 @@ object HelpCommand {
     private fun createCommandEntry(command: Commands.CommandInfo): IChatComponent {
         val category = command.category
         val color = category.color
-        val description = command.description.splitLines(200).replace("§r", "§7")
+        val description = command.description.splitLines(300).replace("§r", "§7")
         val categoryDescription = category.description.splitLines(200).replace("§r", "§7")
 
         return Text.text("§7 - $color${command.name}") {

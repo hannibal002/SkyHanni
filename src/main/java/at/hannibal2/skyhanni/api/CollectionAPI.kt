@@ -8,6 +8,9 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.put
+import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -26,22 +29,22 @@ object CollectionAPI {
     private val patternGroup = RepoPattern.group("data.collection.api")
     private val counterPattern by patternGroup.pattern(
         "counter",
-        ".* §e(?<amount>.*)§6/.*"
+        ".* §e(?<amount>.*)§6/.*",
     )
     private val singleCounterPattern by patternGroup.pattern(
         "singlecounter",
-        "§7Total Collected: §e(?<amount>.*)"
+        "§7Total Collected: §e(?<amount>.*)",
     )
     private val collectionTier0Pattern by patternGroup.pattern(
         "tierzero",
-        "§7Progress to .* I: .*"
+        "§7Progress to .* I: .*",
     )
 
     val collectionValue = mutableMapOf<NEUInternalName, Long>()
 
     // TODO repo
     private val incorrectCollectionNames = mapOf(
-        "Mushroom" to "RED_MUSHROOM".asInternalName()
+        "Mushroom" to "RED_MUSHROOM".asInternalName(),
     )
 
     @SubscribeEvent
@@ -104,4 +107,26 @@ object CollectionAPI {
 
     fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
     fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
+
+    fun findAllMultiples(): Map<NEUInternalName, MutableMap<NEUInternalName, Int>> {
+        val entries = mutableMapOf<NEUInternalName, MutableMap<NEUInternalName, Int>>()
+        NEUItems.allInternalNames.values.filter {
+            it.getItemStackOrNull()?.getItemCategoryOrNull()?.let {
+                ItemCategory.nonGear.contains(it)
+            } == true
+        }.map {
+            it!! to NEUItems.getPrimitiveMultiplier(it)
+        }.forEach {
+            entries.compute(it.second.internalName) { _, v ->
+                val pair = it.first to it.second.amount
+                if (v == null) {
+                    mutableMapOf(pair)
+                } else {
+                    v.put(pair)
+                    v
+                }
+            }
+        }
+        return entries.filter { it.value.size > 1 }
+    }
 }

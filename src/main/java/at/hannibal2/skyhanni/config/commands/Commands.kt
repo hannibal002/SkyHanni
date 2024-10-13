@@ -57,6 +57,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
+import at.hannibal2.skyhanni.features.gui.ShTrack
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -98,6 +99,10 @@ import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CommandArgument
+import at.hannibal2.skyhanni.utils.CommandArgument.Companion.findSpecifierAndGetResult
+import at.hannibal2.skyhanni.utils.CommandContextAwareObject
+import at.hannibal2.skyhanni.utils.ComplexCommand
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -189,6 +194,15 @@ object Commands {
 
     @Suppress("LongMethod")
     private fun usersNormal() {
+        registerCommand("shtrack", "Track any quantity", ShTrack.arguments) { ShTrack.ContextObject() }
+        registerCommand(
+            "shtrackitem",
+            "Track any item",
+            ShTrack.arguments,
+            ShTrack.DocumentationExcludes.itemTrack,
+        ) {
+            ShTrack.ContextObject().apply { state = ShTrack.ContextObject.StateType.ITEM }
+        }
         registerCommand(
             "shmarkplayer",
             "Add a highlight effect to a player for better visibility",
@@ -731,4 +745,41 @@ object Commands {
             if (args != null) function(args.asList().toTypedArray())
         }
     }
+
+    private fun <O : CommandContextAwareObject, A : CommandArgument<O>> registerCommand(
+        rawName: String,
+        description: String,
+        specifiers: Collection<A>,
+        excludedSpecifiersFromDescription: Set<A> = emptySet(),
+        context: () -> O,
+    ) {
+        val command = ComplexCommand(rawName, specifiers, context)
+        registerCommand(rawName, command.constructHelp(description, excludedSpecifiersFromDescription)) {
+            advancedHandleCommand(it, specifiers, context())
+        }
+    }
+
+    private fun <O : CommandContextAwareObject, A : CommandArgument<O>> advancedHandleCommand(
+        args: Array<String>,
+        specifiers: Collection<A>,
+        context: O,
+    ) {
+        var index = 0
+        var amountNoPrefixArguments = 0
+
+        while (args.size > index) {
+            val step = specifiers.findSpecifierAndGetResult(args, index, context, amountNoPrefixArguments) { amountNoPrefixArguments++ }
+            context.errorMessage?.let {
+                ChatUtils.userError(it)
+                return
+            }
+            index += step
+        }
+        context.post()
+        context.errorMessage?.let {
+            ChatUtils.userError(it)
+            return
+        }
+    }
 }
+

@@ -18,7 +18,10 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -46,6 +49,8 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import java.util.NavigableMap
+import java.util.TreeMap
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPrice as getNpcPriceNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getNpcPriceOrNull as getNpcPriceOrNullNew
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice as getPriceNew
@@ -97,7 +102,10 @@ object NEUItems {
     }
 
     var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
-    val allInternalNames = mutableListOf<NEUInternalName>()
+    var itemNamesWithoutColor: NavigableMap<String, List<NEUInternalName>> = TreeMap()
+
+    /** Keys are internal names as String */
+    val allInternalNames: NavigableMap<String, NEUInternalName> = TreeMap()
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
@@ -137,6 +145,7 @@ object NEUItems {
     fun readAllNeuItems(): Map<String, NEUInternalName> {
         allInternalNames.clear()
         val map = mutableMapOf<String, NEUInternalName>()
+        val noColor = TreeMap<String, MutableList<NEUInternalName>>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
 
@@ -157,9 +166,17 @@ object NEUItems {
                 }
                 println("wrong name: '$name'")
             }
+
+            name.removeNonAscii().trim()
+
             map[name] = internalName
-            allInternalNames.add(internalName)
+            noColor.compute(name.removeColor()) { _, v ->
+                v?.apply { add(internalName) } ?: mutableListOf(internalName)
+            }
+            allInternalNames[rawInternalName] = internalName
         }
+        @Suppress("UNCHECKED_CAST")
+        itemNamesWithoutColor = noColor as NavigableMap<String, List<NEUInternalName>>
         return map
     }
 
@@ -179,7 +196,6 @@ object NEUItems {
     fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
         getInternalNameFromHypixelIdOrNull(hypixelId)
             ?: error("hypixel item id does not match internal name: $hypixelId")
-
 
     @Deprecated("Moved to ItemPriceUtils", ReplaceWith(""))
     fun NEUInternalName.getPrice(
@@ -295,7 +311,7 @@ object NEUItems {
         }
     }
 
-    fun allNeuRepoItems(): Map<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
+    fun allNeuRepoItems(): NavigableMap<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
     fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
         itemIdCache[item]?.let {
@@ -307,6 +323,19 @@ object NEUItems {
         itemIdCache[item] = result
         return result
     }
+
+    fun findInternalNameStartingWithWithoutNPCs(prefix: String): List<String> =
+        findInternalNameStartingWith(prefix).filterNot { npcInternal.matches(it) }
+
+    fun findInternalNameStartingWith(prefix: String): Set<String> = StringUtils.subMapOfStringsStartingWith(prefix, allInternalNames).keys
+
+    private val npcName = ".*\\((?:(?:rift )?npc|monster|mayor)\\)".toPattern()
+    private val npcInternal = ".*\\((?:(?:RIFT_)?NPC|MONSTER|MAYOR)\\)".toPattern()
+
+    fun findItemNameStartingWithWithoutNPCs(prefix: String): List<String> =
+        findItemNameStartingWith(prefix).filterNot { npcName.matches(it) }
+
+    fun findItemNameStartingWith(prefix: String): Set<String> = StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor).keys
 
     fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }
