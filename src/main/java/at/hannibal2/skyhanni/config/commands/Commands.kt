@@ -645,6 +645,7 @@ object Commands {
         }
     }
 
+    @Suppress("LongMethod")
     private fun devTest(event: RegisterCommandsEvent) {
         event.register("shtest") {
             description = "Unused test command."
