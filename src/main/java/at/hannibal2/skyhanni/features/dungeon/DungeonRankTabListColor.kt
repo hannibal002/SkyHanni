@@ -21,6 +21,7 @@ object DungeonRankTabListColor {
      * REGEX-TEST: §8[§r§9319§r§8] §r§bEmpa_ §r§7α §r§f(§r§dMage XXXIV§r§f)
      * REGEX-TEST: §8[§r§5393§r§8] §r§c[§r§fYOUTUBE§r§c] Remittal§r§f §r§7Σ§r§7♲ §r§f(§r§dMage XL§r§f)
      */
+    @Suppress("MaxLineLength")
     private val pattern by patternGroup.pattern(
         "rank",
         "^(?:§.)*(?<sbLevel>\\[(?:§.)*\\d+(?:§.)*]) (?<rank>(?:§.)*\\[(?:§.)*[^]]+(?:§.)*])? ?(?<playerName>\\S+) (?<symbols>[^(]*)\\((?:§.)*(?<className>\\S+) (?<classLevel>[CLXVI]+)(?:§.)*\\)(?:§.)*$"
@@ -34,7 +35,7 @@ object DungeonRankTabListColor {
             val sbLevel = group("sbLevel")
             val rank = groupOrNull("rank") ?: ""
             val playerName = group("playerName")
-            //val symbols = group("symbols")
+            // val symbols = group("symbols")
             val className = group("className")
             val classLevel = group("classLevel")
 
