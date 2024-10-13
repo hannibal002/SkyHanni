@@ -41,6 +41,8 @@ object InventoryUtils {
 
     fun inInventory() = Minecraft.getMinecraft().currentScreen is GuiChest
 
+    fun inContainer() = Minecraft.getMinecraft().currentScreen is GuiContainer
+
     fun ContainerChest.getInventoryName() = this.lowerChestInventory.displayName.unformattedText.trim()
 
     fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
