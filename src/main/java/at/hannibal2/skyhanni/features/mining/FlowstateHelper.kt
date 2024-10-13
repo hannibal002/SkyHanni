@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
+import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getStreakColor
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getTimerColor
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.streakEndTimer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -29,22 +29,18 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object FlowstateHelper {
     private val config get() = SkyHanniMod.feature.mining.flowstateHelper
+
     var streakEndTimer = SimpleTimeMark.farPast()
         private set
     var blockBreakStreak = 0
         private set
 
-    private var display: List<Renderable>? = null
+    private var display: List<Renderable> = emptyList()
     private var displayDirty = false
     private var displayHibernating = true
     private var timeSinceHibernation = SimpleTimeMark.farPast()
 
     private var flowstateCache: Int? = null
-
-    private val pickobulusPattern by RepoPattern.pattern(
-        "mining.pickobulus.blockdestroy",
-        "§7Your §r§aPickobulus §r§7destroyed §r§e(?<amount>\\d+) §r§7blocks!",
-    )
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onBlockMined(event: OreMinedEvent) {
@@ -76,18 +72,15 @@ object FlowstateHelper {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!MiningAPI.inCustomMiningIsland()) return
-        if (!config.enabled) return
-        if (flowstateCache == null) return
+        if (!MiningAPI.inCustomMiningIsland() || !config.enabled) return
+        if (flowstateCache == null || !streakEndTimer.isInFuture()) return
 
         if (displayHibernating && config.autoHide > -1 && timeSinceHibernation.passedSince() > config.autoHide.seconds) return
-        if (display == null || streakEndTimer.isInFuture()) {
+        if (display.isEmpty() || streakEndTimer.isInFuture()) {
             createDisplay()
         }
 
-        display?.let {
-            config.position.renderRenderables(it, extraSpace = 1, "Flowstate Helper")
-        }
+        config.position.renderRenderables(display, extraSpace = 1, "Flowstate Helper")
     }
 
     private fun createDisplay() {
@@ -119,15 +112,18 @@ object FlowstateHelper {
     }
 
     fun getTimerColor(timeRemaining: Duration): String {
-        if (!config.colorfulTimer) return "§6"
+        if (!config.colorfulTimer) return "§b"
         return when (timeRemaining) {
             in 0.seconds..2.seconds -> "§c"
-            in 2.seconds..5.seconds -> "§#§e§c§7§b§3§6§/"
-            in 5.seconds..7.seconds -> "§e"
-            in 7.seconds..10.seconds -> "§a"
+            in 2.seconds..4.seconds -> "§#§e§c§7§b§3§6§/"
+            in 4.seconds..6.seconds -> "§e"
+            in 6.seconds..8.seconds -> "§a"
+            in 8.seconds..10.seconds -> "§2"
             else -> "§6"
         }
     }
+
+    fun getStreakColor(streak: Int = blockBreakStreak): String = if (streak < 200) "§e" else "§a"
 
     private fun hasFlowstate() {
         val enchantList = InventoryUtils.getItemInHand()?.getEnchantments() ?: run {
@@ -144,36 +140,28 @@ object FlowstateHelper {
 
 enum class FlowstateElements(val label: String, var renderable: Renderable = Renderable.string("")) {
     TITLE("§d§lFlowstate Helper", Renderable.string("§d§lFlowstate Helper")),
-    TIMER("Time Remaining: §b9.71"),
-    STREAK("Streak: §7234"),
+    TIMER("§fTime Remaining: §b9.71"),
+    STREAK("§7Streak: §f123/200"),
     SPEED("§6+600⸕"),
     COMPACT("§7x40 §6+120⸕ §b(9.71)"),
     ;
 
     override fun toString() = label
 
-    private val config get() = SkyHanniMod.feature.mining.flowstateHelper
-
     fun create() {
         if (this !in config.appearance) return
 
         renderable = when (this) {
             TIMER -> {
-                var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
-                if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
+                val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
-                Renderable.string(
-                    "Time Remaining: ${getTimerColor(timeRemaining)}${
-                        timeRemaining.format(
-                            TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true,
-                        )
-                    }",
-                )
+                Renderable.string("§7Time Remaining: ${timeRemaining.formatTime()}")
             }
 
             STREAK -> {
-                val textColor = if (blockBreakStreak < 200) "§7" else "§f"
-                Renderable.string("Streak: $textColor$blockBreakStreak")
+                val textColor = getStreakColor()
+                val string = "§7Streak: $textColor$blockBreakStreak"
+                Renderable.string(string + if (blockBreakStreak < 200) "§8/200" else "")
             }
 
             SPEED -> {
@@ -181,15 +169,12 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
             }
 
             COMPACT -> {
-                var timeRemaining = streakEndTimer.minus(SimpleTimeMark.now())
-                if (timeRemaining < 0.seconds) timeRemaining = 0.seconds
+                val timeRemaining = streakEndTimer.timeUntil().coerceAtLeast(0.seconds)
 
                 Renderable.string(
-                    "§7x$blockBreakStreak " + "§6+${getSpeedBonus()}⸕ " + "${getTimerColor(timeRemaining)}${
-                        timeRemaining.format(
-                            TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true,
-                        )
-                    }",
+                    "§7x${getStreakColor()}$blockBreakStreak " +
+                        "§6+${getSpeedBonus()}⸕ " +
+                        timeRemaining.formatTime(),
                 )
             }
 
@@ -198,6 +183,12 @@ enum class FlowstateElements(val label: String, var renderable: Renderable = Ren
     }
 
     companion object {
+        private val config get() = SkyHanniMod.feature.mining.flowstateHelper
+
+        private fun Duration.formatTime(): String {
+            return getTimerColor(this) + format(TimeUnit.SECOND, true, maxUnits = 2, showSmallerUnits = true)
+        }
+
         @JvmField
         val defaultOption = listOf(
             TITLE, TIMER, STREAK, SPEED,

@@ -25,7 +25,7 @@ public class FlowstateHelperConfig {
     public List<FlowstateElements> appearance = FlowstateElements.defaultOption;
 
     @Expose
-    @ConfigOption(name = "Colorful Timer", desc = "Makes the timer's color dynamic.")
+    @ConfigOption(name = "Dynamic Color", desc = "Makes the timer's color dynamic.")
     @ConfigEditorBoolean
     public boolean colorfulTimer = false;
 
