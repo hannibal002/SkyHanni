@@ -40,12 +40,14 @@ object TerminalWaypoints {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!inBoss()) return
-        DungeonBossAPI.goldorTerminalPattern.matchMatcher(event.message) {
-            val playerName = group("playerName")
-            val playerEntity = EntityUtils.getEntities<EntityPlayerMP>().find { it.name == playerName } ?: return
-            val terminal = TerminalInfo.getClosestTerminal(playerEntity.getLorenzVec())
-            terminal?.highlight = false
-        }
+
+        val playerName = DungeonBossAPI.goldorTerminalPattern.matchMatcher(event.message) {
+            group("playerName")
+        } ?: return
+
+        val playerEntity = EntityUtils.getEntities<EntityPlayerMP>().find { it.name == playerName } ?: return
+        val terminal = TerminalInfo.getClosestTerminal(playerEntity.getLorenzVec())
+        terminal?.highlight = false
     }
 
     private fun inBoss() = DungeonAPI.inBossRoom && DungeonAPI.isOneOf("F7", "M7")
