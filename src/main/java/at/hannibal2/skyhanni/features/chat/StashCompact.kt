@@ -25,7 +25,7 @@ object StashCompact {
      */
     private val materialCountPattern by patternGroup.pattern(
         "material.count",
-        "§f *§7You have §3(?<count>[\\d,]+) (§.)+(?<type>item|material)s? stashed away!.*",
+        "§f *§7You have §3(?<count>[\\d,]+) (?:§.)+(?<type>item|material)s? stashed away!.*",
     )
 
     /**
@@ -102,10 +102,11 @@ object StashCompact {
     }
 
     private fun sendCompactedStashMessage() {
+        val name = StringUtils.pluralize(lastMaterialCount, lastType)
+        val total = StringUtils.pluralize(lastDifferingMaterialsCount, "type")
         ChatUtils.clickableChat(
-            "§7You have §3${lastMaterialCount} §7${StringUtils.pluralize(lastMaterialCount, lastType)} in stash, " +
-                "§8totalling $lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}§7. " +
-                "§3Click to ${if(config.useViewStash) "view stash" else "pickup stash"}§7.",
+            "§7You have §3${lastMaterialCount} §7$name in stash, §8totalling $lastDifferingMaterialsCount $total§7. " +
+                "§3Click to ${if (config.useViewStash) "view" else "pickup"} stash§7.",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(lastType)
                 else HypixelCommands.pickupStash()
