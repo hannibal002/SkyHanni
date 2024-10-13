@@ -25,7 +25,7 @@ public class ReforgeHelperConfig {
     public boolean reforgeStonesOnlyHex = true;
 
     @Expose
-    @ConfigOption(name = "Show Diff", desc = "Shows the difference of the new reforge to the current one in the slecetion list.")
+    @ConfigOption(name = "Show Diff", desc = "Shows the difference of the new reforge to the current one in the selection list.")
     @ConfigEditorBoolean
     public boolean showDiff = false;
 

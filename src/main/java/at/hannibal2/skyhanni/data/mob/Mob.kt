@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.toSingletonListOrEmpty
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
+import at.hannibal2.skyhanni.utils.EntityUtils.getArmorInventory
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -17,6 +18,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.monster.EntityZombie
+import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
 import java.awt.Color
 import java.util.UUID
@@ -111,14 +113,21 @@ class Mob(
 
     fun canBeSeen() = baseEntity.canBeSeen()
 
-    fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
 
     private var highlightColor: Color? = null
 
-    /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
-    fun highlight(color: Color) {
-        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
-        internalHighlight()
+    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
+     * If [color] is set to null it removes a highlight*/
+    fun highlight(color: Color?) {
+        if (color == highlightColor) return
+        if (color == null) {
+            internalRemoveColor()
+            highlightColor = null
+        } else {
+            highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+            internalHighlight()
+        }
     }
 
     private fun internalHighlight() {
@@ -147,9 +156,11 @@ class Mob(
         relativeBoundingBox =
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
-        owner = (ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
-        } else null)?.let { MobUtils.OwnerShip(it) }
+        owner = (
+            ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
+                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+            } else null
+            )?.let { MobUtils.OwnerShip(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
@@ -157,13 +168,16 @@ class Mob(
             MobData.externRemoveOfRetryAmount += it
         }
 
-    fun updateBoundingBox() {
+    private fun updateBoundingBox() {
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
     }
 
-    private fun makeRelativeBoundingBox() =
-        (baseEntity.entityBoundingBox.union(extraEntities.filter { it !is EntityArmorStand }
-            .mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+    private fun makeRelativeBoundingBox() = (
+        baseEntity.entityBoundingBox.union(
+            extraEntities.filter { it !is EntityArmorStand }
+                .mapNotNull { it.entityBoundingBox },
+        )
+        )?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +

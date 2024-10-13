@@ -23,11 +23,13 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -45,12 +47,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -79,9 +81,14 @@ object GardenVisitorFeatures {
     private var display = emptyList<List<Any>>()
 
     private val patternGroup = RepoPattern.group("garden.visitor")
+
+    /**
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
+     */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
-        ".* §r§ehas arrived on your §r§bGarden§r§e!",
+        ".* §r§ehas arrived on your §r§[ba]Garden§r§e!",
     )
     private val copperPattern by patternGroup.pattern(
         "copper",
@@ -201,7 +208,11 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")
                         } else {
-                            BazaarApi.searchForBazaarItem(name, amount)
+                            if (internalName.isBazaarItem()) {
+                                BazaarApi.searchForBazaarItem(name, amount)
+                            } else {
+                                HypixelCommands.auctionSearch(name.removeColor())
+                            }
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
@@ -234,31 +245,29 @@ object GardenVisitorFeatures {
         var amountInSacks = 0
         internalName.getAmountInSacksOrNull()?.let {
             amountInSacks = it
-            val textColour = if (it >= amount) "a" else "e"
-            list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+            val textColor = if (it >= amount) "a" else "e"
+            list.add(" §7(§${textColor}x${it.addSeparators()} §7in sacks)")
         }
 
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
-            ?.allIngredients() ?: emptySet()
+            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            ?.ingredients ?: emptySet()
         if (ingredients.isEmpty()) return
 
-        val requiredIngredients = mutableMapOf<String, Int>()
-        for (ingredient in ingredients) {
-            val key = ingredient.internalItemId
-            requiredIngredients[key] =
-                requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
+        val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
+        for ((key, count) in ingredients.toPrimitiveItemStacks()) {
+            requiredIngredients.addOrPut(key, count)
         }
         var hasIngredients = true
         for ((key, value) in requiredIngredients) {
-            val sackItem = key.asInternalName().getAmountInSacks()
+            val sackItem = key.getAmountInSacks()
             if (sackItem < value * (amount - amountInSacks)) {
                 hasIngredients = false
                 break
             }
         }
-        if (hasIngredients) {
+        if (hasIngredients && (amount - amountInSacks) > 0) {
             val leftToCraft = amount - amountInSacks
             list.add(" §7(")
             list.add(
@@ -268,7 +277,7 @@ object GardenVisitorFeatures {
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$leftToCraft")
                         } else {
-                            HypixelCommands.viewRecipe(internalName.toString())
+                            HypixelCommands.viewRecipe(internalName.asString())
                         }
                     },
                 ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
@@ -352,12 +361,12 @@ object GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        event.parent.drawString(location.add(y = 2.23), text)
+        event.parent.drawString(location.up(2.23), text)
         if (config.rewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 
-                event.parent.drawString(location.add(y = 2.73), "§c!$name§c!")
+                event.parent.drawString(location.up(2.73), "§c!$name§c!")
             }
         }
     }
@@ -673,7 +682,7 @@ object GardenVisitorFeatures {
                     add("shoppingList: '${visitor.shoppingList}'")
                 }
                 visitor.offer?.offerItem?.getInternalName()?.let {
-                    add("offer: '${it}'")
+                    add("offer: '$it'")
                 }
             }
         }
@@ -722,6 +731,14 @@ object GardenVisitorFeatures {
                 drops.add(JsonPrimitive(new.name))
             }
 
+            drops
+        }
+        event.transform(54, "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (entry in element.asJsonArray) {
+                drops.add(JsonPrimitive(entry.asString))
+            }
+            drops.add(JsonPrimitive(VisitorReward.COPPER_DYE.name))
             drops
         }
 

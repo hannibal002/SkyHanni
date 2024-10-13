@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
-import at.hannibal2.skyhanni.events.SkillOverflowLevelupEvent
+import at.hannibal2.skyhanni.events.SkillOverflowLevelUpEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillProgress
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.features.skillprogress.SkillUtil.SPACE_SPLITTER
@@ -266,7 +266,7 @@ object SkillAPI {
             currentXp
         )
         if (skillInfo.overflowLevel > 60 && levelOverflow == skillInfo.overflowLevel + 1)
-            SkillOverflowLevelupEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
+            SkillOverflowLevelUpEvent(skillType, skillInfo.overflowLevel, levelOverflow).postAndCatch()
 
         skillInfo.apply {
             this.level = level
@@ -392,7 +392,7 @@ object SkillAPI {
                     ChatUtils.chat("§bSkill Custom Goal Level")
                     val map = storage?.filter { it.value.customGoalLevel != 0 } ?: return
                     if (map.isEmpty()) {
-                        ChatUtils.chat("§cYou haven't set any custom goals yet!")
+                        ChatUtils.userError("You haven't set any custom goals yet!")
                     }
                     map.forEach { (skill, data) ->
                         ChatUtils.chat("§e${skill.displayName}: §b${data.customGoalLevel}")
@@ -486,7 +486,8 @@ object SkillAPI {
             1 -> listOf("levelwithxp", "xpforlevel", "goal")
             2 -> if (strings[0].lowercase() == "goal") CommandBase.getListOfStringsMatchingLastWord(
                 strings,
-                SkillType.entries.map { it.displayName })
+                SkillType.entries.map { it.displayName }
+            )
             else
                 listOf()
 
@@ -502,7 +503,8 @@ object SkillAPI {
                 "§6/shskills goal - §bView your current goal",
                 "§6/shskills goal <skill> <level> - §bDefine your goal for <skill>",
                 "",
-            ).joinToString("\n"), prefix = false
+            ).joinToString("\n"),
+            prefix = false
         )
     }
 

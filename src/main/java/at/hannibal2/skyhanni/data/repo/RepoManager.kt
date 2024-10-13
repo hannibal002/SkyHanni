@@ -7,12 +7,12 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import com.google.gson.JsonObject
-import net.minecraft.client.Minecraft
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FileUtils
@@ -34,9 +34,9 @@ class RepoManager(private val configLocation: File) {
 
     private val gson get() = ConfigManager.gson
     private var latestRepoCommit: String? = null
-    private val repoLocation: File = File(configLocation, "repo")
+    val repoLocation: File = File(configLocation, "repo")
     private var error = false
-    private var lastRepoUpdate = SimpleTimeMark.farPast()
+    private var lastRepoUpdate = SimpleTimeMark.now()
 
     companion object {
 
@@ -165,11 +165,11 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
-    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Void?> {
-        val comp = CompletableFuture<Void?>()
+    private fun reloadRepository(answerMessage: String = ""): CompletableFuture<Unit?> {
+        val comp = CompletableFuture<Unit?>()
         if (!atomicShouldManuallyReload.get()) return comp
         ErrorManager.resetCache()
-        Minecraft.getMinecraft().addScheduledTask {
+        DelayedRun.onThread.execute {
             error = false
             successfulConstants.clear()
             unsuccessfulConstants.clear()
@@ -232,8 +232,10 @@ class RepoManager(private val configLocation: File) {
             if (unsuccessfulConstants.isNotEmpty()) {
                 val text = mutableListOf<IChatComponent>()
                 text.add(
-                    ("§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
-                        "Please report this error on the Discord!").asComponent(),
+                    (
+                        "§c[SkyHanni-${SkyHanniMod.version}] §7Repo Issue! Some features may not work. " +
+                            "Please report this error on the Discord!"
+                        ).asComponent(),
                 )
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
@@ -286,13 +288,13 @@ class RepoManager(private val configLocation: File) {
         val repoUser = config.location.user
         val repoName = config.location.name
         val repoBranch = config.location.branch
-        return String.format("https://api.github.com/repos/%s/%s/commits/%s", repoUser, repoName, repoBranch)
+        return "https://api.github.com/repos/$repoUser/$repoName/commits/$repoBranch"
     }
 
     private fun getDownloadUrl(commitId: String?): String {
         val repoUser = config.location.user
         val repoName = config.location.name
-        return String.format("https://github.com/%s/%s/archive/%s.zip", repoUser, repoName, commitId)
+        return "https://github.com/$repoUser/$repoName/archive/$commitId.zip"
     }
 
     @Throws(IOException::class)

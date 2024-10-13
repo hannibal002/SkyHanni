@@ -47,9 +47,13 @@ object SlayerAPI {
             val totalPrice = maxPrice * amount
 
             val format = totalPrice.shortFormat()
-            val priceFormat = " §7(§6$format coins§7)"
 
-            "$amountFormat$displayName$priceFormat" to totalPrice
+            if (internalName == NEUInternalName.SKYBLOCK_COIN) {
+                "§6$format coins" to totalPrice
+            } else {
+                val priceFormat = " §7(§6$format coins§7)"
+                "$amountFormat$displayName$priceFormat" to totalPrice
+            }
         }
 
     @SubscribeEvent
@@ -62,7 +66,7 @@ object SlayerAPI {
         }
 
         event.addData {
-            add("activeSlayer: ${getActiveSlayer()}")
+            add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
             add("isInAnyArea: $isInAnyArea")
             add("latestSlayerProgress: $latestSlayerProgress")
@@ -82,9 +86,7 @@ object SlayerAPI {
         }
     }
 
-    fun getActiveSlayer() = activeSlayer.getValue()
-
-    private val activeSlayer = RecalculatingValue(1.seconds) {
+    val activeSlayer by RecalculatingValue(1.seconds) {
         grabActiveSlayer()
     }
 
@@ -125,7 +127,7 @@ object SlayerAPI {
             } else {
                 val slayerTypeForCurrentArea = getSlayerTypeForCurrentArea()
                 isInAnyArea = slayerTypeForCurrentArea != null
-                slayerTypeForCurrentArea == getActiveSlayer() && slayerTypeForCurrentArea != null
+                slayerTypeForCurrentArea == activeSlayer && slayerTypeForCurrentArea != null
             }
         }
     }

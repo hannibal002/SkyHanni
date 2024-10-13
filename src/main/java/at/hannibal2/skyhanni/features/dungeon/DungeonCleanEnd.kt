@@ -23,9 +23,15 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonCleanEnd {
 
     private val config get() = SkyHanniMod.feature.dungeon.cleanEnd
+
+    /**
+     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor III
+     * REGEX-TEST: §f                        §r§cThe Catacombs §r§8- §r§eFloor VI
+     * REGEX-TEST: §f                §r§cMaster Mode Catacombs §r§8- §r§eFloor II
+     */
     private val catacombsPattern by RepoPattern.pattern(
         "dungeon.end.chests.spawned",
-        "(?:§f)?( *)§r§c(The|Master Mode) Catacombs §r§8- §r§eFloor (.*)"
+        "(?:§f)?( *)§r§c(Master Mode )?The Catacombs §r§8- §r§eFloor (.*)",
     )
 
     private var bossDone = false
@@ -93,11 +99,11 @@ object DungeonCleanEnd {
 
         if (entity == Minecraft.getMinecraft().thePlayer) return
 
-        if (config.F3IgnoreGuardians
-            && DungeonAPI.isOneOf("F3", "M3")
-            && entity is EntityGuardian
-            && entity.entityId != lastBossId
-            && Minecraft.getMinecraft().thePlayer.isSneaking
+        if (config.F3IgnoreGuardians &&
+            DungeonAPI.isOneOf("F3", "M3") &&
+            entity is EntityGuardian &&
+            entity.entityId != lastBossId &&
+            Minecraft.getMinecraft().thePlayer.isSneaking
         ) {
             return
         }
