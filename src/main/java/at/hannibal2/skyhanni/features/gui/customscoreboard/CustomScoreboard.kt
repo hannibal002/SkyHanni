@@ -245,7 +245,7 @@ object CustomScoreboard {
                             "${entry.element.getLines().map { it.display }}",
                     )
                 }
-                allUnknownLines.toSet().takeIfNotEmpty()?.let { set ->
+                allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
                     set.forEach { add("   ${it.line}") }
                 }

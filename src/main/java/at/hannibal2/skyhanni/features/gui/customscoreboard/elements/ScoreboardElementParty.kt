@@ -17,7 +17,7 @@ object ScoreboardElementParty : ScoreboardElement() {
         if (partyConfig.showPartyLeader) PartyAPI.partyLeader?.let { leader -> add(" §7- §f$leader §e♚") }
 
         PartyAPI.partyMembers
-            .take(partyConfig.maxPartyList)
+            .take(partyConfig.maxPartyList.get())
             .apply { if (partyConfig.showPartyLeader) remove(PartyAPI.partyLeader) }
             .forEach {
                 add(" §7- §f$it")
