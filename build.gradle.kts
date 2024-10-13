@@ -3,11 +3,12 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import skyhannibuildsystem.ChangelogVerification
 
 plugins {
     idea
@@ -102,6 +103,13 @@ tasks.runClient {
         },
     )
 }
+
+tasks.register("checkPrDescription", ChangelogVerification::class) {
+    this.outputDirectory.set(layout.buildDirectory)
+    this.prTitle = project.findProperty("prTitle") as String
+    this.prBody = project.findProperty("prBody") as String
+}
+
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
@@ -150,9 +158,9 @@ dependencies {
         exclude(module = "unspecified")
         isTransitive = false
     }
-    // August 27, 2024, 4:30 PM AEST
-    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.3.3
-    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.3.3:all") {
+    // October 3, 2024, 11:43 PM AEST
+    // https://github.com/NotEnoughUpdates/NotEnoughUpdates/tree/2.4.0
+    devenvMod("com.github.NotEnoughUpdates:NotEnoughUpdates:2.4.0:all") {
         exclude(module = "unspecified")
         isTransitive = false
     }
