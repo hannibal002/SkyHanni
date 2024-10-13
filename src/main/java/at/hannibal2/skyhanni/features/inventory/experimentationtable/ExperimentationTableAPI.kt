@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.experimentationtable
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -169,8 +170,10 @@ object ExperimentationTableAPI {
      * REGEX-TEST: §dGuardian
      * REGEX-TEST: §9Guardian§e
      */
-    val petNamePattern by patternGroup.pattern(
+    private val petNamePattern by patternGroup.pattern(
         "guardianpet",
         "§[956d]Guardian.*",
     )
+
+    fun hasGuardianPet(): Boolean = petNamePattern.matches(PetAPI.currentPet)
 }

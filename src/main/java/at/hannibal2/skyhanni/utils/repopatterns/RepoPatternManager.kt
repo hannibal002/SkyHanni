@@ -104,7 +104,9 @@ object RepoPatternManager {
                 val previousOwner = exclusivity[key]
                 if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
                     if (!config.tolerateDuplicateUsage)
-                        crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
+                        crash("Non unique access to regex at \"$key\". " +
+                            "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
+                            "tried to use at ${owner.ownerClass} / ${owner.property}")
                 } else {
                     exclusivity[key] = owner
                 }
@@ -122,7 +124,9 @@ object RepoPatternManager {
                 }
                 val previousParentOwner = previousParentOwnerMutable
 
-                if (previousParentOwner != null && previousParentOwner != parentKeyHolder && !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)) {
+                if (previousParentOwner != null && previousParentOwner != parentKeyHolder &&
+                    !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)
+                ) {
                     if (!config.tolerateDuplicateUsage) crash(
                         "Non unique access to array regex at \"$parent\"." +
                             " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +
