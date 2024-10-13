@@ -94,7 +94,7 @@ object DraconicSacrificeTracker {
         add(
             Renderable.hoverTips(
                 "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrified",
-                data.sacrificedItemsMap.map { (key, value) -> "$key: §b$value" },
+                data.sacrificedItemsMap.map { (item, amount) -> "$item: §b$amount" },
             ).toSearchable()
         )
 
