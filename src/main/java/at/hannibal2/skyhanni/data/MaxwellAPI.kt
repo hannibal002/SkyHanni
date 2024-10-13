@@ -135,15 +135,11 @@ object MaxwellAPI {
 
         chatPowerPattern.tryReadPower(message)
         chatPowerUnlockedPattern.tryReadPower(message)
-        if (tuningAutoAssignedPattern.matches(event.message)) {
-            if (tunings.isNullOrEmpty()) return
-            with(CustomScoreboard.config) {
-                if (enabled.get() && ScoreboardEntry.TUNING in scoreboardEntries.get()) {
-                    ChatUtils.chat(
-                        "Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.",
-                    )
-                }
-            }
+        if (!tuningAutoAssignedPattern.matches(event.message)) return
+        if (tunings.isNullOrEmpty()) return
+        with(CustomScoreboard.config) {
+            if (!enabled.get() || ScoreboardEntry.TUNING !in scoreboardEntries.get()) return
+            ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
         }
     }
 

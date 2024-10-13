@@ -318,18 +318,17 @@ object SkillAPI {
         }
 
         val existingLevel = getSkillInfo(skillType) ?: SkillInfo()
-        val gained = matcher.group("gained")
         tablistLevel?.let { level ->
             if (isPercentPatternFound) {
                 val levelXp = calculateLevelXp(existingLevel.level - 1)
                 val nextLevelDiff = levelArray.getOrNull(level)?.toDouble() ?: 7_600_000.0
                 val nextLevelProgress = nextLevelDiff * xpPercentage / 100
                 val totalXp = levelXp + nextLevelProgress
-                updateSkillInfo(existingLevel, level, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong(), gained)
+                updateSkillInfo(existingLevel, level, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong(), matcher.group("gained"))
             } else {
                 val exactLevel = getLevelExact(needed)
                 val levelXp = calculateLevelXp(existingLevel.level - 1).toLong() + current
-                updateSkillInfo(existingLevel, exactLevel, current, needed, levelXp, gained)
+                updateSkillInfo(existingLevel, exactLevel, current, needed, levelXp, matcher.group("gained"))
             }
             storage?.set(skillType, existingLevel)
         }

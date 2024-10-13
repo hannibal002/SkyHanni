@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementChunkedStats
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementProfile
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementQuiver
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSlayer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSoulflow
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTime

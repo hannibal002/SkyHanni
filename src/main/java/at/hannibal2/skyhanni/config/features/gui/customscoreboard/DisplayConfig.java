@@ -150,7 +150,11 @@ public class DisplayConfig {
     public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
 
     @Expose
-    @ConfigOption(name = "Cache Scoreboard on Island Switch", desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
+    @ConfigOption(
+        name = "Cache Scoreboard on Island Switch",
+        desc = "Will stop the Scoreboard from updating while switching islands.\n" +
+            "Removes the shaking when loading data."
+    )
     @ConfigEditorBoolean
     public boolean cacheScoreboardOnIslandSwitch = false;
 }
