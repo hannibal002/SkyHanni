@@ -64,7 +64,7 @@ object CustomScoreboardUtils {
     internal fun getGems() = getGroupFromPattern(TabListData.getTabList(), ScoreboardPattern.gemsPattern, "gems")
 
     internal fun getHeat() =
-        getGroupFromPattern(CustomScoreboard.activeLines, MiningAPI.heatPattern, "scoreboard")
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, MiningAPI.heatPattern, "scoreboard")
 
     internal fun getNorthStars() =
         getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.northstarsPattern, "northstars")

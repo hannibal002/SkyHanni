@@ -475,7 +475,7 @@ private fun getHeatDisplayPair(): List<ScoreboardElementType> {
 }
 
 private fun getHeatShowWhen() = inAnyIsland(IslandType.CRYSTAL_HOLLOWS) &&
-    CustomScoreboard.activeLines.any { MiningAPI.heatPattern.matches(it) }
+    ScoreboardData.sidebarLinesFormatted.any { MiningAPI.heatPattern.matches(it) }
 
 private fun getColdDisplayPair(): List<ScoreboardElementType> {
     val cold = -MiningAPI.cold
@@ -856,7 +856,7 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     if (lines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
     return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + lines.map {
-      it.line to HorizontalAlignment.LEFT
+        it.line to HorizontalAlignment.LEFT
     }
 }
 
