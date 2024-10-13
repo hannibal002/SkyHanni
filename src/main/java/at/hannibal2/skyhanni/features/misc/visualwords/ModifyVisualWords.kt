@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.convertToFormatted
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
@@ -67,16 +66,6 @@ object ModifyVisualWords {
             SkyHanniMod.visualWordsData.modifiedWords = oldModifiedWords
             SkyHanniMod.feature.storage.modifiedWords = emptyList()
             SkyHanniMod.configManager.saveConfig(ConfigFileType.VISUAL_WORDS, "Migrate visual words")
-        }
-    }
-
-    @JvmStatic
-    fun onCommand() {
-        if (!LorenzUtils.onHypixel) {
-            ChatUtils.userError("You need to join Hypixel to use this feature!")
-        } else {
-            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
-            SkyHanniMod.screenToOpen = VisualWordGui()
         }
     }
 }
