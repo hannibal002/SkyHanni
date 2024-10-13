@@ -31,7 +31,7 @@ public class FlowstateHelperConfig {
     public boolean colorfulTimer = false;
 
     @Expose
-    @ConfigOption(name = "Auto Hide", desc = "Automatically hides the GUI after being idle or having the max bonus, in seconds.")
+    @ConfigOption(name = "Auto Hide", desc = "Automatically hides the GUI after being idle, in seconds.")
     @SearchTag("autohide")
     @ConfigEditorSlider(
         minValue = -1,
