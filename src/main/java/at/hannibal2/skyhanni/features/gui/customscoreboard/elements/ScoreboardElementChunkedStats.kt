@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsManager.Companion.getChunkedStats
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsManager.Companion.shouldShowChunkedStats
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsManager.Companion.showChunkedStatsIsland
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLines.Companion.getChunkedStats
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLines.Companion.shouldShowChunkedStats
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ChunkedStatsLines.Companion.showChunkedStatsIsland
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard.chunkedConfig
 
 // internal, widget and scoreboard

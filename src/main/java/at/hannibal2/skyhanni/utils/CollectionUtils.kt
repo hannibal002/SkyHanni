@@ -297,9 +297,7 @@ object CollectionUtils {
     }
 
     fun takeColumn(start: Int, end: Int, startColumn: Int, endColumn: Int, rowSize: Int = 9) =
-        generateSequence(start) {
-            it + 1
-        }.map {
+        generateSequence(start) { it + 1 }.map {
             (it / (endColumn - startColumn)) * rowSize + (it % (endColumn - startColumn)) + startColumn
         }.takeWhile { it <= end }
 

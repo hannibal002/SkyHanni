@@ -27,7 +27,6 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementProfile
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementPurse
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementQuiver
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSlayer
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementSoulflow
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementTime
@@ -36,7 +35,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementUnknown
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementVisiting
 
-enum class ScoreboardEntry(val element: ScoreboardElement) {
+enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     TITLE(ScoreboardElementTitle),
     PROFILE(ScoreboardElementProfile),
     PURSE(ScoreboardElementPurse),

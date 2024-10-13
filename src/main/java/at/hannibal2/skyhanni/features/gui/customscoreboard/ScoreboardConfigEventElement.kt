@@ -30,13 +30,13 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.events.ScoreboardEven
 
 /**
  * This enum contains all the lines that either are events or other lines that are so rare/not often seen that they
- * don't fit in the normal [ScoreboardEntry] enum.
+ * don't fit in the normal [ScoreboardConfigElement] enum.
  *
  * We for example have the [ScoreboardEventVoting] Event, while this is clearly not an event, I don't consider them as normal lines
  * because they are visible for a maximum of like 1 minute every 5 days and ~12 hours.
  */
 
-enum class ScoreboardEventEntry(val event: ScoreboardEvent) {
+enum class ScoreboardConfigEventElement(val event: ScoreboardEvent) {
     VOTING(ScoreboardEventVoting),
     SERVER_CLOSE(ScoreboardEventServerClose),
     DUNGEONS(ScoreboardEventDungeons),

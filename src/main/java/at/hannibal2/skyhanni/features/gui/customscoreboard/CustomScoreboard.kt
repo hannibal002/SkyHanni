@@ -238,7 +238,7 @@ object CustomScoreboard {
                 add("Custom Scoreboard disabled.")
             } else {
                 add("Custom Scoreboard Lines:")
-                ScoreboardEntry.entries.forEach { entry ->
+                ScoreboardConfigElement.entries.forEach { entry ->
                     add(
                         "   ${entry.name.firstLetterUppercase()} - " +
                             "island: ${entry.element.showIsland()} - " +
@@ -246,11 +246,20 @@ object CustomScoreboard {
                             "${entry.element.getLines().map { it.display }}",
                     )
                 }
-                allUnknownLines.toSet().takeIfNotEmpty()?.let { set ->
+                allUnknownLines.takeIfNotEmpty()?.let { set ->
                     add("Recent Unknown Lines:")
                     set.forEach { add("   ${it.line}") }
                 }
             }
+        }
+    }
+
+    @JvmStatic
+    fun resetAppearance() {
+        with(config.scoreboardEntries) {
+            get().clear()
+            get().addAll(ScoreboardConfigElement.defaultOption)
+            notifyObservers()
         }
     }
 

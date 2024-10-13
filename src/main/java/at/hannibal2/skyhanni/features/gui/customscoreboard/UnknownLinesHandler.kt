@@ -256,6 +256,7 @@ object UnknownLinesHandler {
     }
 
     private fun warn(line: String, reason: String) {
+        if (!CustomScoreboard.config.unknownLinesWarning) return
         ErrorManager.logErrorWithData(
             // line included in chat message to not cache a previous message
             Exception(line),

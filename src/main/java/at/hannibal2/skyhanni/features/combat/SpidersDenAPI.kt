@@ -12,6 +12,9 @@ object SpidersDenAPI {
 
     private val repoGroup = RepoPattern.group("combat.spidersden")
 
+    /**
+     * REGEX-TEST: §4Broodmother§7: §6Soon
+     */
     val broodmotherPattern by repoGroup.pattern(
         "broodmother",
         "§4Broodmother§7: §[e64](?:Slain|Dormant|Soon|Awakening|Imminent|Alive!)",

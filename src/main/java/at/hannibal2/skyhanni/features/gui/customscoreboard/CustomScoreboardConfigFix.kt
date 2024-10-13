@@ -53,12 +53,12 @@ object CustomScoreboardConfigFix {
 
         event.transform(37, EVENT_ENTRIES_KEY) {
             it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardEventEntry.QUEUE.name))
+                add(JsonPrimitive(ScoreboardConfigEventElement.QUEUE.name))
             }
         }
 
         event.transform(40, EVENT_ENTRIES_KEY) { element ->
-            replaceElements(element, listOf("HOT_DOG_CONTEST", "EFFIGIES"), ScoreboardEventEntry.RIFT.name)
+            replaceElements(element, listOf("HOT_DOG_CONTEST", "EFFIGIES"), ScoreboardConfigEventElement.RIFT.name)
         }
 
         event.move(43, "$ALIGNMENT_KEY.alignRight", "$ALIGNMENT_KEY.horizontalAlignment") {
@@ -76,14 +76,14 @@ object CustomScoreboardConfigFix {
 
         event.transform(50, EVENT_ENTRIES_KEY) {
             it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardEventEntry.ANNIVERSARY.name))
-                add(JsonPrimitive(ScoreboardEventEntry.CARNIVAL.name))
+                add(JsonPrimitive(ScoreboardConfigEventElement.ANNIVERSARY.name))
+                add(JsonPrimitive(ScoreboardConfigEventElement.CARNIVAL.name))
             }
         }
 
         event.transform(51, EVENT_ENTRIES_KEY) {
             it.asJsonArray.apply {
-                add(JsonPrimitive(ScoreboardEventEntry.NEW_YEAR.name))
+                add(JsonPrimitive(ScoreboardConfigEventElement.NEW_YEAR.name))
             }
         }
 
@@ -92,7 +92,7 @@ object CustomScoreboardConfigFix {
         }
 
         event.transform(58, EVENT_ENTRIES_KEY) { element ->
-            replaceElements(element, listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING"), ScoreboardEventEntry.GARDEN.name)
+            replaceElements(element, listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING"), ScoreboardConfigEventElement.GARDEN.name)
         }
         listOf("customTitle", "customFooter").forEach { key ->
             event.transform(58, "$TITLE_AND_FOOTER_KEY.$key") {
