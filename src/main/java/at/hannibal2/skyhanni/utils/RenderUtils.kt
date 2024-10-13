@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -52,6 +51,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
+@Suppress("LargeClass")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {
@@ -591,10 +591,11 @@ object RenderUtils {
     }
 
     fun Position.renderRenderable(
-        renderable: Renderable,
+        renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        if (renderable == null) return
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
@@ -649,8 +650,11 @@ object RenderUtils {
     ) {
         if (list.isEmpty()) return
 
-        val render =
-            list.map { it.map { Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it") } }
+        val render = list.map { listEntry ->
+            listEntry.map {
+                Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it")
+            }
+        }
 
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
@@ -762,6 +766,15 @@ object RenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
+    }
+
+    fun LorenzRenderWorldEvent.drawCylinderInWorld(
+        color: Color,
+        location: LorenzVec,
+        radius: Float,
+        height: Float,
+    ) {
+        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
     }
 
     fun drawCylinderInWorld(
@@ -1096,6 +1109,15 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    fun LorenzRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
+        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        return exactLocation(player) + add
+    }
+
+    fun LorenzRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
+    }
+
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
@@ -1279,7 +1301,8 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
-        showNoteNames: Boolean = false
+        showNodeNames: Boolean = false,
+        markLastBlock: Boolean = true,
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
@@ -1301,13 +1324,15 @@ object RenderUtils {
                 bezierPoint,
             )
         }
-        if (showNoteNames) {
+        if (showNodeNames) {
             path.filter { it.name?.isNotEmpty() == true }.forEach {
                 this.drawDynamicText(it.position, it.name!!, textSize)
             }
         }
-        val last = path.last()
-        drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        if (markLastBlock) {
+            val last = path.last()
+            drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        }
     }
 
     class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
@@ -1319,11 +1344,11 @@ object RenderUtils {
                 }
             } else {
                 val pathLines = path.zipWithNext()
-                pathLines.forEachIndexed { index, it ->
-                    val reduce = it.second.minus(it.first).normalize().times(bezierPoint)
+                pathLines.forEachIndexed { index, pathLine ->
+                    val reduce = pathLine.second.minus(pathLine.first).normalize().times(bezierPoint)
                     draw3DLine(
-                        if (index != 0) it.first + reduce else it.first,
-                        if (index != pathLines.lastIndex) it.second - reduce else it.second,
+                        if (index != 0) pathLine.first + reduce else pathLine.first,
+                        if (index != pathLines.lastIndex) pathLine.second - reduce else pathLine.second,
                         color,
                         lineWidth,
                         depth,
@@ -1585,7 +1610,11 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun LorenzRenderWorldEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
     ) {
         GlStateManager.disableCull()
 

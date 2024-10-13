@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -48,14 +49,9 @@ object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
-    private val guiName = "Custom Scoreboard"
+    private const val GUI_NAME = "Custom Scoreboard"
 
-    // Cached scoreboard data, only update after no change for 300ms
-    var activeLines = emptyList<String>()
-
-    // Most recent scoreboard state, not in use until cached
-    private var mostRecentLines = emptyList<String>()
-    private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
+    private var nextScoreboardUpdate = SimpleTimeMark.farFuture()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -80,16 +76,14 @@ object CustomScoreboard {
 
         RenderBackground.updatePosition(finalRenderable)
 
-        config.position.renderRenderable(finalRenderable, posLabel = guiName)
+        config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
     }
 
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
-        if (event.guiName == guiName) {
+        if (event.guiName == GUI_NAME) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
-                    verticalAlignment != VerticalAlignment.DONT_ALIGN
-                ) {
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN || verticalAlignment != VerticalAlignment.DONT_ALIGN) {
                     val tempHori = horizontalAlignment
                     val tempVert = verticalAlignment
 
@@ -113,16 +107,9 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
-        var dirty = false
-        if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
-            activeLines = mostRecentLines
-            lastScoreboardUpdate = SimpleTimeMark.farFuture()
-            dirty = true
-        }
-
-        // Creating the lines
-        if (event.isMod(5) || dirty) {
+        if (dirty || nextScoreboardUpdate.isInPast()) {
+            nextScoreboardUpdate = 250.milliseconds.fromNow()
+            dirty = false
             display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
@@ -135,10 +122,8 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        mostRecentLines = event.scoreboard
-        lastScoreboardUpdate = SimpleTimeMark.now()
+        dirty = true
     }
-
 
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display
@@ -160,12 +145,12 @@ object CustomScoreboard {
 
     private fun addAllNonSkyBlockLines() = buildList {
         addAll(ScoreboardElement.TITLE.getVisiblePair())
-        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
     }
 
     private fun addDefaultSkyBlockLines() = buildList {
         add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
-        addAll(activeLines.map { it to HorizontalAlignment.LEFT })
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
     }
 
     private fun addCustomSkyBlockLines() = buildList<ScoreboardElementType> {
@@ -175,7 +160,8 @@ object CustomScoreboard {
 
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == "<empty>" &&
+                lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }

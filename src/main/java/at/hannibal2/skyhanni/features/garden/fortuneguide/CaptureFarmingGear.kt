@@ -112,8 +112,8 @@ object CaptureFarmingGear {
         val currentCrop = itemStack.getCropType()
 
         if (currentCrop == null) {
-            //todo better fall back items
-            //todo Daedalus axe
+            // todo better fall back items
+            // todo Daedalus axe
         } else {
             currentCrop.farmingItem.setItem(itemStack)
         }
@@ -385,6 +385,13 @@ object CaptureFarmingGear {
                 return
             }
         }
+    }
+
+    fun onResetGearCommand() {
+        val storage = GardenAPI.storage?.fortune ?: return
+        ChatUtils.chat("Resets farming items")
+        storage.farmingItems.clear()
+        storage.outdatedItems.clear()
     }
 
     @SubscribeEvent
