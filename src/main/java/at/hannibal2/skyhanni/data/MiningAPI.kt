@@ -46,11 +46,14 @@ object MiningAPI {
     private val glaciteAreaPattern by group.pattern("area.glacite", "Glacite Tunnels|Great Glacite Lake")
     private val dwarvenBaseCampPattern by group.pattern("area.basecamp", "Dwarven Base Camp")
 
-    // TODO add regex test
     private val coldResetPattern by group.pattern(
         "cold.reset",
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
+
+    /**
+     * REGEX-TEST: Cold: §b-1❄
+     */
     val coldPattern by group.pattern(
         "cold",
         "(?:§.)*Cold: §.(?<cold>-?\\d+)❄",
