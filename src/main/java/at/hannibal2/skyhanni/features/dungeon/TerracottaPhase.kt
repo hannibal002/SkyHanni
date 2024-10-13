@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorManager
@@ -39,14 +40,14 @@ object TerracottaPhase {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
-        if (isEnabled() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
+        if (isActive() && config.hideDamageSplash && DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.cancel()
         }
     }
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (isEnabled() && config.hideParticles) {
+        if (isActive() && config.hideParticles) {
             event.cancel()
         }
     }
