@@ -252,7 +252,7 @@ object Commands {
         ) { FarmingWeightDisplay.lookUpCommand(it) }
         registerCommand(
             "shcopytranslation",
-            "Copy the English translation of a message in another language to the clipboard.\n" +
+            "Copy the translation of a message in another language to the clipboard.\n" +
                 "Uses a 2 letter language code that can be found at the end of a translation message.",
         ) { Translator.fromNativeLanguage(it) }
         registerCommand(

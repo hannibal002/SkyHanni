@@ -39,10 +39,7 @@ object ChatManager {
     private val messageHistory =
         object : LinkedHashMap<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>() {
             override fun removeEldestEntry(
-                eldest: MutableMap.MutableEntry<
-                    IdentityCharacteristics<IChatComponent>,
-                    MessageFilteringResult,
-                    >?,
+                eldest: MutableMap.MutableEntry<IdentityCharacteristics<IChatComponent>, MessageFilteringResult>?,
             ): Boolean {
                 return size > 100
             }

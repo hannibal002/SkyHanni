@@ -81,6 +81,7 @@ object GhostCounter {
         "skillxp",
         "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)",
     )
+    
     @Suppress("MaxLineLength")
     private val combatSectionPattern by patternGroup.pattern(
         "combatsection",

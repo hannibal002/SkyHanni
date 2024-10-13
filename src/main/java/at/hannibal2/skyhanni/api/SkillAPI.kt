@@ -330,7 +330,7 @@ object SkillAPI {
                     nextLevelProgress.toLong(),
                     nextLevelDiff.toLong(),
                     totalXp.toLong(),
-                    matcher.group("gained")
+                    matcher.group("gained"),
                 )
             } else {
                 val exactLevel = getLevelExact(needed)

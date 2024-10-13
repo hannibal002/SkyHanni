@@ -22,6 +22,7 @@ enum class MiningEventType(
     val eventName: String,
     private val shortName: String,
     val defaultLength: Duration,
+    // TODO change to LorenzColor
     private val colorCode: Char,
     val dwarvenSpecific: Boolean,
     iconInput: Renderable,
@@ -68,6 +69,7 @@ enum class MiningEventType(
 
         },
     ),
+
     @Suppress("MaxLineLength")
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, 'c', true,
@@ -77,6 +79,7 @@ enum class MiningEventType(
             "ewogICJ0aW1lc3RhbXAiIDogMTYwNzQ2NDg4MTMwOCwKICAicHJvZmlsZUlkIiA6ICJhMmY4MzQ1OTVjODk0YTI3YWRkMzA0OTcxNmNhOTEwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJiUHVuY2giLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMTcyODUwOTA2YjdmMGQ5NTJjMGU1MDgwNzNjYzQzOWZkMzM3NGNjZjViODg5YzA2ZjdlOGQ5MGNjMGNjMjU1YyIKICAgIH0KICB9Cn0=",
         ),
     ),
+
     @Suppress("MaxLineLength")
     BETTER_TOGETHER(
         "BETTER TOGETHER", "Better", 18.minutes, 'd', false,
@@ -110,16 +113,16 @@ enum class MiningEventType(
         "RAFFLE",
         "Raffle",
         160.seconds,
-        '6',
-        true,
-        Items.name_tag.toItemStack().overrideId("MINING_RAFFLE_TICKET"),
+        colorCode = '6',
+        dwarvenSpecific = true,
+        iconInput = Items.name_tag.toItemStack().overrideId("MINING_RAFFLE_TICKET"),
     ),
     MITHRIL_GOURMAND(
         "MITHRIL GOURMAND",
         "Gourmand", 10.minutes,
-        'b',
-        true,
-        Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND")
+        colorCode = 'b',
+        dwarvenSpecific = true,
+        iconInput = Items.dye.toItemStack(6).overrideId("MITHRIL_GOURMAND")
     ),
     ;
 
@@ -127,6 +130,7 @@ enum class MiningEventType(
         eventName: String,
         shortName: String,
         defaultLength: Duration,
+        // TODO change to LorenzColor
         colorCode: Char,
         dwarvenSpecific: Boolean,
         iconInput: ItemStack,
