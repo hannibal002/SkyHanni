@@ -310,7 +310,7 @@ object Commands {
     private fun usersNormalReset(event: RegisterCommandsEvent) {
 
         // Trackers
-        event.register("shresetsayerprofits") {
+        event.register("shresetslayerprofits") {
             description = "Resets the total slayer profit for the current slayer type"
             category = CommandCategory.USERS_RESET
             callback { SlayerProfitTracker.resetCommand() }
