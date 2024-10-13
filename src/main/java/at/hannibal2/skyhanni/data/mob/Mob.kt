@@ -240,5 +240,6 @@ class Mob(
         return id == other.id
     }
 
+    // TODO add max distance
     fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
 }

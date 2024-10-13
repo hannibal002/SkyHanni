@@ -107,6 +107,7 @@ public class MiningConfig {
     @ConfigEditorBoolean
     public boolean lineToYourGoldenGoblin = false;
 
+    @Expose
     @ConfigOption(name = "Precision Mining Helper", desc = "Draws a box over the Precision Mining particles.")
     @ConfigEditorBoolean
     @FeatureToggle
