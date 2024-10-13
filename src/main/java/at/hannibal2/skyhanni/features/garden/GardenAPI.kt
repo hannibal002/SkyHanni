@@ -213,10 +213,8 @@ object GardenAPI {
 
     private var lastLocation: LorenzVec? = null
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        if (!inGarden()) return
-
         val blockState = event.getBlockState
         val cropBroken = blockState.getCropType() ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return

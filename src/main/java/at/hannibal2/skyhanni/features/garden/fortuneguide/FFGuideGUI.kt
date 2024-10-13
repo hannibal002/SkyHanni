@@ -53,9 +53,13 @@ class FFGuideGUI : GuideGUI<FFGuideGUI.FortuneGuidePage>(FortuneGuidePage.OVERVI
             vTab(ItemStack(Items.gold_ingot), Renderable.string("§eBreakdown")) {
                 currentPage = if (currentCrop == null) FortuneGuidePage.OVERVIEW else FortuneGuidePage.CROP
             },
-            vTab(ItemStack(Items.map), Renderable.string("§eUpgrades")) {
+            vTab(
+                ItemStack(Items.map),
+                Renderable.string("§eUpgrades")
+            ) {
                 currentPage = FortuneGuidePage.UPGRADES
-            })
+            }
+        )
         horizontalTabs = buildList {
             add(
                 hTab(ItemStack(Blocks.grass), Renderable.string("§eOverview")) {
