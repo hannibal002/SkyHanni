@@ -61,7 +61,7 @@ public class PowderChestTimerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Line Count", desc = "Between how many chest do you want to draw a line to ?")
+	@ConfigOption(name = "Line Count", desc = "Specify the number of chests to draw a line between.")
     @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
     public int drawLineToChestAmount = 2;
 
