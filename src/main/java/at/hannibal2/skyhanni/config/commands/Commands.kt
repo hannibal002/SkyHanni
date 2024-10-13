@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
+import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -76,6 +77,7 @@ import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
+import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.DebugCommand
@@ -405,7 +407,7 @@ object Commands {
             category = CommandCategory.USERS_RESET
             callback { GardenAPI.resetCropSpeed() }
         }
-        event.register("shresetismet") {
+        event.register("shresetkismet") {
             description = "Resets the saved values of the applied kismet feathers in Croesus"
             category = CommandCategory.USERS_RESET
             callback { CroesusChestTracker.resetChest() }
@@ -429,6 +431,16 @@ object Commands {
             description = "Resets the mineshaft pity display stats"
             category = CommandCategory.USERS_RESET
             callback { MineshaftPityDisplay.fullResetCounter() }
+        }
+        event.register("shresetpunchcard") {
+            description = "Resets the Rift Punchcard Artifact player list."
+            category = CommandCategory.USERS_RESET
+            callback { PunchcardHighlight.clearList() }
+        }
+        event.register("shresetterminal") {
+            description = "Resets terminal highlights in F7."
+            category = CommandCategory.USERS_RESET
+            callback { TerminalInfo.resetTerminals() }
         }
     }
 
