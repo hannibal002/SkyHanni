@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
-import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
@@ -26,6 +25,7 @@ import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
+import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -109,17 +109,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
 object Commands {
-    private fun openMainMenu(args: Array<String>) {
-        if (args.isNotEmpty()) {
-            if (args[0].lowercase() == "gui") {
-                GuiEditManager.openGuiPositionEditor(hotkeyReminder = true)
-            } else {
-                ConfigGuiManager.openConfigGui(args.joinToString(" "))
-            }
-        } else {
-            ConfigGuiManager.openConfigGui()
-        }
-    }
 
     val commands = mutableListOf<CommandBuilder>()
 
@@ -139,11 +128,11 @@ object Commands {
         event.register("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"
-            callback { openMainMenu(it) }
+            callback { ConfigGuiManager.onCommand(it) }
         }
         event.register("ff") {
             description = "Opens the Farming Fortune Guide"
-            callback { openFortuneGuide() }
+            callback { FFGuideGUI.onCommand() }
         }
         event.register("shcommands") {
             description = "Shows this list"
@@ -608,6 +597,11 @@ object Commands {
             category = CommandCategory.DEVELOPER_DEBUG_FEATURES
             callback { ScoreboardData.toggleMonitor() }
         }
+        event.register("shresetterminal") {
+            description = "Resets terminal highlights in F7."
+            category = CommandCategory.DEVELOPER_DEBUG_FEATURES
+            callback { TerminalInfo.resetTerminals() }
+        }
     }
 
     @Suppress("LongMethod")
@@ -833,15 +827,6 @@ object Commands {
             description = "Reverse transfer party to the previous leader"
             category = CommandCategory.SHORTENED_COMMANDS
             callback { PartyCommands.reverseTransfer() }
-        }
-    }
-
-    @JvmStatic
-    fun openFortuneGuide() {
-        if (!LorenzUtils.inSkyBlock) {
-            ChatUtils.userError("Join SkyBlock to open the fortune guide!")
-        } else {
-            FFGuideGUI.open()
         }
     }
 
