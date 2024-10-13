@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.powdertracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.mining.PowderChestTimerConfig
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.HotmData
@@ -94,7 +95,7 @@ object PowderChestTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         val location = event.position
@@ -159,7 +160,7 @@ object PowderChestTimer {
                     val (firstPos, firstTime) = chestToConnect.first()
                     event.draw3DLine(
                         event.exactPlayerEyeLocation(),
-                        firstPos.getMiddle(),
+                        firstPos.blockCenter(),
                         firstTime.timeUntil().getColorBasedOnTime(),
                         3,
                         true,
@@ -173,8 +174,8 @@ object PowderChestTimer {
                         val currentColor = currentUtil.getColorBasedOnTime()
 
                         event.draw3DLine(
-                            current.getMiddle(),
-                            next.getMiddle(),
+                            current.blockCenter(),
+                            next.blockCenter(),
                             currentColor,
                             3,
                             true,
@@ -205,8 +206,6 @@ object PowderChestTimer {
 
         return Color(red, green, 0)
     }
-
-    private fun LorenzVec.getMiddle() = add(0.5, 0.5, 0.5)
 
     private fun LorenzVec.isOpened() = !chestSet.containsKey(this)
 

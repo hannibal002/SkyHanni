@@ -49,10 +49,12 @@ object SackAPI {
         "sack",
         "^(.* Sack|Enchanted .* Sack)\$",
     )
+    @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
         "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
+    @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
         " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
@@ -412,5 +414,5 @@ enum class SackStatus {
     MISSING,
     CORRECT,
     ALRIGHT,
-    OUTDATED;
+    OUTDATED,
 }

@@ -311,7 +311,7 @@ object HideNotClickableItems {
             "BRACELET",
         )
         for (type in list) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
+            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // todo use item api
                 showGreenLine = true
                 return false
             }
@@ -563,7 +563,8 @@ object HideNotClickableItems {
         val bazaarInventory = BazaarApi.inBazaarInventory
 
         val auctionHouseInventory =
-            chestName == "Co-op Auction House" || chestName == "Auction House" || chestName == "Create BIN Auction" || chestName == "Create Auction"
+            chestName == "Co-op Auction House" || chestName == "Auction House" ||
+                chestName == "Create BIN Auction" || chestName == "Create Auction"
         if (!bazaarInventory && !auctionHouseInventory) return false
         showGreenLine = true
 
