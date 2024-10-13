@@ -402,7 +402,7 @@ object Commands {
             category = CommandCategory.USERS_RESET
             callback { GhostUtil.reset() }
         }
-        event.register("shresetropspeed") {
+        event.register("shresetcropspeed") {
             description = "Resets garden crop speed data and best crop time data"
             category = CommandCategory.USERS_RESET
             callback { GardenAPI.resetCropSpeed() }
