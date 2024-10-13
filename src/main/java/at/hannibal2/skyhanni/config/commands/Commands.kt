@@ -174,8 +174,8 @@ object Commands {
             callback { GhostUtil.importCTGhostCounterData() }
         }
         event.register("shcroptime") {
-            description = "Calculates with your current crop per second speed " +
-                "how long you need to farm a crop to collect this amount of items"
+            description =
+                "Calculates with your current crop per second speed " + "how long you need to farm a crop to collect this amount of items"
             category = CommandCategory.USERS_ACTIVE
             callback { GardenCropTimeCommand.onCommand(it) }
         }
@@ -205,8 +205,9 @@ object Commands {
             callback { FarmingWeightDisplay.lookUpCommand(it) }
         }
         event.register("shcopytranslation") {
-            description = "Copy the translation of a message in another language to your clipboard.\n" +
-                "Uses a language code that can be found at the end of a translation message."
+            description =
+                "Copy the translation of a message in another language to your clipboard.\n" +
+                "Uses a 2 letter language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_ACTIVE
             callback { Translator.fromNativeLanguage(it) }
         }
@@ -585,7 +586,8 @@ object Commands {
             callback { ItemPriceUtils.debugItemPrice(it) }
         }
         event.register("shdebugscoreboard") {
-            description = "Monitors the scoreboard changes: " +
+            description =
+                "Monitors the scoreboard changes: " +
                 "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback { ScoreboardData.toggleMonitor() }
@@ -740,7 +742,8 @@ object Commands {
             callback { TitleManager.command(it) }
         }
         event.register("shresetconfig") {
-            description = "Reloads the config manager and rendering processors of MoulConfig. " +
+            description =
+                "Reloads the config manager and rendering processors of MoulConfig. " +
                 "This §cWILL RESET §7your config, but also updating the java config files " +
                 "(names, description, orderings and stuff)."
             category = CommandCategory.DEVELOPER_TEST

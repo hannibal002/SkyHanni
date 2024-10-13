@@ -53,6 +53,7 @@ object InquisitorWaypointShare {
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
+    @Suppress("MaxLineLength")
     private val partyInquisitorCheckerPattern by patternGroup.pattern(
         "party.inquisitorchecker",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
