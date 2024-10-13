@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -24,6 +25,7 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGho
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
+import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
@@ -71,13 +73,16 @@ object GhostCounter {
     val config get() = SkyHanniMod.feature.combat.ghostCounter
     val storage get() = ProfileStorageData.profileSpecific?.ghostCounter
     private var display = emptyList<List<Any>>()
-    var ghostCounterV3File = File(FilenameUtils.separatorsToSystem("./config/ChatTriggers/modules/GhostCounterV3/.persistantData.json"))
+    var ghostCounterV3File =
+        File(FilenameUtils.separatorsToSystem("./config/ChatTriggers/modules/GhostCounterV3/.persistantData.json"))
 
     private val patternGroup = RepoPattern.group("combat.ghostcounter")
     private val skillXPPattern by patternGroup.pattern(
         "skillxp",
         "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)",
     )
+    
+    @Suppress("MaxLineLength")
     private val combatSectionPattern by patternGroup.pattern(
         "combatsection",
         ".*[+](?<gained>[0-9,.]+) (?<skillName>[A-Za-z]+) \\((?<progress>(?<current>[0-9.,]+)/(?<total>[0-9.,]+)|(?<percent>[0-9.]+)%)\\).*",
@@ -279,7 +284,8 @@ object GhostCounter {
         val moneyMadeTips = buildList {
             for ((name, count, value) in priceMap) {
                 moneyMade += (count.toLong() * value.toLong())
-                add("$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} §f= §6${(value.toLong() * count.toLong()).addSeparators()}")
+                add("$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} §f= " +
+                    "§6${(value.toLong() * count.toLong()).addSeparators()}")
             }
             add("§bTotal: §6${moneyMade.addSeparators()}")
             add("§eClick to copy to clipboard!")
@@ -331,13 +337,17 @@ object GhostCounter {
             }
         }
 
-        inMist = LorenzUtils.skyBlockArea == "The Mist"
         update()
 
         if (event.repeatSeconds(2)) {
             calculateXP()
             calculateETA()
         }
+    }
+
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        inMist = IslandAreas.currentAreaName == "The Mist"
     }
 
     @SubscribeEvent
@@ -378,7 +388,7 @@ object GhostCounter {
                 }
                 percent = 100f.coerceAtMost(percent)
                 if (!parse) {
-                    sb.append(" (").append(String.format("%.2f", percent)).append("%)")
+                    sb.append(" (").append(String.format(Locale.US, "%.2f", percent)).append("%)")
                 } else {
                     sb.append(" (").append(nf.format(currentSkillXp))
                     if (totalSkillXp != 0) {
