@@ -96,6 +96,36 @@ object UpgradeReminder {
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         inInventory = event.inventoryName == "Community Shop"
+        if (!inInventory) return
+
+        if (currentProfileUpgrade == null && currentAccountUpgrade == null) return
+        detectWrongAccountUpgradeData(event.inventoryItems)
+    }
+
+    private fun detectWrongAccountUpgradeData(items: Map<Int, ItemStack>) {
+        val hasProfileUpgrade = foundActiveUpgrade(items, 27..35)
+        if (!hasProfileUpgrade && currentProfileUpgrade != null) {
+            ChatUtils.chat("§eRemoved invalid Profile Upgrade information.")
+            currentProfileUpgrade = null
+        }
+
+        val hasAccountUpgrade = foundActiveUpgrade(items, 36..44)
+        if (!hasAccountUpgrade && currentAccountUpgrade != null) {
+            ChatUtils.chat("§eRemoved invalid Account Upgrade information.")
+            currentAccountUpgrade = null
+        }
+    }
+
+    private fun foundActiveUpgrade(items: Map<Int, ItemStack>, slots: IntRange): Boolean {
+        for (slot in slots) {
+            val item = items[slot] ?: continue
+            val isUpgrading = item.getLore().any { it == "§aCurrently upgrading!" }
+            val isDone = item.getLore().any { it == "§cClick to claim!" }
+            val isReadyForUpgrade = item.getLore().any { it == "§eClick to start upgrade!" }
+            if (isUpgrading || isDone) return true
+            if (isReadyForUpgrade) return false
+        }
+        return false
     }
 
     @SubscribeEvent
