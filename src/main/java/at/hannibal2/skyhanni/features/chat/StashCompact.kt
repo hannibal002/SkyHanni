@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -16,7 +17,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object StashCompact {
 
-    //<editor-fold desc="Patterns">
+    // <editor-fold desc="Patterns">
     private val patternGroup = RepoPattern.group("stash.compact")
 
     /**
@@ -56,7 +57,7 @@ object StashCompact {
         "generic",
         "§eOne or more (?:item|material)s? didn't fit in your inventory and were added to your (?:item|material) stash! §6Click here §eto pick them up!",
     )
-    //</editor-fold>
+    // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
 
@@ -76,14 +77,14 @@ object StashCompact {
         }
 
         materialCountPattern.matchMatcher(event.message) {
-            groupOrNull("count")?.replace(",", "")?.toIntOrNull()?.let { count ->
+            groupOrNull("count")?.formatIntOrNull()?.let { count ->
                 lastMaterialCount = count
             }
             event.blockedReason = "stash_compact"
         }
 
         differingMaterialsCountPattern.matchMatcher(event.message) {
-            groupOrNull("count")?.replace(",", "")?.toIntOrNull()?.let { count ->
+            groupOrNull("count")?.formatIntOrNull()?.let { count ->
                 lastDifferingMaterialsCount = count
             }
             groupOrNull("type")?.let { type ->
@@ -102,16 +103,16 @@ object StashCompact {
     }
 
     private fun sendCompactedStashMessage() {
-        val name = StringUtils.pluralize(lastMaterialCount, lastType)
-        val total = StringUtils.pluralize(lastDifferingMaterialsCount, "type")
+        val typeNameFormat = StringUtils.pluralize(lastMaterialCount, lastType)
+        val typeFormat = StringUtils.pluralize(lastDifferingMaterialsCount, "type")
         ChatUtils.clickableChat(
-            "§7You have §3${lastMaterialCount} §7$name in stash, §8totalling $lastDifferingMaterialsCount $total§7. " +
-                "§3Click to ${if (config.useViewStash) "view" else "pickup"} stash§7.",
+            "§eYou have §6${lastMaterialCount} §e$typeNameFormat in stash§6, " +
+                "§etotalling §6$lastDifferingMaterialsCount $typeFormat§6. " +
+                "§eClick to ${if (config.useViewStash) "§6view" else "§6pickup"} §estash§6.",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(lastType)
                 else HypixelCommands.pickupStash()
             },
-            prefix = false,
         )
         lastSentMaterialCount = lastMaterialCount
         lastSentType = lastType
