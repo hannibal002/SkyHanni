@@ -54,6 +54,7 @@ object DraconicSacrificeTracker {
         }
 
     private val altarArea = AxisAlignedBB(-601.0, 4.0, -282.0, -586.0, 15.0, -269.0)
+    private val ESSENCE_DRAGON = "ESSENCE_DRAGON".asInternalName()
 
     class Data : ItemTrackerData() {
         override fun resetItems() {
@@ -93,7 +94,7 @@ object DraconicSacrificeTracker {
 
         add(
             Renderable.hoverTips(
-                "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrified",
+                "§b${data.itemsSacrificed.addSeparators()} §6Items Sacrificed",
                 data.sacrificedItemsMap.map { (item, amount) -> "$item: §b$amount" },
             ).toSearchable()
         )
@@ -108,7 +109,7 @@ object DraconicSacrificeTracker {
         sacrificeLoot.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = group("item")
-            tracker.addItem("ESSENCE_DRAGON".asInternalName(), amount, command = false)
+            tracker.addItem(ESSENCE_DRAGON, amount, command = false)
             tracker.modify {
                 it.itemsSacrificed += 1
                 it.sacrificedItemsMap.addOrPut(item, 1)
