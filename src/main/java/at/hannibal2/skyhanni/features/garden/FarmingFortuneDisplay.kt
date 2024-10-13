@@ -54,6 +54,7 @@ object FarmingFortuneDisplay {
         "collection",
         "§7You have §6\\+(?<ff>\\d{1,3})☘ .*",
     )
+    @Suppress("MaxLineLength")
     private val tooltipFortunePattern by patternGroup.pattern(
         "tooltip.new",
         "^§7Farming Fortune: §a\\+(?<display>[\\d.]+)(?: §2\\(\\+\\d\\))?(?: §9\\(\\+(?<reforge>\\d+)\\))?(?: §d\\(\\+(?<gemstone>\\d+)\\))?\$",

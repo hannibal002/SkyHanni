@@ -344,7 +344,7 @@ object ComposterOverlay {
         newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
 
         val organicMatterPrice = getPrice(organicMatterItem)
-        val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
+        val organicMatterFactor = organicMatterFactors[organicMatterItem] ?: 1.0
 
         val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
         val organicMatterRequiredPreview = ComposterAPI.organicMatterRequiredPer(upgrade)
@@ -353,7 +353,7 @@ object ComposterOverlay {
         val organicMatterPricePerPreview = organicMatterPrice * (organicMatterRequiredPreview / organicMatterFactor)
 
         val fuelPrice = getPrice(fuelItem)
-        val fuelFactor = fuelFactors[fuelItem]!!
+        val fuelFactor = fuelFactors[fuelItem] ?: 1.0
 
         val fuelRequired = ComposterAPI.fuelRequiredPer(null)
         val fuelRequiredPreview = ComposterAPI.fuelRequiredPer(upgrade)
@@ -427,7 +427,7 @@ object ComposterOverlay {
             i++
             if (i < testOffset) continue
             if (first == null) first = internalName
-            val factor = factors[internalName]!!
+            val factor = factors[internalName] ?: 1.0
 
             val item = internalName.getItemStack()
             val price = getPrice(internalName)
