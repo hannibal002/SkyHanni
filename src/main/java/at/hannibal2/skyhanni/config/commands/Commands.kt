@@ -95,10 +95,8 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtils
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
@@ -146,7 +144,7 @@ object Commands {
         }
         event.register("shwords") {
             description = "Opens the config list for modifying visual words"
-            callback { openVisualWords() }
+            callback { VisualWordGui.onCommand() }
         }
         event.register("shnavigate") {
             description = "Using path finder to go to locations"
@@ -425,12 +423,7 @@ object Commands {
         event.register("shresetfarmingitems") {
             description = "Resets farming items saved for the Farming Fortune Guide"
             category = CommandCategory.USERS_RESET
-            callback { resetFarmingItems() }
-        }
-        event.register("shresetfarmingitems") {
-            description = "Resets farming items saved for the Farming Fortune Guide"
-            category = CommandCategory.USERS_RESET
-            callback { resetFarmingItems() }
+            callback { CaptureFarmingGear.onResetGearCommand() }
         }
         event.register("shresetmineshaftpitystats") {
             description = "Resets the mineshaft pity display stats"
@@ -822,22 +815,5 @@ object Commands {
             category = CommandCategory.SHORTENED_COMMANDS
             callback { PartyCommands.reverseTransfer() }
         }
-    }
-
-    @JvmStatic
-    fun openVisualWords() {
-        if (!LorenzUtils.onHypixel) {
-            ChatUtils.userError("You need to join Hypixel to use this feature!")
-        } else {
-            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
-            SkyHanniMod.screenToOpen = VisualWordGui()
-        }
-    }
-
-    private fun resetFarmingItems() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        ChatUtils.chat("Resets farming items")
-        storage.farmingItems.clear()
-        storage.outdatedItems.clear()
     }
 }
