@@ -38,8 +38,7 @@ object SlayerMiniBossFeatures {
         if (!config.slayerMinibossLine) return
         for (mob in miniBosses) {
             if (mob.baseEntity.distanceToPlayer() > 10) continue
-            event.draw3DLine(
-                event.exactPlayerEyeLocation(),
+            event.drawLineToEye(
                 mob.baseEntity.getLorenzVec().up(),
                 LorenzColor.AQUA.toColor(),
                 config.slayerMinibossLineWidth,
