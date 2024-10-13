@@ -432,15 +432,20 @@ object Commands {
             category = CommandCategory.USERS_RESET
             callback { MineshaftPityDisplay.fullResetCounter() }
         }
-        event.register("shresetpunchcard") {
-            description = "Resets the Rift Punchcard Artifact player list."
-            category = CommandCategory.USERS_RESET
-            callback { PunchcardHighlight.clearList() }
-        }
         event.register("shresetterminal") {
             description = "Resets terminal highlights in F7."
             category = CommandCategory.USERS_RESET
             callback { TerminalInfo.resetTerminals() }
+        }
+        event.register("shresetsavedrabbits") {
+            description = "Resets the saved rabbits on this profile."
+            category = CommandCategory.USERS_RESET
+            callback { HoppityCollectionStats.resetSavedRabbits() }
+        }
+        event.register("shresetpunchcard") {
+            description = "Resets the Rift Punchcard Artifact player list."
+            category = CommandCategory.USERS_RESET
+            callback { PunchcardHighlight.onResetCommand() }
         }
     }
 
@@ -455,7 +460,7 @@ object Commands {
             category = CommandCategory.USERS_BUG_FIX
             callback { APIUtils.toggleApiErrorMessages() }
         }
-        event.register("shclearminiondata") {
+        event.register("shfixminions") {
             description = "Removed bugged minion locations from your private island"
             category = CommandCategory.USERS_BUG_FIX
             callback { MinionFeatures.removeBuggedMinions(isCommand = true) }
@@ -494,11 +499,6 @@ object Commands {
             description = "Forcefully updating the bazaar prices right now."
             category = CommandCategory.USERS_BUG_FIX
             callback { HypixelBazaarFetcher.fetchNow() }
-        }
-        event.register("shclearsavedrabbits") {
-            description = "Clears the saved rabbits on this profile."
-            category = CommandCategory.USERS_BUG_FIX
-            callback { HoppityCollectionStats.clearSavedRabbits() }
         }
         event.register("shedittracker") {
             description = "Changes the tracked item amount for Diana, Fishing, Pest, Excavator, and Slayer Item Trackers."
