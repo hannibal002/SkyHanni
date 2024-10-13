@@ -211,4 +211,15 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Show uniques in Warp Menu", desc = "Shows your unique eggs in the Warp Menu during the hoppity event.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean uniquesWarpMenu = true;
+
+    @Expose
+    @ConfigOption(name = "Hide when maxed", desc = "Stops the above feature from working when the island is complete.")
+    @ConfigEditorBoolean
+    public boolean uniquesWarpMenuHideMax = true;
 }

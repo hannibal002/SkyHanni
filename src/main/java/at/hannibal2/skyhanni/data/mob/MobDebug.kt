@@ -42,7 +42,7 @@ object MobDebug {
         val map = filter { it.canBeSeen() && it.isNotInvisible() }
             .map { it.boundingBox.getTopCenter() to it.name }
         for ((location, text) in map) {
-            event.drawString(location.add(y = 0.5), "§5$text", seeThroughBlocks = true)
+            event.drawString(location.up(0.5), "§5$text", seeThroughBlocks = true)
         }
     }
 
