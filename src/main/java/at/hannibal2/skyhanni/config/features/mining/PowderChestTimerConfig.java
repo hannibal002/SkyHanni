@@ -34,7 +34,7 @@ public class PowderChestTimerConfig {
     public String staticColor = "0:245:85:255:85";
 
     @Expose
-    @ConfigOption(name = "Draw Timer", desc = "Draw time left until the chest despawn.")
+    @ConfigOption(name = "Draw Timer", desc = "Draw time left until the chest despawns.")
     @ConfigEditorBoolean
     public boolean drawTimerOnChest = true;
 
