@@ -768,6 +768,15 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    fun LorenzRenderWorldEvent.drawCylinderInWorld(
+        color: Color,
+        location: LorenzVec,
+        radius: Float,
+        height: Float,
+    ) {
+        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
+    }
+
     fun drawCylinderInWorld(
         color: Color,
         x: Double,
@@ -1326,8 +1335,10 @@ object RenderUtils {
         }
     }
 
-    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator, val inverseView: LorenzVec) {
+
         val worldRenderer = tessellator.worldRenderer
+
         fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean, bezierPoint: Double = 1.0) {
             if (bezierPoint < 0) {
                 path.zipWithNext().forEach {
@@ -1370,6 +1381,9 @@ object RenderUtils {
                 GlStateManager.depthMask(true)
             }
         }
+
+        fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
+            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), lorenzVec, color, lineWidth, depth)
 
         fun drawBezier2(
             p1: LorenzVec,
@@ -1417,7 +1431,7 @@ object RenderUtils {
         companion object {
             inline fun draw3D(
                 partialTicks: Float = 0F,
-                crossinline quads: LineDrawer.() -> Unit,
+                crossinline draws: LineDrawer.() -> Unit,
             ) {
 
                 GlStateManager.enableBlend()
@@ -1430,10 +1444,10 @@ object RenderUtils {
                 val tessellator = Tessellator.getInstance()
 
                 GlStateManager.pushMatrix()
-                RenderUtils.translate(getViewerPos(partialTicks).negated())
-                getViewerPos(partialTicks)
+                val inverseView = getViewerPos(partialTicks)
+                RenderUtils.translate(inverseView.negated())
 
-                quads.invoke(LineDrawer(Tessellator.getInstance()))
+                draws.invoke(LineDrawer(Tessellator.getInstance(), inverseView))
 
                 GlStateManager.popMatrix()
 

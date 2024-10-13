@@ -205,7 +205,8 @@ object HoppityEventSummary {
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
-        val availableYearsFormat = "§eHoppity Event Stats are available for the following years:§r\n${statsYearFormatList.joinToString("§e, ") { it }}"
+        val availableYearsFormat =
+            "§eHoppity Event Stats are available for the following years:§r\n${statsYearFormatList.joinToString("§e, ") { it }}"
 
         if (parsedInt == null) {
             if (HoppityAPI.isHoppityEvent()) {

@@ -81,7 +81,10 @@ object ConfigUpdaterMigrator {
             }
             val newParentElement = new.at(np.dropLast(1), true)
             if (newParentElement !is JsonObject) {
-                logger.log("Catastrophic: element at path $old could not be relocated to $new, since another element already inhabits that path")
+                logger.log(
+                    "Catastrophic: element at path $old could not be relocated to $new, " +
+                    "since another element already inhabits that path"
+                )
                 return
             }
             movesPerformed++
