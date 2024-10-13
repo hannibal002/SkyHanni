@@ -91,29 +91,32 @@ object UpdateManager {
             updateStream = UpdateStream.BETA
         }
         activePromise = context.checkUpdate(updateStream.stream)
-            .thenAcceptAsync({
-                logger.log("Update check completed")
-                if (updateState != UpdateState.NONE) {
-                    logger.log("This appears to be the second update check. Ignoring this one")
-                    return@thenAcceptAsync
-                }
-                potentialUpdate = it
-                if (it.isUpdateAvailable) {
-                    updateState = UpdateState.AVAILABLE
-                    if (config.fullAutoUpdates || forceDownload) {
-                        ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now.")
-                        queueUpdate()
-                    } else if (config.autoUpdates) {
-                        ChatUtils.chatAndOpenConfig(
-                            "§aSkyHanni found a new update: ${it.update.versionName}. " +
-                                "Check §b/sh download update §afor more info.",
-                            config::autoUpdates
-                        )
+            .thenAcceptAsync(
+                {
+                    logger.log("Update check completed")
+                    if (updateState != UpdateState.NONE) {
+                        logger.log("This appears to be the second update check. Ignoring this one")
+                        return@thenAcceptAsync
                     }
-                } else if (forceDownload) {
-                    ChatUtils.chat("§aSkyHanni didn't find a new update.")
-                }
-            }, DelayedRun.onThread)
+                    potentialUpdate = it
+                    if (it.isUpdateAvailable) {
+                        updateState = UpdateState.AVAILABLE
+                        if (config.fullAutoUpdates || forceDownload) {
+                            ChatUtils.chat("§aSkyHanni found a new update: ${it.update.versionName}, starting to download now.")
+                            queueUpdate()
+                        } else if (config.autoUpdates) {
+                            ChatUtils.chatAndOpenConfig(
+                                "§aSkyHanni found a new update: ${it.update.versionName}. " +
+                                    "Check §b/sh download update §afor more info.",
+                                config::autoUpdates,
+                            )
+                        }
+                    } else if (forceDownload) {
+                        ChatUtils.chat("§aSkyHanni didn't find a new update.")
+                    }
+                },
+                DelayedRun.onThread,
+            )
     }
 
     fun queueUpdate() {
@@ -124,13 +127,16 @@ object UpdateManager {
         activePromise = CompletableFuture.supplyAsync {
             logger.log("Update download started")
             potentialUpdate!!.prepareUpdate()
-        }.thenAcceptAsync({
-            logger.log("Update download completed, setting exit hook")
-            updateState = UpdateState.DOWNLOADED
-            potentialUpdate!!.executePreparedUpdate()
-            ChatUtils.chat("Download of update complete. ")
-            ChatUtils.chat("§aThe update will be installed after your next restart.")
-        }, DelayedRun.onThread)
+        }.thenAcceptAsync(
+            {
+                logger.log("Update download completed, setting exit hook")
+                updateState = UpdateState.DOWNLOADED
+                potentialUpdate!!.executePreparedUpdate()
+                ChatUtils.chat("Download of update complete. ")
+                ChatUtils.chat("§aThe update will be installed after your next restart.")
+            },
+            DelayedRun.onThread,
+        )
     }
 
     private val context = UpdateContext(
@@ -174,4 +180,28 @@ object UpdateManager {
     }
 
     private var potentialUpdate: PotentialUpdate? = null
+
+    fun forceUpdateCommand(args: Array<String>) {
+        val currentStream = SkyHanniMod.feature.about.updateStream.get()
+        val arg = args.firstOrNull() ?: "current"
+        val updateStream = when {
+            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
+            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
+            else -> currentStream
+        }
+
+        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !isCurrentlyBeta())
+        if (switchingToBeta) {
+            ChatUtils.clickableChat(
+                "Are you sure you want to switch to beta? These versions may be less stable.",
+                onClick = {
+                    checkUpdate(true, updateStream)
+                },
+                "§eClick to confirm!",
+                oneTimeClick = true,
+            )
+        } else {
+            checkUpdate(true, updateStream)
+        }
+    }
 }

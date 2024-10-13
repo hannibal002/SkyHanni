@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigGuiManager
-import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.PartyAPI
@@ -76,7 +75,7 @@ import at.hannibal2.skyhanni.features.misc.massconfiguration.DefaultConfigFeatur
 import at.hannibal2.skyhanni.features.misc.pathfind.NavigationHelper
 import at.hannibal2.skyhanni.features.misc.reminders.ReminderManager
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
-import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
+import at.hannibal2.skyhanni.features.misc.visualwords.ModifyVisualWords
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.everywhere.PunchcardHighlight
 import at.hannibal2.skyhanni.features.slayer.SlayerProfitTracker
@@ -98,10 +97,8 @@ import at.hannibal2.skyhanni.test.command.TrackParticlesCommand
 import at.hannibal2.skyhanni.test.command.TrackSoundsCommand
 import at.hannibal2.skyhanni.test.graph.GraphEditor
 import at.hannibal2.skyhanni.utils.APIUtils
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.ItemPriceUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
@@ -113,7 +110,7 @@ object Commands {
     val commands = mutableListOf<CommandBuilder>()
 
     @HandleEvent
-    fun registerCommands(event: RegisterCommandsEvent) {
+    fun onRegisterCommands(event: RegisterCommandsEvent) {
         usersMain(event)
         usersNormal(event)
         usersNormalClearTracker(event)
@@ -149,7 +146,7 @@ object Commands {
         }
         event.register("shwords") {
             description = "Opens the config list for modifying visual words"
-            callback { openVisualWords() }
+            callback { ModifyVisualWords.onCommand() }
         }
         event.register("shnavigate") {
             description = "Using path finder to go to locations"
@@ -322,7 +319,7 @@ object Commands {
         event.register("shclearfarmingitems") {
             description = "Clear farming items saved for the Farming Fortune Guide"
             category = CommandCategory.USERS_NORMAL
-            callback { clearFarmingItems() }
+            callback { CaptureFarmingGear.clearGearCommand() }
         }
         event.register("shresetghostcounter") {
             description = "Resets the ghost counter"
@@ -490,7 +487,7 @@ object Commands {
         event.register("shupdate") {
             description = "Updates the mod to the specified update stream."
             category = CommandCategory.USERS_BUG_FIX
-            callback { forceUpdate(it) }
+            callback { UpdateManager.forceUpdateCommand(it) }
         }
         event.register("shupdatebazaarprices") {
             description = "Forcefully updating the bazaar prices right now."
@@ -827,47 +824,6 @@ object Commands {
             description = "Reverse transfer party to the previous leader"
             category = CommandCategory.SHORTENED_COMMANDS
             callback { PartyCommands.reverseTransfer() }
-        }
-    }
-
-    @JvmStatic
-    fun openVisualWords() {
-        if (!LorenzUtils.onHypixel) {
-            ChatUtils.userError("You need to join Hypixel to use this feature!")
-        } else {
-            if (VisualWordGui.sbeConfigPath.exists()) VisualWordGui.drawImport = true
-            SkyHanniMod.screenToOpen = VisualWordGui()
-        }
-    }
-
-    private fun clearFarmingItems() {
-        val storage = GardenAPI.storage?.fortune ?: return
-        ChatUtils.chat("clearing farming items")
-        storage.farmingItems.clear()
-        storage.outdatedItems.clear()
-    }
-
-    private fun forceUpdate(args: Array<String>) {
-        val currentStream = SkyHanniMod.feature.about.updateStream.get()
-        val arg = args.firstOrNull() ?: "current"
-        val updateStream = when {
-            arg.equals("(?i)(?:full|release)s?".toRegex()) -> UpdateStream.RELEASES
-            arg.equals("(?i)(?:beta|latest)s?".toRegex()) -> UpdateStream.BETA
-            else -> currentStream
-        }
-
-        val switchingToBeta = updateStream == UpdateStream.BETA && (currentStream != UpdateStream.BETA || !UpdateManager.isCurrentlyBeta())
-        if (switchingToBeta) {
-            ChatUtils.clickableChat(
-                "Are you sure you want to switch to beta? These versions may be less stable.",
-                onClick = {
-                    UpdateManager.checkUpdate(true, updateStream)
-                },
-                "§eClick to confirm!",
-                oneTimeClick = true,
-            )
-        } else {
-            UpdateManager.checkUpdate(true, updateStream)
         }
     }
 }
