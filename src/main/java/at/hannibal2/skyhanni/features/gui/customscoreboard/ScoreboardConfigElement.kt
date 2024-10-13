@@ -35,7 +35,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementUnknown
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementVisiting
 
-enum class ScoreboardEntry(val element: ScoreboardElement) {
+enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     TITLE(ScoreboardElementTitle),
     PROFILE(ScoreboardElementProfile),
     PURSE(ScoreboardElementPurse),

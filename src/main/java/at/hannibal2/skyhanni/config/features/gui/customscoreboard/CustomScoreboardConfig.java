@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEntry;
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -31,13 +31,13 @@ public class CustomScoreboardConfig {
         desc = "Drag text to change the appearance of the advanced scoreboard."
     )
     @ConfigEditorDraggableList()
-    public Property<List<ScoreboardEntry>> scoreboardEntries = Property.of(new ArrayList<>(ScoreboardEntry.defaultOption));
+    public Property<List<ScoreboardConfigElement>> scoreboardEntries = Property.of(new ArrayList<>(ScoreboardConfigElement.defaultOption));
 
     @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
     public Runnable reset = () -> {
         scoreboardEntries.get().clear();
-        scoreboardEntries.get().addAll(ScoreboardEntry.defaultOption);
+        scoreboardEntries.get().addAll(ScoreboardConfigElement.defaultOption);
         scoreboardEntries.notifyObservers();
     };
 

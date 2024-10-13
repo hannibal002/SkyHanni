@@ -237,7 +237,7 @@ object CustomScoreboard {
                 add("Custom Scoreboard disabled.")
             } else {
                 add("Custom Scoreboard Lines:")
-                ScoreboardEntry.entries.forEach { entry ->
+                ScoreboardConfigElement.entries.forEach { entry ->
                     add(
                         "   ${entry.name.firstLetterUppercase()} - " +
                             "island: ${entry.element.showIsland()} - " +

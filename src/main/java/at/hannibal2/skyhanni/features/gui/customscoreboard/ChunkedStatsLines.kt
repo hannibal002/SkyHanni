@@ -26,10 +26,10 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 
 private val hideEmptyLines get() = informationFilteringConfig.hideEmptyLines
 
-enum class ChunkedStatsManager(
+enum class ChunkedStatsLines(
     private val displayPair: () -> String,
-    val showWhen: () -> Boolean,
-    val showIsland: () -> Boolean,
+    private val showWhen: () -> Boolean,
+    private val showIsland: () -> Boolean,
     private val configLine: String,
 ) {
     PURSE(
@@ -92,7 +92,7 @@ enum class ChunkedStatsManager(
 
     companion object {
 
-        private var currentIslandStats = listOf<ChunkedStatsManager>()
+        private var currentIslandStats = listOf<ChunkedStatsLines>()
 
         fun getChunkedStats() = buildList {
             currentIslandStats.forEach { stat ->

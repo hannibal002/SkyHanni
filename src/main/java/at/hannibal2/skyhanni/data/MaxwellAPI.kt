@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardEntry
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardConfigElement
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -138,7 +138,7 @@ object MaxwellAPI {
         if (!tuningAutoAssignedPattern.matches(event.message)) return
         if (tunings.isNullOrEmpty()) return
         with(CustomScoreboard.config) {
-            if (!enabled.get() || ScoreboardEntry.TUNING !in scoreboardEntries.get()) return
+            if (!enabled.get() || ScoreboardConfigElement.TUNING !in scoreboardEntries.get()) return
             ChatUtils.chat("Talk to Maxwell and open the Tuning Page again to update the tuning data in scoreboard.")
         }
     }
