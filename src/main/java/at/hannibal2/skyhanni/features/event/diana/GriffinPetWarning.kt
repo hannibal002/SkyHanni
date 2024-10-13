@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -14,13 +15,14 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object GriffinPetWarning {
+    private val config get() = SkyHanniMod.feature.event.diana
     private var wasCorrectPetAlready = false
     private var lastWarnTime = SimpleTimeMark.farPast()
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (!event.isMod(10)) return
-        if (!SkyHanniMod.feature.event.diana.petWarning) return
+        if (!config.petWarning) return
         if (!DianaAPI.isDoingDiana()) return
         if (!DianaAPI.hasSpadeInHand()) return
 
@@ -50,7 +52,12 @@ object GriffinPetWarning {
     }
 
     private fun warn() {
-        ChatUtils.chat("Reminder to use a Griffin pet for Mythological Ritual!")
+        ChatUtils.clickToActionOrDisable(
+            "Reminder to use a Griffin pet for Mythological Ritual!",
+            config::petWarning,
+            actionName = "open pets menu",
+            action = { HypixelCommands.pet() },
+        )
         if (lastWarnTime.passedSince() > 30.seconds) {
             lastWarnTime = SimpleTimeMark.now()
             LorenzUtils.sendTitle("§cGriffin Pet!", 3.seconds)
