@@ -419,22 +419,22 @@ object Commands {
         }
         event.register("shresetcontestdata") {
             description = "Resets Jacob's Contest Data"
-            category = CommandCategory.USERS_BUG_FIX
+            category = CommandCategory.USERS_RESET
             callback { SkyHanniDebugsAndTests.resetContestData() }
         }
         event.register("shresetfarmingitems") {
             description = "Resets farming items saved for the Farming Fortune Guide"
-            category = CommandCategory.USERS_BUG_FIX
+            category = CommandCategory.USERS_RESET
             callback { resetFarmingItems() }
         }
         event.register("shresetfarmingitems") {
             description = "Resets farming items saved for the Farming Fortune Guide"
-            category = CommandCategory.USERS_BUG_FIX
+            category = CommandCategory.USERS_RESET
             callback { resetFarmingItems() }
         }
         event.register("shresetmineshaftpitystats") {
             description = "Resets the mineshaft pity display stats"
-            category = CommandCategory.DEVELOPER_TEST
+            category = CommandCategory.USERS_RESET
             callback { MineshaftPityDisplay.fullResetCounter() }
         }
     }
