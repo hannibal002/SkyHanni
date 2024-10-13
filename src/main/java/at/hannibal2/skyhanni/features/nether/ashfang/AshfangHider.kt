@@ -18,7 +18,7 @@ object AshfangHider {
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
-        if (!AshfangManager.isAshfangActive() || !config.damageSplash) return
+        if (!AshfangManager.active || !config.damageSplash) return
 
         if (DamageIndicatorManager.isDamageSplash(event.entity)) {
             event.cancel()
@@ -27,13 +27,13 @@ object AshfangHider {
 
     @SubscribeEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!AshfangManager.isAshfangActive() || !config.particles) return
+        if (!AshfangManager.active || !config.particles) return
         event.cancel()
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!AshfangManager.isAshfangActive() || !config.particles) return
+        if (!AshfangManager.active || !config.particles) return
         val entity = event.entity as? EntityArmorStand ?: return
         if (entity.inventory.any { it?.name == "Glowstone" }) event.cancel()
     }

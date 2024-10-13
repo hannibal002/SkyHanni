@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
@@ -56,14 +57,22 @@ object SuperpairDataDisplay {
     @SubscribeEvent
     fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
+        if (InventoryUtils.openInventoryName() == "Experimentation Table") {
+            // Render here so they can move it around.
+            config.superpairDisplayPosition.renderString("§6Superpair Experimentation Data", posLabel = "Superpair Experimentation Data")
+        }
+        if (ExperimentationTableAPI.getCurrentExperiment() == null) return
+
         if (display.isEmpty()) display = drawDisplay()
 
-        config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experiment Information")
+        config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
     }
 
     @SubscribeEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!isEnabled()) return
+        if (ExperimentationTableAPI.getCurrentExperiment() == null) return
+
         val currentExperiment = ExperimentationTableAPI.getCurrentExperiment() ?: return
 
         val item = event.item ?: return
@@ -165,9 +174,9 @@ object SuperpairDataDisplay {
                     // TODO extract logic in some way
                     if (it.value.any { data ->
                             (data.first?.index ?: -1).equalsOneOf(item.index, match.index) ||
-                                (data.second?.index
-                                    ?: -1).equalsOneOf(item.index, match.index)
-                        }) {
+                                (data.second?.index ?: -1).equalsOneOf(item.index, match.index)
+                        }
+                    ) {
                         return
                     }
                 }
@@ -190,12 +199,16 @@ object SuperpairDataDisplay {
                 key.isAnyOf(FoundType.MATCH, FoundType.PAIR) -> {
                     if (value.any { data ->
                             item.index.equalsOneOf(data.first?.index ?: -1, data.second?.index ?: -1)
-                        }) return
+                        }
+                    ) return
                 }
 
-                else -> if (value.any { data ->
-                        (data.item?.index ?: -1) == item.index && data.item?.sameAs(item) == true
-                    }) return
+                else ->
+                    if (
+                        value.any { data ->
+                            (data.item?.index ?: -1) == item.index && data.item?.sameAs(item) == true
+                        }
+                    ) return
             }
         }
 
@@ -284,8 +297,7 @@ object SuperpairDataDisplay {
             slot >= experiment.endSlot ||
             (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
-    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this?.damage == other.damage
+    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
 
-    private fun isEnabled() =
-        IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay && ExperimentationTableAPI.getCurrentExperiment() != null
+    private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay
 }

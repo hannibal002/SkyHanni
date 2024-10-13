@@ -41,6 +41,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
+@Suppress("ImportOrdering")
 object EntityUtils {
 
     @Deprecated("Old. Instead use entity detection feature instead.")
@@ -65,7 +66,7 @@ object EntityUtils {
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
-    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().add(y = 3), radius).filter {
+    ): List<EntityArmorStand> = getArmorStandsInRadius(getLorenzVec().up(3), radius).filter {
         it.getNameAsString().contains(contains)
     }
 
@@ -86,7 +87,7 @@ object EntityUtils {
         inaccuracy: Double = 1.6,
         debugWrongEntity: Boolean = false,
     ): List<EntityArmorStand> {
-        val center = getLorenzVec().add(y = y)
+        val center = getLorenzVec().up(y)
         return getArmorStandsInRadius(center, inaccuracy).filter {
             val result = it.getNameAsString().contains(contains)
             if (debugWrongEntity && !result) {
@@ -183,14 +184,17 @@ object EntityUtils {
     fun getAllEntities(): Sequence<Entity> = Minecraft.getMinecraft().theWorld?.getAllEntities()?.let {
         if (Minecraft.getMinecraft()
                 .isOnMainThread()
-        ) it else it.toMutableList() // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization, but *does* make crashes because of it rarer.
+        ) it
+        // TODO: while i am here, i want to point out that copying the entity list does not constitute proper synchronization,
+        //  but *does* make crashes because of it rarer.
+        else it.toMutableList()
     }?.asSequence()?.filterNotNull() ?: emptySequence()
 
     fun getAllTileEntities(): Sequence<TileEntity> = Minecraft.getMinecraft()?.theWorld?.loadedTileEntityList?.let {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull() ?: emptySequence()
 
-    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().add(y = 0.5).canBeSeen(radius)
+    fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().up(0.5).canBeSeen(radius)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 

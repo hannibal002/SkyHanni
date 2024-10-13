@@ -18,8 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils.mob
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.init.Blocks
@@ -89,9 +88,9 @@ object MobHighlight {
         val arachne = arachne?.baseEntity ?: return
 
         if (arachne.distanceToPlayer() > 10) return
-        event.draw3DLine(
-            event.exactPlayerEyeLocation(),
-            arachne.getLorenzVec().up(1.0),
+
+        event.drawLineToEye(
+            arachne.getLorenzVec().up(),
             LorenzColor.RED.toColor(),
             config.lineToArachneWidth,
             true,
