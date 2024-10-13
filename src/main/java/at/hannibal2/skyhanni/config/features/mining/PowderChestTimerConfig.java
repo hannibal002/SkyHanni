@@ -24,7 +24,7 @@ public class PowderChestTimerConfig {
     public boolean highlightChests = true;
 
     @Expose
-    @ConfigOption(name = "Use Static Color", desc = "Use a single color for the chest highlight instead of chaning it depending of the time.")
+    @ConfigOption(name = "Use Static Color", desc = "Use a single color for the chest highlight instead of changing it depending of the time.")
     @ConfigEditorBoolean
     public boolean useStaticColor = false;
 
