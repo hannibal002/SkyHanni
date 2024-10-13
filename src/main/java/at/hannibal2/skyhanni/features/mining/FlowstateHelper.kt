@@ -39,6 +39,8 @@ object FlowstateHelper {
     private var displayDirty = false
     private var displayHibernating = true
     private var timeSinceHibernation = SimpleTimeMark.farPast()
+    private var timeSinceMax = SimpleTimeMark.farPast()
+    private var displayMaxed = false
 
     private var flowstateCache: Int? = null
 
@@ -64,6 +66,8 @@ object FlowstateHelper {
     private fun attemptClearDisplay() {
         if (streakEndTimer.isInFuture()) return
         blockBreakStreak = 0
+        timeSinceMax = SimpleTimeMark.farPast()
+        displayMaxed = false
         displayDirty = true
         if (!displayHibernating) timeSinceHibernation = SimpleTimeMark.now()
         displayHibernating = true
@@ -73,14 +77,22 @@ object FlowstateHelper {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!MiningAPI.inCustomMiningIsland() || !config.enabled) return
-        if (flowstateCache == null || !streakEndTimer.isInFuture()) return
+        if (flowstateCache == null && !streakEndTimer.isInFuture()) return
 
-        if (displayHibernating && config.autoHide > -1 && timeSinceHibernation.passedSince() > config.autoHide.seconds) return
+        if (shouldAutoHide()) return
         if (display.isEmpty() || streakEndTimer.isInFuture()) {
             createDisplay()
         }
 
         config.position.renderRenderables(display, extraSpace = 1, "Flowstate Helper")
+    }
+
+    private fun shouldAutoHide(): Boolean {
+        if (config.autoHide < 0) return false
+        val autoHide = config.autoHide.seconds
+        if (streakEndTimer.minus(10.seconds - autoHide).isInPast()) return true
+        if (displayMaxed && timeSinceMax.passedSince() > autoHide) return true
+        return false
     }
 
     private fun createDisplay() {
@@ -89,15 +101,23 @@ object FlowstateHelper {
             FlowstateElements.STREAK.create()
             FlowstateElements.SPEED.create()
         }
-        FlowstateElements.TIMER.create()
-        FlowstateElements.COMPACT.create()
+        if (!displayHibernating) {
+            FlowstateElements.TIMER.create()
+            FlowstateElements.COMPACT.create()
+        }
         display = config.appearance.map { it.renderable }
     }
 
     fun getSpeedBonus(): Int {
         val flowstateLevel = flowstateCache ?: 0
-        if (blockBreakStreak >= 200) return 200 * flowstateLevel
-        return blockBreakStreak * flowstateLevel
+
+        return if (blockBreakStreak >= 200) {
+            if (!displayMaxed) {
+                displayMaxed = true
+                timeSinceMax = SimpleTimeMark.now()
+            }
+            200 * flowstateLevel
+        } else blockBreakStreak * flowstateLevel
     }
 
     @SubscribeEvent

@@ -9,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableLi
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 
 import java.util.List;
 
@@ -30,7 +31,8 @@ public class FlowstateHelperConfig {
     public boolean colorfulTimer = false;
 
     @Expose
-    @ConfigOption(name = "Auto Hide", desc = "Automatically hides the GUI after a certain time idle, in seconds.")
+    @ConfigOption(name = "Auto Hide", desc = "Automatically hides the GUI after being idle or having the max bonus, in seconds.")
+    @SearchTag("autohide")
     @ConfigEditorSlider(
         minValue = -1,
         maxValue = 30,
