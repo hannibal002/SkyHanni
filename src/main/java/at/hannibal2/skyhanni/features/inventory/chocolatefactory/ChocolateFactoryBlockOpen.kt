@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandGraphs
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.event.hoppity.MythicRabbitPetWarning
@@ -8,6 +11,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -54,8 +58,13 @@ object ChocolateFactoryBlockOpen {
                 ChatUtils.clickToActionOrDisable(
                     "§cBlocked opening the Chocolate Factory without a §dBooster Cookie §cactive!",
                     config::boosterCookieRequirement,
-                    actionName = "open bazaar",
-                    action = { HypixelCommands.bazaar("Booster Cookie") },
+                    actionName = "warp to hub",
+                    action = {
+                        HypixelCommands.warp("hub")
+                        EntityMovementData.onNextTeleport(IslandType.HUB) {
+                            IslandGraphs.pathFind(LorenzVec(-32.5, 71.0, -76.5), "§aBazaar", condition = { true })
+                        }
+                    },
                 )
             }
         }
