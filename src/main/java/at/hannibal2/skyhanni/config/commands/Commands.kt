@@ -25,6 +25,7 @@ import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
+import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker
@@ -501,6 +502,10 @@ object Commands {
             "shdebugscoreboard",
             "Monitors the scoreboard changes: Prints the raw scoreboard lines in the console after each update, with time since last update.",
         ) { ScoreboardData.toggleMonitor() }
+        registerCommand(
+            "shresetterminal",
+            "Resets terminal highlights in F7.",
+        ) { TerminalInfo.resetTerminals() }
     }
 
     @Suppress("LongMethod")
