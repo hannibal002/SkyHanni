@@ -253,6 +253,15 @@ object CustomScoreboard {
         }
     }
 
+    @JvmStatic
+    fun resetAppearance() {
+        with(config.scoreboardEntries) {
+            get().clear()
+            get().addAll(ScoreboardConfigElement.defaultOption)
+            notifyObservers()
+        }
+    }
+
     private fun isEnabled() =
         (LorenzUtils.inSkyBlock || (OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
 
