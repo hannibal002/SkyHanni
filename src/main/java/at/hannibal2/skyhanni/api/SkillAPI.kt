@@ -324,7 +324,14 @@ object SkillAPI {
                 val nextLevelDiff = levelArray.getOrNull(level)?.toDouble() ?: 7_600_000.0
                 val nextLevelProgress = nextLevelDiff * xpPercentage / 100
                 val totalXp = levelXp + nextLevelProgress
-                updateSkillInfo(existingLevel, level, nextLevelProgress.toLong(), nextLevelDiff.toLong(), totalXp.toLong(), matcher.group("gained"))
+                updateSkillInfo(
+                    existingLevel,
+                    level,
+                    nextLevelProgress.toLong(),
+                    nextLevelDiff.toLong(),
+                    totalXp.toLong(),
+                    matcher.group("gained"),
+                )
             } else {
                 val exactLevel = getLevelExact(needed)
                 val levelXp = calculateLevelXp(existingLevel.level - 1).toLong() + current
@@ -468,7 +475,9 @@ object SkillAPI {
                     val skill = storage?.get(skillType) ?: return
 
                     if (targetLevel <= skill.overflowLevel) {
-                        ChatUtils.userError("Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel}).")
+                        ChatUtils.userError(
+                            "Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel})."
+                        )
                         return
                     }
 
