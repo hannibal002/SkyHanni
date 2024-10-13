@@ -23,6 +23,7 @@ class ParkourHelper(
     val detectionRange: Double = 1.0,
     val depth: Boolean = true,
     val onEndReach: () -> Unit = {},
+    val goInOrder: Boolean = false,
 ) {
 
     private var current = -1
@@ -58,9 +59,9 @@ class ParkourHelper(
                     for ((index, location) in locations.withIndex()) {
                         val onGround = Minecraft.getMinecraft().thePlayer.onGround
                         val closeEnough = location.offsetCenter().distanceToPlayer() < detectionRange
-                        if (closeEnough && onGround) {
-                            current = index
-                        }
+                        if (!(closeEnough && onGround)) continue
+                        if (goInOrder && (index < current - 1 || index > current + 1)) continue
+                        current = index
                     }
                 }
 
@@ -121,7 +122,7 @@ class ParkourHelper(
                     if (outline) event.outlineTopFace(aabb, 2, Color.BLACK, depth)
                 }
                 if (SkyHanniMod.feature.dev.waypoint.showPlatformNumber && !isMovingPlatform) {
-                    event.drawString(location.offsetCenter().add(y = 1), "§a§l$index", seeThroughBlocks = true)
+                    event.drawString(location.offsetCenter().up(1), "§a§l$index", seeThroughBlocks = true)
                 }
             }
         } catch (e: Throwable) {

@@ -8,8 +8,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -41,7 +40,7 @@ object SlayerMiniBossFeatures {
             if (mob.baseEntity.distanceToPlayer() > 10) continue
             event.draw3DLine(
                 event.exactPlayerEyeLocation(),
-                mob.baseEntity.getLorenzVec().up(1.0),
+                mob.baseEntity.getLorenzVec().up(),
                 LorenzColor.AQUA.toColor(),
                 config.slayerMinibossLineWidth,
                 true,

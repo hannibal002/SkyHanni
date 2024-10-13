@@ -74,7 +74,7 @@ object MiningAPI {
      */
     private val pickobulusFailPattern by pickbobulusGroup.pattern(
         "fail",
-        "§7Your §r§aPickobulus §r§7didn't destroy any blocks!"
+        "§7Your §r§aPickobulus §r§7didn't destroy any blocks!",
     )
 
     private data class MinedBlock(val ore: OreBlock, var confirmed: Boolean) {
@@ -127,6 +127,8 @@ object MiningAPI {
     var lastColdReset = SimpleTimeMark.farPast()
         private set
 
+    private var lastOreMinedTime = SimpleTimeMark.farPast()
+
     fun inGlaciteArea() = inGlacialTunnels() || IslandType.MINESHAFT.isInIsland()
 
     fun inDwarvenBaseCamp() = IslandType.DWARVEN_MINES.isInIsland() && dwarvenBaseCampPattern.matches(LorenzUtils.skyBlockArea)
@@ -161,11 +163,10 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!inCustomMiningIsland()) return
         if (event.clickType != ClickType.LEFT_CLICK) return
-        //println(event.getBlockState.properties)
         if (OreBlock.getByStateOrNull(event.getBlockState) == null) return
         recentClickedBlocks += event.position to SimpleTimeMark.now()
     }
@@ -342,6 +343,7 @@ object MiningAPI {
         currentAreaOreBlocks = setOf()
         resetOreEvent()
         resetPickobulusEvent()
+        lastOreMinedTime = SimpleTimeMark.farPast()
     }
 
     private fun resetOreEvent() {
@@ -360,11 +362,20 @@ object MiningAPI {
         pickobulusWaitingForBlock = false
     }
 
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onOreMined(event: OreMinedEvent) {
+        lastOreMinedTime = SimpleTimeMark.now()
+    }
+
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining API")
         if (!inCustomMiningIsland()) {
             event.addIrrelevant("not in a mining island")
+            return
+        }
+        if (lastOreMinedTime.passedSince() > 30.seconds) {
+            event.addIrrelevant("not mined recently")
             return
         }
 

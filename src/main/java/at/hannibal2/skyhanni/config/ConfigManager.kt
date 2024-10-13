@@ -66,7 +66,8 @@ class ConfigManager {
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
         require(value.javaClass == type.clazz)
-        @Suppress("UNCHECKED_CAST") (type.property as KMutableProperty0<Any>).set(value)
+        @Suppress("UNCHECKED_CAST")
+        (type.property as KMutableProperty0<Any>).set(value)
         (jsonHolder as MutableMap<ConfigFileType, Any>)[type] = value
     }
 
@@ -150,7 +151,10 @@ class ConfigManager {
         }
         if (missingConfigLink) {
             println("")
-            println("This crash is here to remind you to fix the missing @ConfigLink annotation over your new config position config element.")
+            println(
+                "This crash is here to remind you to fix the missing " +
+                "@ConfigLink annotation over your new config position config element."
+            )
             println("")
             println("Steps to fix:")
             println("1. Search for `WEE WOO WEE WOO` in the console output.")
@@ -182,7 +186,7 @@ class ConfigManager {
                         try {
                             run()
                         } catch (e: Throwable) {
-                            e.printStackTrace()
+                            logger.log(e.stackTraceToString())
                             LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
                         }
                     } else {
@@ -194,7 +198,7 @@ class ConfigManager {
 
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
-                e.printStackTrace()
+                logger.log(e.stackTraceToString())
                 val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
                 logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
                 logger.log("Exception was $e")
@@ -202,7 +206,7 @@ class ConfigManager {
                     file.copyTo(backupFile)
                 } catch (e: Exception) {
                     logger.log("Could not create backup for $fileName file")
-                    e.printStackTrace()
+                    logger.log(e.stackTraceToString())
                 }
             }
         }
@@ -239,7 +243,7 @@ class ConfigManager {
             move(unit, file, reason)
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
-            e.printStackTrace()
+            logger.log(e.stackTraceToString())
         }
     }
 

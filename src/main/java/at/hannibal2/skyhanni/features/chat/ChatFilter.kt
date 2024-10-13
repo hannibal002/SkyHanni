@@ -27,8 +27,9 @@ object ChatFilter {
     private val config get() = SkyHanniMod.feature.chat.filterType
     private val dungeonConfig get() = SkyHanniMod.feature.dungeon.messageFilter
 
-    /// <editor-fold desc="Regex Patterns & Messages">
+    // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
+    @Suppress("MaxLineLength")
     private val lobbyPatterns = listOf(
         // player join
         "(?: §b>§c>§a>§r §r)?.* §6(?:joined|(?:spooked|slid) into) the lobby!(?:§r §a<§c<§b<)?".toPattern(),
@@ -89,15 +90,19 @@ object ChatFilter {
     )
 
     // Guild EXP
+    /**
+     * REGEX-TEST: §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
+     * REGEX-TEST: §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
+     */
     private val guildExpPatterns = listOf(
-        // §aYou earned §r§22 GEXP §r§afrom playing SkyBlock!
-        // §aYou earned §r§22 GEXP §r§a+ §r§c210 Event EXP §r§afrom playing SkyBlock!
         "§aYou earned §r§2.* GEXP (§r§a\\+ §r§.* Event EXP )?§r§afrom playing SkyBlock!".toPattern(),
     )
 
     // Kill Combo
+    /**
+     * REGEX-TEST: §a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
+     */
     private val killComboPatterns = listOf(
-        //§a§l+5 Kill Combo §r§8+§r§b3% §r§b? Magic Find
         "§.§l\\+(.*) Kill Combo (.*)".toPattern(),
         "§cYour Kill Combo has expired! You reached a (.*) Kill Combo!".toPattern(),
     )
@@ -155,6 +160,7 @@ object ChatFilter {
     )
 
     // Slayer Drop
+    @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
         // Zombie
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
@@ -259,6 +265,7 @@ object ChatFilter {
     )
 
     // Annoying Spam
+    @Suppress("MaxLineLength")
     private val annoyingSpamPatterns = listOf(
         "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
@@ -277,6 +284,7 @@ object ChatFilter {
         "§6§lGOOD CATCH! §r§bYou found a §r§fSpooky Bait§r§b.",
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
+        "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
     )
 
     private val skymallMessages = listOf(
@@ -500,7 +508,7 @@ object ChatFilter {
         "slayer" to slayerMessageStartWith,
         "profile_join" to profileJoinMessageStartsWith,
     )
-    /// </editor-fold>
+    // </editor-fold>
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -515,6 +523,7 @@ object ChatFilter {
      * @param message The message to check
      * @return The reason why the message was blocked, empty if not blocked
      */
+    @Suppress("CyclomaticComplexMethod", "MaxLineLength")
     private fun block(message: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"
