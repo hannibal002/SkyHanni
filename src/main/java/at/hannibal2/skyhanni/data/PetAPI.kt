@@ -479,33 +479,33 @@ object PetAPI {
                 return
             }
         }
-        ChatUtils.userError("bad usage. /shcalcpetxp <level> <rarity> <isGdrag>")
+        ChatUtils.userError("bad usage. /shcalcpetxp <level> <rarity> <pet>")
     }
 
     private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String = ""): Double? {
-        val rarityOffset = getRarityOffset(rarity, petName) ?: return null
-        if (!isValidLevel(level, petName == "Golden Dragon")) return null
+        val newPetName = petName.replace(" ", "_").uppercase()
+        val petObject = xpLevelingCustom?.getAsJsonObject(newPetName)
 
-        return if (petName == "Golden Dragon" && level > 100) {
-            xpLeveling.slice(0 + rarityOffset..<100 + rarityOffset - 1).sum() + getGoldenDragonXP(level - 100).toDouble()
-        } else {
-            xpLeveling.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
-        }
+        val rarityOffset = getRarityOffset(rarity, petObject?.getAsJsonObject("rarity_offset")) ?: return null
+        if (!isValidLevel(level, petObject)) return null
+
+        val xpList = xpLeveling + getCustomLeveling(petObject)
+
+        return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
     }
 
-    private fun isValidLevel(level: Int, isGoldenDragon: Boolean): Boolean {
-        return if (isGoldenDragon) level in 1..200
-        else level in 1..100
+    private fun isValidLevel(level: Int, petObject: JsonObject?): Boolean {
+        val maxLevel = petObject?.get("max_level")?.asInt ?: 100
+
+        return maxLevel >= level
     }
 
-    private fun getGoldenDragonXP(levelAbove100: Int): Int {
-        val overflowLevels = xpLevelingCustom?.getAsJsonObject("GOLDEN_DRAGON")?.getAsJsonArray()?.map { it.asInt } ?: listOf()
-        return overflowLevels.slice(0..<levelAbove100).sum()
+    private fun getCustomLeveling(petObject: JsonObject?): List<Int> {
+        return petObject?.getAsJsonArray("pet_levels")?.map { it.asInt } ?: listOf()
     }
 
-    private fun getRarityOffset(rarity: LorenzRarity, pet: String = ""): Int? {
-        val customLeveling = xpLevelingCustom?.getAsJsonObject(pet.replace(" ", "_").uppercase())?.getAsJsonObject("rarity_offset")
-        return if (customLeveling == null) {
+    private fun getRarityOffset(rarity: LorenzRarity, petObject: JsonObject?): Int? {
+        return if (petObject == null) {
             when (rarity) {
                 LorenzRarity.COMMON -> 0
                 LorenzRarity.UNCOMMON -> 6
@@ -519,7 +519,7 @@ object PetAPI {
                 }
             }
         } else {
-            customLeveling.entrySet().associate { (rarity, offset) ->
+            petObject.entrySet().associate { (rarity, offset) ->
                 (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
             }[rarity]
         }
