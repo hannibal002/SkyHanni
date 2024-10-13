@@ -23,13 +23,16 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.blockReason
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
+import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.isBazaarItem
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.EntityUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.ItemBlink
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -44,12 +47,12 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.allIngredients
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -78,25 +81,30 @@ object GardenVisitorFeatures {
     private var display = emptyList<List<Any>>()
 
     private val patternGroup = RepoPattern.group("garden.visitor")
+
+    /**
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§aGarden§r§e!
+     * REGEX-TEST: §a§r§aBanker Broadjaw §r§ehas arrived on your §r§bGarden§r§e!
+     */
     private val visitorArrivePattern by patternGroup.pattern(
         "visitorarrive",
-        ".* §r§ehas arrived on your §r§bGarden§r§e!"
+        ".* §r§ehas arrived on your §r§[ba]Garden§r§e!",
     )
     private val copperPattern by patternGroup.pattern(
         "copper",
-        " §8\\+§c(?<amount>.*) Copper"
+        " §8\\+§c(?<amount>.*) Copper",
     )
     private val gardenExperiencePattern by patternGroup.pattern(
         "gardenexperience",
-        " §8\\+§2(?<amount>.*) §7Garden Experience"
+        " §8\\+§2(?<amount>.*) §7Garden Experience",
     )
     private val visitorChatMessagePattern by patternGroup.pattern(
         "visitorchat",
-        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*"
+        "§e\\[NPC] (?<color>§.)?(?<name>.*)§f: §r.*",
     )
     private val partialAcceptedPattern by patternGroup.pattern(
         "partialaccepted",
-        "§aYou gave some of the required items!"
+        "§aYou gave some of the required items!",
     )
 
     private val logger = LorenzLogger("garden/visitors")
@@ -129,7 +137,7 @@ object GardenVisitorFeatures {
                     "line" to line,
                     "offerItem" to offerItem,
                     "lore" to lore,
-                    "visitor" to visitor
+                    "visitor" to visitor,
                 )
                 continue
             }
@@ -193,13 +201,22 @@ object GardenVisitorFeatures {
             list.add(" §7- ")
             list.add(itemStack)
 
-            list.add(Renderable.optionalLink("$name §ex${amount.addSeparators()}", {
-                if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
-                    LorenzUtils.setTextIntoSign("$amount")
-                } else {
-                    BazaarApi.searchForBazaarItem(name, amount)
-                }
-            }) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() })
+            list.add(
+                Renderable.optionalLink(
+                    "$name §ex${amount.addSeparators()}",
+                    {
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            LorenzUtils.setTextIntoSign("$amount")
+                        } else {
+                            if (internalName.isBazaarItem()) {
+                                BazaarApi.searchForBazaarItem(name, amount)
+                            } else {
+                                HypixelCommands.auctionSearch(name.removeColor())
+                            }
+                        }
+                    },
+                ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
+            )
 
             if (config.shoppingList.showPrice) {
                 val price = internalName.getPrice() * amount
@@ -228,73 +245,88 @@ object GardenVisitorFeatures {
         var amountInSacks = 0
         internalName.getAmountInSacksOrNull()?.let {
             amountInSacks = it
-            val textColour = if (it >= amount) "a" else "e"
-            list.add(" §7(§${textColour}x${it.addSeparators()} §7in sacks)")
+            val textColor = if (it >= amount) "a" else "e"
+            list.add(" §7(§${textColor}x${it.addSeparators()} §7in sacks)")
         }
 
         val ingredients = NEUItems.getRecipes(internalName)
             // TODO describe what this line does
-            .firstOrNull() { !it.allIngredients().first().internalItemId.contains("PEST") }
-            ?.allIngredients() ?: emptySet()
+            .firstOrNull { !it.ingredients.first().internalName.contains("PEST") }
+            ?.ingredients ?: emptySet()
         if (ingredients.isEmpty()) return
 
-        val requiredIngredients = mutableMapOf<String, Int>()
-        for (ingredient in ingredients) {
-            val key = ingredient.internalItemId
-            requiredIngredients[key] =
-                requiredIngredients.getOrDefault(key, 0) + ingredient.count.toInt()
+        val requiredIngredients = mutableMapOf<NEUInternalName, Int>()
+        for ((key, count) in ingredients.toPrimitiveItemStacks()) {
+            requiredIngredients.addOrPut(key, count)
         }
         var hasIngredients = true
         for ((key, value) in requiredIngredients) {
-            val sackItem = key.asInternalName().getAmountInSacks()
+            val sackItem = key.getAmountInSacks()
             if (sackItem < value * (amount - amountInSacks)) {
                 hasIngredients = false
                 break
             }
         }
-        if (hasIngredients) {
-            list.add(" §7(§aCraftable!§7)")
+        if (hasIngredients && (amount - amountInSacks) > 0) {
+            val leftToCraft = amount - amountInSacks
+            list.add(" §7(")
+            list.add(
+                Renderable.optionalLink(
+                    "§aCraftable!",
+                    {
+                        if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
+                            LorenzUtils.setTextIntoSign("$leftToCraft")
+                        } else {
+                            HypixelCommands.viewRecipe(internalName.asString())
+                        }
+                    },
+                ) { GardenAPI.inGarden() && !NEUItems.neuHasFocus() },
+            )
+            list.add("§7)")
         }
     }
 
     private fun MutableList<List<Any>>.drawVisitors(
-        newVisitors: MutableList<String>,
-        shoppingList: MutableMap<NEUInternalName, Int>,
+        newVisitors: List<String>,
+        shoppingList: Map<NEUInternalName, Int>,
     ) {
-        if (newVisitors.isNotEmpty()) {
-            if (shoppingList.isNotEmpty()) {
-                addAsSingletonList("")
+        if (newVisitors.isEmpty()) return
+        if (shoppingList.isNotEmpty()) {
+            addAsSingletonList("")
+        }
+        val amount = newVisitors.size
+        val visitorLabel = if (amount == 1) "visitor" else "visitors"
+        addAsSingletonList("§e$amount §7new $visitorLabel:")
+        for (visitor in newVisitors) {
+            drawVisitor(visitor)
+        }
+    }
+
+    private fun MutableList<List<Any>>.drawVisitor(visitor: String) {
+        val displayName = GardenVisitorColorNames.getColoredName(visitor)
+
+        val list = mutableListOf<Any>()
+        list.add(" §7- $displayName")
+
+        if (config.shoppingList.itemPreview) {
+            val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
+            if (items == null) {
+                val text = "Visitor '$visitor' has no items in repo!"
+                logger.log(text)
+                ChatUtils.debug(text)
+                list.add(" §7(§c?§7)")
+                return
             }
-            val amount = newVisitors.size
-            val visitorLabel = if (amount == 1) "visitor" else "visitors"
-            addAsSingletonList("§e$amount §7new $visitorLabel:")
-            for (visitor in newVisitors) {
-                val displayName = GardenVisitorColorNames.getColoredName(visitor)
-
-                val list = mutableListOf<Any>()
-                list.add(" §7- $displayName")
-
-                if (config.shoppingList.itemPreview) {
-                    val items = GardenVisitorColorNames.visitorItems[visitor.removeColor()]
-                    if (items == null) {
-                        val text = "Visitor '$visitor' has no items in repo!"
-                        logger.log(text)
-                        ChatUtils.debug(text)
-                        list.add(" §7(§c?§7)")
-                        continue
-                    }
-                    if (items.isEmpty()) {
-                        list.add(" §7(§fAny§7)")
-                    } else {
-                        for (item in items) {
-                            list.add(NEUInternalName.fromItemName(item).getItemStack())
-                        }
-                    }
+            if (items.isEmpty()) {
+                list.add(" §7(§fAny§7)")
+            } else {
+                for (item in items) {
+                    list.add(NEUInternalName.fromItemName(item).getItemStack())
                 }
-
-                add(list)
             }
         }
+
+        add(list)
     }
 
     @SubscribeEvent
@@ -329,12 +361,12 @@ object GardenVisitorFeatures {
         val visitor = event.visitor
         val text = visitor.status.displayName
         val location = event.location
-        event.parent.drawString(location.add(y = 2.23), text)
+        event.parent.drawString(location.up(2.23), text)
         if (config.rewardWarning.showOverName) {
             visitor.hasReward()?.let { reward ->
                 val name = reward.displayName
 
-                event.parent.drawString(location.add(y = 2.73), "§c!$name§c!")
+                event.parent.drawString(location.up(2.73), "§c!$name§c!")
             }
         }
     }
@@ -555,7 +587,7 @@ object GardenVisitorFeatures {
                 if (color != -1) {
                     RenderLivingEntityHelper.setEntityColor(
                         entity,
-                        color
+                        color,
                     ) { config.highlightStatus == HighlightMode.COLOR || config.highlightStatus == HighlightMode.BOTH }
                 }
                 // Haven't gotten either of the known effected visitors (Vex and Leo) so can't test for sure
@@ -650,7 +682,7 @@ object GardenVisitorFeatures {
                     add("shoppingList: '${visitor.shoppingList}'")
                 }
                 visitor.offer?.offerItem?.getInternalName()?.let {
-                    add("offer: '${it}'")
+                    add("offer: '$it'")
                 }
             }
         }
@@ -674,7 +706,7 @@ object GardenVisitorFeatures {
         event.move(
             3,
             "garden.visitorRewardWarning.preventRefusing",
-            "garden.visitors.rewardWarning.preventRefusing"
+            "garden.visitors.rewardWarning.preventRefusing",
         )
         event.move(3, "garden.visitorRewardWarning.bypassKey", "garden.visitors.rewardWarning.bypassKey")
         event.move(3, "garden.visitorRewardWarning.drops", "garden.visitors.rewardWarning.drops")
@@ -699,6 +731,14 @@ object GardenVisitorFeatures {
                 drops.add(JsonPrimitive(new.name))
             }
 
+            drops
+        }
+        event.transform(54, "garden.visitors.rewardWarning.drops") { element ->
+            val drops = JsonArray()
+            for (entry in element.asJsonArray) {
+                drops.add(JsonPrimitive(entry.asString))
+            }
+            drops.add(JsonPrimitive(VisitorReward.COPPER_DYE.name))
             drops
         }
 

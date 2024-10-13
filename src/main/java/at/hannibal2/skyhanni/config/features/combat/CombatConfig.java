@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.combat;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.features.combat.broodmother.BroodmotherConfig;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
 import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
 import com.google.gson.annotations.Expose;
@@ -23,6 +24,12 @@ public class CombatConfig {
     @ConfigOption(name = "Quiver", desc = "")
     @Accordion
     public QuiverConfig quiverConfig = new QuiverConfig();
+
+    @Expose
+    @ConfigOption(name = "Armor Stack Display", desc = "")
+    @Accordion
+    // TODO rename to armor stack display
+    public StackDisplayConfig stackDisplayConfig = new StackDisplayConfig();
 
     @Expose
     @ConfigOption(name = "Summonings", desc = "")
@@ -53,6 +60,11 @@ public class CombatConfig {
     @ConfigOption(name = "Flare", desc = "")
     @Accordion
     public FlareConfig flare = new FlareConfig();
+
+    @Expose
+    @ConfigOption(name = "Broodmother", desc = "")
+    @Accordion
+    public BroodmotherConfig broodmother = new BroodmotherConfig();
 
     @Expose
     @ConfigOption(name = "Hide Damage Splash", desc = "Hide all damage splashes anywhere in SkyBlock.")

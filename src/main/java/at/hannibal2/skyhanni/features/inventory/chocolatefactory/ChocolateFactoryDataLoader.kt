@@ -7,16 +7,18 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -48,6 +50,14 @@ object ChocolateFactoryDataLoader {
     private val chocolateThisPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.thisprestige",
         "§7Chocolate this Prestige: §6(?<amount>[\\d,]+)",
+    )
+
+    /**
+     * REGEX-TEST: §7Max Chocolate: §660B
+     */
+    private val maxChocolatePattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "chocolate.max",
+        "§7Max Chocolate: §6(?<max>.*)",
     )
     private val chocolateForPrestigePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "chocolate.forprestige",
@@ -148,6 +158,18 @@ object ChocolateFactoryDataLoader {
         ConditionalUtils.onToggle(soundProperty) {
             ChocolateFactoryAPI.warningSound = SoundUtils.createSound(soundProperty.get(), 1f)
         }
+
+        config.chocolateUpgradeWarnings.upgradeWarningTimeTower.whenChanged { _, _ ->
+            ChocolateFactoryAPI.factoryUpgrades.takeIf { it.isNotEmpty() }?.let {
+                findBestUpgrades(it)
+            } ?: run {
+                ChatUtils.clickableChat(
+                    "Could not determine your current statistics to get next upgrade. Open CF to fix this!",
+                    onClick = { HypixelCommands.chocolateFactory() },
+                    "§eClick to run /cf!"
+                )
+            }
+        }
     }
 
     private fun clearData() {
@@ -216,6 +238,9 @@ object ChocolateFactoryDataLoader {
             chocolateThisPrestigePattern.matchMatcher(line) {
                 profileStorage.chocolateThisPrestige = group("amount").formatLong()
             }
+            maxChocolatePattern.matchMatcher(line) {
+                profileStorage.maxChocolate = group("max").formatLong()
+            }
             chocolateForPrestigePattern.matchMatcher(line) {
                 ChocolateFactoryAPI.chocolateForPrestige = group("amount").formatLong()
                 prestigeCost = ChocolateFactoryAPI.chocolateForPrestige
@@ -265,7 +290,7 @@ object ChocolateFactoryDataLoader {
         item.getLore().matchFirst(barnAmountPattern) {
             profileStorage.currentRabbits = group("rabbits").formatInt()
             profileStorage.maxRabbits = group("max").formatInt()
-            ChocolateFactoryBarnManager.trySendBarnFullMessage()
+            ChocolateFactoryBarnManager.trySendBarnFullMessage(inventory = true)
         }
     }
 
@@ -320,7 +345,7 @@ object ChocolateFactoryDataLoader {
         val itemName = item.name.removeColor()
         val lore = item.getLore()
         val upgradeCost = ChocolateFactoryAPI.getChocolateBuyCost(lore)
-        val averageChocolate = ChocolateAmount.averageChocPerSecond().round(2)
+        val averageChocolate = ChocolateAmount.averageChocPerSecond().roundTo(2)
         val isMaxed = upgradeCost == null
 
         if (slotIndex in ChocolateFactoryAPI.rabbitSlots) {
@@ -401,8 +426,8 @@ object ChocolateFactoryDataLoader {
         newAverageChocolate: Double,
         isRabbit: Boolean,
     ) {
-        val extra = (newAverageChocolate - averageChocolate).round(2)
-        val effectiveCost = (upgradeCost!! / extra).round(2)
+        val extra = (newAverageChocolate - averageChocolate).roundTo(2)
+        val effectiveCost = (upgradeCost!! / extra).roundTo(2)
         val upgrade = ChocolateFactoryUpgrade(slotIndex, level, upgradeCost, extra, effectiveCost, isRabbit = isRabbit)
         list.add(upgrade)
     }
@@ -427,9 +452,12 @@ object ChocolateFactoryDataLoader {
     private fun findBestUpgrades(list: List<ChocolateFactoryUpgrade>) {
         val profileStorage = profileStorage ?: return
 
-        // removing time tower here as people like to determine when to buy it themselves
-        val notMaxed = list.filter {
-            !it.isMaxed && it.slotIndex != ChocolateFactoryAPI.timeTowerIndex && it.effectiveCost != null
+        val ttFiltered = list.filter {
+            config.chocolateUpgradeWarnings.upgradeWarningTimeTower.get() || it.slotIndex != ChocolateFactoryAPI.timeTowerIndex
+        }
+
+        val notMaxed = ttFiltered.filter {
+            !it.isMaxed && it.effectiveCost != null
         }
 
         val bestUpgrade = notMaxed.minByOrNull { it.effectiveCost ?: Double.MAX_VALUE }

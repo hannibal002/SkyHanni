@@ -96,7 +96,7 @@ object PartyChatCommands {
         if (isBlockedUser(name)) {
             if (config.showIgnoredReminder) ChatUtils.clickableChat(
                 "§cIgnoring chat command from ${event.author}. " +
-                    "Unignore them using /shignore remove <player> or click here!",
+                    "Stop ignoring them using /shignore remove <player> or click here!",
                 onClick = { blacklistModify(event.author) },
                 "§eClick to ignore ${event.author}!",
             )
@@ -200,8 +200,8 @@ object PartyChatCommands {
         var message = "Ignored player list:"
         if (blacklist.size > 15) {
             message += "\n§e"
-            blacklist.forEachIndexed { i, it ->
-                message += it
+            blacklist.forEachIndexed { i, blacklistedMessage ->
+                message += blacklistedMessage
                 if (i < blacklist.size - 1) {
                     message += ", "
                 }
