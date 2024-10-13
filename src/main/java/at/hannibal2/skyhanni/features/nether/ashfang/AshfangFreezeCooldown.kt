@@ -51,5 +51,5 @@ object AshfangFreezeCooldown {
         event.move(2, "ashfang.freezeCooldownPos", "crimsonIsle.ashfang.freezeCooldownPos")
     }
 
-    private fun isEnabled() = AshfangManager.isAshfangActive() && config.freezeCooldown
+    private fun isEnabled() = AshfangManager.active && config.freezeCooldown
 }
