@@ -387,6 +387,13 @@ object CaptureFarmingGear {
         }
     }
 
+    fun onResetGearCommand() {
+        val storage = GardenAPI.storage?.fortune ?: return
+        ChatUtils.chat("Resets farming items")
+        storage.farmingItems.clear()
+        storage.outdatedItems.clear()
+    }
+
     @SubscribeEvent
     fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")

@@ -29,6 +29,9 @@ object DungeonBossAPI {
         F7_GOLDOR_5,
         F7_NECRON,
         M7_WITHER_KING,
+        ;
+
+        fun isCurrent(): Boolean = bossPhase == this
     }
 
     private val patternGroup = RepoPattern.group("dungeon.boss.message")
@@ -86,7 +89,7 @@ object DungeonBossAPI {
      * REGEX-TEST: §bmartimavocado§r§a completed a device! (§r§c3§r§a/8)
      * REGEX-TEST: §bmartimavocado§r§a activated a terminal! (§r§c4§r§a/7)
      */
-    private val goldorTerminalPattern by patternGroup.pattern(
+    val goldorTerminalPattern by patternGroup.pattern(
         "f7.goldor.terminalcomplete",
         "§.(?<playerName>\\w+)§r§a (?:activated|completed) a (?<type>lever|terminal|device)! \\(§r§c(?<currentTerminal>\\d)§r§a/(?<total>\\d)\\)",
     )
