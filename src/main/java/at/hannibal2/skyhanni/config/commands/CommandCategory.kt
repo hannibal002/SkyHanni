@@ -6,25 +6,30 @@ enum class CommandCategory(val color: String, val categoryName: String, val desc
         "Main Command",
         "Most useful commands of SkyHanni",
     ),
-    USERS_NORMAL(
+    USERS_ACTIVE(
         "§e",
         "Normal Command",
         "Normal Command for everyone to use",
+    ),
+    USERS_RESET(
+        "§e",
+        "Normal Reset Command",
+        "Normal Command that resents some data",
     ),
     USERS_BUG_FIX(
         "§f",
         "User Bug Fix",
         "A Command to fix small bugs",
     ),
-    DEVELOPER_CODING_HELP(
+    DEVELOPER_TEST(
         "§5",
-        "Developer Coding Help",
-        "A Command that can help with developing new features. §cIntended for developers only!",
+        "Developer Test Commands",
+        "A Command to edit/test/change some features. §cIntended for developers only!",
     ),
-    DEVELOPER_DEBUG_FEATURES(
+    DEVELOPER_DEBUG(
         "§9",
-        "Developer Debug Features",
-        "A Command that is useful for monitoring/debugging existing features. §cIntended for developers only!",
+        "Developer Debug Commands",
+        "A Command to debug/read/copy/monitor features. §cIntended for developers only!",
     ),
     INTERNAL(
         "§8",
