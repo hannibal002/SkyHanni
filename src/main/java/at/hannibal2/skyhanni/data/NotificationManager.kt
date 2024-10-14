@@ -1,5 +1,8 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.RegisterCommandsEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -71,6 +74,18 @@ object NotificationManager {
 
     fun queueNotification(notification: SkyHanniNotification) {
         notificationQueue.add(notification)
+    }
+
+    @HandleEvent
+    fun onRegisterCommands(event: RegisterCommandsEvent) {
+        event.register("shtestnotification") {
+            description = "Shows a test notification"
+            category = CommandCategory.DEVELOPER_TEST
+            callback {
+                val testingText = it.joinToString(" ").replace("\\n", "\n")
+                queueNotification(SkyHanniNotification(testingText, Duration.INFINITE))
+            }
+        }
     }
 }
 
