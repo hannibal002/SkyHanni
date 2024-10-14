@@ -374,6 +374,7 @@ object NEUItems {
     fun PrimitiveRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 
     fun neuHasFocus(): Boolean {
+        if (!PlatformUtils.isNeuLoaded()) return false
         if (AuctionSearchOverlay.shouldReplace()) return true
         if (BazaarSearchOverlay.shouldReplace()) return true
         // TODO add RecipeSearchOverlay via RecalculatingValue and reflection
