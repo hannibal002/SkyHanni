@@ -211,5 +211,5 @@ object PowderChestTimer {
 
     private fun IBlockState.isChest() = block is BlockChest
 
-    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland()
+    private fun isEnabled() = IslandType.CRYSTAL_HOLLOWS.isInIsland() && config.enabled
 }
