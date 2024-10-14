@@ -24,7 +24,6 @@ import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
-import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalGhosts
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -786,11 +785,6 @@ object Commands {
             description = "Sets the current skyblock island for testing purposes."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyBlockIslandTest.onCommand(it) }
-        }
-        event.register("shrecord") {
-            description = "terminal ghost"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { TerminalGhosts.command(it) }
         }
     }
 

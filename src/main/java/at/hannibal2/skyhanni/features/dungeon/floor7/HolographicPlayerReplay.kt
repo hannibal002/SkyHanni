@@ -19,29 +19,20 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 @SkyHanniModule
-object TerminalGhosts { //TODO: figure out sneaking
+object HolographicPlayerReplay {
     private var recording = false
-
     private val recordedPositions = mutableListOf<RecordedPosition>()
 
-    fun command(args: Array<String>) {
-        if (args.isEmpty()) return
-        when (args[0]) {
-            "true" -> startRecording()
-            "clear" -> recordedPositions.clear()
-            else -> stopRecording()
-        }
-    }
-
-    private fun startRecording() {
+    fun startRecording() {
         if (recording) return
         recordedPositions.clear()
         recording = true
     }
 
-    private fun stopRecording() {
-        if (!recording) return
+    fun stopRecording(): MutableList<RecordedPosition>? {
+        if (!recording) return null
         recording = false
+        return recordedPositions
     }
 
     @HandleEvent
@@ -63,26 +54,16 @@ object TerminalGhosts { //TODO: figure out sneaking
                 pitch,
                 limbSwing,
                 limbSwingAmount,
-                isSneaking
-            )
+                isSneaking,
+            ),
         )
     }
-
-    data class RecordedPosition(
-        val position: LorenzVec,
-        val yaw: Float,
-        val pitch: Float,
-        val limbSwing: Float,
-        val limbSwingAmount: Float,
-        val sneaking: Boolean
-    )
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
         if (recording || recordedPositions.isEmpty()) return
 
-        val realPlayer = Minecraft.getMinecraft().thePlayer
-        val fakePlayer = HolographicEntities.HolographicBase(EntityOtherPlayerMP(null, realPlayer.gameProfile))
+        val fakePlayer = EntityOtherPlayerMP(null, Minecraft.getMinecraft().thePlayer.gameProfile)
 
         val frameIndex = (Minecraft.getMinecraft().theWorld.totalWorldTime % recordedPositions.size).toInt()
         val recordedPosition = recordedPositions[frameIndex]
@@ -91,18 +72,33 @@ object TerminalGhosts { //TODO: figure out sneaking
 
         val interpolatedData = interpolateRecordedPosition(previousPosition, recordedPosition, event.partialTicks)
 
-        val instance = fakePlayer.instance(
+        fakePlayer.setPositionAndRotation(
+            interpolatedData.position.x,
+            interpolatedData.position.y,
+            interpolatedData.position.z,
+            interpolatedData.yaw,
+            interpolatedData.pitch
+        )
+        fakePlayer.limbSwing = interpolatedData.limbSwing
+        fakePlayer.limbSwingAmount = interpolatedData.limbSwingAmount
+        fakePlayer.isSneaking = interpolatedData.sneaking
+
+        val holographicPlayer = HolographicEntities.HolographicBase(fakePlayer)
+
+        val instance = holographicPlayer.instance(
             interpolatedData.position,
-            -interpolatedData.yaw + 360f
+            -interpolatedData.yaw + 360f,
         )
 
-        event.drawString(interpolatedData.position.add(y = 2.35), "sneaking: ${recordedPosition.sneaking}")
+        val stringLocation = interpolatedData.position.add(y = 2.35)
+        event.drawString(stringLocation, "sneaking: ${recordedPosition.sneaking}")
         newRenderHolographicEntity(
             instance,
             event.partialTicks,
             interpolatedData.limbSwing,
             interpolatedData.limbSwingAmount,
-            interpolatedData.pitch
+            interpolatedData.pitch,
+            fakePlayer,
         )
     }
 
@@ -118,7 +114,7 @@ object TerminalGhosts { //TODO: figure out sneaking
             interpolatedPitch,
             interpolatedLimbSwing,
             interpolatedLimbSwingAmount,
-            last.sneaking
+            last.sneaking,
         )
     }
 
@@ -149,7 +145,8 @@ object TerminalGhosts { //TODO: figure out sneaking
         partialTicks: Float,
         limbSwing: Float = 0F,
         limbSwingAmount: Float = 0F,
-        headPitch: Float = 0F
+        headPitch: Float = 0F,
+        fakePlayer: EntityOtherPlayerMP,
     ) {
         val renderManager = Minecraft.getMinecraft().renderManager
         val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(holographicEntity.entity)
@@ -180,8 +177,29 @@ object TerminalGhosts { //TODO: figure out sneaking
         GlStateManager.alphaFunc(GL11.GL_GREATER, 1 / 255F)
 
         GlStateManager.enableTexture2D()
+
         GlStateManager.rotate(netHeadYaw + 180f, 0f, 1f, 0f) //correct looking fowards
         renderer.mainModel.isChild = false
+//         renderer.mainModel.setRotationAngles(
+//             limbSwing,
+//             limbSwingAmount,
+//             ageInTicks,
+//             netHeadYaw,
+//             headPitch,
+//             scaleFactor,
+//             fakePlayer
+//         )
+//
+//         renderer.mainModel.setLivingAnimations(
+//             fakePlayer,
+//             limbSwing,
+//             limbSwingAmount,
+//             partialTicks
+//         )
+
+        val offset = 0.1f
+        GlStateManager.translate(0f, offset, 0f)
+
         renderer.mainModel.render(
             holographicEntity.entity,
             limbSwing,
@@ -191,6 +209,8 @@ object TerminalGhosts { //TODO: figure out sneaking
             headPitch,
             scaleFactor
         )
+
+
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f)
         GlStateManager.color(1f, 1f, 1f, 1f)
         GlStateManager.depthMask(true)
@@ -198,3 +218,12 @@ object TerminalGhosts { //TODO: figure out sneaking
         GlStateManager.popMatrix()
     }
 }
+
+data class RecordedPosition(
+    val position: LorenzVec,
+    val yaw: Float,
+    val pitch: Float,
+    val limbSwing: Float,
+    val limbSwingAmount: Float,
+    val sneaking: Boolean,
+)
