@@ -589,6 +589,7 @@ object PetAPI {
 
     fun PetData?.arePetsEqual(pet2: PetData?): Boolean {
         return this?.internalName == pet2?.internalName &&
+            this?.cleanName == this?.cleanName &&
             this?.rarity == this?.rarity &&
             this?.petItem == this?.petItem &&
             this?.hasSkin == this?.hasSkin &&
