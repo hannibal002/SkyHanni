@@ -565,7 +565,7 @@ private fun getDateDisplayPair() =
 
 private fun getTimeDisplayPair(): List<ScoreboardElementType> {
     val symbol =
-        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol") ?: ""
+        getGroupFromPattern(ScoreboardData.sidebarLinesFormatted, ScoreboardPattern.timePattern, "symbol").orEmpty()
     return listOf(
         "§7" + SkyBlockTime.now()
             .formatted(
@@ -580,7 +580,7 @@ private fun getTimeDisplayPair(): List<ScoreboardElementType> {
 
 private fun getLobbyDisplayPair(): List<ScoreboardElementType> {
     val lobbyCode = HypixelData.serverId
-    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" } ?: ""
+    val roomId = DungeonAPI.getRoomID()?.let { "§8$it" }.orEmpty()
     val lobbyDisplay = lobbyCode?.let { "§8$it $roomId" } ?: "<hidden>"
     return listOf(lobbyDisplay to HorizontalAlignment.LEFT)
 }
@@ -633,10 +633,10 @@ private fun getTuningDisplayPair(): List<Pair<String, HorizontalAlignment>> {
                     } else {
                         "$name: $color$value$icon"
                     }
-                }
+                } to HorizontalAlignment.LEFT
+            }
 
-            }.toTypedArray()
-        listOf("$title:", *tuning).map { it to HorizontalAlignment.LEFT }
+        listOf("$title:" to HorizontalAlignment.LEFT) + tuning
     }
 }
 
@@ -827,11 +827,8 @@ private fun getPartyDisplayPair() =
             if (PartyAPI.partyMembers.isEmpty()) "§9§lParty" else "§9§lParty (${PartyAPI.partyMembers.size})"
         val partyList = PartyAPI.partyMembers
             .take(partyConfig.maxPartyList.get())
-            .map {
-                " §7- §f$it"
-            }
-            .toTypedArray()
-        listOf(title, *partyList).map { it to HorizontalAlignment.LEFT }
+            .map { " §7- §f$it" to HorizontalAlignment.LEFT }
+        listOf(title to HorizontalAlignment.LEFT) + partyList
     }
 
 private fun getPartyShowWhen() = if (DungeonAPI.inDungeon()) {
@@ -855,8 +852,8 @@ private fun getExtraDisplayPair(): List<ScoreboardElementType> {
     val lines = recentUnknownLines()
     if (lines.isEmpty()) return listOf("<hidden>" to HorizontalAlignment.LEFT)
 
-    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + lines.map { 
-      it.line to HorizontalAlignment.LEFT 
+    return listOf("§cUndetected Lines:" to HorizontalAlignment.LEFT) + lines.map {
+        it.line to HorizontalAlignment.LEFT
     }
 }
 

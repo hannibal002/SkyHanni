@@ -512,7 +512,7 @@ object EstimatedItemValueCalculator {
 
             }
             for ((id, _) in tiers.sorted()) {
-                val prices = EssenceItemUtils.itemPrices[id] ?: emptyMap()
+                val prices = EssenceItemUtils.itemPrices[id].orEmpty()
                 maxStars += prices.size
                 if (remainingStars <= 0) continue
 

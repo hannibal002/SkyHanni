@@ -366,10 +366,6 @@ detekt {
 }
 
 tasks.withType<Detekt>().configureEach {
-    onlyIf {
-        false // TODO: Remove onlyIf when we're ready to enforce
-    }
-
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins

@@ -105,9 +105,10 @@ import at.hannibal2.skyhanni.utils.chat.ChatClickActionManager
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGui
 
 @SkyHanniModule
+@Suppress("LargeClass", "LongMethod")
 object Commands {
 
-    val commands = mutableListOf<CommandBuilder>()
+    val commandList = mutableListOf<CommandBuilder>()
 
     @HandleEvent
     fun registerCommands(event: RegisterCommandsEvent) {
@@ -298,6 +299,7 @@ object Commands {
         event.register("shcolors") {
             description = "Prints a list of all Minecraft color & formatting codes in chat."
             category = CommandCategory.USERS_ACTIVE
+            @Suppress("AvoidBritishSpelling")
             aliases = listOf("shcolor", "shcolours", "shcolour")
             callback { ColorFormattingHelper.printColorCodeList() }
         }
