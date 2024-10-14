@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
-import at.hannibal2.skyhanni.config.commands.RegisterCommandsEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -77,7 +77,7 @@ object NotificationManager {
     }
 
     @HandleEvent
-    fun onRegisterCommands(event: RegisterCommandsEvent) {
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shtestnotification") {
             description = "Shows a test notification"
             category = CommandCategory.DEVELOPER_TEST
