@@ -27,7 +27,7 @@ public class BarnTimerConfig {
         desc = "Show the Barn Fishing Timer whenever you fish up a sea creature, regardless of location."
     )
     @ConfigEditorBoolean
-    public Property<Boolean> showAnywhere = Property.of(true);
+    public Property<Boolean> showAnywhere = Property.of(false);
 
     @Expose
     @ConfigOption(
