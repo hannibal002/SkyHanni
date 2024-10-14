@@ -33,9 +33,9 @@ import java.util.List;
 
 
 public class Features extends Config {
-    public static final MyResourceLocation DISCORD = new MyResourceLocation("notenoughupdates", "social/discord.png");
-    public static final MyResourceLocation GITHUB = new MyResourceLocation("notenoughupdates", "social/github.png");
-    public static final MyResourceLocation PATREON = new MyResourceLocation("notenoughupdates", "social/patreon.png");
+    public static final MyResourceLocation DISCORD = new MyResourceLocation("skyhanni", "social/discord.png");
+    public static final MyResourceLocation GITHUB = new MyResourceLocation("skyhanni", "social/github.png");
+    public static final MyResourceLocation PATREON = new MyResourceLocation("skyhanni", "social/patreon.png");
 
     @Override
     public boolean shouldAutoFocusSearchbar() {
