@@ -94,13 +94,13 @@ object ChatUtils {
 
         return if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(message))
-            true
+            chat(text, false)
         } else {
             chat(text)
         }
     }
 
-    fun chat(message: IChatComponent): Boolean {
+    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
         val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
@@ -116,7 +116,7 @@ object ChatUtils {
             return false
         }
 
-        thePlayer.addChatMessage(message)
+        if (send) thePlayer.addChatMessage(message)
         return true
     }
 
