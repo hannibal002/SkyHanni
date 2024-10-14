@@ -92,12 +92,12 @@ object ChatUtils {
     ): Boolean {
         val text = ChatComponentText(message)
 
-        if (replaceSameMessage) {
+        return if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(message))
+            true
         } else {
             chat(text)
         }
-        return chat(text)
     }
 
     fun chat(message: IChatComponent): Boolean {
