@@ -28,6 +28,9 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
         - In IntelliJ, go to `new` → `project from version control`.
         - Select `SkyHanni` from the list.
         - Open the project.
+        - Click the beta dropdown at the top of IntelliJ
+        - Click new branch
+        - Give the branch a name relating to the changes you plan to make
 
 ### Setting up IntelliJ
 
