@@ -28,9 +28,6 @@ We use [IntelliJ](https://www.jetbrains.com/idea/) as an example.
         - In IntelliJ, go to `new` → `project from version control`.
         - Select `SkyHanni` from the list.
         - Open the project.
-        - Click the beta dropdown at the top of IntelliJ
-        - Click new branch
-        - Give the branch a name relating to the changes you plan to make
 
 ### Setting up IntelliJ
 
@@ -88,7 +85,12 @@ out [their guide](https://github.com/NotEnoughUpdates/NotEnoughUpdates/blob/mast
 
 If you are not very familiar with git, you might want to try this out: https://learngitbranching.js.org/.
 
-_An explanation how to use intellij and branches will follow here soon._
+Proposed changes are better off being in their own branch, you can do this by doing the following from within IntelliJ with the SkyHanni project already open.
+- Click the beta dropdown at the top of IntelliJ
+- Click new branch
+- Give the branch a name relating to the changes you plan to make
+
+_A more in depth explanation how to use intellij and branches will follow here soon._
 
 Please use a prefix for the name of the PR (E.g. Feature, Improvement, Fix, Backend, ...).
 
