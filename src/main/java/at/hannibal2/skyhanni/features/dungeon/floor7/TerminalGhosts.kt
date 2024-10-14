@@ -180,14 +180,13 @@ object TerminalGhosts { //TODO: figure out sneaking
         GlStateManager.alphaFunc(GL11.GL_GREATER, 1 / 255F)
 
         GlStateManager.enableTexture2D()
-        GlStateManager.rotate(netHeadYaw, 0f, 1f, 0f) //correct looking fowards
         renderer.mainModel.isChild = false
         renderer.mainModel.render(
             holographicEntity.entity,
             limbSwing,
             limbSwingAmount,
             ageInTicks,
-            180f,
+            netHeadYaw + 180f, //correct looking fowards
             headPitch,
             scaleFactor
         )
