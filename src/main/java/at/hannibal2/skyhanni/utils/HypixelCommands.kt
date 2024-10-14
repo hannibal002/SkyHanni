@@ -158,6 +158,10 @@ object HypixelCommands {
         send("cb $uuid")
     }
 
+    fun locraw() {
+        send("locraw")
+    }
+
     private fun send(command: String) {
         @Suppress("DEPRECATION")
         // TODO rename function
