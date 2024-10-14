@@ -180,7 +180,7 @@ object FishingTimer {
             else -> false
         }
         
-        if (config.showAnywhere == true) {
+        if (config.showAnywhere) {
             rightLocation = true
         }
     }
