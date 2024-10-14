@@ -41,7 +41,7 @@ object PetAPI {
         "Pets(?: \\(\\d+/\\d+\\) )?",
     )
 
-    private var pet: PetData? = null
+    var pet: PetData? = null
     private var inPetMenu = false
 
     private var xpLeveling: List<Int> = listOf()
@@ -268,6 +268,7 @@ object PetAPI {
 
             val newPet = PetData(
                 petNametoInternalName(petName, rarity),
+                petName,
                 rarity,
                 petItem,
                 group("skin") != null,
@@ -350,6 +351,7 @@ object PetAPI {
 
             val newPet = PetData(
                 petNametoInternalName(petName, rarity),
+                petName,
                 rarity,
                 petItem,
                 hasSkin,
@@ -412,17 +414,18 @@ object PetAPI {
     }
 
     private fun getPetDataFromItem(item: ItemStack) {
-        val (_, rarity, petItem, _, _, petXP, _) = parsePetNBT(item.extraAttributes)
-        val (name, _, _, hasSkin, level, _, skin) = parsePetName(item.displayName)
+        val (_, _, rarity, petItem, _, _, petXP, _) = parsePetNBT(item.extraAttributes)
+        val (internalName, name, _, _, hasSkin, level, _, skin) = parsePetName(item.displayName)
 
         val newPet = PetData(
+            internalName,
             name,
             rarity,
             petItem,
             hasSkin,
             level,
             petXP,
-            "§r§7[Lvl $level] §r${rarity.chatColorCode}$name${if (skin != "") "§r${skin}" else ""}",
+            "§r§7[Lvl $level] §r${rarity.chatColorCode}$internalName${if (skin != "") "§r${skin}" else ""}",
         )
         fireEvent(newPet)
     }
@@ -436,6 +439,7 @@ object PetAPI {
 
         return PetData(
             NEUInternalName.NONE,
+            "",
             LorenzRarity.getByName(petInfo.tier) ?: LorenzRarity.ULTIMATE,
             petInfo.heldItem?.asInternalName() ?: NEUInternalName.NONE,
             petInfo.skin != null,
@@ -460,6 +464,7 @@ object PetAPI {
 
         return PetData(
             petNametoInternalName(name, rarity),
+            name,
             rarity,
             NEUInternalName.NONE,
             skin != "",
@@ -545,7 +550,7 @@ object PetAPI {
         event.title("PetAPI")
         if (pet != null) {
             event.addIrrelevant {
-                add("petName: '${pet?.name}'")
+                add("petName: '${pet?.internalName}'")
                 add("petRarity: '${pet?.rarity}'")
                 add("petItem: '${pet?.petItem}'")
                 add("petHasSkin: '${pet?.hasSkin}'")
@@ -583,7 +588,7 @@ object PetAPI {
     }
 
     fun PetData?.arePetsEqual(pet2: PetData?): Boolean {
-        return this?.name == pet2?.name &&
+        return this?.internalName == pet2?.internalName &&
             this?.rarity == this?.rarity &&
             this?.petItem == this?.petItem &&
             this?.hasSkin == this?.hasSkin &&

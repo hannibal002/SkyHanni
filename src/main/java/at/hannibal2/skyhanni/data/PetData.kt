@@ -4,7 +4,8 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 
 data class PetData(
-    val name: NEUInternalName,
+    val internalName: NEUInternalName,
+    val cleanName: String,
     val rarity: LorenzRarity,
     val petItem: NEUInternalName,
     val hasSkin: Boolean,
