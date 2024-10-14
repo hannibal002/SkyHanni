@@ -35,7 +35,6 @@ import kotlin.time.Duration.Companion.minutes
 class RepoManager(private val configLocation: File) {
 
     private val gson get() = ConfigManager.gson
-    private var latestRepoCommit: String? = null
     val repoLocation: File = File(configLocation, "repo")
     private var error = false
     private var lastRepoUpdate = SimpleTimeMark.now()
@@ -92,8 +91,8 @@ class RepoManager(private val configLocation: File) {
     private fun fetchRepository(command: Boolean): CompletableFuture<Boolean> {
         return CompletableFuture.supplyAsync {
             try {
-                val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
-                latestRepoCommit = null
+                val currentDownloadedCommit = readCurrentCommit()
+                var latestRepoCommit: String? = null
                 try {
                     InputStreamReader(URL(getCommitApiUrl()).openStream())
                         .use { inReader ->
@@ -105,7 +104,7 @@ class RepoManager(private val configLocation: File) {
                         e,
                         "Error while loading data from repo",
                         "command" to command,
-                        "currentCommitJSON" to currentCommitJSON,
+                        "currentDownloadedCommit" to currentDownloadedCommit,
                     )
                 }
                 if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) {
@@ -114,7 +113,6 @@ class RepoManager(private val configLocation: File) {
                 }
                 val file = File(configLocation, "repo")
                 if (file.exists() &&
-                    currentCommitJSON?.get("sha")?.asString == latestRepoCommit &&
                     unsuccessfulConstants.isEmpty() &&
                     lastRepoUpdate.passedSince() < 1.minutes
                 ) {
@@ -158,7 +156,7 @@ class RepoManager(private val configLocation: File) {
                     itemsZip.absolutePath,
                     repoLocation.absolutePath,
                 )
-                if (currentCommitJSON == null || currentCommitJSON["sha"].asString != latestRepoCommit) {
+                if (currentDownloadedCommit == null || currentDownloadedCommit != latestRepoCommit) {
                     writeCurrentCommit(latestRepoCommit)
                 }
             } catch (e: Exception) {
@@ -220,6 +218,11 @@ class RepoManager(private val configLocation: File) {
         }
     }
 
+    private fun readCurrentCommit(): String? {
+        val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
+        return currentCommitJSON?.get("sha")?.asString
+    }
+
     @SubscribeEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Repo Status")
@@ -255,6 +258,7 @@ class RepoManager(private val configLocation: File) {
                         ).asComponent(),
                 )
                 text.add("§7Repo Auto Update Value: §c${config.repoAutoUpdate}".asComponent())
+                text.add("§7Backup Repo Value: §c${usingBackupRepo}".asComponent())
                 text.add("§7If you have Repo Auto Update turned off, please try turning that on.".asComponent())
                 text.add("§cUnsuccessful Constants §7(${unsuccessfulConstants.size}):".asComponent())
 
@@ -265,11 +269,12 @@ class RepoManager(private val configLocation: File) {
             }
             return
         }
+        val currentCommit = readCurrentCommit()
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            ChatUtils.chat("Repo working fine! Commit hash: $latestRepoCommit", prefixColor = "§a")
+            ChatUtils.chat("Repo working fine! Commit hash: $currentCommit", prefixColor = "§a")
             return
         }
-        ChatUtils.chat("Repo has errors! Commit has: ${latestRepoCommit ?: "null"}", prefixColor = "§c")
+        ChatUtils.chat("Repo has errors! Commit hash: $currentCommit", prefixColor = "§c")
         if (successfulConstants.isNotEmpty()) ChatUtils.chat(
             "Successful Constants §7(${successfulConstants.size}):",
             prefixColor = "§a",
