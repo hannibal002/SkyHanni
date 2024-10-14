@@ -366,6 +366,10 @@ detekt {
 }
 
 tasks.withType<Detekt>().configureEach {
+    onlyIf {
+        System.getenv("SKIP_DETEKT") != "true"
+    }
+
     reports {
         html.required.set(true) // observe findings in your browser with structure and code snippets
         xml.required.set(true) // checkstyle like format mainly for integrations like Jenkins
