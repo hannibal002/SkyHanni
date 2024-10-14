@@ -179,6 +179,10 @@ object FishingTimer {
             IslandType.PRIVATE_ISLAND -> config.forStranded.get() && LorenzUtils.isStrandedProfile
             else -> false
         }
+        
+        if (config.showAnywhere.get() == true) {
+            rightLocation = true
+        }
     }
 
     @SubscribeEvent
