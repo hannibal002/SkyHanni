@@ -181,6 +181,7 @@ object TerminalGhosts { //TODO: figure out sneaking
 
         GlStateManager.enableTexture2D()
         GlStateManager.rotate(netHeadYaw, 0f, 1f, 0f) //correct looking fowards
+        renderer.mainModel.isChild = false
         renderer.mainModel.render(
             holographicEntity.entity,
             limbSwing,
