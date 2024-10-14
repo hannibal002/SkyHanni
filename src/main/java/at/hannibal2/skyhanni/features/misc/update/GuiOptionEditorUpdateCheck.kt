@@ -68,7 +68,10 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
 
     override fun mouseInput(x: Int, y: Int, width: Int, mouseX: Int, mouseY: Int): Boolean {
         val adjustedWidth = width - 20
-        if (Mouse.getEventButtonState() && (mouseX - getButtonPosition(adjustedWidth) - x) in (0..button.width) && (mouseY - 10 - y) in (0..button.height)) {
+        if (Mouse.getEventButtonState() &&
+            (mouseX - getButtonPosition(adjustedWidth) - x) in (0..button.width) &&
+            (mouseY - 10 - y) in (0..button.height)
+        ) {
             when (UpdateManager.updateState) {
                 UpdateManager.UpdateState.AVAILABLE -> UpdateManager.queueUpdate()
                 UpdateManager.UpdateState.QUEUED -> {}
