@@ -19,7 +19,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
 @SkyHanniModule
-object TerminalGhosts {
+object TerminalGhosts { //TODO: figure out sneaking
     private var recording = false
 
     private val recordedPositions = mutableListOf<RecordedPosition>()
