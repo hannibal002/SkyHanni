@@ -158,6 +158,14 @@ object HypixelCommands {
         send("cb $uuid")
     }
 
+    fun pickupStash() {
+        send("pickupstash")
+    }
+
+    fun viewStash(type: String) {
+        send("viewstash $type")
+    }
+
     fun locraw() {
         send("locraw")
     }

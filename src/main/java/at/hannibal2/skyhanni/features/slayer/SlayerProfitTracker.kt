@@ -246,7 +246,7 @@ object SlayerProfitTracker {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    fun clearProfitCommand(args: Array<String>) {
+    fun resetCommand() {
         if (itemLogCategory == "") {
             ChatUtils.userError(
                 "No current slayer data found! " +

@@ -29,6 +29,7 @@ object ChatFilter {
 
     // <editor-fold desc="Regex Patterns & Messages">
     // Lobby Messages
+    @Suppress("MaxLineLength")
     private val lobbyPatterns = listOf(
         // player join
         "(?: §b>§c>§a>§r §r)?.* §6(?:joined|(?:spooked|slid) into) the lobby!(?:§r §a<§c<§b<)?".toPattern(),
@@ -159,6 +160,7 @@ object ChatFilter {
     )
 
     // Slayer Drop
+    @Suppress("MaxLineLength")
     private val slayerDropPatterns = listOf(
         // Zombie
         "§b§lRARE DROP! §r§7\\(§r§f§r§9Revenant Viscera§r§7\\) (.*)".toPattern(),
@@ -263,6 +265,7 @@ object ChatFilter {
     )
 
     // Annoying Spam
+    @Suppress("MaxLineLength")
     private val annoyingSpamPatterns = listOf(
         "§7Your Implosion hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
         "§7Your Molten Wave hit (.*) for §r§c(.*) §r§7damage.".toPattern(),
@@ -520,7 +523,7 @@ object ChatFilter {
      * @param message The message to check
      * @return The reason why the message was blocked, empty if not blocked
      */
-    @Suppress("CyclomaticComplexMethod")
+    @Suppress("CyclomaticComplexMethod", "MaxLineLength")
     private fun block(message: String): String? = when {
         config.hypixelHub && message.isPresent("lobby") -> "lobby"
         config.empty && StringUtils.isEmpty(message) -> "empty"
