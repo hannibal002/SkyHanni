@@ -111,7 +111,7 @@ object Commands {
     val commands = mutableListOf<CommandBuilder>()
 
     @HandleEvent
-    fun registerCommands(event: RegisterCommandsEvent) {
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
         usersMain(event)
         usersNormal(event)
         usersNormalReset(event)
@@ -122,7 +122,7 @@ object Commands {
         shortenedCommands(event)
     }
 
-    private fun usersMain(event: RegisterCommandsEvent) {
+    private fun usersMain(event: CommandRegistrationEvent) {
         event.register("sh") {
             aliases = listOf("skyhanni")
             description = "Opens the main SkyHanni config"
@@ -168,7 +168,7 @@ object Commands {
     }
 
     @Suppress("LongMethod")
-    private fun usersNormal(event: RegisterCommandsEvent) {
+    private fun usersNormal(event: CommandRegistrationEvent) {
         event.register("shimportghostcounterdata") {
             description = "Manually importing the ghost counter data from GhostCounterV3"
             category = CommandCategory.USERS_ACTIVE
@@ -309,7 +309,7 @@ object Commands {
         }
     }
 
-    private fun usersNormalReset(event: RegisterCommandsEvent) {
+    private fun usersNormalReset(event: CommandRegistrationEvent) {
 
         // Trackers
         event.register("shresetslayerprofits") {
@@ -451,7 +451,7 @@ object Commands {
         }
     }
 
-    private fun usersBugFix(event: RegisterCommandsEvent) {
+    private fun usersBugFix(event: CommandRegistrationEvent) {
         event.register("shupdaterepo") {
             description = "Download the SkyHanni repo again"
             category = CommandCategory.USERS_BUG_FIX
@@ -509,7 +509,7 @@ object Commands {
         }
     }
 
-    private fun devDebug(event: RegisterCommandsEvent) {
+    private fun devDebug(event: CommandRegistrationEvent) {
         event.register("shdebug") {
             description = "Copies SkyHanni debug data in the clipboard."
             category = CommandCategory.DEVELOPER_DEBUG
@@ -641,7 +641,7 @@ object Commands {
     }
 
     @Suppress("LongMethod")
-    private fun devTest(event: RegisterCommandsEvent) {
+    private fun devTest(event: CommandRegistrationEvent) {
         event.register("shtest") {
             description = "Unused test command."
             category = CommandCategory.DEVELOPER_TEST
@@ -792,7 +792,7 @@ object Commands {
         }
     }
 
-    private fun internalCommands(event: RegisterCommandsEvent) {
+    private fun internalCommands(event: CommandRegistrationEvent) {
         event.register("shaction") {
             description = "Internal command for chat click actions"
             category = CommandCategory.INTERNAL
@@ -800,7 +800,7 @@ object Commands {
         }
     }
 
-    private fun shortenedCommands(event: RegisterCommandsEvent) {
+    private fun shortenedCommands(event: CommandRegistrationEvent) {
         event.register("pko") {
             description = "Kicks offline party members"
             category = CommandCategory.SHORTENED_COMMANDS
