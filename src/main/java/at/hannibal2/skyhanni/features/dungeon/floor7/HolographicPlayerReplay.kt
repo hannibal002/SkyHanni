@@ -1,15 +1,19 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
+import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
+import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicEntity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.renderer.GlStateManager
@@ -21,54 +25,124 @@ import org.lwjgl.opengl.GL11
 @SkyHanniModule
 object HolographicPlayerReplay {
     private var recording = false
-    private val recordedPositions = mutableListOf<RecordedPosition>()
+    private var recordedPositions = mutableListOf<RecordedPosition>()
 
-    fun startRecording() {
+    private var recordedTime = SimpleTimeMark.farPast()
+    private var bestTime = Int.MAX_VALUE
+
+    private var bestPositions = listOf<RecordedPosition>()
+
+    private var playing = false
+    private var playIndex = 0
+
+    @SubscribeEvent
+    fun onBossStart(event: DungeonBossRoomEnterEvent) {
+        if (DungeonAPI.dungeonFloor?.contains("3") == false) return
+
+        startRecording()
+        if (bestPositions.isNotEmpty()) {
+            playIndex = 0
+            playing = true
+        }
+    }
+
+    @SubscribeEvent
+    fun onBossEnd(event: DungeonCompleteEvent) {
+        if (DungeonAPI.dungeonFloor?.contains("3") == false) return
+
+        stopRecording()
+        if (playing) {
+            playing = false
+            playIndex = 0
+        }
+    }
+
+    fun command(strings: Array<String>) {
+        when {
+            strings.any { it.contains("clear", ignoreCase = true) } -> {
+                recording = false
+                recordedPositions.clear()
+                recordedTime = SimpleTimeMark.farPast()
+                bestTime = 0
+                bestPositions = listOf()
+                ChatUtils.chat("cleared!")
+                return
+            }
+            strings.any { it.contains("play", ignoreCase = true) } -> {
+                playIndex = 0
+                playing = true
+                ChatUtils.chat("playing")
+                return
+            }
+            else -> {
+                if (!recording) startRecording()
+                else stopRecording()
+                return
+            }
+        }
+    }
+
+    private fun startRecording() {
         if (recording) return
+        ChatUtils.chat("recording")
         recordedPositions.clear()
         recording = true
     }
 
-    fun stopRecording(): MutableList<RecordedPosition>? {
-        if (!recording) return null
+    private fun stopRecording() {
+        if (!recording) return
+        ChatUtils.chat("stopped recording")
         recording = false
-        return recordedPositions
+        attemptSave(recordedPositions, recordedTime.passedSince().inWholeSeconds)
+        recordedPositions.clear()
+        recordedTime = SimpleTimeMark.farPast()
     }
 
-    @HandleEvent
-    fun onPacket(event: PacketSentEvent) {
-        if (!recording) return
+    private fun attemptSave(positions: List<RecordedPosition>, time: Long) {
+        if (time < bestTime) {
+            ChatUtils.chat("new pb!")
+            bestTime = time.toInt()
+            bestPositions = positions.map { it.copy() }
+        }
+    }
 
-        val player = Minecraft.getMinecraft().thePlayer
-        val position = LorenzVec(player.posX, player.posY, player.posZ)
-        val rotation = player.rotationYaw
-        val pitch = player.rotationPitch
-        val limbSwing = player.limbSwing
-        val limbSwingAmount = player.limbSwingAmount
-        val isSneaking = player.isSneaking
+    @SubscribeEvent
+    fun onTick(event: LorenzTickEvent) {
+        if (recording) {
+            val player = Minecraft.getMinecraft().thePlayer
+            val position = LorenzVec(player.posX, player.posY, player.posZ)
+            val rotation = player.rotationYaw
+            val pitch = player.rotationPitch
+            val limbSwing = player.limbSwing
+            val limbSwingAmount = player.limbSwingAmount
+            val isSneaking = player.isSneaking
 
-        recordedPositions.add(
-            RecordedPosition(
-                position,
-                rotation,
-                pitch,
-                limbSwing,
-                limbSwingAmount,
-                isSneaking,
-            ),
-        )
+            recordedPositions.add(
+                RecordedPosition(
+                    position,
+                    rotation,
+                    pitch,
+                    limbSwing,
+                    limbSwingAmount,
+                    isSneaking,
+                ),
+            )
+        }
+        if (playing) {
+            playIndex += 1
+        }
     }
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
-        if (recording || recordedPositions.isEmpty()) return
+        if (!playing || bestPositions.isEmpty()) return
 
         val fakePlayer = EntityOtherPlayerMP(null, Minecraft.getMinecraft().thePlayer.gameProfile)
 
-        val frameIndex = (Minecraft.getMinecraft().theWorld.totalWorldTime % recordedPositions.size).toInt()
-        val recordedPosition = recordedPositions[frameIndex]
-        val previousFrameIndex = if (frameIndex == 0) recordedPositions.size - 1 else frameIndex - 1
-        val previousPosition = recordedPositions[previousFrameIndex]
+
+        val index = if (playIndex < bestPositions.size) playIndex else bestPositions.size - 1
+        val recordedPosition = bestPositions[index]
+        val previousPosition = bestPositions[if (index == 0) 0 else index - 1]
 
         val interpolatedData = interpolateRecordedPosition(previousPosition, recordedPosition, event.partialTicks)
 
