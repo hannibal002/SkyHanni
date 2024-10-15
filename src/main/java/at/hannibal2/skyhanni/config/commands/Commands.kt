@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.data.ChatManager
 import at.hannibal2.skyhanni.data.GardenCropMilestonesCommunityFix
 import at.hannibal2.skyhanni.data.PartyAPI
-import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.data.TitleManager
@@ -784,11 +783,6 @@ object Commands {
             description = "Sets the current skyblock island for testing purposes."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyBlockIslandTest.onCommand(it) }
-        }
-        event.register("shcalcpetxp") {
-            description = "Gets the pet xp from a given level and rarity."
-            category = CommandCategory.DEVELOPER_TEST
-            callback { PetAPI.testLevelToXP(it) }
         }
     }
 
