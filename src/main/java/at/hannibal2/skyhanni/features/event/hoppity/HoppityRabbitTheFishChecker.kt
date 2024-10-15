@@ -40,7 +40,7 @@ object HoppityRabbitTheFishChecker {
     )
 
     /**
-     *
+     * REGEX-TEST: Click to open Chocolate Factory!
      */
     private val openCfSlotLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.mealegg.continue",
