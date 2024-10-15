@@ -119,6 +119,7 @@ public class MiscConfig {
     @Accordion
     public DraconicSacrificeTrackerConfig draconicSacrificeTracker = new DraconicSacrificeTrackerConfig();
 
+    @Expose
     @ConfigOption(name = "Reminders", desc = "")
     @Accordion
     public RemindersConfig reminders = new RemindersConfig();
