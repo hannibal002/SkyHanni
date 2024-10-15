@@ -129,6 +129,7 @@ object HoppityAPI {
                 lastName = "§6El Dorado"
                 lastMeal = STRAY
                 duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
+                attemptFireRabbitFound()
             }
         }
     }
