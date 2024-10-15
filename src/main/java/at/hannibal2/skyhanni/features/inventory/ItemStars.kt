@@ -11,7 +11,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -21,14 +23,27 @@ object ItemStars {
 
     private val config get() = SkyHanniMod.feature.inventory
 
+    private val repoGroup = RepoPattern.group("inventory.itemstars")
+
+    /**
+     * REGEX-TEST: §6Ancient Terror Leggings §d✪✪§6✪✪✪
+     * REGEX-TEST: §dRenowned Burning Crimson Helmet §6✪✪✪✪✪
+     */
+    private val starPattern by repoGroup.pattern(
+        "stars",
+        "^(?<name>.+) (?<stars>(?:(?:§.)?✪)+)"
+    )
+
     @SubscribeEvent(priority = EventPriority.LOW)
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
         if (stack.stackSize != 1) return
         val stars = stack.getStarCount() ?: return
-        val name = stack.name.substringBefore('✪').trim()
-        event.toolTip[0] = "$name §c$stars✪"
+        starPattern.findMatcher(stack.name) {
+            val name = group("name")
+            event.toolTip[0] = "$name §c$stars✪"
+        }
     }
 
     @SubscribeEvent
@@ -41,7 +56,7 @@ object ItemStars {
         event.stackTip = stars.toString()
     }
 
-    fun ItemStack.getStarCount(): Int? {
+    private fun ItemStack.getStarCount(): Int? {
         val internalName = getInternalNameOrNull() ?: return null
         val baseStars = getDungeonStarCount() ?: getStarCount() ?: return null
         if (internalName.isKuudraArmor()) {
