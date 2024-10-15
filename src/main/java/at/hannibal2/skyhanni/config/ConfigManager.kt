@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
@@ -8,7 +9,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.events.LorenzEvent
+import at.hannibal2.skyhanni.events.minecraft.LanguageChangeEvent
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -26,6 +29,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
+import net.minecraft.client.Minecraft
 import java.io.BufferedReader
 import java.io.BufferedWriter
 import java.io.File
@@ -62,6 +66,7 @@ class ConfigManager {
     private val jsonHolder: Map<ConfigFileType, Any> = EnumMap(ConfigFileType::class.java)
 
     lateinit var processor: MoulConfigProcessor<Features>
+    private var hasBeenInited = false
     private var disableSaving = false
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
@@ -88,16 +93,35 @@ class ConfigManager {
         }
 
         val features = SkyHanniMod.feature
-        processor = MoulConfigProcessor(SkyHanniMod.feature)
-        BuiltinMoulConfigGuis.addProcessors(processor)
-        UpdateManager.injectConfigProcessor(processor)
-        ConfigProcessorDriver(processor).processConfig(features)
+        recreateProcessor()
 
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
             if (LorenzEvent.isInGuardedEventHandler) throw e
         }
+        hasBeenInited = true
+    }
+
+    @SkyHanniModule
+    object LanguageManager {
+        @HandleEvent
+        fun onLanguageSwitch(event: LanguageChangeEvent) {
+            if (SkyHanniMod.configManager.hasBeenInited) {
+                SkyHanniMod.configManager.recreateProcessor()
+                ConfigGuiManager.editor = null
+            }
+        }
+    }
+
+    fun recreateProcessor() {
+        processor = MoulConfigProcessor(SkyHanniMod.feature)
+        BuiltinMoulConfigGuis.addProcessors(processor)
+        UpdateManager.injectConfigProcessor(processor)
+        ConfigProcessorDriver(
+            if (Minecraft.getMinecraft().languageManager.currentLanguage.languageCode.contains("gb", ignoreCase = true))
+                BritishSpellingWrapper(processor) else processor,
+        ).processConfig(SkyHanniMod.feature)
     }
 
     // Some position elements don't need config links as they don't have a config option.
@@ -153,7 +177,7 @@ class ConfigManager {
             println("")
             println(
                 "This crash is here to remind you to fix the missing " +
-                "@ConfigLink annotation over your new config position config element."
+                    "@ConfigLink annotation over your new config position config element.",
             )
             println("")
             println("Steps to fix:")

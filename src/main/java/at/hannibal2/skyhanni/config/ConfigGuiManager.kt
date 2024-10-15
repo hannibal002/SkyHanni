@@ -9,18 +9,38 @@ object ConfigGuiManager {
 
     var editor: MoulConfigEditor<Features>? = null
 
+
     private val replacedSearchTerms = mapOf(
         "color" to "colour",
+        "colour" to "color",
         "armor" to "armour",
+        "armour" to "armor",
         "endermen" to "enderman",
         "enderman" to "endermen",
         "hotkey" to "keybind",
-        "gray" to "grey"
+        "keybind" to "hotkey",
+        "gray" to "grey",
+        "grey" to "gray",
     )
+
+    private fun getPossibleAltWords(word: String): List<String> {
+        return buildList {
+            replacedSearchTerms.forEach { first, second ->
+                if (first.startsWith(word, ignoreCase = true)) {
+                    add(second)
+                }
+
+            }
+        }
+    }
 
     fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also {
         it.setSearchFunction { optionEditor, word ->
-            return@setSearchFunction optionEditor.fulfillsSearch(replacedSearchTerms[word] ?: word)
+            if (optionEditor.fulfillsSearch(word)) return@setSearchFunction true
+            getPossibleAltWords(word).forEach{
+                if (optionEditor.fulfillsSearch(it)) return@setSearchFunction true
+            }
+            return@setSearchFunction false
         }
         editor = it
     }
