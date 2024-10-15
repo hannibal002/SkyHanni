@@ -505,7 +505,11 @@ object HoppityCollectionStats {
 
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
 
-            if (!found) continue
+            if (!found) {
+                // if the config has wrong data, remove it
+                loggedRabbits.remove(itemName)
+                continue
+            }
 
             val duplicates = duplicatesFoundPattern.firstMatcher(itemLore) {
                 group("duplicates").formatInt()
@@ -516,9 +520,9 @@ object HoppityCollectionStats {
     }
 
     // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
-    fun clearSavedRabbits() {
+    fun resetSavedRabbits() {
         loggedRabbits.clear()
-        ChatUtils.chat("Cleared saved rabbit data.")
+        ChatUtils.chat("Reset saved rabbit data.")
     }
 
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)
