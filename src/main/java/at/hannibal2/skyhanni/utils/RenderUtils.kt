@@ -1208,7 +1208,6 @@ object RenderUtils {
         drawFilledBoundingBoxNea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
     }
 
-    @Suppress("ktlint:standard:function-naming")
     fun drawWireframeBoundingBoxNea(
         aabb: AxisAlignedBB,
         color: Color,
