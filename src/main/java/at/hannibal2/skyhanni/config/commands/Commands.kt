@@ -66,7 +66,6 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.minion.MinionFeatures
 import at.hannibal2.skyhanni.features.misc.CarryTracker
 import at.hannibal2.skyhanni.features.misc.CollectionTracker
-import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.features.misc.MarkedPlayerManager
 import at.hannibal2.skyhanni.features.misc.TpsCounter
@@ -167,6 +166,7 @@ object Commands {
         }
     }
 
+    @Suppress("LongMethod")
     private fun usersNormal(event: CommandRegistrationEvent) {
         event.register("shimportghostcounterdata") {
             description = "Manually importing the ghost counter data from GhostCounterV3"
@@ -207,7 +207,7 @@ object Commands {
         event.register("shcopytranslation") {
             description =
                 "Copy the translation of a message in another language to your clipboard.\n" +
-                "Uses a 2 letter language code that can be found at the end of a translation message."
+                    "Uses a 2 letter language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_ACTIVE
             callback { Translator.fromNativeLanguage(it) }
         }
@@ -395,12 +395,6 @@ object Commands {
             description = "Resets the Fossil Excavator Profit Tracker"
             category = CommandCategory.USERS_RESET
             callback { ExcavatorProfitTracker.resetCommand() }
-        }
-
-        event.register("shresetdraconicsacrificetracker") {
-            description = "Resets the Draconic Sacrifice Tracker."
-            category = CommandCategory.USERS_RESET
-            callback { DraconicSacrificeTracker.resetCommand() }
         }
 
         // non trackers
@@ -594,7 +588,7 @@ object Commands {
         event.register("shdebugscoreboard") {
             description =
                 "Monitors the scoreboard changes: " +
-                "Prints the raw scoreboard lines in the console after each update, with time since last update."
+                    "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback { ScoreboardData.toggleMonitor() }
         }
@@ -750,8 +744,8 @@ object Commands {
         event.register("shresetconfig") {
             description =
                 "Reloads the config manager and rendering processors of MoulConfig. " +
-                "This §cWILL RESET §7your config, but also updating the java config files " +
-                "(names, description, orderings and stuff)."
+                    "This §cWILL RESET §7your config, but also updating the java config files " +
+                    "(names, description, orderings and stuff)."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.resetConfigCommand() }
         }
@@ -789,7 +783,6 @@ object Commands {
             description = "Sets the current skyblock island for testing purposes."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyBlockIslandTest.onCommand(it) }
-
         }
     }
 
