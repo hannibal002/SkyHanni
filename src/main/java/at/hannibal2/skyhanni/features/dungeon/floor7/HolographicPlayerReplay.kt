@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicEntity
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
@@ -24,13 +24,14 @@ import org.lwjgl.opengl.GL11
 
 @SkyHanniModule
 object HolographicPlayerReplay {
+    val storage get() = ProfileStorageData.playerSpecific?.dungeonGhost
+
     private var recording = false
     private var recordedPositions = mutableListOf<RecordedPosition>()
 
-    private var recordedTime = SimpleTimeMark.farPast()
-    private var bestTime = Int.MAX_VALUE
+    private var currentRun: List<RecordedPosition>? = null
 
-    private var bestPositions = listOf<RecordedPosition>()
+    private var recordedTime = SimpleTimeMark.farPast()
 
     private var playing = false
     private var playIndex = 0
@@ -40,7 +41,11 @@ object HolographicPlayerReplay {
         if (DungeonAPI.dungeonFloor?.contains("3") == false) return
 
         startRecording()
-        if (bestPositions.isNotEmpty()) {
+        if (storage?.bestRun?.isNotEmpty() == true) {
+            currentRun = storage?.bestRun ?: run {
+                ChatUtils.chat("null storage")
+                return
+            }
             playIndex = 0
             playing = true
         }
@@ -63,12 +68,16 @@ object HolographicPlayerReplay {
                 recording = false
                 recordedPositions.clear()
                 recordedTime = SimpleTimeMark.farPast()
-                bestTime = 0
-                bestPositions = listOf()
+                storage?.bestTime = Long.MAX_VALUE
+                storage?.bestRun = listOf()
                 ChatUtils.chat("cleared!")
                 return
             }
             strings.any { it.contains("play", ignoreCase = true) } -> {
+                currentRun = storage?.bestRun ?: run {
+                    ChatUtils.chat("null storage")
+                    return
+                }
                 playIndex = 0
                 playing = true
                 ChatUtils.chat("playing")
@@ -86,6 +95,7 @@ object HolographicPlayerReplay {
         if (recording) return
         ChatUtils.chat("recording")
         recordedPositions.clear()
+        recordedTime = SimpleTimeMark.now()
         recording = true
     }
 
@@ -93,16 +103,18 @@ object HolographicPlayerReplay {
         if (!recording) return
         ChatUtils.chat("stopped recording")
         recording = false
-        attemptSave(recordedPositions, recordedTime.passedSince().inWholeSeconds)
+        attemptSave(recordedPositions, recordedTime.passedSince().inWholeMilliseconds)
         recordedPositions.clear()
         recordedTime = SimpleTimeMark.farPast()
     }
 
     private fun attemptSave(positions: List<RecordedPosition>, time: Long) {
-        if (time < bestTime) {
+        ChatUtils.chat("time: $time")
+        ChatUtils.chat("pb: ${storage?.bestTime}")
+        if (time < (storage?.bestTime ?: Long.MAX_VALUE)) {
             ChatUtils.chat("new pb!")
-            bestTime = time.toInt()
-            bestPositions = positions.map { it.copy() }
+            storage?.bestTime = time
+            storage?.bestRun = positions.map { it.copy() }
         }
     }
 
@@ -135,14 +147,17 @@ object HolographicPlayerReplay {
 
     @SubscribeEvent
     fun onRender(event: LorenzRenderWorldEvent) {
-        if (!playing || bestPositions.isEmpty()) return
+        if (!playing) return
+        if (currentRun == null || currentRun?.size == 0) return
+        val run = currentRun ?: return
 
         val fakePlayer = EntityOtherPlayerMP(null, Minecraft.getMinecraft().thePlayer.gameProfile)
 
+        val index = playIndex.coerceIn(run.indices)
+        val previousIndex = (playIndex - 1).coerceIn(run.indices)
 
-        val index = if (playIndex < bestPositions.size) playIndex else bestPositions.size - 1
-        val recordedPosition = bestPositions[index]
-        val previousPosition = bestPositions[if (index == 0) 0 else index - 1]
+        val recordedPosition = run[index]
+        val previousPosition = run[previousIndex]
 
         val interpolatedData = interpolateRecordedPosition(previousPosition, recordedPosition, event.partialTicks)
 
@@ -164,8 +179,8 @@ object HolographicPlayerReplay {
             -interpolatedData.yaw + 360f,
         )
 
-        val stringLocation = interpolatedData.position.add(y = 2.35)
-        event.drawString(stringLocation, "sneaking: ${recordedPosition.sneaking}")
+//         val stringLocation = interpolatedData.position.add(y = 2.35)
+//         event.drawString(stringLocation, "sneaking: ${recordedPosition.sneaking}")
         newRenderHolographicEntity(
             instance,
             event.partialTicks,

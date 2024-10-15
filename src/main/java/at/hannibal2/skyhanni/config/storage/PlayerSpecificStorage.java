@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.storage;
 
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal;
+import at.hannibal2.skyhanni.features.dungeon.floor7.RecordedPosition;
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder;
 import at.hannibal2.skyhanni.utils.GenericWrapper;
 import at.hannibal2.skyhanni.utils.NEUInternalName;
@@ -77,5 +78,17 @@ public class PlayerSpecificStorage {
 
         @Expose
         public float userLuck = 0f;
+    }
+
+    @Expose
+    public DungeonGhost dungeonGhost = new DungeonGhost();
+
+    public static class DungeonGhost {
+
+        @Expose
+        public long bestTime = Long.MAX_VALUE;
+
+        @Expose
+        public List<RecordedPosition> bestRun = new ArrayList<>();
     }
 }
