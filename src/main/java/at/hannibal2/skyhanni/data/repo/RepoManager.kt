@@ -229,10 +229,15 @@ class RepoManager(private val configLocation: File) {
 
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
             event.addIrrelevant("Repo working fine")
+            if (usingBackupRepo) {
+                event.addIrrelevant("Using backup repo")
+            }
             return
         }
 
         event.addData {
+            add("Using Backup Repo: $usingBackupRepo")
+
             add("Successful Constants (${successfulConstants.size}):")
 
             add("Unsuccessful Constants (${unsuccessfulConstants.size}):")
