@@ -106,7 +106,7 @@ object StashCompact {
         val typeNameFormat = StringUtils.pluralize(lastMaterialCount, lastType)
         val typeFormat = StringUtils.pluralize(lastDifferingMaterialsCount, "type")
         ChatUtils.clickableChat(
-            "§eYou have §6${lastMaterialCount} §e$typeNameFormat in stash§6, " +
+            "§eYou have §6$lastMaterialCount §e$typeNameFormat in stash§6, " +
                 "§etotalling §6$lastDifferingMaterialsCount $typeFormat§6. " +
                 "§eClick to ${if (config.useViewStash) "§6view" else "§6pickup"} §estash§6.",
             onClick = {

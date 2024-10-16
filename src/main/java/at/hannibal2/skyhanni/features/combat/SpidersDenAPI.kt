@@ -7,5 +7,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 
 @SkyHanniModule
 object SpidersDenAPI {
-    fun isAtTopOfNest(): Boolean = ScoreboardData.sidebarLinesFormatted.any { ScoreboardPattern.broodmotherPattern.matches(it) }
+    fun isAtTopOfNest(): Boolean = ScoreboardData.sidebarLinesFormatted.any {
+        ScoreboardPattern.broodmotherPattern.matches(it)
+    }
 }

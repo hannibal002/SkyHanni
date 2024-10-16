@@ -184,7 +184,7 @@ object ChocolateFactoryStrayTracker {
         val caughtString = caughtOfRarity?.toString() ?: return null
 
         val rarityExtraChocMs = data.straysExtraChocMs[rarity]?.milliseconds
-        val extraChocFormat = rarityExtraChocMs?.format() ?: ""
+        val extraChocFormat = rarityExtraChocMs?.format().orEmpty()
 
         val colorCode = rarity.chatColorCode
         val lineHeader = "$colorCode${rarity.toString().lowercase().replaceFirstChar { it.uppercase() }}§7: §r$colorCode"

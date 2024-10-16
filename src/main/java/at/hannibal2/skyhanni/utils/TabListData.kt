@@ -140,9 +140,9 @@ object TabListData {
         }
 
         val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedText ?: ""
+        header = tabListOverlay.header_skyhanni?.formattedText.orEmpty()
 
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText ?: ""
+        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
             TablistFooterUpdateEvent(tabFooter).postAndCatch()
         }
