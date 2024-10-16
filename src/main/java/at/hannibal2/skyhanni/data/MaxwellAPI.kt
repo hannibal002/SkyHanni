@@ -273,11 +273,11 @@ object MaxwellAPI {
             if (noPowerSelectedPattern.matches(line)) currentPower = NO_POWER
 
             inventoryMPPattern.matchMatcher(line) {
+                foundMagicalPower = true
                 // MagicalPower is boosted in catacombs
                 if (DungeonAPI.inDungeon()) return@matchMatcher
 
                 magicalPower = group("mp").formatInt()
-                foundMagicalPower = true
             }
 
             inventoryPowerPattern.matchMatcher(line) {
