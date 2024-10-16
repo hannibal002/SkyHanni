@@ -2,4 +2,4 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
-object LorenzWarpEvent : SkyHanniEvent()
+object SkyHanniWarpEvent : SkyHanniEvent()

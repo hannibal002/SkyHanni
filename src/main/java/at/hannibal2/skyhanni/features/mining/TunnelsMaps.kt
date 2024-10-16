@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.events.LorenzWarpEvent
+import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -503,7 +503,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onLorenzWarp(event: LorenzWarpEvent) {
+    fun onWarp(event: SkyHanniWarpEvent) {
         if (!isEnabled()) return
         if (goal != null) {
             DelayedRun.runNextTick {
