@@ -104,7 +104,7 @@ object EntityMovementData {
         if (!LorenzUtils.inSkyBlock) return
         if (!warpingPattern.matches(event.message)) return
         DelayedRun.runNextTick {
-            LorenzWarpEvent().postAndCatch()
+            LorenzWarpEvent.post()
         }
     }
 

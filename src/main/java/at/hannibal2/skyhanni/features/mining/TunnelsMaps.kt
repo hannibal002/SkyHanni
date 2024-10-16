@@ -502,7 +502,7 @@ object TunnelsMaps {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLorenzWarp(event: LorenzWarpEvent) {
         if (!isEnabled()) return
         if (goal != null) {

@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class LorenzWarpEvent : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+object LorenzWarpEvent : SkyHanniEvent()
