@@ -53,6 +53,7 @@ object PetAPI {
     private var xpLeveling: List<Int> = listOf()
     private var xpLevelingCustom: JsonObject? = null
     private var petRarityOffset = mapOf<LorenzRarity, Int>()
+    private var displayToInternalNameCustom = mapOf<String, NEUInternalName>()
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -580,13 +581,12 @@ object PetAPI {
         petRarityOffset = data.petRarityOffset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
             (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
         }
+        displayToInternalNameCustom = data.displayToInternalName
     }
 
     private fun petNameToFakeInternalName(petName: String): String {
-        return when (petName.uppercase()) {
-            "T-REX" -> "TYRANNOSAURUS"
-            else -> petName.uppercase().replace(" ", "_")
-        }
+        return if (petName in displayToInternalNameCustom) displayToInternalNameCustom[petName].toString()
+        else petName.uppercase().replace(" ", "_")
     }
 
     private fun petNameToInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
