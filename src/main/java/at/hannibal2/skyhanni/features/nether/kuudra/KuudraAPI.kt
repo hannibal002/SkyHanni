@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -30,6 +29,13 @@ object KuudraAPI {
         "chat.complete",
         "§.\\s*(?:§.)*KUUDRA DOWN!"
     )
+
+    /**
+     * REGEX-TEST: BURNING_AURORA_CHESTPLATE
+     * REGEX-TEST: CRIMSON_LEGGINGS
+     * REGEX-TEST: FIERY_CRIMSON_LEGGINGS
+     * REGEX-TEST: TERROR_CHESTPLATE
+     */
     private val kuudraArmorPattern by patternGroup.pattern(
         "internalname.armor",
         "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
