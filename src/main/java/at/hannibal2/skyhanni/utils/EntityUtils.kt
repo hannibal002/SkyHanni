@@ -41,7 +41,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @Suppress("ImportOrdering")
 object EntityUtils {
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.hasNameTagWith(
         y: Int,
         contains: String,
@@ -60,6 +60,7 @@ object EntityUtils {
         return list
     }
 
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getAllNameTagsInRadiusWith(
         contains: String,
         radius: Double = 3.0,
@@ -67,7 +68,7 @@ object EntityUtils {
         it.getNameAsString().contains(contains)
     }
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getNameTagWith(
         y: Int,
         contains: String,
@@ -76,7 +77,7 @@ object EntityUtils {
         debugWrongEntity: Boolean = false,
     ): EntityArmorStand? = getAllNameTagsWith(y, contains, debugRightEntity, inaccuracy, debugWrongEntity).firstOrNull()
 
-    @Deprecated("Old. Instead use entity detection feature instead.")
+    @Deprecated("Use Mob Detection Instead")
     fun EntityLivingBase.getAllNameTagsWith(
         y: Int,
         contains: String,
