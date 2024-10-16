@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import tv.twitch.chat.Chat
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -513,7 +514,8 @@ object ChatFilter {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         var blockReason = block(event.message)
-        if (blockReason == null && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
+        if (blockReason == null && config.powderMining.enabled) blockReason = powderMiningBlock(event)
+        if (blockReason == null && config.crystalNucleus.enabled) blockReason = crystalNucleusBlock(event)
 
         event.blockedReason = blockReason ?: return
     }
@@ -580,6 +582,20 @@ object ChatFilter {
         return powderMiningMatchResult
     }
 
+    /**
+     * Checks if the message is a blocked Crystal Nucleus Run message, as defined in CrystalNucleusChatFilter.
+     * Will conditionally modify/compact messages in some cases, or return a blocking code
+     * @param event The event to check
+     * @return Block reason if applicable
+     * @see block
+     */
+    private fun crystalNucleusBlock(event: LorenzChatEvent): String? {
+        val (blockCode, newMessage) = CrystalNucleusChatFilter.block(event.message)?.getPair() ?: Pair(null, null)
+        newMessage?.let { event.chatComponent = ChatComponentText(it) }
+        blockCode?.let { return it }
+        return null
+    }
+
     private var othersMsg: String? = null
 
     /**
@@ -644,5 +660,7 @@ object ChatFilter {
                 }
             }
         }
+        event.move(61, "chat.filterType.powderMiningFilter", "chat.filterType.powderMining")
+        event.move(61, "chat.filterType.gemstoneFilterConfig", "chat.filterType.powderMining.gemstone")
     }
 }
