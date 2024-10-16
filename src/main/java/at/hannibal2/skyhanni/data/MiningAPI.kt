@@ -132,7 +132,9 @@ object MiningAPI {
         private set
 
     var heat: Int = 0
+        private set
     var lastHeatUpdate = SimpleTimeMark.farPast()
+        private set
 
     var lastColdUpdate = SimpleTimeMark.farPast()
         private set
