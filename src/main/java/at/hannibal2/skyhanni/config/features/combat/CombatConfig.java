@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.combat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.features.combat.broodmother.BroodmotherConfig;
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig;
-import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostCounterConfig;
+import at.hannibal2.skyhanni.config.features.combat.ghostcounter.GhostProfitTrackerConfig;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
@@ -18,7 +18,7 @@ public class CombatConfig {
 
     @Expose
     @Category(name = "Ghost Counter", desc = "Ghost Counter settings")
-    public GhostCounterConfig ghostCounter = new GhostCounterConfig();
+    public GhostProfitTrackerConfig ghostCounter = new GhostProfitTrackerConfig();
 
     @Expose
     @ConfigOption(name = "Quiver", desc = "")
