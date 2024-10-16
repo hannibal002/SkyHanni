@@ -5,99 +5,97 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.ConfigStructureReader
 import java.lang.reflect.Field
-import java.lang.reflect.InvocationHandler
-import java.lang.reflect.Method
 import java.lang.reflect.Proxy
 
-abstract class RenamingWrapper(val wrappedProcessor: ConfigStructureReader) : ConfigStructureReader {
-	override fun pushPath(fieldPath: String?) {
-		wrappedProcessor.pushPath(fieldPath)
-	}
+abstract class RenamingWrapper(private val wrappedProcessor: ConfigStructureReader) : ConfigStructureReader {
+    override fun pushPath(fieldPath: String?) {
+        wrappedProcessor.pushPath(fieldPath)
+    }
 
-	override fun popPath() {
-		wrappedProcessor.popPath()
-	}
+    override fun popPath() {
+        wrappedProcessor.popPath()
+    }
 
-	override fun beginConfig(
-		configClass: Class<out Config?>?,
-		driver: ConfigProcessorDriver?,
-		configObject: Config?
-	) {
-		wrappedProcessor.beginConfig(configClass, driver, configObject)
-	}
+    override fun beginConfig(
+        configClass: Class<out Config?>?,
+        driver: ConfigProcessorDriver?,
+        configObject: Config?,
+    ) {
+        wrappedProcessor.beginConfig(configClass, driver, configObject)
+    }
 
-	override fun endConfig() {
-		wrappedProcessor.endConfig()
-	}
+    override fun endConfig() {
+        wrappedProcessor.endConfig()
+    }
 
-	override fun setCategoryParent(field: Field?) {
-		wrappedProcessor.setCategoryParent(field)
-	}
+    override fun setCategoryParent(field: Field?) {
+        wrappedProcessor.setCategoryParent(field)
+    }
 
-	fun wrapOption(option: ConfigOption): ConfigOption {
-		val originalHandler = Proxy.getInvocationHandler(option)
-		return Proxy.newProxyInstance(
-			option.javaClass.classLoader,
-			arrayOf<Class<*>>(ConfigOption::class.java),
-			object : InvocationHandler {
-				override fun invoke(
-					proxy: Any?,
-					method: Method,
-					args: Array<out Any?>?
-				): Any? {
-					var proxyResult = originalHandler.invoke(proxy, method, args)
-					if (method.name == "name" || method.name == "desc") {
-						proxyResult = mapText(proxyResult as String)
-					}
-					return proxyResult
-				}
-			}) as ConfigOption
-	}
+    private fun wrapOption(option: ConfigOption): ConfigOption {
+        val originalHandler = Proxy.getInvocationHandler(option)
+        return Proxy.newProxyInstance(
+            option.javaClass.classLoader,
+            arrayOf<Class<*>>(ConfigOption::class.java),
+        ) { proxy, method, args ->
+            var proxyResult = originalHandler.invoke(proxy, method, args)
+            if (method.name == "name" || method.name == "desc") {
+                proxyResult = mapText(proxyResult as String)
+            }
+            proxyResult
+        } as ConfigOption
+    }
 
-	abstract fun mapText(original: String): String
+    abstract fun mapText(original: String): String
 
-	override fun beginCategory(
-		baseObject: Any?,
-		field: Field?,
-		name: String,
-		description: String,
-	) {
-		wrappedProcessor.beginCategory(baseObject, field, mapText(name), mapText(description))
-	}
+    override fun beginCategory(
+        baseObject: Any?,
+        field: Field?,
+        name: String,
+        description: String,
+    ) {
+        wrappedProcessor.beginCategory(baseObject, field, mapText(name), mapText(description))
+    }
 
-	override fun endCategory() {
-		wrappedProcessor.endCategory()
-	}
+    override fun endCategory() {
+        wrappedProcessor.endCategory()
+    }
 
-	override fun beginAccordion(
-		baseObject: Any?,
-		field: Field?,
-		option: ConfigOption,
-		id: Int,
-	) {
-		wrappedProcessor.beginAccordion(baseObject, field, wrapOption(option), id)
-	}
+    override fun beginAccordion(
+        baseObject: Any?,
+        field: Field?,
+        option: ConfigOption,
+        id: Int,
+    ) {
+        wrappedProcessor.beginAccordion(baseObject, field, wrapOption(option), id)
+    }
 
-	override fun endAccordion() {
-		wrappedProcessor.endAccordion()
-	}
+    override fun endAccordion() {
+        wrappedProcessor.endAccordion()
+    }
 
-	override fun emitOption(
-		baseObject: Any?,
-		field: Field?,
-		option: ConfigOption,
-	) {
-		wrappedProcessor.emitOption(baseObject, field, wrapOption(option))
-	}
+    override fun emitOption(
+        baseObject: Any?,
+        field: Field?,
+        option: ConfigOption,
+    ) {
+        wrappedProcessor.emitOption(baseObject, field, wrapOption(option))
+    }
 }
 
 class BritishSpellingWrapper(wrappedProcessor: ConfigStructureReader) : RenamingWrapper(wrappedProcessor) {
-	override fun mapText(original: String): String {
-		return original.replace("(?i)(col)(o)(r)".toRegex()) {
-			it.groupValues[1] +
-					it.groupValues[2] +
-					(if (it.groupValues[2].single().isUpperCase()) "U" else "u") +
-					it.groupValues[3]
-		}
-	}
+    override fun mapText(original: String): String {
+        return original
+            .replaceSpelling("(?i)(col)(o)(r)".toRegex(), "u")
+            .replaceSpelling("(?i)(arm)(o)(r)".toRegex(), "u")
+    }
+
+    private fun String.replaceSpelling(regex: Regex, replacement: String): String {
+        return this.replace(regex) {
+            it.groupValues[1] +
+                it.groupValues[2] +
+                (if (it.groupValues[2].single().isUpperCase()) replacement.uppercase() else replacement) +
+                it.groupValues[3]
+        }
+    }
 }

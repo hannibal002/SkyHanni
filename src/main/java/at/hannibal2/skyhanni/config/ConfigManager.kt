@@ -118,10 +118,11 @@ class ConfigManager {
         processor = MoulConfigProcessor(SkyHanniMod.feature)
         BuiltinMoulConfigGuis.addProcessors(processor)
         UpdateManager.injectConfigProcessor(processor)
-        ConfigProcessorDriver(
-            if (Minecraft.getMinecraft().languageManager.currentLanguage.languageCode.contains("gb", ignoreCase = true))
-                BritishSpellingWrapper(processor) else processor,
-        ).processConfig(SkyHanniMod.feature)
+
+        val needsBritishSpelling =
+            !Minecraft.getMinecraft().languageManager.currentLanguage.languageCode.contains("en_us", ignoreCase = true)
+
+        ConfigProcessorDriver(if (needsBritishSpelling) BritishSpellingWrapper(processor) else processor).processConfig(SkyHanniMod.feature)
     }
 
     // Some position elements don't need config links as they don't have a config option.

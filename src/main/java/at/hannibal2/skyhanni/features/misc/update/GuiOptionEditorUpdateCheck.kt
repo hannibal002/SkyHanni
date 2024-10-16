@@ -39,7 +39,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
                 width / 2F,
                 40F,
                 true,
-                -1
+                -1,
             )
         }
 
@@ -56,7 +56,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             10F,
             true,
             widthRemaining / 2,
-            -1
+            -1,
         )
 
         GlStateManager.popMatrix()
