@@ -193,7 +193,7 @@ object EntityUtils {
 
     fun Entity.canBeSeen(radius: Double = 150.0) = getLorenzVec().up(0.5).canBeSeen(radius)
 
-    fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
+    fun getEntityByID(entityId: Int): Entity? = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 
 //#if FORGE
 
