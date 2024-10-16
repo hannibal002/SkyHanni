@@ -82,7 +82,7 @@ object SlayerAPI {
         }
 
         if (event.message == "  §r§a§lSLAYER QUEST COMPLETE!") {
-            SlayerQuestCompleteEvent().postAndCatch()
+            SlayerQuestCompleteEvent.post()
         }
     }
 

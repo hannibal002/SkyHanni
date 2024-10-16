@@ -334,7 +334,7 @@ object SackAPI {
         ProfileStorageData.sackProfiles?.sackContents = sackData
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
 
-        SackDataUpdateEvent().postAndCatch()
+        SackDataUpdateEvent.post()
     }
 
     data class SackGemstone(
