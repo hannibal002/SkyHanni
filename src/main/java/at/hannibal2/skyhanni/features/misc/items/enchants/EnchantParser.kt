@@ -57,6 +57,8 @@ object EnchantParser {
     // enchants stacked in a single column
     private var shouldBeSingleColumn = false
 
+    private var stackingEnchant: Enchant.Stacking? = null
+
     // Used to determine how many enchants are used on each line
     // for this particular item, since consistency is not Hypixel's strong point
     private var maxEnchantsPerLine = 0
@@ -157,6 +159,7 @@ object EnchantParser {
             return
         }
 
+        stackingEnchant = null
         shouldBeSingleColumn = false
         loreLines = mutableListOf()
         orderedEnchants = TreeSet()
@@ -226,6 +229,15 @@ object EnchantParser {
 
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)
+
+        val item = currentItem
+        val stacking = stackingEnchant
+        // The startsWith check is to detect if sba already printed the xp, so that we don't print it again
+        //LorenzDebug.chatAndLog("SBAADADAD: '${loreList[loreList.size - 2]}'")
+        if (config.stackingEnchantProgress && stacking != null && item != null) { //&& !(isSbaLoaded && loreList[loreList.size - 1].startsWith("§7"))) {
+            loreList.add(loreList.size - 1, stacking.progressString(item))
+        }
+
         // Cache parsed lore
         loreCache.updateAfter(loreList)
 
@@ -274,6 +286,10 @@ object EnchantParser {
                     shouldBeSingleColumn = true
                     matcher.group("stacking")
                 } else "empty"
+
+                if (enchant is Enchant.Stacking) {
+                    stackingEnchant = enchant
+                }
 
                 // Last found enchant
                 lastEnchant = FormattedEnchant(enchant, level, stacking, isRoman)
