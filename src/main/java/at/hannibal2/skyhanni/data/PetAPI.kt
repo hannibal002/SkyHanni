@@ -51,9 +51,9 @@ object PetAPI {
         private set
 
     private var xpLeveling: List<Int> = listOf()
-    private var xpLevelingCustom: JsonObject? = null
+    private var customXpLeveling: JsonObject? = null
     private var petRarityOffset = mapOf<LorenzRarity, Int>()
-    private var displayToInternalNameCustom = mapOf<String, NEUInternalName>()
+    private var customDisplayToInternalName = mapOf<NEUInternalName, String>()
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -501,7 +501,7 @@ object PetAPI {
 
     private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String = ""): Double? {
         val newPetName = petNameToFakeInternalName(petName)
-        val petObject = xpLevelingCustom?.getAsJsonObject(newPetName)
+        val petObject = customXpLeveling?.getAsJsonObject(newPetName)
 
         val rarityOffset = getRarityOffset(rarity, petObject?.getAsJsonObject("rarity_offset")) ?: return null
         if (!isValidLevel(level, petObject)) return null
@@ -576,17 +576,24 @@ object PetAPI {
         xpLeveling = data.petLevels
         val xpLevelingCustomJson = data.customPetLeveling.getAsJsonObject()
 
-        xpLevelingCustom = xpLevelingCustomJson
+        customXpLeveling = xpLevelingCustomJson
 
         petRarityOffset = data.petRarityOffset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
             (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
         }
-        displayToInternalNameCustom = data.displayToInternalName
+        customDisplayToInternalName = data.displayToInternalName
     }
 
     private fun petNameToFakeInternalName(petName: String): String {
-        return if (petName in displayToInternalNameCustom) displayToInternalNameCustom[petName].toString()
-        else petName.uppercase().replace(" ", "_")
+        var fakeInternalName: String? = null
+        for ((internalName, name) in customDisplayToInternalName) {
+            if (petName == name) {
+                fakeInternalName = internalName.asString()
+                break
+            }
+        }
+        if (fakeInternalName == null) fakeInternalName = petName.uppercase().replace(" ", "_")
+        return fakeInternalName
     }
 
     private fun petNameToInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
