@@ -66,7 +66,7 @@ class ConfigManager {
     private val jsonHolder: Map<ConfigFileType, Any> = EnumMap(ConfigFileType::class.java)
 
     lateinit var processor: MoulConfigProcessor<Features>
-    private var hasBeenInited = false
+    private var hasBeenInitiated = false
     private var disableSaving = false
 
     private fun setConfigHolder(type: ConfigFileType, value: Any) {
@@ -100,14 +100,14 @@ class ConfigManager {
         } catch (e: Exception) {
             if (LorenzEvent.isInGuardedEventHandler) throw e
         }
-        hasBeenInited = true
+        hasBeenInitiated = true
     }
 
     @SkyHanniModule
     object LanguageManager {
         @HandleEvent
         fun onLanguageSwitch(event: LanguageChangeEvent) {
-            if (SkyHanniMod.configManager.hasBeenInited) {
+            if (SkyHanniMod.configManager.hasBeenInitiated) {
                 SkyHanniMod.configManager.recreateProcessor()
                 ConfigGuiManager.editor = null
             }
