@@ -32,7 +32,7 @@ object ItemStars {
      */
     private val starPattern by repoGroup.pattern(
         "stars",
-        "^(?<name>.+) (?<stars>(?:(?:§.)?✪)+)"
+        "^(?<name>.+) (?<stars>(?:(?:§.)?✪)+)",
     )
 
     @SubscribeEvent(priority = EventPriority.LOW)
