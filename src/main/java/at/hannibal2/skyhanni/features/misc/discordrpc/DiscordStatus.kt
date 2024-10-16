@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.features.misc.compacttablist.AdvancedPlayerList
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
@@ -27,7 +26,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.formatted
-import io.github.moulberry.notenoughupdates.miscfeatures.PetInfoOverlay.getCurrentPet
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import java.util.regex.Pattern
@@ -54,12 +52,12 @@ private fun getVisitingName(): String {
 
 var beenAfkFor = SimpleTimeMark.now()
 
-fun getPetDisplay(): String = PetAPI.currentPet?.let {
-    val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2).removeColor()
-    val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
+fun getPetDisplay(): String = PetAPI.pet?.let {
+    val rarity = PetAPI.pet?.rarity
+    val petName = PetAPI.pet?.cleanName
+    val petLevel = PetAPI.pet?.level ?: "?"
 
-    "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
+    "[Lvl $petLevel] ${rarity?.getCleanName()} $petName"
 } ?: "No pet equipped"
 
 private fun getCropMilestoneDisplay(): String {
