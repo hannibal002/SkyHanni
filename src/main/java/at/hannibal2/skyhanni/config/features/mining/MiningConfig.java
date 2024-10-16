@@ -96,6 +96,12 @@ public class MiningConfig {
     public boolean crystalHollowsNamesInCore = false;
 
     @Expose
+    @ConfigOption(name = "Professor Robot Helper", desc = "Sends a clickable message in chat if you don't have the component in your inventory to get it from sack.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean professorRobotHelper = false;
+
+    @Expose
     @ConfigOption(name = "Private Island Ability Block", desc = "Block the mining ability when on private island.")
     @ConfigEditorBoolean
     @FeatureToggle
