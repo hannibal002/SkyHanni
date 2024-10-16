@@ -602,6 +602,10 @@ object PetAPI {
             this.pet?.level == other.level &&
             this.pet?.rawPetName == other.rawPetName
     }
+
+    override fun hashCode(): Int {
+        return pet?.hashCode() ?: 0
+    }
 }
 
 data class PetNBT(
