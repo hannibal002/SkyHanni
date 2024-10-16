@@ -68,19 +68,36 @@ object ChatUtils {
      * @param message The message to be sent
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
+     * @param replaceSameMessage Replace the old message with this new message if they are identical
      *
      * @see CHAT_PREFIX
      */
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+    fun chat(
+        message: String,
+        prefix: Boolean = true,
+        prefixColor: String = "§e",
+        replaceSameMessage: Boolean = false,
+    ) {
+
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
         } else {
-            internalChat(message)
+            internalChat(message, replaceSameMessage)
         }
     }
 
-    private fun internalChat(message: String): Boolean {
-        return chat(ChatComponentText(message))
+    private fun internalChat(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ): Boolean {
+        val text = ChatComponentText(message)
+
+        if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(message))
+        } else {
+            chat(text)
+        }
+        return chat(text)
     }
 
     fun chat(message: IChatComponent): Boolean {
@@ -166,12 +183,14 @@ object ChatUtils {
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
 
-        chat(Text.text(msgPrefix + message) {
-            this.hover = Text.multiline(hover)
-            if (command != null) {
-                this.command = command
+        chat(
+            Text.text(msgPrefix + message) {
+                this.hover = Text.multiline(hover)
+                if (command != null) {
+                    this.command = command
+                }
             }
-        })
+        )
     }
 
     /**
@@ -194,10 +213,12 @@ object ChatUtils {
         prefixColor: String = "§e",
     ) {
         val msgPrefix = if (prefix) prefixColor + CHAT_PREFIX else ""
-        chat(Text.text(msgPrefix + message) {
-            this.url = url
-            this.hover = "$prefixColor$hover".asComponent()
-        })
+        chat(
+            Text.text(msgPrefix + message) {
+                this.url = url
+                this.hover = "$prefixColor$hover".asComponent()
+            }
+        )
         if (autoOpen) OSUtils.openBrowser(url)
     }
 

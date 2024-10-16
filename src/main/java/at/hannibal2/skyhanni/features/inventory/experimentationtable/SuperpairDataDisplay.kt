@@ -174,9 +174,9 @@ object SuperpairDataDisplay {
                     // TODO extract logic in some way
                     if (it.value.any { data ->
                             (data.first?.index ?: -1).equalsOneOf(item.index, match.index) ||
-                                (data.second?.index
-                                    ?: -1).equalsOneOf(item.index, match.index)
-                        }) {
+                                (data.second?.index ?: -1).equalsOneOf(item.index, match.index)
+                        }
+                    ) {
                         return
                     }
                 }
@@ -199,12 +199,16 @@ object SuperpairDataDisplay {
                 key.isAnyOf(FoundType.MATCH, FoundType.PAIR) -> {
                     if (value.any { data ->
                             item.index.equalsOneOf(data.first?.index ?: -1, data.second?.index ?: -1)
-                        }) return
+                        }
+                    ) return
                 }
 
-                else -> if (value.any { data ->
-                        (data.item?.index ?: -1) == item.index && data.item?.sameAs(item) == true
-                    }) return
+                else ->
+                    if (
+                        value.any { data ->
+                            (data.item?.index ?: -1) == item.index && data.item?.sameAs(item) == true
+                        }
+                    ) return
             }
         }
 
@@ -293,7 +297,7 @@ object SuperpairDataDisplay {
             slot >= experiment.endSlot ||
             (if (experiment.sideSpace == 1) slot in sideSpaces1 else slot in sideSpaces2)
 
-    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this?.damage == other.damage
+    private fun SuperpairItem?.sameAs(other: SuperpairItem) = this?.reward == other.reward && this.damage == other.damage
 
     private fun isEnabled() = IslandType.PRIVATE_ISLAND.isInIsland() && config.superpairDisplay
 }
