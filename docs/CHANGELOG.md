@@ -9,6 +9,7 @@
 + Added an easier way to check your unique Hoppity Eggs collected on each island. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2625)
     +  Shows your progress in the Warp Menu.
     +  Can be automatically hidden when an island is complete.
++ Added the ability to block opening the Chocolate Factory when Booster Cookie is inactive. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2713)
 
 #### Inventory Features
 
@@ -26,6 +27,17 @@
 + Added Precision Mining Highlighter. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2614)
     +  Draws a box over the Precision Mining particles.
 + Added highlighting boxes to Crystal Nucleus crystals during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2598)
++ Added Flowstate Helper. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2561)
+    +  Displays stats for the Flowstate enchantment on mining tools.
+
+#### Dungeon Features
+
++ Added Terminal Waypoints. - Stella (https://github.com/hannibal002/SkyHanni/pull/2719)
+    +  Displays waypoints during the F7/M7 Goldor Phase.
+
+#### Chat Features
+
++ Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
 
 ### Improvements
 
@@ -38,10 +50,21 @@
 + Replaced repeated SkyHanni messages with the previous message. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2700)
 + Added support for Guilds in player-related tab completions. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
 + Added support for all Guild and Friend commands in tab completions. - ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2637)
++ Reordered commands in categories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2642)
++ Renamed some commands for clarity. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2642)
 
 #### Combat Improvements
 
 + Added Totem of Corruption and Enrager to the Ability Cooldown feature. - DungeonHub (https://github.com/hannibal002/SkyHanni/pull/2706)
+
+#### Mining Improvements
+
++ Made the "You need a stronger tool to mine ..." chat filter hide every such message, not just Crystal Hollows gemstones. - Luna (https://github.com/hannibal002/SkyHanni/pull/2724)
++ Added an option to draw a line to your golden or diamond goblin. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2717)
+
+#### Diana Improvements
+
++ Added support for detecting and handling Inquisitor spawn messages from other mods from chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2720)
 
 #### Misc Improvements
 
@@ -63,10 +86,14 @@
 + Fixed an error with compact experiment rewards chat messages. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2702)
 + Fixed Craft Materials Bazaar not working with long item names. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2703)
 + Fixed the debug feature that allows you to add/remove stars being enabled by default. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2715)
++ Fixed displaying the Guardian warning text in the Experimentation Table even when using a Guardian Pet. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2718)
++ Fixed locked Ultimate enchantments being hidden by Enchant Parsing. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2732)
 
 #### Combat Fixes
 
 + Fixed Ghost Counter display appearing while in incorrect areas on the map. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2696)
++ Fixed Ashfang Blazes sometimes being highlighted with the wrong color. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
++ Fixed Ashfang Reset Cooldown counting in the wrong direction. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
 
 #### Custom Scoreboard Fixes
 
@@ -75,6 +102,18 @@
 #### Hoppity Fixes
 
 + Fixed the chocolate egg share message sometimes displaying the wrong location name. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2711)
+
+#### Garden Fixes
+
++ Fixed farming weight not disappearing when the config option is off. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2731)
+
+#### Crimson Isle Fixes
+
++ Fixed Replace Lava not working with OptiFine. - CalMWolfs + nopo (https://github.com/hannibal002/SkyHanni/pull/2727)
+
+#### Diana Fixes
+
++ Fixed Griffin Pet Warning not supporting Diana Autopet rules. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2722)
 
 #### Commands Fixes
 
@@ -94,6 +133,9 @@
 + Added changelog verification. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2692)
     +  This action ensures your PR is in the correct format so that it can be used by the release notes tool.
 + Added dungeon phase detection. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/1865)
++ Added EntityLeaveWorldEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
++ Made command registration event-based. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2642)
++ Added "line to the mob" handler. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2717)
 
 ## Version 0.27
 
