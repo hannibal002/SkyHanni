@@ -194,7 +194,7 @@ object FlareDisplay {
 
     @SubscribeEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!config.flashScreen || !activeWarning) return
+        if (!isEnabled() || !config.flashScreen || !activeWarning) return
         val minecraft = Minecraft.getMinecraft()
         val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
         Gui.drawRect(
