@@ -95,7 +95,7 @@ class RepoManager(private val configLocation: File) {
         return CompletableFuture.supplyAsync {
             try {
                 val currentDownloadedCommit = readCurrentCommit()
-                var latestRepoCommit: String? = null
+                var latestRepoCommit: String?
                 try {
                     InputStreamReader(URL(getCommitApiUrl()).openStream())
                         .use { inReader ->
@@ -109,13 +109,13 @@ class RepoManager(private val configLocation: File) {
                         "command" to command,
                         "currentDownloadedCommit" to currentDownloadedCommit,
                     )
-                }
-                if (latestRepoCommit == null || latestRepoCommit!!.isEmpty()) {
                     repoDownloadFailed = true
                     return@supplyAsync false
                 }
+
                 val file = File(configLocation, "repo")
                 if (file.exists() &&
+                    currentDownloadedCommit == latestRepoCommit &&
                     unsuccessfulConstants.isEmpty() &&
                     lastRepoUpdate.passedSince() < 1.minutes
                 ) {
@@ -126,12 +126,11 @@ class RepoManager(private val configLocation: File) {
                     return@supplyAsync false
                 }
                 lastRepoUpdate = SimpleTimeMark.now()
+
+                repoLocation.mkdirs()
                 val itemsZip = File(repoLocation, "sh-repo-main.zip")
-                try {
-                    itemsZip.createNewFile()
-                } catch (e: IOException) {
-                    return@supplyAsync false
-                }
+                itemsZip.createNewFile()
+
                 val url = URL(getDownloadUrl(latestRepoCommit))
                 val urlConnection = url.openConnection()
                 urlConnection.connectTimeout = 15000
