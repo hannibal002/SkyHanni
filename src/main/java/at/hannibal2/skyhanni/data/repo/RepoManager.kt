@@ -80,7 +80,10 @@ class RepoManager(private val configLocation: File) {
     fun updateRepo() {
         atomicShouldManuallyReload.set(true)
         checkRepoLocation()
-        fetchRepository(true).thenRun { this.reloadRepository("Repo updated successfully.") }
+        fetchRepository(true).thenRun {
+            if (unsuccessfulConstants.isNotEmpty() || usingBackupRepo) return@thenRun
+            this.reloadRepository("Repo updated successfully.")
+        }
     }
 
     fun reloadLocalRepo() {
@@ -123,8 +126,6 @@ class RepoManager(private val configLocation: File) {
                     return@supplyAsync false
                 }
                 lastRepoUpdate = SimpleTimeMark.now()
-                RepoUtils.recursiveDelete(repoLocation)
-                repoLocation.mkdirs()
                 val itemsZip = File(repoLocation, "sh-repo-main.zip")
                 try {
                     itemsZip.createNewFile()
@@ -135,6 +136,10 @@ class RepoManager(private val configLocation: File) {
                 val urlConnection = url.openConnection()
                 urlConnection.connectTimeout = 15000
                 urlConnection.readTimeout = 30000
+
+                RepoUtils.recursiveDelete(repoLocation)
+                repoLocation.mkdirs()
+
                 try {
                     urlConnection.getInputStream().use { `is` ->
                         FileUtils.copyInputStreamToFile(
@@ -167,6 +172,8 @@ class RepoManager(private val configLocation: File) {
                 )
                 repoDownloadFailed = true
             }
+            repoDownloadFailed = false
+            usingBackupRepo = false
             true
         }
     }
@@ -228,9 +235,11 @@ class RepoManager(private val configLocation: File) {
         event.title("Repo Status")
 
         if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            event.addIrrelevant("Repo working fine")
-            if (usingBackupRepo) {
-                event.addIrrelevant("Using backup repo")
+            event.addIrrelevant {
+                add("Repo working fine")
+                if (usingBackupRepo) {
+                    add("Using backup repo")
+                }
             }
             return
         }
