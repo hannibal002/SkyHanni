@@ -44,7 +44,7 @@ object HoppityRabbitTheFishChecker {
      */
     private val openCfSlotLorePattern by ChocolateFactoryAPI.patternGroup.pattern(
         "inventory.mealegg.continue",
-        "(?:§.)*Click to open Chocolate Factory!"
+        "(?:§.)*Click to open Chocolate Factory!",
     )
     //</editor-fold>
 
@@ -64,9 +64,8 @@ object HoppityRabbitTheFishChecker {
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
-        rabbitTheFishIndex = event.inventoryItems.filter { it.value.hasDisplayName() }.entries.firstOrNull {
-            rabbitTheFishItemPattern.matches(it.value.displayName)
-        }?.key
+        rabbitTheFishIndex = event.inventoryItems.filter { it.value.hasDisplayName() }
+            .entries.firstOrNull { rabbitTheFishItemPattern.matches(it.value.displayName) }?.key
     }
 
     @SubscribeEvent
@@ -74,22 +73,20 @@ object HoppityRabbitTheFishChecker {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 
         // Prevent opening chocolate factory when Rabbit the Fish is present
-        event.slot?.stack?.let {
-            if (openCfSlotLorePattern.anyMatches(it.getLore())) {
-                event.cancel()
-                warn()
-            } else if (rabbitTheFishIndex == event.slot.slotNumber) {
-                rabbitTheFishIndex = null
-            }
+        val stack = event.slot?.stack ?: return
+        if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
+            event.cancel()
+            warn()
+        } else if (rabbitTheFishIndex == event.slot.slotNumber) {
+            rabbitTheFishIndex = null
         }
     }
 
     @JvmStatic
     fun shouldContinueWithKeypress(keycode: Int) = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
-    private fun Int.isInventoryClosure(): Boolean {
-        return this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode ||
-            this == Keyboard.KEY_ESCAPE
-    }
+
+    private fun Int.isInventoryClosure(): Boolean =
+        this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
 
     @JvmStatic
     fun warn() {
@@ -97,6 +94,5 @@ object HoppityRabbitTheFishChecker {
         SoundUtils.playErrorSound()
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() &&
-        config.preventMissingFish
+    private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingFish
 }
