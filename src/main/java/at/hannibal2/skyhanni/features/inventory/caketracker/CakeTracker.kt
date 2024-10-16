@@ -16,6 +16,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -140,11 +142,11 @@ object CakeTracker {
         if (!isEnabled()) return
         if (inAuctionHouse) {
             unobtainedCakesDisplayed = getCakeTrackerData()?.let { data ->
-                InventoryUtils.getItemsInOpenChest().filter {
-                    cakeNamePattern.matches(it.stack.displayName)
-                }.onEach { cakeItem ->
+                InventoryUtils.getItemsInOpenChest().onEach { cakeItem ->
                     cakeNamePattern.matchMatcher(cakeItem.stack.displayName) {
-                        group("year").toInt().takeIf { it !in data.cakesOwned }?.let {
+                        group("year").toInt().takeIf {
+                            it !in data.cakesOwned
+                        }?.let {
                             cakeItem highlight config.auctionHighlightColor.toChromaColor()
                         }
                     }
@@ -163,9 +165,12 @@ object CakeTracker {
             if (cakeBagPattern.matches(inventoryName)) inCakeBag = true
             knownCakesInCurrentInventory = event.inventoryItems.values.mapNotNull { item ->
                 cakeNamePattern.matchMatcher(item.displayName) {
-                    group("year")?.toInt()
+                    groupOrNull("year")?.formatInt()?.let {
+                        addCake(it)
+                        it
+                    }
                 }
-            }.toMutableList().onEach { year -> addCake(year) }
+            }.toMutableList()
             inCakeInventory = true
             timeOpenedCakeInventory = SimpleTimeMark.now()
             tracker.firstUpdate()
@@ -198,37 +203,43 @@ object CakeTracker {
     }
 
     private fun checkInventoryCakes() {
-        if (timeOpenedCakeInventory.passedSince() >= 500.milliseconds) {
-            val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
-                cakeNamePattern.matchMatcher(item.stack.displayName) {
-                    group("year")?.toInt()
-                }
+        if (timeOpenedCakeInventory.passedSince() < 500.milliseconds) return
+        val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
+            cakeNamePattern.matchMatcher(item.stack.displayName) {
+                group("year")?.toInt()
             }
+        }
 
-            val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }
-            val removedYears = knownCakesInCurrentInventory.filter { it !in currentYears }
+        val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }
+        val removedYears = knownCakesInCurrentInventory.filter { it !in currentYears }
 
-            addedYears.forEach(::addCake)
-            removedYears.forEach(::removeCake)
+        addedYears.forEach(::addCake)
+        removedYears.forEach(::removeCake)
 
-            if (addedYears.isNotEmpty() || removedYears.isNotEmpty()) {
-                knownCakesInCurrentInventory = currentYears.toMutableList()
-            }
+        if (addedYears.isNotEmpty() || removedYears.isNotEmpty()) {
+            knownCakesInCurrentInventory = currentYears.toMutableList()
         }
     }
 
     private fun recalculateMissingCakes() {
         val cakeTrackerData = getCakeTrackerData() ?: return
         tracker.modify {
-            it.cakesMissing = (1..currentYear).filterNot { year -> cakeTrackerData.cakesOwned.contains(year) }.toMutableList()
+            it.cakesMissing = (1..currentYear).filterNot {
+                year -> cakeTrackerData.cakesOwned.contains(year)
+            }.toMutableList()
         }
     }
 
     private class CakeRange(var start: Int, var end: Int = 0) {
         fun getRenderable(displayType: CakeTrackerDisplayType): Renderable {
-            val colorCode = if (displayType == CakeTrackerDisplayType.OWNED_CAKES) "§a" else "§c"
+            val colorCode =
+                if (displayType == CakeTrackerDisplayType.OWNED_CAKES) "§a"
+                else "§c"
             val stringRenderable =
-                Renderable.string(if (end != 0) "§fYears $colorCode$start§f-$colorCode$end" else "§fYear $colorCode$start")
+                Renderable.string(
+                    if (end != 0) "§fYears $colorCode$start§f-$colorCode$end"
+                    else "§fYear $colorCode$start"
+                )
             return if (displayType == CakeTrackerDisplayType.MISSING_CAKES) Renderable.link(
                 stringRenderable,
                 { HypixelCommands.auctionHouseSearch("New Year Cake (Year $start)") },
