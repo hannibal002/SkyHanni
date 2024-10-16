@@ -442,7 +442,7 @@ object PetAPI {
             NEUInternalName.NONE,
             "",
             LorenzRarity.getByName(petInfo.tier) ?: LorenzRarity.ULTIMATE,
-            petInfo.heldItem?.asInternalName() ?: NEUInternalName.NONE,
+            petInfo.heldItem?.asInternalName(),
             0,
             petInfo.exp,
             ""
@@ -466,7 +466,7 @@ object PetAPI {
             petNameToInternalName(name, rarity),
             name,
             rarity,
-            NEUInternalName.NONE,
+            null,
             level,
             0.0,
             skin,
@@ -591,20 +591,6 @@ object PetAPI {
 
     private fun petNameToInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
         return "${petNameToFakeInternalName(petName)};${rarity.id}".asInternalName()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (other !is PetData) return false
-        return this.pet?.internalName == other.internalName &&
-            this.pet?.cleanName == other.cleanName &&
-            this.pet?.rarity == other.rarity &&
-            this.pet?.petItem == other.petItem &&
-            this.pet?.level == other.level &&
-            this.pet?.rawPetName == other.rawPetName
-    }
-
-    override fun hashCode(): Int {
-        return pet?.hashCode() ?: 0
     }
 }
 
