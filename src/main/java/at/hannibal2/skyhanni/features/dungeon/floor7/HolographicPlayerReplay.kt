@@ -36,6 +36,8 @@ object HolographicPlayerReplay {
     private var playing = false
     private var playIndex = 0
 
+    private val mc get() = Minecraft.getMinecraft()
+
     @SubscribeEvent
     fun onBossStart(event: DungeonBossRoomEnterEvent) {
         if (DungeonAPI.dungeonFloor?.contains("3") == false) return
@@ -121,7 +123,7 @@ object HolographicPlayerReplay {
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
         if (recording) {
-            val player = Minecraft.getMinecraft().thePlayer
+            val player = mc.thePlayer
             val position = LorenzVec(player.posX, player.posY, player.posZ)
             val rotation = player.rotationYaw
             val pitch = player.rotationPitch
@@ -136,7 +138,7 @@ object HolographicPlayerReplay {
                     pitch,
                     limbSwing,
                     limbSwingAmount,
-                    isSneaking,
+                    isSneaking
                 ),
             )
         }
@@ -151,7 +153,7 @@ object HolographicPlayerReplay {
         if (currentRun == null || currentRun?.size == 0) return
         val run = currentRun ?: return
 
-        val fakePlayer = EntityOtherPlayerMP(null, Minecraft.getMinecraft().thePlayer.gameProfile)
+        val fakePlayer = EntityOtherPlayerMP(null, mc.thePlayer.gameProfile)
 
         val index = playIndex.coerceIn(run.indices)
         val previousIndex = (playIndex - 1).coerceIn(run.indices)
@@ -179,15 +181,11 @@ object HolographicPlayerReplay {
             -interpolatedData.yaw + 360f,
         )
 
-//         val stringLocation = interpolatedData.position.add(y = 2.35)
-//         event.drawString(stringLocation, "sneaking: ${recordedPosition.sneaking}")
         newRenderHolographicEntity(
             instance,
             event.partialTicks,
-            interpolatedData.limbSwing,
-            interpolatedData.limbSwingAmount,
-            interpolatedData.pitch,
-            fakePlayer,
+            interpolatedData,
+            fakePlayer
         )
     }
 
@@ -203,7 +201,7 @@ object HolographicPlayerReplay {
             interpolatedPitch,
             interpolatedLimbSwing,
             interpolatedLimbSwingAmount,
-            last.sneaking,
+            last.sneaking
         )
     }
 
@@ -232,13 +230,11 @@ object HolographicPlayerReplay {
     private fun <T : EntityLivingBase> newRenderHolographicEntity(
         holographicEntity: HolographicEntity<T>,
         partialTicks: Float,
-        limbSwing: Float = 0F,
-        limbSwingAmount: Float = 0F,
-        headPitch: Float = 0F,
-        fakePlayer: EntityOtherPlayerMP,
+        recordedPosition: RecordedPosition,
+        fakePlayer: EntityOtherPlayerMP
     ) {
-        val renderManager = Minecraft.getMinecraft().renderManager
-        val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(holographicEntity.entity)
+        val renderManager = mc.renderManager
+        val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(fakePlayer)
         renderer as RendererLivingEntity<T>
         renderer as AccessorRendererLivingEntity<T>
 
@@ -269,33 +265,17 @@ object HolographicPlayerReplay {
 
         GlStateManager.rotate(netHeadYaw + 180f, 0f, 1f, 0f) //correct looking fowards
         renderer.mainModel.isChild = false
-//         renderer.mainModel.setRotationAngles(
-//             limbSwing,
-//             limbSwingAmount,
-//             ageInTicks,
-//             netHeadYaw,
-//             headPitch,
-//             scaleFactor,
-//             fakePlayer
-//         )
-//
-//         renderer.mainModel.setLivingAnimations(
-//             fakePlayer,
-//             limbSwing,
-//             limbSwingAmount,
-//             partialTicks
-//         )
 
         val offset = 0.1f
         GlStateManager.translate(0f, offset, 0f)
 
         renderer.mainModel.render(
             holographicEntity.entity,
-            limbSwing,
-            limbSwingAmount,
+            recordedPosition.limbSwing,
+            recordedPosition.limbSwingAmount,
             ageInTicks,
             0f,
-            headPitch,
+            recordedPosition.pitch,
             scaleFactor
         )
 
