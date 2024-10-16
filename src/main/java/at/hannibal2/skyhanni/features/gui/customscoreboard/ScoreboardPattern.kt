@@ -23,10 +23,6 @@ object ScoreboardPattern {
         "motes",
         "^(§.)*Motes: (§.)*(?<motes>[\\d,]+).*$",
     )
-    val heatPattern by mainSb.pattern(
-        "heat",
-        "^Heat: (?<heat>.*)$",
-    ) // this line is weird (either text or number), ill leave it as is; it even has different colors?
     val coldPattern by mainSb.pattern(
         "cold",
         "^(?:§.)*Cold: §.(?<cold>-?\\d+)❄$",
