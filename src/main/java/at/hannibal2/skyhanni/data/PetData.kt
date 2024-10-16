@@ -8,7 +8,6 @@ data class PetData(
     val cleanName: String,
     val rarity: LorenzRarity,
     val petItem: NEUInternalName,
-    val hasSkin: Boolean,
     val level: Int,
     val xp: Double,
     val rawPetName: String,

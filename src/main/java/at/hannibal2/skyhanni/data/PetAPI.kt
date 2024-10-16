@@ -274,7 +274,6 @@ object PetAPI {
                 petName,
                 rarity,
                 petItem,
-                group("skin") != null,
                 group("level").toInt(),
                 (xp?.plus(xpOverLevel)) ?: 0.0,
                 newPetLine,
@@ -357,7 +356,6 @@ object PetAPI {
                 petName,
                 rarity,
                 petItem,
-                hasSkin,
                 level,
                 levelToXP(level, rarity, petName) ?: 0.0,
                 fakePetLine,
@@ -417,15 +415,14 @@ object PetAPI {
     }
 
     private fun getPetDataFromItem(item: ItemStack) {
-        val (_, _, rarity, petItem, _, _, petXP, _) = parsePetNBT(item.extraAttributes)
-        val (internalName, name, _, _, hasSkin, level, _, skin) = parsePetName(item.displayName)
+        val (_, _, rarity, petItem, _, petXP, _) = parsePetNBT(item.extraAttributes)
+        val (internalName, name, _, _, level, _, skin) = parsePetName(item.displayName)
 
         val newPet = PetData(
             internalName,
             name,
             rarity,
             petItem,
-            hasSkin,
             level,
             petXP,
             "§r§7[Lvl $level] §r${rarity.chatColorCode}$internalName${if (skin != "") "§r${skin}" else ""}",
@@ -445,7 +442,6 @@ object PetAPI {
             "",
             LorenzRarity.getByName(petInfo.tier) ?: LorenzRarity.ULTIMATE,
             petInfo.heldItem?.asInternalName() ?: NEUInternalName.NONE,
-            petInfo.skin != null,
             0,
             petInfo.exp,
             ""
@@ -470,7 +466,6 @@ object PetAPI {
             name,
             rarity,
             NEUInternalName.NONE,
-            skin != "",
             level,
             0.0,
             skin,
@@ -565,7 +560,6 @@ object PetAPI {
                 add("petName: '${pet?.internalName}'")
                 add("petRarity: '${pet?.rarity}'")
                 add("petItem: '${pet?.petItem}'")
-                add("petHasSkin: '${pet?.hasSkin}'")
                 add("petLevel: '${pet?.level}'")
                 add("petXP: '${pet?.xp}'")
                 add("rawPetLine: '${pet?.rawPetName}'")
@@ -605,7 +599,6 @@ object PetAPI {
             this.pet?.cleanName == other.cleanName &&
             this.pet?.rarity == other.rarity &&
             this.pet?.petItem == other.petItem &&
-            this.pet?.hasSkin == other.hasSkin &&
             this.pet?.level == other.level &&
             this.pet?.rawPetName == other.rawPetName
     }
