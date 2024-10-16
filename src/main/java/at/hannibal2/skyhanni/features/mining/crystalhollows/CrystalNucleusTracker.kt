@@ -8,7 +8,8 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.robotParts
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.jungleKeyItem
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.robotPartItems
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -83,25 +84,29 @@ object CrystalNucleusTracker {
         val runsCompleted = data.runsCompleted
 
         if (runsCompleted > 0) {
-            val jungleKeyCost = "JUNGLE_KEY".asInternalName().getPrice() * runsCompleted
+            val jungleKeyCost = jungleKeyItem.getPrice() * runsCompleted
             profit -= jungleKeyCost
             val jungleKeyCostFormat = jungleKeyCost.shortFormat()
             add(
                 Renderable.hoverTips(
                     " §7${runsCompleted}x §5Jungle Key§7: §c-$jungleKeyCostFormat",
-                    listOf("§7You lost §c$jungleKeyCostFormat §7of total profit", "§7due to §5Jungle Keys§7."),
+                    listOf(
+                        "§7You lost §c$jungleKeyCostFormat §7of total profit",
+                        "§7due to §5Jungle Keys§7."
+                    ),
                 ).toSearchable(),
             )
 
-            var robotPartsCost = 0.0
-            robotParts.forEach { robotPartsCost += it.asInternalName().getPrice() }
-            robotPartsCost *= runsCompleted
+            val robotPartsCost = robotPartItems.sumOf { it.getPrice() } * runsCompleted
             profit -= robotPartsCost
             val robotPartsCostFormat = robotPartsCost.shortFormat()
             add(
                 Renderable.hoverTips(
                     " §7${runsCompleted * 6}x §9Robot Parts§7: §c-$robotPartsCostFormat",
-                    listOf("§7You lost §c$robotPartsCostFormat §7of total profit", "§7due to §9Robot Parts§7."),
+                    listOf(
+                        "§7You lost §c$robotPartsCostFormat §7of total profit",
+                        "§7due to §9Robot Parts§7."
+                    ),
                 ).toSearchable(),
             )
 
@@ -121,8 +126,6 @@ object CrystalNucleusTracker {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
-        if (config.hideInCf && ChocolateFactoryAPI.inChocolateFactory) return
-
         tracker.renderDisplay(config.position)
     }
 
@@ -137,6 +140,7 @@ object CrystalNucleusTracker {
         tracker.resetCommand()
     }
 
-    fun isEnabled() =
-        config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && (config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus")
+    private fun isCfEnabled() = !config.hideInCf || !ChocolateFactoryAPI.inChocolateFactory
+    private fun isNucEnabled() = config.showOutsideNucleus || LorenzUtils.skyBlockArea == "Crystal Nucleus"
+    private fun isEnabled() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && isNucEnabled() && isCfEnabled()
 }
