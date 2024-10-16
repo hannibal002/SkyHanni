@@ -31,7 +31,6 @@ public abstract class MixinGuiContainer extends GuiScreen {
     private void onKeyTyped(char typedChar, int keyCode, CallbackInfo ci) {
         if (!HoppityRabbitTheFishChecker.shouldContinueWithKeypress(keyCode)) {
             ci.cancel();
-            HoppityRabbitTheFishChecker.warn();
         }
     }
 

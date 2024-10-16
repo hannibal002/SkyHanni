@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -61,11 +61,14 @@ object HoppityRabbitTheFishChecker {
     }
 
     @SubscribeEvent
-    fun onInventoryUpdate(event: InventoryUpdatedEvent) {
+    fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
-        rabbitTheFishIndex = event.inventoryItems.filter { it.value.hasDisplayName() }
-            .entries.firstOrNull { rabbitTheFishItemPattern.matches(it.value.displayName) }?.key
+        rabbitTheFishIndex = event.inventoryItems.filter {
+            it.value.hasDisplayName()
+        }.entries.firstOrNull {
+            rabbitTheFishItemPattern.matches(it.value.displayName)
+        }?.key
     }
 
     @SubscribeEvent
@@ -76,22 +79,20 @@ object HoppityRabbitTheFishChecker {
         val stack = event.slot?.stack ?: return
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
             event.cancel()
-            warn()
+            SoundUtils.playErrorSound()
         } else if (rabbitTheFishIndex == event.slot.slotNumber) {
             rabbitTheFishIndex = null
         }
     }
 
-    @JvmStatic
-    fun shouldContinueWithKeypress(keycode: Int) = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
-
     private fun Int.isInventoryClosure(): Boolean =
         this == Minecraft.getMinecraft().gameSettings.keyBindInventory.keyCode || this == Keyboard.KEY_ESCAPE
 
     @JvmStatic
-    fun warn() {
-        if (!isEnabled() || rabbitTheFishIndex == null) return
-        SoundUtils.playErrorSound()
+    fun shouldContinueWithKeypress(keycode: Int): Boolean {
+        val shouldContinue = !keycode.isInventoryClosure() || !isEnabled() || rabbitTheFishIndex == null
+        if (!shouldContinue) SoundUtils.playErrorSound()
+        return shouldContinue
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && HoppityAPI.isHoppityEvent() && config.preventMissingFish
