@@ -2,8 +2,10 @@ package at.hannibal2.skyhanni.features.misc.items
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.isKuudraArmor
+import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.removeKuudraTier
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -26,6 +28,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getRawCraftCostOrNull
+import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient
@@ -70,9 +73,6 @@ import java.util.Locale
 object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
-
-    // TODO move into KuudraAPI
-    private val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     var starChange = 0
         get() = if (SkyHanniMod.feature.dev.debug.enabled) field else 0
@@ -137,23 +137,22 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
-    fun isKuudraSet(internalName: String) = internalName.asInternalName().isKuudraArmor()
-
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
-        var internalName = removeKuudraArmorPrefix(stack.getInternalName().asString().removePrefix("VANQUISHED_"))
-        var genericName = internalName
-        if (isKuudraSet(internalName)) {
-            genericName = kuudraSets.fold(internalName) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
+        val internalName = stack.getInternalName()
+        val internalNameString = internalName.removeKuudraTier().removePrefix("VANQUISHED_").asString()
+        var genericName = internalNameString
+        if (internalName.isKuudraArmor()) {
+            genericName = KuudraAPI.kuudraSets.fold(internalNameString) { acc, part -> acc.replace(part, "GENERIC_KUUDRA") }
         }
         stack.getAttributeFromShard()?.let {
             return 0.0
         }
         if (attributes.size != 2) return 0.0
-        val basePrice = internalName.asInternalName().getPriceOrNull() ?: 0.0
+        val basePrice = internalName.getPriceOrNull() ?: 0.0
         var subTotal = 0.0
-        val combo = ("$internalName+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
-        var comboPrice = combo.asInternalName().getPriceOrNull()
+        val combo = ("$internalNameString+ATTRIBUTE_${attributes[0].first}+ATTRIBUTE_${attributes[1].first}")
+        val comboPrice = combo.asInternalName().getPriceOrNull()
 
         if (comboPrice != null) {
             val useless = isUselessAttribute(combo)
@@ -187,16 +186,6 @@ object EstimatedItemValueCalculator {
         }
         // Adding 0.1 so that we always show the estimated item value overlay
         return subTotal + 0.1
-    }
-
-    private fun removeKuudraArmorPrefix(original: String): String {
-        if (!isKuudraSet(original)) return original
-
-        var internalName = original
-        for (prefix in kuudraUpgradeTiers) {
-            internalName = internalName.removePrefix(prefix)
-        }
-        return internalName
     }
 
     private fun addAttributePrice(attributePrice: Double, basePrice: Double): Double = if (attributePrice > basePrice) {
@@ -488,14 +477,13 @@ object EstimatedItemValueCalculator {
         inputStars: Int,
     ): Pair<EssenceItemUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
         var totalStars = inputStars
-        val rawInternalName = internalName.asString()
-        val (price, maxStars) = if (isKuudraSet(rawInternalName)) {
+        val (price, maxStars) = if (internalName.isKuudraArmor()) {
             val tier = internalName.getKuudraTier() ?: 0
             totalStars += tier * 10
 
             var remainingStars = totalStars
 
-            val removed = removeKuudraArmorPrefix(rawInternalName)
+            val removed = internalName.removeKuudraTier().asString()
             var maxStars = 0
             var finalPrice: EssenceItemUtils.EssenceUpgradePrice? = null
 
@@ -681,7 +669,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun addBaseItem(stack: ItemStack, list: MutableList<String>): Double {
-        val internalName = removeKuudraArmorPrefix(stack.getInternalName().asString()).asInternalName()
+        val internalName = stack.getInternalName().removeKuudraTier()
 
         stack.getAttributeFromShard()?.let {
             val price = it.getAttributePrice()

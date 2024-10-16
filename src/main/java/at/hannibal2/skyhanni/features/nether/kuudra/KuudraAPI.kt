@@ -9,7 +9,11 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.removePrefix
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -26,28 +30,29 @@ object KuudraAPI {
         "chat.complete",
         "§.\\s*(?:§.)*KUUDRA DOWN!"
     )
+    private val kuudraArmorPattern by patternGroup.pattern(
+        "internalname.armor",
+        "(?<tier>HOT|BURNING|FIERY|INFERNAL|)_?(?<type>AURORA|CRIMSON|TERROR|HOLLOW|FERVOR)_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)"
+    )
 
-    private val kuudraTiers = listOf("HOT_", "BURNING_", "FIERY_", "INFERNAL_")
+    private val kuudraTiers = listOf("", "HOT", "BURNING", "FIERY", "INFERNAL")
+    val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
-    private val kuudraArmors: List<String>
+    fun NEUInternalName.isKuudraArmor(): Boolean = kuudraArmorPattern.matches(asString())
 
-    init {
-        val kuudraSets = listOf("AURORA_", "CRIMSON_", "TERROR_", "HOLLOW_", "FERVOR_")
-        val armorPieces = listOf("HELMET", "CHESTPLATE", "LEGGINGS", "BOOTS")
-        kuudraArmors = (kuudraTiers + "").flatMap { tier ->
-            kuudraSets.flatMap { set ->
-                armorPieces.map { piece ->
-                    "$set$tier$piece"
-                }
-            }
-        }
+    fun NEUInternalName.getKuudraTier(): Int? {
+        val tier = kuudraArmorPattern.matchGroup(asString(), "tier") ?: return null
+        return (kuudraTiers.indexOf(tier) + 1).takeIf { it != 0 }
     }
 
-    fun NEUInternalName.isKuudraArmor(): Boolean = asString() in kuudraArmors
-
-    fun NEUInternalName.getKuudraTier(): Int? = kuudraTiers.indexOfFirst { asString().startsWith(it) }.takeIf { it != -1 }?.let { it + 1 }
+    fun NEUInternalName.removeKuudraTier(): NEUInternalName {
+        val prefix = kuudraArmorPattern.matchGroup(asString(), "tier") ?: return this
+        return removePrefix("${prefix}_")
+    }
 
     var kuudraTier: Int? = null
+        private set
+
     fun inKuudra() = kuudraTier != null
 
     @SubscribeEvent

@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getDungeonStarCount
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getStarCount
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -39,7 +40,7 @@ object ItemStars {
         if (!isEnabled()) return
         val stack = event.itemStack
         if (stack.stackSize != 1) return
-        val stars = stack.getStarCount() ?: return
+        val stars = stack.grabStarCount() ?: return
         starPattern.findMatcher(stack.name) {
             val name = group("name")
             event.toolTip[0] = "$name §c$stars✪"
@@ -52,11 +53,11 @@ object ItemStars {
         if (!CRIMSON_ARMOR.isSelected()) return
         val stack = event.stack
         if (stack.getInternalNameOrNull()?.isKuudraArmor() != true) return
-        val stars = stack.getStarCount() ?: return
+        val stars = stack.grabStarCount() ?: return
         event.stackTip = stars.toString()
     }
 
-    private fun ItemStack.getStarCount(): Int? {
+    private fun ItemStack.grabStarCount(): Int? {
         val internalName = getInternalNameOrNull() ?: return null
         val baseStars = getDungeonStarCount() ?: getStarCount() ?: return null
         if (internalName.isKuudraArmor()) {
