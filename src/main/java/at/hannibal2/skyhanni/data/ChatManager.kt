@@ -126,7 +126,7 @@ object ChatManager {
 
         if (message.startsWith("§f{\"server\":\"")) {
             HypixelData.checkForLocraw(message)
-            if (HypixelData.lastSentLocraw.passedSince() < 3.seconds) {
+            if (HypixelData.lastLocRaw.passedSince() < 4.seconds) {
                 event.isCanceled = true
             }
             return
