@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.config.features.dev.RepositoryConfig
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -59,6 +60,12 @@ class RepoManager(private val configLocation: File) {
         fun getRepoLocation(): String {
             return "${config.location.user}/${config.location.name}/${config.location.branch}"
         }
+
+        private val defaultUser = "hannibal002"
+        private val defaultName = "SkyHanni-REPO"
+        private val defaultBranch = "main"
+
+        fun RepositoryConfig.RepositoryLocation.hasDefaultSettings() = user == defaultUser && name == defaultName && branch == defaultBranch
     }
 
     fun loadRepoInformation() {
@@ -317,12 +324,9 @@ class RepoManager(private val configLocation: File) {
     }
 
     fun resetRepositoryLocation(manual: Boolean = false) {
-        val defaultUser = "hannibal002"
-        val defaultName = "SkyHanni-Repo"
-        val defaultBranch = "main"
 
         with(config.location) {
-            if (user == defaultUser && name == defaultName && branch == defaultBranch) {
+            if (hasDefaultSettings()) {
                 if (manual) {
                     ChatUtils.chat("Repo settings are already on default!")
                 }
@@ -346,7 +350,7 @@ class RepoManager(private val configLocation: File) {
     }
 
     private fun checkRepoLocation() {
-        if (config.location.user.isEmpty() || config.location.name.isEmpty() || config.location.branch.isEmpty()) {
+        if (config.location.run { user.isEmpty() || name.isEmpty() || branch.isEmpty() }) {
             ChatUtils.userError("Invalid Repo settings detected, resetting default settings.")
             resetRepositoryLocation()
         }
