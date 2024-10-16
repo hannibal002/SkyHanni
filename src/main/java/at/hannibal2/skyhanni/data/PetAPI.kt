@@ -28,11 +28,11 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonObject
-import com.google.gson.annotations.SerializedName
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -46,7 +46,9 @@ object PetAPI {
     )
 
     var pet: PetData? = null
-    private var inPetMenu = false
+        private set
+    var inPetMenu = false
+        private set
 
     private var xpLeveling: List<Int> = listOf()
     private var xpLevelingCustom: JsonObject? = null
@@ -201,10 +203,7 @@ object PetAPI {
             ProfileStorageData.profileSpecific?.currentPet = value
         }
 
-    @Deprecated(message = "use PetAPI.pet.rawPetName",
-        replaceWith = ReplaceWith("pet.name.contains(petName) ?: false", "at.hannibal2.skyhanni.data.PetAPI.pet")
-    )
-    fun isCurrentPet(petName: String): Boolean = currentPet?.contains(petName) ?: false
+    fun isCurrentPet(petName: String): Boolean = pet?.cleanName?.contains(petName) ?: false
 
     fun getCleanName(nameWithLevel: String): String? {
         petItemNamePattern.matchMatcher(nameWithLevel) {
@@ -378,7 +377,7 @@ object PetAPI {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!isPetMenu(event.inventoryName)) {
+        if (!petMenuPattern.matches(event.inventoryName)) {
             inPetMenu = false
             return
         }
@@ -550,10 +549,10 @@ object PetAPI {
     private fun fireEvent(newPet: PetData?) {
         val oldPet = pet
         pet = newPet
-        if (oldPet.arePetsEqual(newPet)) return
+        if (newPet == oldPet) return
         if (SkyHanniMod.feature.dev.debug.petEventMessages) {
-            ChatUtils.debug(oldPet.toString().replace("§", "&"))
-            ChatUtils.debug(newPet.toString().replace("§", "&"))
+            ChatUtils.debug(oldPet.toString().convertToUnformatted())
+            ChatUtils.debug(newPet.toString().convertToUnformatted())
         }
         PetChangeEvent(oldPet, newPet).post()
     }
@@ -579,12 +578,12 @@ object PetAPI {
     @SubscribeEvent
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NEUPetsJson>("pets")
-        xpLeveling = data.pet_levels
-        val xpLevelingCustomJson = data.custom_pet_leveling.getAsJsonObject()
+        xpLeveling = data.petLevels
+        val xpLevelingCustomJson = data.customPetLeveling.getAsJsonObject()
 
         xpLevelingCustom = xpLevelingCustomJson
 
-        petRarityOffset = data.pet_rarity_offset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
+        petRarityOffset = data.petRarityOffset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
             (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
         }
     }
@@ -600,28 +599,29 @@ object PetAPI {
         return "${petNameToFakeInternalName(petName)};${rarity.id}".asInternalName()
     }
 
-    fun PetData?.arePetsEqual(pet2: PetData?): Boolean {
-        return this?.internalName == pet2?.internalName &&
-            this?.cleanName == this?.cleanName &&
-            this?.rarity == this?.rarity &&
-            this?.petItem == this?.petItem &&
-            this?.hasSkin == this?.hasSkin &&
-            this?.level == this?.level &&
-            this?.rawPetName == this?.rawPetName
+    override fun equals(other: Any?): Boolean {
+        if (other !is PetData) return false
+        return this.pet?.internalName == other.internalName &&
+            this.pet?.cleanName == other.cleanName &&
+            this.pet?.rarity == other.rarity &&
+            this.pet?.petItem == other.petItem &&
+            this.pet?.hasSkin == other.hasSkin &&
+            this.pet?.level == other.level &&
+            this.pet?.rawPetName == other.rawPetName
     }
 }
 
 data class PetNBT(
-    @SerializedName("type") val type: String,
-    @SerializedName("active") val active: Boolean,
-    @SerializedName("exp") val exp: Double,
-    @SerializedName("tier") val tier: String,
-    @SerializedName("hideInfo") val hideInfo: Boolean,
-    @SerializedName("heldItem") val heldItem: String?,
-    @SerializedName("candyUsed") val candyUsed: Int,
-    @SerializedName("skin") val skin: String?,
-    @SerializedName("uuid") val uuid: String,
-    @SerializedName("uniqueId") val uniqueId: String,
-    @SerializedName("hideRightClick") val hideRightClick: Boolean,
-    @SerializedName("noMove") val noMove: Boolean
+    val type: String,
+    val active: Boolean,
+    val exp: Double,
+    val tier: String,
+    val hideInfo: Boolean,
+    val heldItem: String?,
+    val candyUsed: Int,
+    val skin: String?,
+    val uuid: String,
+    val uniqueId: String,
+    val hideRightClick: Boolean,
+    val noMove: Boolean
 )

@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import java.util.Locale
+import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 
 // TODO: replace id with ordinal
 enum class LorenzRarity(val color: LorenzColor, val id: Int) {
@@ -47,8 +47,12 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     }
 
     fun getCleanName(): String {
-        return rawName.lowercase(Locale.getDefault())
-            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        val wordArray = rawName.split("_").toTypedArray()
+        val returnList = mutableListOf<String>()
+        for (word in wordArray) {
+            returnList.add(word.firstLetterUppercase())
+        }
+        return returnList.joinToString(" ")
     }
 
     fun isAtLeast(other: LorenzRarity): Boolean = this.ordinal >= other.ordinal
