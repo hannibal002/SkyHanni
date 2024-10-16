@@ -71,6 +71,7 @@ object EstimatedItemValueCalculator {
 
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
+    // TODO move into KuudraAPI
     private val kuudraSets = listOf("AURORA", "CRIMSON", "TERROR", "HOLLOW", "FERVOR")
 
     var starChange = 0
@@ -136,8 +137,7 @@ object EstimatedItemValueCalculator {
         return Pair(totalPrice, basePrice)
     }
 
-    fun isKuudraSet(internalName: String) = internalName.asInternalName().isKuudraArmor(
-        )
+    fun isKuudraSet(internalName: String) = internalName.asInternalName().isKuudraArmor()
 
     private fun addAttributeCost(stack: ItemStack, list: MutableList<String>): Double {
         val attributes = stack.getAttributes() ?: return 0.0
