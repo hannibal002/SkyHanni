@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data.repo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigManager
-import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -227,37 +226,6 @@ class RepoManager(private val configLocation: File) {
     private fun readCurrentCommit(): String? {
         val currentCommitJSON: JsonObject? = getJsonFromFile(File(configLocation, "currentCommit.json"))
         return currentCommitJSON?.get("sha")?.asString
-    }
-
-    @SubscribeEvent
-    fun onDebugDataCollect(event: DebugDataCollectEvent) {
-        event.title("Repo Status")
-
-        if (unsuccessfulConstants.isEmpty() && successfulConstants.isNotEmpty()) {
-            event.addIrrelevant {
-                add("Repo working fine")
-                if (usingBackupRepo) {
-                    add("Using backup repo")
-                }
-            }
-            return
-        }
-
-        event.addData {
-            add("Using Backup Repo: $usingBackupRepo")
-
-            add("Successful Constants (${successfulConstants.size}):")
-
-            add("Unsuccessful Constants (${unsuccessfulConstants.size}):")
-
-            for ((i, constant) in unsuccessfulConstants.withIndex()) {
-                add("   - $constant")
-                if (i == 5) {
-                    add("...")
-                    break
-                }
-            }
-        }
     }
 
     fun displayRepoStatus(joinEvent: Boolean) {
