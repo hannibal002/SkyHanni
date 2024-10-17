@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
@@ -16,9 +17,12 @@ import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.client.model.ModelPlayer
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms
 import net.minecraft.client.renderer.entity.RendererLivingEntity
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
@@ -38,7 +42,7 @@ object HolographicPlayerReplay {
 
     private val mc get() = Minecraft.getMinecraft()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossStart(event: DungeonBossRoomEnterEvent) {
         if (DungeonAPI.dungeonFloor?.contains("3") == false) return
 
@@ -130,6 +134,9 @@ object HolographicPlayerReplay {
             val limbSwing = player.limbSwing
             val limbSwingAmount = player.limbSwingAmount
             val isSneaking = player.isSneaking
+            val isRiding = player.isRiding
+            val heldItem = player.heldItem
+            val swingProgress = player.swingProgress
 
             recordedPositions.add(
                 RecordedPosition(
@@ -138,7 +145,10 @@ object HolographicPlayerReplay {
                     pitch,
                     limbSwing,
                     limbSwingAmount,
-                    isSneaking
+                    isSneaking,
+                    isRiding,
+                    heldItem,
+                    swingProgress
                 ),
             )
         }
@@ -163,17 +173,6 @@ object HolographicPlayerReplay {
 
         val interpolatedData = interpolateRecordedPosition(previousPosition, recordedPosition, event.partialTicks)
 
-        fakePlayer.setPositionAndRotation(
-            interpolatedData.position.x,
-            interpolatedData.position.y,
-            interpolatedData.position.z,
-            interpolatedData.yaw,
-            interpolatedData.pitch
-        )
-        fakePlayer.limbSwing = interpolatedData.limbSwing
-        fakePlayer.limbSwingAmount = interpolatedData.limbSwingAmount
-        fakePlayer.isSneaking = interpolatedData.sneaking
-
         val holographicPlayer = HolographicEntities.HolographicBase(fakePlayer)
 
         val instance = holographicPlayer.instance(
@@ -195,13 +194,17 @@ object HolographicPlayerReplay {
         val interpolatedPitch = interpolateRotation(last.pitch, next.pitch, progress)
         val interpolatedLimbSwing = interpolateValue(last.limbSwing, next.limbSwing, progress)
         val interpolatedLimbSwingAmount = interpolateValue(last.limbSwingAmount, next.limbSwingAmount, progress)
+        val interpolatedSwingProgress = interpolateValue(last.swingProgress, next.swingProgress, progress)
         return RecordedPosition(
             interpolatedPosition,
             -interpolatedYaw,
             interpolatedPitch,
             interpolatedLimbSwing,
             interpolatedLimbSwingAmount,
-            last.sneaking
+            last.sneaking,
+            last.isRiding,
+            last.heldItem,
+            interpolatedSwingProgress
         )
     }
 
@@ -238,6 +241,9 @@ object HolographicPlayerReplay {
         renderer as RendererLivingEntity<T>
         renderer as AccessorRendererLivingEntity<T>
 
+        if (renderer.mainModel !is ModelPlayer) return
+        val newModel = renderer.mainModel as ModelPlayer
+
         renderer.setRenderOutlines(false)
         if (!renderer.bindEntityTexture_skyhanni(holographicEntity.entity))
             return
@@ -264,13 +270,26 @@ object HolographicPlayerReplay {
         GlStateManager.enableTexture2D()
 
         GlStateManager.rotate(netHeadYaw + 180f, 0f, 1f, 0f) //correct looking fowards
-        renderer.mainModel.isChild = false
+        renderer.mainModel.isChild = false //check if skytils small people is active?
+        renderer.mainModel.isRiding = recordedPosition.isRiding
 
         val offset = 0.1f
         GlStateManager.translate(0f, offset, 0f)
 
-        renderer.mainModel.render(
-            holographicEntity.entity,
+        newModel.isSneak = recordedPosition.sneaking
+        newModel.heldItemRight = if (recordedPosition.heldItem == null) 0 else 1
+        newModel.swingProgress = recordedPosition.swingProgress
+        newModel.setRotationAngles(
+            recordedPosition.limbSwing,
+            recordedPosition.limbSwingAmount,
+            ageInTicks,
+            netHeadYaw,
+            recordedPosition.pitch,
+            scaleFactor,
+            fakePlayer
+        )
+        newModel.render(
+            fakePlayer,
             recordedPosition.limbSwing,
             recordedPosition.limbSwingAmount,
             ageInTicks,
@@ -278,6 +297,18 @@ object HolographicPlayerReplay {
             recordedPosition.pitch,
             scaleFactor
         )
+
+        if (recordedPosition.heldItem != null) {
+            GlStateManager.pushMatrix()
+            val renderItem = mc.renderItem
+            GlStateManager.translate(-0.5f, 0.5f, 0.5f)
+            renderItem.renderItemModelForEntity(
+                recordedPosition.heldItem,
+                fakePlayer,
+                ItemCameraTransforms.TransformType.THIRD_PERSON
+            )
+            GlStateManager.popMatrix()
+        }
 
 
         GlStateManager.alphaFunc(GL11.GL_GREATER, 0.1f)
@@ -295,4 +326,7 @@ data class RecordedPosition(
     val limbSwing: Float,
     val limbSwingAmount: Float,
     val sneaking: Boolean,
+    val isRiding: Boolean,
+    val heldItem: ItemStack?,
+    val swingProgress: Float
 )
