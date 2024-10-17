@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -18,7 +19,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonHideItems {
@@ -64,7 +64,7 @@ object DungeonHideItems {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!DungeonAPI.inDungeon()) return
 
         val entity = event.entity

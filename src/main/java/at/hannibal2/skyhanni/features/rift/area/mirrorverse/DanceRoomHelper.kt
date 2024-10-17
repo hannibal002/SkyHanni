@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
@@ -20,7 +21,6 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DanceRoomHelper {
@@ -158,10 +158,9 @@ object DanceRoomHelper {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
         if (RiftAPI.inRift() && config.hidePlayers) {
-            val entity = event.entity
-            if (entity is EntityOtherPlayerMP && inRoom) {
+            if (inRoom) {
                 event.cancel()
             }
         }

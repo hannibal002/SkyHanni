@@ -10,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import net.minecraft.entity.Entity
 import net.minecraft.entity.boss.EntityWither
 
 @SkyHanniModule
@@ -33,7 +34,7 @@ object HideFarEntities {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
         if (entity is EntityWither && entity.entityId < 0) return
         if (isEnabled() && entity.entityId in ignored) {

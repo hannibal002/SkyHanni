@@ -55,7 +55,7 @@ object FishingHookDisplay {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
         if (!config.hideArmorStand) return
 

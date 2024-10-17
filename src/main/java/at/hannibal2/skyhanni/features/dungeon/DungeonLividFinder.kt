@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.SkyhanniTickEvent
@@ -23,10 +24,10 @@ import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -107,7 +108,7 @@ object DungeonLividFinder {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!inDungeon()) return
         if (!config.hideWrong) return
         if (!config.enabled) return

@@ -103,11 +103,9 @@ object DungeonCopilot {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!DungeonAPI.inDungeon()) return
-
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (!searchForKey) return
 

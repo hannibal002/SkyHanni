@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.features.combat.damageindicator.DamageIndicatorMana
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.entity.projectile.EntityFireball
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object BlazeSlayerClearView {
@@ -45,13 +45,9 @@ object BlazeSlayerClearView {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (isEnabled()) {
-            val entity = event.entity
-            if (entity is EntityFireball) {
-                event.cancel()
-            }
-        }
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityFireball>) {
+        if (!isEnabled()) return
+        event.cancel()
     }
 
     private fun isEnabled(): Boolean {

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.SkyhanniTickEvent
@@ -20,7 +21,6 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.math.abs
 
 @SkyHanniModule
@@ -86,11 +86,11 @@ object CraftRoomHolographicMob {
     }
 
     @HandleEvent(receiveCancelled = true)
-    fun onPlayerRender(event: CheckRenderEntityEvent<*>) {
+    fun onPlayerRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
         if (!RiftAPI.inRift() || !config.hidePlayers) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && craftRoomArea.isInside(entity.getLorenzVec())) {
+        if (craftRoomArea.isInside(entity.getLorenzVec())) {
             event.cancel()
         }
     }

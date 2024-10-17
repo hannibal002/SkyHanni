@@ -144,13 +144,13 @@ object VisitorListener {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
+        if (entity.name == "§e§lCLICK") {
             event.cancel()
         }
     }
