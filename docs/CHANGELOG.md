@@ -10,6 +10,8 @@
     +  Shows your progress in the Warp Menu.
     +  Can be automatically hidden when an island is complete.
 + Added the ability to block opening the Chocolate Factory when Booster Cookie is inactive. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2713)
++ Added a feature to block opening Hoppity's trade menu from Abiphone calls if you do not have coins in your purse. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2664)
++ Added the ability to prevent closing Meal Eggs that have Rabbit the Fish inside. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2712)
 
 #### Inventory Features
 
@@ -66,6 +68,14 @@
 
 + Added support for detecting and handling Inquisitor spawn messages from other mods from chat. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2720)
 
+#### Fishing Improvements
+
++ Added an option to always display the Barn Fishing Timer anywhere. - NeoNyaa (https://github.com/hannibal002/SkyHanni/pull/2735)
+
+#### Hoppity Improvements
+
++ Improved the Time Tower Usage Warning so it doesn't spam messages. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2730)
+
 #### Misc Improvements
 
 + Added distance display to waypoints created by Patcher's Send Coords feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2704)
@@ -88,12 +98,15 @@
 + Fixed the debug feature that allows you to add/remove stars being enabled by default. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2715)
 + Fixed displaying the Guardian warning text in the Experimentation Table even when using a Guardian Pet. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2718)
 + Fixed locked Ultimate enchantments being hidden by Enchant Parsing. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2732)
++ Fixed Chest Value Display on Carpentry Chests. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2743)
++ Fixed Compact Item Stars. - Empa, Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2741)
 
 #### Combat Fixes
 
 + Fixed Ghost Counter display appearing while in incorrect areas on the map. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2696)
 + Fixed Ashfang Blazes sometimes being highlighted with the wrong color. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
 + Fixed Ashfang Reset Cooldown counting in the wrong direction. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
++ Fixed Millennia-Aged Blaze not being highlighted by the Area Boss Highlight feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2707)
 
 #### Custom Scoreboard Fixes
 
@@ -102,6 +115,7 @@
 #### Hoppity Fixes
 
 + Fixed the chocolate egg share message sometimes displaying the wrong location name. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2711)
++ Fixed El Dorado not receiving a compacted chat message. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2742)
 
 #### Garden Fixes
 
@@ -118,6 +132,14 @@
 #### Commands Fixes
 
 + Fixed /shtranslate not working in most cases. - Obsidian (https://github.com/hannibal002/SkyHanni/pull/2693)
+
+#### Mining Fixes
+
++ Fixed a crash when attempting to edit the Flowstate Helper config. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2740)
+
+#### Misc Fixes
+
++ Fixed SkyHanni messages being sent twice. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2736)
 
 ### Technical Details
 
@@ -136,6 +158,11 @@
 + Added EntityLeaveWorldEvent. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
 + Made command registration event-based. - j10a1n15, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/2642)
 + Added "line to the mob" handler. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2717)
++ No longer use NEU GUI elements for the auto-update button. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2725)
++ Added SkyHanni notifications. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2630)
++ Moved Hoppity Warp Menu config to `HoppityWarpMenuConfig`. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2712)
++ Migrated some LorenzEvents without parameters to SkyHanniEvents. - Empa (https://github.com/hannibal002/SkyHanni/pull/2744)
++ Changed SkyHanniEvents without parameters to be objects. - Empa (https://github.com/hannibal002/SkyHanni/pull/2744)
 
 ## Version 0.27
 
