@@ -19,7 +19,7 @@ public class PowderChestTimerConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Highlight Chests", desc = "Highlight chest with a color depending on how much time left until it despawn.")
+    @ConfigOption(name = "Highlight Chests", desc = "Highlight chests with a color depending on how much time left until they despawn.")
     @ConfigEditorBoolean
     public boolean highlightChests = true;
 
