@@ -306,7 +306,7 @@ object HolographicPlayerReplay {
             GlStateManager.depthMask(true)
             GlStateManager.translate(-0.4f, 0.5f, 0f)
             if (mc.renderItem.itemModelMesher.getItemModel(recordedPosition.heldItem).isGui3d) {
-                GlStateManager.translate(0f, 0f, -0.1f)
+                GlStateManager.translate(0f, 0.1f, -0.075f)
                 GlStateManager.rotate(20f, -1f, 0f, 0f)
                 GlStateManager.scale(1.8f, 1.8f, 1.8f)
             }
@@ -325,10 +325,9 @@ object HolographicPlayerReplay {
     private fun renderItem(item: ItemStack) {
         var model = mc.renderItem.itemModelMesher.getItemModel(item)
 
-
         mc.textureManager.bindTexture(TextureMap.locationBlocksTexture)
         mc.textureManager.getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false)
-        preTransformItem(item, model)
+        preTransformItem(model)
         GlStateManager.enableRescaleNormal()
         GlStateManager.alphaFunc(516, 0.1f)
         GlStateManager.enableBlend()
@@ -344,9 +343,8 @@ object HolographicPlayerReplay {
         mc.textureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap()
     }
 
-    private fun preTransformItem(item: ItemStack, model: IBakedModel) {
-        val flag = model.isGui3d
-        if (!flag) {
+    private fun preTransformItem(model: IBakedModel) {
+        if (!model.isGui3d) {
             GlStateManager.scale(2.0f, 2.0f, 2.0f)
         }
 
@@ -359,7 +357,7 @@ object HolographicPlayerReplay {
         if (model.isBuiltInRenderer) {
             GlStateManager.rotate(180.0f, 0.0f, 1.0f, 0.0f)
             GlStateManager.translate(-0.5f, -0.5f, -0.5f)
-            GlStateManager.color(1.0f, 1.0f, 1.0f, 1f)
+            GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f)
             GlStateManager.enableRescaleNormal()
             TileEntityItemStackRenderer.instance.renderByItem(item)
         } else {
