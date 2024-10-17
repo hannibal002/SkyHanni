@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.EliteBotAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.EliteFarmingCollectionConfig.CropDisplay
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.jsonobjects.other.EliteCollectionGraphEntry
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -114,7 +115,7 @@ object EliteFarmingCollectionDisplay {
     }
 
     //This uses the block click event instead of the crop click event, so it still works outside the garden.
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClicked(event: BlockClickEvent) {
         if (event.clickType == ClickType.RIGHT_CLICK) return
         val crop = event.getBlockState.getCropType() ?: return
@@ -133,7 +134,7 @@ object EliteFarmingCollectionDisplay {
         resetData()
     }
 
-    fun onCommand(args: Array<String>) {
+    fun refresh() {
         if (EliteBotAPI.disableRefreshCommand) {
             ChatUtils.userError("§eCommand has been disabled")
         } else if (commandLastUsed.passedSince() < 1.minutes) {
@@ -261,7 +262,7 @@ object EliteFarmingCollectionDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/${getEliteBotLeaderboardForCrop(crop)}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-        val response = APIUtil.getJSONResponseAsElement(url)
+        val response = APIUtils.getJSONResponseAsElement(url)
 
         try {
             val data = eliteCollectionApiGson.fromJson<EliteLeaderboard>(response)
@@ -303,7 +304,7 @@ object EliteFarmingCollectionDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/crops?days=1"
-        val response = APIUtil.getJSONResponseAsElement(url)
+        val response = APIUtils.getJSONResponseAsElement(url)
 
         try {
             val data = eliteCollectionApiGson.fromJson<Array<EliteCollectionGraphEntry>>(response)

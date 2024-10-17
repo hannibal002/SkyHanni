@@ -113,7 +113,7 @@ object PestProfitTracker {
     fun onPestKill(event: PestKillEvent) {
         if (!isEnabled()) return
 
-        tracker.addItem(event.item, event.amount)
+        tracker.addItem(event.item, event.amount, false)
         addKill()
         if (config.hideChat) event.blockedReason = "pest_drop"
     }

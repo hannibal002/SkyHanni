@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -120,7 +120,7 @@ object EliteSkillRankDisplay {
         resetData()
     }
 
-    fun onCommand(args: Array<String>) {
+    fun reset() {
         if (EliteBotAPI.disableRefreshCommand) {
             ChatUtils.userError("§eCommand has been disabled")
         } else if (commandLastUsed.passedSince() < 1.minutes) {
@@ -244,7 +244,7 @@ object EliteSkillRankDisplay {
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/$skill/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
 
-        val response = APIUtil.getJSONResponseAsElement(url)
+        val response = APIUtils.getJSONResponseAsElement(url)
 
         try {
             val data = eliteCollectionApiGson.fromJson<EliteLeaderboard>(response)
@@ -286,7 +286,7 @@ object EliteSkillRankDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Graph/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/skills?days=1"
-        val response = APIUtil.getJSONResponseAsElement(url)
+        val response = APIUtils.getJSONResponseAsElement(url)
 
         try {
             val data = eliteCollectionApiGson.fromJson<Array<EliteSkillGraphEntry>>(response)

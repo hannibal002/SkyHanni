@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.garden.pests.PestKillEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
@@ -127,7 +127,7 @@ object ElitePestKillsDisplay {
         currentPests.addOrPut(pest, 1)
     }
 
-    fun onCommand(args: Array<String>) {
+    fun reset() {
         if (EliteBotAPI.disableRefreshCommand) {
             ChatUtils.userError("§eCommand has been disabled")
         } else if (commandLastUsed.passedSince() < 1.minutes) {
@@ -231,7 +231,7 @@ object ElitePestKillsDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Leaderboard/rank/${pest.displayName.lowercase()}/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}?includeUpcoming=true"
-        val response = APIUtil.getJSONResponseAsElement(url)
+        val response = APIUtils.getJSONResponseAsElement(url)
 
         try {
             val data = elitePestApiGson.fromJson<EliteLeaderboard>(response)
@@ -273,7 +273,7 @@ object ElitePestKillsDisplay {
         if (EliteBotAPI.profileID == null) return
         val url =
             "https://api.elitebot.dev/Profile/${LorenzUtils.getPlayerUuid()}/${EliteBotAPI.profileID!!.toDashlessUUID()}/"
-        val response = APIUtil.getJSONResponseAsElement(url)
+        val response = APIUtils.getJSONResponseAsElement(url)
 
         try {
             val data = elitePestApiGson.fromJson<EliteProfileMember>(response)
