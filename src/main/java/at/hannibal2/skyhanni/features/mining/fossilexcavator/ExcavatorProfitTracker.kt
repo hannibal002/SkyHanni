@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ExcavatorProfitTracker {

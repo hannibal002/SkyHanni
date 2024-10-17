@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -27,7 +28,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.tileentity.TileEntityBeacon
 import net.minecraft.util.AxisAlignedBB
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 

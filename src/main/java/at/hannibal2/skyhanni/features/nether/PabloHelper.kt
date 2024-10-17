@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.minutes
 
 // https://wiki.hypixel.net/Pablo

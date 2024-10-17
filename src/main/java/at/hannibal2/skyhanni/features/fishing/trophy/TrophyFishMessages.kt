@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.fishing.trophyfishing.ChatMessagesConfig.DesignFormat
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

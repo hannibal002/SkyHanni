@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DungeonBossPhaseChangeEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonBossAPI {

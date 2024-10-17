@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
@@ -23,8 +24,6 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraft.client.player.inventory.ContainerLocalMenu
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DeepCavernsGuide {

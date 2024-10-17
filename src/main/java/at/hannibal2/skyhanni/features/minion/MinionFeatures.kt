@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ClickType
@@ -15,8 +16,8 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
@@ -57,8 +58,6 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
 import net.minecraftforge.event.entity.player.PlayerInteractEvent
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
@@ -22,7 +23,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object SlayerMiniBossFeatures {

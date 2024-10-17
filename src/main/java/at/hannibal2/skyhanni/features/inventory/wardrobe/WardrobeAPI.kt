@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -22,8 +23,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule

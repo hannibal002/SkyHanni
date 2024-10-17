@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object SeaCreatureTracker {

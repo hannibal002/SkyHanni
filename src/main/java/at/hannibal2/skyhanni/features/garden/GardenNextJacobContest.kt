@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
@@ -40,7 +41,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent

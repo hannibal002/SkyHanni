@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -37,7 +38,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds

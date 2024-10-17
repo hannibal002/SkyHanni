@@ -11,8 +11,8 @@ import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.PartyAPI.partyLeader
@@ -15,8 +16,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PartyCommands {

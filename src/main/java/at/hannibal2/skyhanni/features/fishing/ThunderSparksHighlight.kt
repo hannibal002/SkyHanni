@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.init.Blocks
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule

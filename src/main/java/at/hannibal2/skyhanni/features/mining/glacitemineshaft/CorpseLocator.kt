@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PartyChatEvent
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 // TODO: Maybe implement automatic warp-in for chosen players if the user is not in a party.
 @SkyHanniModule

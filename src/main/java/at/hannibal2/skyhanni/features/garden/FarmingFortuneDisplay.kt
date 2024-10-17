@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.time.Duration.Companion.minutes

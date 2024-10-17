@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.item.ItemStack
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ChocolateShopPrice {

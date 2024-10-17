@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.player.EntityPlayerMP
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object TerminalWaypoints {

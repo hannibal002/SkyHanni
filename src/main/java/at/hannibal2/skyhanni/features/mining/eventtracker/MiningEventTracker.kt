@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.BossbarData
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.io.IOException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes

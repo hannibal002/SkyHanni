@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -29,8 +30,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 

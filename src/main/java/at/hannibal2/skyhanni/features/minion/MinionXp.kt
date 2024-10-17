@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MinionXPJson
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -24,7 +25,6 @@ import net.minecraft.block.BlockChest
 import net.minecraft.client.Minecraft
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.util.EnumMap
 
 @SkyHanniModule

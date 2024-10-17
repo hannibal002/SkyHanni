@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.TooltipTweaksConfig.CropTooltipFortuneEntry
 import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFarmingForDummie
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.text.DecimalFormat
 import kotlin.math.roundToInt
 

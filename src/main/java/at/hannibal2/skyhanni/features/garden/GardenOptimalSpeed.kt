@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -24,7 +25,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 

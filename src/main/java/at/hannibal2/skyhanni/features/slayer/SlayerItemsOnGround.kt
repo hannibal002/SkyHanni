@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.init.Items
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

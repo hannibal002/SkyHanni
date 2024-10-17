@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.client.Minecraft
@@ -9,7 +10,6 @@ import net.minecraft.client.gui.FontRenderer
 import net.minecraft.entity.Entity
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.scoreboard.Team
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonTeammateOutlines {

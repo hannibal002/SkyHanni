@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object OdgerWaypoint {

@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MiningAPI
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -15,7 +16,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.MovingObjectPosition
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule

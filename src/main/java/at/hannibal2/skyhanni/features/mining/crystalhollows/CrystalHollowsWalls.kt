@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -13,7 +14,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.inflateBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule

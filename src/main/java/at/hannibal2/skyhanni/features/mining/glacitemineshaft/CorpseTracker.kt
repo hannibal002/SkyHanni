@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.util.EnumMap
 
 @SkyHanniModule

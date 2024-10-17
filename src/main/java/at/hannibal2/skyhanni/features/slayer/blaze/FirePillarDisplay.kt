@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object FirePillarDisplay {

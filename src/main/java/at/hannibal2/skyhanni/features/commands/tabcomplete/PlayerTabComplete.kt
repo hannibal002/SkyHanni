@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.commands.tabcomplete
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FriendAPI
 import at.hannibal2.skyhanni.data.GuildAPI
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.features.commands.suggestions.LazySuggestionEntry
 import at.hannibal2.skyhanni.features.commands.suggestions.SuggestionProvider
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PlayerTabComplete {

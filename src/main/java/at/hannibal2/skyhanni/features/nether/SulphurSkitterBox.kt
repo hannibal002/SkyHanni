@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.SulphurSkitterBoxConfig
 import at.hannibal2.skyhanni.data.IslandType
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule

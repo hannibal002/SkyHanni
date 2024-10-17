@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.TrophyFishJson
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object TrophyFishManager {

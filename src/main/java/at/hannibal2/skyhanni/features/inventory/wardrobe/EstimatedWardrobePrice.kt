@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object EstimatedWardrobePrice {

@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun

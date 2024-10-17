@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.combat.damageindicator.DamageIndicatorConfig
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.combat.damageindicator.BossType
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
@@ -47,7 +48,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 

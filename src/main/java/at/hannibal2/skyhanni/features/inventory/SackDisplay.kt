@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFormatEntry
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object SackDisplay {

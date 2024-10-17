@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.mining.fossilexcavator.solver
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.SkyHanniMod.Companion.coroutineScope
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlinx.coroutines.launch
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object FossilSolverDisplay {
