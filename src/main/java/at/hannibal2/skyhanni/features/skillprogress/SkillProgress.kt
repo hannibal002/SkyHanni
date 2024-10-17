@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -35,8 +36,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
@@ -219,7 +218,7 @@ object SkillProgress {
     @HandleEvent(priority = HandleEvent.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!config.hideInActionBar || !isEnabled()) return
-        if (event.isCanceled) return
+        if (event.isCancelled) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
             msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")

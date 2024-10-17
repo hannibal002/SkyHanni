@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -26,7 +27,7 @@ object ActionBarData {
         val message = LorenzUtils.stripVanillaMessage(original.formattedText)
         actionBar = message
         val actionBarEvent = ActionBarUpdateEvent(actionBar, event.message)
-        actionBarEvent.postAndCatch()
+        actionBarEvent.post()
         if (event.message.formattedText != actionBarEvent.chatComponent.formattedText) {
             event.message = actionBarEvent.chatComponent
         }

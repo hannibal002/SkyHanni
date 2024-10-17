@@ -130,7 +130,7 @@ object GetFromSackAPI {
         val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
         queuedHandler(replacedEvent)
         bazaarHandler(replacedEvent)
-        if (replacedEvent.isCanceled) {
+        if (replacedEvent.isCancelled) {
             event.cancel()
             return
         }
@@ -157,7 +157,7 @@ object GetFromSackAPI {
     }
 
     private fun bazaarHandler(event: MessageSendToServerEvent) {
-        if (event.isCanceled) return
+        if (event.isCancelled) return
         if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
         lastItemStack = commandValidator(event.splitMessage.drop(1)).second
     }
