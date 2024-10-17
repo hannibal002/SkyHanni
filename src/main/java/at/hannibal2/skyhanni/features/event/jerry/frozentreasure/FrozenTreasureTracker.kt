@@ -69,7 +69,7 @@ object FrozenTreasureTracker {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         icePerHour = 0
         stoppedChecks = 0
         icePerSecond = mutableListOf()
@@ -116,7 +116,7 @@ object FrozenTreasureTracker {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!ProfileStorageData.loaded) return
         if (!onJerryWorkshop()) return
 

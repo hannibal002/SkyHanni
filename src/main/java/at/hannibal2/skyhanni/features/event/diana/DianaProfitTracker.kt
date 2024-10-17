@@ -124,7 +124,7 @@ object DianaProfitTracker {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
@@ -147,7 +147,7 @@ object DianaProfitTracker {
         }
     }
 
-    private fun tryHide(event: LorenzChatEvent) {
+    private fun tryHide(event: SkyhanniChatEvent) {
         if (SkyHanniMod.feature.chat.filterType.diana) {
             event.blockedReason = "diana_chain_or_drops"
         }

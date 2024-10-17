@@ -39,7 +39,7 @@ object DungeonCleanEnd {
     private var lastBossId: Int = -1
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (!config.enabled) return
 
@@ -60,7 +60,7 @@ object DungeonCleanEnd {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         bossDone = false
         chestsSpawned = false
         lastBossId = -1

@@ -360,7 +360,7 @@ object EntityOutlineRenderer {
      * @param event the client tick event
      */
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!(event.phase == EventPriority.NORMAL && isEnabled())) return
 
         val renderGlobal = try {

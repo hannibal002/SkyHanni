@@ -6,7 +6,7 @@ import net.minecraftforge.fml.common.eventhandler.Cancelable
 
 open class EntityRenderLayersEvent<T : Entity>(
     val entity: T,
-) : LorenzEvent() {
+) : SkyHanniEvent() {
 
     @Cancelable
     class Pre<T : Entity>(

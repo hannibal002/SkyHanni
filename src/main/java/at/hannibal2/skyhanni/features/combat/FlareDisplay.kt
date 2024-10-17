@@ -61,7 +61,7 @@ object FlareDisplay {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.displayType == FlareConfig.DisplayType.GUI) return
 
@@ -141,13 +141,13 @@ object FlareDisplay {
         flares.any { it.entity.entityId == entity.entityId }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         flares.clear()
         display = emptyList()
     }
 
     @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
+    fun onRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.outlineType == FlareConfig.OutlineType.NONE) return
 

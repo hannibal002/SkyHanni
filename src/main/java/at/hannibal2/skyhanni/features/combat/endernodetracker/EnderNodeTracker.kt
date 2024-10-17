@@ -88,7 +88,7 @@ object EnderNodeTracker {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
 

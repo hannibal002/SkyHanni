@@ -214,7 +214,7 @@ object DungeonHideItems {
         } ?: false
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         hideParticles.clear()
         movingSkeletonSkulls.clear()
     }

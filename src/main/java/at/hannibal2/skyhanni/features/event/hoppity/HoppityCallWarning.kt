@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -81,7 +81,7 @@ object HoppityCallWarning {
     private var commandSentTimer = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    fun onKeyPress(event: KeyPressEvent) {
         if (config.acceptHotkey == Keyboard.KEY_NONE || config.acceptHotkey != event.keyCode) return
         acceptUUID?.let {
             HypixelCommands.callback(acceptUUID!!)
@@ -100,7 +100,7 @@ object HoppityCallWarning {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (callRingPattern.matches(event.message) && acceptUUID == null) readPickupUuid(event)
         if (!isEnabled()) return
         if (initHoppityCallPattern.matches(event.message)) startWarningUser()
@@ -159,7 +159,7 @@ object HoppityCallWarning {
         )
     }
 
-    private fun readPickupUuid(event: LorenzChatEvent) {
+    private fun readPickupUuid(event: SkyhanniChatEvent) {
         val siblings = event.chatComponent.siblings.takeIf { it.size >= 3 } ?: return
         val clickEvent = siblings[2]?.chatStyle?.chatClickEvent ?: return
         if (clickEvent.action.name.lowercase() != "run_command" || !clickEvent.value.lowercase().startsWith("/cb")) return

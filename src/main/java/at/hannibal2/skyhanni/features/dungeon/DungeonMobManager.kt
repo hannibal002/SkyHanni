@@ -74,13 +74,13 @@ object DungeonMobManager {
     }
 
     @SubscribeEvent
-    fun onLorenzTick(event: LorenzTickEvent) {
+    fun onLorenzTick(event: SkyhanniTickEvent) {
         if (!IslandType.CATACOMBS.isInIsland()) return
         handleInvisibleStar()
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!fel.highlight.get()) return
         if (fel.line) {
             felOnTheGround.filter { it.canBeSeen() }.forEach {

@@ -154,7 +154,7 @@ object FishingTimer {
     }
 
     @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (config.manualResetTimer.isKeyClicked()) {
@@ -184,7 +184,7 @@ object FishingTimer {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
@@ -214,7 +214,7 @@ object FishingTimer {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         mobDespawnTime.clear()
         recentMobs.clear()
         babyMagmaSlugsToFind = 0

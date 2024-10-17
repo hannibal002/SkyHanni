@@ -202,7 +202,7 @@ object FishingProfitTracker {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         coinsChatPattern.matchMatcher(event.message) {
             tryAddItem(NEUInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
             addCatch()
@@ -227,7 +227,7 @@ object FishingProfitTracker {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 

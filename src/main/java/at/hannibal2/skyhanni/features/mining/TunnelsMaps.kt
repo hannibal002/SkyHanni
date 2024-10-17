@@ -13,12 +13,12 @@ import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -204,7 +204,7 @@ object TunnelsMaps {
     }
 
     @SubscribeEvent
-    fun onRenderItemTooltip(event: LorenzToolTipEvent) {
+    fun onRenderItemTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
         clickTranslate[event.slot.slotIndex]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
@@ -394,7 +394,7 @@ object TunnelsMaps {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevclosest = closestNode
@@ -447,7 +447,7 @@ object TunnelsMaps {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path?.takeIf { it.first.isNotEmpty() } ?: return
         event.draw3DPathWithWaypoint(
@@ -478,7 +478,7 @@ object TunnelsMaps {
     } ?: config.pathColour.toChromaColor()
 
     @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         campfireKey(event)
@@ -493,7 +493,7 @@ object TunnelsMaps {
         nextSpot()
     }
 
-    private fun campfireKey(event: LorenzKeyPressEvent) {
+    private fun campfireKey(event: KeyPressEvent) {
         if (event.keyCode != config.campfireKey) return
         if (config.travelScroll) {
             HypixelCommands.warp("basecamp")
@@ -523,7 +523,7 @@ object TunnelsMaps {
 
     private var nextSpotDelay = SimpleTimeMark.farPast()
 
-    private fun nextSpotKey(event: LorenzKeyPressEvent) {
+    private fun nextSpotKey(event: KeyPressEvent) {
         if (event.keyCode != config.nextSpotHotkey) return
         nextSpot()
     }

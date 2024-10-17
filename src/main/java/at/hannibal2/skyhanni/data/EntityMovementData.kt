@@ -82,7 +82,7 @@ object EntityMovementData {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         addToTrack(Minecraft.getMinecraft().thePlayer)
 
@@ -100,7 +100,7 @@ object EntityMovementData {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!warpingPattern.matches(event.message)) return
         DelayedRun.runNextTick {
@@ -109,7 +109,7 @@ object EntityMovementData {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         entityLocation.clear()
     }
 }

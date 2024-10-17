@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils
@@ -31,7 +31,7 @@ object LineToMobHandler {
     }
 
     @SubscribeEvent
-    fun onLorenzRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onLorenzRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (lines.isEmpty()) return
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {

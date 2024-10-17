@@ -141,7 +141,7 @@ object DianaFixChat {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         successfulCounter = 0
     }
 

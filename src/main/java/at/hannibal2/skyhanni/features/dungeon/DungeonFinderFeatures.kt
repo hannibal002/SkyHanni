@@ -304,7 +304,7 @@ object DungeonFinderFeatures {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 

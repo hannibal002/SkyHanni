@@ -20,7 +20,7 @@ object EndermanSlayerHideParticles {
     private var endermanLocations = listOf<LorenzVec>()
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
 
         endermanLocations = EntityUtils.getEntities<EntityEnderman>().map { it.getLorenzVec() }.toList()
