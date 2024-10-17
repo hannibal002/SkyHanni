@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.HasLegacyId
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -84,11 +83,6 @@ object ConfigUtils {
 
     fun KMutableProperty0<*>.jumpToEditor() {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
-
-        // TODO create utils function "crashIfInDevEnv"
-        if (LorenzEvent.isInGuardedEventHandler) {
-            throw Error("can not jump to editor $name")
-        }
         ErrorManager.logErrorStateWithData(
             "Can not open the config",
             "error while trying to jump to an editor element",
