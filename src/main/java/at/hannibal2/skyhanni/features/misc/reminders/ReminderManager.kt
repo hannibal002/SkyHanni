@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.reminders
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.chat.Text.wrap
 import net.minecraft.util.IChatComponent
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 

@@ -1,11 +1,11 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.boss.BossStatus
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object BossbarData {

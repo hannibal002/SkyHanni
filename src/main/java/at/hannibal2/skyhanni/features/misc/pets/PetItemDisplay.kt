@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getPetItem
 import net.minecraft.client.Minecraft
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PetItemDisplay {

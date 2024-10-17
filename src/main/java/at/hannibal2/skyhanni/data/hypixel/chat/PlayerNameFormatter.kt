@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chat.PlayerMessagesConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
@@ -29,7 +30,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonNull
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 /**
  * Listening to the player chat events, and applying custom chat options to them.

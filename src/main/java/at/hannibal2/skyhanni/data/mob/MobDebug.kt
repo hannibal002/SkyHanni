@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data.mob
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.dev.DebugMobConfig.HowToShow
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object MobDebug {
