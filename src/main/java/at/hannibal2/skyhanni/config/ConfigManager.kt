@@ -94,7 +94,8 @@ class ConfigManager {
 
         try {
             findPositionLinks(features, mutableSetOf())
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            if (PlatformUtils.isDevEnvironment) throw e
         }
     }
 
