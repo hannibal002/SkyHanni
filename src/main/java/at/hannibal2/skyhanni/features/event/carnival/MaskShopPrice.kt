@@ -38,8 +38,12 @@ object MaskShopPrice {
 
     val patternGroup = RepoPattern.group("carnival.shop")
     private val tokenAmountPattern by patternGroup.pattern(
-        "amount",
+        "tokencost",
         "(?<amount>[\\d,]+) Carnival Tokens",
+    )
+    private val inventoryPattern by patternGroup.pattern(
+        "mask.inventoryname",
+        "Carnival Masks"
     )
 
     @SubscribeEvent
@@ -52,7 +56,7 @@ object MaskShopPrice {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
-        if (event.inventoryName != "Carnival Masks") return
+        if (!inventoryPattern.matches(event.inventoryName)) return
         inInventory = true
         inventoryItems = event.inventoryItems
         update()
