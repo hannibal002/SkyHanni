@@ -106,6 +106,7 @@ object ChocolateFactoryTimeTowerManager {
         )
         SoundUtils.playBeepSound()
         lastTimeTowerWarning = SimpleTimeMark.now()
+        warnedAboutLatestCharge = true
     }
 
     fun timeTowerCharges(): String {
