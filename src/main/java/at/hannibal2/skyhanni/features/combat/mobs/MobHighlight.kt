@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
 import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
@@ -23,7 +24,6 @@ import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.init.Blocks
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object MobHighlight {

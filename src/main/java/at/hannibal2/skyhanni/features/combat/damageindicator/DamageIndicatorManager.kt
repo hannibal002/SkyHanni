@@ -59,7 +59,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
