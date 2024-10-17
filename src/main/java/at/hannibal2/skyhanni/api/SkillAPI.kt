@@ -421,7 +421,7 @@ object SkillAPI {
                     ChatUtils.chat("§bSkill Custom Goal Level")
                     val map = storage?.filter { it.value.customGoalLevel != 0 } ?: return
                     if (map.isEmpty()) {
-                        ChatUtils.chat("§cYou haven't set any custom goals yet!")
+                        ChatUtils.userError("You haven't set any custom goals yet!")
                     }
                     map.forEach { (skill, data) ->
                         ChatUtils.chat("§e${skill.displayName}: §b${data.customGoalLevel}")
@@ -479,6 +479,30 @@ object SkillAPI {
             when (first) {
                 "goal" -> {
                     setSkillGoal(it[1].lowercase(), it[2])
+                    val rawSkill = it[1].lowercase()
+                    val skillType = SkillType.getByNameOrNull(rawSkill)
+                    if (skillType == null) {
+                        ChatUtils.userError("Unknown Skill type: $rawSkill")
+                        return
+                    }
+                    val rawLevel = it[2]
+                    val targetLevel = rawLevel.toIntOrNull()
+                    if (targetLevel == null) {
+                        ChatUtils.userError("$rawLevel is not a valid number.")
+                        return
+                    }
+                    val skill = storage?.get(skillType) ?: return
+
+                    if (targetLevel <= skill.overflowLevel) {
+                        ChatUtils.userError(
+                            "Custom goal level ($targetLevel) must be greater than your current level (${skill.overflowLevel})."
+                        )
+                        return
+                    }
+
+                    skill.customGoalLevel = targetLevel
+                    ChatUtils.chat("Custom goal level for §b${skillType.displayName} §eset to §b$targetLevel")
+                    return
                 }
             }
         }

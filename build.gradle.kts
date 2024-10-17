@@ -8,6 +8,8 @@ import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.DownloadBackupRepo
 
 plugins {
     idea
@@ -95,6 +97,12 @@ val headlessLwjgl by configurations.creating {
     isTransitive = false
     isVisible = false
 }
+
+val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.branch = "main"
+}
+
 tasks.runClient {
     this.javaLauncher.set(
         javaToolchains.launcherFor {
@@ -102,6 +110,13 @@ tasks.runClient {
         },
     )
 }
+
+tasks.register("checkPrDescription", ChangelogVerification::class) {
+    this.outputDirectory.set(layout.buildDirectory)
+    this.prTitle = project.findProperty("prTitle") as String
+    this.prBody = project.findProperty("prBody") as String
+}
+
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
@@ -205,6 +220,7 @@ kotlin {
 
 // Tasks:
 tasks.processResources {
+    from(includeBackupRepo)
     inputs.property("version", version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)

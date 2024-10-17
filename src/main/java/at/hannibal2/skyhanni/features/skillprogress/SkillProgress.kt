@@ -366,7 +366,7 @@ object SkillProgress {
                         }
                         append("§7)")
                     },
-                    tips,
+                    tips
                 )
             }
         }
@@ -378,10 +378,11 @@ object SkillProgress {
         val xpInfo = skillXPInfoMap[activeSkill] ?: return@buildMap
         val skillInfoLast = oldSkillInfoMap[activeSkill] ?: return@buildMap
         oldSkillInfoMap[activeSkill] = skillInfo
-        val level =
-            if (config.overflowConfig.enableInEtaDisplay.get() ||
-                config.customGoalConfig.enableInETADisplay
-            ) skillInfo.overflowLevel else skillInfo.level
+        val level = if (config.overflowConfig.enableInEtaDisplay.get() || config.customGoalConfig.enableInETADisplay) {
+            skillInfo.overflowLevel
+        } else {
+            skillInfo.level
+        }
 
         val useCustomGoalLevel =
             skillInfo.customGoalLevel != 0 && skillInfo.customGoalLevel > skillInfo.overflowLevel && customGoalConfig.enableInETADisplay
