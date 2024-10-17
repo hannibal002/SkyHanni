@@ -57,7 +57,7 @@ object HoppityEventSummary {
         config.eventSummary.liveDisplayPosition.renderRenderables(
             listOf(
                 Renderable.string(
-                    "§d§lHoppity's Hunt #${currentYear} Stats",
+                    "§d§lHoppity's Hunt #${getHoppityEventNumber(currentYear)} Stats",
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                 ),
                 cardRenderable
