@@ -9,7 +9,7 @@ object ConfigGuiManager {
 
     var editor: MoulConfigEditor<Features>? = null
 
-
+    @Suppress("AvoidBritishSpelling")
     private val replacedSearchTerms = mapOf(
         "color" to "colour",
         "colour" to "color",
@@ -25,24 +25,23 @@ object ConfigGuiManager {
 
     private fun getPossibleAltWords(word: String): List<String> {
         return buildList {
-            replacedSearchTerms.forEach { first, second ->
+            replacedSearchTerms.forEach { (first, second) ->
                 if (first.startsWith(word, ignoreCase = true)) {
                     add(second)
                 }
-
             }
         }
     }
 
-    fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also {
-        it.setSearchFunction { optionEditor, word ->
+    fun getEditorInstance() = editor ?: MoulConfigEditor(SkyHanniMod.configManager.processor).also { editor ->
+        editor.setSearchFunction { optionEditor, word ->
             if (optionEditor.fulfillsSearch(word)) return@setSearchFunction true
-            getPossibleAltWords(word).forEach{
+            getPossibleAltWords(word).forEach {
                 if (optionEditor.fulfillsSearch(it)) return@setSearchFunction true
             }
             return@setSearchFunction false
         }
-        editor = it
+        this.editor = editor
     }
 
     fun openConfigGui(search: String? = null) {

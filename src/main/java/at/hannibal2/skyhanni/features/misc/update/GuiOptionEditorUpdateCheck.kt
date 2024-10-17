@@ -56,7 +56,7 @@ class GuiOptionEditorUpdateCheck(option: ProcessedOption) : GuiOptionEditor(opti
             10F,
             true,
             widthRemaining / 2,
-            -1
+            -1,
         )
 
         GlStateManager.popMatrix()
