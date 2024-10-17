@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.data.GuiEditManager
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsX
 import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.model.Graph
-import at.hannibal2.skyhanni.data.model.toPositionsList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -19,11 +18,11 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
+import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
 import at.hannibal2.skyhanni.utils.shader.ShaderManager
-import io.github.moulberry.notenoughupdates.util.Utils
 import io.github.notenoughupdates.moulconfig.internal.TextRenderUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.FontRenderer
@@ -41,6 +40,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.MathHelper
 import net.minecraft.util.ResourceLocation
+import org.lwjgl.input.Mouse
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.nio.FloatBuffer
@@ -51,6 +51,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
+@Suppress("LargeClass")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {
@@ -93,6 +94,15 @@ object RenderUtils {
 
     infix fun RenderGuiItemOverlayEvent.highlight(color: Color) {
         highlight(color, x, y)
+    }
+
+    fun getMouseX(): Int {
+        return Mouse.getX() * GuiScreenUtils.scaledWindowWidth / Minecraft.getMinecraft().displayWidth
+    }
+
+    fun getMouseY(): Int {
+        val height = GuiScreenUtils.scaledWindowHeight
+        return height - Mouse.getY() * height / Minecraft.getMinecraft().displayHeight - 1
     }
 
     fun highlight(color: Color, x: Int, y: Int) {
@@ -504,8 +514,8 @@ object RenderUtils {
     fun Position.transform(): Pair<Int, Int> {
         GlStateManager.translate(getAbsX().toFloat(), getAbsY().toFloat(), 0F)
         GlStateManager.scale(effectiveScale, effectiveScale, 1F)
-        val x = ((Utils.getMouseX() - getAbsX()) / effectiveScale).toInt()
-        val y = ((Utils.getMouseY() - getAbsY()) / effectiveScale).toInt()
+        val x = ((getMouseX() - getAbsX()) / effectiveScale).toInt()
+        val y = ((getMouseY() - getAbsY()) / effectiveScale).toInt()
         return x to y
     }
 
@@ -581,10 +591,11 @@ object RenderUtils {
     }
 
     fun Position.renderRenderable(
-        renderable: Renderable,
+        renderable: Renderable?,
         posLabel: String,
         addToGuiManager: Boolean = true,
     ) {
+        if (renderable == null) return
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         Renderable.withMousePosition(x, y) {
@@ -639,8 +650,11 @@ object RenderUtils {
     ) {
         if (list.isEmpty()) return
 
-        val render =
-            list.map { it.map { Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it") } }
+        val render = list.map { listEntry ->
+            listEntry.map {
+                Renderable.fromAny(it, itemScale = itemScale) ?: throw RuntimeException("Unknown render object: $it")
+            }
+        }
 
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
@@ -752,6 +766,15 @@ object RenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f)
         GlStateManager.popMatrix()
+    }
+
+    fun LorenzRenderWorldEvent.drawCylinderInWorld(
+        color: Color,
+        location: LorenzVec,
+        radius: Float,
+        height: Float,
+    ) {
+        drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
     }
 
     fun drawCylinderInWorld(
@@ -1086,6 +1109,15 @@ object RenderUtils {
         return exactLocation(player) + add
     }
 
+    fun LorenzRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
+        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        return exactLocation(player) + add
+    }
+
+    fun LorenzRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
+    }
+
     fun exactLocation(entity: Entity, partialTicks: Float): LorenzVec {
         if (entity.isDead) return entity.getLorenzVec()
         val x = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks
@@ -1269,6 +1301,8 @@ object RenderUtils {
         waypointColor: Color =
             (path.lastOrNull()?.name?.getFirstColorCode()?.toLorenzColor() ?: LorenzColor.WHITE).toColor(),
         bezierPoint: Double = 1.0,
+        showNodeNames: Boolean = false,
+        markLastBlock: Boolean = true,
     ) {
         if (path.isEmpty()) return
         val points = if (startAtEye) {
@@ -1290,15 +1324,21 @@ object RenderUtils {
                 bezierPoint,
             )
         }
-        path.filter { it.name?.isNotEmpty() == true }.forEach {
-            this.drawDynamicText(it.position, it.name!!, textSize)
+        if (showNodeNames) {
+            path.filter { it.name?.isNotEmpty() == true }.forEach {
+                this.drawDynamicText(it.position, it.name!!, textSize)
+            }
         }
-        val last = path.last()
-        drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        if (markLastBlock) {
+            val last = path.last()
+            drawWaypointFilled(last.position, waypointColor, seeThroughBlocks = true)
+        }
     }
 
-    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator) {
+    class LineDrawer @PublishedApi internal constructor(val tessellator: Tessellator, val inverseView: LorenzVec) {
+
         val worldRenderer = tessellator.worldRenderer
+
         fun drawPath(path: List<LorenzVec>, color: Color, lineWidth: Int, depth: Boolean, bezierPoint: Double = 1.0) {
             if (bezierPoint < 0) {
                 path.zipWithNext().forEach {
@@ -1306,11 +1346,11 @@ object RenderUtils {
                 }
             } else {
                 val pathLines = path.zipWithNext()
-                pathLines.forEachIndexed { index, it ->
-                    val reduce = it.second.minus(it.first).normalize().times(bezierPoint)
+                pathLines.forEachIndexed { index, pathLine ->
+                    val reduce = pathLine.second.minus(pathLine.first).normalize().times(bezierPoint)
                     draw3DLine(
-                        if (index != 0) it.first + reduce else it.first,
-                        if (index != pathLines.lastIndex) it.second - reduce else it.second,
+                        if (index != 0) pathLine.first + reduce else pathLine.first,
+                        if (index != pathLines.lastIndex) pathLine.second - reduce else pathLine.second,
                         color,
                         lineWidth,
                         depth,
@@ -1341,6 +1381,9 @@ object RenderUtils {
                 GlStateManager.depthMask(true)
             }
         }
+
+        fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
+            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), lorenzVec, color, lineWidth, depth)
 
         fun drawBezier2(
             p1: LorenzVec,
@@ -1388,7 +1431,7 @@ object RenderUtils {
         companion object {
             inline fun draw3D(
                 partialTicks: Float = 0F,
-                crossinline quads: LineDrawer.() -> Unit,
+                crossinline draws: LineDrawer.() -> Unit,
             ) {
 
                 GlStateManager.enableBlend()
@@ -1401,10 +1444,10 @@ object RenderUtils {
                 val tessellator = Tessellator.getInstance()
 
                 GlStateManager.pushMatrix()
-                RenderUtils.translate(getViewerPos(partialTicks).negated())
-                getViewerPos(partialTicks)
+                val inverseView = getViewerPos(partialTicks)
+                RenderUtils.translate(inverseView.negated())
 
-                quads.invoke(LineDrawer(Tessellator.getInstance()))
+                draws.invoke(LineDrawer(Tessellator.getInstance(), inverseView))
 
                 GlStateManager.popMatrix()
 
@@ -1572,7 +1615,11 @@ object RenderUtils {
 
     // TODO nea please merge with 'draw3DLine'
     fun LorenzRenderWorldEvent.draw3DLine_nea(
-        p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean,
+        p1: LorenzVec,
+        p2: LorenzVec,
+        color: Color,
+        lineWidth: Int,
+        depth: Boolean,
     ) {
         GlStateManager.disableCull()
 
@@ -1609,6 +1656,27 @@ object RenderUtils {
         GlStateManager.popMatrix()
         GlStateManager.disableLighting()
         GlStateManager.enableCull()
+    }
+
+    fun LorenzRenderWorldEvent.drawHitbox(
+        boundingBox: AxisAlignedBB,
+        lineWidth: Int,
+        color: Color,
+        depth: Boolean,
+    ) {
+        val cornersTop = boundingBox.getCorners(boundingBox.maxY)
+        val cornersBottom = boundingBox.getCorners(boundingBox.minY)
+
+        // Draw lines for the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersTop[i], cornersTop[(i + 1) % 4], color, lineWidth, depth)
+            this.draw3DLine(cornersBottom[i], cornersBottom[(i + 1) % 4], color, lineWidth, depth)
+        }
+
+        // Draw lines connecting the top and bottom faces
+        for (i in 0..3) {
+            this.draw3DLine(cornersBottom[i], cornersTop[i], color, lineWidth, depth)
+        }
     }
 
     fun chromaColor(
@@ -1688,7 +1756,7 @@ object RenderUtils {
     fun drawRoundTexturedRect(x: Int, y: Int, width: Int, height: Int, filter: Int, radius: Int = 10, smoothness: Int = 1) {
         // if radius is 0 then just draw a normal textured rect
         if (radius <= 0) {
-            Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+            GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
             return
         }
 
@@ -1707,7 +1775,7 @@ object RenderUtils {
         GlStateManager.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.ROUNDED_TEXTURE)
 
-        Utils.drawTexturedRect(x.toFloat(), y.toFloat(), width.toFloat(), height.toFloat(), filter)
+        GuiRenderUtils.drawTexturedRect(x, y, width, height, filter = filter)
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
@@ -1808,6 +1876,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
+    // todo merge with the one in GuiRenderUtils
     fun drawGradientRect(
         left: Int,
         top: Int,
@@ -1845,13 +1914,6 @@ object RenderUtils {
         GlStateManager.disableBlend()
         GlStateManager.enableAlpha()
         GlStateManager.enableTexture2D()
-    }
-
-    // TODO move off of neu function
-    fun drawTexturedRect(x: Float, y: Float) {
-        with(ScaledResolution(Minecraft.getMinecraft())) {
-            Utils.drawTexturedRect(x, y, scaledWidth.toFloat(), scaledHeight.toFloat(), GL11.GL_NEAREST)
-        }
     }
 
     fun getAlpha(): Float {

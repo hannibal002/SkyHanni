@@ -19,6 +19,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.event.HoverEvent
@@ -40,7 +41,7 @@ object EnchantParser {
     val patternGroup = RepoPattern.group("misc.items.enchantparsing")
     val enchantmentPattern by patternGroup.pattern(
         "enchants.new",
-        "(§9§d§l|§d§l§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
+        "(§7§l|§d§l|§9)(?<enchant>[A-Za-z][A-Za-z '-]+) (?<levelNumeral>[IVXLCDM]+|[0-9]+)(?<stacking>(§r)?§9, |\$| §8\\d{1,3}(,\\d{3})*)",
     )
     private val grayEnchantPattern by patternGroup.pattern(
         "grayenchants", "^(Respiration|Aqua Affinity|Depth Strider|Efficiency).*",
@@ -202,7 +203,26 @@ object EnchantParser {
         val insertEnchants: MutableList<String> = mutableListOf()
 
         // Format enchants based on format config option
-        formatEnchants(insertEnchants)
+        try {
+            formatEnchants(insertEnchants)
+        } catch (e: ArithmeticException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "Item has enchants in nbt but none were found?",
+                "item" to currentItem,
+                "loreList" to loreList,
+                "nbt" to currentItem?.getExtraAttributes()
+            )
+            return
+        } catch (e: ConcurrentModificationException) {
+            ErrorManager.logErrorWithData(
+                e,
+                "ConcurrentModificationException whilst formatting enchants",
+                "loreList" to loreList,
+                "format" to config.format.get(),
+                "orderedEnchants" to orderedEnchants
+            )
+        }
 
         // Add our parsed enchants back into the lore
         loreList.addAll(startEnchant, insertEnchants)

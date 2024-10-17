@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
+import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -78,7 +79,8 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment)
+    private val localLoading: Boolean
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
 
     private val logger = LogManager.getLogger("SkyHanni")
 
@@ -101,7 +103,9 @@ object RepoPatternManager {
                 val previousOwner = exclusivity[key]
                 if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
                     if (!config.tolerateDuplicateUsage)
-                        crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
+                        crash("Non unique access to regex at \"$key\". " +
+                            "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
+                            "tried to use at ${owner.ownerClass} / ${owner.property}")
                 } else {
                     exclusivity[key] = owner
                 }
@@ -119,7 +123,9 @@ object RepoPatternManager {
                 }
                 val previousParentOwner = previousParentOwnerMutable
 
-                if (previousParentOwner != null && previousParentOwner != parentKeyHolder && !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)) {
+                if (previousParentOwner != null && previousParentOwner != parentKeyHolder &&
+                    !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)
+                ) {
                     if (!config.tolerateDuplicateUsage) crash(
                         "Non unique access to array regex at \"$parent\"." +
                             " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +

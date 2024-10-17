@@ -56,6 +56,10 @@ public class Position {
     private boolean clicked = false;
     public String internalName = null;
 
+    public Position() {
+        this(0, 0);
+    }
+
     public Position(int x, int y) {
         this(x, y, false, false);
     }

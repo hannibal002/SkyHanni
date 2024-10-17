@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.roundToPrecision
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
@@ -40,7 +40,7 @@ object SkillTooltip {
                 val maxReached = "§7§8Max Skill level reached!"
                 if (line.contains(maxReached) && overflowConfig.enableInSkillMenuTooltip) {
                     val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax) * 100
-                    val percent = "§e${progress.roundToPrecision(1)}%"
+                    val percent = "§e${progress.roundTo(1)}%"
                     val currentLevel = skillInfo.overflowLevel
 
                     val level = if (useRoman) currentLevel.toRoman() else currentLevel
@@ -56,7 +56,8 @@ object SkillTooltip {
                     if (line.contains(bar)) {
                         val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax)
                         val progressBar = StringUtils.progressBar(progress)
-                        iterator.set("$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/§e${skillInfo.overflowCurrentXpMax.addSeparators()}")
+                        iterator.set("$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/" +
+                            "§e${skillInfo.overflowCurrentXpMax.addSeparators()}")
                         iterator.add("")
                     }
                 }
@@ -74,7 +75,7 @@ object SkillTooltip {
                     val progress = have.toDouble() / need
                     val progressBar = StringUtils.progressBar(progress)
                     val nextLevel = if (useRoman) targetLevel.toRoman() else targetLevel
-                    val percent = "§e${(progress * 100).roundToPrecision(1)}%"
+                    val percent = "§e${(progress * 100).roundTo(1)}%"
                     iterator.add("")
                     iterator.add("§7Progress to Level $nextLevel: $percent")
                     iterator.add("$progressBar §e${have.addSeparators()}§6/§e${need.addSeparators()}")

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.misc.items
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.EstimatedItemValueConfig
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -21,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -32,12 +34,13 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 
 @SkyHanniModule
 object EstimatedItemValue {
 
-    val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
+    val config: EstimatedItemValueConfig get() = SkyHanniMod.feature.inventory.estimatedItemValues
     private var display = emptyList<List<Any>>()
     private val cache = mutableMapOf<ItemStack, List<List<Any>>>()
     private var lastToolTipTime = 0L
@@ -87,6 +90,16 @@ object EstimatedItemValue {
     fun tryRendering() {
         currentlyShowing = checkCurrentlyVisible()
         if (!currentlyShowing) return
+
+        if (SkyHanniMod.feature.dev.debug.enabled) {
+            if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+                EstimatedItemValueCalculator.starChange += 1
+                cache.clear()
+            } else if (Keyboard.KEY_LEFT.isKeyClicked()) {
+                EstimatedItemValueCalculator.starChange -= 1
+                cache.clear()
+            }
+        }
 
         config.itemPriceDataPos.renderStringsAndItems(display, posLabel = "Estimated Item Value")
     }

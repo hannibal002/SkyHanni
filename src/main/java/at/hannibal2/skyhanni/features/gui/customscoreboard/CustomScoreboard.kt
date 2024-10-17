@@ -12,6 +12,8 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
@@ -28,6 +30,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -46,14 +49,9 @@ object CustomScoreboard {
 
     private var display = emptyList<ScoreboardElementType>()
     private var cache = emptyList<ScoreboardElementType>()
-    private val guiName = "Custom Scoreboard"
+    private const val GUI_NAME = "Custom Scoreboard"
 
-    // Cached scoreboard data, only update after no change for 300ms
-    var activeLines = emptyList<String>()
-
-    // Most recent scoreboard state, not in use until cached
-    private var mostRecentLines = emptyList<String>()
-    private var lastScoreboardUpdate = SimpleTimeMark.farFuture()
+    private var nextScoreboardUpdate = SimpleTimeMark.farFuture()
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
@@ -61,7 +59,7 @@ object CustomScoreboard {
         if (display.isEmpty()) return
 
         val render =
-            if (!TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
+            if (LorenzUtils.inSkyBlock && !TabListData.fullyLoaded && displayConfig.cacheScoreboardOnIslandSwitch && cache.isNotEmpty()) {
                 cache
             } else {
                 display
@@ -78,16 +76,14 @@ object CustomScoreboard {
 
         RenderBackground.updatePosition(finalRenderable)
 
-        config.position.renderRenderable(finalRenderable, posLabel = guiName)
+        config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
     }
 
     @SubscribeEvent
     fun onGuiPositionMoved(event: GuiPositionMovedEvent) {
-        if (event.guiName == guiName) {
+        if (event.guiName == GUI_NAME) {
             with(alignmentConfig) {
-                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN ||
-                    verticalAlignment != VerticalAlignment.DONT_ALIGN
-                ) {
+                if (horizontalAlignment != HorizontalAlignment.DONT_ALIGN || verticalAlignment != VerticalAlignment.DONT_ALIGN) {
                     val tempHori = horizontalAlignment
                     val tempVert = verticalAlignment
 
@@ -111,16 +107,9 @@ object CustomScoreboard {
     fun onTick(event: LorenzTickEvent) {
         if (!isEnabled()) return
 
-        // We want to update the scoreboard as soon as we have new data, not 5 ticks delayed
-        var dirty = false
-        if (lastScoreboardUpdate.passedSince() > 300.milliseconds) {
-            activeLines = mostRecentLines
-            lastScoreboardUpdate = SimpleTimeMark.farFuture()
-            dirty = true
-        }
-
-        // Creating the lines
-        if (event.isMod(5) || dirty) {
+        if (dirty || nextScoreboardUpdate.isInPast()) {
+            nextScoreboardUpdate = 250.milliseconds.fromNow()
+            dirty = false
             display = createLines().removeEmptyLinesFromEdges()
             if (TabListData.fullyLoaded) {
                 cache = display.toList()
@@ -128,15 +117,13 @@ object CustomScoreboard {
         }
 
         // Remove Known Lines, so we can get the unknown ones
-        UnknownLinesHandler.handleUnknownLines()
+        if (LorenzUtils.inSkyBlock && displayConfig.useCustomLines) UnknownLinesHandler.handleUnknownLines()
     }
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        mostRecentLines = event.scoreboard
-        lastScoreboardUpdate = SimpleTimeMark.now()
+        dirty = true
     }
-
 
     internal val config get() = SkyHanniMod.feature.gui.customScoreboard
     internal val displayConfig get() = config.display
@@ -150,26 +137,40 @@ object CustomScoreboard {
     internal val informationFilteringConfig get() = config.informationFiltering
     internal val backgroundConfig get() = config.background
 
-    private fun createLines() = buildList<ScoreboardElementType> {
+    private fun createLines() = when {
+        !LorenzUtils.inSkyBlock -> addAllNonSkyBlockLines()
+        !displayConfig.useCustomLines -> addDefaultSkyBlockLines()
+        else -> addCustomSkyBlockLines()
+    }
+
+    private fun addAllNonSkyBlockLines() = buildList {
+        addAll(ScoreboardElement.TITLE.getVisiblePair())
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
+    }
+
+    private fun addDefaultSkyBlockLines() = buildList {
+        add(ScoreboardData.objectiveTitle to displayConfig.titleAndFooter.alignTitleAndFooter)
+        addAll(ScoreboardData.sidebarLinesFormatted.map { it to HorizontalAlignment.LEFT })
+    }
+
+    private fun addCustomSkyBlockLines() = buildList<ScoreboardElementType> {
         for (element in config.scoreboardEntries) {
             val lines = element.getVisiblePair()
             if (lines.isEmpty()) continue
 
-            // Hide consecutive empty lines
             if (
                 informationFilteringConfig.hideConsecutiveEmptyLines &&
-                lines.first().first == "<empty>" && lastOrNull()?.first?.isEmpty() == true
+                lines.first().first == "<empty>" &&
+                lastOrNull()?.first?.isEmpty() == true
             ) {
                 continue
             }
 
-            // Adds empty lines
             if (lines.first().first == "<empty>") {
                 add("" to HorizontalAlignment.LEFT)
                 continue
             }
 
-            // Does not display this line
             if (lines.any { it.first == "<hidden>" }) {
                 continue
             }
@@ -205,7 +206,11 @@ object CustomScoreboard {
 
     @SubscribeEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        ConditionalUtils.onToggle(config.enabled, displayConfig.hideVanillaScoreboard) {
+        ConditionalUtils.onToggle(
+            config.enabled,
+            displayConfig.hideVanillaScoreboard,
+            SkyHanniMod.feature.misc.showOutsideSB,
+        ) {
             if (!isHideVanillaScoreboardEnabled()) dirty = true
         }
     }
@@ -213,7 +218,7 @@ object CustomScoreboard {
     @SubscribeEvent
     fun onWorldChange(event: LorenzWorldChangeEvent) {
         runDelayed(2.seconds) {
-            if (!LorenzUtils.inSkyBlock) dirty = true
+            if (!LorenzUtils.inSkyBlock || !(LorenzUtils.onHypixel && OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected())) dirty = true
         }
     }
 
@@ -235,7 +240,9 @@ object CustomScoreboard {
         }
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
+    private fun isEnabled() =
+        (LorenzUtils.inSkyBlock || (OutsideSbFeature.CUSTOM_SCOREBOARD.isSelected() && LorenzUtils.onHypixel)) && config.enabled.get()
+
     private fun isHideVanillaScoreboardEnabled() = isEnabled() && displayConfig.hideVanillaScoreboard.get()
 
     @SubscribeEvent
@@ -326,6 +333,13 @@ object CustomScoreboard {
             val array = element.asJsonArray
             array.add(JsonPrimitive(ScoreboardEvent.NEW_YEAR.name))
             array
+        }
+        event.move(
+            57,
+            "$displayPrefix.titleAndFooter.useHypixelTitleAnimation",
+            "$displayPrefix.titleAndFooter.useCustomTitle",
+        ) {
+            JsonPrimitive(!it.asBoolean)
         }
     }
 }

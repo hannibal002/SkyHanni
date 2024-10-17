@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.features.misc.items.enchants
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.features.chroma.ChromaManager
 import at.hannibal2.skyhanni.utils.ItemCategory
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
@@ -64,7 +66,8 @@ open class Enchant : Comparable<Enchant> {
         val config = SkyHanniMod.feature.inventory.enchantParsing
 
         val itemCategory = itemStack?.getItemCategoryOrNull()
-        val itemName = itemStack?.itemNameWithoutColor
+        val internalName = itemStack?.getInternalNameOrNull()
+        val itemName = internalName?.itemName?.removeColor()
 
         if (this.nbtName == "efficiency") {
             // If the item is a Stonk, or a non-mining tool with Efficiency 5 (whilst not being a Promising Shovel),
@@ -91,8 +94,7 @@ open class Enchant : Comparable<Enchant> {
         return if (this.isUltimate()) -1 else 1
     }
 
-    class Normal : Enchant() {
-    }
+    class Normal : Enchant()
 
     class Ultimate : Enchant() {
         override fun getFormat(level: Int, itemStack: ItemStack?) = "§d§l"
@@ -108,7 +110,7 @@ open class Enchant : Comparable<Enchant> {
         @Expose
         private var stackLevel: TreeSet<Int>? = null
 
-        override fun toString() = "$nbtNum ${stackLevel.toString()} ${super.toString()}"
+        override fun toString() = "$nbtNum $stackLevel ${super.toString()}"
     }
 
     class Dummy(name: String) : Enchant() {

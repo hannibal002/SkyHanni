@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -54,10 +53,20 @@ object InquisitorWaypointShare {
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
+    @Suppress("MaxLineLength")
     private val partyInquisitorCheckerPattern by patternGroup.pattern(
         "party.inquisitorchecker",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
     )
+
+    /**
+     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     */
+    private val odinPattern by patternGroup.pattern(
+        "party.odin",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!"
+    )
+
     private val diedPattern by patternGroup.pattern(
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
@@ -202,7 +211,8 @@ object InquisitorWaypointShare {
         lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
-            ErrorManager.skyHanniError("No Inquisitor Found!")
+            ChatUtils.debug("Trying to send inquisitor via chat, but no Inquisitor is nearby.")
+            return
         }
 
         val inquisitor = EntityUtils.getEntityByID(inquisitor)
@@ -233,6 +243,11 @@ object InquisitorWaypointShare {
         if (packet.type.toInt() != 0) return
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
+            if (detectFromChat()) {
+                event.cancel()
+            }
+        }
+        odinPattern.matchMatcher(message) {
             if (detectFromChat()) {
                 event.cancel()
             }

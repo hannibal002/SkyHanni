@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
@@ -52,7 +53,7 @@ object WorldEdit {
         return text
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (event.itemInHand?.getItemId() != "WOOD_AXE") return
@@ -105,7 +106,8 @@ object WorldEdit {
         }
         when (it.firstOrNull()) {
             null, "help" -> {
-                ChatUtils.chat("Use a wood axe and left/right click to select a region in the world. Then use /shworldedit copy or /shworldedit reset.")
+                ChatUtils.chat("Use a wood axe and left/right click to select a region in the world. " +
+                    "Then use /shworldedit copy or /shworldedit reset.")
             }
 
             "copy" -> {

@@ -15,9 +15,19 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class HoppityEggsConfig {
 
     @Expose
+    @ConfigOption(name = "Hoppity Abiphone Calls", desc = "")
+    @Accordion
+    public HoppityCallWarningConfig hoppityCallWarning = new HoppityCallWarningConfig();
+
+    @Expose
     @ConfigOption(name = "Event Summary", desc = "")
     @Accordion
     public HoppityEventSummaryConfig eventSummary = new HoppityEventSummaryConfig();
+
+    @Expose
+    @ConfigOption(name = "Warp Menu", desc = "")
+    @Accordion
+    public HoppityWarpMenuConfig warpMenu = new HoppityWarpMenuConfig();
 
     @Expose
     @ConfigOption(name = "Hoppity Waypoints", desc = "Toggle guess waypoints for Hoppity's Hunt.")
@@ -44,6 +54,12 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean showLine = false;
+
+    @Expose
+    @ConfigOption(name = "Show Path Finder", desc = "Show a pathfind to the next hoppity egg.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean showPathFinder = false;
 
     @Expose
     @ConfigOption(name = "Show All Waypoints", desc = "Show all possible egg waypoints for the current lobby. §e" +
@@ -187,6 +203,11 @@ public class HoppityEggsConfig {
     }
 
     @Expose
+    @ConfigOption(name = "Show Duplicate Count", desc = "Show the number of previous finds of a duplicate Hoppity rabbit in chat messages.")
+    @ConfigEditorBoolean
+    public boolean showDuplicateNumber = false;
+
+    @Expose
     @ConfigOption(
         name = "Rabbit Pet Warning",
         desc = "Warn when using the Egglocator without a §d§lMythic Rabbit Pet §7equipped. " +
@@ -195,4 +216,10 @@ public class HoppityEggsConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petWarning = false;
+
+    @Expose
+    @ConfigOption(name = "Prevent Missing Fish the Rabbit", desc = "Prevent closing a Meal Egg's inventory if Fish the Rabbit is present.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean preventMissingFish = true;
 }

@@ -31,7 +31,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.addSelector
-import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.NONE
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -40,6 +39,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -338,13 +338,13 @@ object ComposterOverlay {
         val multiplier = multiDropFactor * timeMultiplier
         val multiplierPreview = multiDropFactorPreview * timeMultiplierPreview
         val compostPerTitlePreview =
-            if (multiplier != multiplierPreview) " §c➜ §e" + multiplierPreview.round(2) else ""
+            if (multiplier != multiplierPreview) " §c➜ §e" + multiplierPreview.roundTo(2) else ""
         val compostPerTitle =
             if (currentTimeType == TimeType.COMPOST) "Compost multiplier" else "Composts per $timeText"
-        newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.round(2)}$compostPerTitlePreview")
+        newList.addAsSingletonList(" §7$compostPerTitle: §e${multiplier.roundTo(2)}$compostPerTitlePreview")
 
         val organicMatterPrice = getPrice(organicMatterItem)
-        val organicMatterFactor = organicMatterFactors[organicMatterItem]!!
+        val organicMatterFactor = organicMatterFactors[organicMatterItem] ?: 1.0
 
         val organicMatterRequired = ComposterAPI.organicMatterRequiredPer(null)
         val organicMatterRequiredPreview = ComposterAPI.organicMatterRequiredPer(upgrade)
@@ -353,7 +353,7 @@ object ComposterOverlay {
         val organicMatterPricePerPreview = organicMatterPrice * (organicMatterRequiredPreview / organicMatterFactor)
 
         val fuelPrice = getPrice(fuelItem)
-        val fuelFactor = fuelFactors[fuelItem]!!
+        val fuelFactor = fuelFactors[fuelItem] ?: 1.0
 
         val fuelRequired = ComposterAPI.fuelRequiredPer(null)
         val fuelRequiredPreview = ComposterAPI.fuelRequiredPer(upgrade)
@@ -427,7 +427,7 @@ object ComposterOverlay {
             i++
             if (i < testOffset) continue
             if (first == null) first = internalName
-            val factor = factors[internalName]!!
+            val factor = factors[internalName] ?: 1.0
 
             val item = internalName.getItemStack()
             val price = getPrice(internalName)
@@ -488,7 +488,7 @@ object ComposterOverlay {
         }
         val havingInInventory = internalName.getAmountInInventory()
         if (havingInInventory >= itemsNeeded) {
-            ChatUtils.chat("$itemName §8x${itemsNeeded} §ealready found in inventory!")
+            ChatUtils.chat("$itemName §8x$itemsNeeded §ealready found in inventory!")
             return
         }
 
@@ -564,18 +564,24 @@ object ComposterOverlay {
         }
     }
 
+    private val blockedItems = listOf(
+        "POTION_AFFINITY_TALISMAN",
+        "CROPIE_TALISMAN",
+        "SPEED_TALISMAN",
+        "SIMPLE_CARROT_CANDY",
+    )
+
+    private fun isBlockedArmor(internalName: String): Boolean {
+        return internalName.endsWith("_BOOTS") ||
+            internalName.endsWith("_HELMET") ||
+            internalName.endsWith("_CHESTPLATE") ||
+            internalName.endsWith("_LEGGINGS")
+    }
+
     private fun updateOrganicMatterFactors(baseValues: Map<NEUInternalName, Double>): Map<NEUInternalName, Double> {
         val map = mutableMapOf<NEUInternalName, Double>()
         for ((internalName, _) in NEUItems.allNeuRepoItems()) {
-            if (internalName == "POTION_AFFINITY_TALISMAN"
-                || internalName == "CROPIE_TALISMAN"
-                || internalName.endsWith("_BOOTS")
-                || internalName.endsWith("_HELMET")
-                || internalName.endsWith("_CHESTPLATE")
-                || internalName.endsWith("_LEGGINGS")
-                || internalName == "SPEED_TALISMAN"
-                || internalName == "SIMPLE_CARROT_CANDY"
-            ) continue
+            if (blockedItems.contains(internalName) || isBlockedArmor(internalName)) continue
 
             var (newId, amount) = NEUItems.getPrimitiveMultiplier(internalName.asInternalName())
             if (amount <= 9) continue
@@ -633,20 +639,20 @@ object ComposterOverlay {
             add("currentOrganicMatterItem: $currentOrganicMatterItem")
             add("currentFuelItem: $currentFuelItem")
 
-            println(" ")
+            add(" ")
             val composterUpgrades = ComposterAPI.composterUpgrades
             if (composterUpgrades == null) {
-                println("composterUpgrades is null")
+                add("composterUpgrades is null")
             } else {
                 for ((a, b) in composterUpgrades) {
-                    println("upgrade $a: $b")
+                    add("upgrade $a: $b")
                 }
             }
 
-            println(" ")
+            add(" ")
             val tabListData = ComposterAPI.tabListData
             for ((a, b) in tabListData) {
-                println("tabListData $a: $b")
+                add("tabListData $a: $b")
             }
         }
     }

@@ -230,13 +230,11 @@ object ChestValue {
     enum class SortType(val shortName: String, val longName: String) {
         PRICE_DESC("Price D", "Price Descending"),
         PRICE_ASC("Price A", "Price Ascending"),
-        ;
     }
 
     enum class FormatType(val type: String) {
         SHORT("Formatted"),
         LONG("Unformatted"),
-        ;
     }
 
     enum class DisplayType(val type: String) {
@@ -260,7 +258,9 @@ object ChestValue {
         }
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
-        return name == "Chest" || name == "Large Chest" || inMinion || name == "Personal Vault"
+        // TODO: Use repo for this
+        return name == "Chest" || name == "Large Chest" || inMinion ||
+            name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {

@@ -40,6 +40,15 @@ public class EstimatedItemValueConfig {
     public Property<Integer> enchantmentsCap = Property.of(7);
 
     @Expose
+    @ConfigOption(name = "Star Material Cap", desc = "Only show the top # most expensive parts of star prices.")
+    @ConfigEditorSlider(
+        minValue = 1,
+        maxValue = 15,
+        minStep = 1
+    )
+    public Property<Integer> starMaterialCap = Property.of(3);
+
+    @Expose
     @ConfigOption(name = "Show Exact Price", desc = "Show the exact total price instead of the compact number.")
     @ConfigEditorBoolean
     public Property<Boolean> exactPrice = Property.of(false);
@@ -97,5 +106,6 @@ public class EstimatedItemValueConfig {
 
     @Expose
     @ConfigLink(owner = EstimatedItemValueConfig.class, field = "enabled")
+    // TODO rename "position"
     public Position itemPriceDataPos = new Position(140, 90, false, true);
 }

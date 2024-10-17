@@ -6,10 +6,12 @@ import at.hannibal2.skyhanni.data.IslandType;
 import at.hannibal2.skyhanni.data.MaxwellAPI;
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
+import at.hannibal2.skyhanni.data.model.SkyblockStat;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
+import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal;
 import at.hannibal2.skyhanni.features.event.diana.DianaProfitTracker;
 import at.hannibal2.skyhanni.features.event.diana.MythologicalCreatureTracker;
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats;
@@ -30,9 +32,11 @@ import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker;
 import at.hannibal2.skyhanni.features.garden.pests.VinylType;
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward;
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker;
+import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker;
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI;
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay;
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker;
+import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker;
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker;
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker;
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker;
@@ -64,6 +68,29 @@ public class ProfileSpecificStorage {
     public String currentPet = "";
 
     @Expose
+    public ExperimentationStorage experimentation = new ExperimentationStorage();
+
+    public static class ExperimentationStorage {
+
+        @Expose
+        public LorenzVec tablePos = new LorenzVec();
+
+        @Expose
+        public ExperimentsDryStreakStorage dryStreak = new ExperimentsDryStreakStorage();
+
+        public static class ExperimentsDryStreakStorage {
+            @Expose
+            public int attemptsSince = 0;
+
+            @Expose
+            public int xpSince = 0;
+        }
+
+        @Expose
+        public ExperimentsProfitTracker.Data experimentsProfitTracker = new ExperimentsProfitTracker.Data();
+    }
+
+    @Expose
     public ChocolateFactoryStorage chocolateFactory = new ChocolateFactoryStorage();
 
     public static class ChocolateFactoryStorage {
@@ -75,6 +102,9 @@ public class ProfileSpecificStorage {
 
         @Expose
         public long currentChocolate = 0;
+
+        @Expose
+        public long maxChocolate = 0;
 
         @Expose
         public long chocolateThisPrestige = 0;
@@ -157,6 +187,25 @@ public class ProfileSpecificStorage {
         @Expose
         public ChocolateFactoryStrayTracker.Data strayTracker = new ChocolateFactoryStrayTracker.Data();
     }
+
+    @Expose
+    public CarnivalStorage carnival = new CarnivalStorage();
+
+    public static class CarnivalStorage {
+
+        @Expose
+        @Nullable
+        public java.time.LocalDate lastClaimedDay = null;
+
+        @Expose
+        public int carnivalYear = 0;
+
+        @Expose
+        public Map<CarnivalGoal, Boolean> goals = new HashMap<>();
+    }
+
+    @Expose
+    public Map<SkyblockStat,Double> stats = new HashMap<>(SkyblockStat.getEntries().size());
 
     @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
@@ -534,7 +583,7 @@ public class ProfileSpecificStorage {
         public HotmTree hotmTree = new HotmTree();
 
         @Expose
-        public Map<HotmAPI.Powder, PowderStorage> powder = new HashMap<>();
+        public Map<HotmAPI.PowderType, PowderStorage> powder = new HashMap<>();
 
         public static class PowderStorage {
 
@@ -564,6 +613,9 @@ public class ProfileSpecificStorage {
 
             @Expose
             public List<MineshaftPityDisplay.PityData> blocksBroken = new ArrayList<>();
+
+            @Expose
+            public CorpseTracker.BucketData corpseProfitTracker = new CorpseTracker.BucketData();
         }
     }
 
@@ -647,8 +699,14 @@ public class ProfileSpecificStorage {
         public DianaProfitTracker.Data dianaProfitTracker = new DianaProfitTracker.Data();
 
         @Expose
+        public Map<Integer, DianaProfitTracker.Data> dianaProfitTrackerPerElectionSeason = new HashMap<>();
+
+        @Expose
         // TODO rename
         public MythologicalCreatureTracker.Data mythologicalMobTracker = new MythologicalCreatureTracker.Data();
+
+        @Expose
+        public Map<Integer, MythologicalCreatureTracker.Data> mythologicalMobTrackerPerElectionSeason = new HashMap<>();
     }
 
     @Expose
@@ -668,6 +726,10 @@ public class ProfileSpecificStorage {
 
     @Expose
     public UpgradeReminder.CommunityShopUpgrade communityShopProfileUpgrade = null;
+
+    @Expose
+    @Nullable
+    public Integer abiphoneContactAmount = null;
 
     @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();

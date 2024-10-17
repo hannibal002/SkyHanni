@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.Chocolat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HoppityEggLocationsJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MilestoneJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
@@ -20,13 +21,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.seconds
@@ -80,7 +81,9 @@ object ChocolateFactoryAPI {
     var shrineIndex = 41
     var coachRabbitIndex = 42
     var maxRabbits = 395
-    var maxMilestoneChocolate = 700_000_000_000L
+    private var chocolateMilestones = TreeSet<Long>()
+    private var chocolateFactoryMilestones: MutableList<MilestoneJson> = mutableListOf()
+    private var chocolateShopMilestones: MutableList<MilestoneJson> = mutableListOf()
     private var maxPrestige = 5
 
     var inChocolateFactory = false
@@ -142,7 +145,9 @@ object ChocolateFactoryAPI {
         coachRabbitIndex = data.coachRabbitIndex
         maxRabbits = data.maxRabbits
         maxPrestige = data.maxPrestige
-        maxMilestoneChocolate = data.maxMilestoneChocolate
+        chocolateMilestones = data.chocolateMilestones
+        chocolateFactoryMilestones = data.chocolateFactoryMilestones.toMutableList()
+        chocolateShopMilestones = data.chocolateShopMilestones.toMutableList()
         specialRabbitTextures = data.specialRabbits
 
         ChocolateFactoryUpgrade.updateIgnoredSlots()
@@ -179,23 +184,24 @@ object ChocolateFactoryAPI {
         }
     }
 
-    fun getNextLevelName(stack: ItemStack): String? =
-        upgradeLorePattern.firstMatcher(stack.getLore()) {
-            val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
-                groupOrNull("employee")
-            } else groupOrNull("upgradename")
-            val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
-            if (upgradeName == null || nextLevel == null) null
-            else "$upgradeName $nextLevel"
-        }
+    fun getNextLevelName(stack: ItemStack): String? = upgradeLorePattern.firstMatcher(stack.getLore()) {
+        val upgradeName = if (stack.getLore().any { it == "§8Employee" }) employeeNamePattern.matchMatcher(stack.name) {
+            groupOrNull("employee")
+        } else groupOrNull("upgradename")
+        val nextLevel = groupOrNull("nextlevel") ?: groupOrNull("nextlevelalt")
+        if (upgradeName == null || nextLevel == null) null
+        else "$upgradeName $nextLevel"
+    }
 
+    fun getNextMilestoneChocolate(amount: Long): Long {
+        return chocolateMilestones.higher(amount) ?: 0
+    }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
     fun isMaxPrestige() = currentPrestige >= maxPrestige
 
-    fun timeTowerChargeDuration() =
-        if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
+    fun timeTowerChargeDuration() = if (HoppityCollectionStats.hasFoundRabbit("Einstein")) 7.hours else 8.hours
 
     fun timeTowerMultiplier(): Double {
         var multiplier = (profileStorage?.timeTowerLevel ?: 0) * 0.1
@@ -225,4 +231,16 @@ object ChocolateFactoryAPI {
         val basePerSecond = rawChocolatePerSecond * baseMultiplier
         return (needed / basePerSecond + secondsUntilTowerExpires).seconds
     }
+
+    fun milestoneByRabbit(rabbitName: String): MilestoneJson? {
+        return chocolateFactoryMilestones.firstOrNull {
+            it.rabbit.removeColor() == rabbitName.removeColor()
+        } ?: chocolateShopMilestones.firstOrNull {
+            it.rabbit.removeColor() == rabbitName.removeColor()
+        }
+    }
+
+    fun isMax(): Boolean = profileStorage?.let {
+        it.maxChocolate == it.currentChocolate
+    } ?: false
 }

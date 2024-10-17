@@ -32,6 +32,10 @@ object HypixelCommands {
         send("recipe $itemName")
     }
 
+    fun npcOption(npc: String, answer: String) {
+        send("selectnpcoption $npc $answer")
+    }
+
     fun warp(warp: String) {
         send("warp $warp")
     }
@@ -148,6 +152,22 @@ object HypixelCommands {
 
     fun chatPrompt(prompt: String) {
         send("chatprompt $prompt")
+    }
+
+    fun callback(uuid: String) {
+        send("cb $uuid")
+    }
+
+    fun bank() {
+        send("bank")
+    }
+    
+    fun pickupStash() {
+        send("pickupstash")
+    }
+
+    fun viewStash(type: String) {
+        send("viewstash $type")
     }
 
     private fun send(command: String) {
