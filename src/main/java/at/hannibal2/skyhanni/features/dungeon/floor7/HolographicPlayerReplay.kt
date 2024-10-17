@@ -402,17 +402,17 @@ object HolographicPlayerReplay {
 
     private fun renderModel(model: IBakedModel, color: Int, item: ItemStack?) {
         val tessellator = Tessellator.getInstance()
-        val worldrenderer = tessellator.worldRenderer
-        worldrenderer.begin(7, DefaultVertexFormats.ITEM)
+        val worldRenderer = tessellator.worldRenderer
+        worldRenderer.begin(7, DefaultVertexFormats.ITEM)
         val var6 = EnumFacing.entries.toTypedArray()
         val var7 = var6.size
 
         for (var8 in 0 until var7) {
-            val enumfacing = var6[var8]
-            renderQuads(worldrenderer, model.getFaceQuads(enumfacing), color, item)
+            val enumFacing = var6[var8]
+            renderQuads(worldRenderer, model.getFaceQuads(enumFacing), color, item)
         }
 
-        renderQuads(worldrenderer, model.generalQuads, color, item)
+        renderQuads(worldRenderer, model.generalQuads, color, item)
         tessellator.draw()
     }
 
@@ -420,12 +420,11 @@ object HolographicPlayerReplay {
         val flag = inputColor == -1 && stack != null
         var i = 0
 
-        val j = quads.size
-        while (i < j) {
-            val bakedquad = quads[i]
+        while (i < quads.size) {
+            val bakedQuad = quads[i]
             var color = inputColor
-            if (flag && bakedquad.hasTintIndex()) {
-                color = stack?.item?.getColorFromItemStack(stack, bakedquad.tintIndex) ?: 16777215
+            if (flag && bakedQuad.hasTintIndex()) {
+                color = stack?.item?.getColorFromItemStack(stack, bakedQuad.tintIndex) ?: 16777215
                 if (EntityRenderer.anaglyphEnable) {
                     color = TextureUtil.anaglyphColor(color)
                 }
@@ -433,9 +432,9 @@ object HolographicPlayerReplay {
                 color = color or -16777216
             }
             if (color != -8372020) {
-                color = 2583691263.toInt()
+                color = 2583691263.toInt() //set transparency
             }
-            LightUtil.renderQuadColor(renderer, bakedquad, color)
+            LightUtil.renderQuadColor(renderer, bakedQuad, color)
             ++i
         }
     }
