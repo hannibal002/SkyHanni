@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object GardenCropMilestoneInventory {

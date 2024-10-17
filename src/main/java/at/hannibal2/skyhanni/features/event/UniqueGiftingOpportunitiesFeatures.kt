@@ -27,7 +27,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object UniqueGiftingOpportunitiesFeatures {

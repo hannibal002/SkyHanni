@@ -34,7 +34,6 @@ import com.jagrosh.discordipc.entities.RichPresence
 import com.jagrosh.discordipc.entities.RichPresenceButton
 import com.jagrosh.discordipc.entities.pipe.PipeStatus
 import kotlinx.coroutines.launch
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

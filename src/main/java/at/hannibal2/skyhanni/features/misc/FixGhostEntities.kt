@@ -12,7 +12,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
 import net.minecraft.network.play.server.S13PacketDestroyEntities
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 /**
  * This feature fixes ghost entities sent by hypixel that are not properly deleted in the correct order.

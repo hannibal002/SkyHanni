@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule

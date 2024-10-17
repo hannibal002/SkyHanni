@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap

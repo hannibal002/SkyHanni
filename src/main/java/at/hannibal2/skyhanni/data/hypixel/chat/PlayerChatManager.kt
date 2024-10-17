@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
@@ -221,7 +221,7 @@ object PlayerChatManager {
         chatComponent: IChatComponent,
     ) {
         if (cancelled) {
-            this.cancel()
+            //u shouldnt be able to cancel this its not possible
         }
         blockedReason?.let {
             this.blockedReason = it

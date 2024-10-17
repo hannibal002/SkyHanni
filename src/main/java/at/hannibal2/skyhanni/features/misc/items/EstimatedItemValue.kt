@@ -33,7 +33,6 @@ import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 

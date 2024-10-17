@@ -27,7 +27,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.Loader
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.util.TreeSet
 
 /**
