@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.isRoman
-import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object SkillTooltip {
