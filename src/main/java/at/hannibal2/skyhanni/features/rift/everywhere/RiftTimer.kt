@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -43,7 +43,7 @@ object RiftTimer {
     private val changes = mutableMapOf<Long, String>()
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
         maxTime = 0.seconds
         latestTime = 0.seconds
@@ -66,7 +66,7 @@ object RiftTimer {
     // prevents rift time from pausing during Rift Race
     // (hypixel hides the action bar during the race)
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled() || !RiftAPI.inRiftRace) return
         if (!event.isMod(5)) return
         val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")

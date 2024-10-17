@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -24,7 +24,7 @@ object GardenInventoryTooltipOverflow {
     private val config get() = SkyHanniMod.feature.garden.cropMilestones.overflow
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
 
         val inventoryName = InventoryUtils.openInventoryName()

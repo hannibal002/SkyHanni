@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.QuiverAPI.amount
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
@@ -86,7 +86,7 @@ object QuiverWarning {
     }
 
     @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldChangeEvent) {
+    fun onWorldSwitch(event: WorldChangeEvent) {
         arrowsInInstance.clear()
     }
 

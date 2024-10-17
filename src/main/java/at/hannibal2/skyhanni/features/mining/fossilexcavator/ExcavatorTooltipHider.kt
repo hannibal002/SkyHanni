@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,7 +23,7 @@ object ExcavatorTooltipHider {
     )
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
 
         if (event.slot.inventory !is ContainerLocalMenu) return

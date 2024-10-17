@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
@@ -41,7 +41,7 @@ object SprayFeatures {
 
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
         display = changeMaterialPattern.matchMatcher(event.message) {
@@ -69,7 +69,7 @@ object SprayFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.drawPlotsBorderWhenInHands) return
         if (!InventoryUtils.itemInHandId.equals("SPRAYONATOR")) return

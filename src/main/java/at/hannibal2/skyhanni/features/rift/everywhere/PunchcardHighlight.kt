@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -186,7 +186,7 @@ object PunchcardHighlight {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!IslandType.THE_RIFT.isInIsland()) return
         if (!listening) return
         if (playerQueue.isEmpty()) return

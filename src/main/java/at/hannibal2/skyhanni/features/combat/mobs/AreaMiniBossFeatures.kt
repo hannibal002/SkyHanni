@@ -2,9 +2,9 @@ package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SlayerAPI
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -39,7 +39,7 @@ object AreaMiniBossFeatures {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!SlayerAPI.isInAnyArea) return
         if (!config.areaBossRespawnTimer) return
 
@@ -60,7 +60,7 @@ object AreaMiniBossFeatures {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         miniBossType = null
     }
 

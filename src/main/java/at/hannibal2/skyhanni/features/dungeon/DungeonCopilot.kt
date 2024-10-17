@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -46,7 +46,7 @@ object DungeonCopilot {
     private var searchForKey = false
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
         copilot(event.message)?.let {
@@ -140,7 +140,7 @@ object DungeonCopilot {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         changeNextStep("")
     }
 

@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -39,7 +39,7 @@ object CraftRoomHolographicMob {
     )
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         for (entity in entitiesList) {
             entity.moveTo(entity.position.up(.1), (entity.yaw + 5) % 360)
@@ -47,7 +47,7 @@ object CraftRoomHolographicMob {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for (theMob in EntityUtils.getEntitiesNearby<EntityLivingBase>(LocationUtils.playerLocation(), 25.0)) {

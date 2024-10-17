@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.rift.area.colosseum
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,7 +23,7 @@ object BlobbercystsHighlight {
     private const val BLOBBER_NAME = "Blobbercyst "
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         val color = Color.RED.withAlpha(80)
@@ -36,7 +36,7 @@ object BlobbercystsHighlight {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         entityList.clear()
     }

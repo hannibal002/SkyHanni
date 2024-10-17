@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.claimMessagePattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.enchantingExpPattern
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentationTableAPI.experienceBottleChatPattern
@@ -107,7 +107,7 @@ object ExperimentsProfitTracker {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message.removeColor()
@@ -128,7 +128,7 @@ object ExperimentsProfitTracker {
         }
     }
 
-    private fun LorenzChatEvent.handleDrop(reward: String) {
+    private fun SkyhanniChatEvent.handleDrop(reward: String) {
         blockedReason = when {
             enchantingExpPattern.matches(reward) && ExperimentMessages.EXPERIENCE.isSelected() -> "EXPERIENCE_DROP"
             experienceBottleChatPattern.matches(reward) && ExperimentMessages.BOTTLES.isSelected() -> "BOTTLE_DROP"

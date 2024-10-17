@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.nether.kuudra
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.KuudraEnterEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -62,25 +62,25 @@ object KuudraAPI {
     fun inKuudra() = kuudraTier != null
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (kuudraTier != null) return
         for (line in ScoreboardData.sidebarLinesFormatted) {
             tierPattern.matchMatcher(line) {
                 val tier = group("tier").toInt()
                 kuudraTier = tier
-                KuudraEnterEvent(tier).postAndCatch()
+                KuudraEnterEvent(tier).post()
             }
         }
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         kuudraTier = null
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         val message = event.message
         completePattern.matchMatcher(message) {
             val tier = kuudraTier ?: return

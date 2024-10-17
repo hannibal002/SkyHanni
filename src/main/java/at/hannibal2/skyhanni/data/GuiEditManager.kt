@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.events.GuiPositionMovedEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -42,7 +42,7 @@ object GuiEditManager {
     private var lastMovedGui: String? = null
 
     @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    fun onKeyClick(event: KeyPressEvent) {
         if (event.keyCode != SkyHanniMod.feature.gui.keyBindOpen) return
         if (event.keyCode == Keyboard.KEY_RETURN) {
             ChatUtils.chat("You can't use Enter as a keybind to open the gui editor!")
@@ -70,7 +70,7 @@ object GuiEditManager {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         lastMovedGui?.let {
             GuiPositionMovedEvent(it).postAndCatch()
             lastMovedGui = null

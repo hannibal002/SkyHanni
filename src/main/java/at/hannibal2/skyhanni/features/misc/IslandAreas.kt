@@ -10,9 +10,9 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -46,7 +46,7 @@ object IslandAreas {
     private val textInput = TextInput()
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         nodes = emptyMap()
         display = null
         targetNode = null
@@ -83,7 +83,7 @@ object IslandAreas {
     private var hasMoved = false
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandGraphs.existsForThisIsland) return
 
@@ -224,7 +224,7 @@ object IslandAreas {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {

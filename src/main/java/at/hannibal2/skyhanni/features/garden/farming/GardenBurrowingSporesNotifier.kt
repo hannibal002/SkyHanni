@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -11,7 +11,7 @@ import kotlin.time.Duration.Companion.seconds
 object GardenBurrowingSporesNotifier {
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.config.burrowingSporesNotification) return
 

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.garden.inventory.plots
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -130,7 +130,7 @@ object GardenPlotIcon {
     }
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
         val plotList = plotList ?: return
         val list = event.toolTip

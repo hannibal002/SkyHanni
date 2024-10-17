@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -60,7 +60,7 @@ object RiftGunthersRace {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         RiftAPI.inRiftRace = false
     }
 
@@ -92,7 +92,7 @@ object RiftGunthersRace {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
         raceStartedPattern.matchMatcher(event.message) {
@@ -121,7 +121,7 @@ object RiftGunthersRace {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled() || !RiftAPI.inRiftRace) return
 
         parkourHelper?.render(event)

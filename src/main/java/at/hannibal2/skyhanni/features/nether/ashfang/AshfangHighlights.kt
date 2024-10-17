@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -55,7 +55,7 @@ object AshfangHighlights {
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!AshfangManager.active) return
 
         if (config.blazingSouls.enabled) {
@@ -78,12 +78,12 @@ object AshfangHighlights {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         blazingSouls.clear()
         gravityOrbs.clear()
     }
 
-    private fun LorenzRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
+    private fun SkyhanniRenderWorldEvent.drawBlendedColorString(location: LorenzVec, text: String) {
         val distance = location.distanceToPlayer()
         if (distance < MAX_DISTANCE) {
             val colorCode = getColorCode(distance)

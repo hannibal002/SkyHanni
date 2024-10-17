@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -12,7 +12,7 @@ object GuildAPI {
     private val list = mutableListOf<String>()
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         val message = event.message
         if (message.startsWith("§6Guild Name: ")) {
             inGuildMessage = true

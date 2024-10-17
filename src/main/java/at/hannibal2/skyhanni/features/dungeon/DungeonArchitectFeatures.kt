@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.dungeon
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.GetFromSackAPI
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -31,7 +31,7 @@ object DungeonArchitectFeatures {
     private val architectsFirstDraftItem = "ARCHITECT_FIRST_DRAFT".asInternalName()
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
         puzzleFailPattern.matchMatcher(event.message) {
@@ -44,7 +44,7 @@ object DungeonArchitectFeatures {
 
     private val architectsFirstDraft = "ARCHITECT_FIRST_DRAFT".asInternalName().makePrimitiveStack()
 
-    private fun generateMessage(name: String, event: LorenzChatEvent) {
+    private fun generateMessage(name: String, event: SkyhanniChatEvent) {
         val architectItemAmount = architectsFirstDraftItem.getAmountInSacks()
         if (architectItemAmount <= 0) return
 

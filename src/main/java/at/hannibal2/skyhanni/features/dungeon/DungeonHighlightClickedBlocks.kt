@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
@@ -55,7 +55,7 @@ object DungeonHighlightClickedBlocks {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
         if (leverPattern.matches(event.message)) {
@@ -91,7 +91,7 @@ object DungeonHighlightClickedBlocks {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         blocks.forEach { (position, block) ->

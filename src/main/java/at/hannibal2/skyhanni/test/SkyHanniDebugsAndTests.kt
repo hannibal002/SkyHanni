@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
@@ -103,7 +103,7 @@ object SkyHanniDebugsAndTests {
     private var testLocation: LorenzVec? = null
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Test", 1.5)
@@ -416,7 +416,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onShowInternalName(event: LorenzToolTipEvent) {
+    fun onShowInternalName(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack
@@ -426,7 +426,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun showItemRarity(event: LorenzToolTipEvent) {
+    fun showItemRarity(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
@@ -436,7 +436,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun showItemCategory(event: LorenzToolTipEvent) {
+    fun showItemCategory(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemCategory) return
         val itemStack = event.itemStack
@@ -446,7 +446,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onShowNpcPrice(event: LorenzToolTipEvent) {
+    fun onShowNpcPrice(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
@@ -456,7 +456,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onShowCraftPrice(event: LorenzToolTipEvent) {
+    fun onShowCraftPrice(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
@@ -465,7 +465,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onShowBzPrice(event: LorenzToolTipEvent) {
+    fun onShowBzPrice(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showBZPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
@@ -479,7 +479,7 @@ object SkyHanniDebugsAndTests {
     }
 
     @SubscribeEvent
-    fun onShowItemName(event: LorenzToolTipEvent) {
+    fun onShowItemName(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemName) return
         val itemStack = event.itemStack
@@ -494,7 +494,7 @@ object SkyHanniDebugsAndTests {
 
     @SubscribeEvent
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
     }
 
     @SubscribeEvent

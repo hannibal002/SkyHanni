@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -30,7 +30,7 @@ object BurrowWarpHelper {
     private var lastWarp: WarpPoint? = null
 
     @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    fun onKeyClick(event: KeyPressEvent) {
         if (!DianaAPI.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
 
@@ -51,7 +51,7 @@ object BurrowWarpHelper {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.message == "§cYou haven't unlocked this fast travel destination!") {
@@ -68,7 +68,7 @@ object BurrowWarpHelper {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         lastWarp = null
         currentWarp = null
     }

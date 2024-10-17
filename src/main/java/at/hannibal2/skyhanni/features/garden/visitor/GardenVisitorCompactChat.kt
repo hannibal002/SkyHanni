@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -61,7 +61,7 @@ object GardenVisitorCompactChat {
     private var rewardsList = mutableListOf<String>()
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (GardenAPI.inGarden() && config.compactRewardChat && (
                 fullyAcceptedPattern.matcher(event.message.removeResets()).matches() ||
                     visitorRewardPattern.matcher(event.message.removeResets()).matches() ||
@@ -72,7 +72,7 @@ object GardenVisitorCompactChat {
         }
     }
 
-    private fun handleChat(event: LorenzChatEvent) {
+    private fun handleChat(event: SkyhanniChatEvent) {
         val transformedMessage = event.message.removeResets()
 
         fullyAcceptedPattern.matchMatcher(transformedMessage) {
@@ -117,7 +117,7 @@ object GardenVisitorCompactChat {
         compactChat(event)
     }
 
-    private fun compactChat(event: LorenzChatEvent) {
+    private fun compactChat(event: SkyhanniChatEvent) {
         event.blockedReason = "compact_visitor"
         visitorAcceptedChat.add(event.message)
         if (visitorAcceptedChat.size == 3) {

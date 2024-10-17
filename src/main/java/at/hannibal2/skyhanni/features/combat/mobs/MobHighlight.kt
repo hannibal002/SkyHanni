@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.combat.mobs
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -103,7 +103,7 @@ object MobHighlight {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock || !config.lineToArachne) return
 
         val arachne = arachne ?: return
@@ -123,7 +123,7 @@ object MobHighlight {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         arachne = null
     }
 

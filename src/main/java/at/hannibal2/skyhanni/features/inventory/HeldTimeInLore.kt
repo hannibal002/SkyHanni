@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrInsert
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -22,7 +22,7 @@ object HeldTimeInLore {
     private val cacaoTruffle by lazy { "DARK_CACAO_TRUFFLE".asInternalName() }
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.timeHeldInLore) return
 

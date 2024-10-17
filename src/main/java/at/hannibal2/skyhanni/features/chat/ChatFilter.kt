@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilter.messagesMap
 import at.hannibal2.skyhanni.features.chat.PowderMiningChatFilter.genericMiningRewardMessage
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -511,7 +511,7 @@ object ChatFilter {
     // </editor-fold>
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         var blockReason = block(event.message)
         if (blockReason == null && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
 
@@ -565,7 +565,7 @@ object ChatFilter {
      * @return Block reason if applicable
      * @see block
      */
-    private fun powderMiningBlock(event: LorenzChatEvent): String? {
+    private fun powderMiningBlock(event: SkyhanniChatEvent): String? {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.misc.pets
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemRarityOrNull
@@ -30,7 +30,7 @@ object PetExpTooltip {
     private const val LEVEL_200_LEGENDARY = 210_255_385
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onItemTooltipLow(event: LorenzToolTipEvent) {
+    fun onItemTooltipLow(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.petDisplay) return
         if (!KeyboardManager.isShiftKeyDown() && !config.showAlways) return

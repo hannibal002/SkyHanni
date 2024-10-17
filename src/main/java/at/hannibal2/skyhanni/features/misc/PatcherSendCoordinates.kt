@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -41,7 +41,7 @@ object PatcherSendCoordinates {
     )
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!config.enabled) return
 
         val message = event.message.removeColor()
@@ -64,7 +64,7 @@ object PatcherSendCoordinates {
     }
 
     @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!config.enabled) return
 
         for (beacon in patcherBeacon) {
@@ -79,7 +79,7 @@ object PatcherSendCoordinates {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!event.isMod(10)) return
 
         val location = LocationUtils.playerLocation()
@@ -91,7 +91,7 @@ object PatcherSendCoordinates {
     }
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         patcherBeacon.clear()
         logger.log("Reset everything (world change)")
     }

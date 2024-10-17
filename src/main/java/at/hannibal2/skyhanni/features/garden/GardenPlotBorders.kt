@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
@@ -19,7 +19,7 @@ object GardenPlotBorders {
     private var showBorders = false
 
     @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    fun onKeyClick(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (timeLastSaved.passedSince() < 250.milliseconds) return
 
@@ -34,7 +34,7 @@ object GardenPlotBorders {
     }
 
     @SubscribeEvent
-    fun render(event: LorenzRenderWorldEvent) {
+    fun render(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!showBorders) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: getClosestPlot() ?: return

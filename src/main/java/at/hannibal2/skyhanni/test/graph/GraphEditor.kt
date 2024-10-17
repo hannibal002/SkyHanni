@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -96,14 +96,14 @@ object GraphEditor {
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRender(event: LorenzRenderWorldEvent) {
+    fun onRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
         drawGhostPosition(event)
     }
 
-    private fun drawGhostPosition(event: LorenzRenderWorldEvent) {
+    private fun drawGhostPosition(event: SkyhanniRenderWorldEvent) {
         val ghostPosition = ghostPosition ?: return
         if (ghostPosition.distanceToPlayer() >= config.maxNodeDistance) return
 
@@ -185,14 +185,14 @@ object GraphEditor {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         input()
         if (nodes.isEmpty()) return
         closestNode = nodes.minBy { it.position.distanceSqToPlayer() }
     }
 
-    private fun LorenzRenderWorldEvent.drawNode(node: GraphingNode) {
+    private fun SkyhanniRenderWorldEvent.drawNode(node: GraphingNode) {
         if (node.position.distanceToPlayer() > config.maxNodeDistance) return
         this.drawWaypointFilled(
             node.position,
@@ -229,7 +229,7 @@ object GraphEditor {
         )
     }
 
-    private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) {
+    private fun SkyhanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
         this.draw3DLine_nea(
             edge.node1.position.add(0.5, 0.5, 0.5),

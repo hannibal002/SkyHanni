@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -30,7 +30,7 @@ object MineshaftWaypoints {
     private var timeLastShared = SimpleTimeMark.farPast()
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         waypoints.clear()
     }
 
@@ -58,7 +58,7 @@ object MineshaftWaypoints {
     }
 
     @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    fun onKeyPress(event: KeyPressEvent) {
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (event.keyCode != config.shareWaypointLocation) return
         if (timeLastShared.passedSince() < 500.milliseconds) return
@@ -81,7 +81,7 @@ object MineshaftWaypoints {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (waypoints.isEmpty()) return
 
         waypoints

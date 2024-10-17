@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.garden.pests.SprayType
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -251,7 +251,7 @@ object GardenPlotAPI {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!GardenAPI.inGarden()) return
 
         plotSprayedPattern.matchMatcher(event.message) {
@@ -315,7 +315,7 @@ object GardenPlotAPI {
 
     fun getPlotByID(plotId: Int) = plots.firstOrNull { it.id == plotId }
 
-    fun LorenzRenderWorldEvent.renderPlot(
+    fun SkyhanniRenderWorldEvent.renderPlot(
         plot: Plot,
         lineColor: Color,
         cornerColor: Color,
@@ -386,7 +386,7 @@ object GardenPlotAPI {
         }
     }
 
-    private fun LorenzRenderWorldEvent.tryDraw3DLine(
+    private fun SkyhanniRenderWorldEvent.tryDraw3DLine(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,

@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -54,7 +54,7 @@ object GardenWarpCommands {
     }
 
     @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    fun onKeyClick(event: KeyPressEvent) {
         if (!GardenAPI.inGarden()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return

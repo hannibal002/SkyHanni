@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -42,7 +42,7 @@ object QuickCraftFeatures {
     }
 
     @SubscribeEvent
-    fun onToolTip(event: LorenzToolTipEvent) {
+    fun onToolTip(event: SkyhanniToolTipEvent) {
         val inventoryType = getInventoryType() ?: return
         if (inventoryType.ignoreSlot(event.slot.slotNumber)) return
 

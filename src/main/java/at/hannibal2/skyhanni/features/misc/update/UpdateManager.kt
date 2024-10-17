@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc.update
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -52,7 +52,7 @@ object UpdateManager {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
         MinecraftForge.EVENT_BUS.unregister(this)
         if (config.autoUpdates || config.fullAutoUpdates)

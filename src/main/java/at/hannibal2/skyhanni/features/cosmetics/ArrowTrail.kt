@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.features.cosmetics
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -32,7 +32,7 @@ object ArrowTrail {
     private val listYourArrow: MutableList<Line> = LinkedList<Line>()
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         val secondsAlive = config.secondsAlive.toDouble().toDuration(DurationUnit.SECONDS)
         val time = SimpleTimeMark.now()
@@ -52,7 +52,7 @@ object ArrowTrail {
     }
 
     @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         val color = if (config.handlePlayerArrowsDifferently) config.playerArrowColor else config.arrowColor
         val playerArrowColor = color.toChromaColor()

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.chroma.ChromaConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
@@ -59,7 +59,7 @@ object RenderData {
     @SubscribeEvent
     fun onRenderWorld(event: RenderWorldLastEvent) {
         if (!SkyHanniDebugsAndTests.globalRender) return
-        LorenzRenderWorldEvent(event.partialTicks).postAndCatch()
+        SkyhanniRenderWorldEvent(event.partialTicks).postAndCatch()
     }
 
     // TODO find better spot for this

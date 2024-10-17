@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -55,14 +55,14 @@ object ShowMotesNpcSellPrice {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isInventoryValueEnabled()) return
         if (!event.isMod(10, 1)) return
         processItems()
     }
 
     @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isShowPriceEnabled()) return
 
         val itemStack = event.itemStack
@@ -117,7 +117,7 @@ object ShowMotesNpcSellPrice {
     }
 
     @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyhanniChatEvent) {
         if (!RiftAPI.inRift()) return
         burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()

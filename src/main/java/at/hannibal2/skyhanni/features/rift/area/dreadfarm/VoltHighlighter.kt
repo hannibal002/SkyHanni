@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.rift.area.dreadfarm
 
 import at.hannibal2.skyhanni.events.EntityEquipmentChangeEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -48,7 +48,7 @@ object VoltHighlighter {
     }
 
     @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
+    fun onRender(event: SkyhanniRenderWorldEvent) {
         if (!RiftAPI.inRift() || !(config.voltRange || config.voltMoodMeter)) return
         for (entity in getEntities<EntityLivingBase>()) {
             val state = getVoltState(entity)

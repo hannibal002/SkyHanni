@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -18,14 +18,14 @@ object FocusMode {
     private var toggle = true
 
     @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onLorenzToolTip(event: LorenzToolTipEvent) {
+    fun onLorenzToolTip(event: SkyhanniToolTipEvent) {
         if (!isEnabled() || !toggle) return
         if(event.toolTip.isEmpty()) return
         event.toolTip = mutableListOf(event.toolTip.first())
     }
 
     @SubscribeEvent
-    fun onLorenzTick(event: LorenzTickEvent) {
+    fun onLorenzTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!config.toggleKey.isKeyClicked()) return
         toggle = !toggle

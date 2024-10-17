@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import net.minecraft.entity.Entity
 import net.minecraft.item.ItemStack
 
@@ -7,7 +8,7 @@ data class EntityEquipmentChangeEvent(
     val entity: Entity,
     val equipmentSlot: Int,
     val newItemStack: ItemStack?,
-) : LorenzEvent() {
+) : SkyHanniEvent() {
 
     val isHead get() = equipmentSlot == EQUIPMENT_SLOT_HEAD
     val isChest get() = equipmentSlot == EQUIPMENT_SLOT_CHEST

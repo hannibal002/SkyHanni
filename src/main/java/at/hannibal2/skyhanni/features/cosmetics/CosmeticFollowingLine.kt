@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.cosmetics
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -32,12 +32,12 @@ object CosmeticFollowingLine {
     class LocationSpot(val time: SimpleTimeMark, val onGround: Boolean)
 
     @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    fun onWorldChange(event: WorldChangeEvent) {
         locations = emptyMap()
     }
 
     @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         updateClose(event)
@@ -50,7 +50,7 @@ object CosmeticFollowingLine {
     }
 
     private fun renderFar(
-        event: LorenzRenderWorldEvent,
+        event: SkyhanniRenderWorldEvent,
         firstPerson: Boolean,
         color: Color,
     ) {
@@ -71,7 +71,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun updateClose(event: LorenzRenderWorldEvent) {
+    private fun updateClose(event: SkyhanniRenderWorldEvent) {
         val playerLocation = event.exactLocation(Minecraft.getMinecraft().thePlayer).up(0.3)
 
         latestLocations = latestLocations.editCopy {
@@ -81,7 +81,7 @@ object CosmeticFollowingLine {
         }
     }
 
-    private fun renderClose(event: LorenzRenderWorldEvent, firstPerson: Boolean, color: Color) {
+    private fun renderClose(event: SkyhanniRenderWorldEvent, firstPerson: Boolean, color: Color) {
         if (firstPerson && latestLocations.any { !it.value.onGround }) return
 
 
@@ -100,7 +100,7 @@ object CosmeticFollowingLine {
     }
 
     @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
 
         if (event.isMod(5)) {
