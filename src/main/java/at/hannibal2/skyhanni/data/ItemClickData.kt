@@ -64,7 +64,7 @@ object ItemClickData {
         }
     }
 
-    /* @HandleEvent
+    /* @SubscribeEvent
     fun onEntityClick(event: InputEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
