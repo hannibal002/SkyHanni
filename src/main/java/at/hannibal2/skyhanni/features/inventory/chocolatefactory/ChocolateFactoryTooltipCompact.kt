@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -21,7 +21,7 @@ object ChocolateFactoryTooltipCompact {
     private var lastHover = SimpleTimeMark.farPast()
     private var tooltipToHover = listOf<String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
@@ -39,7 +39,7 @@ object ChocolateFactoryTooltipCompact {
         onCompactClick(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (config.tooltipMove) {
@@ -65,7 +65,7 @@ object ChocolateFactoryTooltipCompact {
         return
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
 
         if (ChocolateFactoryAPI.inChocolateFactory) {

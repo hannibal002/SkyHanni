@@ -34,7 +34,7 @@ object MinecraftData {
                 LorenzVec(packet.x, packet.y, packet.z),
                 packet.pitch,
                 packet.volume
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
         }
@@ -42,7 +42,7 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        WorldChangeEvent().postAndCatch()
+        WorldChangeEvent.post()
     }
 
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
@@ -58,7 +58,7 @@ object MinecraftData {
                 LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
                 packet.isLongDistance,
                 packet.particleArgs,
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
         }
@@ -73,10 +73,10 @@ object MinecraftData {
 
         DelayedRun.checkRuns()
         totalTicks++
-        SkyhanniTickEvent(totalTicks).postAndCatch()
+        SkyhanniTickEvent(totalTicks).post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
@@ -90,11 +90,11 @@ object MinecraftData {
             }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
-            ItemInHandChangeEvent(newItem, oldItem).postAndCatch()
+            ItemInHandChangeEvent(newItem, oldItem).post()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         InventoryUtils.itemInHandId = NEUInternalName.NONE
         InventoryUtils.recentItemsInHand.clear()

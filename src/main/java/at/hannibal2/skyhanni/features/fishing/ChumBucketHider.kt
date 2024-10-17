@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -22,12 +22,12 @@ object ChumBucketHider {
     private val titleEntity = TimeLimitedSet<Entity>(5.seconds)
     private val hiddenEntities = TimeLimitedSet<Entity>(5.seconds)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled.get()) return
@@ -80,7 +80,7 @@ object ChumBucketHider {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled, config.hideBucket, config.hideOwn) { reset() }
     }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MarkedPlayerManager {
@@ -92,7 +92,7 @@ object MarkedPlayerManager {
         return text
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.markOwnName.whenChanged { _, new ->
             val name = LorenzUtils.getPlayerName()
@@ -107,14 +107,14 @@ object MarkedPlayerManager {
         config.entityColor.onToggle(::refreshColors)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
         findPlayers()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         if (Minecraft.getMinecraft().thePlayer == null) return
 
@@ -127,7 +127,7 @@ object MarkedPlayerManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "markedPlayers", "gui.markedPlayers")
     }

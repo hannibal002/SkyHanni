@@ -23,7 +23,7 @@ import net.minecraft.entity.monster.EntityCaveSpider
 import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object MobHighlight {
@@ -31,7 +31,7 @@ object MobHighlight {
     private val config get() = SkyHanniMod.feature.combat.mobs
     private var arachne: EntityLivingBase? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -45,7 +45,7 @@ object MobHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -102,7 +102,7 @@ object MobHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock || !config.lineToArachne) return
 
@@ -122,7 +122,7 @@ object MobHighlight {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         arachne = null
     }

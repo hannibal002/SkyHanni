@@ -34,7 +34,7 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ChestValue {
@@ -46,7 +46,7 @@ object ChestValue {
     private var inOwnInventory = false
     private var compactInventory = true
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (DungeonAPI.inDungeon() && !config.enableInDungeons) return
@@ -68,7 +68,7 @@ object ChestValue {
 
     fun featureName() = if (inOwnInventory) "Estimated Inventory Value" else "Estimated Chest Value"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
@@ -78,7 +78,7 @@ object ChestValue {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (inInventory) {
@@ -86,7 +86,7 @@ object ChestValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         chestItems.clear()
     }
@@ -296,7 +296,7 @@ object ChestValue {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(17, "inventory.chestValueConfig.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)

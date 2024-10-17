@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object EasterEggWaypoints {
@@ -21,7 +21,7 @@ object EasterEggWaypoints {
     private var closest: EasterEgg? = null
     private var isEgg: Boolean = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEgg) return
@@ -41,7 +41,7 @@ object EasterEggWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.allWaypoints && !config.allEntranceWaypoints) return
         if (!isEnabled()) return
@@ -59,7 +59,7 @@ object EasterEggWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!isEgg) return

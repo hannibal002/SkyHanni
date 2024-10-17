@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object BurrowWarpHelper {
     private var lastWarpTime = SimpleTimeMark.farPast()
     private var lastWarp: WarpPoint? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyClick(event: KeyPressEvent) {
         if (!DianaAPI.isDoingDiana()) return
         if (!config.burrowNearestWarp) return
@@ -50,7 +50,7 @@ object BurrowWarpHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -67,13 +67,13 @@ object BurrowWarpHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         lastWarp = null
         currentWarp = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Diana Burrow Nearest Warp")
 

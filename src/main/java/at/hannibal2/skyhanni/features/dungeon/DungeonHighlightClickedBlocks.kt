@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -54,7 +54,7 @@ object DungeonHighlightClickedBlocks {
         return randomColors[colorIndex]
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
@@ -90,7 +90,7 @@ object DungeonHighlightClickedBlocks {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 
@@ -102,7 +102,7 @@ object DungeonHighlightClickedBlocks {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(56, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }

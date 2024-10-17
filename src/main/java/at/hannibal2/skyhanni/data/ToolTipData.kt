@@ -17,7 +17,7 @@ object ToolTipData {
         val slot = lastSlot ?: return
         val itemStack = slot.stack ?: return
         try {
-            if (SkyhanniToolTipEvent(slot, itemStack, toolTip).postAndCatch()) {
+            if (SkyhanniToolTipEvent(slot, itemStack, toolTip).post()) {
                 toolTip.clear()
             }
         } catch (e: Throwable) {

@@ -32,7 +32,7 @@ import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.Mod
 import net.minecraftforge.fml.common.event.FMLInitializationEvent
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.apache.logging.log4j.Level
 import org.apache.logging.log4j.LogManager
 import org.apache.logging.log4j.Logger
@@ -90,7 +90,7 @@ class SkyHanniMod {
         MinecraftForge.EVENT_BUS.register(obj)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (screenToOpen != null) {
             screenTicks++

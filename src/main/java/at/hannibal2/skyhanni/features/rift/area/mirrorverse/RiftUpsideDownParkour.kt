@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object RiftUpsideDownParkour {
@@ -20,7 +20,7 @@ object RiftUpsideDownParkour {
     private val config get() = RiftAPI.config.area.mirrorverse.upsideDownParkour
     private var parkourHelper: ParkourHelper? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftUpsideDownParkour")
         parkourHelper = ParkourHelper(
@@ -32,7 +32,7 @@ object RiftUpsideDownParkour {
         updateConfig()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
@@ -44,7 +44,7 @@ object RiftUpsideDownParkour {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
@@ -53,7 +53,7 @@ object RiftUpsideDownParkour {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
@@ -69,7 +69,7 @@ object RiftUpsideDownParkour {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 

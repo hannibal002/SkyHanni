@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.inPartialHours
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object MotesSession {
@@ -36,7 +36,7 @@ object MotesSession {
         "\\s+Lifetime Motes: §r§d(?<motes>[\\d,.]+)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.RIFT_INFO)) return
         lifetimeMotesPattern.firstMatcher(event.widget.lines) {
@@ -50,7 +50,7 @@ object MotesSession {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.oldIsland == IslandType.THE_RIFT) {
             sendMotesInfo()

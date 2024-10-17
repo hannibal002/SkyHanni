@@ -12,21 +12,21 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PlayerDeathMessages {
 
     private val lastTimePlayerSeen = mutableMapOf<String, Long>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isHideFarDeathsEnabled()) return
 
         checkOtherPlayers()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (!LorenzUtils.inSkyBlock) return
 

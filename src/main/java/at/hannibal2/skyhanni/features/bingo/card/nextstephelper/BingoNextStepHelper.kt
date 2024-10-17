@@ -28,7 +28,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object BingoNextStepHelper {
@@ -132,7 +132,7 @@ object BingoNextStepHelper {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return
@@ -148,7 +148,7 @@ object BingoNextStepHelper {
 
     private var nextMessageIsCrystal = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.enabled) return

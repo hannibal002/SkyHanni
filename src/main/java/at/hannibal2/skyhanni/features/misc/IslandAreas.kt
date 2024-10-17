@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
@@ -31,7 +32,6 @@ import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -45,7 +45,7 @@ object IslandAreas {
     var currentAreaName = ""
     private val textInput = TextInput()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         nodes = emptyMap()
         display = null
@@ -82,7 +82,7 @@ object IslandAreas {
 
     private var hasMoved = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandGraphs.existsForThisIsland) return
@@ -93,7 +93,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent) {
         if (isEnabled()) {
             if (event.entity == Minecraft.getMinecraft().thePlayer) {
@@ -106,7 +106,7 @@ object IslandAreas {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
@@ -117,7 +117,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
@@ -223,7 +223,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.inWorld) return
@@ -238,7 +238,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.pathfinder.color) {
             targetNode?.let {

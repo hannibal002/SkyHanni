@@ -27,7 +27,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object UniqueGiftingOpportunitiesFeatures {
@@ -69,7 +69,7 @@ object UniqueGiftingOpportunitiesFeatures {
         addGiftedPlayer(matchedPlayer.name)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityChangeName(event: EntityCustomNameUpdateEvent) {
         val entity = event.entity as? EntityArmorStand ?: return
         analyzeArmorStand(entity)
@@ -100,7 +100,7 @@ object UniqueGiftingOpportunitiesFeatures {
     private fun isIronman(entity: EntityLivingBase) =
         !LorenzUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group(1))
@@ -108,7 +108,7 @@ object UniqueGiftingOpportunitiesFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         holdingGift = false
 
@@ -119,7 +119,7 @@ object UniqueGiftingOpportunitiesFeatures {
         holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         holdingGift = false
     }

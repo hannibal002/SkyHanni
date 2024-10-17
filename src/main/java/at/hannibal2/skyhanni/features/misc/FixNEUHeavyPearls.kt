@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.hours
 
 @SkyHanniModule
@@ -16,7 +16,7 @@ object FixNEUHeavyPearls {
     private val config get() = SkyHanniMod.feature.misc
     private val heavyPearl = "HEAVY_PEARL".asInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 

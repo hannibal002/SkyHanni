@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object QuiverDisplay {
@@ -33,7 +33,7 @@ object QuiverDisplay {
     private var amount = QuiverAPI.currentAmount
     private var hideAmount = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         arrow = QuiverAPI.currentArrow
@@ -62,7 +62,7 @@ object QuiverDisplay {
         add(Renderable.string(" $rarity$arrowDisplayName"))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         arrow = event.currentArrow
         amount = event.currentAmount
@@ -71,7 +71,7 @@ object QuiverDisplay {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) updateDisplay()
@@ -86,7 +86,7 @@ object QuiverDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.whenToShow,

@@ -22,7 +22,7 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntitySpider
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object SlayerMiniBossFeatures {
@@ -30,7 +30,7 @@ object SlayerMiniBossFeatures {
     private val config get() = SkyHanniMod.feature.slayer
     private var miniBosses = listOf<EntityCreature>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityMaxHealthUpdateEvent) {
         if (!isEnabled()) return
         val entity = event.entity as? EntityCreature ?: return
@@ -49,12 +49,12 @@ object SlayerMiniBossFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         miniBosses = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!config.slayerMinibossLine) return
         for (mob in miniBosses) {

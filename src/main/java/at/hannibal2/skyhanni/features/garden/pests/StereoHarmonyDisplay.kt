@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object StereoHarmonyDisplay {
@@ -79,7 +79,7 @@ object StereoHarmonyDisplay {
         add(Renderable.verticalContainer(list, verticalAlign = RenderUtils.VerticalAlignment.CENTER))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!GardenAPI.inGarden()) return
         selectVinylPattern.matchMatcher(event.message) {
@@ -92,7 +92,7 @@ object StereoHarmonyDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!GardenAPI.isCurrentlyFarming() && !config.alwaysShow) return
@@ -105,12 +105,12 @@ object StereoHarmonyDisplay {
         config.position.renderRenderables(renderables, posLabel = "Stereo Harmony Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.showHead, config.showCrop) { update() }
     }

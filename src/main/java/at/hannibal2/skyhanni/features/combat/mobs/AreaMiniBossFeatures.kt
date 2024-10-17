@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.mobs
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -23,7 +23,7 @@ object AreaMiniBossFeatures {
     private var miniBossType: AreaMiniBossType? = null
     private var respawnCooldown = 11.seconds
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         val type = AreaMiniBossType.entries.find { it.displayName == event.mob.name } ?: return
         miniBossType = type
@@ -38,7 +38,7 @@ object AreaMiniBossFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!SlayerAPI.isInAnyArea) return
         if (!config.areaBossRespawnTimer) return
@@ -59,7 +59,7 @@ object AreaMiniBossFeatures {
         return color.getChatColor() + format
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         miniBossType = null
     }

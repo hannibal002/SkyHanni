@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.intellij.lang.annotations.Language
 import java.util.EnumMap
 import java.util.regex.Pattern
@@ -125,7 +125,7 @@ enum class SkyblockStat(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventory(event: InventoryFullyOpenedEvent) {
             if (!LorenzUtils.inSkyBlock) return
             onSkyblockMenu(event)
@@ -153,7 +153,7 @@ enum class SkyblockStat(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onTabList(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.STATS, TabWidget.DUNGEON_SKILLS_AND_STATS)) return
             val type = if (event.isWidget(TabWidget.DUNGEON_SKILLS_AND_STATS)) StatSourceType.TABLIST_DUNGEON else StatSourceType.TABLIST

@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object TrophyFishManager {
     private val config get() = SkyHanniMod.feature.fishing.trophyFishing
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<TrophyFishJson>("TrophyFish")
         trophyFishInfo = data.trophyFish
@@ -28,7 +28,7 @@ object TrophyFishManager {
 
     private var loadedNeu = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuProfileDataLoaded(event: NeuProfileDataLoadedEvent) {
         if (loadedNeu || !config.loadFromNeuPV) return
 

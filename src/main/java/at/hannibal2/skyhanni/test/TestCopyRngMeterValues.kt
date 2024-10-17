@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object TestCopyRngMeterValues {
@@ -28,7 +28,7 @@ object TestCopyRngMeterValues {
         "§7Dungeon Score: §d.*§5/§d(?<xp>.*)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!SkyHanniMod.feature.dev.debug.copyRngMeter) return
 
@@ -49,7 +49,7 @@ object TestCopyRngMeterValues {
         ChatUtils.debug("${map.size} items saved to clipboard.")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.copyRngMeter", "dev.debug.copyRngMeter")
     }

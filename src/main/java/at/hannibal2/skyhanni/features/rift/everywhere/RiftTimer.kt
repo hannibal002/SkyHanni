@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -42,7 +42,7 @@ object RiftTimer {
     private var latestTime = 0.seconds
     private val changes = mutableMapOf<Long, String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
         maxTime = 0.seconds
@@ -50,7 +50,7 @@ object RiftTimer {
         currentTime = 0.seconds
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
         if (event.updated != ActionBarStatsData.RIFT_TIME) return
         if (!isEnabled() || RiftAPI.inRiftRace) return
@@ -65,7 +65,7 @@ object RiftTimer {
 
     // prevents rift time from pausing during Rift Race
     // (hypixel hides the action bar during the race)
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled() || !RiftAPI.inRiftRace) return
         if (!event.isMod(5)) return
@@ -110,7 +110,7 @@ object RiftTimer {
         changes[System.currentTimeMillis()] = diffFormat
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.percentage,
@@ -122,7 +122,7 @@ object RiftTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockArea == "Mirrorverse") return
@@ -130,7 +130,7 @@ object RiftTimer {
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!RiftAPI.inRift() || !config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {

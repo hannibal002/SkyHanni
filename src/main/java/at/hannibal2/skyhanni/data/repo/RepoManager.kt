@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import com.google.gson.JsonObject
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.apache.commons.io.FileUtils
 import java.io.BufferedReader
 import java.io.BufferedWriter
@@ -311,9 +311,9 @@ class RepoManager(private val configLocation: File) {
         ).use { writer -> writer.write(gson.toJson(json)) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
-        NeuRepositoryReloadEvent().postAndCatch()
+        NeuRepositoryReloadEvent().post()
     }
 
     fun resetRepositoryLocation(manual: Boolean = false) {

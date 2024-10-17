@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object TrackerManager {
@@ -19,7 +19,7 @@ object TrackerManager {
     var dirty = false
     var commandEditTrackerSuccess = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.misc.tracker.hideCheapItems
         ConditionalUtils.onToggle(config.alwaysShowBest, config.minPrice, config.enabled) {
@@ -27,14 +27,14 @@ object TrackerManager {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onRenderOverlayFirst(event: GuiRenderEvent) {
         if (hasChanged) {
             dirty = true
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlayLast(event: GuiRenderEvent) {
         if (hasChanged) {
             dirty = false
@@ -62,7 +62,7 @@ object TrackerManager {
         }
 
         commandEditTrackerSuccess = false
-        ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).postAndCatch()
+        ItemAddEvent(internalName, amount, ItemAddManager.Source.COMMAND).post()
         if (!commandEditTrackerSuccess) {
             ChatUtils.userError("Could not edit the Item Tracker! Does this item belong to this tracker? Is the tracker active right now?")
         }

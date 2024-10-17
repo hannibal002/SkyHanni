@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getAppliedPocketSackInASack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PocketSackInASackDisplay {
@@ -17,7 +17,7 @@ object PocketSackInASackDisplay {
     private val config get() = SkyHanniMod.feature.inventory.pocketSackInASack
     private const val MAX_STITCHES = 3
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         val stack = event.stack ?: return
         if (!LorenzUtils.inSkyBlock || stack.stackSize != 1) return
@@ -31,7 +31,7 @@ object PocketSackInASackDisplay {
         event.drawSlotText(x, y, stackTip, .9f)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.replaceLore) return
@@ -55,7 +55,7 @@ object PocketSackInASackDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "misc.pocketSackInASack", "inventory.pocketSackInASack")
     }

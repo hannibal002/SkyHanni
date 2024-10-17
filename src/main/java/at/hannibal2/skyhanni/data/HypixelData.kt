@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.concurrent.thread
 import kotlin.time.Duration.Companion.seconds
 
@@ -192,7 +191,7 @@ object HypixelData {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Server ID")
         if (!LorenzUtils.inSkyBlock) {
@@ -288,7 +287,7 @@ object HypixelData {
 
     private var loggerIslandChange = LorenzLogger("debug/island_change")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         locrawData = null
         skyBlock = false
@@ -314,12 +313,12 @@ object HypixelData {
         hasScoreboardUpdated = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         hasScoreboardUpdated = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.onHypixel) return
 
@@ -328,14 +327,14 @@ object HypixelData {
             val newProfile = message.replace("your profile was changed to:", "").replace("(co-op)", "").trim()
             if (profileName == newProfile) return
             profileName = newProfile
-            ProfileJoinEvent(newProfile).postAndCatch()
+            ProfileJoinEvent(newProfile).post()
         }
         if (message.startsWith("you are playing on profile:")) {
             val newProfile = message.replace("you are playing on profile:", "").replace("(co-op)", "").trim()
             ProfileStorageData.profileJoinMessage()
             if (profileName == newProfile) return
             profileName = newProfile
-            ProfileJoinEvent(newProfile).postAndCatch()
+            ProfileJoinEvent(newProfile).post()
         }
     }
 
@@ -346,12 +345,12 @@ object HypixelData {
             if (RiftAPI.inRift()) newProfile = newProfile.reversed()
             if (profileName == newProfile) return
             profileName = newProfile
-            ProfileJoinEvent(newProfile).postAndCatch()
+            ProfileJoinEvent(newProfile).post()
         }
     }
 
     // TODO rewrite everything in here
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) {
             checkNEULocraw()
@@ -378,7 +377,7 @@ object HypixelData {
         if (!LorenzUtils.onHypixel) {
             checkHypixel()
             if (LorenzUtils.onHypixel) {
-                HypixelJoinEvent().postAndCatch()
+                HypixelJoinEvent.post()
                 SkyHanniMod.repo.displayRepoStatus(true)
             }
         }
@@ -411,7 +410,7 @@ object HypixelData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         when (event.widget) {
             TabWidget.AREA -> checkIsland(event)
@@ -425,7 +424,7 @@ object HypixelData {
 
         TabListData.getTabList().matchFirst(UtilsPatterns.tabListProfilePattern) {
             profileName = group("profile").lowercase()
-            ProfileJoinEvent(profileName).postAndCatch()
+            ProfileJoinEvent(profileName).post()
         }
     }
 
@@ -503,7 +502,7 @@ object HypixelData {
 
         // TODO don't send events when one of the arguments is none, at least when not on sb anymore
         if (skyBlockIsland != islandType) {
-            IslandChangeEvent(islandType, skyBlockIsland).postAndCatch()
+            IslandChangeEvent(islandType, skyBlockIsland).post()
             if (islandType == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
                 loggerIslandChange.log("Unknown: '$foundIsland'")

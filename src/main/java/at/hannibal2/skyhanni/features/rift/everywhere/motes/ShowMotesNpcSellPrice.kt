@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ShowMotesNpcSellPrice {
@@ -42,7 +42,7 @@ object ShowMotesNpcSellPrice {
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isInventoryValueEnabled()) return
         if (inInventory) {
@@ -54,14 +54,14 @@ object ShowMotesNpcSellPrice {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isInventoryValueEnabled()) return
         if (!event.isMod(10, 1)) return
         processItems()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isShowPriceEnabled()) return
 
@@ -79,12 +79,12 @@ object ShowMotesNpcSellPrice {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         reset()
     }
@@ -116,7 +116,7 @@ object ShowMotesNpcSellPrice {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!RiftAPI.inRift()) return
         burgerPattern.matchMatcher(event.message) {
@@ -192,7 +192,7 @@ object ShowMotesNpcSellPrice {
 
     private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "rift.motes.inventoryValue.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)

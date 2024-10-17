@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object FocusMode {
@@ -17,14 +17,14 @@ object FocusMode {
 
     private var toggle = true
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onLorenzToolTip(event: SkyhanniToolTipEvent) {
         if (!isEnabled() || !toggle) return
         if(event.toolTip.isEmpty()) return
         event.toolTip = mutableListOf(event.toolTip.first())
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLorenzTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!config.toggleKey.isKeyClicked()) return

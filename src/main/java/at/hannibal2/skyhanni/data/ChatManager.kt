@@ -109,7 +109,7 @@ object ChatManager {
                 trimmedMessage,
                 trimmedMessage.split(" "),
                 originatingModContainer
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
@@ -129,7 +129,7 @@ object ChatManager {
         }
         val key = IdentityCharacteristics(original)
         val chatEvent = SkyhanniChatEvent(message, original)
-        chatEvent.postAndCatch()
+        chatEvent.post()
 
         val blockReason = chatEvent.blockedReason.uppercase()
         if (blockReason != "") {

@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.events.RawScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,8 +15,6 @@ import net.minecraft.network.play.server.S3CPacketUpdateScore
 import net.minecraft.network.play.server.S3EPacketTeams
 import net.minecraft.scoreboard.Score
 import net.minecraft.scoreboard.ScorePlayerTeam
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ScoreboardData {
@@ -100,7 +98,7 @@ object ScoreboardData {
         println(" ")
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onTick(event: SkyhanniTickEvent) {
         if (!dirty) return
         dirty = false
@@ -109,14 +107,14 @@ object ScoreboardData {
         val list = fetchScoreboardLines().reversed()
         val semiFormatted = list.map { cleanSB(it) }
         if (semiFormatted != sidebarLines) {
-            RawScoreboardUpdateEvent(semiFormatted).postAndCatch()
+            RawScoreboardUpdateEvent(semiFormatted).post()
             sidebarLines = semiFormatted
         }
 
         sidebarLinesRaw = list
         val new = formatLines(list)
         if (new != sidebarLinesFormatted) {
-            ScoreboardUpdateEvent(new).postAndCatch()
+            ScoreboardUpdateEvent(new).post()
             sidebarLinesFormatted = new
         }
     }

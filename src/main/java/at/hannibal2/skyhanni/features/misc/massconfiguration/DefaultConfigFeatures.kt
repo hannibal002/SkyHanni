@@ -8,14 +8,14 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import net.minecraft.client.Minecraft
 import net.minecraft.command.CommandBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DefaultConfigFeatures {
 
     private var didNotifyOnce = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (didNotifyOnce) return
         Minecraft.getMinecraft().thePlayer ?: return

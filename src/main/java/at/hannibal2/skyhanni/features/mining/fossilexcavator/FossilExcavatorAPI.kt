@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object FossilExcavatorAPI {
@@ -52,14 +52,14 @@ object FossilExcavatorAPI {
 
     val scrapItem = "SUSPICIOUS_SCRAP".asInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
         if (event.inventoryName != "Fossil Excavator") return
         inInventory = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inInventory) return
         val slots = InventoryUtils.getItemsInOpenChest()
@@ -67,26 +67,26 @@ object FossilExcavatorAPI {
         inExcavatorMenu = itemNames.any { it == "Start Excavator" }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         inInventory = false
         inExcavatorMenu = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         inExcavatorMenu = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
 
         val message = event.message
 
         if (emptyPattern.matches(message)) {
-            FossilExcavationEvent(emptyList()).postAndCatch()
+            FossilExcavationEvent(emptyList()).post()
         }
 
 
@@ -98,7 +98,7 @@ object FossilExcavatorAPI {
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
-            FossilExcavationEvent(loot.toList()).postAndCatch()
+            FossilExcavationEvent(loot.toList()).post()
             loot.clear()
             inLoot = false
             return

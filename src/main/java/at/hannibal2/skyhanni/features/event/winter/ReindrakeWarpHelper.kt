@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ReindrakeWarpHelper {
@@ -27,7 +27,7 @@ object ReindrakeWarpHelper {
         "§c§lWOAH! (?:§r)?§cA (?:§r)?§4Reindrake (?:§r)?§cwas summoned from the depths!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessage(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         if (!spawnPattern.matches(event.message)) return

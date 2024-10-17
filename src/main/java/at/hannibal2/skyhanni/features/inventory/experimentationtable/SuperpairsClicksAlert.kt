@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object SuperpairsClicksAlert {
@@ -21,7 +21,7 @@ object SuperpairsClicksAlert {
     private val currentRoundRegex = Regex("""Round: (\d+)""")
     private val targetInventoryNames = arrayOf("Chronomatron", "Ultrasequencer")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!config.superpairsClicksAlert) return
         if (!targetInventoryNames.any { event.inventoryName.contains(it) }) return
@@ -40,7 +40,7 @@ object SuperpairsClicksAlert {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!config.superpairsClicksAlert) return
         if (roundsNeeded == -1) return
@@ -71,7 +71,7 @@ object SuperpairsClicksAlert {
                 .filter { it.key < 45 }
                 .any { it.value.stackSize > roundsNeeded }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(46, "misc.superpairsClicksAlert", "inventory.helper.enchanting.superpairsClicksAlert")
 

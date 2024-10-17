@@ -18,14 +18,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object GardenComposterInventoryFeatures {
 
     private val config get() = GardenAPI.config.composters
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.upgradePrice) return
@@ -73,7 +73,7 @@ object GardenComposterInventoryFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.highlightUpgrade) return
@@ -91,7 +91,7 @@ object GardenComposterInventoryFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterUpgradePrice", "garden.composters.upgradePrice")
         event.move(3, "garden.composterHighLightUpgrade", "garden.composters.highlightUpgrade")

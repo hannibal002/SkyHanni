@@ -19,7 +19,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
@@ -34,7 +34,7 @@ object VoltHighlighter {
     private val CHARGE_TIME = 12.seconds
     private var chargingSince = mapOf<Entity, SimpleTimeMark>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onArmorChange(event: EntityEquipmentChangeEvent) {
         if (!RiftAPI.inRift() || !config.voltWarning) return
         val player = Minecraft.getMinecraft().thePlayer ?: return
@@ -47,7 +47,7 @@ object VoltHighlighter {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: SkyhanniRenderWorldEvent) {
         if (!RiftAPI.inRift() || !(config.voltRange || config.voltMoodMeter)) return
         for (entity in getEntities<EntityLivingBase>()) {

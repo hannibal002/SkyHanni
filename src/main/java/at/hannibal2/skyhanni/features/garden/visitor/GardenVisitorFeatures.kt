@@ -112,12 +112,12 @@ object GardenVisitorFeatures {
     private var lastFullPrice = 0.0
     private val greenThumb = "GREEN_THUMB;1".asInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorOpen(event: VisitorOpenEvent) {
         val visitor = event.visitor
         val offerItem = visitor.offer?.offerItem ?: return
@@ -330,7 +330,7 @@ object GardenVisitorFeatures {
         add(list)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (GardenAPI.onBarnPlot) {
             update()
@@ -342,22 +342,22 @@ object GardenVisitorFeatures {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorRefused(event: VisitorRefusedEvent) {
         update()
         GardenVisitorDropStatistics.deniedVisitors += 1
         GardenVisitorDropStatistics.saveAndUpdate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorAccepted(event: VisitorAcceptedEvent) {
-        VisitorAcceptEvent(event.visitor).postAndCatch()
+        VisitorAcceptEvent(event.visitor).post()
         update()
         GardenVisitorDropStatistics.coinsSpent += round(lastFullPrice).toLong()
         GardenVisitorDropStatistics.lastAccept = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorRender(event: VisitorRenderEvent) {
         val visitor = event.visitor
         val text = visitor.status.displayName
@@ -491,7 +491,7 @@ object GardenVisitorFeatures {
         visitor.lastLore = finalList
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.shoppingList.display && config.highlightStatus == HighlightMode.DISABLED) return
@@ -502,7 +502,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         val visitor = event.visitor
         val name = visitor.visitorName
@@ -532,7 +532,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (config.hypixelArrivedMessage && visitorArrivePattern.matcher(event.message).matches()) {
             event.blockedReason = "new_visitor_arrived"
@@ -636,7 +636,7 @@ object GardenVisitorFeatures {
 
     private fun hideExtraGuis() = GardenAPI.hideExtraGuis() && !VisitorAPI.inInventory
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!config.shoppingList.display) return
 
@@ -663,7 +663,7 @@ object GardenVisitorFeatures {
         return false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Visitor Stats")
 
@@ -691,7 +691,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorNeedsDisplay", "garden.visitors.needs.display")
         event.move(3, "garden.visitorNeedsPos", "garden.visitors.needs.pos")

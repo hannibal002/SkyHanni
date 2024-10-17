@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatStyle
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.util.UUID
 
 @SkyHanniModule
@@ -55,7 +55,7 @@ object FriendAPI {
         FriendsJson.PlayerFriends().also { it.friends = mutableMapOf() }
     }.friends
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         if (SkyHanniMod.friendsData.players == null) {
             SkyHanniMod.friendsData.players = mutableMapOf()
@@ -74,7 +74,7 @@ object FriendAPI {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.FRIENDS, "Save file")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         readFriendsList(event)
 

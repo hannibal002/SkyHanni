@@ -27,7 +27,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -54,7 +53,7 @@ object OwnInventoryData {
                 val slot = packet.func_149173_d()
                 val item = packet.func_149174_e() ?: return
                 DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item, slot).postAndCatch()
+                    OwnInventoryItemUpdateEvent(item, slot).post()
                 }
             }
         }
@@ -69,7 +68,7 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (itemAmounts.isEmpty()) {
@@ -95,7 +94,7 @@ object OwnInventoryData {
         return map
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         itemAmounts = emptyMap()
     }
@@ -109,14 +108,14 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds) { it == internalNameOrNull }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
@@ -161,7 +160,7 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
@@ -187,6 +186,6 @@ object OwnInventoryData {
 
         if (internalName.startsWith("MAP-")) return
 
-        ItemAddInInventoryEvent(internalName, add).postAndCatch()
+        ItemAddInInventoryEvent(internalName, add).post()
     }
 }

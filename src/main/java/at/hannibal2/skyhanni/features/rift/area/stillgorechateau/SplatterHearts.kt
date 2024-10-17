@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -20,7 +20,7 @@ object SplatterHearts {
     private var shownHearts = setOf<LorenzVec>()
     private val currentHearts = mutableSetOf<LorenzVec>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (event.type != EnumParticleTypes.HEART) return
@@ -34,7 +34,7 @@ object SplatterHearts {
         currentHearts += event.location
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (lastHearts.passedSince() > 300.milliseconds) return

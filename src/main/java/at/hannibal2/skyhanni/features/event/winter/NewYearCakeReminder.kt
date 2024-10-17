@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -28,14 +28,14 @@ object NewYearCakeReminder {
     )
     private var lastReminderSend = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (event.message == "§aYou claimed a §r§cNew Year Cake§r§a!") {
             markCakeClaimed()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         //  cake already claimed
         if (event.inventoryName == "Baker") {
@@ -53,7 +53,7 @@ object NewYearCakeReminder {
         return playerSpecific.winter.cakeCollectedYear == SkyBlockTime.now().year
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.newYearCakeReminder) return

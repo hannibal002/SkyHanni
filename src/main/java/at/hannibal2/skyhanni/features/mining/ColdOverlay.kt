@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.util.ResourceLocation
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.lwjgl.opengl.GL11
 import kotlin.time.Duration.Companion.seconds
 
@@ -27,7 +27,7 @@ object ColdOverlay {
 
     private val textureLocation by lazy { ResourceLocation("skyhanni", "cold_overlay.png") }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         val alpha = getColdAlpha()
@@ -56,7 +56,7 @@ object ColdOverlay {
         return coldPercentage.coerceAtLeast(0f) * (config.maxAlpha / 100)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onColdUpdate(event: ColdUpdateEvent) {
         val duration = if (event.cold == 0) 1.seconds else 0.seconds
         DelayedRun.runDelayed(duration) {

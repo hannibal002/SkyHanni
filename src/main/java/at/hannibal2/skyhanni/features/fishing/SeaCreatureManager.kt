@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object SeaCreatureManager {
@@ -39,7 +39,7 @@ object SeaCreatureManager {
         "§e> Your bottle of thunder has fully charged!"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (doubleHookPattern.matches(event.message)) {
@@ -50,13 +50,13 @@ object SeaCreatureManager {
         } else if (!doubleHook || !thunderBottleChargedPattern.matches(event.message)) {
             val seaCreature = getSeaCreatureFromMessage(event.message)
             if (seaCreature != null) {
-                SeaCreatureFishEvent(seaCreature, event, doubleHook).postAndCatch()
+                SeaCreatureFishEvent(seaCreature, event, doubleHook).post()
             }
             doubleHook = false
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         seaCreatureMap.clear()
         allFishingMobs = emptyMap()

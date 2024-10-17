@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.toRoman
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 // TODO: Merge common code with skill overflow
 @SkyHanniModule
@@ -23,7 +23,7 @@ object GardenInventoryTooltipOverflow {
 
     private val config get() = SkyHanniMod.feature.garden.cropMilestones.overflow
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
 

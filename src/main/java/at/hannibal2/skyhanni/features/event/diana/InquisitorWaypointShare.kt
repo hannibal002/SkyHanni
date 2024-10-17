@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
 
@@ -101,7 +100,7 @@ object InquisitorWaypointShare {
         ChatUtils.chat("Inquisitor Test " + if (test) "Enabled" else "Disabled")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -112,7 +111,7 @@ object InquisitorWaypointShare {
         waypoints = waypoints.editCopy { values.removeIf { it.spawnTime.passedSince() > 75.seconds } }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         waypoints = emptyMap()
         inquisitorsNearby = emptyList()
@@ -144,7 +143,7 @@ object InquisitorWaypointShare {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message
@@ -174,7 +173,7 @@ object InquisitorWaypointShare {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         if (!isEnabled()) return
         if (event.health > 0) return
@@ -188,7 +187,7 @@ object InquisitorWaypointShare {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyClick(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return

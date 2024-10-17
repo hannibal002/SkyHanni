@@ -35,7 +35,7 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -264,7 +264,7 @@ object ChocolateFactoryStrayTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SecondPassedEvent) {
         if (!isEnabled()) return
         InventoryUtils.getItemsInOpenChest().filter {
@@ -289,13 +289,13 @@ object ChocolateFactoryStrayTracker {
         incrementGoldenType("sidedish")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         tracker.renderDisplay(config.strayRabbitTrackerPosition)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         tracker.firstUpdate()
@@ -317,7 +317,7 @@ object ChocolateFactoryStrayTracker {
         return newElement
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(58, "chocolateFactory.strayTracker.straysCaught") { element ->
             migrateJsonStringKeyToRarityKey(element, LorenzRarity::class.java)

@@ -29,7 +29,7 @@ object GuiData {
         if (preDrawEventCancelled) event.cancel()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onClick(event: GuiContainerEvent.SlotClickEvent) {
         if (preDrawEventCancelled) event.cancel()
     }
@@ -59,7 +59,7 @@ object GuiData {
         if (preDrawEventCancelled) event.isCanceled = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
             if (Minecraft.getMinecraft().currentScreen !is GuiChest) {
@@ -68,7 +68,7 @@ object GuiData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         preDrawEventCancelled = false
     }

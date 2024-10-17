@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO rename to something else to reduce confusion
@@ -29,12 +29,12 @@ object MineshaftWaypoints {
     val waypoints = mutableListOf<MineshaftWaypoint>()
     private var timeLastShared = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         waypoints.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland != IslandType.MINESHAFT) return
 
@@ -57,7 +57,7 @@ object MineshaftWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (event.keyCode != config.shareWaypointLocation) return
@@ -80,7 +80,7 @@ object MineshaftWaypoints {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (waypoints.isEmpty()) return
 

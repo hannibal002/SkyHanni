@@ -26,7 +26,7 @@ import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.potion.Potion
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonLividFinder {
@@ -39,7 +39,7 @@ object DungeonLividFinder {
     private var gotBlinded = false
     private var color: LorenzColor? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!inDungeon()) return
 
@@ -106,7 +106,7 @@ object DungeonLividFinder {
         if (!it.isDead && it.health > 0.5) it else null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!inDungeon()) return
         if (!config.hideWrong) return
@@ -127,7 +127,7 @@ object DungeonLividFinder {
         Minecraft.getMinecraft().thePlayer.getActivePotionEffect(Potion.blindness).duration > 10
     } else false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!inDungeon()) return
         if (!config.enabled) return
@@ -145,7 +145,7 @@ object DungeonLividFinder {
         event.drawWaypointFilled(location.add(-0.5, 0.0, -0.5), color, beacon = false, seeThroughBlocks = true)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         lividEntity = null
         gotBlinded = false

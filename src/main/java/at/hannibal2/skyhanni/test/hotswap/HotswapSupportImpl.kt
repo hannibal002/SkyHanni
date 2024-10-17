@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.test.hotswap
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
@@ -9,7 +10,6 @@ import moe.nea.hotswapagentforge.forge.ClassDefinitionEvent
 import moe.nea.hotswapagentforge.forge.HotswapEvent
 import moe.nea.hotswapagentforge.forge.HotswapFinishedEvent
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class HotswapSupportImpl : HotswapSupportHandle {
 
@@ -18,7 +18,7 @@ class HotswapSupportImpl : HotswapSupportHandle {
         println("Hotswap Client in Skyhanni loaded")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHotswapClass(event: ClassDefinitionEvent.Redefinition) {
         val instance = SkyHanniMod.modules.find { it.javaClass.name == event.fullyQualifiedName } ?: return
         val primaryConstructor = runCatching { instance.javaClass.getDeclaredConstructor() }.getOrNull()
@@ -46,7 +46,7 @@ class HotswapSupportImpl : HotswapSupportHandle {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHotswapDetected(event: HotswapFinishedEvent) {
         ChatUtils.chat("Hotswap finished!")
     }

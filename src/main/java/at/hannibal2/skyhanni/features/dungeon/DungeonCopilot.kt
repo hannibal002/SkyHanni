@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonCopilot {
@@ -45,7 +45,7 @@ object DungeonCopilot {
     private var nextStep = ""
     private var searchForKey = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
@@ -103,7 +103,7 @@ object DungeonCopilot {
         nextStep = step
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!DungeonAPI.inDungeon()) return
 
@@ -122,13 +122,13 @@ object DungeonCopilot {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonStartEvent) {
         changeNextStep("Clear first room")
         searchForKey = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonStart(event: DungeonEnterEvent) {
         changeNextStep("Talk to Mort")
         searchForKey = true
@@ -139,21 +139,21 @@ object DungeonCopilot {
         changeNextStep("Defeat the boss! Good luck :)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         changeNextStep("")
     }
 
     private fun isEnabled(): Boolean = DungeonAPI.inDungeon() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.pos.renderString(nextStep, posLabel = "Dungeon Copilot")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.messageFilterKeysAndDoors", "dungeon.messageFilter.keysAndDoors")
         event.move(3, "dungeon.copilotEnabled", "dungeon.dungeonCopilot.enabled")

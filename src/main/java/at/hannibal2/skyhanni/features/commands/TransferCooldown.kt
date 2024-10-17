@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -19,7 +19,7 @@ object TransferCooldown {
     private var lastRunCompleted: SimpleTimeMark = SimpleTimeMark.farPast()
     private var action: (() -> Unit)? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldLoad(event: WorldChangeEvent) {
         if (!config.transferCooldown || lastRunCompleted.isInFuture()) return
         lastRunCompleted = DelayedRun.runDelayed(3.seconds) {
@@ -31,7 +31,7 @@ object TransferCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCommand(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock || !config.transferCooldown || lastRunCompleted.isInPast()) return
         when (event.splitMessage[0]) {

@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -25,7 +25,7 @@ object ParkourWaypointSaver {
     private var locations = mutableListOf<LorenzVec>()
     private var parkourHelper: ParkourHelper? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyClick(event: KeyPressEvent) {
         if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
         if (Minecraft.getMinecraft().currentScreen != null) return
@@ -68,7 +68,7 @@ object ParkourWaypointSaver {
         OSUtils.copyToClipboard(resultList.joinToString((",\n")))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock && !config.parkourOutsideSB) return
 

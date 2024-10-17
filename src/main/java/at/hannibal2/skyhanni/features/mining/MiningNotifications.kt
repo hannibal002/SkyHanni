@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveSta
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -60,7 +60,7 @@ object MiningNotifications {
     private var hasSentCold = false
     private var hasSentAscensionRope = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.inMiningIsland()) return
         if (!config.enabled) return
@@ -73,7 +73,7 @@ object MiningNotifications {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onColdUpdate(event: ColdUpdateEvent) {
         if (!inGlaciteArea()) return
         if (!config.enabled) return
@@ -91,13 +91,13 @@ object MiningNotifications {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         hasSentCold = false
         hasSentAscensionRope = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.coldThreshold) {
             if (MiningAPI.cold != config.coldThreshold.get()) hasSentCold = false

@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -510,7 +510,7 @@ object ChatFilter {
     )
     // </editor-fold>
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         var blockReason = block(event.message)
         if (blockReason == null && config.powderMiningFilter.enabled) blockReason = powderMiningBlock(event)
@@ -624,7 +624,7 @@ object ChatFilter {
         (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
         (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.hypixelHub", "chat.filterType.hypixelHub")
         event.move(3, "chat.empty", "chat.filterType.empty")

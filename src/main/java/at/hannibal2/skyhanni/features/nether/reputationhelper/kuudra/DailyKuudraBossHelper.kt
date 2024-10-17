@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -27,7 +27,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (!config.enabled.get()) return
@@ -40,7 +40,7 @@ class DailyKuudraBossHelper(private val reputationHelper: CrimsonIsleReputationH
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKuudraDone(event: KuudraCompleteEvent) {
         val tier = event.kuudraTier
         val kuudraTier = getByTier(tier) ?: return

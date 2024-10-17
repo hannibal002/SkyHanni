@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -47,7 +47,7 @@ object EntityMovementData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         val nextData = nextTeleport ?: return
         if (nextData.island != event.newIsland) return
@@ -63,7 +63,7 @@ object EntityMovementData {
         nextTeleport = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent) {
         if (!LorenzUtils.inSkyBlock || event.entity != Minecraft.getMinecraft().thePlayer) return
 
@@ -81,7 +81,7 @@ object EntityMovementData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         addToTrack(Minecraft.getMinecraft().thePlayer)
@@ -94,12 +94,12 @@ object EntityMovementData {
             val distance = newLocation.distance(oldLocation)
             if (distance > 0.01) {
                 entityLocation[entity] = newLocation
-                EntityMoveEvent(entity, oldLocation, newLocation, distance).postAndCatch()
+                EntityMoveEvent(entity, oldLocation, newLocation, distance).post()
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!warpingPattern.matches(event.message)) return
@@ -108,7 +108,7 @@ object EntityMovementData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         entityLocation.clear()
     }

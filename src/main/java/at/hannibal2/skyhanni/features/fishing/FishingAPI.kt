@@ -30,7 +30,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FishingAPI {
@@ -64,7 +63,7 @@ object FishingAPI {
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
         bobberHasTouchedLiquid = false
-        FishingBobberCastEvent(event.entity).postAndCatch()
+        FishingBobberCastEvent(event.entity).post()
     }
 
     private fun resetBobber() {
@@ -72,12 +71,12 @@ object FishingAPI {
         bobberHasTouchedLiquid = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         resetBobber()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -97,7 +96,7 @@ object FishingAPI {
                 }
 
                 bobberHasTouchedLiquid = true
-                FishingBobberInLiquidEvent(bobber, isWater).postAndCatch()
+                FishingBobberInLiquidEvent(bobber, isWater).post()
             }
         }
     }
@@ -111,7 +110,7 @@ object FishingAPI {
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
@@ -119,7 +118,7 @@ object FishingAPI {
         holdingWaterRod = event.newItem.isWaterRod()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         lavaRods = data.lavaFishingRods

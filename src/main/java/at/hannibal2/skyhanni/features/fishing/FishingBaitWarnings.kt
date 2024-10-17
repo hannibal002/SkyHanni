@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.entity.projectile.EntityFishHook
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -41,13 +41,13 @@ object FishingBaitWarnings {
 
     private val baitEntities = TimeLimitedSet<Bait>(750.seconds)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         lastBait = null
         wasUsingBait = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobber(event: FishingBobberInLiquidEvent) {
         if (!isEnabled()) return
         DelayedRun.runDelayed(500.milliseconds) {

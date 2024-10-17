@@ -25,7 +25,7 @@ import at.hannibal2.skyhanni.utils.renderables.RenderableInventory
 import at.hannibal2.skyhanni.utils.renderables.RenderableTooltips
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PersonalCompactorOverlay {
@@ -50,7 +50,7 @@ object PersonalCompactorOverlay {
     private val compactorRenderableMap = mutableMapOf<String, Renderable>()
     private val compactorEnabledMap = mutableMapOf<String, Boolean>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
         if (!shouldShow()) return
@@ -90,17 +90,17 @@ object PersonalCompactorOverlay {
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         compactorRenderableMap.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         compactorEnabledMap.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showToggle) return

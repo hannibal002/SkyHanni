@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -46,7 +45,7 @@ object ArachneSpawnTimer {
     private var lastTickTime = SimpleTimeMark.farPast()
     private var searchTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         searchTime = SimpleTimeMark.farPast()
         lastTickTime = SimpleTimeMark.farPast()
@@ -55,7 +54,7 @@ object ArachneSpawnTimer {
         arachneSpawnTime = SimpleTimeMark.farPast()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (arachneSpawnTime.isInPast()) return
@@ -65,7 +64,7 @@ object ArachneSpawnTimer {
         event.drawDynamicText(arachneAltarLocation, "§b$format", 1.5)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message.removeColor().lowercase()

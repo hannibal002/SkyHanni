@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.BlockPos
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -65,13 +65,13 @@ object WorldEdit {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         leftPos = null
         rightPos = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorldLast(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 

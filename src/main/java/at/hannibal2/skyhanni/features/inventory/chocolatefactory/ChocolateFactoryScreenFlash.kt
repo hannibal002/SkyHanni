@@ -16,7 +16,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.math.sin
 
 @SkyHanniModule
@@ -25,7 +25,7 @@ object ChocolateFactoryScreenFlash {
     private val config get() = ChocolateFactoryAPI.config
     var flashScreen = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         flashScreen = InventoryUtils.getItemsInOpenChest().any {
@@ -44,7 +44,7 @@ object ChocolateFactoryScreenFlash {
     private fun isSpecial(slot: Slot) =
         clickMeGoldenRabbitPattern.matches(slot.stack.name) || slot.stack.getSkullTexture() in specialRabbitTextures
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!flashScreen) return

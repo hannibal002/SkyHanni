@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -26,7 +26,7 @@ object BlazeSlayerFirePitsWarning {
         lastFirePitsWarning = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(10)) return
@@ -36,7 +36,7 @@ object BlazeSlayerFirePitsWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossHealthChange(event: BossHealthChangeEvent) {
         if (!isEnabled()) return
         val entityData = event.entityData
@@ -69,7 +69,7 @@ object BlazeSlayerFirePitsWarning {
             BossType.SLAYER_BLAZE_TYPHOEUS_4,
         )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "slayer.firePitsWarning", "slayer.blazes.firePitsWarning")
     }

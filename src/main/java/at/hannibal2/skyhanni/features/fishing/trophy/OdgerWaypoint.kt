@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object OdgerWaypoint {
@@ -25,14 +25,14 @@ object OdgerWaypoint {
 
     private var trophyFishInInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled() || !event.isMod(10)) return
         trophyFishInInventory = InventoryUtils.getItemsInOwnInventory()
             .any { it.getItemCategoryOrNull() == ItemCategory.TROPHY_FISH }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (FishingAPI.holdingLavaRod) return
@@ -42,7 +42,7 @@ object OdgerWaypoint {
         event.drawDynamicText(location, "Odger", 1.5)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "fishing.odgerLocation", "fishing.trophyFishing.odgerLocation")
     }

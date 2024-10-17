@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object MobDebug {
@@ -46,7 +46,7 @@ object MobDebug {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldRenderDebug(event: SkyhanniRenderWorldEvent) {
         if (config.showRayHit || config.showInvisible) {
             lastRayHit = MobUtils.rayTraceForMobs(Minecraft.getMinecraft().thePlayer, event.partialTicks)
@@ -87,7 +87,7 @@ object MobDebug {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobEvent(event: MobEvent) {
         if (!config.logEvents) return
         val text = "Mob ${if (event is MobEvent.Spawn) "Spawn" else "Despawn"}: ${

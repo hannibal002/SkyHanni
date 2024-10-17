@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 
@@ -345,12 +345,12 @@ enum class TabWidget(
         if (lines == this.lines) return
         this.lines = lines
         isActive = true
-        WidgetUpdateEvent(this, lines).postAndCatch()
+        WidgetUpdateEvent(this, lines).post()
     }
 
     private fun postClearEvent() {
         lines = emptyList()
-        WidgetUpdateEvent(this, lines).postAndCatch()
+        WidgetUpdateEvent(this, lines).post()
     }
 
     /** Update the state of the widget, posts the clear if [isActive] == true && [gotChecked] == false */
@@ -375,7 +375,7 @@ enum class TabWidget(
             entries.forEach { it.pattern }
         }
 
-        @SubscribeEvent(priority = EventPriority.HIGH)
+        @HandleEvent(priority = HandleEvent.HIGH)
         fun onTabListUpdate(event: TabListUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) {
                 if (separatorIndexes.isNotEmpty()) {
@@ -409,7 +409,7 @@ enum class TabWidget(
             }
         }
 
-        @SubscribeEvent(priority = EventPriority.LOW)
+        @HandleEvent(priority = HandleEvent.LOW)
         fun onRepoReload(event: RepositoryReloadEvent) {
             extraPatterns = repoGroup.getUnusedPatterns()
         }

@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
@@ -113,7 +113,7 @@ object PlayerChatManager {
         "(?<prefix>.*)(?<guest>§a\\[✌] )(?<suffix>.*)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         val chatComponent = event.chatComponent.intoSpan().stripHypixelMessage()
         coopPattern.matchStyledMatcher(chatComponent) {
@@ -205,13 +205,13 @@ object PlayerChatManager {
 
     private fun sendSystemMessage(event: SkyhanniChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
-            val cancelled = postAndCatch()
+            val cancelled = post()
             event.handleChat(cancelled, blockedReason, chatComponent)
         }
     }
 
     private fun AbstractChatEvent.postChat(event: SkyhanniChatEvent) {
-        val cancelled = postAndCatch()
+        val cancelled = post()
         event.handleChat(cancelled, blockedReason, chatComponent)
     }
 

@@ -62,7 +62,7 @@ object TestChatCommand {
     private fun test(componentText: IChatComponent, isHidden: Boolean) {
         val message = componentText.formattedText.stripHypixelMessage()
         val event = SkyhanniChatEvent(message, componentText)
-        event.postAndCatch()
+        event.post()
 
         if (isHidden) return
 

@@ -18,7 +18,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonHideItems {
@@ -63,7 +63,7 @@ object DungeonHideItems {
         return itemStack != null && itemStack.cleanName() == "Skeleton Skull"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!DungeonAPI.inDungeon()) return
 
@@ -173,7 +173,7 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
@@ -192,7 +192,7 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityMove(event: EntityMoveEvent) {
         if (!DungeonAPI.inDungeon()) return
 
@@ -213,13 +213,13 @@ object DungeonHideItems {
             it + 200 > System.currentTimeMillis()
         } ?: false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         hideParticles.clear()
         movingSkeletonSkulls.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.hideSuperboomTNT", "dungeon.objectHider.hideSuperboomTNT")
         event.move(3, "dungeon.hideBlessing", "dungeon.objectHider.hideBlessing")

@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ExperimentsDryStreakDisplay {
@@ -31,7 +31,7 @@ object ExperimentsDryStreakDisplay {
 
     private var didJustFind = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!ExperimentationTableAPI.inventoriesPattern.matches(InventoryUtils.openInventoryName())) return
@@ -43,12 +43,12 @@ object ExperimentsDryStreakDisplay {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName == "Experimentation Table" && didJustFind) didJustFind = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled() || didJustFind || ExperimentationTableAPI.getCurrentExperiment() == null) return
 
@@ -70,7 +70,7 @@ object ExperimentsDryStreakDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (didJustFind || ExperimentationTableAPI.getCurrentExperiment() == null) return
 
@@ -78,7 +78,7 @@ object ExperimentsDryStreakDisplay {
         storage.attemptsSince += 1
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled() || didJustFind) return
 

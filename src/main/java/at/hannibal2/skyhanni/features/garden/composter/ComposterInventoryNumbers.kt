@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ComposterInventoryNumbers {
@@ -26,7 +26,7 @@ object ComposterInventoryNumbers {
         "§7§7Compost Available: §a(?<amount>.*)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.config.composters.inventoryNumbers) return
@@ -73,7 +73,7 @@ object ComposterInventoryNumbers {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.composterInventoryNumbers", "garden.composters.inventoryNumbers")
     }

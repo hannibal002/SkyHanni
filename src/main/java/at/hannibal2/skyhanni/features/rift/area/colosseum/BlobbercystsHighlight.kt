@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.event.entity.living.LivingDeathEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
@@ -22,7 +23,7 @@ object BlobbercystsHighlight {
     private val entityList = mutableListOf<EntityOtherPlayerMP>()
     private const val BLOBBER_NAME = "Blobbercyst "
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
@@ -35,7 +36,7 @@ object BlobbercystsHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         entityList.clear()
@@ -51,7 +52,7 @@ object BlobbercystsHighlight {
 
     fun isEnabled() = RiftAPI.inRift() && config.highlightBlobbercysts && LorenzUtils.skyBlockArea == "Colosseum"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.colosseumConfig", "rift.area.colosseum")
     }

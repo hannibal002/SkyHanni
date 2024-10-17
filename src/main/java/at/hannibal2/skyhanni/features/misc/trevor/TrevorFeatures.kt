@@ -43,7 +43,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -108,7 +108,7 @@ object TrevorFeatures {
 
     private val config get() = SkyHanniMod.feature.misc.trevorTheTrapper
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!onFarmingIsland()) return
         updateTrapper()
@@ -119,7 +119,7 @@ object TrevorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!onFarmingIsland()) return
 
@@ -182,7 +182,7 @@ object TrevorFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.trapperCooldownGui) return
         if (!onFarmingIsland()) return
@@ -248,7 +248,7 @@ object TrevorFeatures {
         questActive = active
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!onFarmingIsland()) return
         var entityTrapper = EntityUtils.getEntityByID(trapperID)
@@ -284,7 +284,7 @@ object TrevorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyClick(event: KeyPressEvent) {
         if (!onFarmingIsland()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
@@ -309,7 +309,7 @@ object TrevorFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onCheckRender(event: CheckRenderEntityEvent<*>) {
         if (!inTrapperDen) return
         if (!config.trapperTalkCooldown) return
@@ -327,12 +327,12 @@ object TrevorFeatures {
         inBetweenQuests = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         resetTrapper()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         inTrapperDen = areaTrappersDenPattern.matches(LorenzUtils.skyBlockArea)
     }
@@ -349,7 +349,7 @@ object TrevorFeatures {
 
     fun onFarmingIsland() = IslandType.THE_FARMING_ISLANDS.isInIsland()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(11, "misc.trevorTheTrapper.textFormat") { element ->
             ConfigUtils.migrateIntArrayListToEnumArrayList(element, TrackerEntry::class.java)

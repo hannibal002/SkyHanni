@@ -25,7 +25,6 @@ import net.minecraft.entity.item.EntityItemFrame
 import net.minecraft.entity.item.EntityXPOrb
 import net.minecraft.network.play.server.S1CPacketEntityMetadata
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -44,7 +43,7 @@ object EntityData {
         EntityPlayerSP::class.java,
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         for (entity in EntityUtils.getEntities<EntityLivingBase>()) { // this completely ignores the ignored entities list?
             val maxHealth = entity.baseMaxHealth
@@ -52,7 +51,7 @@ object EntityData {
             val oldMaxHealth = maxHealthMap.getOrDefault(id, -1)
             if (oldMaxHealth != maxHealth) {
                 maxHealthMap[id] = maxHealth
-                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).postAndCatch()
+                EntityMaxHealthUpdateEvent(entity, maxHealth.derpy()).post()
             }
         }
     }
@@ -62,7 +61,7 @@ object EntityData {
         maxHealthMap -= event.entity.entityId
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         maxHealthMap.clear()
     }
@@ -83,7 +82,7 @@ object EntityData {
             val health = (it.`object` as Float).toInt()
             if (entity is EntityWither && health == 300 && entityId < 0) return
             if (entity is EntityLivingBase) {
-                EntityHealthUpdateEvent(entity, health.derpy()).postAndCatch()
+                EntityHealthUpdateEvent(entity, health.derpy()).post()
             }
         }
     }
@@ -100,14 +99,14 @@ object EntityData {
 
     private fun postRenderNametag(entity: Entity, chatComponent: ChatComponentText) = nametagCache.getOrPut(entity) {
         val event = EntityDisplayNameEvent(entity, chatComponent)
-        event.postAndCatch()
+        event.post()
         event.chatComponent
     }
 
     @JvmStatic
     fun getHealthDisplay(text: String) = healthDisplayCache.getOrPut(text) {
         val event = EntityHealthDisplayEvent(text)
-        event.postAndCatch()
+        event.post()
         event.text
     }
 

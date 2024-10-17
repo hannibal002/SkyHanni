@@ -22,7 +22,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,7 +56,7 @@ object FlowstateHelper {
         createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!MiningAPI.inCustomMiningIsland()) return
 
@@ -74,7 +74,7 @@ object FlowstateHelper {
         createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!MiningAPI.inCustomMiningIsland() || !config.enabled) return
         if (flowstateCache == null && !streakEndTimer.isInFuture()) return
@@ -118,12 +118,12 @@ object FlowstateHelper {
         } else blockBreakStreak * flowstateLevel
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChangeItem(event: ItemInHandChangeEvent) {
         hasFlowstate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         streakEndTimer = SimpleTimeMark.farPast()
         attemptClearDisplay()

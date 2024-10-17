@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 import kotlin.time.Duration.Companion.seconds
 
@@ -67,7 +67,7 @@ object CarnivalZombieShootout {
         DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) // Diamond
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled() || !started || (!config.coloredHitboxes && !config.coloredLines)) return
 
@@ -113,7 +113,7 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !started || !config.lampTimer) return
 
@@ -142,7 +142,7 @@ object CarnivalZombieShootout {
         config.lampPosition.renderRenderable(content, posLabel = "Lantern Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled() || !started) return
 
@@ -156,7 +156,7 @@ object CarnivalZombieShootout {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 

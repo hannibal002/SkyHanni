@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 // todo: create abstract class for this and BasketWaypoints
 @SkyHanniModule
@@ -48,13 +48,13 @@ object PresentWaypoints {
         "§aCongratulations! You found all the presents in every lobby!",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         if (!isEnabled()) return
         closest = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         processChatMessage(event.message)
@@ -89,7 +89,7 @@ object PresentWaypoints {
 
     // </editor-fold>
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled() && config.onlyClosest && HypixelData.locrawData != null && closest == null) return
         val notFoundPresents = presentSet?.filterNot { it.isFound }
@@ -97,7 +97,7 @@ object PresentWaypoints {
         closest = notFoundPresents?.minByOrNull { it.position.distanceSqToPlayer() } ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         presentSet?.let { event.drawWaypoints(it, config.allWaypoints, LorenzColor.GOLD, "§6") }
@@ -117,7 +117,7 @@ object PresentWaypoints {
 
     private fun EventWaypoint.shouldShow(): Boolean = !isFound && (!config.onlyClosest || closest == this)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventWaypointsJson>("EventWaypoints")
         presentLocations = loadEventWaypoints(data.presents)

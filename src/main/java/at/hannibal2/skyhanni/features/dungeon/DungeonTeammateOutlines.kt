@@ -9,14 +9,14 @@ import net.minecraft.client.gui.FontRenderer
 import net.minecraft.entity.Entity
 import net.minecraft.scoreboard.ScorePlayerTeam
 import net.minecraft.scoreboard.Team
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object DungeonTeammateOutlines {
 
     private val config get() = SkyHanniMod.feature.dungeon
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderEntityOutlines(event: RenderEntityOutlineEvent) {
         if (isEnabled() && event.type === RenderEntityOutlineEvent.Type.XRAY) {
             event.queueEntitiesToOutline { entity -> getEntityOutlineColor(entity) }

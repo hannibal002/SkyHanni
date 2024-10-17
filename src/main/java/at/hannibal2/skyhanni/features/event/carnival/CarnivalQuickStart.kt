@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -52,7 +52,7 @@ object CarnivalQuickStart {
         event.cancel()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLorenzChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         // IDK what is wrong here, but it does not work with event.message

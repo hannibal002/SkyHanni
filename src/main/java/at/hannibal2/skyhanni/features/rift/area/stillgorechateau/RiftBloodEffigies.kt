@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -47,14 +47,14 @@ object RiftBloodEffigies {
         "Effigies: (?<hearts>((§[7c])?⧯)*)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         effigiesTimes = cleanMap()
     }
 
     private fun cleanMap() = (0..5).associateWith { SimpleTimeMark.farPast() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Rift Blood Effigies")
 
@@ -70,7 +70,7 @@ object RiftBloodEffigies {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val newLocations = event.getConstant<RiftEffigiesJson>("RiftEffigies").locations
         if (newLocations.size != 6) {
@@ -79,7 +79,7 @@ object RiftBloodEffigies {
         locations = newLocations
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: RawScoreboardUpdateEvent) {
         if (!isEnabled()) return
 
@@ -109,7 +109,7 @@ object RiftBloodEffigies {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -125,7 +125,7 @@ object RiftBloodEffigies {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 
@@ -163,7 +163,7 @@ object RiftBloodEffigies {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inStillgoreChateau()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.stillgoreChateauConfig", "rift.area.stillgoreChateau")
     }

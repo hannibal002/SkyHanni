@@ -18,7 +18,7 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -47,7 +47,7 @@ object BroodmotherFeatures {
     private var broodmotherSpawnTime = SimpleTimeMark.farPast()
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
         val newStage = event.widget.matchMatcherFirstLine { group("stage") } ?: ""
@@ -139,7 +139,7 @@ object BroodmotherFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         broodmotherSpawnTime = SimpleTimeMark.farPast()
         lastStage = null
@@ -147,7 +147,7 @@ object BroodmotherFeatures {
         display = ""
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
         if (display.isEmpty()) return
@@ -158,7 +158,7 @@ object BroodmotherFeatures {
         config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isCountdownEnabled()) return
 

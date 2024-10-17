@@ -34,7 +34,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as renderableString
@@ -112,7 +112,7 @@ object ReforgeHelper {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.slotNumber == reforgeButton) {
@@ -144,7 +144,7 @@ object ReforgeHelper {
         return false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         when {
@@ -169,7 +169,7 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         when {
@@ -194,7 +194,7 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onClose(event: InventoryCloseEvent) {
         if (!isInReforgeMenu) return
         isInReforgeMenu = false
@@ -358,13 +358,13 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(display, posLabel = "Reforge Overlay")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (currentReforge == null) return
@@ -374,7 +374,7 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiContainerBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (hoveredReforge != null && isInHexReforgeMenu) {
             if (hoveredReforge != currentReforge) {

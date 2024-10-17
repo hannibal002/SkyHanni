@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -78,7 +78,7 @@ object PunchcardHighlight {
     private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
     private var display: Renderable = Renderable.string("hello")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
         if (!config.highlight.get()) return
         if (!IslandType.THE_RIFT.isInIsland()) return
@@ -91,7 +91,7 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onToggle(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.highlight,
@@ -127,7 +127,7 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
         DelayedRun.runDelayed(1500.milliseconds) {
             if (playerList.isEmpty()) return@runDelayed
@@ -185,7 +185,7 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!IslandType.THE_RIFT.isInIsland()) return
         if (!listening) return
@@ -217,7 +217,7 @@ object PunchcardHighlight {
         display = drawDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
         if (!RiftAPI.inRift()) return

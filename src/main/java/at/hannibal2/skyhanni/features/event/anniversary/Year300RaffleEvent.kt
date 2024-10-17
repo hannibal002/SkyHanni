@@ -15,7 +15,7 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -31,7 +31,7 @@ object Year300RaffleEvent {
 
     private var overlay: List<Any>? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (event.message == "§6§lACTIVE PLAYER! §eYou gained §b+1 Raffle Ticket§e!") {
             lastTimerReceived = SimpleTimeMark.now()
@@ -41,7 +41,7 @@ object Year300RaffleEvent {
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer &&
         Instant.now().isBefore(SkyBlockTime(301).toInstant())
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         config.activeTimerPosition.renderSingleLineWithItems(
             overlay ?: return,
@@ -49,7 +49,7 @@ object Year300RaffleEvent {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) {
             overlay = null

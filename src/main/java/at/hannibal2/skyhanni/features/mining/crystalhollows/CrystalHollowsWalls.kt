@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.RenderUtils.inflateBlock
 import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -67,7 +67,7 @@ object CrystalHollowsWalls {
     private fun Double.shiftPZ() = this + LorenzVec.expandVector.z * EXPAND_TIMES
     private fun Double.shiftNZ() = this - LorenzVec.expandVector.z * EXPAND_TIMES
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         val position = RenderUtils.getViewerPos(event.partialTicks)

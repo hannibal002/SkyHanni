@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.util.regex.Pattern
 
 @SkyHanniModule
@@ -100,7 +100,7 @@ object DicerRngDropTracker {
         PRAY_TO_RNGESUS('5', "PRAY TO RNGESUS"),
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.hideChat && !config.display) return
@@ -117,7 +117,7 @@ object DicerRngDropTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.compact) {
             tracker.update()
@@ -151,7 +151,7 @@ object DicerRngDropTracker {
     private var cropInHand: CropType? = null
     private var toolName = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         val crop = event.crop
         cropInHand = if (crop == CropType.MELON || crop == CropType.PUMPKIN) crop else null
@@ -168,7 +168,7 @@ object DicerRngDropTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (cropInHand == null) return
@@ -180,7 +180,7 @@ object DicerRngDropTracker {
 
     fun isEnabled() = GardenAPI.inGarden() && config.display
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.dicerCounterDisplay", "garden.dicerCounters.display")
         event.move(3, "garden.dicerCounterHideChat", "garden.dicerCounters.hideChat")

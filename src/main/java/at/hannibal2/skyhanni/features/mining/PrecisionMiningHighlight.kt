@@ -15,7 +15,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.util.AxisAlignedBB
 import net.minecraft.util.EnumParticleTypes
 import net.minecraft.util.MovingObjectPosition
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -27,7 +27,7 @@ object PrecisionMiningHighlight {
     private var lookingAtParticle: Boolean = false
     private var deleteTime: SimpleTimeMark? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!(event.type == EnumParticleTypes.CRIT || event.type == EnumParticleTypes.VILLAGER_HAPPY) ||
@@ -48,14 +48,14 @@ object PrecisionMiningHighlight {
         deleteTime = 5.ticks.fromNow()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: SkyhanniRenderWorldEvent) {
         val particleBoundingBox = lastParticle ?: return
 
         event.drawFilledBoundingBox_nea(particleBoundingBox, if (lookingAtParticle) Color.GREEN else Color.CYAN)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         lastParticle ?: return
         val deletionTime = deleteTime ?: return

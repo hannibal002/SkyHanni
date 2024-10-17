@@ -21,7 +21,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PatcherSendCoordinates {
@@ -40,7 +40,7 @@ object PatcherSendCoordinates {
         "(?<playerName>.*): [xX]: (?<x>[0-9.-]+),? [yY]: (?<y>[0-9.-]+),? [zZ]: (?<z>[0-9.-]+(?: .*)?)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!config.enabled) return
 
@@ -63,7 +63,7 @@ object PatcherSendCoordinates {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!config.enabled) return
 
@@ -78,7 +78,7 @@ object PatcherSendCoordinates {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!event.isMod(10)) return
 
@@ -90,7 +90,7 @@ object PatcherSendCoordinates {
         patcherBeacon.removeIf { System.currentTimeMillis() / 1000 > it.time + config.duration }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         patcherBeacon.clear()
         logger.log("Reset everything (world change)")
@@ -98,7 +98,7 @@ object PatcherSendCoordinates {
 
     data class PatcherBeacon(val location: LorenzVec, val name: String, val time: Long)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(39, "misc.patcherSendCoordWaypoint", "misc.patcherCoordsWaypoint.enabled")
     }

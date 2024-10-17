@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object TeleportPadCompactName {
@@ -24,7 +24,7 @@ object TeleportPadCompactName {
         "§.✦ §cNo Destination"
     )
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         if (!IslandType.PRIVATE_ISLAND.isInIsland()) return
         if (!SkyHanniMod.feature.misc.teleportPad.compactName) return

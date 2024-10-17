@@ -33,7 +33,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object EnderNodeTracker {
@@ -87,7 +87,7 @@ object EnderNodeTracker {
         var lootCount: MutableMap<EnderNode, Int> = mutableMapOf()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
@@ -135,7 +135,7 @@ object EnderNodeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (!isEnabled()) return
         miteGelInInventory = Minecraft.getMinecraft().thePlayer.inventory.mainInventory.filter {
@@ -143,7 +143,7 @@ object EnderNodeTracker {
         }.sumOf { it.stackSize }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
@@ -157,7 +157,7 @@ object EnderNodeTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled()) return
         if (!ProfileStorageData.loaded) return
@@ -174,14 +174,14 @@ object EnderNodeTracker {
         miteGelInInventory = newMiteGelInInventory
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.textFormat.afterChange {
             tracker.update()
@@ -189,7 +189,7 @@ object EnderNodeTracker {
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.enderNodeTracker", "combat.enderNodeTracker")
         event.transform(11, "combat.enderNodeTracker.textFormat") { element ->

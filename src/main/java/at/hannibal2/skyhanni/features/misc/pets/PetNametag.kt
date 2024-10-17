@@ -10,7 +10,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object PetNametag {
@@ -26,7 +26,7 @@ object PetNametag {
         "(?<start>§8\\[§7Lv(?<lvl>\\d+)§8]) (?<rarity>§.)(?<pet>[\\w\\s]+)(?<skin>§. ✦)?",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNameTagRender(event: EntityDisplayNameEvent) {
         if (!isEnabled()) return
         if (event.entity !is EntityArmorStand) return

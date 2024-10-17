@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraftforge.client.event.GuiOpenEvent
 import net.minecraftforge.client.event.GuiScreenEvent.DrawScreenEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -60,7 +61,7 @@ object GardenOptimalSpeed {
     private var display = listOf<Renderable>()
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!GardenAPI.inGarden()) return
         currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
@@ -120,7 +121,7 @@ object GardenOptimalSpeed {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
@@ -128,7 +129,7 @@ object GardenOptimalSpeed {
         optimalSpeed = cropInHand?.getOptimalSpeed()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
             ConditionalUtils.onToggle(value.getConfig()) {
@@ -156,7 +157,7 @@ object GardenOptimalSpeed {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden()) return
 
@@ -204,7 +205,7 @@ object GardenOptimalSpeed {
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.optimalSpeedEnabled", "garden.optimalSpeeds.enabled")
         event.move(3, "garden.optimalSpeedWarning", "garden.optimalSpeeds.warning")

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.PurseAPI
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -22,8 +23,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.isValidUuid
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import java.time.Instant
 import kotlin.math.sin
@@ -80,7 +79,7 @@ object HoppityCallWarning {
     private var acceptUUID: String? = null
     private var commandSentTimer = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyPress(event: KeyPressEvent) {
         if (config.acceptHotkey == Keyboard.KEY_NONE || config.acceptHotkey != event.keyCode) return
         acceptUUID?.let {
@@ -89,7 +88,7 @@ object HoppityCallWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val soundProperty = config.hoppityCallSound
         ConditionalUtils.onToggle(soundProperty) {
@@ -99,7 +98,7 @@ object HoppityCallWarning {
         finalWarningTime = null
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onChat(event: SkyhanniChatEvent) {
         if (callRingPattern.matches(event.message) && acceptUUID == null) readPickupUuid(event)
         if (!isEnabled()) return
@@ -107,7 +106,7 @@ object HoppityCallWarning {
         if (pickupHoppityCallPattern.matches(event.message)) stopWarningUser()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (!activeWarning) return
@@ -120,7 +119,7 @@ object HoppityCallWarning {
         if (currentTime >= finalWarningTime) stopWarningUser()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !activeWarning) return
         val minecraft = Minecraft.getMinecraft()
@@ -141,7 +140,7 @@ object HoppityCallWarning {
         GlStateManager.color(1F, 1F, 1F, 1F)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCommandSend(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock || !config.ensureCoins) return
         if (!pickupOutgoingCommandPattern.matches(event.message)) return

@@ -17,6 +17,7 @@ import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.player.EnumPlayerModelParts
 import net.minecraftforge.client.event.RenderGameOverlayEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -45,7 +46,7 @@ object TabListRenderer {
     private var isPressed = false
     private var isTabToggled = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled.get()) return
@@ -140,7 +141,7 @@ object TabListRenderer {
                 if (tabLine.type == TabStringType.SUB_TITLE) {
                     lastSubTitle = tabLine
                 }
-                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).postAndCatch()
+                !SkipTabListLineEvent(tabLine, lastSubTitle, lastTitle).post()
             }.let(::RenderColumn)
 
             Gui.drawRect(
@@ -213,14 +214,14 @@ object TabListRenderer {
         "§.§lFire Sales: §r§f\\([0-9]+\\)"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSkipTablistLine(event: SkipTabListLineEvent) {
         if (config.hideFiresales && event.lastSubTitle != null && fireSalePattern.matches(event.lastSubTitle.text)) {
             event.cancel()
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "misc.compactTabList", "gui.compactTabList")
     }

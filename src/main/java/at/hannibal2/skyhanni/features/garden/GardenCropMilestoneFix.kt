@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object GardenCropMilestoneFix {
@@ -49,7 +49,7 @@ object GardenCropMilestoneFix {
 
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         levelUpPattern.matchMatcher(event.message) {
             val cropName = group("crop")
@@ -87,7 +87,7 @@ object GardenCropMilestoneFix {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
         event.lines.matchFirst(tabListPattern) {

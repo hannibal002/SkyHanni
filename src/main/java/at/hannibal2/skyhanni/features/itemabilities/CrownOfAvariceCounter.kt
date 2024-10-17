@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object CrownOfAvariceCounter {
@@ -25,12 +25,12 @@ object CrownOfAvariceCounter {
 
     private var render: Renderable? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         render?.let { config.position.renderRenderable(it, posLabel = "Crown of Avarice Counter") }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         render = check()
     }

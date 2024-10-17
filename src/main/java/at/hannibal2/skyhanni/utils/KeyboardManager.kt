@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.events.SkyhanniTickEvent
@@ -53,12 +54,12 @@ object KeyboardManager {
     @SubscribeEvent
     fun onGuiScreenKeybind(event: GuiScreenEvent.KeyboardInputEvent.Pre) {
         val guiScreen = event.gui as? GuiContainer ?: return
-        if (GuiKeyPressEvent(guiScreen).postAndCatch()) {
+        if (GuiKeyPressEvent(guiScreen).post()) {
             event.isCanceled = true
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
@@ -68,21 +69,21 @@ object KeyboardManager {
 
         if (Mouse.getEventButtonState() && Mouse.getEventButton() != -1) {
             val key = Mouse.getEventButton() - 100
-            KeyPressEvent(key).postAndCatch()
+            KeyPressEvent(key).post()
             lastClickedMouseButton = key
             return
         }
 
         if (Keyboard.getEventKeyState() && Keyboard.getEventKey() != 0) {
             val key = Keyboard.getEventKey()
-            KeyPressEvent(key).postAndCatch()
+            KeyPressEvent(key).post()
             lastClickedMouseButton = -1
             return
         }
 
         if (Mouse.getEventButton() == -1 && lastClickedMouseButton != -1) {
             if (lastClickedMouseButton.isKeyHeld()) {
-                KeyPressEvent(lastClickedMouseButton).postAndCatch()
+                KeyPressEvent(lastClickedMouseButton).post()
                 return
             }
             lastClickedMouseButton = -1
@@ -90,7 +91,7 @@ object KeyboardManager {
 
         // This is needed because of other keyboards that don't have a key code for the key, but is read as a character
         if (Keyboard.getEventKey() == 0) {
-            KeyPressEvent(Keyboard.getEventCharacter().code + 256).postAndCatch()
+            KeyPressEvent(Keyboard.getEventCharacter().code + 256).post()
         }
     }
 

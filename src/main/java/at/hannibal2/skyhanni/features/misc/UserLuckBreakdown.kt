@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -71,7 +71,7 @@ object UserLuckBreakdown {
 
     private var skillOverflowLuck = mutableMapOf<SkillType, Int>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.userluckEnabled) return
         if (event.inventory !is ContainerLocalMenu) return
@@ -113,7 +113,7 @@ object UserLuckBreakdown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun openInventory(event: InventoryOpenEvent) {
         if (event.inventoryName != "Your Stats Breakdown") {
             inMiscStats = false
@@ -135,7 +135,7 @@ object UserLuckBreakdown {
         return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun closeInventory(event: InventoryCloseEvent) {
         inMiscStats = false
         inCustomBreakdown = false
@@ -152,7 +152,7 @@ object UserLuckBreakdown {
         return null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHoverItem(event: SkyhanniToolTipEvent) {
         if (!config.userluckEnabled) return
         if (!LorenzUtils.inSkyBlock) return
@@ -214,7 +214,7 @@ object UserLuckBreakdown {
         else string
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.userluckEnabled) return
         if (!inMiscStats) return

@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -16,7 +16,7 @@ object ChocolateFactoryKeybinds {
     private val config get() = ChocolateFactoryAPI.config.keybinds
     private var lastClick = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyPress(event: GuiKeyPressEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
@@ -43,7 +43,7 @@ object ChocolateFactoryKeybinds {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return

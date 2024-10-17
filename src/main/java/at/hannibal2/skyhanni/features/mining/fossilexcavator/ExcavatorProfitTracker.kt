@@ -26,7 +26,7 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import com.google.gson.annotations.Expose
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ExcavatorProfitTracker {
@@ -158,7 +158,7 @@ object ExcavatorProfitTracker {
         return profit - scrapPrice
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
@@ -172,7 +172,7 @@ object ExcavatorProfitTracker {
         tracker.addItem(internalName, amount, command)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onFossilExcavation(event: FossilExcavationEvent) {
         if (!isEnabled()) return
         for ((name, amount) in event.loot) {
@@ -210,7 +210,7 @@ object ExcavatorProfitTracker {
         tryAddItem(internalName, amount, command = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         val inChest = Minecraft.getMinecraft().currentScreen is GuiChest
@@ -224,7 +224,7 @@ object ExcavatorProfitTracker {
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()

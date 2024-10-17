@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import io.netty.util.internal.ConcurrentSet
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.milliseconds
@@ -152,7 +151,7 @@ object MiningAPI {
 
     fun inColdIsland() = inAnyIsland(IslandType.DWARVEN_MINES, IslandType.MINESHAFT)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         val newCold = ScoreboardPattern.coldPattern.firstMatcher(event.scoreboard) {
             group("cold").toInt().absoluteValue
@@ -171,7 +170,7 @@ object MiningAPI {
         recentClickedBlocks += event.position to SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!inColdIsland()) return
         if (coldResetPattern.matches(event.message)) {
@@ -199,7 +198,7 @@ object MiningAPI {
 
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (event.name == LorenzUtils.getPlayerName()) {
             updateCold(0)
@@ -207,7 +206,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!inCustomMiningIsland()) return
         if (event.soundName == "random.explode" && lastPickobulusUse.passedSince() < 5.seconds) {
@@ -242,7 +241,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!inCustomMiningIsland()) return
         val oldState = event.oldState
@@ -285,7 +284,7 @@ object MiningAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!inCustomMiningIsland()) return
         if (currentAreaOreBlocks.isEmpty()) return
@@ -309,7 +308,7 @@ object MiningAPI {
         updateLocation()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         updateLocation()
     }
@@ -333,7 +332,7 @@ object MiningAPI {
         recentClickedBlocks.removeIf { it.second.passedSince() >= originalBlock.time.passedSince() }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         if (cold != 0) updateCold(0)
         lastColdReset = SimpleTimeMark.now()
@@ -367,7 +366,7 @@ object MiningAPI {
         lastOreMinedTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mining API")
         if (!inCustomMiningIsland()) {
@@ -397,7 +396,7 @@ object MiningAPI {
         // Hypixel sends cold data once in scoreboard even after resetting it
         if (cold == 0 && lastColdUpdate.passedSince() < 1.seconds) return
         lastColdUpdate = SimpleTimeMark.now()
-        ColdUpdateEvent(newCold).postAndCatch()
+        ColdUpdateEvent(newCold).post()
         cold = newCold
     }
 

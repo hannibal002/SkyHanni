@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
 @SkyHanniModule
@@ -27,7 +27,7 @@ object MatriarchHelper {
         first.baseEntity.getLorenzVec().y.compareTo(second.baseEntity.getLorenzVec().y)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.Special) {
         if (!isHeavyPearl(event)) return
         pearlList.add(event.mob)
@@ -43,13 +43,13 @@ object MatriarchHelper {
 
     private fun isHeavyPearl(event: MobEvent) = isEnabled() && event.mob.name == "Heavy Pearl"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDespawn(event: MobEvent.DeSpawn.Special) {
         if (!isHeavyPearl(event)) return
         pearlList.remove(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.highlight) {

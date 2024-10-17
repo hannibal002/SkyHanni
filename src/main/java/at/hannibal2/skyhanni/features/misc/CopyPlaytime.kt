@@ -12,11 +12,11 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object CopyPlaytime {
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (InventoryUtils.openInventoryName() != "Detailed /playtime") return
         if (event.slot.slotNumber != 4) return
@@ -25,7 +25,7 @@ object CopyPlaytime {
         event.toolTip.add("§eClick to Copy!")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
         if (InventoryUtils.openInventoryName() != "Detailed /playtime") return
         if (event.slotId != 4) return

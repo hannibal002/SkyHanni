@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.lwjgl.input.Keyboard
 
 @SkyHanniModule
@@ -19,7 +19,7 @@ object PowderPerHotmPerk {
 
     private val config get() = SkyHanniMod.feature.mining.hotm
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!isEnabled()) return
 

@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import kotlin.time.Duration.Companion.minutes
@@ -55,13 +55,13 @@ object CarnivalReminder {
         "§e\\[NPC\\] §aCarnival Leader§f: §rYou've already claimed your §aCarnival Tickets §ffor §btoday§f, but I'm happy to answer any questions you might have.",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassedEvent(event: SecondPassedEvent) {
         if (!isEnabled() || nextCheckTime.isInFuture()) return
         check()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         claimedToday = false
         if (!isEnabled()) return
@@ -70,7 +70,7 @@ object CarnivalReminder {
         check()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLorenzChat(event: SkyhanniChatEvent) {
         if (!isEnabled() && !claimedToday) return
         if (!ticketClaimedPattern.matches(event.message) && !alreadyClaimedPattern.matches(event.message)) return

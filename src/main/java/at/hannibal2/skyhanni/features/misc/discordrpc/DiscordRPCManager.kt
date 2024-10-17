@@ -34,7 +34,7 @@ import com.jagrosh.discordipc.entities.RichPresence
 import com.jagrosh.discordipc.entities.RichPresenceButton
 import com.jagrosh.discordipc.entities.pipe.PipeStatus
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -98,7 +98,7 @@ object DiscordRPCManager : IPCListener {
 
     private fun isConnected() = client?.status == PipeStatus.CONNECTED
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.firstLine, config.secondLine, config.customText) {
             if (isConnected()) {
@@ -112,7 +112,7 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         stackingEnchants = event.getConstant<StackingEnchantsJson>("StackingEnchants").enchants
     }
@@ -143,7 +143,7 @@ object DiscordRPCManager : IPCListener {
         logger.info("Discord RPC Ready.")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isConnected()) return
         if (event.repeatSeconds(5)) {
@@ -166,7 +166,7 @@ object DiscordRPCManager : IPCListener {
 
     private fun isEnabled() = config.enabled.get()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         // The mod has already started the connection process. This variable is my way of running a function when
         // the player joins SkyBlock but only running it again once they join and leave.
@@ -177,7 +177,7 @@ object DiscordRPCManager : IPCListener {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         if (nextUpdate.isInFuture()) return
         // wait 5 seconds to check if the new world is skyblock or not before stopping the function
@@ -216,13 +216,13 @@ object DiscordRPCManager : IPCListener {
     }
 
     // Events that change things in DiscordStatus
-    @SubscribeEvent
+    @HandleEvent
     fun onKeyClick(event: KeyPressEvent) {
         if (!isEnabled() || !PriorityEntry.AFK.isSelected()) return // autoPriority 4 is dynamic afk
         beenAfkFor = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(11, "misc.discordRPC.firstLine") { element ->
             ConfigUtils.migrateIntToEnum(element, LineEntry::class.java)

@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.lwjgl.input.Mouse
 import kotlin.time.Duration.Companion.seconds
 
@@ -51,7 +51,7 @@ object PageScrolling {
 
     private var cooldown = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLorenzTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (cooldown.isInFuture()) return

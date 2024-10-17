@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -27,7 +27,7 @@ object ChickenHeadTimer {
 
     private val chickenHead = "CHICKEN_HEAD".asInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
@@ -35,12 +35,12 @@ object ChickenHeadTimer {
         hasChickenHead = InventoryUtils.getHelmet()?.getInternalName() == chickenHead
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         lastTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
         if (!hasChickenHead) return
@@ -52,7 +52,7 @@ object ChickenHeadTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!hasChickenHead) return
@@ -68,7 +68,7 @@ object ChickenHeadTimer {
         config.position.renderString(displayText, posLabel = "Chicken Head Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.chickenHeadTimerHideChat", "itemAbilities.chickenHead.hideChat")
         event.move(2, "misc.chickenHeadTimerPosition", "itemAbilities.chickenHead.position")

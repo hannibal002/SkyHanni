@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -32,7 +32,7 @@ object NPCVisitorFix {
         "§aChanging Barn skin to §r.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!GardenAPI.inGarden()) return
         val name = staticVisitors.firstOrNull { event.inventoryName.contains(it) } ?: return
@@ -60,12 +60,12 @@ object NPCVisitorFix {
 
     private var lastVisitorOpen = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorOpen(event: VisitorOpenEvent) {
         lastVisitorOpen = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         barnSkinChangePattern.matchMatcher(event.message) {
             GardenAPI.storage?.npcVisitorLocations?.clear()

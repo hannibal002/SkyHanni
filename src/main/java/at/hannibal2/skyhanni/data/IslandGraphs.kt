@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -137,21 +136,21 @@ object IslandGraphs {
         "(Glacite Tunnels|Dwarven Base Camp|Great Glacite Lake|Fossil Research Center)",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         loadIsland(LorenzUtils.skyBlockIsland)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (currentIslandGraph != null) return
         if (event.newIsland == IslandType.NONE) return
         loadIsland(event.newIsland)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         currentIslandGraph = null
         if (currentTarget != null) {
@@ -224,7 +223,7 @@ object IslandGraphs {
         closestNode = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.isMod(2)) {
@@ -327,7 +326,7 @@ object IslandGraphs {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent) {
         if (LorenzUtils.inSkyBlock && event.entity == Minecraft.getMinecraft().thePlayer) {
             hasMoved = true
@@ -473,7 +472,7 @@ object IslandGraphs {
         componentText.send(PATHFIND_ID)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val path = fastestPath ?: return

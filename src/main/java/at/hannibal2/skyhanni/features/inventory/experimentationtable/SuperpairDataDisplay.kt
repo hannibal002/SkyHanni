@@ -19,7 +19,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 // TODO important: all use cases of listOf in combination with string needs to be gone. no caching, constant new list creation, and bad design.
@@ -46,7 +46,7 @@ object SuperpairDataDisplay {
     private var uncoveredItems = mutableMapOf<Int, SuperpairItem>()
     private var found = mutableMapOf<FoundType, MutableList<FoundData>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         display = emptyList()
 
@@ -54,7 +54,7 @@ object SuperpairDataDisplay {
         found.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChestGuiOverlayRendered(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.openInventoryName() == "Experimentation Table") {
@@ -68,7 +68,7 @@ object SuperpairDataDisplay {
         config.superpairDisplayPosition.renderStrings(display, posLabel = "Superpair Experimentation Data")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: SlotClickEvent) {
         if (!isEnabled()) return
         if (ExperimentationTableAPI.getCurrentExperiment() == null) return

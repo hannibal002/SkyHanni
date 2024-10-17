@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.events.SkyhanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.boss.BossStatus
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object BossbarData {
@@ -14,14 +14,14 @@ object BossbarData {
 
     fun getBossbar() = bossbar ?: ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         val oldBossbar = bossbar ?: return
         previousServerBossbar = oldBossbar
         bossbar = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         val bossbarLine = BossStatus.bossName ?: return
         if (bossbarLine.isBlank() || bossbarLine.isEmpty()) return
@@ -30,6 +30,6 @@ object BossbarData {
         if (previousServerBossbar.isNotEmpty()) previousServerBossbar = ""
 
         bossbar = bossbarLine
-        BossbarUpdateEvent(bossbarLine).postAndCatch()
+        BossbarUpdateEvent(bossbarLine).post()
     }
 }

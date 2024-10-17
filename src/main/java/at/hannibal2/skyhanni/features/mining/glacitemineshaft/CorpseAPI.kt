@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object CorpseAPI {
@@ -43,7 +43,7 @@ object CorpseAPI {
 
     private var corpseType: CorpseType? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!IslandType.MINESHAFT.isInIsland()) return
 
@@ -60,7 +60,7 @@ object CorpseAPI {
 
         if (endPattern.matches(message)) {
             corpseType?.let {
-                CorpseLootedEvent(it, loot.toList()).postAndCatch()
+                CorpseLootedEvent(it, loot.toList()).post()
             }
             corpseType = null
             loot.clear()

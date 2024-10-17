@@ -30,7 +30,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object CroesusChestTracker {
@@ -72,7 +72,7 @@ object CroesusChestTracker {
 
     private val croesusChests get() = ProfileStorageData.profileSpecific?.dungeons?.runs
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker) return
@@ -93,7 +93,7 @@ object CroesusChestTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if ((SkyHanniMod.feature.dungeon.croesusUnopenedChestTracker || config.showUsedKismets) &&
@@ -172,13 +172,13 @@ object CroesusChestTracker {
         kismetUsed = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inCroesusInventory = false
         chestInventory = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
@@ -204,7 +204,7 @@ object CroesusChestTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.kismetStackSize) return
@@ -214,7 +214,7 @@ object CroesusChestTracker {
         event.stackTip = "§a$kismetAmountCache"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTipIsKismetable(event: RenderInventoryItemTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.showUsedKismets) return
@@ -227,7 +227,7 @@ object CroesusChestTracker {
         event.stackTip = "§a✔"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         if (event.floor == "E") return
         croesusChests?.add(0, DungeonRunInfo(event.floor))

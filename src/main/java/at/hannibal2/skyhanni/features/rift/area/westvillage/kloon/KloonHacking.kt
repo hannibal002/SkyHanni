@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage.kloon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -21,8 +22,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object KloonHacking {
@@ -40,7 +39,7 @@ object KloonHacking {
     private val correctButtons = mutableListOf<String>()
     private var nearestTerminal: KloonTerminal? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!RiftAPI.inRift()) return
         checkHelmet()
@@ -50,7 +49,7 @@ object KloonHacking {
         wearingHelmet = InventoryUtils.getHelmet()?.getInternalName()?.equals("RETRO_ENCABULATING_VISOR") ?: false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inTerminalInventory = false
         inColorInventory = false
@@ -71,13 +70,13 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inTerminalInventory = false
         inColorInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!RiftAPI.inRift()) return
         if (inTerminalInventory) {
@@ -110,13 +109,13 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inTerminalInventory || !RiftAPI.inRift()) return
         event.makePickblock()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!RiftAPI.inRift()) return
         if (!config.waypoints) return
@@ -129,7 +128,7 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
@@ -142,7 +141,7 @@ object KloonHacking {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTooltip(event: SkyhanniToolTipEvent) {
         if (!RiftAPI.inRift()) return
         if (!inTerminalInventory) return
@@ -169,7 +168,7 @@ object KloonHacking {
         return closestTerminal
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.westVillageConfig", "rift.area.westVillage")
     }

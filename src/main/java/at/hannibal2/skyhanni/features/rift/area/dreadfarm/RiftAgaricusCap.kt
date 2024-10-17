@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object RiftAgaricusCap {
@@ -23,7 +23,7 @@ object RiftAgaricusCap {
     private var startTime = SimpleTimeMark.farPast()
     private var location: LorenzVec? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         val area = LorenzUtils.skyBlockArea
@@ -59,7 +59,7 @@ object RiftAgaricusCap {
         return null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 
@@ -76,7 +76,7 @@ object RiftAgaricusCap {
 
     fun isEnabled() = RiftAPI.inRift() && config.agaricusCap
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.dreadfarmConfig", "rift.area.dreadfarm")
     }

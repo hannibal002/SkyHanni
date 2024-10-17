@@ -20,7 +20,7 @@ import net.minecraft.entity.monster.EntitySlime
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.math.abs
 
 @SkyHanniModule
@@ -38,7 +38,7 @@ object CraftRoomHolographicMob {
         EntityCaveSpider::class.java to HolographicEntities.caveSpider,
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!isEnabled()) return
         for (entity in entitiesList) {
@@ -46,7 +46,7 @@ object CraftRoomHolographicMob {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldRender(event: SkyhanniRenderWorldEvent) {
         if (!isEnabled()) return
 
@@ -85,7 +85,7 @@ object CraftRoomHolographicMob {
         }
     }
 
-    @SubscribeEvent(receiveCanceled = true)
+    @HandleEvent(receiveCancelled = true)
     fun onPlayerRender(event: CheckRenderEntityEvent<*>) {
         if (!RiftAPI.inRift() || !config.hidePlayers) return
 

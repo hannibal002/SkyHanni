@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.intellij.lang.annotations.Language
 
 val patternGroup = RepoPattern.group("skyblockguide.highlight")
@@ -84,10 +84,10 @@ class SkyblockGuideHighlightFeature private constructor(
             activeObject = null
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryClose(event: InventoryCloseEvent) = close()
 
-        @SubscribeEvent
+        @HandleEvent
         fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
@@ -95,7 +95,7 @@ class SkyblockGuideHighlightFeature private constructor(
             current.onSlotClicked.invoke(event)
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
             if (!isEnabled()) return
             if (activeObject == null) return
@@ -105,7 +105,7 @@ class SkyblockGuideHighlightFeature private constructor(
                 .forEach { it highlight LorenzColor.RED }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onTooltip(event: SkyhanniToolTipEvent) {
             if (!isEnabled()) return
             val current = activeObject ?: return
@@ -113,7 +113,7 @@ class SkyblockGuideHighlightFeature private constructor(
             current.onTooltip.invoke(event)
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
             if (!isEnabled()) return
             val current =

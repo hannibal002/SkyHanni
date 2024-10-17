@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraftforge.client.event.GuiScreenEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -29,7 +30,7 @@ object CustomWardrobeKeybinds {
         )
     var lastClick = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGui(event: GuiKeyPressEvent) {
         if (handlePress()) event.cancel()
     }

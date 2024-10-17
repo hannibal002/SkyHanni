@@ -13,7 +13,7 @@ object ActionBarData {
 
     fun getActionBar() = actionBar
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         actionBar = ""
     }

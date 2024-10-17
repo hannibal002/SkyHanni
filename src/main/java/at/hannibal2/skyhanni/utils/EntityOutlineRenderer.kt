@@ -18,7 +18,7 @@ import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL30
@@ -359,7 +359,7 @@ object EntityOutlineRenderer {
      *
      * @param event the client tick event
      */
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!(event.phase == EventPriority.NORMAL && isEnabled())) return
 
@@ -375,13 +375,13 @@ object EntityOutlineRenderer {
             // These events need to be called in this specific order for the xray to have priority over the no xray
             // Get all entities to render xray outlines
             val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
-            xrayOutlineEvent.postAndCatch()
+            xrayOutlineEvent.post()
             // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
             val noXrayOutlineEvent = RenderEntityOutlineEvent(
                 RenderEntityOutlineEvent.Type.NO_XRAY,
                 xrayOutlineEvent.entitiesToChooseFrom
             )
-            noXrayOutlineEvent.postAndCatch()
+            noXrayOutlineEvent.post()
             // Cache the entities for future use
             entityRenderCache.xrayCache = xrayOutlineEvent.entitiesToOutline
             entityRenderCache.noXrayCache = noXrayOutlineEvent.entitiesToOutline

@@ -11,13 +11,13 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ProfitPerMineshaftCorpse {
     private val config get() = SkyHanniMod.feature.mining.mineshaft
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCorpseLooted(event: CorpseLootedEvent) {
         if (!config.profitPerCorpseLoot) return
         val loot = event.loot

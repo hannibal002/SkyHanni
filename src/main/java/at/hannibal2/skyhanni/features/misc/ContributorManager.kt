@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ContributorManager {
@@ -17,12 +17,12 @@ object ContributorManager {
 
     private var contributors: Map<String, ContributorJsonEntry> = emptyMap()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         contributors = event.getConstant<ContributorsJson>("Contributors").contributors.mapKeys { it.key.lowercase() }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderNametag(event: EntityDisplayNameEvent) {
         if (!config.contributorNametags) return
         (event.entity as? EntityPlayer)?.let { player ->

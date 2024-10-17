@@ -12,7 +12,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object CropAccessoryData {
@@ -25,13 +25,13 @@ object CropAccessoryData {
     private var accessoryInBag = CropAccessory.NONE
     private var accessoryInInventory = CropAccessory.NONE
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         accessoryInBag = CropAccessory.NONE
         accessoryInInventory = CropAccessory.NONE
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryUpdatedEvent) {
         if (!accessoryBagNamePattern.matches(event.inventoryName)) return
 
@@ -42,7 +42,7 @@ object CropAccessoryData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!event.repeatSeconds(5)) return

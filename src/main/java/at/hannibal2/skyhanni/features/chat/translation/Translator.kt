@@ -21,7 +21,7 @@ import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import java.net.URLDecoder
 import java.net.URLEncoder
 import kotlin.time.Duration.Companion.milliseconds
@@ -34,7 +34,7 @@ object Translator {
 
     // Logic for listening for a user click on a chat message is from NotEnoughUpdates
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onChat(event: SkyhanniChatEvent) {
         if (!isEnabled()) return
 
@@ -49,14 +49,14 @@ object Translator {
         editedComponent.setChatStyle(clickStyle)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(55, "chat.translator", "chat.translator.translateOnClick")
     }
 
     var lastUserChange = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigReload(event: ConfigLoadEvent) {
         config.languageCode.onToggle {
             if (lastUserChange.passedSince() < 50.milliseconds) return@onToggle

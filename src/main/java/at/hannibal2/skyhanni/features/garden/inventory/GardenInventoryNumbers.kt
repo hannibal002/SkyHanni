@@ -14,7 +14,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object GardenInventoryNumbers {
@@ -26,7 +26,7 @@ object GardenInventoryNumbers {
         "§7Current Tier: §[ea](?<tier>.*)§7/§a.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!GardenAPI.inGarden()) return
 
@@ -58,7 +58,7 @@ object GardenInventoryNumbers {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.numberCropMilestone", "garden.number.cropMilestone")
         event.move(3, "garden.numberCropUpgrades", "garden.number.cropUpgrades")

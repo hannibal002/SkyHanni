@@ -49,7 +49,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
 import net.minecraft.network.play.client.C09PacketHeldItemChange
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -96,7 +95,7 @@ object GardenAPI {
         checkItemInHand()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inGarden()) return
         checkItemInHand()
@@ -107,7 +106,7 @@ object GardenAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTick(event: SkyhanniTickEvent) {
         if (!inGarden()) return
         if (event.isMod(10, 1)) {
@@ -120,7 +119,7 @@ object GardenAPI {
     }
 
     // TODO use IslandChangeEvent
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         DelayedRun.runDelayed(2.seconds) {
             if (inGarden()) {
@@ -130,7 +129,7 @@ object GardenAPI {
     }
 
     private fun updateGardenTool() {
-        GardenToolChangeEvent(cropInHand, itemInHand).postAndCatch()
+        GardenToolChangeEvent(cropInHand, itemInHand).post()
     }
 
     private fun checkItemInHand() {
@@ -207,7 +206,7 @@ object GardenAPI {
         ChatUtils.chat("Manually reset all crop speed data!")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         GardenBestCropTime.reset()
     }
@@ -231,7 +230,7 @@ object GardenAPI {
         }
 
         lastLocation = position
-        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).postAndCatch()
+        CropClickEvent(position, cropBroken, blockState, event.clickType, event.itemInHand).post()
     }
 
     fun getExpForLevel(requestedLevel: Int): Long {
@@ -277,7 +276,7 @@ object GardenAPI {
         return tier
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
         gardenExperience = data.gardenExp

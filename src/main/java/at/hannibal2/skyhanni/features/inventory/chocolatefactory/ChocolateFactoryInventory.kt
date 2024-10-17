@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object ChocolateFactoryInventory {
@@ -21,7 +21,7 @@ object ChocolateFactoryInventory {
         "§7§aYou have \\d+ unclaimed rewards?!"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.highlightUpgrades) return
@@ -37,7 +37,7 @@ object ChocolateFactoryInventory {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.highlightUpgrades) return
@@ -78,7 +78,7 @@ object ChocolateFactoryInventory {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.showStackSizes) return
@@ -87,7 +87,7 @@ object ChocolateFactoryInventory {
         event.stackTip = upgradeInfo.stackTip()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         val slot = event.slot ?: return

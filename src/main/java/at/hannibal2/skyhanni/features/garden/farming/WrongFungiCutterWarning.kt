@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getFungiCutterMode
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -20,7 +20,7 @@ object WrongFungiCutterWarning {
     private var mode = FungiMode.UNKNOWN
     private var lastPlaySoundTime = 0L
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         val message = event.message
         if (message == "§eFungi Cutter Mode: §r§cRed Mushrooms") {
@@ -31,7 +31,7 @@ object WrongFungiCutterWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (event.clickType != ClickType.LEFT_CLICK) return
         if (event.crop != CropType.MUSHROOM) return
@@ -55,7 +55,7 @@ object WrongFungiCutterWarning {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         if (event.crop == CropType.MUSHROOM) {
             readItem(event.toolItem ?: error("Tool item is null"))

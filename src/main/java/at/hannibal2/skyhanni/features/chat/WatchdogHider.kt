@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SkyhanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 
 @SkyHanniModule
 object WatchdogHider {
@@ -20,7 +20,7 @@ object WatchdogHider {
     private const val ANNOUNCEMENT_LINE = "§4[WATCHDOG ANNOUNCEMENT]"
     private const val END_LINE = "§c"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChat(event: SkyhanniChatEvent) {
         if (!LorenzUtils.onHypixel || !SkyHanniMod.feature.chat.filterType.watchDog) return
 
@@ -52,7 +52,7 @@ object WatchdogHider {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "chat.watchDog", "chat.filterType.watchDog")
     }
