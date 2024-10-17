@@ -76,6 +76,7 @@ object MaskShopPrice {
         updateProducts()
 
         val multiplier = 100
+        // TODO merge core with SkyMartCopperPrice into a utils
         val table = mutableListOf<DisplayTableEntry>()
 
         for (product in products) {
@@ -84,12 +85,10 @@ object MaskShopPrice {
 
             val hover = buildList {
                 add(product.name)
-
                 add("")
                 add("§7Item price: §6${product.itemPrice.shortFormat()} ")
                 add("§7Carnival Token cost: §c${product.carnivalTokens.shortFormat()} ")
                 add("§7Profit per 100 Carnival Tokens: §6$perFormat ")
-                add("")
             }
             table.add(
                 DisplayTableEntry(
