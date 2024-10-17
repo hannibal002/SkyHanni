@@ -66,7 +66,7 @@ public class PowderChestTimerConfig {
     public int drawLineToChestAmount = 2;
 
     @Expose
-    @ConfigLink(owner = PowderTrackerConfig.class, field = "onlyWhenPowderGrinding")
+    @ConfigLink(owner = PowderChestTimerConfig.class, field = "enabled")
     public Position position = new Position(100, 100, false, true);
 
 }
