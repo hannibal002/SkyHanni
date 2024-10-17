@@ -19,7 +19,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.model.ModelPlayer
 import net.minecraft.client.renderer.GlStateManager
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms
+import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType
 import net.minecraft.client.renderer.entity.RendererLivingEntity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
@@ -148,7 +148,7 @@ object HolographicPlayerReplay {
                     isSneaking,
                     isRiding,
                     heldItem,
-                    swingProgress
+                    swingProgress,
                 ),
             )
         }
@@ -184,7 +184,7 @@ object HolographicPlayerReplay {
             instance,
             event.partialTicks,
             interpolatedData,
-            fakePlayer
+            fakePlayer,
         )
     }
 
@@ -204,7 +204,7 @@ object HolographicPlayerReplay {
             last.sneaking,
             last.isRiding,
             last.heldItem,
-            interpolatedSwingProgress
+            interpolatedSwingProgress,
         )
     }
 
@@ -234,7 +234,7 @@ object HolographicPlayerReplay {
         holographicEntity: HolographicEntity<T>,
         partialTicks: Float,
         recordedPosition: RecordedPosition,
-        fakePlayer: EntityOtherPlayerMP
+        fakePlayer: EntityOtherPlayerMP,
     ) {
         val renderManager = mc.renderManager
         val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(fakePlayer)
@@ -253,7 +253,6 @@ object HolographicPlayerReplay {
         val mobPosition = holographicEntity.interpolatedPosition(partialTicks)
         val renderingOffset = mobPosition - viewerPosition
         renderingOffset.applyTranslationToGL()
-        GlStateManager.disableCull()
         GlStateManager.enableRescaleNormal()
         GlStateManager.scale(-1f, -1f, 1f)
         GlStateManager.translate(0F, -1.5078125f, 0f)
@@ -261,8 +260,8 @@ object HolographicPlayerReplay {
         val scaleFactor = 0.0625f
         val netHeadYaw: Float = holographicEntity.interpolatedYaw(partialTicks)
         renderer.setBrightness_skyhanni(holographicEntity.entity, 0f, true)
-        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.4f)
-        GlStateManager.depthMask(false)
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f)
+        GlStateManager.depthMask(true)
         GlStateManager.enableBlend()
         GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA)
         GlStateManager.alphaFunc(GL11.GL_GREATER, 1 / 255F)
@@ -279,15 +278,6 @@ object HolographicPlayerReplay {
         newModel.isSneak = recordedPosition.sneaking
         newModel.heldItemRight = if (recordedPosition.heldItem == null) 0 else 1
         newModel.swingProgress = recordedPosition.swingProgress
-        newModel.setRotationAngles(
-            recordedPosition.limbSwing,
-            recordedPosition.limbSwingAmount,
-            ageInTicks,
-            netHeadYaw,
-            recordedPosition.pitch,
-            scaleFactor,
-            fakePlayer
-        )
         newModel.render(
             fakePlayer,
             recordedPosition.limbSwing,
@@ -295,18 +285,15 @@ object HolographicPlayerReplay {
             ageInTicks,
             0f,
             recordedPosition.pitch,
-            scaleFactor
+            scaleFactor,
         )
 
         if (recordedPosition.heldItem != null) {
             GlStateManager.pushMatrix()
-            val renderItem = mc.renderItem
-            GlStateManager.translate(-0.5f, 0.5f, 0.5f)
-            renderItem.renderItemModelForEntity(
-                recordedPosition.heldItem,
-                fakePlayer,
-                ItemCameraTransforms.TransformType.THIRD_PERSON
-            )
+            GlStateManager.depthMask(true)
+            GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f)
+            GlStateManager.translate(-0.4f, 0.5f, 0f)
+            mc.renderItem.renderItem(recordedPosition.heldItem, TransformType.THIRD_PERSON)
             GlStateManager.popMatrix()
         }
 
@@ -328,5 +315,5 @@ data class RecordedPosition(
     val sneaking: Boolean,
     val isRiding: Boolean,
     val heldItem: ItemStack?,
-    val swingProgress: Float
+    val swingProgress: Float,
 )
