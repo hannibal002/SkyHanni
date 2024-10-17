@@ -1,13 +1,17 @@
 package at.hannibal2.skyhanni.features.skillprogress
 
 import at.hannibal2.skyhanni.api.SkillAPI
+import at.hannibal2.skyhanni.api.SkillAPI.customGoalConfig
 import at.hannibal2.skyhanni.api.SkillAPI.excludedSkills
+import at.hannibal2.skyhanni.api.SkillAPI.overflowConfig
 import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
+import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -19,9 +23,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object SkillTooltip {
 
-    private val overflowConfig get() = SkillProgress.config.overflowConfig
-    private val customGoalConfig get() = SkillProgress.config.customGoalConfig
-
+    // TODO extract function into more smaller ones
     @SubscribeEvent
     fun onTooltip(event: LorenzToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -56,8 +58,8 @@ object SkillTooltip {
                     if (line.contains(bar)) {
                         val progress = (skillInfo.overflowCurrentXp.toDouble() / skillInfo.overflowCurrentXpMax)
                         val progressBar = StringUtils.progressBar(progress)
-                        iterator.set("$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/" +
-                            "§e${skillInfo.overflowCurrentXpMax.addSeparators()}")
+                        val max = skillInfo.overflowCurrentXpMax.addSeparators()
+                        iterator.set("$progressBar §e${skillInfo.overflowCurrentXp.addSeparators()}§6/§e$max")
                         iterator.add("")
                     }
                 }
@@ -86,6 +88,42 @@ object SkillTooltip {
                         iterator.add("§b§lOVERFLOW XP:")
                         iterator.add("§7▸ ${skillInfo.overflowTotalXp.addSeparators()}")
                     }
+                }
+            }
+        }
+
+
+        if ((inventoryName == "SkyBlock Menu" || inventoryName == "Your Skills") &&
+            stack.displayName == "§aYour Skills" &&
+            overflowConfig.enableSkillAvg
+        ) {
+            val iterator = event.toolTip.listIterator()
+            for (line in iterator) {
+                if (!line.contains("Skill Avg.")) continue
+                val storage = SkillAPI.storage ?: return
+                var total = 0.0
+                for ((_, skill) in storage) {
+                    val level = skill.overflowLevel
+                    val have = skill.overflowTotalXp
+                    val need = skill.overflowCurrentXpMax
+                    val progress = have.toDouble() / need
+                    total += (level + progress)
+                }
+                val avg = (total / storage.size).roundTo(2)
+                iterator.set("§6$avg Skill Avg. §8(non-cosmetic)")
+
+                if (overflowConfig.showAvgInfoKey.isKeyHeld()) {
+                    iterator.add("")
+                    for ((type, info) in storage) {
+                        val level = info.overflowLevel
+                        val have = info.overflowCurrentXp
+                        val need = info.overflowCurrentXpMax
+                        val progress = have.toDouble() / need
+                        iterator.add("§7${type.displayName}: §6${(level + progress).roundTo(2)}")
+                    }
+                } else {
+                    iterator.add("")
+                    iterator.add("§8§oHold ${KeyboardManager.getKeyName(overflowConfig.showAvgInfoKey)} to show more info!")
                 }
             }
         }

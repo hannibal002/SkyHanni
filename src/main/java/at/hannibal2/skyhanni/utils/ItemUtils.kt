@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
@@ -492,6 +493,23 @@ object ItemUtils {
             return "$it Pet"
         }
         return name
+    }
+
+    fun createToggleItem(enabled: Boolean, featureName: String): ItemStack {
+        val colorCode = if (enabled) "§a" else "§c"
+        val statusText = if (enabled) "Currently ON" else "Currently OFF"
+        val damage = if (enabled) 13 else 14
+        val stack = ItemStack(Blocks.stained_hardened_clay)
+        return createItemStack(
+            stack.item,
+            "$colorCode$featureName $statusText",
+            listOf(
+                "§8(From SkyHanni)",
+                "",
+                "§7§eClick to toggle!",
+            ),
+            damage = damage,
+        )
     }
 
     fun ItemStack.loreCosts(): MutableList<NEUInternalName> {

@@ -104,4 +104,54 @@ public class SkillProgressBarConfig {
         @ConfigEditorSlider(minStep = 1, minValue = 3, maxValue = 15)
         public int height = 6;
     }
+
+    @Expose
+    @ConfigOption(name = "Color Per Skill", desc = "Change the bar color depending of the skill.")
+    @ConfigEditorBoolean
+    public boolean colorPerSkill = false;
+
+    @Expose
+    @ConfigOption(name = "Combat", desc = "Color for the combat bar.")
+    @ConfigEditorColour
+    public Property<String> combatBarColor = Property.of("0:245:255:0:59");
+
+    @Expose
+    @ConfigOption(name = "Farming", desc = "Color for the farming bar.")
+    @ConfigEditorColour
+    public Property<String> farmingBarColor = Property.of("0:245:85:255:85");
+
+    @Expose
+    @ConfigOption(name = "Fishing", desc = "Color for the fishing bar.")
+    @ConfigEditorColour
+    public Property<String> fishingBarColor = Property.of("0:245:0:64:255");
+
+    @Expose
+    @ConfigOption(name = "Mining", desc = "Color for the mining bar.")
+    @ConfigEditorColour
+    public Property<String> miningBarColor = Property.of("0:245:0:255:249");
+
+    @Expose
+    @ConfigOption(name = "Foraging", desc = "Color for the foraging bar.")
+    @ConfigEditorColour
+    public Property<String> foragingBarColor = Property.of("0:245:30:126:0");
+
+    @Expose
+    @ConfigOption(name = "Enchanting", desc = "Color for the enchanting bar.")
+    @ConfigEditorColour
+    public Property<String> enchantingBarColor = Property.of("0:255:255:248:0");
+
+    @Expose
+    @ConfigOption(name = "Alchemy", desc = "Color for the alchemy bar.")
+    @ConfigEditorColour
+    public Property<String> alchemyBarColor = Property.of("0:245:255:141:206");
+
+    @Expose
+    @ConfigOption(name = "Carpentry", desc = "Color for the carpentry bar.")
+    @ConfigEditorColour
+    public Property<String> carpentryBarColor = Property.of("0:245:255:250:242");
+
+    @Expose
+    @ConfigOption(name = "Taming", desc = "Color for the taming bar.")
+    @ConfigEditorColour
+    public Property<String> tamingBarColor = Property.of("0:245:255:0:171");
 }
