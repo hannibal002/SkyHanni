@@ -99,6 +99,8 @@ object EliteSkillRankDisplay {
         updateDisplay()
     }
 
+
+    //TODO this event doesn't seem to work :(
     @SubscribeEvent
     fun onSkillGained(event: SkillExpGainEvent) {
         val skillName = event.skill.name.lowercase()

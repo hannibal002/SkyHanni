@@ -107,6 +107,8 @@ object GardenCropMilestoneDisplay {
         update()
     }
 
+
+    //TODO this doesn't seem to live update the collection amount
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!GardenAPI.inGarden()) return
