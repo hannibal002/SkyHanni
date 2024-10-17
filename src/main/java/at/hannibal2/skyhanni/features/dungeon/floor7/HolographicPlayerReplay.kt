@@ -18,11 +18,24 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.model.ModelPlayer
+import net.minecraft.client.renderer.EntityRenderer
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.client.renderer.Tessellator
+import net.minecraft.client.renderer.WorldRenderer
+import net.minecraft.client.renderer.block.model.BakedQuad
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms.TransformType
 import net.minecraft.client.renderer.entity.RendererLivingEntity
+import net.minecraft.client.renderer.texture.TextureMap
+import net.minecraft.client.renderer.texture.TextureUtil
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats
+import net.minecraft.client.resources.model.IBakedModel
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.ItemStack
+import net.minecraft.util.EnumFacing
+import net.minecraft.util.ResourceLocation
+import net.minecraftforge.client.ForgeHooksClient
+import net.minecraftforge.client.model.pipeline.LightUtil
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 
@@ -291,9 +304,13 @@ object HolographicPlayerReplay {
         if (recordedPosition.heldItem != null) {
             GlStateManager.pushMatrix()
             GlStateManager.depthMask(true)
-            GlStateManager.color(1.0f, 1.0f, 1.0f, 0.6f)
             GlStateManager.translate(-0.4f, 0.5f, 0f)
-            mc.renderItem.renderItem(recordedPosition.heldItem, TransformType.THIRD_PERSON)
+            if (mc.renderItem.itemModelMesher.getItemModel(recordedPosition.heldItem).isGui3d) {
+                GlStateManager.translate(0f, 0f, -0.1f)
+                GlStateManager.rotate(20f, -1f, 0f, 0f)
+                GlStateManager.scale(1.8f, 1.8f, 1.8f)
+            }
+            renderItem(recordedPosition.heldItem)
             GlStateManager.popMatrix()
         }
 
@@ -303,6 +320,126 @@ object HolographicPlayerReplay {
         GlStateManager.depthMask(true)
         GlStateManager.disableBlend()
         GlStateManager.popMatrix()
+    }
+
+    private fun renderItem(item: ItemStack) {
+        var model = mc.renderItem.itemModelMesher.getItemModel(item)
+
+
+        mc.textureManager.bindTexture(TextureMap.locationBlocksTexture)
+        mc.textureManager.getTexture(TextureMap.locationBlocksTexture).setBlurMipmap(false, false)
+        preTransformItem(item, model)
+        GlStateManager.enableRescaleNormal()
+        GlStateManager.alphaFunc(516, 0.1f)
+        GlStateManager.enableBlend()
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0)
+        GlStateManager.pushMatrix()
+        model = ForgeHooksClient.handleCameraTransforms(model, TransformType.THIRD_PERSON)
+        renderItemModel(item, model)
+        GlStateManager.cullFace(1029)
+        GlStateManager.popMatrix()
+        GlStateManager.disableRescaleNormal()
+        GlStateManager.disableBlend()
+        mc.textureManager.bindTexture(TextureMap.locationBlocksTexture)
+        mc.textureManager.getTexture(TextureMap.locationBlocksTexture).restoreLastBlurMipmap()
+    }
+
+    private fun preTransformItem(item: ItemStack, model: IBakedModel) {
+        val flag = model.isGui3d
+        if (!flag) {
+            GlStateManager.scale(2.0f, 2.0f, 2.0f)
+        }
+
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1f)
+    }
+
+    private fun renderItemModel(item: ItemStack, model: IBakedModel) {
+        GlStateManager.pushMatrix()
+        GlStateManager.scale(0.5f, 0.5f, 0.5f)
+        if (model.isBuiltInRenderer) {
+            GlStateManager.rotate(180.0f, 0.0f, 1.0f, 0.0f)
+            GlStateManager.translate(-0.5f, -0.5f, -0.5f)
+            GlStateManager.color(1.0f, 1.0f, 1.0f, 1f)
+            GlStateManager.enableRescaleNormal()
+            TileEntityItemStackRenderer.instance.renderByItem(item)
+        } else {
+            GlStateManager.translate(-0.5f, -0.5f, -0.5f)
+            renderModel(model, -1, item)
+            if (item.hasEffect()) {
+                applyEnchantGlint(model)
+            }
+        }
+
+        GlStateManager.popMatrix()
+    }
+
+    private fun applyEnchantGlint(model: IBakedModel) {
+        GlStateManager.depthMask(false)
+        GlStateManager.depthFunc(514)
+        GlStateManager.disableLighting()
+        GlStateManager.blendFunc(768, 1)
+        mc.textureManager.bindTexture(ResourceLocation("textures/misc/enchanted_item_glint.png"))
+        GlStateManager.matrixMode(5890)
+        GlStateManager.pushMatrix()
+        GlStateManager.scale(8.0f, 8.0f, 8.0f)
+        val f = (Minecraft.getSystemTime() % 3000L).toFloat() / 3000.0f / 8.0f
+        GlStateManager.translate(f, 0.0f, 0.0f)
+        GlStateManager.rotate(-50.0f, 0.0f, 0.0f, 1.0f)
+        renderModel(model, -8372020, null)
+        GlStateManager.popMatrix()
+        GlStateManager.pushMatrix()
+        GlStateManager.scale(8.0f, 8.0f, 8.0f)
+        val f1 = (Minecraft.getSystemTime() % 4873L).toFloat() / 4873.0f / 8.0f
+        GlStateManager.translate(-f1, 0.0f, 0.0f)
+        GlStateManager.rotate(10.0f, 0.0f, 0.0f, 1.0f)
+        renderModel(model, -8372020, null)
+        GlStateManager.popMatrix()
+        GlStateManager.matrixMode(5888)
+        GlStateManager.blendFunc(770, 771)
+        GlStateManager.enableLighting()
+        GlStateManager.depthFunc(515)
+        GlStateManager.depthMask(true)
+        mc.textureManager.bindTexture(TextureMap.locationBlocksTexture)
+    }
+
+    private fun renderModel(model: IBakedModel, color: Int, item: ItemStack?) {
+        val tessellator = Tessellator.getInstance()
+        val worldrenderer = tessellator.worldRenderer
+        worldrenderer.begin(7, DefaultVertexFormats.ITEM)
+        val var6 = EnumFacing.entries.toTypedArray()
+        val var7 = var6.size
+
+        for (var8 in 0 until var7) {
+            val enumfacing = var6[var8]
+            renderQuads(worldrenderer, model.getFaceQuads(enumfacing), color, item)
+        }
+
+        renderQuads(worldrenderer, model.generalQuads, color, item)
+        tessellator.draw()
+    }
+
+    private fun renderQuads(renderer: WorldRenderer, quads: List<BakedQuad>, inputColor: Int, stack: ItemStack?) {
+        val flag = inputColor == -1 && stack != null
+        var i = 0
+
+        val j = quads.size
+        while (i < j) {
+            val bakedquad = quads[i]
+            var color = inputColor
+            if (flag && bakedquad.hasTintIndex()) {
+                color = stack?.item?.getColorFromItemStack(stack, bakedquad.tintIndex) ?: 16777215
+                if (EntityRenderer.anaglyphEnable) {
+                    color = TextureUtil.anaglyphColor(color)
+                }
+
+                color = color or -16777216
+            }
+            if (color != -8372020) {
+                color = 2583691263.toInt()
+            }
+            LightUtil.renderQuadColor(renderer, bakedquad, color)
+            ++i
+        }
     }
 }
 
