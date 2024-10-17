@@ -110,7 +110,7 @@ class Mob(
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
-    fun canBeSeen() = baseEntity.canBeSeen()
+    fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
     fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
 
