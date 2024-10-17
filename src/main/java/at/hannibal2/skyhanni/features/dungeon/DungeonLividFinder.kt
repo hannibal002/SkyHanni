@@ -111,6 +111,7 @@ object DungeonLividFinder {
 
     @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
+        if (!inDungeon()) return
         if (!config.hideWrong) return
         if (!config.enabled) return
 
