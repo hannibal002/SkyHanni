@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.MiningAPI
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
@@ -49,14 +49,14 @@ object PrecisionMiningHighlight {
     }
 
     @HandleEvent
-    fun onRender(event: SkyhanniRenderWorldEvent) {
+    fun onRender(event: SkyHanniRenderWorldEvent) {
         val particleBoundingBox = lastParticle ?: return
 
         event.drawFilledBoundingBox_nea(particleBoundingBox, if (lookingAtParticle) Color.GREEN else Color.CYAN)
     }
 
     @HandleEvent
-    fun onTick(event: SkyhanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         lastParticle ?: return
         val deletionTime = deleteTime ?: return
         if (deletionTime.isInPast()) {

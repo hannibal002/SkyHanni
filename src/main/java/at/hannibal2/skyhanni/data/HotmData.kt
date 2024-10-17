@@ -13,7 +13,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -728,7 +728,7 @@ enum class HotmData(
         }
 
         @HandleEvent
-        fun onChat(event: SkyhanniChatEvent) {
+        fun onChat(event: SkyHanniChatEvent) {
             if (!LorenzUtils.inSkyBlock) return
             if (resetChatPattern.matches(event.message)) {
                 resetTree()

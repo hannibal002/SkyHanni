@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -36,7 +36,7 @@ object CompactBingoChat {
     )
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.isBingoProfile && !config.outsideBingo) return
 

@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.fishing.trophy
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager.getFilletValue
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -19,7 +19,7 @@ import org.lwjgl.input.Keyboard
 object TrophyFishFillet {
 
     @HandleEvent
-    fun onTooltip(event: SkyhanniToolTipEvent) {
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
         if (event.slot.inventory.name.contains("Sack")) return
         val internalName = event.itemStack.getInternalName().asString()

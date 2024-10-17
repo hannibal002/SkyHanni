@@ -5,7 +5,7 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 
 
-class SkyhanniToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) :
+class SkyHanniToolTipEvent(val slot: Slot, val itemStack: ItemStack, private val toolTip0: MutableList<String>) :
     CancellableSkyHanniEvent() {
 
     var toolTip: MutableList<String>

@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -139,7 +139,7 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun onRenderLastClickedMinion(event: SkyhanniRenderWorldEvent) {
+    fun onRenderLastClickedMinion(event: SkyHanniRenderWorldEvent) {
         if (!enableWithHub()) return
         if (!config.lastClickedMinion.display) return
 
@@ -266,7 +266,7 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun onTick(event: SkyhanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (coinsPerDay != "") return
 
@@ -319,7 +319,7 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -355,7 +355,7 @@ object MinionFeatures {
     }
 
     @HandleEvent
-    fun onRenderLastEmptied(event: SkyhanniRenderWorldEvent) {
+    fun onRenderLastEmptied(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         val playerLocation = LocationUtils.playerLocation()

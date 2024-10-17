@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
 import at.hannibal2.skyhanni.events.KuudraEnterEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -62,7 +62,7 @@ object KuudraAPI {
     fun inKuudra() = kuudraTier != null
 
     @HandleEvent
-    fun onTick(event: SkyhanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (kuudraTier != null) return
         for (line in ScoreboardData.sidebarLinesFormatted) {
@@ -80,7 +80,7 @@ object KuudraAPI {
     }
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         completePattern.matchMatcher(message) {
             val tier = kuudraTier ?: return

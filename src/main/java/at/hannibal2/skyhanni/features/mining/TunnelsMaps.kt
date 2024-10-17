@@ -16,9 +16,9 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkyHanniWarpEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
-import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
@@ -203,7 +203,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onRenderItemTooltip(event: SkyhanniToolTipEvent) {
+    fun onRenderItemTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
         clickTranslate[event.slot.slotIndex]?.let {
             event.toolTip.add("§e§lRight Click §r§eto for Tunnel Maps.")
@@ -393,7 +393,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onTick(event: SkyhanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (checkGoalReached()) return
         val prevclosest = closestNode
@@ -446,7 +446,7 @@ object TunnelsMaps {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val path = path?.takeIf { it.first.isNotEmpty() } ?: return
         event.draw3DPathWithWaypoint(

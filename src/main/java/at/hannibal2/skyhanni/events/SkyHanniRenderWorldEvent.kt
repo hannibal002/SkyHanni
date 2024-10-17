@@ -2,4 +2,4 @@ package at.hannibal2.skyhanni.events
 
 import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 
-class SkyhanniRenderWorldEvent(val partialTicks: Float) : SkyHanniEvent()
+class SkyHanniRenderWorldEvent(val partialTicks: Float) : SkyHanniEvent()

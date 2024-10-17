@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.getOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -22,7 +22,7 @@ object ChocolateFactoryTooltipCompact {
     private var tooltipToHover = listOf<String>()
 
     @HandleEvent
-    fun onTooltip(event: SkyhanniToolTipEvent) {
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
 
         if (config.tooltipMove) {
@@ -49,7 +49,7 @@ object ChocolateFactoryTooltipCompact {
         }
     }
 
-    private fun onCompactClick(event: SkyhanniToolTipEvent) {
+    private fun onCompactClick(event: SkyHanniToolTipEvent) {
         if (!config.compactOnClick) return
 
         val itemStack = event.itemStack

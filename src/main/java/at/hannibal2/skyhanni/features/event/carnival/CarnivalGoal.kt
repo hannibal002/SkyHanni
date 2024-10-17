@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -186,7 +186,7 @@ enum class CarnivalGoal(
         }
 
         @HandleEvent
-        fun onLorenzChat(event: SkyhanniChatEvent) {
+        fun onLorenzChat(event: SkyHanniChatEvent) {
             if (!isEnabled()) return
             entries.firstOrNull { it.chatPattern.matches(event.message) }?.isReached = true
         }

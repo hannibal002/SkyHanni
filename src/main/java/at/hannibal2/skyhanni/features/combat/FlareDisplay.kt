@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -61,7 +61,7 @@ object FlareDisplay {
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.displayType == FlareConfig.DisplayType.GUI) return
 
@@ -147,7 +147,7 @@ object FlareDisplay {
     }
 
     @HandleEvent
-    fun onRender(event: SkyhanniRenderWorldEvent) {
+    fun onRender(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.outlineType == FlareConfig.OutlineType.NONE) return
 

@@ -5,6 +5,6 @@ import at.hannibal2.skyhanni.features.fishing.SeaCreature
 
 class SeaCreatureFishEvent(
     val seaCreature: SeaCreature,
-    val chatEvent: SkyhanniChatEvent,
+    val chatEvent: SkyHanniChatEvent,
     val doubleHook: Boolean,
 ) : SkyHanniEvent()

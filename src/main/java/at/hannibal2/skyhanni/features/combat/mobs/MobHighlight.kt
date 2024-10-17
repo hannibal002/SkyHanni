@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.EntityMaxHealthUpdateEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -103,7 +103,7 @@ object MobHighlight {
     }
 
     @HandleEvent
-    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock || !config.lineToArachne) return
 
         val arachne = arachne ?: return

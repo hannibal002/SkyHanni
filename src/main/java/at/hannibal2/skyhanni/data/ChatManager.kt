@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -128,7 +128,7 @@ object ChatManager {
             return
         }
         val key = IdentityCharacteristics(original)
-        val chatEvent = SkyhanniChatEvent(message, original)
+        val chatEvent = SkyHanniChatEvent(message, original)
         chatEvent.post()
 
         val blockReason = chatEvent.blockedReason.uppercase()

@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.transformAt
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -68,7 +68,7 @@ object StockOfStonkFeature {
     }
 
     @HandleEvent
-    fun onLorenzToolTip(event: SkyhanniToolTipEvent) {
+    fun onLorenzToolTip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
         if (!itemPattern.matches(event.itemStack.displayName)) return

@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -106,7 +106,7 @@ object EndermanSlayerFeatures {
     private fun showBeacon() = beaconConfig.highlightBeacon || beaconConfig.showWarning || beaconConfig.showLine
 
     @HandleEvent
-    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
         if (!IslandType.THE_END.isInIsland()) return
 
         if (beaconConfig.highlightBeacon) {
@@ -122,7 +122,7 @@ object EndermanSlayerFeatures {
         drawNukekubiSkulls(event)
     }
 
-    private fun drawNukekubiSkulls(event: SkyhanniRenderWorldEvent) {
+    private fun drawNukekubiSkulls(event: SkyHanniRenderWorldEvent) {
         for (skull in nukekubiSkulls) {
             if (skull.isDead) continue
             if (config.highlightNukekebi) {
@@ -148,7 +148,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawFlyingBeacon(event: SkyhanniRenderWorldEvent) {
+    private fun drawFlyingBeacon(event: SkyHanniRenderWorldEvent) {
         for (beacon in flyingBeacons) {
             if (beacon.isDead) continue
             if (beaconConfig.highlightBeacon) {
@@ -168,7 +168,7 @@ object EndermanSlayerFeatures {
         }
     }
 
-    private fun drawSittingBeacon(event: SkyhanniRenderWorldEvent) {
+    private fun drawSittingBeacon(event: SkyHanniRenderWorldEvent) {
         for ((location, time) in sittingBeacon) {
             if (location.distanceToPlayer() > 20) continue
             if (beaconConfig.showLine) {

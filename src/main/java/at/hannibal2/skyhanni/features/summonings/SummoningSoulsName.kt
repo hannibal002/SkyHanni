@@ -1,8 +1,8 @@
 package at.hannibal2.skyhanni.features.summonings
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -35,7 +35,7 @@ object SummoningSoulsName {
     private val mobsName = TimeLimitedCache<Int, String>(6.minutes)
 
     @HandleEvent
-    fun onTick(event: SkyhanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         // TODO use packets instead of this
@@ -78,7 +78,7 @@ object SummoningSoulsName {
     }
 
     @HandleEvent
-    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((entity, name) in souls) {

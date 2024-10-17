@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PartyAPI
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.KeyPressEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -81,7 +81,7 @@ object MineshaftWaypoints {
     }
 
     @HandleEvent
-    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
         if (waypoints.isEmpty()) return
 
         waypoints

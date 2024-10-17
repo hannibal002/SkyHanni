@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.winter
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -28,7 +28,7 @@ object ReindrakeWarpHelper {
     )
 
     @HandleEvent
-    fun onMessage(event: SkyhanniChatEvent) {
+    fun onMessage(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (!spawnPattern.matches(event.message)) return
         ChatUtils.clickToActionOrDisable(

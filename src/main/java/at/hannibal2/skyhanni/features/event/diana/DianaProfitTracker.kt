@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -124,7 +124,7 @@ object DianaProfitTracker {
     }
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
@@ -147,7 +147,7 @@ object DianaProfitTracker {
         }
     }
 
-    private fun tryHide(event: SkyhanniChatEvent) {
+    private fun tryHide(event: SkyHanniChatEvent) {
         if (SkyHanniMod.feature.chat.filterType.diana) {
             event.blockedReason = "diana_chain_or_drops"
         }

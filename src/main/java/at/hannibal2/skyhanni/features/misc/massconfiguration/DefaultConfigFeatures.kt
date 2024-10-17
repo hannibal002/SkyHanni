@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.misc.massconfiguration
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
@@ -16,7 +16,7 @@ object DefaultConfigFeatures {
     private var didNotifyOnce = false
 
     @HandleEvent
-    fun onTick(event: SkyhanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (didNotifyOnce) return
         Minecraft.getMinecraft().thePlayer ?: return
         didNotifyOnce = true

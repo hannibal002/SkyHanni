@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.SecondPassedEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
@@ -127,7 +127,7 @@ object HoppityEggsManager {
     }
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         hoppityEventNotOn.matchMatcher(event.message) {
@@ -170,7 +170,7 @@ object HoppityEggsManager {
         }
     }
 
-    internal fun Matcher.getEggType(event: SkyhanniChatEvent): HoppityEggType =
+    internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
         HoppityEggType.getMealByName(group("meal")) ?: run {
             ErrorManager.skyHanniError(
                 "Unknown meal: ${group("meal")}",

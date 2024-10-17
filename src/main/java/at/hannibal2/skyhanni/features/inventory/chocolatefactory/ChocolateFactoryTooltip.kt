@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.profileStorage
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
@@ -14,7 +14,7 @@ object ChocolateFactoryTooltip {
     private val config get() = ChocolateFactoryAPI.config
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onTooltip(event: SkyhanniToolTipEvent) {
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.extraTooltipStats) return
 

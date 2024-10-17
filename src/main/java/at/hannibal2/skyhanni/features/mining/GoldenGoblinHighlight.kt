@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -29,7 +29,7 @@ object GoldenGoblinHighlight {
     private var lastGoblin: Mob? = null
 
     @HandleEvent
-    fun onChatEvent(event: SkyhanniChatEvent) {
+    fun onChatEvent(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (!MiningNotifications.goldenGoblinSpawn.matches(event.message) &&
             !MiningNotifications.diamondGoblinSpawn.matches(event.message)

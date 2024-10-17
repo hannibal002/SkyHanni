@@ -4,8 +4,8 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -71,7 +71,7 @@ object TrackParticlesCommand {
     }
 
     @HandleEvent
-    fun onTick(event: SkyhanniTickEvent) {
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isRecording) return
 
         val particlesToDisplay = particles.takeWhile { startTime.passedSince() - it.first < 3.seconds }
@@ -106,7 +106,7 @@ object TrackParticlesCommand {
     }
 
     @HandleEvent
-    fun onWorldRender(event: SkyhanniRenderWorldEvent) {
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
         if (cutOffTime.isInPast()) return
         worldParticles.forEach { (key, value) ->
             if (value.size != 1) {

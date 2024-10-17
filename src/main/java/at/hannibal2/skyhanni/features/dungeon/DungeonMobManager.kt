@@ -6,8 +6,8 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.MobEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -74,13 +74,13 @@ object DungeonMobManager {
     }
 
     @HandleEvent
-    fun onLorenzTick(event: SkyhanniTickEvent) {
+    fun onLorenzTick(event: SkyHanniTickEvent) {
         if (!IslandType.CATACOMBS.isInIsland()) return
         handleInvisibleStar()
     }
 
     @HandleEvent
-    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!fel.highlight.get()) return
         if (fel.line) {
             felOnTheGround.filter { it.canBeSeen() }.forEach {

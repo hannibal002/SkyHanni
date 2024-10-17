@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
-import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
@@ -24,7 +24,7 @@ object ChocolateFactoryTooltipStray {
     )
 
     @HandleEvent(priority = HandleEvent.HIGH)
-    fun onTooltip(event: SkyhanniToolTipEvent) {
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.showStrayTime) return
         if (event.slot.slotNumber > 26 || event.slot.slotNumber == ChocolateFactoryAPI.infoIndex) return

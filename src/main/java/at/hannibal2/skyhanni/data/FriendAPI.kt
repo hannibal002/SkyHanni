@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson.PlayerFriends.Friend
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -75,7 +75,7 @@ object FriendAPI {
     }
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         readFriendsList(event)
 
         removedFriendPattern.matchMatcher(event.message) {
@@ -114,7 +114,7 @@ object FriendAPI {
         saveConfig()
     }
 
-    private fun readFriendsList(event: SkyhanniChatEvent) {
+    private fun readFriendsList(event: SkyHanniChatEvent) {
         if (!event.message.contains("Friends")) return
 
         for (sibling in event.chatComponent.siblings) {

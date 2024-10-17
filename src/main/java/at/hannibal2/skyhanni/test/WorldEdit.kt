@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -71,7 +71,7 @@ object WorldEdit {
     }
 
     @HandleEvent
-    fun onRenderWorldLast(event: SkyhanniRenderWorldEvent) {
+    fun onRenderWorldLast(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         leftPos?.let { l ->

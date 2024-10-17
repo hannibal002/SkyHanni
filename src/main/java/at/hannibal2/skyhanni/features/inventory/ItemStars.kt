@@ -4,7 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.InventoryConfig.ItemNumberEntry.CRIMSON_ARMOR
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
-import at.hannibal2.skyhanni.events.SkyhanniToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.ItemDisplayOverlayFeatures.isSelected
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.getKuudraTier
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI.isKuudraArmor
@@ -35,7 +35,7 @@ object ItemStars {
     )
 
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onTooltip(event: SkyhanniToolTipEvent) {
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
         val stack = event.itemStack
         if (stack.stackSize != 1) return

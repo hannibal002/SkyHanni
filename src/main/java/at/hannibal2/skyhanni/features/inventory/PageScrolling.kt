@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.ToolTipData
-import at.hannibal2.skyhanni.events.SkyhanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
@@ -52,7 +52,7 @@ object PageScrolling {
     private var cooldown = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onLorenzTick(event: SkyhanniTickEvent) {
+    fun onLorenzTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return

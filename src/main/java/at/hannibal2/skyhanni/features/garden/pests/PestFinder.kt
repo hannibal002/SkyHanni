@@ -5,8 +5,8 @@ import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.Visib
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.KeyPressEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
-import at.hannibal2.skyhanni.events.SkyhanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
@@ -118,7 +118,7 @@ object PestFinder {
 
     // priority to low so that this happens after other renderPlot calls.
     @HandleEvent(priority = HandleEvent.LOW)
-    fun onRenderWorld(event: SkyhanniRenderWorldEvent) {
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (config.onlyWithVacuum && !PestAPI.hasVacuumInHand() &&
@@ -147,7 +147,7 @@ object PestFinder {
     private fun drawName(
         plot: GardenPlotAPI.Plot,
         playerLocation: LorenzVec,
-        event: SkyhanniRenderWorldEvent,
+        event: SkyHanniRenderWorldEvent,
     ) {
         val pests = plot.pests
         val pestsName = StringUtils.pluralize(pests, "pest")
@@ -167,7 +167,7 @@ object PestFinder {
     private var lastKeyPress = SimpleTimeMark.farPast()
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.noPestTitle) return
 

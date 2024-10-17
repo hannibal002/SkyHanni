@@ -11,7 +11,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.events.SkyhanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
@@ -114,7 +114,7 @@ object PlayerChatManager {
     )
 
     @HandleEvent
-    fun onChat(event: SkyhanniChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
         val chatComponent = event.chatComponent.intoSpan().stripHypixelMessage()
         coopPattern.matchStyledMatcher(chatComponent) {
             val author = groupOrThrow("author")
@@ -166,7 +166,7 @@ object PlayerChatManager {
         sendSystemMessage(event)
     }
 
-    private fun ComponentMatcher.isGlobalChat(event: SkyhanniChatEvent): Boolean {
+    private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent): Boolean {
         var author = groupOrThrow("author")
         val message = groupOrThrow("message").removePrefix("§f")
         if (author.getText().contains("[NPC]")) {
@@ -203,19 +203,19 @@ object PlayerChatManager {
         return true
     }
 
-    private fun sendSystemMessage(event: SkyhanniChatEvent) {
+    private fun sendSystemMessage(event: SkyHanniChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
             val cancelled = post()
             event.handleChat(cancelled, blockedReason, chatComponent)
         }
     }
 
-    private fun AbstractChatEvent.postChat(event: SkyhanniChatEvent) {
+    private fun AbstractChatEvent.postChat(event: SkyHanniChatEvent) {
         val cancelled = post()
         event.handleChat(cancelled, blockedReason, chatComponent)
     }
 
-    private fun SkyhanniChatEvent.handleChat(
+    private fun SkyHanniChatEvent.handleChat(
         cancelled: Boolean,
         blockedReason: String?,
         chatComponent: IChatComponent,
