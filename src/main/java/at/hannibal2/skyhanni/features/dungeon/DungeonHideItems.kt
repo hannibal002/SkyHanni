@@ -192,12 +192,9 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
-    fun onEntityMove(event: EntityMoveEvent) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onEntityMove(event: EntityMoveEvent<EntityArmorStand>) {
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
