@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -83,6 +84,10 @@ object ConfigUtils {
 
     fun KMutableProperty0<*>.jumpToEditor() {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
+
+        if (PlatformUtils.isDevEnvironment) {
+            throw Error("can not jump to editor $name")
+        }
         ErrorManager.logErrorStateWithData(
             "Can not open the config",
             "error while trying to jump to an editor element",

@@ -58,11 +58,6 @@ object RepoPatternManager {
     private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
     private var wasPreInitialized = false
-    private val isInDevEnv = try {
-        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
-    } catch (_: Exception) {
-        true
-    }
 
     private val insideTest = Launch.blackboard == null
 
@@ -86,7 +81,7 @@ object RepoPatternManager {
      * Crash if in a development environment, or if inside a guarded event handler.
      */
     fun crash(reason: String) {
-        if (isInDevEnv)
+        if (PlatformUtils.isDevEnvironment)
             throw RuntimeException(reason)
     }
 
