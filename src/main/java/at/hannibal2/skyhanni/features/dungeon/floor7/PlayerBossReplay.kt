@@ -71,9 +71,10 @@ object PlayerBossReplay {
             recordedPositions.add(newPosition)
         }
         if (playing) {
-            playIndex += 1
-            if (playIndex > (currentRun?.recordedPositions?.size ?: 0)) {
+            if (playIndex >= (currentRun?.recordedPositions?.size ?: 0)) {
                 playIndex = 0
+            } else {
+                playIndex += 1
             }
         }
     }
@@ -184,8 +185,10 @@ object PlayerBossReplay {
         if (!playing) return
         if (currentRun == null) return
 
+        val previousIndex = if (playIndex == 0) 0 else playIndex - 1
+
         val recordedPosition = RecordedPositionDelta.getComplete(currentRun?.recordedPositions ?: listOf(), playIndex)
-        val previousPosition = RecordedPositionDelta.getComplete(currentRun?.recordedPositions ?: listOf(), playIndex - 1)
+        val previousPosition = RecordedPositionDelta.getComplete(currentRun?.recordedPositions ?: listOf(), previousIndex)
         val gameProfile = GameProfile(currentRun?.playerUUID, currentRun?.playerName)
 
         HolographicPlayerReplay.renderHolographicPlayer(event, recordedPosition, previousPosition, playIndex, gameProfile)

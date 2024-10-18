@@ -51,21 +51,18 @@ object HolographicPlayerReplay {
         gameProfile: GameProfile
     ) {
         val fakePlayer = EntityOtherPlayerMP(null, gameProfile)
-
-        val interpolatedData = interpolateRecordedPosition(previousPosition, position, event.partialTicks)
-
-        fakePlayer.isEating = interpolatedData.isEating
         val holographicPlayer = HolographicEntities.HolographicBase(fakePlayer)
 
+        val finalPosition = interpolateRecordedPosition(previousPosition, position, event.partialTicks)
         val instance = holographicPlayer.instance(
-            interpolatedData.position,
-            -interpolatedData.yaw + 360f,
+            finalPosition.position,
+            finalPosition.yaw,
         )
 
-        newRenderHolographicEntity(
+        renderHolographicPlayerReplay(
             instance,
             event.partialTicks,
-            interpolatedData,
+            finalPosition,
             fakePlayer,
             index
         )
@@ -80,7 +77,7 @@ object HolographicPlayerReplay {
         val interpolatedSwingProgress = interpolateValue(last.swingProgress, next.swingProgress, progress)
         return RecordedPosition(
             interpolatedPosition,
-            -interpolatedYaw,
+            interpolatedYaw,
             interpolatedPitch,
             interpolatedLimbSwing,
             interpolatedLimbSwingAmount,
@@ -117,7 +114,7 @@ object HolographicPlayerReplay {
         return last + progress * direction
     }
 
-    private fun <T : EntityLivingBase> newRenderHolographicEntity(
+    private fun <T : EntityLivingBase> renderHolographicPlayerReplay(
         holographicEntity: HolographicEntity<T>,
         partialTicks: Float,
         recordedPosition: RecordedPosition,
@@ -232,6 +229,7 @@ object HolographicPlayerReplay {
         GlStateManager.popMatrix()
     }
 
+    //this is mostly copied from itemRenderer, needed to change the rendering color
     private fun renderItem(item: ItemStack) {
         var model = mc.renderItem.itemModelMesher.getItemModel(item)
 
@@ -341,7 +339,7 @@ object HolographicPlayerReplay {
 
                 color = color or -16777216
             }
-            if (color != -8372020) {
+            if (color != -8372020) { //enchant glint color, having it white would be bad
                 color = 2583691263.toInt() //set transparency
             }
             LightUtil.renderQuadColor(renderer, bakedQuad, color)
@@ -385,7 +383,8 @@ data class RecordedPositionDelta(
         fun getComplete(positions: List<RecordedPositionDelta>, index: Int): HolographicPlayerReplay.RecordedPosition {
             var incompletePositions = RecordedPositionDelta()
 
-            for (i in index - 1 downTo 0) {
+            for (i in index downTo 0) {
+                if (i >= positions.size) continue
                 val position = positions[i]
 
                 incompletePositions = incompletePositions.copy(
