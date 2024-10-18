@@ -35,6 +35,8 @@ import at.hannibal2.skyhanni.utils.chat.Text.onClick
 import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds
@@ -326,9 +328,9 @@ object IslandGraphs {
         }
     }
 
-    @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (LorenzUtils.inSkyBlock && event.entity == Minecraft.getMinecraft().thePlayer) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (event.isPlayer) {
             hasMoved = true
         }
     }

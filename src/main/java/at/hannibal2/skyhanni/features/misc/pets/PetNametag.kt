@@ -27,9 +27,8 @@ object PetNametag {
     )
 
     @HandleEvent
-    fun onNameTagRender(event: EntityDisplayNameEvent) {
+    fun onNameTagRender(event: EntityDisplayNameEvent<EntityArmorStand>) {
         if (!isEnabled()) return
-        if (event.entity !is EntityArmorStand) return
 
         petNametagPattern.matchMatcher(event.chatComponent.unformattedText) {
             val start = group("start")

@@ -55,9 +55,8 @@ object EndermanSlayerFeatures {
     private const val NUKEKUBI_SKULL_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZWIwNzU5NGUyZGYyNzM5MjFhNzdjMTAxZDBiZmRmYTExMTVhYmVkNWI5YjIwMjllYjQ5NmNlYmE5YmRiYjRiMyJ9fX0="
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_END)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
-        if (!IslandType.THE_END.isInIsland()) return
         val entity = event.entity
         if (entity in endermenWithBeacons || entity in flyingBeacons) return
 

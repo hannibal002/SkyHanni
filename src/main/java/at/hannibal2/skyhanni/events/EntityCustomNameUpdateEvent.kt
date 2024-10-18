@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.events
 
-import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+import at.hannibal2.skyhanni.api.event.GenericSkyHanniEvent
 import net.minecraft.entity.Entity
 
-data class EntityCustomNameUpdateEvent(
+data class EntityCustomNameUpdateEvent<T : Entity>(
+    val entity: T,
     val newName: String?,
-    val entity: Entity,
-) : SkyHanniEvent()
+) : GenericSkyHanniEvent<T>(entity.javaClass)

@@ -68,10 +68,9 @@ object UniqueGiftingOpportunitiesFeatures {
         addGiftedPlayer(matchedPlayer.name)
     }
 
-    @HandleEvent
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent) {
-        val entity = event.entity as? EntityArmorStand ?: return
-        analyzeArmorStand(entity)
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<EntityArmorStand>) {
+        analyzeArmorStand(event.entity)
     }
 
     @HandleEvent

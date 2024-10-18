@@ -27,9 +27,8 @@ object ChumBucketHider {
         reset()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
-        if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled.get()) return
 
         val entity = event.entity

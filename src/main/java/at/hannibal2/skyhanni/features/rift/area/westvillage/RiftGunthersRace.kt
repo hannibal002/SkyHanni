@@ -17,7 +17,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
+import net.minecraft.entity.player.EntityPlayer
 
 @SkyHanniModule
 object RiftGunthersRace {
@@ -109,7 +109,7 @@ object RiftGunthersRace {
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityPlayer>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
         if (!RiftAPI.inRiftRace) return

@@ -25,18 +25,18 @@ object LesserOrbHider {
     private const val LESSER_TEXTURE =
         "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvZjgzMjM2NjM5NjA3MDM2YzFiYTM5MWMyYjQ2YTljN2IwZWZkNzYwYzhiZmEyOTk2YTYwNTU1ODJiNGRhNSJ9fX0="
 
-    @HandleEvent
-    fun onArmorChange(event: EntityEquipmentChangeEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onArmorChange(event: EntityEquipmentChangeEvent<EntityArmorStand>) {
         val entity = event.entity
         val itemStack = event.newItemStack ?: return
 
-        if (entity is EntityArmorStand && event.isHand && itemStack.getSkullTexture() == LESSER_TEXTURE) {
+        if (event.isHand && itemStack.getSkullTexture() == LESSER_TEXTURE) {
             hiddenEntities.add(entity)
         }
     }
 
     @HandleEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!isEnabled()) return
 
         if (event.entity in hiddenEntities) {

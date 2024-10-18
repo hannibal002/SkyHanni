@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -63,10 +64,8 @@ object DungeonHideItems {
         return itemStack != null && itemStack.cleanName() == "Skeleton Skull"
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
-        if (!DungeonAPI.inDungeon()) return
-
         val entity = event.entity
 
         if (entity is EntityItem) {
@@ -158,7 +157,7 @@ object DungeonHideItems {
         }
 
         if (config.hideHealerFairy) {
-            // Healer Fairy texture is stored in id 0, not id 4 for some reasons.
+            // Healer Fairy texture is stored in id 0, not id 4 for some reason.
             if (entity.inventory[0]?.getSkullTexture() == HEALER_FAIRY_TEXTURE) {
                 event.cancel()
                 return
@@ -192,12 +191,9 @@ object DungeonHideItems {
         }
     }
 
-    @HandleEvent
-    fun onEntityMove(event: EntityMoveEvent) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onEntityMove(event: EntityMoveEvent<EntityArmorStand>) {
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()

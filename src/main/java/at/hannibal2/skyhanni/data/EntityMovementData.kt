@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.entity.Entity
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -63,9 +64,9 @@ object EntityMovementData {
         nextTeleport = null
     }
 
-    @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (!LorenzUtils.inSkyBlock || event.entity != Minecraft.getMinecraft().thePlayer) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (!event.isPlayer) return
 
         val nextData = nextTeleport ?: return
 

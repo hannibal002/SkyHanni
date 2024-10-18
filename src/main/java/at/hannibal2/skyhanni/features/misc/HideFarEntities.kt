@@ -33,11 +33,12 @@ object HideFarEntities {
             .map { it.first }.toSet()
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
+        if (!isEnabled()) return
         val entity = event.entity
         if (entity is EntityWither && entity.entityId < 0) return
-        if (isEnabled() && entity.entityId in ignored) {
+        if (entity.entityId in ignored) {
             event.cancel()
         }
     }

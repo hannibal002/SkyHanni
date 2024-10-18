@@ -308,7 +308,7 @@ object TrevorFeatures {
         }
     }
 
-    @HandleEvent(priority = HandleEvent.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST, onlyOnIsland = IslandType.THE_FARMING_ISLANDS)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!inTrapperDen) return
         if (!config.trapperTalkCooldown) return

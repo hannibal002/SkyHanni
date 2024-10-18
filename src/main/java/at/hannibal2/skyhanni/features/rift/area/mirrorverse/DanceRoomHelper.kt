@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -157,12 +158,10 @@ object DanceRoomHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (RiftAPI.inRift() && config.hidePlayers) {
-            if (inRoom) {
-                event.cancel()
-            }
+        if (config.enabled && inRoom) {
+            event.cancel()
         }
     }
 

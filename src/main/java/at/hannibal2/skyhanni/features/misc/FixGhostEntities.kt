@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.MobUtils.isDefaultValue
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
@@ -60,9 +59,9 @@ object FixGhostEntities {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
-        if (!LorenzUtils.inSkyBlock || !config.hideTemporaryArmorstands) return
+        if (!config.hideTemporaryArmorstands) return
         with(event.entity) {
             if (ticksExisted < 10 && isDefaultValue() && inventory.all { it == null }) event.cancel()
         }

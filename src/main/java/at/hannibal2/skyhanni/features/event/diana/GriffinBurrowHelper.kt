@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
@@ -180,9 +181,9 @@ object GriffinBurrowHelper {
     }
 
     @HandleEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+        if (event.distance > 10 && event.isPlayer) {
             update()
         }
     }

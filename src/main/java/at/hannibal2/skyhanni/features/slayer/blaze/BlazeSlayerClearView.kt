@@ -44,10 +44,11 @@ object BlazeSlayerClearView {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityFireball>) {
-        if (!isEnabled()) return
-        event.cancel()
+        if (isEnabled()) {
+            event.cancel()
+        }
     }
 
     private fun isEnabled(): Boolean {

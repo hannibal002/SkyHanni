@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
@@ -30,8 +31,9 @@ object AshfangHider {
         event.cancel()
     }
 
-    @HandleEvent(priority = HandleEvent.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH, onlyOnIsland = IslandType.CRIMSON_ISLE)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
+        if (!AshfangManager.active || !config.particles) return
         if (event.entity.inventory.any { it?.name == "Glowstone" }) event.cancel()
     }
 
