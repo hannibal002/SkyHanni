@@ -2,12 +2,15 @@ package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.mixins.hooks.getValue
+import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
@@ -24,6 +27,21 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         listeners.any { it.options.receiveCancelled }
     )
 
+    companion object {
+        private var eventHandlerDepth by object : ThreadLocal<Int>() {
+            override fun initialValue():Int {
+                return 0
+            }
+        }
+
+        /**
+         * Returns true if the current thread is in an event handler. This is because the event handler catches exceptions which means
+         * that we are free to throw exceptions in the event handler without crashing the game.
+         * We also return true if we are in a dev environment to alert the developer of any errors effectively.
+         */
+        val isInEventHandler get() = eventHandlerDepth > 0 || PlatformUtils.isDevEnvironment
+    }
+
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
         invokeCount++
         if (this.listeners.isEmpty()) return false
@@ -32,6 +50,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
         var errors = 0
 
+        eventHandlerDepth++
         for (listener in listeners) {
             if (!shouldInvoke(event, listener)) continue
             try {
@@ -48,6 +67,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             }
             if (event.isCancelled && !canReceiveCancelled) break
         }
+        eventHandlerDepth--
 
         if (errors > 3) {
             val hiddenErrors = errors - 3
