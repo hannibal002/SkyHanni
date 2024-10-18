@@ -238,7 +238,8 @@ class ConfigManager {
             val unit = file.parentFile.resolve("$fileName.json.write")
             unit.createNewFile()
             BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
-                writer.write(gson.toJson(data))
+                if (fileName == "dungeon_replays") writer.write(GsonBuilder().create().toJson(data)) else
+                    writer.write(gson.toJson(data))
             }
             // Perform move — which is atomic, unlike writing — after writing is done.
             move(unit, file, reason)

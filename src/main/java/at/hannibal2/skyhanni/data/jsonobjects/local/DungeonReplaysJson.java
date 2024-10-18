@@ -15,7 +15,4 @@ public class DungeonReplaysJson {
 
     @Expose
     public DungeonGhostData floorMaster7 = new DungeonGhostData();
-
-    @Expose
-    public Boolean test = false;
 }

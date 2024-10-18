@@ -10,11 +10,10 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.google.gson.annotations.Expose
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
@@ -23,17 +22,15 @@ import java.util.UUID
 @SkyHanniModule
 object PlayerBossReplay {
     private var recording = false
-    private var recordedPositions = mutableListOf<RecordedPosition>()
-
-    private var currentRun: List<RecordedPosition>? = null
+    private var recordedPositions = mutableListOf<RecordedPositionDelta>()
 
     private var recordedTime = SimpleTimeMark.farPast()
 
     private var playing = false
     private var playIndex = 0
 
-    private var bestRun: List<RecordedPosition> = listOf()
-    private var bestRunTime: Long = Long.MAX_VALUE
+    private var currentRun: DungeonGhostData? = null
+    private var bestRun = DungeonGhostData()
 
     private val player get() = Minecraft.getMinecraft().thePlayer
 
@@ -50,31 +47,32 @@ object PlayerBossReplay {
             val isSneaking = player.isSneaking
             val isRiding = player.isRiding
             val heldItem = player.heldItem
+            val isHoldingItem = player.heldItem != null
             val swingProgress = player.swingProgress
             val isUsingItem = player.itemInUseCount > 0
             val isEating = player.isEating
-            player.isEating
 
-            recordedPositions.add(
-                RecordedPosition(
-                    position,
-                    yaw,
-                    pitch,
-                    limbSwing,
-                    limbSwingAmount,
-                    swingProgress,
-                    heldItem.getInternalName(),
-                    heldItem.isEnchanted(),
-                    isUsingItem,
-                    isEating,
-                    isSneaking,
-                    isRiding
-                ),
+            val previousPosition = RecordedPositionDelta.getComplete(recordedPositions, recordedPositions.size - 1)
+            val newPosition = RecordedPositionDelta(
+                if (previousPosition.position != position) position else null,
+                if (previousPosition.yaw != yaw) yaw else null,
+                if (previousPosition.pitch != pitch) pitch else null,
+                if (previousPosition.limbSwing != limbSwing) limbSwing else null,
+                if (previousPosition.limbSwingAmount != limbSwingAmount) limbSwingAmount else null,
+                if (previousPosition.swingProgress != swingProgress) swingProgress else null,
+                if (previousPosition.heldItemID != heldItem?.getInternalNameOrNull()) heldItem?.getInternalNameOrNull() else null,
+                if (previousPosition.itemEnchanted != heldItem?.isItemEnchanted) heldItem?.isItemEnchanted else null,
+                if (previousPosition.isHoldingItem != isHoldingItem) isHoldingItem else null,
+                if (previousPosition.isUsingItem != isUsingItem) isUsingItem else null,
+                if (previousPosition.isEating != isEating) isEating else null,
+                if (previousPosition.isSneaking != isSneaking) isSneaking else null,
+                if (previousPosition.isRiding != isRiding) isRiding else null
             )
+            recordedPositions.add(newPosition)
         }
         if (playing) {
             playIndex += 1
-            if (playIndex > (currentRun?.size ?: 0)) {
+            if (playIndex > (currentRun?.recordedPositions?.size ?: 0)) {
                 playIndex = 0
             }
         }
@@ -85,7 +83,7 @@ object PlayerBossReplay {
         if (DungeonAPI.dungeonFloor?.contains("3") == false) return
 
         startRecording()
-        if (bestRun.isNotEmpty()) {
+        if (bestRun.recordedPositions.isNotEmpty()) {
             currentRun = bestRun
             playIndex = 0
             playing = true
@@ -109,8 +107,7 @@ object PlayerBossReplay {
                 recording = false
                 recordedPositions.clear()
                 recordedTime = SimpleTimeMark.farPast()
-                bestRunTime = Long.MAX_VALUE
-                bestRun = listOf()
+                bestRun = DungeonGhostData()
                 ChatUtils.chat("cleared!")
                 return
             }
@@ -119,6 +116,11 @@ object PlayerBossReplay {
                 playIndex = 0
                 playing = true
                 ChatUtils.chat("playing")
+                return
+            }
+            strings.any { it.contains("stop", ignoreCase = true) } -> {
+                playing = false
+                ChatUtils.chat("stopped")
                 return
             }
             else -> {
@@ -146,35 +148,34 @@ object PlayerBossReplay {
         recordedTime = SimpleTimeMark.farPast()
     }
 
-    private fun attemptSave(positions: List<RecordedPosition>, time: Long, type: String?) {
+    private fun attemptSave(positions: List<RecordedPositionDelta>, time: Long, type: String?) {
         ChatUtils.chat("time: $time")
-        ChatUtils.chat("pb: $bestRunTime")
+        ChatUtils.chat("pb: ${bestRun.time}")
         ChatUtils.chat("position size: ${positions.size}")
-        if (time < bestRunTime) {
+        if (time < bestRun.time) {
             ChatUtils.chat("new pb! trying to save to '$type'")
-            SkyHanniMod.dungeonReplayData.test = false
-            SkyHanniMod.configManager.saveConfig(ConfigFileType.DUNGEON_REPLAY, "reset test boolean")
-            ChatUtils.chat("resetting test")
+            val ghostData = DungeonGhostData(positions, time, player.gameProfile.id)
             when (type) {
                 "manual" -> {
-                    ChatUtils.chat("manual save")
-                    OSUtils.copyToClipboard(DungeonGhostData(positions, time, player.gameProfile).toString())
-                    SkyHanniMod.dungeonReplayData.manual = DungeonGhostData(positions, time, player.gameProfile)
-                    SkyHanniMod.dungeonReplayData.test = true
+                    SkyHanniMod.dungeonReplayData.manual = ghostData
                 }
                 "F3" -> {
-                    SkyHanniMod.dungeonReplayData.floor3 = DungeonGhostData(positions, time, player.gameProfile)
+                    SkyHanniMod.dungeonReplayData.floor3 = ghostData
                 }
                 "F7" -> {
-                    SkyHanniMod.dungeonReplayData.floor7 = DungeonGhostData(positions, time, player.gameProfile)
+                    SkyHanniMod.dungeonReplayData.floor7 = ghostData
                 }
                 "M7" -> {
-                    SkyHanniMod.dungeonReplayData.floorMaster7 = DungeonGhostData(positions, time, player.gameProfile)
+                    SkyHanniMod.dungeonReplayData.floorMaster7 = ghostData
                 }
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.DUNGEON_REPLAY, "Updated Dungeon Replays")
-            bestRunTime = time
-            bestRun = positions.map { it.copy() }
+            bestRun = bestRun.copy(
+                recordedPositions = positions.map { it.copy() },
+                time = time,
+                playerUUID = player.gameProfile.id,
+                playerName = player.gameProfile.name
+            )
         }
     }
 
@@ -182,16 +183,18 @@ object PlayerBossReplay {
     fun onRender(event: LorenzRenderWorldEvent) {
         if (!playing) return
         if (currentRun == null) return
-        currentRun.let {
-            if (it != null) {
-                HolographicPlayerReplay.renderHolographicPlayer(event, it, player.gameProfile, playIndex)
-            }
-        }
+
+        val recordedPosition = RecordedPositionDelta.getComplete(currentRun?.recordedPositions ?: listOf(), playIndex)
+        val previousPosition = RecordedPositionDelta.getComplete(currentRun?.recordedPositions ?: listOf(), playIndex - 1)
+        val gameProfile = GameProfile(currentRun?.playerUUID, currentRun?.playerName)
+
+        HolographicPlayerReplay.renderHolographicPlayer(event, recordedPosition, previousPosition, playIndex, gameProfile)
     }
 }
 
 data class DungeonGhostData(
-    val recordedPositions: List<RecordedPosition> = listOf(),
-    val time: Long = Long.MAX_VALUE,
-    val gameProfile: GameProfile = GameProfile(UUID.fromString("49f4c15d-14e0-4d75-be1b-9c1b85bad53c"), "martimavocado")
+    @Expose val recordedPositions: List<RecordedPositionDelta> = listOf(),
+    @Expose val time: Long = Long.MAX_VALUE,
+    @Expose val playerUUID: UUID = UUID.fromString("49f4c15d-14e0-4d75-be1b-9c1b85bad53c"),
+    @Expose val playerName: String = "martimavocado"
 )

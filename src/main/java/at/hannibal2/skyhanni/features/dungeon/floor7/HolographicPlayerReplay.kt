@@ -5,14 +5,13 @@ import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicEntity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
-import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.google.gson.annotations.Expose
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -38,30 +37,22 @@ import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.pipeline.LightUtil
 import org.lwjgl.opengl.GL11
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HolographicPlayerReplay {
     private val mc get() = Minecraft.getMinecraft()
     private val config get() = SkyHanniMod.feature.dev
 
-    private var errorCooldown = SimpleTimeMark.farPast()
-
-    fun renderHolographicPlayer(event: LorenzRenderWorldEvent, replay: List<RecordedPosition>, gameProfile: GameProfile, playIndex: Int) {
-        if (playIndex > replay.size && errorCooldown.passedSince() > 5.seconds) {
-            errorCooldown = SimpleTimeMark.now()
-            ChatUtils.debug("Invalid index on HolographicPlayer: $playIndex")
-            return
-        }
+    fun renderHolographicPlayer(
+        event: LorenzRenderWorldEvent,
+        position: RecordedPosition,
+        previousPosition: RecordedPosition,
+        index: Int,
+        gameProfile: GameProfile
+    ) {
         val fakePlayer = EntityOtherPlayerMP(null, gameProfile)
 
-        val index = playIndex.coerceIn(replay.indices)
-        val previousIndex = (playIndex - 1).coerceIn(replay.indices)
-
-        val recordedPosition = replay[index]
-        val previousPosition = replay[previousIndex]
-
-        val interpolatedData = interpolateRecordedPosition(previousPosition, recordedPosition, event.partialTicks)
+        val interpolatedData = interpolateRecordedPosition(previousPosition, position, event.partialTicks)
 
         fakePlayer.isEating = interpolatedData.isEating
         val holographicPlayer = HolographicEntities.HolographicBase(fakePlayer)
@@ -76,7 +67,7 @@ object HolographicPlayerReplay {
             event.partialTicks,
             interpolatedData,
             fakePlayer,
-            playIndex
+            index
         )
     }
 
@@ -96,6 +87,7 @@ object HolographicPlayerReplay {
             interpolatedSwingProgress,
             last.heldItemID,
             last.itemEnchanted,
+            last.isHoldingItem,
             last.isUsingItem,
             last.isEating,
             last.isSneaking,
@@ -132,7 +124,7 @@ object HolographicPlayerReplay {
         fakePlayer: EntityOtherPlayerMP,
         playIndex: Int
     ) {
-        val item = recordedPosition.heldItemID?.getItemStack()
+        val item = if (!recordedPosition.isHoldingItem) null else recordedPosition.heldItemID?.getItemStack()
         if (recordedPosition.itemEnchanted && item != null) {
             item.addEnchantment(Enchantment.infinity, 1)
         }
@@ -175,11 +167,11 @@ object HolographicPlayerReplay {
         val offset = 0.1f
         GlStateManager.translate(0f, offset, 0f)
 
-        if ((ContributorManager.shouldBeUpsideDown(fakePlayer.name) || fakePlayer.name == "martimavocado") && config.flipContributors) {
+        if ((ContributorManager.shouldBeUpsideDown(fakePlayer.name)) && config.flipContributors) {
             GlStateManager.rotate(180f, 0f, 0f, 1f)
             GlStateManager.translate(0f, -0.8f, 0f)
         }
-        if ((ContributorManager.shouldSpin(fakePlayer.name) || fakePlayer.name == "martimavocado") && config.rotateContributors) {
+        if ((ContributorManager.shouldSpin(fakePlayer.name)) && config.rotateContributors) {
             val rotation = ((playIndex % 90) * 4).toFloat()
             GlStateManager.rotate(rotation, 0f, 1f, 0f)
         }
@@ -356,19 +348,96 @@ object HolographicPlayerReplay {
             ++i
         }
     }
+
+    data class RecordedPosition(
+        val position: LorenzVec,
+        @Expose val yaw: Float,
+        @Expose val pitch: Float,
+        @Expose val limbSwing: Float,
+        @Expose val limbSwingAmount: Float,
+        @Expose val swingProgress: Float,
+        @Expose val heldItemID: NEUInternalName?,
+        @Expose val itemEnchanted: Boolean,
+        @Expose val isHoldingItem: Boolean,
+        @Expose val isUsingItem: Boolean,
+        @Expose val isEating: Boolean,
+        @Expose val isSneaking: Boolean,
+        @Expose val isRiding: Boolean
+    )
 }
 
-data class RecordedPosition(
-    val position: LorenzVec,
-    val yaw: Float,
-    val pitch: Float,
-    val limbSwing: Float,
-    val limbSwingAmount: Float,
-    val swingProgress: Float,
-    val heldItemID: NEUInternalName?,
-    val itemEnchanted: Boolean,
-    val isUsingItem: Boolean,
-    val isEating: Boolean,
-    val isSneaking: Boolean,
-    val isRiding: Boolean
-)
+data class RecordedPositionDelta(
+    @Expose val position: LorenzVec? = null,
+    @Expose val yaw: Float? = null,
+    @Expose val pitch: Float? = null,
+    @Expose val limbSwing: Float? = null,
+    @Expose val limbSwingAmount: Float? = null,
+    @Expose val swingProgress: Float? = null,
+    @Expose val heldItemID: NEUInternalName? = null,
+    @Expose val itemEnchanted: Boolean? = null,
+    @Expose val isHoldingItem: Boolean? = null,
+    @Expose val isUsingItem: Boolean? = null,
+    @Expose val isEating: Boolean? = null,
+    @Expose val isSneaking: Boolean? = null,
+    @Expose val isRiding: Boolean? = null
+) {
+    companion object {
+        fun getComplete(positions: List<RecordedPositionDelta>, index: Int): HolographicPlayerReplay.RecordedPosition {
+            var incompletePositions = RecordedPositionDelta()
+
+            for (i in index - 1 downTo 0) {
+                val position = positions[i]
+
+                incompletePositions = incompletePositions.copy(
+                    position = incompletePositions.position ?: position.position,
+                    yaw = incompletePositions.yaw ?: position.yaw,
+                    pitch = incompletePositions.pitch ?: position.pitch,
+                    limbSwing = incompletePositions.limbSwing ?: position.limbSwing,
+                    limbSwingAmount = incompletePositions.limbSwingAmount ?: position.limbSwingAmount,
+                    swingProgress = incompletePositions.swingProgress ?: position.swingProgress,
+                    heldItemID = incompletePositions.heldItemID ?: position.heldItemID,
+                    itemEnchanted = incompletePositions.itemEnchanted ?: position.itemEnchanted,
+                    isHoldingItem = incompletePositions.isHoldingItem ?: position.isHoldingItem,
+                    isUsingItem = incompletePositions.isUsingItem ?: position.isUsingItem,
+                    isEating = incompletePositions.isEating ?: position.isEating,
+                    isSneaking = incompletePositions.isSneaking ?: position.isSneaking,
+                    isRiding = incompletePositions.isRiding ?: position.isRiding
+                )
+
+                if (incompletePositions.isComplete()) break
+            }
+
+            return HolographicPlayerReplay.RecordedPosition(
+                incompletePositions.position ?: LorenzVec(),
+                incompletePositions.yaw ?: 0f,
+                incompletePositions.pitch ?: 0f,
+                incompletePositions.limbSwing ?: 0f,
+                incompletePositions.limbSwingAmount ?: 0f,
+                incompletePositions.swingProgress ?: 0f,
+                incompletePositions.heldItemID,
+                incompletePositions.itemEnchanted ?: false,
+                incompletePositions.isHoldingItem ?: false,
+                incompletePositions.isUsingItem ?: false,
+                incompletePositions.isEating ?: false,
+                incompletePositions.isSneaking ?: false,
+                incompletePositions.isRiding ?: false
+            )
+        }
+
+        private fun RecordedPositionDelta.isComplete(): Boolean {
+            return position != null &&
+                yaw != null &&
+                pitch != null &&
+                limbSwing != null &&
+                limbSwingAmount != null &&
+                swingProgress != null &&
+                heldItemID != null &&
+                itemEnchanted != null &&
+                isUsingItem != null &&
+                isEating != null &&
+                isSneaking != null &&
+                isRiding != null
+        }
+    }
+}
+
