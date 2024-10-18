@@ -37,6 +37,7 @@ import net.minecraft.client.gui.GuiIngameMenu
 import net.minecraft.client.gui.inventory.GuiEditSign
 import net.minecraft.client.gui.inventory.GuiInventory.drawEntityOnScreen
 import net.minecraft.client.renderer.GlStateManager
+import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.item.ItemStack
 import net.minecraft.util.ResourceLocation
@@ -1364,7 +1365,7 @@ interface Renderable {
         }
 
         fun fakePlayer(
-            player: EntityPlayer,
+            player: EntityLivingBase,
             followMouse: Boolean = false,
             eyesX: Float = 0f,
             eyesY: Float = 0f,

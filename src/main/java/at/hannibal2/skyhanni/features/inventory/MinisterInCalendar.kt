@@ -3,9 +3,11 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI
+import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.features.gui.electionviewer.CurrentMayorScreen
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
@@ -81,6 +83,17 @@ object MinisterInCalendar {
         }
 
         return item.setLore(ministerLore).setStackDisplayName(ministerDisplayName)
+    }
+
+    @SubscribeEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
+        if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
+
+        if (event.slotId in listOf(37, 38)) {
+            event.cancel()
+
+            SkyHanniMod.screenToOpen = CurrentMayorScreen
+        }
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && SkyHanniMod.feature.inventory.ministerInCalendar
