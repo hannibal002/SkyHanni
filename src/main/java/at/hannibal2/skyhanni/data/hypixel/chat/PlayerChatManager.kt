@@ -205,11 +205,13 @@ object PlayerChatManager {
 
     private fun sendSystemMessage(event: LorenzChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
+            postAndCatch()
             event.handleChat(blockedReason, chatComponent)
         }
     }
 
     private fun AbstractChatEvent.postChat(event: LorenzChatEvent) {
+        postAndCatch()
         event.handleChat(blockedReason, chatComponent)
     }
 
