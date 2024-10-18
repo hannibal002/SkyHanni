@@ -123,7 +123,7 @@ object DungeonAPI {
         val message = rawMessage.removeColor()
         val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
         if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
-            DungeonBossRoomEnterEvent().postAndCatch()
+            DungeonBossRoomEnterEvent.post()
             inBossRoom = true
         }
     }

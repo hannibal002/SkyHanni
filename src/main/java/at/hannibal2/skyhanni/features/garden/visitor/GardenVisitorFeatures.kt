@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.garden.visitor.VisitorConfig.HighlightMode
 import at.hannibal2.skyhanni.data.IslandType
@@ -336,7 +337,7 @@ object GardenVisitorFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackUpdate(event: SackDataUpdateEvent) {
         update()
     }

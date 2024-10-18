@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
@@ -69,7 +70,7 @@ object SlayerAPI {
             add("activeSlayer: $activeSlayer")
             add("isInCorrectArea: $isInCorrectArea")
             add("isInAnyArea: $isInAnyArea")
-            add("latestSlayerProgress: $latestSlayerProgress")
+            add("latestSlayerProgress: ${latestSlayerProgress.removeColor()}")
         }
     }
 
@@ -82,7 +83,7 @@ object SlayerAPI {
         }
 
         if (event.message == "  §r§a§lSLAYER QUEST COMPLETE!") {
-            SlayerQuestCompleteEvent().postAndCatch()
+            SlayerQuestCompleteEvent.post()
         }
     }
 
