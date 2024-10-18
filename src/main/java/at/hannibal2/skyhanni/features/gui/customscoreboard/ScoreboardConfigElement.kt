@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementChunkedStats
@@ -79,6 +80,7 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     EMPTY_LINE8(ScoreboardElementEmptyLine),
     EMPTY_LINE9(ScoreboardElementEmptyLine),
     EMPTY_LINE10(ScoreboardElementEmptyLine),
+    CUSTOM_LINE1(ScoreboardElementCustomLine),
     ;
 
     override fun toString() = element.configLine
