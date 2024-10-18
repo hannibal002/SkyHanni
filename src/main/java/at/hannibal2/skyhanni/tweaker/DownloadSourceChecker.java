@@ -82,7 +82,7 @@ public class DownloadSourceChecker {
 
         // Compile the regex pattern for matching an empty host
         Pattern pattern = Pattern.compile("https:\\/\\/.*.com\\/$|about:internet");
-        Matcher matcher = pattern.matcher(host.getHost());
+        Matcher matcher = pattern.matcher(uriToSimpleString(host));
 
         // Check if the host is empty (Brave is cutting everything past .com/ from the host)
         String cutHostMessage = "";
