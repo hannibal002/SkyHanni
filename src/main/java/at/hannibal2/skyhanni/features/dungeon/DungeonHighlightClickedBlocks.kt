@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ExtendedChatColor
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
@@ -35,6 +36,12 @@ object DungeonHighlightClickedBlocks {
         "locked",
         "§cThat chest is locked!",
     )
+
+    private const val WATER_ROOM_ID = "-60,-60"
+
+    private val inWaterRoom by RecalculatingValue<Boolean>(1.seconds) {
+        DungeonAPI.getRoomID() == WATER_ROOM_ID
+    }
 
     private val blocks = TimeLimitedCache<LorenzVec, ClickedBlock>(3.seconds)
     private var colorIndex = 0
@@ -70,8 +77,7 @@ object DungeonHighlightClickedBlocks {
     @HandleEvent
     fun onDungeonClickedBlock(event: DungeonBlockClickEvent) {
         if (!isEnabled()) return
-        val isWaterRoom = DungeonAPI.getRoomID() == "-60,-60"
-        if (isWaterRoom && event.blockType == ClickedBlockType.LEVER) return
+        if (inWaterRoom && event.blockType == ClickedBlockType.LEVER) return
 
         val type = event.blockType
 
@@ -107,9 +113,9 @@ object DungeonHighlightClickedBlocks {
         event.move(56, "dungeon.highlightClickedBlocks", "dungeon.clickedBlocks.enabled")
     }
 
-    class ClickedBlock(val displayText: String, var color: Color)
-    class BlockProperties(val name: String, val color: String)
+    private data class ClickedBlock(val displayText: String, var color: Color)
+    private data class BlockProperties(val name: String, val color: String)
 
-    fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
+    private fun isEnabled() = !DungeonAPI.inBossRoom && DungeonAPI.inDungeon() && config.enabled
 
 }
