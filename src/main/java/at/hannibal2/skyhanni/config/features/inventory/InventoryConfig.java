@@ -140,6 +140,11 @@ public class InventoryConfig {
     public MagicalPowerConfig magicalPower = new MagicalPowerConfig();
 
     @Expose
+    @ConfigOption(name = "Attribute Overlay", desc = "")
+    @Accordion
+    public AttributeOverlayConfig attributeOverlay = new AttributeOverlayConfig();
+
+    @Expose
     @ConfigOption(name = "Item Number", desc = "Showing the item number as a stack size for these items.")
     @ConfigEditorDraggableList
     public List<ItemNumberEntry> itemNumberAsStackSize = new ArrayList<>(Arrays.asList(

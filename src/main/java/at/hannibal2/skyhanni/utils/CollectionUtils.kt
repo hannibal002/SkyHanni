@@ -258,6 +258,13 @@ object CollectionUtils {
     @Suppress("UNCHECKED_CAST")
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
 
+
+    fun <T> List<T>.toPair(): Pair<T, T>? = if (size == 2) this[0] to this[1] else null
+
+    fun <T> Pair<T, T>.equalsIgnoreOrder(other: Pair<T, T>): Boolean = toSet() == other.toSet()
+
+    fun <T> Pair<T, T>.toSet(): Set<T> = setOf(first, second)
+
     // TODO add cache
     fun MutableList<Renderable>.addString(
         text: String,
