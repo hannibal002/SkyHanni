@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
@@ -230,72 +231,71 @@ object PetAPI {
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
 
-        var newPetLine: String? = null
-        for (line in event.lines) {
-            if (petWidgetPattern.matches(line)) {
-                newPetLine = line.removePrefix(" ")
-                break
-            }
-        }
-        if (newPetLine == pet?.rawPetName || newPetLine == null) return
+        val newPetLine = petWidgetPattern.firstMatches(event.lines)?.trim() ?: return
+        if (newPetLine == pet?.rawPetName) return
 
-        var petItem = NEUInternalName.NONE
-        var petXP: Double? = null
+        var newPetData = PetData()
+        var overflowXP = 0.0
         event.lines.forEach { line ->
             val tempPetItem = handleWidgetStringLine(line)
-            if (tempPetItem != NEUInternalName.NONE) {
-                petItem = tempPetItem
+            if (tempPetItem != null) {
+                newPetData = newPetData.copy(petItem = tempPetItem)
                 return@forEach
             }
+
             val tempPetXP = handleWidgetXPLine(line)
             if (tempPetXP != null) {
-                petXP = tempPetXP
+                overflowXP = tempPetXP
+                return@forEach
+            }
+
+            val tempPetMisc = handleWidgetPetLine(line, newPetLine)
+            if (tempPetMisc != null) {
+                newPetData = newPetData.copy(
+                    internalName = tempPetMisc.internalName,
+                    cleanName = tempPetMisc.cleanName,
+                    rarity = tempPetMisc.rarity,
+                    level = tempPetMisc.level,
+                    xp = tempPetMisc.xp,
+                    rawPetName = tempPetMisc.rawPetName,
+                )
                 return@forEach
             }
         }
-
-        event.lines.forEach { line ->
-            if (handleWidgetPetLine(line, petItem, petXP, newPetLine)) return@forEach
-        }
+        fireEvent(newPetData.copy(xp = newPetData.xp + overflowXP))
     }
 
-    private fun handleWidgetPetLine(line: String, petItem: NEUInternalName, petXP: Double?, newPetLine: String): Boolean {
-        val xpOverLevel = petXP ?: 0.0
+    private fun handleWidgetPetLine(line: String, newPetLine: String): PetData? {
         petWidgetPattern.matchMatcher(line) {
-            val xp = (levelToXP(
-                group("level").toInt(),
-                LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE,
-                group("name")
-            ))
-            val petName = group("name")
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
+            val petName = group("name")
+            val level = group("level").toInt()
+            val xp = levelToXP(level, rarity, petName) ?: return null
 
-            val newPet = PetData(
+            return PetData(
                 petNameToInternalName(petName, rarity),
                 petName,
                 rarity,
-                petItem,
-                group("level").toInt(),
-                (xp?.plus(xpOverLevel)) ?: 0.0,
+                null,
+                level,
+                xp,
                 newPetLine,
             )
-            fireEvent(newPet)
-            return true
         }
-        return false
+        return null
     }
 
-    private fun handleWidgetStringLine(line: String): NEUInternalName {
+    private fun handleWidgetStringLine(line: String): NEUInternalName? {
         widgetStringPattern.matchMatcher(line) {
             val string = group("string")
             if (string == "No pet selected") {
                 PetChangeEvent(pet, null).post()
                 pet = null
-                return NEUInternalName.NONE
+                return null
             }
             return NEUInternalName.fromItemNameOrNull(string) ?: NEUInternalName.NONE
         }
-        return NEUInternalName.NONE
+        return null
     }
 
     private fun handleWidgetXPLine(line: String): Double? {
@@ -313,11 +313,7 @@ object PetAPI {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (autopetMessagePattern.matches(event.message)) {
-            val hoverMessage = buildList {
-                event.chatComponent.hover?.siblings?.forEach {
-                    add(it.formattedText)
-                }
-            }.toString().split("\n")
+            val hoverMessage = event.chatComponent.hover?.siblings?.joinToString("")?.split("\n") ?: return
 
             var petItem = NEUInternalName.NONE
             for (it in hoverMessage) {
@@ -368,10 +364,9 @@ object PetAPI {
     }
 
     private fun handleAutopetItemMessage(string: String): NEUInternalName? {
-        autopetHoverPetItemPattern.matchMatcher(string) {
-            return NEUInternalName.fromItemNameOrNull(group("item"))
+        return autopetHoverPetItemPattern.matchMatcher(string) {
+            NEUInternalName.fromItemNameOrNull(group("item"))
         }
-        return null
     }
 
     @SubscribeEvent
@@ -426,7 +421,7 @@ object PetAPI {
             petItem,
             level,
             petXP,
-            "§r§7[Lvl $level] §r${rarity.chatColorCode}$internalName${if (skin != "") "§r${skin}" else ""}",
+            "§r§7[Lvl $level] §r${rarity.chatColorCode}$name${if (skin != "") "§r${skin}" else ""}",
         )
         fireEvent(newPet)
     }
@@ -489,14 +484,14 @@ object PetAPI {
             val petName = input.slice(2..<input.size).joinToString(" ")
             if (level != null && rarity != null) {
                 val xp: Double = levelToXP(level, rarity, petName) ?: run {
-                    ChatUtils.userError("bad input. invalid rarity or level")
+                    ChatUtils.userError("Invalid level or rarity.")
                     return
                 }
                 ChatUtils.chat(xp.addSeparators())
                 return
             }
         }
-        ChatUtils.userError("bad usage. /shcalcpetxp <level> <rarity> <pet>")
+        ChatUtils.userError("Invalid Usage. /shcalcpetxp <level> <rarity> <pet>")
     }
 
     private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String = ""): Double? {
@@ -531,7 +526,7 @@ object PetAPI {
                 LorenzRarity.LEGENDARY -> 20
                 LorenzRarity.MYTHIC -> 20
                 else -> {
-                    ChatUtils.userError("bad rarity. ${rarity.name}")
+                    ChatUtils.userError("Invalid Rarity \"${rarity.name}\"")
                     null
                 }
             }
@@ -547,8 +542,8 @@ object PetAPI {
         pet = newPet
         if (newPet == oldPet) return
         if (SkyHanniMod.feature.dev.debug.petEventMessages) {
-            ChatUtils.debug(oldPet.toString().convertToUnformatted())
-            ChatUtils.debug(newPet.toString().convertToUnformatted())
+            ChatUtils.debug("oldPet: " + oldPet.toString().convertToUnformatted())
+            ChatUtils.debug("newPet: " + newPet.toString().convertToUnformatted())
         }
         PetChangeEvent(oldPet, newPet).post()
     }
@@ -585,15 +580,8 @@ object PetAPI {
     }
 
     private fun petNameToFakeInternalName(petName: String): String {
-        var fakeInternalName: String? = null
-        for ((internalName, name) in customDisplayToInternalName) {
-            if (petName == name) {
-                fakeInternalName = internalName.asString()
-                break
-            }
-        }
-        if (fakeInternalName == null) fakeInternalName = petName.uppercase().replace(" ", "_")
-        return fakeInternalName
+        return customDisplayToInternalName.entries.find { it.value == petName }?.key?.asString()
+            ?: petName.uppercase().replace(" ", "_")
     }
 
     private fun petNameToInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
