@@ -156,8 +156,7 @@ object EntityUtils {
     fun EntityPlayer.isNPC() = !isRealPlayer()
 
     fun EntityLivingBase.hasPotionEffect(
-        potion:
-        //#if MC <1.21
+        potion: //#if MC <1.21
         Potion,
         //#else
         //$$ net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>
@@ -191,7 +190,7 @@ object EntityUtils {
         if (Minecraft.getMinecraft().isCallingFromMinecraftThread) it else it.toMutableList()
     }?.asSequence()?.filterNotNull() ?: emptySequence()
 
-    fun Entity.canBeSeen(radius: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(radius.toDouble())
+    fun Entity.canBeSeen(viewDistance: Number = 150.0) = getLorenzVec().up(0.5).canBeSeen(viewDistance)
 
     fun getEntityByID(entityId: Int) = Minecraft.getMinecraft()?.thePlayer?.entityWorld?.getEntityByID(entityId)
 
@@ -199,8 +198,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPre(
-        event:
-        //#if MC < 1.14
+        event: //#if MC < 1.14
         RenderLivingEvent.Pre<*>,
         //#else
         //$$ RenderLivingEvent.Pre<*, *>
@@ -215,8 +213,7 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPost(
-        event:
-        //#if MC < 11400
+        event: //#if MC < 11400
         RenderLivingEvent.Post<*>,
         //#else
         //$$ RenderLivingEvent.Post<*, *>
