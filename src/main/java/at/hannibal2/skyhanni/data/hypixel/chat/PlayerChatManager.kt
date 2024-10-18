@@ -205,13 +205,11 @@ object PlayerChatManager {
 
     private fun sendSystemMessage(event: LorenzChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
-            val cancelled = postAndCatch()
             event.handleChat(blockedReason, chatComponent)
         }
     }
 
     private fun AbstractChatEvent.postChat(event: LorenzChatEvent) {
-        val cancelled = postAndCatch()
         event.handleChat(blockedReason, chatComponent)
     }
 
