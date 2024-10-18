@@ -23,6 +23,7 @@ public class EventsConfig {
 
     @ConfigOption(name = "Reset Events Priority", desc = "Reset the priority of all events.")
     @ConfigEditorButton(buttonText = "Reset")
+    // TODO move into kotlin
     public Runnable reset = () -> {
         eventEntries.get().clear();
         eventEntries.get().addAll(ScoreboardConfigEventElement.defaultOption);

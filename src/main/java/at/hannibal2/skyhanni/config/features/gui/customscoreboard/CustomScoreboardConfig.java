@@ -31,8 +31,8 @@ public class CustomScoreboardConfig {
         name = "Appearance",
         desc = "Drag text to change the appearance of the advanced scoreboard."
     )
-    @ConfigEditorDraggableList()
-    public Property<List<ScoreboardConfigElement>> scoreboardEntries = Property.of(new ArrayList<>(ScoreboardConfigElement.defaultOption));
+    @ConfigEditorDraggableList
+    public Property<List<ScoreboardConfigElement>> scoreboardEntries = Property.of(new ArrayList<>(ScoreboardConfigElement.defaultOptions));
 
     @ConfigOption(name = "Reset Appearance", desc = "Reset the appearance of the advanced scoreboard.")
     @ConfigEditorButton(buttonText = "Reset")
