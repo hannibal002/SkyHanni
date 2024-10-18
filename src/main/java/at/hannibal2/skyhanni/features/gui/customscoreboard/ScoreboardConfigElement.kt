@@ -35,6 +35,7 @@ import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardEl
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementUnknown
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementVisiting
 
+// TODO once the config can support dynamic lists, remove this enum
 enum class ScoreboardConfigElement(val element: ScoreboardElement) {
     TITLE(ScoreboardElementTitle),
     PROFILE(ScoreboardElementProfile),
@@ -84,7 +85,7 @@ enum class ScoreboardConfigElement(val element: ScoreboardElement) {
 
     companion object {
         @JvmField
-        val defaultOption = listOf(
+        val defaultOptions = listOf(
             TITLE,
             PROFILE,
             PURSE,
