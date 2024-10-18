@@ -1,12 +1,8 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.features.misc.ContributorManager
 import at.hannibal2.skyhanni.mixins.transformers.AccessorRendererLivingEntity
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,6 +11,7 @@ import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicEntity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.client.model.ModelPlayer
@@ -31,161 +28,39 @@ import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.client.resources.model.IBakedModel
 import net.minecraft.entity.EntityLivingBase
+import net.minecraft.item.EnumAction
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumFacing
 import net.minecraft.util.ResourceLocation
 import net.minecraftforge.client.ForgeHooksClient
 import net.minecraftforge.client.model.pipeline.LightUtil
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object HolographicPlayerReplay {
-    val storage get() = ProfileStorageData.playerSpecific?.dungeonGhost
-
-    private var recording = false
-    private var recordedPositions = mutableListOf<RecordedPosition>()
-
-    private var currentRun: List<RecordedPosition>? = null
-
-    private var recordedTime = SimpleTimeMark.farPast()
-
-    private var playing = false
-    private var playIndex = 0
-
     private val mc get() = Minecraft.getMinecraft()
+    private val config get() = SkyHanniMod.feature.dev
 
-    @HandleEvent
-    fun onBossStart(event: DungeonBossRoomEnterEvent) {
-        if (DungeonAPI.dungeonFloor?.contains("3") == false) return
+    private var errorCooldown = SimpleTimeMark.farPast()
 
-        startRecording()
-        if (storage?.bestRun?.isNotEmpty() == true) {
-            currentRun = storage?.bestRun ?: run {
-                ChatUtils.chat("null storage")
-                return
-            }
-            playIndex = 0
-            playing = true
+    fun renderHolographicPlayer(event: LorenzRenderWorldEvent, replay: List<RecordedPosition>, gameProfile: GameProfile, playIndex: Int) {
+        if (playIndex > replay.size && errorCooldown.passedSince() > 5.seconds) {
+            errorCooldown = SimpleTimeMark.now()
+            ChatUtils.debug("Invalid index on HolographicPlayer: $playIndex")
+            return
         }
-    }
+        val fakePlayer = EntityOtherPlayerMP(null, gameProfile)
 
-    @SubscribeEvent
-    fun onBossEnd(event: DungeonCompleteEvent) {
-        if (DungeonAPI.dungeonFloor?.contains("3") == false) return
+        val index = playIndex.coerceIn(replay.indices)
+        val previousIndex = (playIndex - 1).coerceIn(replay.indices)
 
-        stopRecording()
-        if (playing) {
-            playing = false
-            playIndex = 0
-        }
-    }
-
-    fun command(strings: Array<String>) {
-        when {
-            strings.any { it.contains("clear", ignoreCase = true) } -> {
-                recording = false
-                recordedPositions.clear()
-                recordedTime = SimpleTimeMark.farPast()
-                storage?.bestTime = Long.MAX_VALUE
-                storage?.bestRun = listOf()
-                ChatUtils.chat("cleared!")
-                return
-            }
-            strings.any { it.contains("play", ignoreCase = true) } -> {
-                currentRun = storage?.bestRun ?: run {
-                    ChatUtils.chat("null storage")
-                    return
-                }
-                playIndex = 0
-                playing = true
-                ChatUtils.chat("playing")
-                return
-            }
-            else -> {
-                if (!recording) startRecording()
-                else stopRecording()
-                return
-            }
-        }
-    }
-
-    private fun startRecording() {
-        if (recording) return
-        ChatUtils.chat("recording")
-        recordedPositions.clear()
-        recordedTime = SimpleTimeMark.now()
-        recording = true
-    }
-
-    private fun stopRecording() {
-        if (!recording) return
-        ChatUtils.chat("stopped recording")
-        recording = false
-        attemptSave(recordedPositions, recordedTime.passedSince().inWholeMilliseconds)
-        recordedPositions.clear()
-        recordedTime = SimpleTimeMark.farPast()
-    }
-
-    private fun attemptSave(positions: List<RecordedPosition>, time: Long) {
-        ChatUtils.chat("time: $time")
-        ChatUtils.chat("pb: ${storage?.bestTime}")
-        if (time < (storage?.bestTime ?: Long.MAX_VALUE)) {
-            ChatUtils.chat("new pb!")
-            storage?.bestTime = time
-            storage?.bestRun = positions.map { it.copy() }
-        }
-    }
-
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (recording) {
-            val player = mc.thePlayer
-            val position = LorenzVec(player.posX, player.posY, player.posZ)
-            val rotation = player.rotationYaw
-            val pitch = player.rotationPitch
-            val limbSwing = player.limbSwing
-            val limbSwingAmount = player.limbSwingAmount
-            val isSneaking = player.isSneaking
-            val isRiding = player.isRiding
-            val heldItem = player.heldItem
-            val swingProgress = player.swingProgress
-
-            recordedPositions.add(
-                RecordedPosition(
-                    position,
-                    rotation,
-                    pitch,
-                    limbSwing,
-                    limbSwingAmount,
-                    isSneaking,
-                    isRiding,
-                    heldItem,
-                    swingProgress,
-                ),
-            )
-        }
-        if (playing) {
-            playIndex += 1
-        }
-    }
-
-    @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
-        if (!playing) return
-        if (currentRun == null || currentRun?.size == 0) return
-        val run = currentRun ?: return
-
-        val fakePlayer = EntityOtherPlayerMP(null, mc.thePlayer.gameProfile)
-
-        val index = playIndex.coerceIn(run.indices)
-        val previousIndex = (playIndex - 1).coerceIn(run.indices)
-
-        val recordedPosition = run[index]
-        val previousPosition = run[previousIndex]
+        val recordedPosition = replay[index]
+        val previousPosition = replay[previousIndex]
 
         val interpolatedData = interpolateRecordedPosition(previousPosition, recordedPosition, event.partialTicks)
 
+        fakePlayer.isEating = interpolatedData.isEating
         val holographicPlayer = HolographicEntities.HolographicBase(fakePlayer)
 
         val instance = holographicPlayer.instance(
@@ -198,6 +73,7 @@ object HolographicPlayerReplay {
             event.partialTicks,
             interpolatedData,
             fakePlayer,
+            playIndex
         )
     }
 
@@ -214,10 +90,12 @@ object HolographicPlayerReplay {
             interpolatedPitch,
             interpolatedLimbSwing,
             interpolatedLimbSwingAmount,
-            last.sneaking,
-            last.isRiding,
-            last.heldItem,
             interpolatedSwingProgress,
+            last.heldItem,
+            last.isUsingItem,
+            last.isEating,
+            last.isSneaking,
+            last.isRiding
         )
     }
 
@@ -248,7 +126,9 @@ object HolographicPlayerReplay {
         partialTicks: Float,
         recordedPosition: RecordedPosition,
         fakePlayer: EntityOtherPlayerMP,
+        playIndex: Int
     ) {
+        val item = recordedPosition.heldItem
         val renderManager = mc.renderManager
         val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(fakePlayer)
         renderer as RendererLivingEntity<T>
@@ -288,8 +168,26 @@ object HolographicPlayerReplay {
         val offset = 0.1f
         GlStateManager.translate(0f, offset, 0f)
 
-        newModel.isSneak = recordedPosition.sneaking
-        newModel.heldItemRight = if (recordedPosition.heldItem == null) 0 else 1
+        if ((ContributorManager.shouldBeUpsideDown(fakePlayer.name) || fakePlayer.name == "martimavocado") && config.flipContributors) {
+            GlStateManager.rotate(180f, 0f, 0f, 1f)
+            GlStateManager.translate(0f, -0.8f, 0f)
+        }
+        if ((ContributorManager.shouldSpin(fakePlayer.name) || fakePlayer.name == "martimavocado") && config.rotateContributors) {
+            val rotation = ((playIndex % 90) * 4).toFloat()
+            GlStateManager.rotate(rotation, 0f, 1f, 0f)
+        }
+
+        newModel.isSneak = recordedPosition.isSneaking
+        newModel.heldItemRight = if (item == null) 0 else 1
+        if (item != null && recordedPosition.isUsingItem) {
+            val action = item.itemUseAction
+            when (action) {
+                EnumAction.BOW -> newModel.aimedBow = true
+                EnumAction.BLOCK -> newModel.heldItemRight = 3
+                else -> newModel.heldItemRight = 1
+            }
+        }
+
         newModel.swingProgress = recordedPosition.swingProgress
         newModel.render(
             fakePlayer,
@@ -305,7 +203,20 @@ object HolographicPlayerReplay {
             GlStateManager.pushMatrix()
             GlStateManager.depthMask(true)
             GlStateManager.translate(-0.4f, 0.5f, 0f)
-            if (mc.renderItem.itemModelMesher.getItemModel(recordedPosition.heldItem).isGui3d) {
+            if (newModel.isSneak && !newModel.aimedBow) {
+                GlStateManager.translate(0.0f, 0.203125f, 0.0f)
+            }
+
+            if (newModel.aimedBow) {
+                GlStateManager.rotate(90f, -1f, 0f, 0f)
+                GlStateManager.translate(0.2f, 0.5f, -0.4f)
+            }
+            if (newModel.heldItemRight == 3) { //blocking sword
+                GlStateManager.rotate(25f, 0f, -1f, 0f)
+            }
+
+
+            if (mc.renderItem.itemModelMesher.getItemModel(item).isGui3d) {
                 GlStateManager.translate(0f, 0.1f, -0.075f)
                 GlStateManager.rotate(20f, -1f, 0f, 0f)
                 GlStateManager.scale(1.8f, 1.8f, 1.8f)
@@ -446,8 +357,10 @@ data class RecordedPosition(
     val pitch: Float,
     val limbSwing: Float,
     val limbSwingAmount: Float,
-    val sneaking: Boolean,
-    val isRiding: Boolean,
-    val heldItem: ItemStack?,
     val swingProgress: Float,
+    val heldItem: ItemStack?,
+    val isUsingItem: Boolean,
+    val isEating: Boolean,
+    val isSneaking: Boolean,
+    val isRiding: Boolean
 )

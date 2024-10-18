@@ -24,8 +24,7 @@ import at.hannibal2.skyhanni.features.commands.PartyChatCommands
 import at.hannibal2.skyhanni.features.commands.PartyCommands
 import at.hannibal2.skyhanni.features.commands.WikiManager
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker
-import at.hannibal2.skyhanni.features.dungeon.floor7.HolographicPlayerReplay
-
+import at.hannibal2.skyhanni.features.dungeon.floor7.PlayerBossReplay
 import at.hannibal2.skyhanni.features.dungeon.floor7.TerminalInfo
 import at.hannibal2.skyhanni.features.event.diana.AllBurrowsList
 import at.hannibal2.skyhanni.features.event.diana.BurrowWarpHelper
@@ -169,7 +168,7 @@ object Commands {
         }
         event.register("shrecord") {
             description = "Download the SkyHanni repo again"
-            callback { HolographicPlayerReplay.command(it) }
+            callback { PlayerBossReplay.command(it) }
         }
     }
 
