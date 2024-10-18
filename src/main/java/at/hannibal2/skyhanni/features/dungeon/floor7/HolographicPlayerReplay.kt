@@ -9,6 +9,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HolographicEntities
 import at.hannibal2.skyhanni.utils.HolographicEntities.HolographicEntity
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.getViewerPos
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.mojang.authlib.GameProfile
@@ -27,6 +29,7 @@ import net.minecraft.client.renderer.texture.TextureUtil
 import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats
 import net.minecraft.client.resources.model.IBakedModel
+import net.minecraft.enchantment.Enchantment
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.item.EnumAction
 import net.minecraft.item.ItemStack
@@ -91,7 +94,8 @@ object HolographicPlayerReplay {
             interpolatedLimbSwing,
             interpolatedLimbSwingAmount,
             interpolatedSwingProgress,
-            last.heldItem,
+            last.heldItemID,
+            last.itemEnchanted,
             last.isUsingItem,
             last.isEating,
             last.isSneaking,
@@ -128,7 +132,10 @@ object HolographicPlayerReplay {
         fakePlayer: EntityOtherPlayerMP,
         playIndex: Int
     ) {
-        val item = recordedPosition.heldItem
+        val item = recordedPosition.heldItemID?.getItemStack()
+        if (recordedPosition.itemEnchanted && item != null) {
+            item.addEnchantment(Enchantment.infinity, 1)
+        }
         val renderManager = mc.renderManager
         val renderer = renderManager.getEntityRenderObject<EntityLivingBase>(fakePlayer)
         renderer as RendererLivingEntity<T>
@@ -199,7 +206,7 @@ object HolographicPlayerReplay {
             scaleFactor,
         )
 
-        if (recordedPosition.heldItem != null) {
+        if (item != null) {
             GlStateManager.pushMatrix()
             GlStateManager.depthMask(true)
             GlStateManager.translate(-0.4f, 0.5f, 0f)
@@ -221,7 +228,7 @@ object HolographicPlayerReplay {
                 GlStateManager.rotate(20f, -1f, 0f, 0f)
                 GlStateManager.scale(1.8f, 1.8f, 1.8f)
             }
-            renderItem(recordedPosition.heldItem)
+            renderItem(item)
             GlStateManager.popMatrix()
         }
 
@@ -358,7 +365,8 @@ data class RecordedPosition(
     val limbSwing: Float,
     val limbSwingAmount: Float,
     val swingProgress: Float,
-    val heldItem: ItemStack?,
+    val heldItemID: NEUInternalName?,
+    val itemEnchanted: Boolean,
     val isUsingItem: Boolean,
     val isEating: Boolean,
     val isSneaking: Boolean,

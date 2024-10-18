@@ -10,11 +10,15 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.isEnchanted
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.mojang.authlib.GameProfile
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import java.util.UUID
 
 @SkyHanniModule
 object PlayerBossReplay {
@@ -59,7 +63,8 @@ object PlayerBossReplay {
                     limbSwing,
                     limbSwingAmount,
                     swingProgress,
-                    heldItem,
+                    heldItem.getInternalName(),
+                    heldItem.isEnchanted(),
                     isUsingItem,
                     isEating,
                     isSneaking,
@@ -150,6 +155,7 @@ object PlayerBossReplay {
             when (type) {
                 "manual" -> {
                     ChatUtils.chat("manual save")
+                    OSUtils.copyToClipboard(DungeonGhostData(positions, time, player.gameProfile).toString())
                     SkyHanniMod.dungeonReplayData.manual = DungeonGhostData(positions, time, player.gameProfile)
                 }
                 "F3" -> {
@@ -183,5 +189,5 @@ object PlayerBossReplay {
 data class DungeonGhostData(
     val recordedPositions: List<RecordedPosition> = listOf(),
     val time: Long = Long.MAX_VALUE,
-    val gameProfile: GameProfile = GameProfile(null, "martimavocado")
+    val gameProfile: GameProfile = GameProfile(UUID.fromString("49f4c15d-14e0-4d75-be1b-9c1b85bad53c"), "martimavocado")
 )
