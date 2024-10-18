@@ -32,7 +32,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
@@ -95,12 +95,10 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (isEnabled()) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                hasMoved = true
-            }
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (event.isLocalPlayer) {
+            hasMoved = true
         }
     }
 
