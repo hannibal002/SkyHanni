@@ -118,7 +118,7 @@ object PlayerBossReplay {
             }
             else -> {
                 if (!recording) startRecording()
-                else stopRecording()
+                else stopRecording(true)
                 return
             }
         }
@@ -132,24 +132,28 @@ object PlayerBossReplay {
         recording = true
     }
 
-    private fun stopRecording() {
+    private fun stopRecording(isManual: Boolean = false) {
         if (!recording) return
         ChatUtils.chat("stopped recording")
         recording = false
-        attemptSave(recordedPositions, recordedTime.passedSince().inWholeMilliseconds)
+        attemptSave(recordedPositions, recordedTime.passedSince().inWholeMilliseconds, if (isManual) "manual" else DungeonAPI.dungeonFloor)
         recordedPositions.clear()
         recordedTime = SimpleTimeMark.farPast()
     }
 
-    private fun attemptSave(positions: List<RecordedPosition>, time: Long) {
+    private fun attemptSave(positions: List<RecordedPosition>, time: Long, type: String?) {
         ChatUtils.chat("time: $time")
         ChatUtils.chat("pb: $bestRunTime")
+        ChatUtils.chat("position size: ${positions.size}")
         if (time < bestRunTime) {
-            ChatUtils.chat("new pb! trying to save to '${DungeonAPI.dungeonFloor}'")
-            when (DungeonAPI.dungeonFloor) {
+            ChatUtils.chat("new pb! trying to save to '$type'")
+            when (type) {
+                "manual" -> {
+                    ChatUtils.chat("manual save")
+                    SkyHanniMod.dungeonReplayData.manual = DungeonGhostData(positions, time, player.gameProfile)
+                }
                 "F3" -> {
                     SkyHanniMod.dungeonReplayData.floor3 = DungeonGhostData(positions, time, player.gameProfile)
-                    SkyHanniMod.dungeonReplayData.test = true
                 }
                 "F7" -> {
                     SkyHanniMod.dungeonReplayData.floor7 = DungeonGhostData(positions, time, player.gameProfile)

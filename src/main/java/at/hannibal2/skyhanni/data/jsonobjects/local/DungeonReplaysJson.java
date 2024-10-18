@@ -5,6 +5,9 @@ import com.google.gson.annotations.Expose;
 
 public class DungeonReplaysJson {
     @Expose
+    public DungeonGhostData manual = new DungeonGhostData();
+
+    @Expose
     public DungeonGhostData floor3 = new DungeonGhostData();
 
     @Expose
