@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -58,9 +58,9 @@ object NucleusBarriersBox {
         ),
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        inNucleus = IslandAreas.currentAreaName == "Crystal Nucleus"
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inNucleus = event.area == "Crystal Nucleus"
     }
 
     @SubscribeEvent

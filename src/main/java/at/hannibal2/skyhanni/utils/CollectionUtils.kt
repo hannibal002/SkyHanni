@@ -117,6 +117,22 @@ object CollectionUtils {
         return null
     }
 
+    /**
+     * Returns a sublist of this list, starting after the first occurrence of the specified element.
+     *
+     * @param after The element after which the sublist should start.
+     * @param skip The number of elements to skip after the occurrence of `after` (default is 1).
+     * @param amount The number of elements to include in the returned sublist (default is 1).
+     * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
+     *         or an empty list if `after` is not found.
+     */
+    fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1): List<String> {
+        val startIndex = indexOf(after)
+        if (startIndex == -1) return emptyList()
+
+        return this.drop(startIndex + skip).take(amount)
+    }
+
     fun List<String>.removeNextAfter(after: String, skip: Int = 1) = removeNextAfter({ it == after }, skip)
 
     fun List<String>.removeNextAfter(after: (String) -> Boolean, skip: Int = 1): List<String> {
@@ -144,10 +160,7 @@ object CollectionUtils {
         return this
     }
 
-    /**
-     * This does not work inside a [buildList] block
-     */
-    fun List<String>.addIfNotNull(element: String?) = element?.let { plus(it) } ?: this
+    fun <T> MutableList<T>.addNotNull(element: T?) = element?.let { add(it) }
 
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
@@ -257,6 +270,8 @@ object CollectionUtils {
 
     @Suppress("UNCHECKED_CAST")
     fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
+
+    fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
 
     // TODO add cache
     fun MutableList<Renderable>.addString(
