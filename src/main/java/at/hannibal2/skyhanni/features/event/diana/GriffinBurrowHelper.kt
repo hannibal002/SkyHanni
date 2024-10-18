@@ -183,7 +183,7 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.isPlayer) {
+        if (event.distance > 10 && event.isLocalPlayer) {
             update()
         }
     }

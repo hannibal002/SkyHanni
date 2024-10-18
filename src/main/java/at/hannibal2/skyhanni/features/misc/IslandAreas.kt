@@ -96,7 +96,7 @@ object IslandAreas {
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
-        if (event.isPlayer) {
+        if (event.isLocalPlayer) {
             hasMoved = true
         }
     }
