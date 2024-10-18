@@ -152,11 +152,15 @@ object PlayerBossReplay {
         ChatUtils.chat("position size: ${positions.size}")
         if (time < bestRunTime) {
             ChatUtils.chat("new pb! trying to save to '$type'")
+            SkyHanniMod.dungeonReplayData.test = false
+            SkyHanniMod.configManager.saveConfig(ConfigFileType.DUNGEON_REPLAY, "reset test boolean")
+            ChatUtils.chat("resetting test")
             when (type) {
                 "manual" -> {
                     ChatUtils.chat("manual save")
                     OSUtils.copyToClipboard(DungeonGhostData(positions, time, player.gameProfile).toString())
                     SkyHanniMod.dungeonReplayData.manual = DungeonGhostData(positions, time, player.gameProfile)
+                    SkyHanniMod.dungeonReplayData.test = true
                 }
                 "F3" -> {
                     SkyHanniMod.dungeonReplayData.floor3 = DungeonGhostData(positions, time, player.gameProfile)
