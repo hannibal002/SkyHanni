@@ -856,7 +856,7 @@ object DamageIndicatorManager {
     }
 
     @HandleEvent
-    fun onEntityJoin(event: EntityEnterWorldEvent<Entity>) {
+    fun onEntityJoin(event: EntityEnterWorldEvent<*>) {
         mobFinder?.handleNewEntity(event.entity)
     }
 
