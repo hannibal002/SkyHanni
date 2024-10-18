@@ -156,7 +156,8 @@ object EntityUtils {
     fun EntityPlayer.isNPC() = !isRealPlayer()
 
     fun EntityLivingBase.hasPotionEffect(
-        potion: //#if MC <1.21
+        potion:
+        //#if MC <1.21
         Potion,
         //#else
         //$$ net.minecraft.registry.entry.RegistryEntry<net.minecraft.entity.effect.StatusEffect>
@@ -198,7 +199,8 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPre(
-        event: //#if MC < 1.14
+        event:
+        //#if MC < 1.14
         RenderLivingEvent.Pre<*>,
         //#else
         //$$ RenderLivingEvent.Pre<*, *>
@@ -213,7 +215,8 @@ object EntityUtils {
 
     @SubscribeEvent
     fun onEntityRenderPost(
-        event: //#if MC < 11400
+        event:
+        //#if MC < 11400
         RenderLivingEvent.Post<*>,
         //#else
         //$$ RenderLivingEvent.Post<*, *>
