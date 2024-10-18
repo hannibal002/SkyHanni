@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
@@ -83,6 +84,11 @@ public class SkillProgressConfig {
     @ConfigOption(name = "Show Level", desc = "Show your current level in the display.")
     @ConfigEditorBoolean
     public Property<Boolean> showLevel = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Color Config", desc = "Color config related stuff.")
+    @Accordion
+    public SkillColorConfig skillColorConfig = new SkillColorConfig();
 
     @Expose
     @Category(name = "Progress Bar", desc = "Progress Bar Config.")
