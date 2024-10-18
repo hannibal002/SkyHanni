@@ -81,7 +81,7 @@ object CakeTracker {
      */
     private val auctionBrowserPattern by patternGroup.pattern(
         "auction.search",
-        "^(Auctions Browser|Auctions: \".*)$",
+        "^(?:Auctions Browser|Auctions: \".*)$",
     )
 
     /**
@@ -101,10 +101,10 @@ object CakeTracker {
         }
 
         @Expose
-        var cakesOwned: MutableList<Int> = mutableListOf()
+        var cakesOwned: MutableSet<Int> = mutableSetOf()
 
         @Expose
-        var cakesMissing: MutableList<Int> = mutableListOf()
+        var cakesMissing: MutableSet<Int> = mutableSetOf()
     }
 
     private fun addCake(cakeYear: Int) {
@@ -224,9 +224,9 @@ object CakeTracker {
     private fun recalculateMissingCakes() {
         val cakeTrackerData = getCakeTrackerData() ?: return
         tracker.modify {
-            it.cakesMissing = (1..currentYear).filterNot {
-                year -> cakeTrackerData.cakesOwned.contains(year)
-            }.toMutableList()
+            it.cakesMissing = (1..currentYear).filterNot { year ->
+                cakeTrackerData.cakesOwned.contains(year)
+            }.toMutableSet()
         }
     }
 
@@ -238,7 +238,7 @@ object CakeTracker {
             val stringRenderable =
                 Renderable.string(
                     if (end != 0) "§fYears $colorCode$start§f-$colorCode$end"
-                    else "§fYear $colorCode$start"
+                    else "§fYear $colorCode$start",
                 )
             return if (displayType == CakeTrackerDisplayType.MISSING_CAKES) Renderable.link(
                 stringRenderable,
@@ -268,7 +268,7 @@ object CakeTracker {
                     ownedString,
                     { setDisplayType(CakeTrackerDisplayType.OWNED_CAKES) },
                     condition = { config.displayType != CakeTrackerDisplayType.OWNED_CAKES },
-                )
+                ),
             )
             add(Renderable.string(" §7§l- §r"))
             add(
@@ -276,9 +276,9 @@ object CakeTracker {
                     missingString,
                     { setDisplayType(CakeTrackerDisplayType.MISSING_CAKES) },
                     condition = { config.displayType != CakeTrackerDisplayType.MISSING_CAKES },
-                )
+                ),
             )
-        }
+        },
     )
 
     private fun setDisplayOrderType(type: CakeTrackerDisplayOrderType) {
@@ -302,7 +302,7 @@ object CakeTracker {
                     newestString,
                     { setDisplayOrderType(CakeTrackerDisplayOrderType.NEWEST_FIRST) },
                     condition = { config.displayOrderType != CakeTrackerDisplayOrderType.NEWEST_FIRST },
-                )
+                ),
             )
             add(Renderable.string(" §7§l- §r"))
             add(
@@ -310,9 +310,9 @@ object CakeTracker {
                     oldestString,
                     { setDisplayOrderType(CakeTrackerDisplayOrderType.OLDEST_FIRST) },
                     condition = { config.displayOrderType != CakeTrackerDisplayOrderType.OLDEST_FIRST },
-                )
+                ),
             )
-        }
+        },
     )
 
     private fun drawDisplay(data: Data): List<Searchable> = buildList {
@@ -340,7 +340,7 @@ object CakeTracker {
                 CakeTrackerDisplayOrderType.OLDEST_FIRST -> cakeList.sorted()
                 CakeTrackerDisplayOrderType.NEWEST_FIRST -> cakeList.sortedDescending()
                 null -> cakeList
-            }
+            }.toMutableList()
 
             // Combine consecutive years into ranges
             val cakeRanges = mutableListOf<CakeRange>()
