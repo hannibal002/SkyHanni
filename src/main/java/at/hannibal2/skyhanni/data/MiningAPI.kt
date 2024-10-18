@@ -52,12 +52,21 @@ object MiningAPI {
         "§6The warmth of the campfire reduced your §r§b❄ Cold §r§6to §r§a0§r§6!|§c ☠ §r§7You froze to death§r§7\\.",
     )
 
+    /**
+     * REGEX-TEST: Heat: §6IMMUNE
+     * REGEX-TEST: Heat: §c14♨
+     * REGEX-TEST: Heat: §c0♨
+     */
+    val heatPattern by group.pattern(
+        "heat.scoreboard",
+        "^Heat: (?<scoreboard>§.(?<heat>\\d+|IMMUNE)♨?)\$",
+    )
+
     private val pickbobulusGroup = group.group("pickobulus")
 
     /**
      * REGEX-TEST: §aYou used your §r§6Pickobulus §r§aPickaxe Ability!
      */
-
     private val pickobulusUsePattern by pickbobulusGroup.pattern(
         "use",
         "§aYou used your §r§6Pickobulus §r§aPickaxe Ability!",
@@ -122,6 +131,11 @@ object MiningAPI {
     var cold: Int = 0
         private set
 
+    var heat: Int = 0
+        private set
+    var lastHeatUpdate = SimpleTimeMark.farPast()
+        private set
+
     var lastColdUpdate = SimpleTimeMark.farPast()
         private set
     var lastColdReset = SimpleTimeMark.farPast()
@@ -154,12 +168,20 @@ object MiningAPI {
 
     @SubscribeEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
-        val newCold = ScoreboardPattern.coldPattern.firstMatcher(event.scoreboard) {
-            group("cold").toInt().absoluteValue
-        } ?: return
+        ScoreboardPattern.coldPattern.firstMatcher(event.scoreboard) {
+            val newCold = group("cold").toInt().absoluteValue
+            if (newCold != cold) {
+                updateCold(newCold)
+            }
+        }
 
-        if (newCold != cold) {
-            updateCold(newCold)
+        heatPattern.firstMatcher(event.scoreboard) {
+            val newHeat = group("heat")
+            if (newHeat == "IMMUNE") {
+                updateHeat(0)
+            } else if (newHeat.toInt() != heat) {
+                updateHeat(newHeat.toInt())
+            }
         }
     }
 
@@ -203,6 +225,7 @@ object MiningAPI {
     fun onPlayerDeath(event: PlayerDeathEvent) {
         if (event.name == LorenzUtils.getPlayerName()) {
             updateCold(0)
+            updateHeat(0)
             lastColdReset = SimpleTimeMark.now()
         }
     }
@@ -399,6 +422,12 @@ object MiningAPI {
         lastColdUpdate = SimpleTimeMark.now()
         ColdUpdateEvent(newCold).postAndCatch()
         cold = newCold
+    }
+
+    private fun updateHeat(newHeat: Int) {
+        if (heat == 0 && lastHeatUpdate.passedSince() < 1.seconds) return
+        lastHeatUpdate = SimpleTimeMark.now()
+        heat = newHeat
     }
 
     private fun updateLocation() {

@@ -117,4 +117,10 @@ public class MiningConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightPrecisionMiningParticles = false;
+
+    @Expose
+    @ConfigOption(name = "Mute High Heat", desc = "Mutes the panting sound when above 90 heat in the Magma Fields.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean muteHighHeat = true;
 }
