@@ -15,7 +15,7 @@ object DataWatcherAPI {
     fun onDataWatcherUpdate(event: DataWatcherUpdatedEvent<Entity>) {
         for (updatedEntry in event.updatedEntries) {
             if (updatedEntry.dataValueId == DATA_VALUE_CUSTOM_NAME) {
-                EntityCustomNameUpdateEvent( event.entity, event.entity.customNameTag).post()
+                EntityCustomNameUpdateEvent(event.entity, event.entity.customNameTag).post()
             }
         }
     }
