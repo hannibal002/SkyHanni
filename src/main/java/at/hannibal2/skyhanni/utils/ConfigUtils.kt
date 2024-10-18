@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.HasLegacyId
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -85,7 +86,7 @@ object ConfigUtils {
     fun KMutableProperty0<*>.jumpToEditor() {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
 
-        if (PlatformUtils.isDevEnvironment) {
+        if (EventHandler.isInEventHandler) {
             throw Error("can not jump to editor $name")
         }
         ErrorManager.logErrorStateWithData(
