@@ -87,7 +87,8 @@ public class DownloadSourceChecker {
         // Check if the host is empty (Brave is cutting everything past .com/ from the host)
         String cutHostMessage = "";
         if (matcher.find()) {
-            cutHostMessage = "\n\nYour browser MAY have interfered with the download process.\nTry downloading the file using a different browser (Microsoft Edge, Google Chrome, etc.).";
+            cutHostMessage = "\n\nYour browser MAY have interfered with the download process.\n" +
+                "Try downloading the file using a different browser (Microsoft Edge, Google Chrome, etc.).";
         }
 
         JOptionPane.showOptionDialog(
