@@ -1,10 +1,12 @@
 package at.hannibal2.skyhanni.config.features.event.hoppity;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 import java.util.ArrayList;
@@ -14,10 +16,20 @@ import java.util.List;
 public class HoppityEventSummaryConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Show a summary of your Hoppity Hunt stats when the event is over.")
+    @ConfigOption(name = "Enabled", desc = "Show a summary of your Hoppity's Hunt stats when the event is over.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
+
+    @Expose
+    @ConfigOption(name = "Live Display", desc = "Show the preview card in a GUI element during Hoppity's Hunt.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean liveDisplay = false;
+
+    @Expose
+    @ConfigLink(owner = HoppityEventSummaryConfig.class, field = "liveDisplay")
+    public Position liveDisplayPosition = new Position(0, 0);
 
     @Expose
     @ConfigOption(
