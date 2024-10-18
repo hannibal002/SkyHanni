@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.Graph
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -171,10 +173,9 @@ object IslandAreas {
                     }
                 }
                 if (name != currentAreaName) {
-                    if (inAnArea && config.enterTitle) {
-                        LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
-                    }
+                    val oldArea = currentAreaName
                     currentAreaName = name
+                    GraphAreaChangeEvent(name, oldArea).post()
                 }
 
                 addSearchString("§eAreas nearby:")
@@ -220,6 +221,15 @@ object IslandAreas {
             } else {
                 addSearchString("§cThere is no $islandName area data avaliable yet!")
             }
+        }
+    }
+
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        val name = event.area
+        val inAnArea = name != "no_area"
+        if (inAnArea && config.enterTitle) {
+            LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
         }
     }
 
