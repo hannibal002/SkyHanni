@@ -57,7 +57,7 @@ object ChocolateFactoryTimeTowerManager {
             }
         }
 
-        if (currentCharges() in 0..maxCharges()) {
+        if (currentCharges() > 0 && currentCharges() < maxCharges()) {
             if (!config.timeTowerWarning || timeTowerActive()) return
             if (!warnAboutNewCharge) return
             ChatUtils.clickableChat(
