@@ -74,7 +74,7 @@ object CopyNearbyEntitiesCommand {
                 val ridingEntity = entity.ridingEntity
                 resultList.add("ridingEntity: $ridingEntity")
 
-                if(entity.isInvisible) {
+                if (entity.isInvisible) {
                     resultList.add("Invisible: true")
                 }
 

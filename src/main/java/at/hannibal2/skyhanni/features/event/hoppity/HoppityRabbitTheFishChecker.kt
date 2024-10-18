@@ -20,7 +20,7 @@ import org.lwjgl.input.Keyboard
 @SkyHanniModule
 object HoppityRabbitTheFishChecker {
 
-    //<editor-fold desc="Patterns">
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: Chocolate Breakfast Egg
      * REGEX-TEST: Chocolate Lunch Egg
@@ -46,7 +46,7 @@ object HoppityRabbitTheFishChecker {
         "inventory.mealegg.continue",
         "(?:§.)*Click to open Chocolate Factory!",
     )
-    //</editor-fold>
+    // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private var rabbitTheFishIndex: Int? = null

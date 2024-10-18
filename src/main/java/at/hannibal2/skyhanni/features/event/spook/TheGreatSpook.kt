@@ -40,7 +40,7 @@ object TheGreatSpook {
     }
 
     private fun checkTabList(matchString: String): String {
-        return (TabListData.getTabList().find { it.contains(matchString) } ?: "").trim()
+        return (TabListData.getTabList().find { it.contains(matchString) }.orEmpty()).trim()
     }
 
     @SubscribeEvent

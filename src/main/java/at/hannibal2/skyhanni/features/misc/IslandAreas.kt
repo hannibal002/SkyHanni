@@ -242,7 +242,7 @@ object IslandAreas {
             if (name == currentAreaName) continue
             if (name == "no_area") continue
             val position = node.position
-            val color = node.getAreaTag()?.color?.getChatColor() ?: ""
+            val color = node.getAreaTag()?.color?.getChatColor().orEmpty()
             if (!position.canBeSeen(40.0)) return
             event.drawDynamicText(position, color + name, 1.5)
         }
