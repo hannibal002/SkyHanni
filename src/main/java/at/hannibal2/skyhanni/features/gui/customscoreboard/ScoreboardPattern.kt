@@ -19,6 +19,8 @@ object ScoreboardPattern {
 
     // Main scoreboard
     private val mainSb = scoreboardGroup.group("main")
+
+    //TODO add regex tests
     val motesPattern by mainSb.pattern(
         "motes",
         "(?:§.)*Motes: (?:§.)*(?<motes>[\\d,]+).*",
@@ -123,6 +125,7 @@ object ScoreboardPattern {
         "solo",
         "§3§lSolo",
     )
+
     @Suppress("MaxLineLength")
     val teammatesPattern by dungeonSb.pattern(
         "teammates",

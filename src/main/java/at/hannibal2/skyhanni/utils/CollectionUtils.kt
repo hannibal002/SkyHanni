@@ -117,6 +117,15 @@ object CollectionUtils {
         return null
     }
 
+    /**
+     * Returns a sublist of this list, starting after the first occurrence of the specified element.
+     *
+     * @param after The element after which the sublist should start.
+     * @param skip The number of elements to skip after the occurrence of `after` (default is 1).
+     * @param amount The number of elements to include in the returned sublist (default is 1).
+     * @return A list containing up to `amount` elements starting `skip` elements after the first occurrence of `after`,
+     *         or an empty list if `after` is not found.
+     */
     fun List<String>.sublistAfter(after: String, skip: Int = 1, amount: Int = 1): List<String> {
         val startIndex = indexOf(after)
         if (startIndex == -1) return emptyList()

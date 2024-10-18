@@ -30,15 +30,14 @@ object DebugCommand {
                 if (search.equalsIgnoreColor("all")) {
                     "search for everything:"
                 } else "search '$search':"
-            } else "no search specified, only showing interesting stuff:"
+            } else "no search specified, only showing interesting stuff:",
         )
 
         val event = DebugDataCollectEvent(list, search)
 
         // calling default debug stuff
         player(event)
-        repoAutoUpdate(event)
-        repoLocation(event)
+        repoData(event)
         globalRender(event)
         skyblockStatus(event)
         profileName(event)
@@ -144,18 +143,19 @@ object DebugCommand {
         }
     }
 
-    private fun repoAutoUpdate(event: DebugDataCollectEvent) {
-        event.title("Repo Auto Update")
-        if (SkyHanniMod.feature.dev.repo.repoAutoUpdate) {
-            event.addIrrelevant("normal enabled")
-        } else {
-            event.addData("The repo does not auto update because auto update is disabled!")
+    private fun repoData(event: DebugDataCollectEvent) {
+        event.title("Repo Information")
+        event.addIrrelevant {
+            add(" repoAutoUpdate: ${SkyHanniMod.feature.dev.repo.repoAutoUpdate}")
+            add(" usingBackupRepo: ${RepoManager.usingBackupRepo}")
+            add(" repoLocation: '${RepoManager.getRepoLocation()}'")
+            if (RepoManager.unsuccessfulConstants.isNotEmpty()) {
+                add(" unsuccessful constants:")
+                for (constant in RepoManager.unsuccessfulConstants) {
+                    add("  - $constant")
+                }
+            }
         }
-    }
-
-    private fun repoLocation(event: DebugDataCollectEvent) {
-        event.title("Repo Location")
-        event.addIrrelevant("repo location: '${RepoManager.getRepoLocation()}'")
     }
 
     private fun player(event: DebugDataCollectEvent) {

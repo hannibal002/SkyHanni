@@ -448,7 +448,8 @@ object BestiaryData {
             return true
         } else if (name == "Search Results") {
             val loreList = stack.getLore()
-            if (loreList.size >= 2 && loreList[0].startsWith("§7Query: §a") &&
+            if (loreList.size >= 2 &&
+                loreList[0].startsWith("§7Query: §a") &&
                 loreList[1].startsWith("§7Results: §a")
             ) {
                 return true
@@ -464,7 +465,7 @@ object BestiaryData {
 
     enum class NumberType(val type: String) {
         INT("Normal (1, 2, 3)"),
-        ROMAN("Roman (I, II, III")
+        ROMAN("Roman (I, II, III)")
     }
 
     enum class DisplayType(val type: String) {

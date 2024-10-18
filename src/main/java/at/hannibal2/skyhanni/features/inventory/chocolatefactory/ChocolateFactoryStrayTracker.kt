@@ -77,7 +77,7 @@ object ChocolateFactoryStrayTracker {
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado §7- quite the elusive rabbit!
      * REGEX-TEST: §7You caught a stray §6§lGolden Rabbit§7! §7You caught §6El Dorado§7! Since you §7already have captured him before, §7you gained §6+324,364,585 Chocolate§7.
      */
-    private val strayDoradoPattern by ChocolateFactoryAPI.patternGroup.pattern(
+    val strayDoradoPattern by ChocolateFactoryAPI.patternGroup.pattern(
         "stray.dorado",
         ".*§6El Dorado(?:.*?§6\\+?(?<amount>[\\d,]+) Chocolate)?.*",
     )
@@ -147,7 +147,7 @@ object ChocolateFactoryStrayTracker {
         var goldenTypesCaught: MutableMap<String, Int> = mutableMapOf()
     }
 
-    private fun formLoreToSingleLine(lore: List<String>): String {
+    fun formLoreToSingleLine(lore: List<String>): String {
         val notEmptyLines = lore.filter { it.isNotEmpty() }
         return notEmptyLines.joinToString(" ")
     }

@@ -258,7 +258,7 @@ object CustomScoreboard {
     fun resetAppearance() {
         with(config.scoreboardEntries) {
             get().clear()
-            get().addAll(ScoreboardConfigElement.defaultOption)
+            get().addAll(ScoreboardConfigElement.defaultOptions)
             notifyObservers()
         }
     }
