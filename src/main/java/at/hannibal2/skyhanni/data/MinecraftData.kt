@@ -2,10 +2,10 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -34,7 +34,7 @@ object MinecraftData {
                 LorenzVec(packet.x, packet.y, packet.z),
                 packet.pitch,
                 packet.volume
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
         }
@@ -42,7 +42,7 @@ object MinecraftData {
 
     @SubscribeEvent
     fun onWorldChange(event: WorldEvent.Load) {
-        LorenzWorldChangeEvent().postAndCatch()
+        WorldChangeEvent.post()
     }
 
     @HandleEvent(receiveCancelled = true, onlyOnSkyblock = true)
@@ -58,7 +58,7 @@ object MinecraftData {
                 LorenzVec(packet.xOffset, packet.yOffset, packet.zOffset),
                 packet.isLongDistance,
                 packet.particleArgs,
-            ).postAndCatch()
+            ).post()
         ) {
             event.cancel()
         }
@@ -73,11 +73,11 @@ object MinecraftData {
 
         DelayedRun.checkRuns()
         totalTicks++
-        LorenzTickEvent(totalTicks).postAndCatch()
+        SkyHanniTickEvent(totalTicks).post()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val hand = InventoryUtils.getItemInHand()
         val newItem = hand?.getInternalName() ?: NEUInternalName.NONE
@@ -90,12 +90,12 @@ object MinecraftData {
             }
             InventoryUtils.itemInHandId = newItem
             InventoryUtils.latestItemInHand = hand
-            ItemInHandChangeEvent(newItem, oldItem).postAndCatch()
+            ItemInHandChangeEvent(newItem, oldItem).post()
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         InventoryUtils.itemInHandId = NEUInternalName.NONE
         InventoryUtils.recentItemsInHand.clear()
     }

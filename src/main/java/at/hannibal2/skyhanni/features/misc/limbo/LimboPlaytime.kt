@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.limbo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -47,7 +47,7 @@ object LimboPlaytime {
     private lateinit var limboItem: ItemStack
     private var lastCreateCooldown = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!enabled) return
         if (event.inventory !is ContainerLocalMenu) return
@@ -78,8 +78,8 @@ object LimboPlaytime {
         else -> arrayOf("§7Playtime: §a$wholeMinutes minutes")
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!enabled) return
         if (!event.slot.inventory.name.startsWith("Detailed /playtime")) return
@@ -95,7 +95,7 @@ object LimboPlaytime {
         remakeList(event.toolTip, minutesList, hoursList)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderGUI(event: InventoryOpenEvent) {
         if (event.inventoryName != "Detailed /playtime") return
         val playtime = (storage?.playtime ?: 0).seconds

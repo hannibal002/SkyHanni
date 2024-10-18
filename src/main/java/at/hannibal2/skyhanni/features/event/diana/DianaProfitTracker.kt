@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.MayorAPI.getElectionYear
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DianaDropsJson
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DianaProfitTracker {
@@ -107,7 +107,7 @@ object DianaProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!(DianaAPI.isDoingDiana() && config.enabled)) return
 
@@ -123,8 +123,8 @@ object DianaProfitTracker {
         tracker.addItem(internalName, amount, command)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         val message = event.message
         if (chatDugOutPattern.matches(message)) {
             BurrowAPI.lastBurrowRelatedChatMessage = SimpleTimeMark.now()
@@ -147,13 +147,13 @@ object DianaProfitTracker {
         }
     }
 
-    private fun tryHide(event: LorenzChatEvent) {
+    private fun tryHide(event: SkyHanniChatEvent) {
         if (SkyHanniMod.feature.chat.filterType.diana) {
             event.blockedReason = "diana_chain_or_drops"
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
@@ -168,7 +168,7 @@ object DianaProfitTracker {
 
     private fun isAllowedItem(internalName: NEUInternalName): Boolean = internalName in allowedDrops
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         allowedDrops = event.getConstant<DianaDropsJson>("DianaDrops").dianaDrops
     }

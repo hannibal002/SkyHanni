@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.ConfigGuiManager
 import at.hannibal2.skyhanni.config.HasLegacyId
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
@@ -85,8 +86,7 @@ object ConfigUtils {
     fun KMutableProperty0<*>.jumpToEditor() {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
 
-        // TODO create utils function "crashIfInDevEnv"
-        if (LorenzEvent.isInGuardedEventHandler) {
+        if (EventHandler.isInEventHandler) {
             throw Error("can not jump to editor $name")
         }
         ErrorManager.logErrorStateWithData(

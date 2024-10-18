@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.ItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.FishingBobberInLiquidEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyFishManager
@@ -30,7 +30,6 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.projectile.EntityFishHook
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FishingAPI {
@@ -64,7 +63,7 @@ object FishingAPI {
         lastCastTime = SimpleTimeMark.now()
         bobber = event.entity
         bobberHasTouchedLiquid = false
-        FishingBobberCastEvent(event.entity).postAndCatch()
+        FishingBobberCastEvent(event.entity).post()
     }
 
     private fun resetBobber() {
@@ -72,13 +71,13 @@ object FishingAPI {
         bobberHasTouchedLiquid = false
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         resetBobber()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.isMod(5)) {
@@ -97,7 +96,7 @@ object FishingAPI {
                 }
 
                 bobberHasTouchedLiquid = true
-                FishingBobberInLiquidEvent(bobber, isWater).postAndCatch()
+                FishingBobberInLiquidEvent(bobber, isWater).post()
             }
         }
     }
@@ -111,7 +110,7 @@ object FishingAPI {
 
     fun ItemStack.isBait(): Boolean = stackSize == 1 && getItemCategoryOrNull() == ItemCategory.BAIT
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         // TODO correct rod type per island water/lava
         holdingRod = event.newItem.isFishingRod()
@@ -119,7 +118,7 @@ object FishingAPI {
         holdingWaterRod = event.newItem.isWaterRod()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         lavaRods = data.lavaFishingRods

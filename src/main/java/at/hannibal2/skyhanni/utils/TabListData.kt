@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.utils
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
@@ -20,7 +20,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.world.WorldSettings
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
@@ -125,15 +124,15 @@ object TabListData {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!dirty) return
         dirty = false
 
         val tabList = readTabList() ?: return
         if (tablistCache != tabList) {
             tablistCache = tabList
-            TabListUpdateEvent(getTabList()).postAndCatch()
+            TabListUpdateEvent(getTabList()).post()
             if (!LorenzUtils.onHypixel) {
                 workaroundDelayedTabListUpdateAgain()
             }
@@ -144,7 +143,7 @@ object TabListData {
 
         val tabFooter = tabListOverlay.footer_skyhanni?.formattedText ?: ""
         if (tabFooter != footer && tabFooter != "") {
-            TablistFooterUpdateEvent(tabFooter).postAndCatch()
+            TablistFooterUpdateEvent(tabFooter).post()
         }
         footer = tabFooter
     }
@@ -153,7 +152,7 @@ object TabListData {
         DelayedRun.runDelayed(2.seconds) {
             if (LorenzUtils.onHypixel) {
                 println("workaroundDelayedTabListUpdateAgain")
-                TabListUpdateEvent(getTabList()).postAndCatch()
+                TabListUpdateEvent(getTabList()).post()
             }
         }
     }

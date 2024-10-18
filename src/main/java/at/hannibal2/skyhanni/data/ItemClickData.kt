@@ -83,6 +83,6 @@ object ItemClickData {
         if (minecraft.thePlayer == null) return
         if (clickedEntity == null) return
 
-        EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).postAndCatch()
+        EntityClickEvent(clickType, clickedEntity, InventoryUtils.getItemInHand()).post()
     } */
 }

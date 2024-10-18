@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.mining.fossilexcavator
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.mining.FossilExcavationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object FossilExcavatorAPI {
@@ -52,14 +52,14 @@ object FossilExcavatorAPI {
 
     val scrapItem = "SUSPICIOUS_SCRAP".asInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
         if (event.inventoryName != "Fossil Excavator") return
         inInventory = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!inInventory) return
         val slots = InventoryUtils.getItemsInOpenChest()
@@ -67,26 +67,26 @@ object FossilExcavatorAPI {
         inExcavatorMenu = itemNames.any { it == "Start Excavator" }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         inInventory = false
         inExcavatorMenu = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         inExcavatorMenu = false
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!IslandType.DWARVEN_MINES.isInIsland()) return
 
         val message = event.message
 
         if (emptyPattern.matches(message)) {
-            FossilExcavationEvent(emptyList()).postAndCatch()
+            FossilExcavationEvent(emptyList()).post()
         }
 
 
@@ -98,7 +98,7 @@ object FossilExcavatorAPI {
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
-            FossilExcavationEvent(loot.toList()).postAndCatch()
+            FossilExcavationEvent(loot.toList()).post()
             loot.clear()
             inLoot = false
             return

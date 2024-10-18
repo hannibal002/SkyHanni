@@ -13,10 +13,10 @@ import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -39,8 +39,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
+import net.minecraft.client.entity.EntityPlayerSP
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.seconds
 
@@ -69,7 +69,7 @@ object GriffinBurrowHelper {
     private var testList = listOf<LorenzVec>()
     private var testGriffinSpots = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Helper")
 
@@ -88,7 +88,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         update()
@@ -149,7 +149,7 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
 
@@ -157,7 +157,7 @@ object GriffinBurrowHelper {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
@@ -173,23 +173,23 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBurrowDug(event: BurrowDugEvent) {
         val location = event.burrowLocation
         particleBurrows = particleBurrows.editCopy { remove(location) }
         update()
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
+    @HandleEvent
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
         if (!isEnabled()) return
-        if (event.distance > 10 && event.entity == Minecraft.getMinecraft().thePlayer) {
+        if (event.distance > 10 && event.isLocalPlayer) {
             update()
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (event.message.startsWith("§c ☠ §r§7You were killed by §r")) {
             particleBurrows = particleBurrows.editCopy { keys.removeIf { this[it] == BurrowType.MOB } }
@@ -213,8 +213,8 @@ object GriffinBurrowHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         resetAllData()
     }
 
@@ -264,8 +264,8 @@ object GriffinBurrowHelper {
         return point.copy(y = gY - 1)
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         showTestLocations(event)
@@ -347,14 +347,14 @@ object GriffinBurrowHelper {
         }
     }
 
-    private fun showTestLocations(event: LorenzRenderWorldEvent) {
+    private fun showTestLocations(event: SkyHanniRenderWorldEvent) {
         if (!testGriffinSpots) return
         for (location in testList) {
             event.drawColor(location, LorenzColor.WHITE)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "diana", "event.diana")
     }

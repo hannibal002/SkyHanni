@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.Mayor.Companion.addPerks
 import at.hannibal2.skyhanni.data.Mayor.Companion.getMayorFromPerk
@@ -12,8 +13,8 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.MayorJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.APIUtils
@@ -37,7 +38,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -119,7 +119,7 @@ object MayorAPI {
      */
     fun mayorNameWithColorCode(input: String) = mayorNameToColorCode(input) + input
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.onHypixel) return
         if (event.repeatSeconds(2)) {
@@ -148,8 +148,8 @@ object MayorAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (electionOverPattern.matches(event.message)) {
@@ -159,7 +159,7 @@ object MayorAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventory(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -239,7 +239,7 @@ object MayorAPI {
 
     private fun List<MayorCandidate>.bestCandidate() = maxBy { it.votes }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigReload(event: ConfigLoadEvent) {
         SkyHanniMod.feature.dev.debug.assumeMayor.onToggle {
             val mayor = SkyHanniMod.feature.dev.debug.assumeMayor.get()
@@ -253,7 +253,7 @@ object MayorAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Mayor")
         event.addIrrelevant {

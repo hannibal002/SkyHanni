@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.AbstractClientPlayer
 import net.minecraft.entity.EntityLivingBase
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -78,7 +77,7 @@ object PunchcardHighlight {
     private val displayIcon by lazy { "PUNCHCARD_ARTIFACT".asInternalName().getItemStack() }
     private var display: Renderable = Renderable.string("hello")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
         if (!config.highlight.get()) return
         if (!IslandType.THE_RIFT.isInIsland()) return
@@ -91,7 +90,7 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onToggle(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.highlight,
@@ -127,7 +126,7 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
         DelayedRun.runDelayed(1500.milliseconds) {
             if (playerList.isEmpty()) return@runDelayed
@@ -185,8 +184,8 @@ object PunchcardHighlight {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!IslandType.THE_RIFT.isInIsland()) return
         if (!listening) return
         if (playerQueue.isEmpty()) return
@@ -217,7 +216,7 @@ object PunchcardHighlight {
         display = drawDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderUI(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.gui.get()) return
         if (!RiftAPI.inRift()) return

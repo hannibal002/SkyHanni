@@ -186,7 +186,7 @@ class RepoManager(private val configLocation: File) {
             unsuccessfulConstants.clear()
             lastConstant = null
 
-            RepositoryReloadEvent(repoLocation, gson).postAndCatchAndBlock(ignoreErrorCache = true) {
+            RepositoryReloadEvent(repoLocation, gson).post {
                 error = true
                 lastConstant?.let {
                     unsuccessfulConstants.add(it)
@@ -313,7 +313,7 @@ class RepoManager(private val configLocation: File) {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: io.github.moulberry.notenoughupdates.events.RepositoryReloadEvent) {
-        NeuRepositoryReloadEvent().postAndCatch()
+        NeuRepositoryReloadEvent().post()
     }
 
     fun resetRepositoryLocation(manual: Boolean = false) {

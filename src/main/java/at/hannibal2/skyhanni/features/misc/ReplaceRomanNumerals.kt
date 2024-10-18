@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.ChatHoverEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.mixins.hooks.GuiChatHook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -15,8 +16,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.isRoman
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.event.HoverEvent
 import net.minecraft.util.ChatComponentText
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ReplaceRomanNumerals {
@@ -33,14 +32,14 @@ object ReplaceRomanNumerals {
     )
 
     // TODO: Remove after pr 1717 is ready and switch to ItemHoverEvent
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
 
         event.toolTip.replaceAll { it.transformLine() }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onChatHover(event: ChatHoverEvent) {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled()) return
@@ -54,7 +53,7 @@ object ReplaceRomanNumerals {
         GuiChatHook.replaceOnlyHoverEvent(hoverEvent)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!isEnabled() || event.message.isSelectOption()) return
         event.applyIfPossible { it.transformLine() }

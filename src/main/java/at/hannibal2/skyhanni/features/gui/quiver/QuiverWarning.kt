@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.quiver
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ArrowType
 import at.hannibal2.skyhanni.data.QuiverAPI
@@ -8,8 +9,8 @@ import at.hannibal2.skyhanni.data.QuiverAPI.amount
 import at.hannibal2.skyhanni.data.TitleManager
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.KuudraCompleteEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -32,12 +32,12 @@ object QuiverWarning {
     private var lastLowQuiverReminder = SimpleTimeMark.farPast()
     private var arrowsInInstance = mutableSetOf<ArrowType>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonComplete(event: DungeonCompleteEvent) {
         onInstanceComplete()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKuudraComplete(event: KuudraCompleteEvent) {
         onInstanceComplete()
     }
@@ -71,7 +71,7 @@ object QuiverWarning {
         ChatUtils.chat("Low on arrows §e(${amount.addSeparators()} left)")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onQuiverUpdate(event: QuiverUpdateEvent) {
         val amount = event.currentAmount
         val arrow = event.currentArrow ?: return
@@ -85,14 +85,14 @@ object QuiverWarning {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldSwitch(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldSwitch(event: WorldChangeEvent) {
         arrowsInInstance.clear()
     }
 
     private fun inInstance() = DungeonAPI.inDungeon() || KuudraAPI.inKuudra()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(35, "inventory.quiverAlert", "combat.quiverConfig.lowQuiverNotification")
     }

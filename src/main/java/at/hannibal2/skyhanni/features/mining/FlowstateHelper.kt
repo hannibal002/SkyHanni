@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.blockBreakStreak
 import at.hannibal2.skyhanni.features.mining.FlowstateHelper.getSpeedBonus
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -56,8 +55,8 @@ object FlowstateHelper {
         createDisplay()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!MiningAPI.inCustomMiningIsland()) return
 
         attemptClearDisplay()
@@ -74,7 +73,7 @@ object FlowstateHelper {
         createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!MiningAPI.inCustomMiningIsland() || !config.enabled) return
         if (flowstateCache == null && !streakEndTimer.isInFuture()) return
@@ -118,12 +117,12 @@ object FlowstateHelper {
         } else blockBreakStreak * flowstateLevel
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onChangeItem(event: ItemInHandChangeEvent) {
         hasFlowstate()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         streakEndTimer = SimpleTimeMark.farPast()
         attemptClearDisplay()

@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import net.minecraft.client.Minecraft
 import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItemFrame
 
 class RenderEntityOutlineEvent(theType: Type?, potentialEntities: HashSet<Entity>?) :
-    LorenzEvent() {
+    SkyHanniEvent() {
 
     /**
      * The phase of the event (see [Type]

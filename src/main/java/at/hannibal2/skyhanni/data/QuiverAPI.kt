@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArrowTypeJson
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.QuiverUpdateEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -27,7 +28,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemBow
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 
 @SkyHanniModule
@@ -103,8 +103,8 @@ object QuiverAPI {
         "§7Active Arrow: §.(?<type>.*) §7\\(§e(?<amount>.*)§7\\)"
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -193,7 +193,7 @@ object QuiverAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryFullyLoaded(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         if (!quiverInventoryNamePattern.matches(event.inventoryName)) return
@@ -211,7 +211,7 @@ object QuiverAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdate(event: OwnInventoryItemUpdateEvent) {
         if (!isEnabled() && event.slot != 44) return
         val stack = event.itemStack
@@ -274,10 +274,10 @@ object QuiverAPI {
     }
 
     private fun postUpdateEvent(arrowType: ArrowType? = currentArrow) {
-        QuiverUpdateEvent(arrowType, currentAmount).postAndCatch()
+        QuiverUpdateEvent(arrowType, currentAmount).post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (event.repeatSeconds(2)) {
@@ -287,7 +287,7 @@ object QuiverAPI {
     }
 
     // Load arrows from repo
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val arrowData = event.getConstant<ArrowTypeJson>("ArrowTypes")
         arrows = arrowData.arrows.map { ArrowType(it.value.arrow, it.key.asInternalName()) }

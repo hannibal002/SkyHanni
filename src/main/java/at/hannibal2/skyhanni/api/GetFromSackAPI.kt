@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackAPI
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.commands.tabcomplete.GetFromSacksTabComplete
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -27,7 +28,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.Deque
 import java.util.LinkedList
 import kotlin.time.Duration.Companion.seconds
@@ -86,8 +86,8 @@ object GetFromSackAPI {
 
     private fun addToInventory(items: List<PrimitiveItemStack>, slotId: Int) = inventoryMap.put(slotId, items)
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (queue.isNotEmpty() && lastTimeOfCommand.passedSince() >= minimumDelay) {
             val item = queue.poll()
@@ -97,12 +97,12 @@ object GetFromSackAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryMap.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClicked(event: GuiContainerEvent.SlotClickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (event.clickedButton != 1) return // filter none right clicks
@@ -111,8 +111,8 @@ object GetFromSackAPI {
         event.cancel()
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val list = inventoryMap[event.slot.slotIndex] ?: return
         event.toolTip.let { tip ->
@@ -122,7 +122,7 @@ object GetFromSackAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMessageToServer(event: MessageSendToServerEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.queuedGFS && !config.bazaarGFS) return
@@ -130,7 +130,7 @@ object GetFromSackAPI {
         val replacedEvent = GetFromSacksTabComplete.handleUnderlineReplace(event)
         queuedHandler(replacedEvent)
         bazaarHandler(replacedEvent)
-        if (replacedEvent.isCanceled) {
+        if (replacedEvent.isCancelled) {
             event.cancel()
             return
         }
@@ -157,7 +157,7 @@ object GetFromSackAPI {
     }
 
     private fun bazaarHandler(event: MessageSendToServerEvent) {
-        if (event.isCanceled) return
+        if (event.isCancelled) return
         if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
         lastItemStack = commandValidator(event.splitMessage.drop(1)).second
     }
@@ -201,8 +201,8 @@ object GetFromSackAPI {
         return CommandResult.VALID to PrimitiveItemStack(item, amountString.toDouble().toInt())
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.bazaarGFS || LorenzUtils.noTradeMode) return
         val stack = lastItemStack ?: return

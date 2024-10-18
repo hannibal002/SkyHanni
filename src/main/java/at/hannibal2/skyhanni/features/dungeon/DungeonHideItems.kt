@@ -1,12 +1,14 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.EntityMovementData
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -18,7 +20,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonHideItems {
@@ -63,10 +64,8 @@ object DungeonHideItems {
         return itemStack != null && itemStack.cleanName() == "Skeleton Skull"
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         val entity = event.entity
 
         if (entity is EntityItem) {
@@ -158,7 +157,7 @@ object DungeonHideItems {
         }
 
         if (config.hideHealerFairy) {
-            // Healer Fairy texture is stored in id 0, not id 4 for some reasons.
+            // Healer Fairy texture is stored in id 0, not id 4 for some reason.
             if (entity.inventory[0]?.getSkullTexture() == HEALER_FAIRY_TEXTURE) {
                 event.cancel()
                 return
@@ -173,7 +172,7 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!DungeonAPI.inDungeon()) return
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
@@ -192,12 +191,9 @@ object DungeonHideItems {
         }
     }
 
-    @SubscribeEvent
-    fun onEntityMove(event: EntityMoveEvent) {
-        if (!DungeonAPI.inDungeon()) return
-
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onEntityMove(event: EntityMoveEvent<EntityArmorStand>) {
         val entity = event.entity
-        if (entity !is EntityArmorStand) return
 
         if (isSkeletonSkull(entity)) {
             movingSkeletonSkulls[entity] = System.currentTimeMillis()
@@ -213,13 +209,13 @@ object DungeonHideItems {
             it + 200 > System.currentTimeMillis()
         } ?: false
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         hideParticles.clear()
         movingSkeletonSkulls.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dungeon.hideSuperboomTNT", "dungeon.objectHider.hideSuperboomTNT")
         event.move(3, "dungeon.hideBlessing", "dungeon.objectHider.hideBlessing")

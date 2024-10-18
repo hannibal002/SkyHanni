@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HotmData
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 @SkyHanniModule
@@ -19,8 +19,8 @@ object PowderPerHotmPerk {
 
     private val config get() = SkyHanniMod.feature.mining.hotm
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
 
         val itemName = event.itemStack.displayName
@@ -32,7 +32,7 @@ object PowderPerHotmPerk {
         if (config.powderFor10Levels) handlePowderFor10Levels(event, perk)
     }
 
-    private fun handlePowderFor10Levels(event: LorenzToolTipEvent, perk: HotmData) {
+    private fun handlePowderFor10Levels(event: SkyHanniToolTipEvent, perk: HotmData) {
         if (!Keyboard.KEY_LSHIFT.isKeyHeld()) return
 
         val indexOfCost = event.toolTip.indexOfFirst { HotmData.perkCostPattern.matches(it) }

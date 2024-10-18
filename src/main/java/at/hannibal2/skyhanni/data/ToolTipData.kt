@@ -1,6 +1,6 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.events.item.ItemHoverEvent
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -17,7 +17,7 @@ object ToolTipData {
         val slot = lastSlot ?: return
         val itemStack = slot.stack ?: return
         try {
-            if (LorenzToolTipEvent(slot, itemStack, toolTip).postAndCatch()) {
+            if (SkyHanniToolTipEvent(slot, itemStack, toolTip).post()) {
                 toolTip.clear()
             }
         } catch (e: Throwable) {

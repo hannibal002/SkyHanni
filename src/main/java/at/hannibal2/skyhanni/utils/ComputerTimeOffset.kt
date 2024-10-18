@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.net.ntp.NTPUDPClient
 import java.net.InetAddress
 import kotlin.concurrent.thread
@@ -86,7 +86,7 @@ object ComputerTimeOffset {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         DelayedRun.runDelayed(5.seconds) {
             checkOffset()
@@ -112,7 +112,7 @@ object ComputerTimeOffset {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugCollect(event: DebugDataCollectEvent) {
         event.title("Time Offset")
         val offset = offsetMillis ?: run {

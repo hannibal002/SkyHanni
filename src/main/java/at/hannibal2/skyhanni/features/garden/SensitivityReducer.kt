@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.SensitivityReducerConfig
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.misc.LockMouseLook
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -15,7 +16,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.seconds
 
@@ -31,8 +31,8 @@ object SensitivityReducer {
     private val mc get() = Minecraft.getMinecraft()
     private val gameSettings = mc.gameSettings
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!GardenAPI.inGarden()) {
             if (isToggled && lastCheckCooldown.passedSince() > 1.seconds) {
                 lastCheckCooldown = SimpleTimeMark.now()
@@ -78,7 +78,7 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.reducingFactor.afterChange {
             reloadSensitivity()
@@ -104,7 +104,7 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!(isToggled || isManualToggle)) return
         if (!config.showGUI) return
@@ -169,7 +169,7 @@ object SensitivityReducer {
         else (divisor * (input - LOCKED)) + LOCKED
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val divisor = config.reducingFactor.get()
         val expectedLoweredSensitivity = doTheMath(gameSettings.mouseSensitivity, true)
@@ -181,7 +181,7 @@ object SensitivityReducer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Sensitivity Reducer")
 

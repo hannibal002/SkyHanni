@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -53,15 +53,15 @@ object FlareDisplay {
             to FlareType.SOS,
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (config.displayType == FlareConfig.DisplayType.WORLD) return
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.displayType == FlareConfig.DisplayType.GUI) return
 
@@ -74,7 +74,7 @@ object FlareDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondsPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         flares.removeIf { !it.entity.isEntityAlive }
@@ -140,14 +140,14 @@ object FlareDisplay {
     private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =
         flares.any { it.entity.entityId == entity.entityId }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         flares.clear()
         display = emptyList()
     }
 
-    @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRender(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (config.outlineType == FlareConfig.OutlineType.NONE) return
 
@@ -179,7 +179,7 @@ object FlareDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!config.hideParticles) return

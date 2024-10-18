@@ -27,7 +27,6 @@ import net.minecraft.item.ItemStack
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.IChatComponent
 import net.minecraftforge.fml.common.Loader
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
 /**
@@ -70,12 +69,12 @@ object EnchantParser {
     // Maps for all enchants
     private var enchants: EnchantsJson = EnchantsJson()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         this.enchants = event.getConstant<EnchantsJson>("Enchants")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         // Add observers to config options that would need us to mark cache dirty
         ConditionalUtils.onToggle(
@@ -113,7 +112,7 @@ object EnchantParser {
     /**
      * For tooltips that are shown when hovering over an item from /show
      */
-    @SubscribeEvent
+    @HandleEvent
     fun onChatHoverEvent(event: ChatHoverEvent) {
         if (event.getHoverEvent().action != HoverEvent.Action.SHOW_TEXT) return
         if (!isEnabled() || !this.enchants.hasEnchantData()) return

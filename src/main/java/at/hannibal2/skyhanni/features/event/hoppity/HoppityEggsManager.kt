@@ -3,9 +3,9 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -25,7 +25,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.now
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -105,8 +104,8 @@ object HoppityEggsManager {
 
     private var latestWaypointOnclick: () -> Unit = {}
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastMeal = null
         lastNote = null
     }
@@ -127,8 +126,8 @@ object HoppityEggsManager {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         hoppityEventNotOn.matchMatcher(event.message) {
@@ -171,7 +170,7 @@ object HoppityEggsManager {
         }
     }
 
-    internal fun Matcher.getEggType(event: LorenzChatEvent): HoppityEggType =
+    internal fun Matcher.getEggType(event: SkyHanniChatEvent): HoppityEggType =
         HoppityEggType.getMealByName(group("meal")) ?: run {
             ErrorManager.skyHanniError(
                 "Unknown meal: ${group("meal")}",
@@ -207,7 +206,7 @@ object HoppityEggsManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isActive()) return
         HoppityEggType.checkClaimed()
@@ -250,7 +249,7 @@ object HoppityEggsManager {
         SoundUtils.repeatSound(100, 10, SoundUtils.plingSound)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(
             44,

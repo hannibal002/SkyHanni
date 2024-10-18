@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HotmData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
@@ -8,7 +9,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object HotmFeatures {
@@ -17,7 +17,7 @@ object HotmFeatures {
 
     fun isEnabled() = LorenzUtils.inSkyBlock && HotmData.inInventory
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!config.highlightEnabledPerks) return
@@ -28,7 +28,7 @@ object HotmFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
         handleLevelStackSize(event)

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -22,8 +23,6 @@ import net.minecraft.init.Blocks
 import net.minecraft.init.Items
 import net.minecraft.item.EnumDyeColor
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -103,7 +102,7 @@ object WardrobeAPI {
         if (totalPrice != 0.0) add(" §aTotal Value: §6§l${totalPrice.shortFormat()} coins")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inventoryPattern.matches(event.inventoryName).let {
             inWardrobe = it
@@ -111,7 +110,7 @@ object WardrobeAPI {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -164,7 +163,7 @@ object WardrobeAPI {
         return foundCurrentSlot
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!inWardrobe) return
         DelayedRun.runDelayed(250.milliseconds) {
@@ -175,7 +174,7 @@ object WardrobeAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugCollect(event: DebugDataCollectEvent) {
         event.title("Wardrobe")
         event.addIrrelevant {

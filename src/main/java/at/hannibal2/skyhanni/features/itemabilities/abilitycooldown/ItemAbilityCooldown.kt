@@ -5,13 +5,13 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.RenderObject
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.itemabilities.abilitycooldown.ItemAbility.Companion.getMultiplier
 import at.hannibal2.skyhanni.features.nether.ashfang.AshfangFreezeCooldown
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -34,7 +34,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemUuid
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.max
 
 @SkyHanniModule
@@ -65,7 +64,7 @@ object ItemAbilityCooldown {
     private val TOTEM_OF_CORRUPTION = "TOTEM_OF_CORRUPTION".asInternalName()
 
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPlaySound(event: PlaySoundEvent) {
         when {
             // Hyperion
@@ -230,15 +229,15 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onIslandChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onIslandChange(event: WorldChangeEvent) {
         for (ability in ItemAbility.entries) {
             ability.lastActivation = 0L
             ability.specialColor = null
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
 
@@ -289,8 +288,8 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
         checkHotBar(event.isMod(10))
@@ -335,7 +334,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderItemTipEvent) {
         if (!isEnabled()) return
 
@@ -357,7 +356,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItem(event: RenderGuiItemOverlayEvent) {
         if (!isEnabled()) return
         if (!config.itemAbilityCooldownBackground) return
@@ -384,8 +383,8 @@ object ItemAbilityCooldown {
 
     private fun ItemStack.getIdentifier() = getItemUuid() ?: getItemId()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -415,7 +414,7 @@ object ItemAbilityCooldown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "itemAbilities", "inventory.itemAbilities")
     }

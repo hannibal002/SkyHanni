@@ -1,3 +1,5 @@
 package at.hannibal2.skyhanni.events
 
-class ScoreboardUpdateEvent(val scoreboard: List<String>) : LorenzEvent()
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
+
+class ScoreboardUpdateEvent(val scoreboard: List<String>) : SkyHanniEvent()
