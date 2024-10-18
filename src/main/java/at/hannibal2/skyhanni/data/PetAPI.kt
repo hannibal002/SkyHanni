@@ -293,7 +293,7 @@ object PetAPI {
                 pet = null
                 return null
             }
-            return NEUInternalName.fromItemNameOrNull(string) ?: NEUInternalName.NONE
+            return NEUInternalName.fromItemNameOrNull(string)
         }
         return null
     }
