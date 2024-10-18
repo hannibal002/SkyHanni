@@ -91,16 +91,16 @@ object CustomScoreboardConfigFix {
             JsonPrimitive(!it.asBoolean)
         }
 
-        event.transform(58, EVENT_ENTRIES_KEY) { element ->
+        event.transform(62, EVENT_ENTRIES_KEY) { element ->
             replaceElements(element, listOf("GARDEN_CLEAN_UP", "GARDEN_PASTING"), ScoreboardConfigEventElement.GARDEN.name)
         }
         listOf("customTitle", "customFooter").forEach { key ->
-            event.transform(58, "$TITLE_AND_FOOTER_KEY.$key") {
+            event.transform(62, "$TITLE_AND_FOOTER_KEY.$key") {
                 JsonPrimitive(it.asString.replace("&", "&&"))
             }
         }
         listOf("alignTitle", "alignFooter").forEach { key ->
-            event.move(58, "$TITLE_AND_FOOTER_KEY.alignTitleAndFooter", "$TITLE_AND_FOOTER_KEY.$key")
+            event.move(62, "$TITLE_AND_FOOTER_KEY.alignTitleAndFooter", "$TITLE_AND_FOOTER_KEY.$key")
         }
     }
 
