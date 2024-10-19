@@ -45,7 +45,7 @@ object TheGreatSpook {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isTimerEnabled()) config.positionTimer.renderString(displayTimer, posLabel = "Primal Fear Timer")
-        if (isFearStatEnabled() && SkyblockStat.FEAR.lastKnownValue != 0.0){
+        if (isFearStatEnabled() && SkyblockStat.FEAR.lastKnownValue != 0.0) {
             config.positionFear.renderString(SkyblockStat.FEAR.displayValue, posLabel = "Fear Stat Display")
         }
         if (isTimeLeftEnabled()) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
