@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.api.hypixel.HypixelLocationAPI
+import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationAPI
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent

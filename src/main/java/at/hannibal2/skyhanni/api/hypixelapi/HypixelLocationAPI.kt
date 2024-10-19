@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api.hypixel
+package at.hannibal2.skyhanni.api.hypixelapi
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent

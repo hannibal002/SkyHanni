@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.api.hypixel
+package at.hannibal2.skyhanni.api.hypixelapi
 
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelAPIServerChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -12,10 +12,10 @@ object HypixelEventAPI {
     init {
         val modApi = HypixelModAPI.getInstance()
         modApi.subscribeToEventPacket(ClientboundLocationPacket::class.java)
-        modApi.createHandler(ClientboundLocationPacket::class.java, ::sendLocationPacket)
+        modApi.createHandler(ClientboundLocationPacket::class.java, ::onLocationPacket)
     }
 
-    private fun sendLocationPacket(packet: ClientboundLocationPacket) {
+    private fun onLocationPacket(packet: ClientboundLocationPacket) {
         if (!HypixelLocationAPI.config) return
         HypixelAPIServerChangeEvent(
             packet.serverName,
