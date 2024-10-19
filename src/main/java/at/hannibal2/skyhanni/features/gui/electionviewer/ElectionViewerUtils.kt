@@ -1,7 +1,11 @@
 package at.hannibal2.skyhanni.features.gui.electionviewer
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.jsonobjects.other.MayorCandidate
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.FakePlayer
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullOwner
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -12,6 +16,7 @@ import net.minecraft.client.Minecraft
 import net.minecraft.entity.passive.EntityVillager
 import net.minecraft.nbt.NBTUtil
 
+@SkyHanniModule
 object ElectionViewerUtils {
 
     private val specialMayorStart = mapOf(
@@ -59,5 +64,14 @@ object ElectionViewerUtils {
 
         val skullOwner = mayorName.asInternalName().getItemStack().getSkullOwner() ?: return null
         return NBTUtil.readGameProfileFromNBT(skullOwner)
+    }
+
+    @HandleEvent
+    fun onCommand(event: CommandRegistrationEvent) {
+        event.register("shelectionviewer") {
+            aliases = listOf("shmayor", "shelection", "shmayorviewer")
+            description = "Opens the Mayor Election Viewer"
+            callback { SkyHanniMod.screenToOpen = CurrentMayorScreen }
+        }
     }
 }
