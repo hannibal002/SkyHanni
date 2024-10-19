@@ -135,7 +135,7 @@ object HypixelLocationAPI {
             userMessage,
             internalMessage,
             "HypixelData.skyBlock" to HypixelData.skyBlock,
-            "inSkyBlock" to inSkyblock,
+            "inSkyblock" to inSkyblock,
             "HypixelData.hypixelLive" to HypixelData.hypixelLive,
             "inHypixel" to inHypixel,
             "HypixelData.skyBlockIsland" to HypixelData.skyBlockIsland,
