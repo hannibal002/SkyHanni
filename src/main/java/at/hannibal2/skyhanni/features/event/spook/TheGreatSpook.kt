@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.spook
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,7 +26,6 @@ object TheGreatSpook {
         if (isAllDisabled()) return
 
         if (isTimerEnabled() || isNotificationEnabled()) displayTimer = checkTabList(" §r§cPrimal Fears§r§7: ")
-        if (isFearStatEnabled()) displayFearStat = checkTabList(" §r§5Fear: ")
         if (isTimeLeftEnabled()) displayTimeLeft = checkTabList(" §r§dEnds In§r§7: ")
         if (isNotificationEnabled()) {
             if (displayTimer.endsWith("READY!!")) {
@@ -46,7 +46,7 @@ object TheGreatSpook {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isTimerEnabled()) config.positionTimer.renderString(displayTimer, posLabel = "Primal Fear Timer")
-        if (isFearStatEnabled()) config.positionFear.renderString(displayFearStat, posLabel = "Fear Stat Display")
+        if (isFearStatEnabled() && SkyblockStat.FEAR.lastKnownValue != 0.0) config.positionFear.renderString(SkyblockStat.FEAR.displayValue, posLabel = "Fear Stat Display")
         if (isTimeLeftEnabled()) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
     }
 
