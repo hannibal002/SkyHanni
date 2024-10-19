@@ -8,7 +8,7 @@ import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 object ScoreboardElementLobbyCode : ScoreboardElement() {
     override fun getDisplay(): String? {
         val lobbyCode = HypixelData.serverId ?: return null
-        val roomId = DungeonAPI.getRoomID()?.let { " §8$it" } ?: ""
+        val roomId = DungeonAPI.getRoomID()?.let { " §8$it" }.orEmpty()
         return "§8$lobbyCode$roomId"
     }
 

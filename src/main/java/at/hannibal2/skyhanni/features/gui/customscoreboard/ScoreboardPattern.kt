@@ -20,7 +20,7 @@ object ScoreboardPattern {
     // Main scoreboard
     private val mainSb = scoreboardGroup.group("main")
 
-    //TODO add regex tests
+    // TODO add regex tests
     val motesPattern by mainSb.pattern(
         "motes",
         "(?:§.)*Motes: (?:§.)*(?<motes>[\\d,]+).*",
