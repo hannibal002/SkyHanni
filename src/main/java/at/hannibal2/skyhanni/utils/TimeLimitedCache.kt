@@ -14,9 +14,9 @@ class TimeLimitedCache<K : Any, V : Any>(
 
     private val cache = CacheBuilder.newBuilder()
         .expireAfterWrite(expireAfterWrite.inWholeMilliseconds, TimeUnit.MILLISECONDS)
-        .also { cache ->
+        .apply {
             removalListener?.let { listener ->
-                cache.removalListener {
+                removalListener {
                     listener(it.key, it.value, it.cause)
                 }
             }
