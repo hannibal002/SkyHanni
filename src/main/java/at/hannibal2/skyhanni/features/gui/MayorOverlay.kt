@@ -42,7 +42,7 @@ enum class MayorOverlay(private val configLine: String, private val createLines:
     CANDIDATES(
         "Candidates",
         {
-            val candidates = MayorAPI.rawMayorData?.current?.candidates ?: emptyList()
+            val candidates = MayorAPI.rawMayorData?.current?.candidates.orEmpty()
 
             Renderable.verticalContainer(
                 candidates.map { candidate ->
@@ -92,7 +92,7 @@ private fun renderPerson(title: String, name: String?, perks: List<Perk>?): Rend
     val colorCode = MayorAPI.mayorNameToColorCode(name.orEmpty())
     val perkLines = perks?.takeIf { config.showPerks }?.map { perk ->
         "${if (perk.minister) "§6✯ " else ""}§e${perk.perkName}" to "§7${perk.description}"
-    } ?: emptyList()
+    }.orEmpty()
 
     return Renderable.verticalContainer(
         buildMap {
