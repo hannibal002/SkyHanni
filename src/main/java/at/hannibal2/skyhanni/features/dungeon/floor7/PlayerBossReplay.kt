@@ -1,10 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon.floor7
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
-import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
@@ -79,29 +76,6 @@ object PlayerBossReplay {
         }
     }
 
-    @HandleEvent
-    fun onBossStart(event: DungeonBossRoomEnterEvent) {
-        if (DungeonAPI.dungeonFloor?.contains("3") == false) return
-
-        startRecording()
-        if (bestRun.recordedPositions.isNotEmpty()) {
-            currentRun = bestRun
-            playIndex = 0
-            playing = true
-        }
-    }
-
-    @SubscribeEvent
-    fun onBossEnd(event: DungeonCompleteEvent) {
-        if (DungeonAPI.dungeonFloor?.contains("3") == false) return
-
-        stopRecording()
-        if (playing) {
-            playing = false
-            playIndex = 0
-        }
-    }
-
     fun command(strings: Array<String>) {
         when {
             strings.any { it.contains("clear", ignoreCase = true) } -> {
@@ -109,11 +83,22 @@ object PlayerBossReplay {
                 recordedPositions.clear()
                 recordedTime = SimpleTimeMark.farPast()
                 bestRun = DungeonGhostData()
+                SkyHanniMod.dungeonReplayData.manual = DungeonGhostData()
+                SkyHanniMod.configManager.saveConfig(ConfigFileType.DUNGEON_REPLAY, "manualreset")
                 ChatUtils.chat("cleared!")
                 return
             }
-            strings.any { it.contains("play", ignoreCase = true) } -> {
+            strings.any { it.contains("playtemp", ignoreCase = true) } -> {
                 currentRun = bestRun
+                playIndex = 0
+                playing = true
+                ChatUtils.chat("playing")
+                return
+            }
+            strings.any { it.contains("playstorage", ignoreCase = true) } -> {
+                currentRun = SkyHanniMod.dungeonReplayData.manual
+                val awesome = SkyHanniMod.dungeonReplayData.manual
+                ChatUtils.chat(awesome.toString())
                 playIndex = 0
                 playing = true
                 ChatUtils.chat("playing")
@@ -171,12 +156,7 @@ object PlayerBossReplay {
                 }
             }
             SkyHanniMod.configManager.saveConfig(ConfigFileType.DUNGEON_REPLAY, "Updated Dungeon Replays")
-            bestRun = bestRun.copy(
-                recordedPositions = positions.map { it.copy() },
-                time = time,
-                playerUUID = player.gameProfile.id,
-                playerName = player.gameProfile.name
-            )
+            bestRun = ghostData
         }
     }
 
