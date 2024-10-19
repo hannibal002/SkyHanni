@@ -41,7 +41,6 @@ object TimeUtils {
         val largestNonZeroUnit = parts.firstNotNullOfOrNull { if (it.value != 0) it.key else null } ?: TimeUnit.SECOND
 
         if (absoluteValue < 1.seconds) {
-            if (!showMilliSeconds) return TimeUnit.SECOND.format(0, longName)
             val formattedMillis = (millis / 100).toInt()
             return "${prefix}0.${formattedMillis}${TimeUnit.SECOND.getName(formattedMillis, longName)}"
         }
