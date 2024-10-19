@@ -1,10 +1,11 @@
-
-net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
-net.minecraft.util.math.BlockPos net.minecraft.util.BlockPos
-net.minecraft.util.math.AxisAlignedBB net.minecraft.util.AxisAlignedBB
-net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
-net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
-net.minecraft.util.math.Rotations net.minecraft.util.Rotations
+net.minecraft.network.play.client.CPacketAnimation net.minecraft.network.play.client.C0APacketAnimation
+net.minecraft.network.play.client.CPacketChatMessage net.minecraft.network.play.client.C01PacketChatMessage
+net.minecraft.network.play.client.CPacketClickWindow net.minecraft.network.play.client.C0EPacketClickWindow
+net.minecraft.network.play.client.CPacketHeldItemChange net.minecraft.network.play.client.C09PacketHeldItemChange
+net.minecraft.network.play.client.CPacketPlayer net.minecraft.network.play.client.C03PacketPlayer
+net.minecraft.network.play.client.CPacketPlayerDigging net.minecraft.network.play.client.C07PacketPlayerDigging
+net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
+net.minecraft.network.play.client.CPacketUseEntity net.minecraft.network.play.client.C02PacketUseEntity
 
 net.minecraft.network.play.server.SPacketAnimation net.minecraft.network.play.server.S0BPacketAnimation
 net.minecraft.network.play.server.SPacketBlockChange net.minecraft.network.play.server.S23PacketBlockChange
@@ -40,14 +41,12 @@ net.minecraft.network.play.server.SPacketTitle net.minecraft.network.play.server
 net.minecraft.network.play.server.SPacketUpdateScore net.minecraft.network.play.server.S3CPacketUpdateScore
 net.minecraft.network.play.server.SPacketWorldBorder net.minecraft.network.play.server.S44PacketWorldBorder
 
-net.minecraft.network.play.client.CPacketAnimation net.minecraft.network.play.client.C0APacketAnimation
-net.minecraft.network.play.client.CPacketChatMessage net.minecraft.network.play.client.C01PacketChatMessage
-net.minecraft.network.play.client.CPacketClickWindow net.minecraft.network.play.client.C0EPacketClickWindow
-net.minecraft.network.play.client.CPacketHeldItemChange net.minecraft.network.play.client.C09PacketHeldItemChange
-net.minecraft.network.play.client.CPacketPlayer net.minecraft.network.play.client.C03PacketPlayer
-net.minecraft.network.play.client.CPacketPlayerDigging net.minecraft.network.play.client.C07PacketPlayerDigging
-net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
-net.minecraft.network.play.client.CPacketUseEntity net.minecraft.network.play.client.C02PacketUseEntity
+net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
+net.minecraft.util.math.BlockPos net.minecraft.util.BlockPos
+net.minecraft.util.math.AxisAlignedBB net.minecraft.util.AxisAlignedBB
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+net.minecraft.util.math.Rotations net.minecraft.util.Rotations
 
 net.minecraft.util.text.TextComponentString net.minecraft.util.ChatComponentText
 net.minecraft.util.text.TextComponentTranslation net.minecraft.util.ChatComponentTranslation
@@ -58,5 +57,3 @@ net.minecraft.util.text.TextFormatting net.minecraft.util.EnumChatFormatting
 net.minecraft.util.text.ITextComponent net.minecraft.util.IChatComponent
 net.minecraft.util.text.event.HoverEvent net.minecraft.event.HoverEvent
 net.minecraft.util.text.event.ClickEvent net.minecraft.event.ClickEvent
-
-

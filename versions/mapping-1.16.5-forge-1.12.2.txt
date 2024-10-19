@@ -51,29 +51,29 @@ net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentSt
 
 net.minecraft.network.protocol.Packet net.minecraft.network.Packet
 
-net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
 net.minecraft.network.protocol.game.ClientboundAddEntityPacket net.minecraft.network.play.server.SPacketSpawnObject
-net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.SPacketSpawnPlayer
 net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.network.play.server.SPacketSpawnMob
-net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.SPacketDestroyEntities
-net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.SPacketPlayerListHeaderFooter
+net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.SPacketSpawnPlayer
 net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.SPacketAnimation
-net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecraft.network.play.server.SPacketEntityVelocity
-net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.SPacketEntity
-net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.SPacketEntityTeleport
-net.minecraft.network.protocol.game.ClientboundRotateHeadPacket net.minecraft.network.play.server.SPacketEntityHeadLook
-net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket net.minecraft.network.play.server.SPacketEntityAttach
-net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket net.minecraft.network.play.server.SPacketEntityMetadata
-net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.SPacketEntityEffect
-net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.SPacketEntityProperties
-net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
-net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.SPacketEntityEquipment
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
+net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
+net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.SPacketEntity
 net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.SPacketPlayerListItem
+net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.SPacketDestroyEntities
+net.minecraft.network.protocol.game.ClientboundRotateHeadPacket net.minecraft.network.play.server.SPacketEntityHeadLook
+net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket net.minecraft.network.play.server.SPacketEntityMetadata
+net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket net.minecraft.network.play.server.SPacketEntityAttach
+net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecraft.network.play.server.SPacketEntityVelocity
+net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.SPacketEntityEquipment
+net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.SPacketPlayerListHeaderFooter
+net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.SPacketEntityTeleport
+net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.SPacketEntityProperties
+net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.SPacketEntityEffect
 
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
-net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.CPacketHeldItemChange
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
+net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.CPacketHeldItemChange
 
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
