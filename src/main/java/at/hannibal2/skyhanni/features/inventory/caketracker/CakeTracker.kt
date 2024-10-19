@@ -92,8 +92,8 @@ object CakeTracker {
         "^Auctions: \"New Year C.*$",
     )
 
-    private val tracker = SkyHanniTracker("New Year Cake Tracker", { Data() }, { it.cakeTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("New Year Cake Tracker", { Data() }, { it.cakeTracker } )
+        { drawDisplay(it) }
 
     class Data : TrackerData() {
         override fun reset() {

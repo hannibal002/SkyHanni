@@ -157,7 +157,7 @@ object HypixelCommands {
     fun auctionHouseSearch(query: String) {
         send("ahs $query")
     }
-        
+
     fun callback(uuid: String) {
         send("cb $uuid")
     }
