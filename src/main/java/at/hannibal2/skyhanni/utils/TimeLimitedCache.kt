@@ -9,7 +9,7 @@ import kotlin.time.Duration
 @Suppress("UnstableApiUsage")
 class TimeLimitedCache<K : Any, V : Any>(
     expireAfterWrite: Duration,
-    private val removalListener: ((K?, V?) -> Unit)? = null,
+    private val removalListener: ((K?, V?, RemovalCause) -> Unit)? = null,
 ) : MutableMap<K, V> {
 
     private val cache = CacheBuilder.newBuilder()
@@ -17,7 +17,7 @@ class TimeLimitedCache<K : Any, V : Any>(
         .also { cache ->
             removalListener?.let { listener ->
                 cache.removalListener {
-                    listener(it.key, it.value)
+                    listener(it.key, it.value, it.cause)
                 }
             }
         }

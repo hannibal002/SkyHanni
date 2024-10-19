@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils
 import com.google.common.cache.RemovalCause
 import kotlin.time.Duration
 
+@Suppress("UnstableApiUsage")
 class TimeLimitedSet<T : Any>(
     expireAfterWrite: Duration,
     private val removalListener: (T, RemovalCause) -> Unit = { _, _ -> },
