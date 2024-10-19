@@ -18,12 +18,14 @@ import java.util.EnumMap
 import java.util.regex.Pattern
 import kotlin.math.roundToInt
 
+
+@Suppress("MaxLineLength")
 enum class SkyblockStat(
     val icon: String,
     @Language("RegExp") tabListPatternS: String,
     @Language("RegExp") menuPatternS: String,
 ) {
-    DAMAGE("§c❁", "", ""),  // Weapon only
+    DAMAGE("§c❁", "", ""), // Weapon only
     HEALTH("§c❤", " Health: §r§c❤(?<value>.*)", " §c❤ Health §f(?<value>.*)"), // TODO get from action bar
     DEFENSE("§a❈", " Defense: §r§a❈(?<value>.*)", " §a❈ Defense §f(?<value>.*)"), // TODO get from action bar
     STRENGTH("§c❁", " Strength: §r§c❁(?<value>.*)", " §c❁ Strength §f(?<value>.*)"),
@@ -137,7 +139,8 @@ enum class SkyblockStat(
         private fun onSkyblockMenu(event: InventoryFullyOpenedEvent) {
             if (event.inventoryName != "SkyBlock Menu") return
             val list = event.inventoryItems[PLAYER_STATS_SLOT_INDEX]?.getLore() ?: return
-            DelayedRun.runNextTick {  // Delayed to not impact opening time
+
+            DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.SKYBLOCK_MENU) { it.menuPattern }
             }
         }
@@ -148,7 +151,8 @@ enum class SkyblockStat(
             if (event.inventoryName != "Your Equipment and Stats") return
             val list = statsMenuRelevantSlotIndexes.mapNotNull { event.inventoryItems[it]?.getLore() }.flatten()
             if (list.isEmpty()) return
-            DelayedRun.runNextTick {  // Delayed to not impact opening time
+
+            DelayedRun.runNextTick { // Delayed to not impact opening time
                 assignEntry(list, StatSourceType.STATS_MENU) { it.menuPattern }
             }
         }

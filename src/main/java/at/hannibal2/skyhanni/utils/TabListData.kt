@@ -74,10 +74,10 @@ object TabListData {
         val tabHeader = header.conditionalTransform(noColor, { this.removeColor() }, { this })
         val tabFooter = footer.conditionalTransform(noColor, { this.removeColor() }, { this })
 
-            val widgets = TabWidget.entries.filter { it.isActive }
-                .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
-            val string =
-                "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
+        val widgets = TabWidget.entries.filter { it.isActive }
+            .joinToString("\n") { "\n${it.name} : \n${it.lines.joinToString("\n")}" }
+        val string =
+            "Header:\n\n$tabHeader\n\nBody:\n\n${resultList.joinToString("\n")}\n\nFooter:\n\n$tabFooter\n\nWidgets:$widgets"
 
         OSUtils.copyToClipboard(string)
         ChatUtils.chat("Tab list copied into the clipboard!")
@@ -140,9 +140,9 @@ object TabListData {
         }
 
         val tabListOverlay = Minecraft.getMinecraft().ingameGUI.tabList as AccessorGuiPlayerTabOverlay
-        header = tabListOverlay.header_skyhanni?.formattedText ?: ""
+        header = tabListOverlay.header_skyhanni?.formattedText.orEmpty()
 
-        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText ?: ""
+        val tabFooter = tabListOverlay.footer_skyhanni?.formattedText.orEmpty()
         if (tabFooter != footer && tabFooter != "") {
             TablistFooterUpdateEvent(tabFooter).postAndCatch()
         }

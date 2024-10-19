@@ -61,10 +61,10 @@ object CarnivalZombieShootout {
     )
 
     enum class ZombieType(val points: Int, val helmet: String, val color: Color) {
-        LEATHER(30, "Leather Cap", Color(165, 42, 42)), //Brown
-        IRON(50, "Iron Helmet", Color(192, 192, 192)), //Silver
-        GOLD(80, "Golden Helmet", Color(255, 215, 0)), //Gold
-        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) //Diamond
+        LEATHER(30, "Leather Cap", Color(165, 42, 42)), // Brown
+        IRON(50, "Iron Helmet", Color(192, 192, 192)), // Silver
+        GOLD(80, "Golden Helmet", Color(255, 215, 0)), // Gold
+        DIAMOND(120, "Diamond Helmet", Color(44, 214, 250)) // Diamond
     }
 
     @SubscribeEvent
@@ -86,9 +86,13 @@ object CarnivalZombieShootout {
                 zombie to type
             }.toMap()
 
-            drawZombies =
-                if (config.highestOnly) nearbyZombies.filterValues { zombieType -> zombieType == nearbyZombies.values.maxByOrNull { it.points } }
-                else nearbyZombies
+            drawZombies = if (config.highestOnly)
+                nearbyZombies.filterValues { zombieType ->
+                    zombieType == nearbyZombies.values.maxByOrNull {
+                        it.points
+                    }
+                }
+            else nearbyZombies
 
             lastUpdate.zombie = SimpleTimeMark.now()
         }
@@ -127,7 +131,7 @@ object CarnivalZombieShootout {
             content = Renderable.horizontalContainer(
                 listOf(
                     Renderable.itemStack(lamp),
-                    Renderable.string("§6Disappears in $prefix${timer}"),
+                    Renderable.string("§6Disappears in $prefix$timer"),
                 ),
                 spacing = 1,
                 verticalAlign = RenderUtils.VerticalAlignment.CENTER,

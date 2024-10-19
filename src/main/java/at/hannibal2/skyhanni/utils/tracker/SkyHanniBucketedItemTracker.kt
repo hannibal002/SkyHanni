@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("SpreadOperator")
 class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTrackerData<E>>(
     name: String,
     createNewSession: () -> BucketedData,
@@ -59,9 +60,9 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             lists.addSearchableSelector<ItemPriceSource>(
                 "",
                 getName = { type -> type.sellName },
-                isCurrent = { it?.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
                 onChange = {
-                    config.priceSource = it?.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
+                    config.priceSource = it.let { ItemPriceSource.entries[it.ordinal] } // todo avoid ordinal
                     update()
                 },
             )
@@ -151,7 +152,11 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
                 onClick = {
                     if (KeyboardManager.isModifierKeyDown()) {
                         data.removeItem(data.getSelectedBucket(), internalName)
-                        ChatUtils.chat("Removed $cleanName §efrom $name${if (data.getSelectedBucket() != null) " (${data.getSelectedBucket()})" else ""}")
+                        ChatUtils.chat(
+                            "Removed $cleanName §efrom $name" +
+                                if (data.getSelectedBucket() != null) " (${data.getSelectedBucket()})"
+                                else ""
+                        )
                     } else {
                         modify {
                             it.toggleItemHide(data.getSelectedBucket(), internalName)
@@ -193,7 +198,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         add("§eControl + Click to remove this item!")
         if (SkyHanniMod.feature.dev.debug.enabled) {
             add("")
-            add("§7${internalName}")
+            add("§7$internalName")
         }
     }
 
