@@ -1022,6 +1022,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     +  Shows your progress in the Warp Menu.
     +  Can be automatically hidden when an island is complete.
 + Added the ability to block opening the Chocolate Factory when Booster Cookie is inactive. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2713)
++ Added a feature to block opening Hoppity's trade menu from Abiphone calls if you do not have coins in your purse. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2664)
++ Added the ability to prevent closing Meal Eggs that have Rabbit the Fish inside. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2712)
 
 ### The Carnival
 
