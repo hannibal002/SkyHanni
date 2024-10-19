@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.combat.ghosttracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.GhostDrops
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SkillExpGainEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -45,10 +47,10 @@ object GhostTracker {
         }
 
     private val isMaxBestiary get() = currentBestiaryKills >= MAX_BESTIARY_KILLS
-
-    private var allowedDrops = listOf<NEUInternalName>()
-
+    private var allowedDrops = setOf<NEUInternalName>()
     private val MAX_BESTIARY_KILLS = getBestiaryKillsUntilLevel(25)
+
+    private var inArea: Boolean = false
 
     private val tracker = SkyHanniItemTracker(
         "Ghost Tracker",
@@ -247,7 +249,12 @@ object GhostTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghost_drops
+        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghost_drops.toSet()
+    }
+
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inArea = event.area == "The Mist" && IslandType.DWARVEN_MINES.isInIsland()
     }
 
     @SubscribeEvent
@@ -263,8 +270,7 @@ object GhostTracker {
         if (mf == 0L || kills == 0L) 0.0 else mf / (kills).toDouble()
 
 
-    private fun isEnabled() =
-        IslandType.DWARVEN_MINES.isInIsland() && LorenzUtils.skyBlockArea == "The Mist" && config.enabled
+    private fun isEnabled() = inArea && config.enabled
 
     enum class GhostTrackerLines(private val display: String) {
         KILLS("§7Kills: §e7,813"),
