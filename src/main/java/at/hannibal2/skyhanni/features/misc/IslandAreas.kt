@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
@@ -170,10 +171,9 @@ object IslandAreas {
                     }
                 }
                 if (name != currentAreaName) {
-                    if (inAnArea && config.enterTitle) {
-                        LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
-                    }
+                    val oldArea = currentAreaName
                     currentAreaName = name
+                    GraphAreaChangeEvent(name, oldArea).post()
                 }
 
                 addSearchString("§eAreas nearby:")
@@ -222,6 +222,15 @@ object IslandAreas {
         }
     }
 
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        val name = event.area
+        val inAnArea = name != "no_area"
+        if (inAnArea && config.enterTitle) {
+            LorenzUtils.sendTitle("§aEntered $name!", 3.seconds)
+        }
+    }
+
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
@@ -231,7 +240,7 @@ object IslandAreas {
             if (name == currentAreaName) continue
             if (name == "no_area") continue
             val position = node.position
-            val color = node.getAreaTag()?.color?.getChatColor() ?: ""
+            val color = node.getAreaTag()?.color?.getChatColor().orEmpty()
             if (!position.canBeSeen(40.0)) return
             event.drawDynamicText(position, color + name, 1.5)
         }

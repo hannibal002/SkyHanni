@@ -55,7 +55,7 @@ object DanceRoomHelper {
 
         when {
             index < size && index == lineIndex -> {
-                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
+                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" }.orEmpty()
                 "${now.formatColor()} $format $countdown"
             }
 
