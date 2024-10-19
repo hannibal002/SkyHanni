@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -117,15 +118,18 @@ object HoppityAPI {
                         duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
                         attemptFireRabbitFound()
                     }
-                    "El Dorado" -> {
-                        EggFoundEvent(STRAY, it.slotNumber).post()
-                        lastName = "§6El Dorado"
-                        lastMeal = STRAY
-                        duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
-                        attemptFireRabbitFound()
-                    }
                     else -> return@matchMatcher
                 }
+            }
+            ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(formLoreToSingleLine(it.stack.getLore())) {
+                // We don't need to do a handleStrayClicked here - the lore from El Dorado is already:
+                // §6§lGolden Rabbit §d§lCAUGHT!
+                // Which will trigger the above matcher. We only need to check name here to fire the found event for Dorado.
+                EggFoundEvent(STRAY, it.slotNumber).post()
+                lastName = "§6El Dorado"
+                lastMeal = STRAY
+                duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
+                attemptFireRabbitFound()
             }
         }
     }

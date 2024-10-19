@@ -88,7 +88,7 @@ open class SkyHanniTracker<Data : TrackerData>(
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
                 buildFinalDisplay(searchables.buildSearchBox(textInput), displayModeToggleable)
-            } ?: emptyList()
+            }.orEmpty()
             dirty = false
         }
 
