@@ -73,6 +73,8 @@ object CustomScoreboard {
         // We want to update the background every time, so we can have a smooth transition when using chroma as the color
         val finalRenderable = RenderBackground.addBackground(render)
 
+        RenderBackground.updatePosition(finalRenderable)
+
         config.position.renderRenderable(finalRenderable, posLabel = GUI_NAME)
     }
 
