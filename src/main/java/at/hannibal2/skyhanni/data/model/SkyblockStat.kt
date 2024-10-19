@@ -87,8 +87,8 @@ enum class SkyblockStat(
     UNKNOWN("§c?", "", "")
     ;
 
-    var lastKnownValue: Double
-        get() = ProfileStorageData.profileSpecific?.stats?.get(this) ?: 0.0
+    var lastKnownValue: Double?
+        get() = ProfileStorageData.profileSpecific?.stats?.get(this)
         set(value) {
             ProfileStorageData.profileSpecific?.stats?.set(this, value)
         }
@@ -101,7 +101,7 @@ enum class SkyblockStat(
 
     val keyName = name.lowercase().replace('_', '.')
 
-    val displayValue get() = icon + lastKnownValue.roundToInt()
+    val displayValue get() = lastKnownValue?.let { icon + it.roundToInt() }
 
     val tablistPattern by RepoPattern.pattern("stats.tablist.$keyName", tabListPatternS)
     val menuPattern by RepoPattern.pattern("stats.menu.$keyName", menuPatternS)

@@ -45,8 +45,10 @@ object TheGreatSpook {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (isTimerEnabled()) config.positionTimer.renderString(displayTimer, posLabel = "Primal Fear Timer")
-        if (isFearStatEnabled() && SkyblockStat.FEAR.lastKnownValue != 0.0) {
-            config.positionFear.renderString(SkyblockStat.FEAR.displayValue, posLabel = "Fear Stat Display")
+        if (isFearStatEnabled()) {
+            SkyblockStat.FEAR.displayValue?.let {
+                config.positionFear.renderString(it, posLabel = "Fear Stat Display")
+            }
         }
         if (isTimeLeftEnabled()) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
     }
@@ -57,6 +59,5 @@ object TheGreatSpook {
     private fun isFearStatEnabled(): Boolean = LorenzUtils.inSkyBlock && config.fearStatDisplay
     private fun isTimeLeftEnabled(): Boolean = LorenzUtils.inSkyBlock && config.greatSpookTimeLeft
 
-    private fun isAllDisabled(): Boolean = !isTimeLeftEnabled() && !isTimerEnabled() && !isFearStatEnabled() &&
-        !isNotificationEnabled()
+    private fun isAllDisabled(): Boolean = !isTimeLeftEnabled() && !isTimerEnabled() && !isFearStatEnabled() && !isNotificationEnabled()
 }
