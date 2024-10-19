@@ -20,4 +20,9 @@ public class LavaReplacementConfig {
     @ConfigOption(name = "Only In Crimson Isle", desc = "Enable the water texture only in Crimson Isle.")
     @ConfigEditorBoolean
     public Property<Boolean> onlyInCrimsonIsle = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Only In Kuudra", desc = "Enable the water texture only in Kuudra.")
+    @ConfigEditorBoolean
+    public Property<Boolean> onlyInKuudra = Property.of(true);
 }
