@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -109,9 +110,9 @@ class Mob(
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
-    fun canBeSeen() = baseEntity.canBeSeen()
+    fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
 
     private var highlightColor: Color? = null
 
@@ -130,9 +131,9 @@ class Mob(
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { true }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { true }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
             }
         }
     }
@@ -226,6 +227,8 @@ class Mob(
         internalHighlight()
     }
 
+    val centerCords get() = boundingBox.getCenter()
+
     override fun hashCode() = id.hashCode()
 
     override fun toString(): String = "$name - ${baseEntity.entityId}"
@@ -236,4 +239,8 @@ class Mob(
 
         return id == other.id
     }
+
+    // TODO add max distance
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 }

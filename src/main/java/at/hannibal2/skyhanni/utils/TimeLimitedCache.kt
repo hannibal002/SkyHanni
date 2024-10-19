@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import com.google.common.cache.CacheBuilder
+import com.google.common.cache.RemovalCause
 import java.util.concurrent.ConcurrentMap
 import java.util.concurrent.TimeUnit
 import kotlin.time.Duration
