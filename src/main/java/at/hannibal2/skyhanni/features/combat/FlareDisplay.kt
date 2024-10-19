@@ -42,6 +42,8 @@ object FlareDisplay {
 
     private val MAX_FLARE_TIME = 3.minutes
 
+    // TODO: Move to repo
+    @Suppress("MaxLineLength")
     private val flareSkins = mapOf(
         "ewogICJ0aW1lc3RhbXAiIDogMTY0NjY4NzMwNjIyMywKICAicHJvZmlsZUlkIiA6ICI0MWQzYWJjMmQ3NDk0MDBjOTA5MGQ1NDM0ZDAzODMxYiIsCiAgInByb2ZpbGVOYW1lIiA6ICJNZWdha2xvb24iLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvMjJlMmJmNmMxZWMzMzAyNDc5MjdiYTYzNDc5ZTU4NzJhYzY2YjA2OTAzYzg2YzgyYjUyZGFjOWYxYzk3MTQ1OCIKICAgIH0KICB9Cn0="
             to FlareType.WARNING,
@@ -120,7 +122,7 @@ object FlareDisplay {
                 else -> {}
             }
         }
-        display = newDisplay ?: emptyList()
+        display = newDisplay.orEmpty()
     }
 
     private fun getRemainingTime(flare: Flare): Duration {
