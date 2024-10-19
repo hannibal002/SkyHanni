@@ -41,7 +41,7 @@ object TimeUtils {
         val largestNonZeroUnit = parts.firstNotNullOfOrNull { if (it.value != 0) it.key else null } ?: TimeUnit.SECOND
 
         if (absoluteValue < 1.seconds) {
-            if (!showMilliSeconds) "0" + TimeUnit.SECOND.getName(0, longName)
+            if (!showMilliSeconds) return TimeUnit.SECOND.format(0, longName)
             val formattedMillis = (millis / 100).toInt()
             return "${prefix}0.${formattedMillis}${TimeUnit.SECOND.getName(formattedMillis, longName)}"
         }
@@ -178,7 +178,7 @@ enum class TimeUnit(val factor: Long, private val shortName: String, private val
     ;
 
     fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
-        " $longName" + if (value > 1) "s" else ""
+        " $longName" + if (value == 1) "" else "s"
     } else shortName
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
