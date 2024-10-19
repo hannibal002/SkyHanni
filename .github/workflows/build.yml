@@ -58,8 +58,6 @@ jobs:
     preprocess:
         runs-on: ubuntu-latest
         name: "Build multi version"
-        env:
-            SKIP_DETEKT: "true"
         steps:
             -   name: Checkout code
                 uses: actions/checkout@v4
