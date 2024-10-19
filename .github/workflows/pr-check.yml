@@ -2,11 +2,11 @@ name: "PR Changelog Verification"
 
 on:
     pull_request_target:
-        types: [ opened, edited ]
+        types: [ opened, edited, ready_for_review ]
 
 jobs:
     verify-changelog:
-        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id
+        if: github.event.pull_request.state == 'open' && '511310721' == github.repository_id && github.event.pull_request.draft == false
         runs-on: ubuntu-latest
 
         steps:

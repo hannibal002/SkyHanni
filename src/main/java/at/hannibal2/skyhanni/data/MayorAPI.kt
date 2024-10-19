@@ -98,7 +98,7 @@ object MayorAPI {
     private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
     private var lastUpdate = SimpleTimeMark.farPast()
-    private var dispatcher = Dispatchers.IO
+    private val dispatcher = Dispatchers.IO
 
     var rawMayorData: MayorJson? = null
     private var candidates = mapOf<Int, MayorCandidate>()
