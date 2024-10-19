@@ -71,7 +71,7 @@ object TentacleWaypoint {
                     else -> 4
                 }
                 val hpColor = if (hits > 0) "§c" else "§a"
-                "$hpColor${maxHp - hits}§a/${maxHp}§c❤"
+                "$hpColor${maxHp - hits}§a/$maxHp§c❤"
             }
 
             event.drawDynamicText(
