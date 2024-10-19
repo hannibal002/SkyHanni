@@ -29,7 +29,7 @@ read -r -d '' jq_command <<'EOF'
     ",title=" + (.ruleId) +
     ",col=" + (.l.region.startColumn|tostring) +
     ",endColumn=" + (.l.region.endColumn|tostring) +
-    "::" + (.message.text)
+    "::" + (.message)
 )
 EOF
 
