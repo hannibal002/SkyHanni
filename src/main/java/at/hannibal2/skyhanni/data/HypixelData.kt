@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.hypixel.HypixelLocationAPI
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -395,6 +396,7 @@ object HypixelData {
 
         if (inSkyBlock == skyBlock) return
         skyBlock = inSkyBlock
+        HypixelLocationAPI.checkSkyblock(skyBlock)
     }
 
     // Modified from NEU.
@@ -460,6 +462,7 @@ object HypixelData {
         }
 
         hypixelLive = hypixel && !hypixelAlpha
+        HypixelLocationAPI.checkHypixel(hypixelLive)
     }
 
     private fun checkSidebar() {
@@ -507,6 +510,7 @@ object HypixelData {
             val oldIsland = skyBlockIsland
             skyBlockIsland = newIsland
             IslandChangeEvent(newIsland, oldIsland).postAndCatch()
+            HypixelLocationAPI.checkIsland(skyBlockIsland)
 
             if (newIsland == IslandType.UNKNOWN) {
                 ChatUtils.debug("Unknown island detected: '$foundIsland'")
