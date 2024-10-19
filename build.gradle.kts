@@ -9,6 +9,7 @@ import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.DownloadBackupRepo
 
 plugins {
     idea
@@ -96,6 +97,12 @@ val headlessLwjgl by configurations.creating {
     isTransitive = false
     isVisible = false
 }
+
+val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.branch = "main"
+}
+
 tasks.runClient {
     this.javaLauncher.set(
         javaToolchains.launcherFor {
@@ -213,6 +220,7 @@ kotlin {
 
 // Tasks:
 tasks.processResources {
+    from(includeBackupRepo)
     inputs.property("version", version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
@@ -367,7 +375,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        false // TODO: Remove onlyIf when we're ready to enforce
+        System.getenv("SKIP_DETEKT") != "true"
     }
 
     reports {

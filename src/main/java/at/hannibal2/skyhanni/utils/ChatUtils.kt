@@ -68,22 +68,39 @@ object ChatUtils {
      * @param message The message to be sent
      * @param prefix Whether to prefix the message with the chat prefix, default true
      * @param prefixColor Color that the prefix should be, default yellow (§e)
+     * @param replaceSameMessage Replace the old message with this new message if they are identical
      *
      * @see CHAT_PREFIX
      */
-    fun chat(message: String, prefix: Boolean = true, prefixColor: String = "§e") {
+    fun chat(
+        message: String,
+        prefix: Boolean = true,
+        prefixColor: String = "§e",
+        replaceSameMessage: Boolean = false,
+    ) {
+
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage)
         } else {
-            internalChat(message)
+            internalChat(message, replaceSameMessage)
         }
     }
 
-    private fun internalChat(message: String): Boolean {
-        return chat(ChatComponentText(message))
+    private fun internalChat(
+        message: String,
+        replaceSameMessage: Boolean = false,
+    ): Boolean {
+        val text = ChatComponentText(message)
+
+        return if (replaceSameMessage) {
+            text.send(getUniqueMessageIdForString(message))
+            chat(text, false)
+        } else {
+            chat(text)
+        }
     }
 
-    fun chat(message: IChatComponent): Boolean {
+    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
         val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
@@ -99,7 +116,7 @@ object ChatUtils {
             return false
         }
 
-        thePlayer.addChatMessage(message)
+        if (send) thePlayer.addChatMessage(message)
         return true
     }
 
@@ -129,9 +146,9 @@ object ChatUtils {
 
         val rawText = msgPrefix + message
         val text = Text.text(rawText) {
-                this.onClick(expireAt, oneTimeClick, onClick)
-                this.hover = hover.asComponent()
-            }
+            this.onClick(expireAt, oneTimeClick, onClick)
+            this.hover = hover.asComponent()
+        }
         if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(rawText))
         } else {
