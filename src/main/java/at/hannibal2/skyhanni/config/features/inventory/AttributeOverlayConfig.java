@@ -19,6 +19,7 @@ public class AttributeOverlayConfig {
     @FeatureToggle
     public boolean enabled = false;
 
+    // TODO: add way of making config options with data classes from repo
     @Expose
     @ConfigOption(name = "Attributes Shown", desc = "List of attributes shown.")
     @ConfigEditorDraggableList
