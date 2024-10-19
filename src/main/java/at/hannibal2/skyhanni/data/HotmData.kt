@@ -679,7 +679,7 @@ enum class HotmData(
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
-            ScoreboardPattern.powderPattern.firstMatcher(event.scoreboard) {
+            ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmAPI.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
                 val difference = amount - type.getCurrent()

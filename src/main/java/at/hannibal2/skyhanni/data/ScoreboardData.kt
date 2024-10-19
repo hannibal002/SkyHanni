@@ -116,8 +116,9 @@ object ScoreboardData {
         sidebarLinesRaw = list
         val new = formatLines(list)
         if (new != sidebarLinesFormatted) {
-            ScoreboardUpdateEvent(new).postAndCatch()
+            val old = sidebarLinesFormatted
             sidebarLinesFormatted = new
+            ScoreboardUpdateEvent(new).postAndCatch()
         }
     }
 
