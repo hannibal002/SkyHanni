@@ -14,6 +14,6 @@ jbAnnotations = { module = "org.jetbrains:annotations", version.ref = "jbAnnotat
 hotswapagentforge = { module = "moe.nea:hotswapagent-forge", version = "1.0.1" }
 autoservice_ksp = {module="dev.zacsweers.autoservice:auto-service-ksp",version="1.1.0"}
 autoservice_annotations = {module="com.google.auto.service:auto-service-annotations",version="1.1.1"}
-hypixelmodapi = { module = "net.hypixel:mod-forge", version.ref = "hypixelmodapi" }
+hypixelmodapi = { module = "net.hypixel:mod-api-forge", version.ref = "hypixelmodapi" }
 hypixelmodapitweaker = { module = "net.hypixel:mod-api-forge-tweaker", version.ref = "hypixelmodapi" }
 

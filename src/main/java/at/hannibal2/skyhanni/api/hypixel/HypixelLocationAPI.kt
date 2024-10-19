@@ -144,7 +144,6 @@ object HypixelLocationAPI {
             "serverId" to serverId,
             "serverType" to serverType,
             "map" to map,
-            ignoreErrorCache = true,
             betaOnly = true,
             noStackTrace = true,
         )
