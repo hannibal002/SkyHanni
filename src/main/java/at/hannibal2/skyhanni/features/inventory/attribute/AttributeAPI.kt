@@ -62,7 +62,7 @@ object AttributeAPI {
 
         companion object {
 
-            fun getByInternalNameOrNull(internalName: String) = entries.firstOrNull { it.internalName == internalName }
+            fun getByInternalNameOrNull(internalName: String) = entries.find { it.internalName == internalName }
 
             fun getByInternalName(internalName: String) = getByInternalNameOrNull(internalName) ?: UNKNOWN
         }
