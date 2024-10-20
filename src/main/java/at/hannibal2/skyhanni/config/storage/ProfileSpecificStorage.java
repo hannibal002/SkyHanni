@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.data.model.SkyblockStat;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
+import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
 import at.hannibal2.skyhanni.features.event.carnival.CarnivalGoal;
@@ -488,6 +489,7 @@ public class ProfileSpecificStorage {
         public VinylType activeVinyl = null;
     }
 
+    // TODO: Merge data with GhostProfitTracker at a later date
     @Expose
     public GhostCounter ghostCounter = new GhostCounter();
 
@@ -514,6 +516,18 @@ public class ProfileSpecificStorage {
         @Expose
         public int configUpdateVersion = 0;
 
+    }
+
+    @Expose
+    public GhostStorage ghostStorage = new GhostStorage();
+
+    public static class GhostStorage {
+
+        @Expose
+        public GhostTracker.Data ghostTracker = new GhostTracker.Data();
+
+        @Expose
+        public Long bestiaryKills = 0L;
     }
 
     @Expose
