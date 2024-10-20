@@ -133,8 +133,6 @@ object SkyHanniDebugsAndTests {
 
     fun testCommand(args: Array<String>) {
 
-        OreBlock.toRepo()
-
         SkyHanniMod.coroutineScope.launch {
             asyncTest(args)
         }

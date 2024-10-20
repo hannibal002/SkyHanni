@@ -282,7 +282,7 @@ object BlockStrengthGuide {
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
         event.register("shblockstrength") {
-            description = "Shows the block strengths in relation to your mining speed"
+            description = "Shows how many ticks you need to break any block with your mining speed."
             category = CommandCategory.USERS_ACTIVE
             callback { onCommand() }
         }
