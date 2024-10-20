@@ -47,7 +47,7 @@ object StashCompact {
      */
     private val pickupStashPattern by patternGroup.pattern(
         "pickup.stash",
-        "§f *§.§l>>> §.§lCLICK HERE§b to pick (?:them|it) up! §.§l<<<.*",
+        "§f *§.§l>>> §.§lCLICK HERE§. to pick (?:them|it) up! §.§l<<<.*",
     )
 
     /**
