@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.data
 enum class IslandType(val displayName: String, private val id: String?) {
     // TODO
     //  USE SH-REPO (for displayName only)
-    //  Change Guest islands to just be a boolean
     PRIVATE_ISLAND("Private Island", "dynamic"),
     PRIVATE_ISLAND_GUEST("Private Island Guest", null),
     THE_END("The End", "combat_3"),
@@ -32,25 +31,26 @@ enum class IslandType(val displayName: String, private val id: String?) {
     UNKNOWN("???", null),
     ;
 
-    fun toggleGuest(): IslandType = when (this) {
+    fun guestVariant(): IslandType = when (this) {
         PRIVATE_ISLAND -> PRIVATE_ISLAND_GUEST
-        PRIVATE_ISLAND_GUEST -> PRIVATE_ISLAND
         GARDEN -> GARDEN_GUEST
-        GARDEN_GUEST -> GARDEN
         else -> this
+    }
+
+    // TODO: IslandTags
+    fun hasGuestVariant(): Boolean = when (this) {
+        PRIVATE_ISLAND, GARDEN -> true
+        else -> false
     }
 
     companion object {
 
-        fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
-        fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
+        fun getByNameOrUnknown(name: String): IslandType = getByNameOrNull(name) ?: UNKNOWN
+        fun getByName(name: String): IslandType = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
 
-        fun getByNameOrNull(name: String) = entries.find { it.displayName == name }
+        fun getByNameOrNull(name: String): IslandType? = entries.find { it.displayName == name }
 
-        fun getByIdOrNull(id: String?): IslandType? {
-            if (id == null) return null
-            return entries.find { it.id == id }
-        }
-        fun getByIdOrUnknown(id: String?) = getByIdOrNull(id) ?: UNKNOWN
+        fun getByIdOrNull(id: String): IslandType? = entries.find { it.id == id }
+        fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
     }
 }

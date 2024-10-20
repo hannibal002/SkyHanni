@@ -7,15 +7,17 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelAPIServerChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
+import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzLogger
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-@Suppress("MemberVisibilityCanBePrivate", "UNUSED_VARIABLE", "unused")
+@Suppress("MemberVisibilityCanBePrivate")
 @SkyHanniModule
 object HypixelLocationAPI {
 
@@ -34,14 +36,21 @@ object HypixelLocationAPI {
     var serverType: ServerType? = null
         private set
 
+    var mode: String? = null
+        private set
+
     var map: String? = null
         private set
 
-    fun inLimbo(): Boolean = serverId == "limbo"
+    var isGuest: Boolean = false
+        private set
 
     val config = SkyHanniMod.feature.dev.hypixelModApi
 
     private val logger = LorenzLogger("debug/hypixel_api")
+
+    private var sentIslandEvent = false
+    private var internalIsland = IslandType.NONE
 
     @HandleEvent(priority = Int.MIN_VALUE)
     fun onServerChange(event: HypixelAPIServerChangeEvent) {
@@ -49,25 +58,54 @@ object HypixelLocationAPI {
         checkHypixel()
         inSkyblock = event.serverType == GameType.SKYBLOCK
         serverType = event.serverType
+        mode = event.mode
         map = event.map
         serverId = event.serverName
-        if (!inSkyblock) return changeIsland(IslandType.NONE)
 
-        val newIsland = IslandType.getByIdOrUnknown(event.mode)
+        // Set island to NONE when you leave skyblock
+        if (!inSkyblock) {
+            internalIsland = IslandType.NONE
+            changeIsland()
+            return
+        }
+        val mode = event.mode ?: return
+
+        val newIsland = IslandType.getByIdOrUnknown(mode)
         if (newIsland == IslandType.UNKNOWN) {
             ChatUtils.debug("Unknown island detected: '$newIsland'")
-            logger.log("Unknown Island: '$newIsland'")
+            logger.log("Unknown Island detected: '$newIsland'")
         } else {
-            logger.log("Island: '$newIsland'")
+            logger.log("Island detected: '$newIsland'")
         }
-        island = newIsland
-        changeIsland(island)
+        internalIsland = newIsland
+
+        // If the island has a guest variant, we wait for the scoreboard packet to confirm if it's a guest island or not
+        if (internalIsland.hasGuestVariant()) {
+            sentIslandEvent = false
+        } else {
+            sentIslandEvent = true
+            changeIsland()
+        }
     }
 
-    private fun changeIsland(newIsland: IslandType) {
-        if (newIsland == island) return
+    @HandleEvent
+    fun onScoreboardTitle(event: ScoreboardTitleUpdateEvent) {
+        if (!inHypixel || !inSkyblock || sentIslandEvent || !event.isSkyblock) return
+        isGuest = event.title.trim().removeColor().endsWith("GUEST")
+        sentIslandEvent = true
+
+        if (internalIsland.hasGuestVariant() && isGuest) {
+            internalIsland = internalIsland.guestVariant()
+        }
+
+        changeIsland()
+    }
+
+    private fun changeIsland() {
+        if (internalIsland == island) return
         val oldIsland = island
-        island = newIsland
+        island = internalIsland
+        logger.log("Island change: '$oldIsland' -> '$island'")
         // TODO: post island change event
         return
     }
@@ -86,6 +124,9 @@ object HypixelLocationAPI {
         }
     }
 
+    @HandleEvent
+    fun onDisconnect(event: ClientDisconnectEvent) = reset()
+
     private fun reset() {
         logger.log("Disconnected")
         inHypixel = false
@@ -93,60 +134,61 @@ object HypixelLocationAPI {
         island = IslandType.NONE
         serverId = null
         serverType = null
+        mode = null
         map = null
+        isGuest = false
+        sentIslandEvent = false
+        internalIsland = IslandType.NONE
     }
 
     fun checkHypixel(hypixel: Boolean) {
         if (hypixel == inHypixel) return
-        sendError("Hypixel", "inHypixel")
+        sendError("Hypixel")
     }
 
     fun checkSkyblock(skyblock: Boolean) {
         if (skyblock == inSkyblock) return
-        sendError("SkyBlock", "inSkyblock")
+        sendError("SkyBlock")
     }
 
     fun checkIsland(otherIsland: IslandType) {
         if (otherIsland == island) return
         if (otherIsland == IslandType.NONE) return
-        if (otherIsland.toggleGuest() == island) return
-        sendError("Island", "island")
+        sendError("Island")
     }
 
     fun checkServerId(otherId: String?) {
         if (serverId == otherId) return
-        sendError("ServerId", "serverId")
+        sendError("ServerId")
     }
 
-    private fun sendError(userMessage: String, internal: String) {
+    private fun sendError(message: String) {
         if (!config) return
         val data = debugData
         logger.log("ERROR: ${data.joinToString(transform = ::dataToString)}")
         ErrorManager.logErrorStateWithData(
-            "$userMessage check comparison with HypixelModAPI failed. Please report in discord.",
-            "$internal comparison failed",
+            "$message check comparison with HypixelModAPI failed. Please report in discord.",
+            "$message comparison failed",
             *data.toTypedArray(),
             betaOnly = true,
             noStackTrace = true,
         )
     }
 
-    private val debugData get() = listOf(
-        "HypixelData.skyBlock" to HypixelData.skyBlock,
-        "inSkyblock" to inSkyblock,
-        "HypixelData.hypixelLive" to HypixelData.hypixelLive,
-        "inHypixel" to inHypixel,
-        "HypixelData.skyBlockIsland" to HypixelData.skyBlockIsland,
-        "island" to island,
-        "HypixelData.serverId" to HypixelData.serverId,
-        "serverId" to serverId,
-        "serverType" to serverType,
-        "map" to map,
-    )
+    private val debugData
+        get() = listOf(
+            "HypixelData.skyBlock" to HypixelData.skyBlock,
+            "inSkyblock" to inSkyblock,
+            "HypixelData.hypixelLive" to HypixelData.hypixelLive,
+            "inHypixel" to inHypixel,
+            "HypixelData.skyBlockIsland" to HypixelData.skyBlockIsland,
+            "island" to island,
+            "HypixelData.serverId" to HypixelData.serverId,
+            "serverId" to serverId,
+            "serverType" to serverType,
+            "map" to map,
+        )
 
     private fun dataToString(pair: Pair<String, Any?>) = "${pair.first}: ${pair.second}"
-
-    @HandleEvent
-    fun onDisconnect(event: ClientDisconnectEvent) = reset()
 
 }
