@@ -3,6 +3,7 @@
 !.idea/icon.svg
 !.idea/dictionaries/default_user.xml
 !.idea/scopes/Mixins.xml
+!.idea/liveTemplates/SkyHanni.xml
 .vscode/
 run/
 build/
@@ -18,3 +19,4 @@ gradle.properties
 
 .devauth/*
 !.devauth/config.toml
+.kotlin

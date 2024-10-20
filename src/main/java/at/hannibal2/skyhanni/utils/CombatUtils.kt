@@ -24,6 +24,9 @@ object CombatUtils {
     var killGainHourLast = -1
     var killGainHour = -1
     private var gainTimer = 0
+
+    // Todo: Why do we have two isKilling variables?
+    @Suppress("ObjectPropertyNaming")
     var _isKilling = false
 
     private fun getSkillInfo(xpInformation: XPInformation.SkillInfo?): Float {
@@ -113,10 +116,10 @@ object CombatUtils {
     /**
      * Taken from NotEnoughUpdates
      */
-    fun interp(now: Float, last: Float, lastupdate: Long): Float {
+    fun interp(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
         if (last >= 0 && last != now) {
-            var factor = (System.currentTimeMillis() - lastupdate) / 1000f
+            var factor = (System.currentTimeMillis() - lastUpdate) / 1000f
             factor = LerpUtils.clampZeroOne(factor)
             interp = last + (now - last) * factor
         }

@@ -90,9 +90,8 @@ object DiscordRPCManager : IPCListener {
                 "Discord Rich Presence was unable to start! " +
                     "This usually happens when you join SkyBlock when Discord is not started. " +
                     "Please run /shrpcstart to retry once you have launched Discord.",
-                onClick = {
-                    startCommand()
-                }
+                onClick = { startCommand() },
+                "§eClick to run /shrpcstart!"
             )
         }
     }
@@ -121,21 +120,23 @@ object DiscordRPCManager : IPCListener {
     private fun updatePresence() {
         val location = DiscordStatus.LOCATION.getDisplayString()
         val discordIconKey = DiscordLocationKey.getDiscordIconKey(location)
-        client?.sendRichPresence(RichPresence.Builder().apply {
-            setDetails(getStatusByConfigId(config.firstLine.get()).getDisplayString())
-            setState(getStatusByConfigId(config.secondLine.get()).getDisplayString())
-            setStartTimestamp(startTimestamp)
-            setLargeImage(discordIconKey, location)
+        client?.sendRichPresence(
+            RichPresence.Builder().apply {
+                setDetails(getStatusByConfigId(config.firstLine.get()).getDisplayString())
+                setState(getStatusByConfigId(config.secondLine.get()).getDisplayString())
+                setStartTimestamp(startTimestamp)
+                setLargeImage(discordIconKey, location)
 
-            if (config.showSkyCryptButton.get()) {
-                addButton(
-                    RichPresenceButton(
-                        "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
-                        "Open SkyCrypt"
+                if (config.showSkyCryptButton.get()) {
+                    addButton(
+                        RichPresenceButton(
+                            "https://sky.shiiyu.moe/stats/${LorenzUtils.getPlayerName()}/${HypixelData.profileName}",
+                            "Open SkyCrypt"
+                        )
                     )
-                )
-            }
-        }.build())
+                }
+            }.build()
+        )
     }
 
     override fun onReady(client: IPCClient) {

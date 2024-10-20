@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.cleanName
 import at.hannibal2.skyhanni.utils.EntityUtils.isCorrupted
 import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
+import at.hannibal2.skyhanni.utils.LocationUtils.getCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -109,23 +110,30 @@ class Mob(
 
     fun isInRender() = baseEntity.distanceToPlayer() < MobData.ENTITY_RENDER_RANGE_IN_BLOCKS
 
-    fun canBeSeen() = baseEntity.canBeSeen()
+    fun canBeSeen(viewDistance: Number = 150) = baseEntity.canBeSeen(viewDistance)
 
-    fun isInvisible() = if (baseEntity !is EntityZombie) baseEntity.isInvisible else false
+    fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.inventory.isNullOrEmpty()
 
     private var highlightColor: Color? = null
 
-    /** If no alpha is set or alpha is set to 255 it will set the alpha to 127 */
-    fun highlight(color: Color) {
-        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
-        internalHighlight()
+    /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
+     * If [color] is set to null it removes a highlight*/
+    fun highlight(color: Color?) {
+        if (color == highlightColor) return
+        if (color == null) {
+            internalRemoveColor()
+            highlightColor = null
+        } else {
+            highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+            internalHighlight()
+        }
     }
 
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { true }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { true }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
             }
         }
     }
@@ -147,9 +155,11 @@ class Mob(
         relativeBoundingBox =
             if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null // Inlined updateBoundingBox()
 
-        owner = (ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
-            summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
-        } else null)?.let { MobUtils.OwnerShip(it) }
+        owner = (
+            ownerName ?: if (mobType == Type.SLAYER) hologram2?.let {
+                summonOwnerPattern.matchMatcher(it.cleanName()) { this.group("name") }
+            } else null
+            )?.let { MobUtils.OwnerShip(it) }
     }
 
     private fun removeExtraEntitiesFromChecking() =
@@ -157,13 +167,16 @@ class Mob(
             MobData.externRemoveOfRetryAmount += it
         }
 
-    fun updateBoundingBox() {
+    private fun updateBoundingBox() {
         relativeBoundingBox = if (extraEntities.isNotEmpty()) makeRelativeBoundingBox() else null
     }
 
-    private fun makeRelativeBoundingBox() =
-        (baseEntity.entityBoundingBox.union(extraEntities.filter { it !is EntityArmorStand }
-            .mapNotNull { it.entityBoundingBox }))?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
+    private fun makeRelativeBoundingBox() = (
+        baseEntity.entityBoundingBox.union(
+            extraEntities.filter { it !is EntityArmorStand }
+                .mapNotNull { it.entityBoundingBox },
+        )
+        )?.offset(-baseEntity.posX, -baseEntity.posY, -baseEntity.posZ)
 
     fun fullEntityList() =
         baseEntity.toSingletonListOrEmpty() +
@@ -214,6 +227,8 @@ class Mob(
         internalHighlight()
     }
 
+    val centerCords get() = boundingBox.getCenter()
+
     override fun hashCode() = id.hashCode()
 
     override fun toString(): String = "$name - ${baseEntity.entityId}"
@@ -224,4 +239,8 @@ class Mob(
 
         return id == other.id
     }
+
+    // TODO add max distance
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 }

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ClickType
@@ -46,7 +47,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.SpecialColour
+import at.hannibal2.skyhanni.utils.SpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -121,7 +122,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -129,7 +130,7 @@ object MinionFeatures {
         lastClickedEntity = event.clickedEntity?.getLorenzVec() ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBlockClick(event: BlockClickEvent) {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -143,7 +144,7 @@ object MinionFeatures {
         if (!config.lastClickedMinion.display) return
 
         val special = config.lastClickedMinion.color
-        val color = Color(SpecialColour.specialToChromaRGB(special), true)
+        val color = Color(SpecialColor.specialToChromaRGB(special), true)
 
         val loc = lastMinion
         if (loc != null) {
@@ -298,7 +299,7 @@ object MinionFeatures {
             System.currentTimeMillis() - lastClicked
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
-        //§7Held Coins: §b151,389
+        // §7Held Coins: §b151,389
         // TODO use regex
         val coins = line.split(": §b")[1].formatDouble()
 
@@ -360,7 +361,7 @@ object MinionFeatures {
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
         for (minion in minions) {
-            val location = minion.key.add(y = 1.0)
+            val location = minion.key.up()
             if (location.distanceToPlayer() > 50) continue
 
             val lastEmptied = minion.value.lastClicked
@@ -371,14 +372,14 @@ object MinionFeatures {
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName
-                event.drawString(location.add(y = 0.65), name, true)
+                event.drawString(location.up(0.65), name, true)
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
                 val passedSince = SimpleTimeMark(lastEmptied).passedSince()
                 val format = passedSince.format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(y = 1.15), text, true)
+                event.drawString(location.up(1.15), text, true)
             }
         }
     }

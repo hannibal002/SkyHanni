@@ -55,7 +55,7 @@ enum class TabWidget(
     ),
     PROFILE(
         // language=RegExp
-        "(?:§.)*Profile: (?:§.)*(?<profile>\\S+).*",
+        "(?:§.)+Profile: §r§a(?<profile>[\\w\\s]+[^ §]).*",
     ),
     SB_LEVEL(
         // language=RegExp
@@ -77,7 +77,7 @@ enum class TabWidget(
         // language=RegExp
         "(?:§.)*Pet:",
     ),
-    PET_TRANING(
+    PET_TRAINING(
         // language=RegExp
         "(?:§.)*Pet Training:",
     ),
@@ -95,7 +95,7 @@ enum class TabWidget(
     ),
     EVENT(
         // language=RegExp
-        "(?:§.)*Event: (?:§.)*(?<event>.*)",
+        "(?:§.)*Event: (?<color>(?:§.)*)(?<event>.*)",
     ),
     SKILLS(
         // language=RegExp
@@ -195,7 +195,7 @@ enum class TabWidget(
     ),
     BROODMOTHER(
         // language=RegExp
-        "Broodmother: (?:§.)*(?<time>.*)",
+        "Broodmother: (?:§.)*(?<stage>.*)",
     ),
     EYES_PLACED(
         // language=RegExp
@@ -207,7 +207,7 @@ enum class TabWidget(
     ),
     DRAGON(
         // language=RegExp
-        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)])\\)",
+        "(?:§.)*Dragon: (?:§.)*\\((?<type>[^)]*)\\)",
     ),
     VOLCANO(
         // language=RegExp
@@ -306,6 +306,10 @@ enum class TabWidget(
     SCRAP(
         // language=RegExp
         "Scrap: (?:§.)*(?<amount>\\d)(?:§.)*/(?:§.)*\\d",
+    ),
+    EVENT_TRACKERS(
+        // language=RegExp
+        "§e§lEvent Trackers:",
     )
 
     ;
@@ -315,7 +319,7 @@ enum class TabWidget(
 
     /** The current active information from tab list.
      *
-     * When the widget isn't visible it will be empty
+     * When the widget isn't visible, it will be empty
      * */
     var lines: List<String> = emptyList()
         private set
@@ -419,11 +423,13 @@ enum class TabWidget(
             val removeIndexes = mutableListOf<Int>()
 
             for ((index, header) in headers) when {
-                PLAYER_LIST.pattern.matches(header) -> if (playerListFound) removeIndexes.add(index - removeIndexes.size) else playerListFound =
-                    true
+                PLAYER_LIST.pattern.matches(header) ->
+                    if (playerListFound) removeIndexes.add(index - removeIndexes.size)
+                    else playerListFound = true
 
-                INFO.pattern.matches(header) -> if (infoFound) removeIndexes.add(index - removeIndexes.size) else infoFound =
-                    true
+                INFO.pattern.matches(header) ->
+                    if (infoFound) removeIndexes.add(index - removeIndexes.size)
+                    else infoFound = true
             }
 
             return tabList.transformIf({ size > 81 }, { dropLast(size - 80) }).editCopy {

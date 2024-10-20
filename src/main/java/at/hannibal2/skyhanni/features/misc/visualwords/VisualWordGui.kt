@@ -4,10 +4,12 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SoundUtils
@@ -63,6 +65,16 @@ open class VisualWordGui : GuiScreen() {
 
     companion object {
 
+        @JvmStatic
+        fun onCommand() {
+            if (!LorenzUtils.onHypixel) {
+                ChatUtils.userError("You need to join Hypixel to use this feature!")
+            } else {
+                if (sbeConfigPath.exists()) drawImport = true
+                SkyHanniMod.screenToOpen = VisualWordGui()
+            }
+        }
+
         fun isInGui() = Minecraft.getMinecraft().currentScreen is VisualWordGui
         var sbeConfigPath = File("." + File.separator + "config" + File.separator + "SkyblockExtras.cfg")
         var drawImport = false
@@ -112,8 +124,8 @@ open class VisualWordGui : GuiScreen() {
             val y = guiTop + 170
 
             drawUnmodifiedStringCentered("§aAdd New", x, y)
-            val colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+            val color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+            drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
             if (shouldDrawImport) {
                 val importX = guiLeft + sizeX - 45
@@ -250,12 +262,12 @@ open class VisualWordGui : GuiScreen() {
             var x = guiLeft + 180
             var y = guiTop + 140
             drawUnmodifiedStringCentered("§cDelete", x, y)
-            var colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+            var color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+            drawRect(x - 30, y - 10, x + 30, y + 10, color)
             y += 30
             drawUnmodifiedStringCentered("§eBack", x, y)
-            colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-            drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+            color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+            drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
             if (currentIndex < modifiedWords.size && currentIndex != -1) {
                 val currentPhrase = modifiedWords[currentIndex]
@@ -264,15 +276,15 @@ open class VisualWordGui : GuiScreen() {
                 drawUnmodifiedStringCentered("§bReplacement Enabled", x, y - 20)
                 var status = if (currentPhrase.enabled) "§2Enabled" else "§4Disabled"
                 drawUnmodifiedStringCentered(status, x, y)
-                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+                color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+                drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
                 x += 200
                 drawUnmodifiedStringCentered("§bCase Sensitive", x, y - 20)
                 status = if (!currentPhrase.isCaseSensitive()) "§2True" else "§4False"
                 drawUnmodifiedStringCentered(status, x, y)
-                colour = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
-                drawRect(x - 30, y - 10, x + 30, y + 10, colour)
+                color = if (isPointInMousePos(x - 30, y - 10, 60, 20)) colorA else colorB
+                drawRect(x - 30, y - 10, x + 30, y + 10, color)
 
                 drawUnmodifiedString("§bIs replaced by:", guiLeft + 30, guiTop + 75)
 
@@ -511,7 +523,7 @@ open class VisualWordGui : GuiScreen() {
 
         if (KeyboardManager.isPastingKeysDown()) {
             SkyHanniMod.coroutineScope.launch {
-                val clipboard = OSUtils.readFromClipboard() ?: ""
+                val clipboard = OSUtils.readFromClipboard().orEmpty()
                 for (char in clipboard) {
                     if (currentText.length < maxTextLength && !Character.isISOControl(char)) {
                         currentText += char

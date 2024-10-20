@@ -138,16 +138,18 @@ object CroesusChestTracker {
             val lore = item.getLore()
 
             if (run.floor == null) run.floor =
-                (if (masterPattern.matches(item.name)) "M" else "F") + (lore.firstNotNullOfOrNull {
-                    floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
-                } ?: "0")
+                (if (masterPattern.matches(item.name)) "M" else "F") + (
+                    lore.firstNotNullOfOrNull {
+                        floorPattern.matchMatcher(it) { group("floor").romanToDecimal() }
+                    } ?: "0"
+                    )
             run.openState = when {
                 keyUsedPattern.anyMatches(lore) -> OpenedState.KEY_USED
                 openedPattern.anyMatches(lore) -> OpenedState.OPENED
                 unopenedPattern.anyMatches(lore) -> OpenedState.UNOPENED
                 else -> ErrorManager.logErrorStateWithData(
                     "Croesus Chest couldn't be read correctly.",
-                    "Openstate check failed for chest.",
+                    "Open state check failed for chest.",
                     "run" to run,
                     "lore" to lore
                 ).run { null }
@@ -267,18 +269,19 @@ object CroesusChestTracker {
     fun resetChest() = croesusChests?.let {
         it.clear()
         it.addAll(generateMaxChest())
-        ChatUtils.chat("Kismet State was cleared!")
+        ChatUtils.chat("Kismet State was Reset!")
     }
 
     @JvmStatic
     fun generateMaxChestAsList(): List<DungeonRunInfo> = generateMaxChest().toList()
     private fun generateMaxChest(): Sequence<DungeonRunInfo> = generateSequence { DungeonRunInfo() }.take(MAX_CHESTS)
 
-    fun getLastActiveChest(includeDungeonKey: Boolean = false): Int =
-        (croesusChests?.indexOfLast {
+    private fun getLastActiveChest(includeDungeonKey: Boolean = false): Int = (
+        croesusChests?.indexOfLast {
             it.floor != null &&
                 (it.openState == OpenedState.UNOPENED || (includeDungeonKey && it.openState == OpenedState.OPENED))
-        } ?: -1) + 1
+        } ?: -1
+        ) + 1
 
     enum class OpenedState {
         UNOPENED,

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.ConfigFileType
-import at.hannibal2.skyhanni.config.features.inventory.SackDisplayConfig.PriceFrom
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -22,7 +21,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getNpcPriceOrNull
 import at.hannibal2.skyhanni.utils.NEUItems.getPrice
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimal
@@ -49,15 +47,17 @@ object SackAPI {
     private val patternGroup = RepoPattern.group("data.sacks")
     private val sackPattern by patternGroup.pattern(
         "sack",
-        "^(.* Sack|Enchanted .* Sack)\$"
+        "^(.* Sack|Enchanted .* Sack)\$",
     )
+    @Suppress("MaxLineLength")
     private val numPattern by patternGroup.pattern(
         "number",
-        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)"
+        "(?:(?:§[0-9a-f](?<level>I{1,3})§7:)?|(?:§7Stored:)?) (?<color>§[0-9a-f])(?<stored>[0-9.,kKmMbB]+)§7/(?<total>\\d+(?:[0-9.,]+)?[kKmMbB]?)",
     )
+    @Suppress("MaxLineLength")
     private val gemstonePattern by patternGroup.pattern(
         "gemstone",
-        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?"
+        " §[0-9a-f](?<gemrarity>[A-z]*): §[0-9a-f](?<stored>\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?)(?: §[0-9a-f]\\(\\d+(?:\\.\\d+)?(?:(?:,\\d+)?)+[kKmM]?\\))?",
     )
 
     private var isRuneSack = false
@@ -114,21 +114,14 @@ object SackAPI {
         SackDisplay.update(isNewInventory)
     }
 
-    private fun String.getTrophyRarity(): TrophyRarity? {
-        return if (this.startsWith("Bronze"))
-            TrophyRarity.BRONZE
-        else
-            if (this.startsWith("Silver"))
-                TrophyRarity.SILVER
-            else null
+    private fun String.getTrophyRarity(): TrophyRarity? = when {
+        this.startsWith("Bronze") -> TrophyRarity.BRONZE
+        this.startsWith("Silver") -> TrophyRarity.SILVER
+        else -> null
     }
 
     private fun NEUInternalName.sackPrice(stored: Int): Long {
-        return when (sackDisplayConfig.priceFrom) {
-            PriceFrom.BAZAAR -> (getPrice() * stored).toLong().coerceAtLeast(0)
-            PriceFrom.NPC -> (getNpcPriceOrNull() ?: 0.0).toLong() * stored
-            else -> 0L
-        }
+        return getPrice(sackDisplayConfig.priceSource).toLong() * stored
     }
 
     fun getSacksData(savingSacks: Boolean) {
@@ -240,12 +233,12 @@ object SackAPI {
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Added")
             }
-        } ?: ""
+        }.orEmpty()
         val sackRemoveText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
             sibling.chatStyle?.chatHoverEvent?.value?.formattedText?.removeColor()?.takeIf {
                 it.startsWith("Removed")
             }
-        } ?: ""
+        }.orEmpty()
 
         val sackChangeText = sackAddText + sackRemoveText
         if (sackChangeText.isEmpty()) return
@@ -341,7 +334,7 @@ object SackAPI {
         ProfileStorageData.sackProfiles?.sackContents = sackData
         SkyHanniMod.configManager.saveConfig(ConfigFileType.SACKS, "saving-data")
 
-        SackDataUpdateEvent().postAndCatch()
+        SackDataUpdateEvent.post()
     }
 
     data class SackGemstone(
@@ -352,7 +345,10 @@ object SackAPI {
         var roughPrice: Long = 0,
         var flawedPrice: Long = 0,
         var finePrice: Long = 0,
-    ) : AbstractSackItem()
+    ) : AbstractSackItem() {
+        val priceSum: Long
+            get() = roughPrice + flawedPrice + finePrice
+    }
 
     data class SackRune(
         var stack: ItemStack? = null,
@@ -421,5 +417,5 @@ enum class SackStatus {
     MISSING,
     CORRECT,
     ALRIGHT,
-    OUTDATED;
+    OUTDATED,
 }
