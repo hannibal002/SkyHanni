@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.chat;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -13,6 +14,14 @@ public class StashConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;
+
+    @ConfigOption(
+        name = "§cNotice",
+        desc = "Due to Hypixel sending empty messages before and after the stash message, " +
+            "you may see empty lines still. Turn on `/sh empty messages` to solve for this."
+    )
+    @ConfigEditorInfoText
+    public String notice = "";
 
     @Expose
     @ConfigOption(name = "Hide Duplicate Warnings", desc = "Hide duplicate warnings for previously reported stash counts.")
