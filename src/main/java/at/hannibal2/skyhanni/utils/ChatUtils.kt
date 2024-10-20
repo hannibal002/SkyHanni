@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -46,7 +45,7 @@ object ChatUtils {
      * @see DEBUG_PREFIX
      */
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
+        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message)) {
             LorenzUtils.consoleLog("[Debug] $message")
         }
     }
@@ -92,15 +91,15 @@ object ChatUtils {
     ): Boolean {
         val text = ChatComponentText(message)
 
-        if (replaceSameMessage) {
+        return if (replaceSameMessage) {
             text.send(getUniqueMessageIdForString(message))
+            chat(text, false)
         } else {
             chat(text)
         }
-        return chat(text)
     }
 
-    fun chat(message: IChatComponent): Boolean {
+    fun chat(message: IChatComponent, send: Boolean = true): Boolean {
         val formattedMessage = message.getFormattedTextCompat()
         log.log(formattedMessage)
 
@@ -116,7 +115,7 @@ object ChatUtils {
             return false
         }
 
-        thePlayer.addChatMessage(message)
+        if (send) thePlayer.addChatMessage(message)
         return true
     }
 
