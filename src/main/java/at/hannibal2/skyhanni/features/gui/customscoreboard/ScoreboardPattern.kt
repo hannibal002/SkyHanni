@@ -339,6 +339,7 @@ object ScoreboardPattern {
         "magmabosshealth",
         "§7Boss Health:",
     )
+    // TODO add regex test
     val bossHealthBarPattern by combatSb.pattern(
         "magmabosshealthbar",
         "§.[\\w,.]+§f/§a10M§c❤",
