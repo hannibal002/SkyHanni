@@ -120,6 +120,9 @@ object StashCompact {
         )
         lastSentMaterialCount = lastMaterialCount
         lastSentType = lastType
+        // Dirty, but item stash doesn't always have differing materials count,
+        // and we don't compare this value to the last one, so we can reset it here
+        lastDifferingMaterialsCount = 0
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
