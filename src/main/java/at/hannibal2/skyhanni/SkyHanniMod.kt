@@ -61,7 +61,7 @@ class SkyHanniMod {
 
         CommandRegistrationEvent.post()
 
-        PreInitFinishedEvent().post()
+        PreInitFinishedEvent.post()
     }
 
     @Mod.EventHandler
