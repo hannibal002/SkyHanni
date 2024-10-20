@@ -65,6 +65,7 @@ class TextInput {
             activeInstance = null
         }
 
+        @Suppress("UnusedParameter")
         fun onMinecraftInput(keyBinding: KeyBinding, cir: CallbackInfoReturnable<Boolean>) {
             if (activeInstance != null) {
                 cir.returnValue = false
@@ -92,7 +93,7 @@ class TextInput {
             }
 
         private var textBox
-            get() = activeInstance?.textBox ?: ""
+            get() = activeInstance?.textBox.orEmpty()
             set(value) {
                 activeInstance?.textBox = value
             }
@@ -111,7 +112,7 @@ class TextInput {
             }
             if (KeyboardManager.isPastingKeysDown()) {
                 runBlocking {
-                    textBox = OSUtils.readFromClipboard() ?: return@runBlocking
+                    textBox = OSUtils.readFromClipboard()?.take(2024) ?: return@runBlocking
                     updated()
                 }
                 return

@@ -16,7 +16,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.APIUtil
+import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -96,7 +96,7 @@ object MayorAPI {
     private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
     private var lastUpdate = SimpleTimeMark.farPast()
-    private var dispatcher = Dispatchers.IO
+    private val dispatcher = Dispatchers.IO
 
     private var rawMayorData: MayorJson? = null
     private var candidates = mapOf<Int, MayorCandidate>()
@@ -143,6 +143,7 @@ object MayorAPI {
             ChatUtils.clickableChat(
                 "The Perkpocalypse Mayor is not known! Click here to update the temporary Mayor.",
                 onClick = { HypixelCommands.calendar() },
+                replaceSameMessage = true,
             )
         }
     }
@@ -170,7 +171,7 @@ object MayorAPI {
             } ?: false
         } ?: return
 
-        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }) ?: return
+        val perk = stack.getLore().nextAfter({ perkpocalypsePerksPattern.matches(it) }, 2) ?: return
         // This is the first Perk of the Perkpocalypse Mayor
         val jerryMayor = getMayorFromPerk(getPerkFromName(perk.removeColor()) ?: return)?.addAllPerks() ?: return
 
@@ -186,17 +187,21 @@ object MayorAPI {
         jerryExtraMayor = jerryMayor to expireTime
     }
 
+    fun SkyBlockTime.getElectionYear(): Int {
+        var mayorYear = year
+
+        // Check if this year's election has not happened yet
+        if (month < ELECTION_END_MONTH || (day < ELECTION_END_DAY && month == ELECTION_END_MONTH)) {
+            // If so, the current mayor is still from last year's election
+            mayorYear--
+        }
+        return mayorYear
+    }
+
     private fun calculateNextMayorTime(): SimpleTimeMark {
         val now = SkyBlockTime.now()
-        var mayorYear = now.year
 
-        // Check if either the month is already over or the day after 27th in the third month
-        if (now.month > ELECTION_END_MONTH || (now.day >= ELECTION_END_DAY && now.month == ELECTION_END_MONTH)) {
-            // If so, the next mayor will be in the next year
-            mayorYear++
-        }
-
-        return SkyBlockTime(mayorYear, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
+        return SkyBlockTime(now.getElectionYear() + 1, ELECTION_END_MONTH, day = ELECTION_END_DAY).asTimeMark()
     }
 
     private fun getTimeTillNextMayor() {
@@ -212,7 +217,7 @@ object MayorAPI {
 
         SkyHanniMod.coroutineScope.launch {
             val url = "https://api.hypixel.net/v2/resources/skyblock/election"
-            val jsonObject = withContext(dispatcher) { APIUtil.getJSONResponse(url) }
+            val jsonObject = withContext(dispatcher) { APIUtils.getJSONResponse(url) }
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
             val data = rawMayorData ?: return@launch
             val map = mutableMapOf<Int, MayorCandidate>()

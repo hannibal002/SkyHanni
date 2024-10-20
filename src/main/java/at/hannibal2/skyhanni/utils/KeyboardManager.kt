@@ -108,16 +108,15 @@ object KeyboardManager {
         return this.isKeyDown || this.isPressed
     }
 
-    fun Int.isKeyHeld(): Boolean {
-        if (this == 0) return false
-        return if (this < 0) {
-            Mouse.isButtonDown(this + 100)
-        } else if (this >= Keyboard.KEYBOARD_SIZE) {
+    fun Int.isKeyHeld(): Boolean = when {
+        this == 0 -> false
+        this < 0 -> Mouse.isButtonDown(this + 100)
+        this >= Keyboard.KEYBOARD_SIZE -> {
             val pressedKey = if (Keyboard.getEventKey() == 0) Keyboard.getEventCharacter().code + 256 else Keyboard.getEventKey()
             Keyboard.getEventKeyState() && this == pressedKey
-        } else {
-            Keyboard.isKeyDown(this)
         }
+
+        else -> Keyboard.isKeyDown(this)
     }
 
     private val pressedKeys = mutableMapOf<Int, Boolean>()
@@ -155,11 +154,14 @@ object KeyboardManager {
             object : Iterator<KeyBinding> {
 
                 var current = w
+                var finished = false
 
                 override fun hasNext(): Boolean =
-                    current != down
+                    !finished
 
                 override fun next(): KeyBinding {
+                    if (!hasNext()) throw NoSuchElementException()
+
                     return current.also {
                         current = when (it) {
                             w -> a
@@ -167,7 +169,10 @@ object KeyboardManager {
                             s -> d
                             d -> up
                             up -> down
-                            else -> throw java.lang.IndexOutOfBoundsException()
+                            else -> {
+                                finished = true
+                                throw NoSuchElementException()
+                            }
                         }
                     }
                 }

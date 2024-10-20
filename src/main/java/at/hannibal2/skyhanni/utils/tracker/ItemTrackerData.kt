@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.utils.tracker
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import com.google.gson.annotations.Expose
 
 abstract class ItemTrackerData : TrackerData() {
-
-    private val config get() = SkyHanniMod.feature.misc.tracker
 
     abstract fun resetItems()
 
@@ -52,5 +49,19 @@ abstract class ItemTrackerData : TrackerData() {
         var hidden = false
 
         var lastTimeUpdated = SimpleTimeMark.farPast()
+
+        fun copy(
+            timesGained: Long = this.timesGained,
+            totalAmount: Long = this.totalAmount,
+            hidden: Boolean = this.hidden,
+            lastTimeUpdated: SimpleTimeMark = this.lastTimeUpdated,
+        ): TrackedItem {
+            val copy = TrackedItem()
+            copy.timesGained = timesGained
+            copy.totalAmount = totalAmount
+            copy.hidden = hidden
+            copy.lastTimeUpdated = lastTimeUpdated
+            return copy
+        }
     }
 }
