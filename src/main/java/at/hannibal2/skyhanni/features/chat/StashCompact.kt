@@ -106,9 +106,9 @@ object StashCompact {
 
     private fun sendCompactedStashMessage() {
         val typeNameFormat = StringUtils.pluralize(lastMaterialCount, lastType)
-        val typeStringExtra =
-            if (lastDifferingMaterialsCount == 0) "."
-            else ", §etotalling §6$lastDifferingMaterialsCount ${StringUtils.pluralize(lastDifferingMaterialsCount, "type")}§6."
+        val typeStringExtra = lastDifferingMaterialsCount.let {
+            if (it == 0) "." else ", §etotalling §6$it ${StringUtils.pluralize(it, "type")}§6."
+        }
 
         ChatUtils.clickableChat(
             "§eYou have §6$lastMaterialCount §e$typeNameFormat in stash§6${typeStringExtra} " +
