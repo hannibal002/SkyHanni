@@ -119,6 +119,14 @@ object PlayerBossReplay {
                 ChatUtils.chat("playing")
                 return
             }
+            strings.any { it.contains("storage", ignoreCase = true) } -> {
+                println(SkyHanniMod.dungeonReplayData.manual)
+                currentRun = SkyHanniMod.dungeonReplayData.manual
+                playIndex = 0
+                playing = true
+                ChatUtils.chat("playing from storage")
+                return
+            }
             strings.any { it.contains("stop", ignoreCase = true) } -> {
                 playing = false
                 ChatUtils.chat("stopped")
@@ -155,10 +163,11 @@ object PlayerBossReplay {
         ChatUtils.chat("position size: ${positions.size}")
         if (time < bestRun.time) {
             ChatUtils.chat("new pb! trying to save to '$type'")
-            val ghostData = DungeonGhostData(positions, time, player.gameProfile.id)
+            val ghostData = DungeonGhostData(positions, time, player.gameProfile.id, player.gameProfile.name)
             when (type) {
                 "manual" -> {
                     SkyHanniMod.dungeonReplayData.manual = ghostData
+                    println(SkyHanniMod.dungeonReplayData.manual)
                 }
                 "F3" -> {
                     SkyHanniMod.dungeonReplayData.floor3 = ghostData
