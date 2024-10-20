@@ -83,13 +83,7 @@ class CustomImportOrdering(config: Config) : Rule(config) {
         val expectedImports = imports.sortedWith(importOrder).map { "import ${it.importPath}" }
         val formattedExpected = expectedImports.filter { !linesToIgnore.contains(it) }.joinToString("\n")
 
-        val isExpected = formattedOriginal == formattedExpected
-        if (!isExpected) {
-            println("Original imports:\n\"$formattedOriginal\"")
-            println("Expected imports:\n\"$formattedExpected\"")
-        }
-
-        return isExpected
+        return formattedOriginal == formattedExpected
     }
 
     override fun visitImportList(importList: KtImportList) {

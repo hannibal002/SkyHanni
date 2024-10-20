@@ -96,8 +96,13 @@ object TabListData {
             val team1 = o1.playerTeam
             val team2 = o2.playerTeam
             return ComparisonChain.start().compareTrueFirst(
+                //#if MC<1.12
                 o1.gameType != WorldSettings.GameType.SPECTATOR,
                 o2.gameType != WorldSettings.GameType.SPECTATOR
+                //#else
+                //$$ o1.gameType != GameType.SPECTATOR,
+                //$$ o2.gameType != GameType.SPECTATOR
+                //#endif
             )
                 .compare(
                     if (team1 != null) team1.registeredName else "",
