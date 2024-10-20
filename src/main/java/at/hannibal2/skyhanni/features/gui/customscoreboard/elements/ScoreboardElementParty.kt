@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 // internal
 // add party update event
 object ScoreboardElementParty : ScoreboardElement() {
+    // TODO cache until next party update event
     override fun getDisplay() = buildList {
         if (PartyAPI.partyMembers.isEmpty() && informationFilteringConfig.hideEmptyLines) return@buildList
 
