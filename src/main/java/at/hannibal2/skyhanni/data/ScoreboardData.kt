@@ -25,7 +25,8 @@ object ScoreboardData {
 
     private var sidebarLines: List<String> = emptyList() // TODO rename to raw
     var sidebarLinesRaw: List<String> = emptyList() // TODO delete
-    val objectiveTitle: String get() = Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName ?: ""
+    val objectiveTitle: String get() =
+        Minecraft.getMinecraft().theWorld?.scoreboard?.getObjectiveInDisplaySlot(1)?.displayName.orEmpty()
 
     private var dirty = false
 
@@ -48,19 +49,16 @@ object ScoreboardData {
              *        - '§8- §c§6Flame Dr§6agon§a 460M§c❤'
              * ```
              */
-            val lastColor = start.lastColorCode() ?: ""
+            val lastColor = start.lastColorCode().orEmpty()
 
             // Generate the list of color suffixes
-            val colorSuffixes = generateSequence(lastColor) { it.dropLast(2) }
-                .takeWhile { it.isNotEmpty() }
-                .toMutableList()
+            val colorSuffixes = lastColor.chunked(2).toMutableList()
 
             // Iterate through the colorSuffixes to remove matching prefixes from 'end'
             for (suffix in colorSuffixes.toList()) {
                 if (end.startsWith(suffix)) {
                     end = end.removePrefix(suffix)
                     colorSuffixes.remove(suffix)
-                    break
                 }
             }
 

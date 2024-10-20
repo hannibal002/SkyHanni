@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceCostJson
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -16,14 +15,7 @@ object EssenceItemUtils {
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val unformattedData = event.getConstant<Map<String, NeuEssenceCostJson>>("essencecosts", NeuEssenceCostJson.TYPE)
-
-        ConfigManager.gson.toJson(unformattedData).let {
-            ChatUtils.debug("saved to clipboard!")
-            OSUtils.copyToClipboard(it)
-        }
         this.itemPrices = reformatData(unformattedData)
-
-        println("result: ${itemPrices.size}")
     }
 
     fun NEUInternalName.getEssencePrices(): Map<Int, EssenceUpgradePrice>? = itemPrices[this]
@@ -33,13 +25,13 @@ object EssenceItemUtils {
         for ((name, data) in unformattedData) {
 
             val essencePrices = loadEssencePrices(data)
-            val extraItems = data.extraItems ?: emptyMap()
+            val extraItems = data.extraItems.orEmpty()
             val (coinPrices, iemPrices) = loadCoinAndItemPrices(extraItems)
 
             val upgradePrices = mutableMapOf<Int, EssenceUpgradePrice>()
             for ((tier, essencePrice) in essencePrices) {
                 val coinPrice = coinPrices[tier]
-                val itemPrice = iemPrices[tier] ?: emptyMap()
+                val itemPrice = iemPrices[tier].orEmpty()
                 upgradePrices[tier] = EssenceUpgradePrice(essencePrice, coinPrice, itemPrice)
             }
 
@@ -72,7 +64,9 @@ object EssenceItemUtils {
         return Pair(collectCoinPrices, collectItemPrices)
     }
 
-    private fun split(string: String): Pair<NEUInternalName, Long> = string.split(":").let { it[0].asInternalName() to it[1].toLong() }
+    private fun split(string: String): Pair<NEUInternalName, Long> = string.split(":").let {
+        it[0].asInternalName() to it[1].toLong()
+    }
 
     private fun loadEssencePrices(data: NeuEssenceCostJson): MutableMap<Int, EssencePrice> {
         val map = mutableMapOf<Int, EssencePrice>()
