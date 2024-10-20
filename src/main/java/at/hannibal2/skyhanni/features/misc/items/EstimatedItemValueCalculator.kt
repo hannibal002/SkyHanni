@@ -479,7 +479,7 @@ object EstimatedItemValueCalculator {
     ): Pair<EssenceItemUtils.EssenceUpgradePrice, Pair<Int, Int>>? {
         var totalStars = inputStars
         val (price, maxStars) = if (internalName.isKuudraArmor()) {
-            val tier = internalName.getKuudraTier() ?: 0
+            val tier = (internalName.getKuudraTier() ?: 0) - 1
             totalStars += tier * 10
 
             var remainingStars = totalStars
