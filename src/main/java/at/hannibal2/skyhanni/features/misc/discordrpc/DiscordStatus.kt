@@ -118,10 +118,10 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         val scoreboard = ScoreboardData.sidebarLinesFormatted
         // Matches coins amount in purse or piggy, with optional decimal points
         val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
-            purseRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+            purseRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
         }
         val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
-            motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+            motesRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
         }
         lastKnownDisplayStrings[PURSE] = when {
             coins == "1" -> "1 Coin"
@@ -129,9 +129,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             motes == "1" -> "1 Mote"
             motes != "" && motes != null -> "$motes Motes"
 
-            else -> lastKnownDisplayStrings[PURSE] ?: ""
+            else -> lastKnownDisplayStrings[PURSE].orEmpty()
         }
-        lastKnownDisplayStrings[PURSE] ?: ""
+        lastKnownDisplayStrings[PURSE].orEmpty()
     }),
 
     BITS({
@@ -156,7 +156,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         if (ActionBarStatsData.MANA.value != "") {
             lastKnownDisplayStrings[STATS] = statString
         }
-        lastKnownDisplayStrings[STATS] ?: ""
+        lastKnownDisplayStrings[STATS].orEmpty()
     }),
 
     ITEM({
@@ -266,7 +266,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         }
 
         val itemInHand = InventoryUtils.getItemInHand()
-        val itemName = itemInHand?.displayName?.removeColor() ?: ""
+        val itemName = itemInHand?.displayName?.removeColor().orEmpty()
 
         val extraAttributes = getExtraAttributes(itemInHand)
 
@@ -333,7 +333,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     })
     ;
 
-    fun getDisplayString(): String = displayMessageSupplier() ?: ""
+    fun getDisplayString(): String = displayMessageSupplier().orEmpty()
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {

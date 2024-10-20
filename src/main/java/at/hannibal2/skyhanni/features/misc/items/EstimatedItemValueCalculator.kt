@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
@@ -75,7 +76,7 @@ object EstimatedItemValueCalculator {
     private val config get() = SkyHanniMod.feature.inventory.estimatedItemValues
 
     var starChange = 0
-        get() = if (SkyHanniMod.feature.dev.debug.enabled) field else 0
+        get() = if (LorenzUtils.debug) field else 0
 
     private val additionalCostFunctions = listOf(
         ::addAttributeCost,
@@ -495,7 +496,7 @@ object EstimatedItemValueCalculator {
 
             }
             for ((id, _) in tiers.sorted()) {
-                val prices = EssenceItemUtils.itemPrices[id] ?: emptyMap()
+                val prices = EssenceItemUtils.itemPrices[id].orEmpty()
                 maxStars += prices.size
                 if (remainingStars <= 0) continue
 
@@ -731,6 +732,7 @@ object EstimatedItemValueCalculator {
 
         // todo use repo
         val tieredEnchants = listOf("compact", "cultivating", "champion", "expertise", "hecatomb", "toxophilite")
+        @Suppress("PropertyWrapping")
         val onlyTierOnePrices = listOf("ultimate_chimera", "ultimate_fatal_tempo", "smoldering", "ultimate_flash", "divine_gift")
         val onlyTierFivePrices = listOf("ferocious_mana", "hardened_mana", "mana_vampire", "strong_mana")
 
