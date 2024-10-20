@@ -14,8 +14,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.hasMaxHealth
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.entity.EntityCreature
 import net.minecraft.entity.monster.EntityBlaze
@@ -43,8 +42,10 @@ object SlayerMiniBossFeatures {
             if (bossType.clazz != entity.javaClass) continue
 
             miniBosses = miniBosses.editCopy { add(entity) }
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(entity, LorenzColor.AQUA.toColor().withAlpha(127))
-            { config.slayerMinibossHighlight }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
+                entity,
+                LorenzColor.AQUA.toColor().withAlpha(127)
+            ) { config.slayerMinibossHighlight }
         }
     }
 
@@ -61,12 +62,11 @@ object SlayerMiniBossFeatures {
             if (mob.isDead) continue
             if (mob.distanceToPlayer() > 10) continue
 
-            event.draw3DLine(
-                event.exactPlayerEyeLocation(),
-                mob.getLorenzVec().add(y = 1),
+            event.drawLineToEye(
+                mob.getLorenzVec().up(),
                 LorenzColor.AQUA.toColor(),
                 config.slayerMinibossLineWidth,
-                true
+                true,
             )
         }
     }
@@ -79,6 +79,5 @@ object SlayerMiniBossFeatures {
         SVEN(EntityWolf::class.java, 45_000, 120_000, 480_000),
         VOIDLING(EntityEnderman::class.java, 8_400_000, 17_500_000, 52_500_000),
         INFERNAL(EntityBlaze::class.java, 12_000_000, 25_000_000, 75_000_000),
-        ;
     }
 }

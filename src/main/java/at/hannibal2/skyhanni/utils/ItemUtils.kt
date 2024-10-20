@@ -1,15 +1,17 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetAPI
+import at.hannibal2.skyhanni.data.SkyHanniNotification
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator.getAttributeName
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.cachedData
@@ -19,11 +21,10 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import com.google.common.collect.Lists
-import io.github.moulberry.notenoughupdates.recipes.NeuRecipe
-import io.github.moulberry.notenoughupdates.util.NotificationHandler
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
@@ -32,6 +33,8 @@ import net.minecraftforge.common.util.Constants
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.regex.Matcher
+import kotlin.time.Duration.Companion.INFINITE
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -40,19 +43,29 @@ object ItemUtils {
     private val itemNameCache = mutableMapOf<NEUInternalName, String>() // internal name -> item name
 
     private val missingRepoItems = mutableSetOf<String>()
+    private var lastRepoWarning = SimpleTimeMark.farPast()
 
     fun ItemStack.cleanName() = this.displayName.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
-    fun ItemStack.getLore(): List<String> {
-        val tagCompound = this.tagCompound ?: return emptyList()
-        val tagList = tagCompound.getCompoundTag("display").getTagList("Lore", 8)
+    fun ItemStack.getLore(): List<String> = this.tagCompound.getLore()
+
+    fun NBTTagCompound?.getLore(): List<String> {
+        this ?: return emptyList()
+        val tagList = this.getCompoundTag("display").getTagList("Lore", 8)
         val list: MutableList<String> = ArrayList()
         for (i in 0 until tagList.tagCount()) {
             list.add(tagList.getStringTagAt(i))
         }
         return list
+    }
+
+    fun getDisplayName(compound: NBTTagCompound?): String? {
+        compound ?: return null
+        val name = compound.getCompoundTag("display").getString("Name")
+        if (name == null || name.isEmpty()) return null
+        return name
     }
 
     fun ItemStack.setLore(lore: List<String>): ItemStack {
@@ -69,11 +82,13 @@ object ItemUtils {
     }
 
     var ItemStack.extraAttributes: NBTTagCompound
-        get() = this.tagCompound?.getCompoundTag("ExtraAttributes") ?: NBTTagCompound()
+        get() = this.tagCompound?.extraAttributes ?: NBTTagCompound()
         set(value) {
             val tag = this.tagCompound ?: NBTTagCompound().also { tagCompound = it }
             tag.setTag("ExtraAttributes", value)
         }
+
+    val NBTTagCompound.extraAttributes: NBTTagCompound get() = this.getCompoundTag("ExtraAttributes")
 
     fun ItemStack.overrideId(id: String): ItemStack {
         extraAttributes = extraAttributes.apply { setString("id", id) }
@@ -183,6 +198,23 @@ object ItemUtils {
         tag.setTag("SkullOwner", skullOwner)
         render.tagCompound = tag
         return render
+    }
+
+    fun createItemStack(item: Item, displayName: String, vararg lore: String): ItemStack {
+        return createItemStack(item, displayName, lore.toList())
+    }
+
+    // Overload to avoid spread operators
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
+        createItemStack(item, displayName, loreArray.toList(), amount, damage)
+    // Taken from NEU
+    fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
+        val stack = ItemStack(item, amount, damage)
+        val tag = NBTTagCompound()
+        addNameAndLore(tag, displayName, *lore.toTypedArray())
+        tag.setInteger("HideFlags", 254)
+        stack.tagCompound = tag
+        return stack
     }
 
     // Taken from NEU
@@ -316,6 +348,28 @@ object ItemUtils {
         set(value) {
             setStackDisplayName(value)
         }
+
+    // Taken from NEU
+    fun ItemStack.editItemInfo(displayName: String, disableNeuTooltips: Boolean, lore: List<String>): ItemStack {
+        val tag = this.tagCompound ?: NBTTagCompound()
+        val display = tag.getCompoundTag("display")
+        val loreList = NBTTagList()
+        for (line in lore) {
+            loreList.appendTag(NBTTagString(line))
+        }
+
+        display.setString("Name", displayName)
+        display.setTag("Lore", loreList)
+
+        tag.setTag("display", display)
+        tag.setInteger("HideFlags", 254)
+        if (disableNeuTooltips) {
+            tag.setBoolean("disableNeuTooltip", true)
+        }
+
+        this.tagCompound = tag
+        return this
+    }
 
     fun isSkyBlockMenuItem(stack: ItemStack?): Boolean = stack?.getInternalName()?.equals("SKYBLOCK_MENU") ?: false
 
@@ -463,19 +517,17 @@ object ItemUtils {
         return list
     }
 
-    fun neededItems(recipe: NeuRecipe): Map<NEUInternalName, Int> {
+    fun neededItems(recipe: PrimitiveRecipe): Map<NEUInternalName, Int> {
         val neededItems = mutableMapOf<NEUInternalName, Int>()
-        for (ingredient in recipe.ingredients) {
-            val material = ingredient.internalItemId.asInternalName()
-            val amount = ingredient.count.toInt()
+        for ((material, amount) in recipe.ingredients.toPrimitiveItemStacks()) {
             neededItems.addOrPut(material, amount)
         }
         return neededItems
     }
 
-    fun NeuRecipe.getRecipePrice(
+    fun PrimitiveRecipe.getRecipePrice(
         priceSource: ItemPriceSource = ItemPriceSource.BAZAAR_INSTANT_BUY,
-        pastRecipes: List<NeuRecipe> = emptyList(),
+        pastRecipes: List<PrimitiveRecipe> = emptyList(),
     ): Double = neededItems(this).map {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
@@ -499,20 +551,20 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
-//         showRepoWarning()
+        if (!LorenzUtils.debug && !PlatformUtils.isDevEnvironment) return
+
+        if (lastRepoWarning.passedSince() < 3.minutes) return
+        lastRepoWarning = SimpleTimeMark.now()
+        showRepoWarning(name)
     }
 
-    // Running NEU's function `Utils.showOutdatedRepoNotification()` caused a NoSuchMethodError in dev env.
-    // Therefore we run NotificationHandler.displayNotification directly
-    private fun showRepoWarning() {
-        NotificationHandler.displayNotification(
-            Lists.newArrayList(
-                "§c§lMissing repo data",
-                "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
-                "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
-                "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
-            ),
-            true, true,
+    private fun showRepoWarning(item: String) {
+        val text = listOf(
+            "§c§lMissing repo data for item: $item",
+            "§cData used for some SkyHanni features is not up to date, this should normally not be the case.",
+            "§cYou can try §l/neuresetrepo§r§c and restart your game to see if that fixes the issue.",
+            "§cIf the problem persists please join the SkyHanni Discord and message in §l#support§r§c to get support.",
         )
+        NotificationManager.queueNotification(SkyHanniNotification(text, INFINITE, true))
     }
 }

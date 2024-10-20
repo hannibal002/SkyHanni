@@ -7,7 +7,6 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.entity.slayer.SlayerDeathEvent
-import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboardUtils.formatNum
 import at.hannibal2.skyhanni.features.slayer.SlayerType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -18,6 +17,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrUserError
 import at.hannibal2.skyhanni.utils.NumberUtil.formatIntOrUserError
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.cleanPlayerName
@@ -181,7 +181,7 @@ object CarryTracker {
         val price = rawPrice.formatDoubleOrUserError() ?: return
         carryType.pricePer = price
         update()
-        ChatUtils.chat("Set carry price for $carryType §eto §6${price.formatNum()} coins.")
+        ChatUtils.chat("Set carry price for $carryType §eto §6${price.shortFormat()} coins.")
     }
 
     private fun getCustomer(customerName: String): Customer {
@@ -228,7 +228,7 @@ object CarryTracker {
                             add("§7Missing: §e$missing")
                             add("")
                             if (cost != "") {
-                                add("§7Total cost: §e${cost}")
+                                add("§7Total cost: §e$cost")
                                 add("§7Cost per carry: §e${formatCost(carry.type.pricePer)}")
                             } else {
                                 add("§cNo price set for this carry!")
@@ -260,11 +260,11 @@ object CarryTracker {
         val totalCost = customer.carries.sumOf { it.getCost() ?: 0.0 }
         val totalCostFormat = formatCost(totalCost)
         if (totalCostFormat != "") {
-            val paidFormat = "§6${customer.alreadyPaid.formatNum()}"
+            val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
             val missingFormat = formatCost(totalCost - customer.alreadyPaid)
             list.add(
                 Renderable.clickAndHover(
-                    Renderable.string("§b$customerName $paidFormat§8/${totalCostFormat}"),
+                    Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
                     tips = listOf(
                         "§7Carries for §b$customerName",
                         "",
@@ -276,7 +276,8 @@ object CarryTracker {
                     ),
                     onClick = {
                         HypixelCommands.partyChat(
-                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " + "still missing: ${missingFormat.removeColor()}",
+                            "$customerName Carry: already paid: ${paidFormat.removeColor()}, " +
+                                "still missing: ${missingFormat.removeColor()}",
                         )
                     },
                 ),
@@ -293,7 +294,7 @@ object CarryTracker {
         }?.takeIf { it != 0.0 }
     }
 
-    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.formatNum()}"
+    private fun formatCost(totalCost: Double?): String = if (totalCost == 0.0 || totalCost == null) "" else "§6${totalCost.shortFormat()}"
 
     private fun createCarryType(input: String): CarryType? {
         if (input.length == 1) return null
