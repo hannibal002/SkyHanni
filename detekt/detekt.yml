@@ -12,6 +12,11 @@ FormattingRules:
     CustomCommentSpacing:
         active: true
 
+UseRepoRules:
+    active: true
+    SkullTexturesUseRepo:
+        active: true
+
 
 style:
     MagicNumber: # I, Linnea Gräf, of sound mind and body, disagree with disabling this rule
