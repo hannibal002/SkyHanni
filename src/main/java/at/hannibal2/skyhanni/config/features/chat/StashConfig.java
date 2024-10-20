@@ -17,8 +17,8 @@ public class StashConfig {
 
     @ConfigOption(
         name = "§cNotice",
-        desc = "Due to Hypixel sending empty messages before and after the stash message, " +
-            "you may see empty lines still. Turn on `/sh empty messages` to solve for this."
+        desc = "Hypixel sends un-detectable empty messages wrapping the stash message. " +
+            "Enable §e§l/sh empty messages §r§7to hide them."
     )
     @ConfigEditorInfoText
     public String notice = "";
