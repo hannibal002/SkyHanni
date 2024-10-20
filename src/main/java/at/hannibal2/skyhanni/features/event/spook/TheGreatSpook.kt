@@ -60,6 +60,10 @@ object TheGreatSpook {
         if (isTimeLeftEnabled()) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
     }
 
+
+    /**
+     * REGEX-TEST: §d§lQUICK MATHS! §r§7Solve: §r§e(10*2)+12*5
+     */
     private val mathFearMessagePattern by RepoPattern.pattern(
         "chat.math",
         "§d§lQUICK MATHS! §r§7Solve: §r§e(?<math>.*)",
@@ -99,13 +103,14 @@ object TheGreatSpook {
             speakingFearMessagePattern.matchMatcher(event.message) {
                 DelayedRun.runNextTick {
                     val feature: KMutableProperty0<*> = config.primalFearSolver::publicSpeaking
+                    val stringToSend = "I looove SkyHanni! " + StringUtils.generateRandomString(4)
                     ChatUtils.clickToActionOrDisable(
                         "Click to send a random string to complete the Primal Fear",
                         feature,
-                        "Sends the message!",
+                        "Sends $stringToSend",
                         action =
                         {
-                            HypixelCommands.allChat("I looove SkyHanni! " + StringUtils.generateRandomString(4))
+                            HypixelCommands.allChat(stringToSend)
                         }
                     )
                 }
