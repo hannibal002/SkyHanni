@@ -158,6 +158,10 @@ object HypixelCommands {
         send("cb $uuid")
     }
 
+    fun bank() {
+        send("bank")
+    }
+
     fun pickupStash() {
         send("pickupstash")
     }
