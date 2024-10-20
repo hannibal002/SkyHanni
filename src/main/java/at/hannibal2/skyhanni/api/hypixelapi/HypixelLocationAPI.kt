@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAll
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import net.hypixel.data.type.GameType
 import net.hypixel.data.type.ServerType
@@ -83,14 +82,7 @@ object HypixelLocationAPI {
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Hypixel Mod API")
         event.addIrrelevant {
-            addAll(
-                "inHypixel: $inHypixel",
-                "inSkyblock: $inSkyblock",
-                "island: $island",
-                "serverId: $serverId",
-                "serverType: $serverType",
-                "map: $map",
-            )
+            addAll(debugData.map(::dataToString))
         }
     }
 
@@ -106,48 +98,53 @@ object HypixelLocationAPI {
 
     fun checkHypixel(hypixel: Boolean) {
         if (hypixel == inHypixel) return
-        sendError(
-            "Hypixel check comparison with HypixelModAPI failed. Please report in discord.",
-            "inHypixel comparison failed",
-        )
+        sendError("Hypixel", "inHypixel")
     }
 
     fun checkSkyblock(skyblock: Boolean) {
         if (skyblock == inSkyblock) return
-        sendError(
-            "SkyBlock check comparison with HypixelModAPI failed. Please report in discord.",
-            "inSkyBlock comparison failed",
-        )
+        sendError("SkyBlock", "inSkyblock")
     }
 
     fun checkIsland(otherIsland: IslandType) {
         if (otherIsland == island) return
         if (otherIsland == IslandType.NONE) return
         if (otherIsland.toggleGuest() == island) return
-        sendError(
-            "Island check comparison with HypixelModAPI failed. Please report in discord.",
-            "island comparison failed",
-        )
+        sendError("Island", "island")
     }
 
-    private fun sendError(userMessage: String, internalMessage: String) {
+    fun checkServerId(otherId: String?) {
+        if (serverId == otherId) return
+        sendError("ServerId", "serverId")
+    }
+
+    private fun sendError(userMessage: String, internal: String) {
+        if (!config) return
+        val data = debugData
+        logger.log("ERROR: ${data.joinToString(transform = ::dataToString)}")
         ErrorManager.logErrorStateWithData(
-            userMessage,
-            internalMessage,
-            "HypixelData.skyBlock" to HypixelData.skyBlock,
-            "inSkyblock" to inSkyblock,
-            "HypixelData.hypixelLive" to HypixelData.hypixelLive,
-            "inHypixel" to inHypixel,
-            "HypixelData.skyBlockIsland" to HypixelData.skyBlockIsland,
-            "island" to island,
-            "HypixelData.serverId" to HypixelData.serverId,
-            "serverId" to serverId,
-            "serverType" to serverType,
-            "map" to map,
+            "$userMessage check comparison with HypixelModAPI failed. Please report in discord.",
+            "$internal comparison failed",
+            *data.toTypedArray(),
             betaOnly = true,
             noStackTrace = true,
         )
     }
+
+    private val debugData get() = listOf(
+        "HypixelData.skyBlock" to HypixelData.skyBlock,
+        "inSkyblock" to inSkyblock,
+        "HypixelData.hypixelLive" to HypixelData.hypixelLive,
+        "inHypixel" to inHypixel,
+        "HypixelData.skyBlockIsland" to HypixelData.skyBlockIsland,
+        "island" to island,
+        "HypixelData.serverId" to HypixelData.serverId,
+        "serverId" to serverId,
+        "serverType" to serverType,
+        "map" to map,
+    )
+
+    private fun dataToString(pair: Pair<String, Any?>) = "${pair.first}: ${pair.second}"
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) = reset()
