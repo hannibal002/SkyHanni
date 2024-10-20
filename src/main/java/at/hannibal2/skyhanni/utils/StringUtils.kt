@@ -419,7 +419,7 @@ object StringUtils {
     private fun addComponent(foundCommands: MutableList<IChatComponent>, message: IChatComponent) {
         val clickEvent = message.chatStyle.chatClickEvent
         if (clickEvent != null) {
-            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent.value == clickEvent.value) {
+            if (foundCommands.size == 1 && foundCommands[0].chatStyle.chatClickEvent?.value == clickEvent.value) {
                 return
             }
             foundCommands.add(message)
