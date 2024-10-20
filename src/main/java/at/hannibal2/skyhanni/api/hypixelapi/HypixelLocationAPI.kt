@@ -169,14 +169,14 @@ object HypixelLocationAPI {
         ErrorManager.logErrorStateWithData(
             "$message check comparison with HypixelModAPI failed. Please report in discord.",
             "$message comparison failed",
-            *data.toTypedArray(),
+            *data,
             betaOnly = true,
             noStackTrace = true,
         )
     }
 
     private val debugData
-        get() = listOf(
+        get() = arrayOf(
             "HypixelData.skyBlock" to HypixelData.skyBlock,
             "inSkyblock" to inSkyblock,
             "HypixelData.hypixelLive" to HypixelData.hypixelLive,
