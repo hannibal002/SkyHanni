@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.essenceUpgradePattern
 import at.hannibal2.skyhanni.features.inventory.EssenceShopHelper.maxedUpgradeLorePattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.createItemStack
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -94,7 +93,11 @@ object CarnivalShopHelper {
     }
 
     private fun tryReplaceShopSpecificStack(event: ReplaceItemEvent) {
-        if (currentProgress == null || !repoEventShops.any { it.shopName.equals(event.inventory.name, ignoreCase = true) }) return
+        if (currentProgress == null ||
+            !repoEventShops.any {
+                it.shopName.equals(event.inventory.name, ignoreCase = true)
+            }
+        ) return
         shopSpecificInfoItemStack.let { event.replace(it) }
     }
 
@@ -164,7 +167,7 @@ object CarnivalShopHelper {
             createItemStack(
                 "NAME_TAG".asInternalName().getItemStack().item,
                 "§bRemaining Event Shop Token Upgrades",
-                *buildList {
+                buildList {
                     add("")
                     var sumTokensNeeded = 0
                     var foundShops = 0
@@ -181,7 +184,7 @@ object CarnivalShopHelper {
                     }
                     val extraFormatting = if (foundShops != repoEventShops.size) "*" else ""
                     sumTokensNeeded.takeIf { it > 0 }?.let { addNeededRemainingTokens(it, extraFormatting) }
-                }.toTypedArray(),
+                }
             )
         }
     }
@@ -191,7 +194,7 @@ object CarnivalShopHelper {
             createItemStack(
                 "NAME_TAG".asInternalName().getItemStack().item,
                 "§bRemaining $currentEventType Token Upgrades",
-                *buildList {
+                buildList {
                     val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
                     if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
                     else {
@@ -213,7 +216,7 @@ object CarnivalShopHelper {
                         add("§cFound upgrades not in repo§c§l:")
                         progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
                     }
-                }.toTypedArray(),
+                }
             )
         }
     }

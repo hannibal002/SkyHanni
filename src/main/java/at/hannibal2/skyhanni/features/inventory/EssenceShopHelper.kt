@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.EssenceShopUpgrade
+import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceShopJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -83,7 +83,7 @@ object EssenceShopHelper {
         "§.(?<upgrade>.*) (?<tier>[IVXLCDM]*)",
     )
 
-    data class EssenceShop(val shopName: String, val upgrades: List<EssenceShopUpgrade>)
+    data class EssenceShop(val shopName: String, val upgrades: List<NeuEssenceShopJson>)
     data class EssenceShopUpgradeStatus(
         val upgradeName: String,
         val currentLevel: Int,
@@ -127,7 +127,7 @@ object EssenceShopHelper {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        val repoEssenceShops = event.readConstant<Map<String, Map<String, EssenceShopUpgrade>>>("essenceshops")
+        val repoEssenceShops = event.readConstant<Map<String, Map<String, NeuEssenceShopJson>>>("essenceshops")
         essenceShops = repoEssenceShops.map { (key, value) ->
             EssenceShop(key, value.values.toMutableList())
         }.toMutableList()
@@ -157,7 +157,7 @@ object EssenceShopHelper {
             createItemStack(
                 "GOLD_NUGGET".asInternalName().getItemStack().item,
                 "§bRemaining $currentEssenceType Essence Upgrades",
-                *buildList {
+                buildList {
                     val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
                     if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
                     else {
@@ -197,7 +197,7 @@ object EssenceShopHelper {
                         add("§cFound upgrades not in repo§c§l:")
                         progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
                     }
-                }.toTypedArray(),
+                }
             )
         }
     }
