@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -203,6 +204,9 @@ object ItemUtils {
         return createItemStack(item, displayName, lore.toList())
     }
 
+    // Overload to avoid spread operators
+    fun createItemStack(item: Item, displayName: String, loreArray: Array<String>, amount: Int = 1, damage: Int = 0): ItemStack =
+        createItemStack(item, displayName, loreArray.toList(), amount, damage)
     // Taken from NEU
     fun createItemStack(item: Item, displayName: String, lore: List<String>, amount: Int = 1, damage: Int = 0): ItemStack {
         val stack = ItemStack(item, amount, damage)
@@ -547,6 +551,7 @@ object ItemUtils {
     fun addMissingRepoItem(name: String, message: String) {
         if (!missingRepoItems.add(name)) return
         ChatUtils.debug(message)
+        if (!LorenzUtils.debug && !PlatformUtils.isDevEnvironment) return
 
         if (lastRepoWarning.passedSince() < 3.minutes) return
         lastRepoWarning = SimpleTimeMark.now()
