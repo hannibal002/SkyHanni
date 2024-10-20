@@ -20,7 +20,7 @@ object RiftLarva {
     private val config get() = RiftAPI.config.area.wyldWoods.larvas
     private var hasHookInHand = false
 
-    private val LARVA_SKULL_TEXTURE = SkullTextureHolder.getTexture("RIFT_LARVA")
+    private val LARVA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_LARVA") }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

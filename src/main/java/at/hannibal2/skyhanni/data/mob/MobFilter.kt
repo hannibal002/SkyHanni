@@ -121,11 +121,11 @@ object MobFilter {
         "^§8\\[§7Lv\\d+§8] §.(?<name>Horse|Armadillo|Skeleton Horse|Pig|Rat)$",
     )
 
-    internal val RAT_SKULL_TEXTURE = SkullTextureHolder.getTexture("MOB_RAT")
-    private val HELLWISP_TENTACLE_SKULL_TEXTURE = SkullTextureHolder.getTexture("HELLWISP_TENTACLE")
-    private val RIFT_EYE_SKULL1_TEXTURE = SkullTextureHolder.getTexture("RIFT_EYE_1")
-    private val RIFT_EYE_SKULL2_TEXTURE = SkullTextureHolder.getTexture("RIFT_EYE_2")
-    internal val NPC_TURD_SKULL = SkullTextureHolder.getTexture("NPC_TURD")
+    internal val RAT_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_RAT") }
+    private val HELLWISP_TENTACLE_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("HELLWISP_TENTACLE") }
+    private val RIFT_EYE_SKULL1_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_EYE_1") }
+    private val RIFT_EYE_SKULL2_TEXTURE by lazy { SkullTextureHolder.getTexture("RIFT_EYE_2") }
+    internal val NPC_TURD_SKULL by lazy { SkullTextureHolder.getTexture("NPC_TURD") }
 
     const val MINION_MOB_PREFIX = "Minion Mob "
 

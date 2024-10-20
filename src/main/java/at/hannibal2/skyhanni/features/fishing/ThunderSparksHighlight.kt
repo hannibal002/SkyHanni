@@ -27,7 +27,7 @@ import java.awt.Color
 object ThunderSparksHighlight {
 
     private val config get() = SkyHanniMod.feature.fishing.thunderSpark
-    private val THUNDER_SPARK_TEXTURE = SkullTextureHolder.getTexture("THUNDER_SPARK")
+    private val THUNDER_SPARK_TEXTURE by lazy { SkullTextureHolder.getTexture("THUNDER_SPARK") }
     private val sparks = mutableListOf<EntityArmorStand>()
 
     @SubscribeEvent

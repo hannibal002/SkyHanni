@@ -64,7 +64,7 @@ object DungeonAPI {
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
 
     private val patternGroup = RepoPattern.group("dungeon")
-    private val WITHER_ESSENCE_TEXTURE = SkullTextureHolder.getTexture("WITHER_ESSENCE")
+    private val WITHER_ESSENCE_TEXTURE by lazy { SkullTextureHolder.getTexture("WITHER_ESSENCE") }
 
     /**
      * REGEX-TEST: Time Elapsed: §a01m 17s

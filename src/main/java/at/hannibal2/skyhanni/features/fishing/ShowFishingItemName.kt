@@ -28,10 +28,12 @@ object ShowFishingItemName {
     private var itemsOnGround = TimeLimitedCache<EntityItem, String>(750.milliseconds)
 
     // Textures taken from Skytils - moved to REPO
-    private val cheapCoins = setOf(
-        SkullTextureHolder.getTexture("COINS_1"),
-        SkullTextureHolder.getTexture("COINS_2"),
-    )
+    private val cheapCoins by lazy {
+        setOf(
+            SkullTextureHolder.getTexture("COINS_1"),
+            SkullTextureHolder.getTexture("COINS_2"),
+        )
+    }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

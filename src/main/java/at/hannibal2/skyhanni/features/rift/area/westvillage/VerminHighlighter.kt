@@ -27,8 +27,8 @@ object VerminHighlighter {
 
     private val checkedEntities = TimeLimitedSet<Int>(1.minutes)
 
-    private val VERMIN_FLY_TEXTURE = SkullTextureHolder.getTexture("VERMIN_FLY")
-    private val VERMIN_SPIDER_TEXTURE = SkullTextureHolder.getTexture("VERMIN_SPIDER")
+    private val VERMIN_FLY_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_FLY") }
+    private val VERMIN_SPIDER_TEXTURE by lazy { SkullTextureHolder.getTexture("VERMIN_SPIDER") }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {

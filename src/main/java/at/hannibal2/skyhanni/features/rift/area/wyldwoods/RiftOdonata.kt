@@ -21,7 +21,7 @@ object RiftOdonata {
     private val config get() = RiftAPI.config.area.wyldWoods.odonata
     private var hasBottleInHand = false
 
-    private val ODONATA_SKULL_TEXTURE = SkullTextureHolder.getTexture("MOB_ODONATA")
+    private val ODONATA_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("MOB_ODONATA") }
     private val emptyBottle by lazy { "EMPTY_ODONATA_BOTTLE".asInternalName() }
 
     @SubscribeEvent

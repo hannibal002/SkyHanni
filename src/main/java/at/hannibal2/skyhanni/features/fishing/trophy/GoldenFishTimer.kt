@@ -94,7 +94,7 @@ object GoldenFishTimer {
         handle()
     }
 
-    private val GOLDEN_FISH_SKULL_TEXTURE = SkullTextureHolder.getTexture("GOLDEN_FISH")
+    private val GOLDEN_FISH_SKULL_TEXTURE by lazy { SkullTextureHolder.getTexture("GOLDEN_FISH") }
     private val goldenFishSkullItem by lazy {
         ItemUtils.createSkull(
             displayName = "§6Golden Fish",

@@ -20,7 +20,7 @@ object LesserOrbHider {
     private val config get() = SkyHanniMod.feature.misc
     private val hiddenEntities = CollectionUtils.weakReferenceList<EntityArmorStand>()
 
-    private val LESSER_TEXTURE = SkullTextureHolder.getTexture("LESSER_ORB")
+    private val LESSER_TEXTURE by lazy { SkullTextureHolder.getTexture("") }
 
     @SubscribeEvent
     fun onArmorChange(event: EntityEquipmentChangeEvent) {

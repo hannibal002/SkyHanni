@@ -30,9 +30,9 @@ object VoltHighlighter {
 
     private val config get() = RiftAPI.config.area.dreadfarm.voltCrux
 
-    private val VOLT_DOING_LIGHTNING = SkullTextureHolder.getTexture("VOLT_DOING_LIGHTNING")
-    private val VOLT_FRIENDLY = SkullTextureHolder.getTexture("VOLT_FRIENDLY")
-    private val VOLT_HOSTILE = SkullTextureHolder.getTexture("VOLT_HOSTILE")
+    private val VOLT_DOING_LIGHTNING by lazy { SkullTextureHolder.getTexture("VOLT_DOING_LIGHTNING") }
+    private val VOLT_FRIENDLY by lazy { SkullTextureHolder.getTexture("VOLT_FRIENDLY") }
+    private val VOLT_HOSTILE by lazy { SkullTextureHolder.getTexture("VOLT_HOSTILE") }
 
     private const val LIGHTNING_DISTANCE = 7F
     private const val ARMOR_SLOT_HEAD = 3
@@ -99,7 +99,6 @@ object VoltHighlighter {
         DOING_LIGHTNING,
     }
 
-    @Suppress("MaxLineLength")
     private fun getVoltState(itemStack: ItemStack): VoltState {
         return when (itemStack.getSkullTexture()) {
             VOLT_DOING_LIGHTNING -> VoltState.DOING_LIGHTNING

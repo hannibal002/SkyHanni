@@ -29,14 +29,14 @@ object DungeonHideItems {
     private val hideParticles = mutableMapOf<EntityArmorStand, Long>()
     private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, Long>()
 
-    private val SOUL_WEAVER_HIDER = SkullTextureHolder.getTexture("DUNGEONS_SOUL_WEAVER")
-    private val BLESSING_TEXTURE = SkullTextureHolder.getTexture("DUNGEONS_BLESSING")
-    private val REVIVE_STONE_TEXTURE = SkullTextureHolder.getTexture("DUNGEONS_REVIVE_STONE")
-    private val PREMIUM_FLESH_TEXTURE = SkullTextureHolder.getTexture("DUNGEONS_PREMIUM_FLESH")
-    private val ABILITY_ORB_TEXTURE = SkullTextureHolder.getTexture("DUNGEONS_ABILITY_ORB")
-    private val SUPPORT_ORB_TEXTURE = SkullTextureHolder.getTexture("DUNGEONS_SUPPORT_ORB")
-    private val DAMAGE_ORB_TEXTURE = SkullTextureHolder.getTexture("DUNGEONS_DAMAGE_ORB")
-    private val HEALER_FAIRY_TEXTURE = SkullTextureHolder.getTexture("DUNGEONS_HEALER_FAIRY")
+    private val SOUL_WEAVER_HIDER by lazy { SkullTextureHolder.getTexture("DUNGEONS_SOUL_WEAVER") }
+    private val BLESSING_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_BLESSING") }
+    private val REVIVE_STONE_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_REVIVE_STONE") }
+    private val PREMIUM_FLESH_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_PREMIUM_FLESH") }
+    private val ABILITY_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_ABILITY_ORB") }
+    private val SUPPORT_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_SUPPORT_ORB") }
+    private val DAMAGE_ORB_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_DAMAGE_ORB") }
+    private val HEALER_FAIRY_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_HEALER_FAIRY") }
 
     private fun isSkeletonSkull(entity: EntityArmorStand): Boolean {
         val itemStack = entity.inventory[4]

@@ -66,8 +66,8 @@ object VampireSlayerFeatures {
     private val username
         get() = EntityUtils.getEntities<EntityPlayerSP>().firstOrNull()?.name ?: error("own player is null")
 
-    private val BLOOD_ICHOR_TEXTURE = SkullTextureHolder.getTexture("BLOOD_ICHOR")
-    private val KILLER_SPRING_TEXTURE = SkullTextureHolder.getTexture("KILLER_SPRING")
+    private val BLOOD_ICHOR_TEXTURE by lazy { SkullTextureHolder.getTexture("BLOOD_ICHOR") }
+    private val KILLER_SPRING_TEXTURE by lazy { SkullTextureHolder.getTexture("KILLER_SPRING") }
     private var nextClawSend = 0L
 
     @SubscribeEvent

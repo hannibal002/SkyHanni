@@ -43,11 +43,13 @@ object FlareDisplay {
 
     private val MAX_FLARE_TIME = 3.minutes
 
-    private val flareSkins = mapOf(
-        SkullTextureHolder.getTexture("FLARE_WARNING") to FlareType.WARNING,
-        SkullTextureHolder.getTexture("FLARE_ALERT") to FlareType.ALERT,
-        SkullTextureHolder.getTexture("FLARE_SOS") to FlareType.SOS,
-    )
+    private val flareSkins by lazy {
+        mapOf(
+            SkullTextureHolder.getTexture("FLARE_WARNING") to FlareType.WARNING,
+            SkullTextureHolder.getTexture("FLARE_ALERT") to FlareType.ALERT,
+            SkullTextureHolder.getTexture("FLARE_SOS") to FlareType.SOS,
+        )
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

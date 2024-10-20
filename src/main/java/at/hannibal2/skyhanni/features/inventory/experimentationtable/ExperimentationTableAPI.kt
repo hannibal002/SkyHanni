@@ -44,7 +44,7 @@ object ExperimentationTableAPI {
         if (storage?.tablePos != vec) storage?.tablePos = vec
     }
 
-    private val EXPERIMENTATION_TABLE_SKULL = SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE")
+    private val EXPERIMENTATION_TABLE_SKULL by lazy { SkullTextureHolder.getTexture("EXPERIMENTATION_TABLE") }
     private val patternGroup = RepoPattern.group("enchanting.experiments")
 
     /**
