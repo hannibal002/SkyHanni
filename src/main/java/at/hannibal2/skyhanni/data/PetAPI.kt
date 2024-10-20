@@ -270,7 +270,9 @@ object PetAPI {
 
     private fun handleWidgetPetLine(line: String, newPetLine: String): PetData? {
         return petWidgetPattern.matchMatcher(line) {
-            val rarity = LorenzRarity.getByColorCode(groupOrNull("rarity")?.get(0) ?: '4') ?: LorenzRarity.ULTIMATE
+            val rarity = LorenzRarity.getByColorCode(groupOrNull("rarity")?.get(0) ?: run {
+                throwUnknownRarity(group("rarity"))
+            }) ?: throwUnknownRarity(group("rarity"))
             val petName = groupOrNull("name") ?: ""
             val level = groupOrNull("level")?.toInt() ?: 0
             val xp = levelToXP(level, rarity, petName) ?: return null
@@ -345,7 +347,7 @@ object PetAPI {
     private fun readAutopetMessage(string: String): PetData? {
         autopetHoverPetPattern.matchMatcher(string) {
             val level = group("level").toInt()
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
+            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: throwUnknownRarity(group("rarity"))
             val petName = group("pet")
             val hasSkin = group("skin") != null
 
@@ -517,7 +519,10 @@ object PetAPI {
 
     private fun getRarityOffset(rarity: LorenzRarity, petObject: JsonObject?): Int? {
         return petObject?.entrySet()?.associate { (rarity, offset) ->
-            (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
+            (LorenzRarity.getByName(rarity) ?: run {
+                ChatUtils.userError("Invalid Rarity '${rarity}''")
+                return null
+            }) to offset.asInt
         }?.let { it[rarity] }
             ?: when (rarity) {
                 LorenzRarity.COMMON -> 0
@@ -571,7 +576,7 @@ object PetAPI {
         customXpLeveling = xpLevelingCustomJson
 
         petRarityOffset = data.petRarityOffset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
-            (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
+            (LorenzRarity.getByName(rarity) ?: throwUnknownRarity(rarity)) to offset.asInt
         }
         customDisplayToInternalName = data.internalToDisplayName
     }
@@ -583,6 +588,12 @@ object PetAPI {
 
     private fun petNameToInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
         return "${petNameToFakeInternalName(petName)};${rarity.id}".asInternalName()
+    }
+
+    private fun throwUnknownRarity(badRarity: String): Nothing {
+        ErrorManager.skyHanniError("Unknown rarity",
+            Pair("rarity", badRarity)
+        )
     }
 }
 
