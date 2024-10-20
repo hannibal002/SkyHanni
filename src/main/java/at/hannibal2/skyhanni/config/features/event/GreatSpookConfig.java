@@ -26,7 +26,9 @@ public class GreatSpookConfig {
     public Position positionTimer = new Position(20, 20, false, true);
 
     @Expose
-    @ConfigOption(name = "Fear Stat Display", desc = "Show your current Fear stat value.")
+    @ConfigOption(name = "Fear Stat Display",
+        desc = "Show Fear stat as single GUI element.\n" +
+        "§eRequires tab list widget enabled and Fear selected to update live.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean fearStatDisplay = false;

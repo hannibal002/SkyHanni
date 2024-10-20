@@ -9,10 +9,14 @@ import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_SHOP_MILESTONE
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.SIDE_DISH
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicateDoradoStrayPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.duplicatePseudoStrayPattern
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker.formLoreToSingleLine
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -23,8 +27,10 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.SkyblockSeason
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -54,7 +60,9 @@ object HoppityAPI {
 
     fun getLastRabbit(): String = this.lastNameCache
     fun isHoppityEvent() = (SkyblockSeason.currentSeason == SkyblockSeason.SPRING || SkyHanniMod.feature.dev.debug.alwaysHoppitys)
-    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull { it.chatColorCode == rabbit.substring(0, 2) }
+    fun rarityByRabbit(rabbit: String): LorenzRarity? = hoppityRarities.firstOrNull {
+        it.chatColorCode == rabbit.substring(0, 2)
+    }
 
     /**
      * REGEX-TEST: §f1st Chocolate Milestone
@@ -103,10 +111,25 @@ object HoppityAPI {
             ChocolateFactoryStrayTracker.strayCaughtPattern.matchMatcher(it.stack.displayName) {
                 ChocolateFactoryStrayTracker.handleStrayClicked(it)
                 when (groupOrNull("name") ?: return@matchMatcher) {
-                    "Fish the Rabbit" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
-                    "El Dorado" -> EggFoundEvent(HoppityEggType.STRAY, it.slotNumber, null).post()
+                    "Fish the Rabbit" -> {
+                        EggFoundEvent(STRAY, it.slotNumber).post()
+                        lastName = "§9Fish the Rabbit"
+                        lastMeal = STRAY
+                        duplicate = it.stack.getLore().any { line -> duplicatePseudoStrayPattern.matches(line) }
+                        attemptFireRabbitFound()
+                    }
                     else -> return@matchMatcher
                 }
+            }
+            ChocolateFactoryStrayTracker.strayDoradoPattern.matchMatcher(formLoreToSingleLine(it.stack.getLore())) {
+                // We don't need to do a handleStrayClicked here - the lore from El Dorado is already:
+                // §6§lGolden Rabbit §d§lCAUGHT!
+                // Which will trigger the above matcher. We only need to check name here to fire the found event for Dorado.
+                EggFoundEvent(STRAY, it.slotNumber).post()
+                lastName = "§6El Dorado"
+                lastMeal = STRAY
+                duplicate = it.stack.getLore().any { line -> duplicateDoradoStrayPattern.matches(line) }
+                attemptFireRabbitFound()
             }
         }
     }
@@ -121,7 +144,7 @@ object HoppityAPI {
         val nameText = (if (clickedStack.hasDisplayName()) clickedStack.displayName else clickedStack.itemName)
 
         sideDishNamePattern.matchMatcher(nameText) {
-            EggFoundEvent(SIDE_DISH, index, null).post()
+            EggFoundEvent(SIDE_DISH, index).post()
             lastMeal = SIDE_DISH
             attemptFireRabbitFound()
         }
@@ -129,12 +152,12 @@ object HoppityAPI {
             clickedStack.getLore().let {
                 if (!it.any { line -> line == "§eClick to claim!" }) return
                 allTimeLorePattern.firstMatcher(it) {
-                    EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index, null).post()
+                    EggFoundEvent(CHOCOLATE_FACTORY_MILESTONE, index).post()
                     lastMeal = CHOCOLATE_FACTORY_MILESTONE
                     attemptFireRabbitFound()
                 }
                 shopLorePattern.firstMatcher(it) {
-                    EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index, null).post()
+                    EggFoundEvent(CHOCOLATE_SHOP_MILESTONE, index).post()
                     lastMeal = CHOCOLATE_SHOP_MILESTONE
                     attemptFireRabbitFound()
                 }
@@ -149,14 +172,15 @@ object HoppityAPI {
         eggFoundPattern.matchMatcher(event.message) {
             resetRabbitData()
             lastMeal = getEggType(event)
-            lastMeal?.let { EggFoundEvent(it, null, groupOrNull("note")).post() }
+            val note = groupOrNull("note")?.removeColor()
+            lastMeal?.let { EggFoundEvent(it, note = note).post() }
             attemptFireRabbitFound()
         }
 
         HoppityEggsManager.eggBoughtPattern.matchMatcher(event.message) {
             if (group("rabbitname").equals(lastName)) {
                 lastMeal = HoppityEggType.BOUGHT
-                EggFoundEvent(HoppityEggType.BOUGHT, null, null).post()
+                EggFoundEvent(HoppityEggType.BOUGHT).post()
                 attemptFireRabbitFound()
             }
         }

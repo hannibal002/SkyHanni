@@ -9,10 +9,14 @@ import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemBlink.checkBlinkItem
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getItemId
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
@@ -31,7 +35,6 @@ import io.github.moulberry.notenoughupdates.events.ProfileDataLoadedEvent
 import io.github.moulberry.notenoughupdates.overlays.AuctionSearchOverlay
 import io.github.moulberry.notenoughupdates.overlays.BazaarSearchOverlay
 import io.github.moulberry.notenoughupdates.util.ItemResolutionQuery
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GLAllocation
 import net.minecraft.client.renderer.GlStateManager
@@ -63,6 +66,7 @@ object NEUItems {
             .registerTypeAdapter(
                 HypixelApiTrophyFish::class.java,
                 object : TypeAdapter<HypixelApiTrophyFish>() {
+                    @Suppress("EmptyFunctionBlock")
                     override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
 
                     override fun read(reader: JsonReader): HypixelApiTrophyFish {
@@ -97,7 +101,7 @@ object NEUItems {
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
-        Utils.createItemStack(
+        ItemUtils.createItemStack(
             ItemStack(Blocks.barrier).item,
             "§cMissing Repo Item",
             "§cYour NEU repo seems to be out of date",
@@ -222,6 +226,13 @@ object NEUItems {
 
     fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
 
+    fun NEUInternalName.removePrefix(prefix: String): NEUInternalName {
+        if (prefix.isEmpty()) return this
+        val string = asString()
+        if (!string.startsWith(prefix)) return this
+        return string.substring(prefix.length).asInternalName()
+    }
+
     const val itemFontSize = 2.0 / 3.0
 
     fun ItemStack.renderOnScreen(
@@ -257,7 +268,17 @@ object NEUItems {
 
         AdjustStandardItemLighting.adjust() // Compensate for z scaling
 
-        Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        try {
+            Minecraft.getMinecraft().renderItem.renderItemIntoGUI(item, 0, 0)
+        } catch (e: Exception) {
+            println(" ")
+            println("item: $item")
+            println("name: ${item.name}")
+            println("getInternalNameOrNull: ${item.getInternalNameOrNull()}")
+            println(" ")
+            @Suppress("PrintStackTrace")
+            e.printStackTrace()
+        }
         RenderHelper.disableStandardItemLighting()
 
         GlStateManager.popMatrix()
@@ -309,8 +330,8 @@ object NEUItems {
             if (!recipe.isCraftingRecipe()) continue
 
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (ingredient in recipe.getCachedIngredients()) {
-                val count = ingredient.count.toInt()
+            for (ingredient in recipe.getCachedIngredients().toPrimitiveItemStacks()) {
+                val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
                 // ignore cactus green
                 if (internalName == "ENCHANTED_CACTUS_GREEN".asInternalName() && internalItemId == "INK_SACK-2".asInternalName()) {
@@ -332,8 +353,7 @@ object NEUItems {
                     continue
                 }
 
-                val old = map.getOrDefault(internalItemId, 0)
-                map[internalItemId] = old + count
+                map.addOrPut(internalItemId, amount)
             }
             if (map.size != 1) continue
             val current = map.iterator().next().toPair()

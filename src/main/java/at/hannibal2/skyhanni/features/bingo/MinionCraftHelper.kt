@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.hasEnchantments
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
@@ -18,6 +19,7 @@ import at.hannibal2.skyhanni.utils.NEUItems
 import at.hannibal2.skyhanni.utils.NEUItems.getCachedIngredients
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -96,7 +98,8 @@ object MinionCraftHelper {
         return newDisplay
     }
 
-    private fun loadFromInventory(mainInventory: Array<ItemStack?>): Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
+    private fun loadFromInventory(mainInventory: Array<ItemStack?>):
+        Pair<MutableMap<String, NEUInternalName>, MutableMap<NEUInternalName, Int>> {
         init()
 
         val minions = mutableMapOf<String, NEUInternalName>()
@@ -113,18 +116,20 @@ object MinionCraftHelper {
         val allMinions = tierOneMinions.toMutableList()
         minions.values.mapTo(allMinions) { it.addOneToId() }
 
-        for (item in mainInventory) {
-            val name = item?.name?.removeColor() ?: continue
-            if (item.hasEnchantments()) continue
+        for (item in mainInventory.filterNotNull()) {
+            val name = item.name.removeColor()
             val rawId = item.getInternalName()
-            if (!isMinionName(name)) {
-                if (!allIngredients.contains(rawId)) continue
-                if (!isAllowed(allMinions, rawId)) continue
 
-                val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
-                val old = otherItems.getOrDefault(itemId, 0)
-                otherItems[itemId] = old + item.stackSize * multiplier
-            }
+            if (
+                item.hasEnchantments() ||
+                !isMinionName(name) ||
+                !allIngredients.contains(rawId) ||
+                !isAllowed(allMinions, rawId)
+            ) continue
+
+            val (itemId, multiplier) = NEUItems.getPrimitiveMultiplier(rawId)
+            val old = otherItems.getOrDefault(itemId, 0)
+            otherItems[itemId] = old + item.stackSize * multiplier
         }
 
         FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
@@ -142,7 +147,9 @@ object MinionCraftHelper {
                     if (ingredientInternalName == internalName) return true
 
                     val ingredientPrimitive = NEUItems.getPrimitiveMultiplier(ingredientInternalName)
-                    if (primitiveStack.internalName == ingredientPrimitive.internalName && primitiveStack.amount < ingredientPrimitive.amount) return true
+                    if (primitiveStack.internalName == ingredientPrimitive.internalName &&
+                        primitiveStack.amount < ingredientPrimitive.amount
+                    ) return true
                 }
             }
         }
@@ -197,12 +204,9 @@ object MinionCraftHelper {
             val output = recipe.output ?: continue
             if (!output.internalName.contains("_GENERATOR_")) continue
             val map = mutableMapOf<NEUInternalName, Int>()
-            for (input in recipe.ingredients) {
-                val itemId = input.internalName
+            for ((itemId, count) in recipe.ingredients.toPrimitiveItemStacks()) {
                 if (minionId != itemId) {
-                    val count = input.count.toInt()
-                    val old = map.getOrDefault(itemId, 0)
-                    map[itemId] = old + count
+                    map.addOrPut(itemId, count)
                 }
             }
             var allDone = true
