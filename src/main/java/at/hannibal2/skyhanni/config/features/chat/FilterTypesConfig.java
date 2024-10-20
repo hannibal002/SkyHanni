@@ -19,6 +19,11 @@ public class FilterTypesConfig {
     public CrystalNucleusConfig crystalNucleus = new CrystalNucleusConfig();
 
     @Expose
+    @ConfigOption(name = "Stash Messages", desc = "")
+    @Accordion
+    public StashConfig stashMessages = new StashConfig();
+
+    @Expose
     @ConfigOption(name = "Hypixel Lobbies", desc = "Hide announcements in Hypixel lobbies " +
         "(player joins, loot boxes, prototype lobby messages, radiating generosity, Hypixel tournaments)")
     @ConfigEditorBoolean

@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrEmpty
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -571,7 +572,7 @@ object ChatFilter {
         val powderMiningMatchResult = PowderMiningChatFilter.block(event.message)
         if (powderMiningMatchResult == "no_filter") {
             genericMiningRewardMessage.matchMatcher(event.message) {
-                val reward = groupOrNull("reward") ?: ""
+                val reward = groupOrEmpty("reward")
                 val amountFormat = groupOrNull("amount")?.let {
                     "§a+ §b$it§r"
                 } ?: "§a+§r"
@@ -635,10 +636,10 @@ object ChatFilter {
      * @see messagesContainsMap
      * @see messagesStartsWithMap
      */
-    private fun String.isPresent(key: String) = this in (messagesMap[key] ?: emptyList()) ||
-        (patternsMap[key] ?: emptyList()).any { it.matches(this) } ||
-        (messagesContainsMap[key] ?: emptyList()).any { this.contains(it) } ||
-        (messagesStartsWithMap[key] ?: emptyList()).any { this.startsWith(it) }
+    private fun String.isPresent(key: String) = this in (messagesMap[key].orEmpty()) ||
+        (patternsMap[key].orEmpty()).any { it.matches(this) } ||
+        (messagesContainsMap[key].orEmpty()).any { this.contains(it) } ||
+        (messagesStartsWithMap[key].orEmpty()).any { this.startsWith(it) }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
