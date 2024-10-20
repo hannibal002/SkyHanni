@@ -1,13 +1,11 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
-import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -20,7 +18,6 @@ object RiftLavaMazeParkour {
 
     private val config get() = RiftAPI.config.area.mirrorverse.lavaMazeConfig
     private var parkourHelper: ParkourHelper? = null
-    private var inMirrorVerse = false
 
 
     @SubscribeEvent
@@ -78,10 +75,5 @@ object RiftLavaMazeParkour {
         parkourHelper?.render(event)
     }
 
-    @HandleEvent
-    fun onAreaChange(event: GraphAreaChangeEvent) {
-        inMirrorVerse = event.area == "Mirrorverse"
-    }
-
-    fun isEnabled() = RiftAPI.inRift() && inMirrorVerse && config.enabled
+    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inMirrorVerse && config.enabled
 }
