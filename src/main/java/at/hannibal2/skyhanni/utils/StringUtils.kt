@@ -336,7 +336,9 @@ object StringUtils {
 
     private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     fun generateRandomString(length: Int): String {
-        return repeat(length, { CHARS.random() }).toString()
+        var res: String = ""
+        repeat(length) { res += CHARS.random() }
+        return res
     }
 
     fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
