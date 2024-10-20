@@ -10,7 +10,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 public class DraconicSacrificeTrackerConfig {
 
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Enable the Draconic sacrifice tracker.")
+    @ConfigOption(name = "Enabled", desc = "Track items/profit while using the Draconic Altar in the End.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = true;

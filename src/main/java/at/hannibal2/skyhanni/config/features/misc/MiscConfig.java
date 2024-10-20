@@ -115,11 +115,6 @@ public class MiscConfig {
     public PatcherCoordsWaypointConfig patcherCoordsWaypoint = new PatcherCoordsWaypointConfig();
 
     @Expose
-    @ConfigOption(name = "Draconic Sacrifice Tracker", desc = "")
-    @Accordion
-    public DraconicSacrificeTrackerConfig draconicSacrificeTracker = new DraconicSacrificeTrackerConfig();
-
-    @Expose
     @ConfigOption(name = "Reminders", desc = "")
     @Accordion
     public RemindersConfig reminders = new RemindersConfig();

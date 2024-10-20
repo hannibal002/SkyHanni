@@ -31,7 +31,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object DraconicSacrificeTracker {
 
-    private val config get() = SkyHanniMod.feature.misc.draconicSacrificeTracker
+    private val config get() = SkyHanniMod.feature.combat.endIsland.draconicSacrificeTracker
     private val patternGroup = RepoPattern.group("misc.draconicsacrifice")
 
     /**
