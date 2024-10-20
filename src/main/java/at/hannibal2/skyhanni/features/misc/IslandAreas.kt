@@ -53,6 +53,7 @@ object IslandAreas {
         display = null
         targetNode = null
         hasMoved = true
+        updateArea("no_area")
     }
 
     fun nodeMoved() {
@@ -170,11 +171,7 @@ object IslandAreas {
                         addSearchString("§7Not in an area.")
                     }
                 }
-                if (name != currentAreaName) {
-                    val oldArea = currentAreaName
-                    currentAreaName = name
-                    GraphAreaChangeEvent(name, oldArea).post()
-                }
+                updateArea(name)
 
                 addSearchString("§eAreas nearby:")
                 continue
@@ -219,6 +216,14 @@ object IslandAreas {
             } else {
                 addSearchString("§cThere is no $islandName area data avaliable yet!")
             }
+        }
+    }
+
+    private fun updateArea(name: String) {
+        if (name != currentAreaName) {
+            val oldArea = currentAreaName
+            currentAreaName = name
+            GraphAreaChangeEvent(name, oldArea).post()
         }
     }
 
