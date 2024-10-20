@@ -52,13 +52,7 @@ private fun getVisitingName(): String {
 
 var beenAfkFor = SimpleTimeMark.now()
 
-fun getPetDisplay(): String = PetAPI.pet?.let {
-    val rarity = PetAPI.pet?.rarity
-    val petName = PetAPI.pet?.cleanName
-    val petLevel = PetAPI.pet?.level ?: "?"
-
-    "[Lvl $petLevel] ${rarity?.getCleanName()} $petName"
-} ?: "No pet equipped"
+fun getPetDisplay(): String = PetAPI.pet?.rawPetName ?: "No pet equipped"
 
 private fun getCropMilestoneDisplay(): String {
     val crop = InventoryUtils.getItemInHand()?.getCropType()

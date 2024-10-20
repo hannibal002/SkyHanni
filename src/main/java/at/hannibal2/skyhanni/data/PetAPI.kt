@@ -25,8 +25,10 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.NumberUtil.formatDoubleOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
@@ -194,11 +196,13 @@ object PetAPI {
         "➡",
     )
 
-    @Deprecated(message = "use PetAPI.inPetMenu")
-    fun isPetMenu(inventoryTitle: String): Boolean = petMenuPattern.matches(inventoryTitle)
+    fun isPetMenu(inventoryTitle: String, inventoryItems: Map<Int, ItemStack>): Boolean {
+        if (!petMenuPattern.matches(inventoryTitle)) return false
 
-    // Contains color code + name and for older SkyHanni users maybe also the pet level
-    @Deprecated(message = "use PetAPI.pet.name")
+        val goBackLore = inventoryItems[48]?.getLore() ?: emptyList()
+        return !goBackLore.any { forgeBackMenuPattern.matches(it) }
+    }
+
     var currentPet: String?
         get() = ProfileStorageData.profileSpecific?.currentPet?.takeIf { it.isNotEmpty() }
         set(value) {
@@ -226,7 +230,6 @@ object PetAPI {
     @Deprecated(message = "use PetAPI.pet.name")
     fun hasPetName(name: String): Boolean = petItemNamePattern.matches(name) && !ignoredPetStrings.any { name.contains(it) }
 
-// ---
     @SubscribeEvent
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
@@ -236,17 +239,17 @@ object PetAPI {
 
         var newPetData = PetData()
         var overflowXP = 0.0
-        event.lines.forEach { line ->
+        for (line in event.lines) {
             val tempPetItem = handleWidgetStringLine(line)
             if (tempPetItem != null) {
                 newPetData = newPetData.copy(petItem = tempPetItem)
-                return@forEach
+                continue
             }
 
             val tempPetXP = handleWidgetXPLine(line)
             if (tempPetXP != null) {
                 overflowXP = tempPetXP
-                return@forEach
+                continue
             }
 
             val tempPetMisc = handleWidgetPetLine(line, newPetLine)
@@ -259,17 +262,17 @@ object PetAPI {
                     xp = tempPetMisc.xp,
                     rawPetName = tempPetMisc.rawPetName,
                 )
-                return@forEach
+                continue
             }
         }
-        fireEvent(newPetData.copy(xp = newPetData.xp + overflowXP))
+        updatePet(newPetData.copy(xp = newPetData.xp + overflowXP))
     }
 
     private fun handleWidgetPetLine(line: String, newPetLine: String): PetData? {
-        petWidgetPattern.matchMatcher(line) {
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
-            val petName = group("name")
-            val level = group("level").toInt()
+        return petWidgetPattern.matchMatcher(line) {
+            val rarity = LorenzRarity.getByColorCode(groupOrNull("rarity")?.get(0) ?: '4') ?: LorenzRarity.ULTIMATE
+            val petName = groupOrNull("name") ?: ""
+            val level = groupOrNull("level")?.toInt() ?: 0
             val xp = levelToXP(level, rarity, petName) ?: return null
 
             return PetData(
@@ -282,11 +285,10 @@ object PetAPI {
                 newPetLine,
             )
         }
-        return null
     }
 
     private fun handleWidgetStringLine(line: String): NEUInternalName? {
-        widgetStringPattern.matchMatcher(line) {
+        return widgetStringPattern.matchMatcher(line) {
             val string = group("string")
             if (string == "No pet selected") {
                 PetChangeEvent(pet, null).post()
@@ -295,17 +297,13 @@ object PetAPI {
             }
             return NEUInternalName.fromItemNameOrNull(string)
         }
-        return null
     }
 
     private fun handleWidgetXPLine(line: String): Double? {
         xpWidgetPattern.matchMatcher(line) {
-            if (group("max") != null) return null
+            if (hasGroup("max")) return null
 
-            val overflow = group("overflow")?.formatDoubleOrNull() ?: 0.0
-            val currentXP = group("currentXP")?.formatDoubleOrNull() ?: 0.0
-
-            return overflow + currentXP
+            return group("overflow")?.formatDouble() ?: group("currentXP")?.formatDouble()
         }
         return null
     }
@@ -315,17 +313,22 @@ object PetAPI {
         if (autopetMessagePattern.matches(event.message)) {
             val hoverMessage = event.chatComponent.hover?.siblings?.joinToString("")?.split("\n") ?: return
 
-            var petItem = NEUInternalName.NONE
-            for (it in hoverMessage) {
-                val item = handleAutopetItemMessage(it)
+            var petData = PetData()
+            var petItem: NEUInternalName? = null
+            for (line in hoverMessage) {
+                val item = readAutopetItemMessage(line)
                 if (item != null) {
                     petItem = item
-                    break
+                    continue
+                }
+
+                val data = readAutopetMessage(line)
+                if (data != null) {
+                    petData = data
+                    continue
                 }
             }
-            hoverMessage.forEach {
-                if (handleAutopetMessage(it, petItem)) return
-            }
+            updatePet(petData.copy(petItem = petItem))
             return
         }
         petItemMessagePattern.matchMatcher(event.message) {
@@ -335,11 +338,11 @@ object PetAPI {
                 Pair("item", group("petItem"))
             )
             val newPet = pet?.copy(petItem = item) ?: return
-            fireEvent(newPet)
+            updatePet(newPet)
         }
     }
 
-    private fun handleAutopetMessage(string: String, petItem: NEUInternalName): Boolean {
+    private fun readAutopetMessage(string: String): PetData? {
         autopetHoverPetPattern.matchMatcher(string) {
             val level = group("level").toInt()
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
@@ -348,22 +351,19 @@ object PetAPI {
 
             val fakePetLine = "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (hasSkin) "§r${group("skin")}" else ""}"
 
-            val newPet = PetData(
-                petNameToInternalName(petName, rarity),
-                petName,
-                rarity,
-                petItem,
-                level,
-                levelToXP(level, rarity, petName) ?: 0.0,
-                fakePetLine,
+            return PetData(
+                internalName = petNameToInternalName(petName, rarity),
+                cleanName = petName,
+                rarity = rarity,
+                level = level,
+                xp = levelToXP(level, rarity, petName) ?: 0.0,
+                rawPetName = fakePetLine,
             )
-            fireEvent(newPet)
-            return true
         }
-        return false
+        return null
     }
 
-    private fun handleAutopetItemMessage(string: String): NEUInternalName? {
+    private fun readAutopetItemMessage(string: String): NEUInternalName? {
         return autopetHoverPetItemPattern.matchMatcher(string) {
             NEUInternalName.fromItemNameOrNull(group("item"))
         }
@@ -371,17 +371,7 @@ object PetAPI {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!petMenuPattern.matches(event.inventoryName)) {
-            inPetMenu = false
-            return
-        }
-        val goBackLore = event.inventoryItems[48]?.getLore() ?: emptyList()
-        if (goBackLore.any { forgeBackMenuPattern.matches(it) }) {
-            inPetMenu = false
-            return
-        }
-
-        inPetMenu = true
+        inPetMenu = isPetMenu(event.inventoryName, event.inventoryItems)
     }
 
     @SubscribeEvent
@@ -403,7 +393,7 @@ object PetAPI {
         val lore = item.getLore()
 
         if (lore.any { petDespawnMenuPattern.matches(it) }) {
-            fireEvent(null)
+            updatePet(null)
             return
         }
 
@@ -412,7 +402,7 @@ object PetAPI {
 
     private fun getPetDataFromItem(item: ItemStack) {
         val (_, _, rarity, petItem, _, petXP, _) = parsePetNBT(item.extraAttributes)
-        val (internalName, name, _, _, level, _, skin) = parsePetName(item.displayName)
+        val (internalName, name, _, _, level, _, skin) = parsePetName(item.displayName) ?: return
 
         val newPet = PetData(
             internalName,
@@ -423,78 +413,87 @@ object PetAPI {
             petXP,
             "§r§7[Lvl $level] §r${rarity.chatColorCode}$name${if (skin != "") "§r${skin}" else ""}",
         )
-        fireEvent(newPet)
+        updatePet(newPet)
     }
 
     private fun parsePetNBT(nbt: NBTTagCompound): PetData {
-        val jsonString = nbt.getTag("petInfo").toString()
+        val jsonString = nbt.getString("petInfo")
             .replace("\\", "")
             .removePrefix("\"")
             .removeSuffix("\"")
         val petInfo = Gson().fromJson(jsonString, PetNBT::class.java)
 
+        val rarity = LorenzRarity.getByName(petInfo.tier) ?: ErrorManager.skyHanniError(
+            "Couldn't parse pet rarity.",
+            Pair("petNBT", petInfo),
+            Pair("rarity", petInfo.tier)
+        )
+
         return PetData(
-            NEUInternalName.NONE,
-            "",
-            LorenzRarity.getByName(petInfo.tier) ?: LorenzRarity.ULTIMATE,
-            petInfo.heldItem?.asInternalName(),
-            0,
-            petInfo.exp,
-            ""
+            rarity = rarity,
+            petItem = petInfo.heldItem?.asInternalName(),
+            xp = petInfo.exp,
         )
     }
 
-    private fun parsePetName(displayName: String): PetData {
-        var name = ""
-        var rarity = LorenzRarity.ULTIMATE
-        var level = 0
-        var skin = ""
-
+    private fun parsePetName(displayName: String): PetData? {
         petNameMenuPattern.matchMatcher(displayName) {
-            name = group("name") ?: ""
-            rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: LorenzRarity.ULTIMATE
-            level = group("level").toInt()
-            skin = group("skin") ?: ""
-        }
+            val name = group("name") ?: ""
+            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: ErrorManager.skyHanniError(
+                "Couldn't parse pet rarity.",
+                Pair("displayName", displayName),
+                Pair("rarity", group("rarity"))
+            )
+            val level = group("level").toInt()
+            val skin = group("skin") ?: ""
 
-        return PetData(
-            petNameToInternalName(name, rarity),
-            name,
-            rarity,
-            null,
-            level,
-            0.0,
-            skin,
-        )
+            return PetData(
+                internalName = petNameToInternalName(name, rarity),
+                cleanName = name,
+                rarity = rarity,
+                level = level,
+                rawPetName = skin,
+            )
+        }
+        return null
     }
 
     @HandleEvent
     fun onCommandRegistration(event: CommandRegistrationEvent) {
-        event.register("shcalcpetxp") {
-            description = "Gets the pet xp from a given level and rarity."
+        event.register("shpetxp") {
+            description = "Calculates the pet xp from a given level and rarity."
             category = CommandCategory.DEVELOPER_TEST
-            callback { testLevelToXP(it) }
+            callback { levelToXPCommand(it) }
         }
     }
 
-    private fun testLevelToXP(input: Array<String>) {
-        if (input.size >= 3) {
-            val level = input[0].toIntOrNull()
-            val rarity = LorenzRarity.getByName(input[1])
-            val petName = input.slice(2..<input.size).joinToString(" ")
-            if (level != null && rarity != null) {
-                val xp: Double = levelToXP(level, rarity, petName) ?: run {
-                    ChatUtils.userError("Invalid level or rarity.")
-                    return
-                }
-                ChatUtils.chat(xp.addSeparators())
-                return
-            }
+    private fun levelToXPCommand(input: Array<String>) {
+        if (input.size < 3) {
+            ChatUtils.userError("Usage: /shcalcpetxp <level> <rarity> <pet>")
+            return
         }
-        ChatUtils.userError("Invalid Usage. /shcalcpetxp <level> <rarity> <pet>")
+
+        val level = input[0].toIntOrNull()
+        if (level == null) {
+            ChatUtils.userError("Invalid level '${input[0]}'.")
+            return
+        }
+        val rarity = LorenzRarity.getByName(input[1])
+        if (rarity == null) {
+            ChatUtils.userError("Invalid rarity '${input[1]}'.")
+            return
+        }
+
+        val petName = input.slice(2..<input.size).joinToString(" ")
+        val xp: Double = levelToXP(level, rarity, petName) ?: run {
+            ChatUtils.userError("Invalid level or rarity.")
+            return
+        }
+        ChatUtils.chat(xp.addSeparators())
+        return
     }
 
-    private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String = ""): Double? {
+    private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String): Double? {
         val newPetName = petNameToFakeInternalName(petName)
         val petObject = customXpLeveling?.getAsJsonObject(newPetName)
 
@@ -517,8 +516,10 @@ object PetAPI {
     }
 
     private fun getRarityOffset(rarity: LorenzRarity, petObject: JsonObject?): Int? {
-        return if (petObject == null) {
-            when (rarity) {
+        return petObject?.entrySet()?.associate { (rarity, offset) ->
+            (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
+        }?.let { it[rarity] }
+            ?: when (rarity) {
                 LorenzRarity.COMMON -> 0
                 LorenzRarity.UNCOMMON -> 6
                 LorenzRarity.RARE -> 11
@@ -530,38 +531,34 @@ object PetAPI {
                     null
                 }
             }
-        } else {
-            petObject.entrySet().associate { (rarity, offset) ->
-                (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
-            }[rarity]
-        }
     }
 
-    private fun fireEvent(newPet: PetData?) {
+    private fun updatePet(newPet: PetData?) {
+        if (newPet == pet) return
         val oldPet = pet
         pet = newPet
-        if (newPet == oldPet) return
         if (SkyHanniMod.feature.dev.debug.petEventMessages) {
             ChatUtils.debug("oldPet: " + oldPet.toString().convertToUnformatted())
             ChatUtils.debug("newPet: " + newPet.toString().convertToUnformatted())
         }
+        currentPet = if (newPet == null) null else "§${newPet.rarity.chatColorCode}${newPet.cleanName}"
         PetChangeEvent(oldPet, newPet).post()
     }
 
     @SubscribeEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("PetAPI")
-        if (pet != null) {
-            event.addIrrelevant {
-                add("petName: '${pet?.internalName}'")
-                add("petRarity: '${pet?.rarity}'")
-                add("petItem: '${pet?.petItem}'")
-                add("petLevel: '${pet?.level}'")
-                add("petXP: '${pet?.xp}'")
-                add("rawPetLine: '${pet?.rawPetName}'")
-            }
-        } else {
-            event.addData("no pet equipped")
+        if (pet == null) {
+            event.addIrrelevant("no pet equipped")
+            return
+        }
+        event.addIrrelevant {
+            add("petName: '${pet?.internalName}'")
+            add("petRarity: '${pet?.rarity}'")
+            add("petItem: '${pet?.petItem}'")
+            add("petLevel: '${pet?.level}'")
+            add("petXP: '${pet?.xp}'")
+            add("rawPetLine: '${pet?.rawPetName}'")
         }
     }
 
@@ -576,7 +573,7 @@ object PetAPI {
         petRarityOffset = data.petRarityOffset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
             (LorenzRarity.getByName(rarity) ?: LorenzRarity.ULTIMATE) to offset.asInt
         }
-        customDisplayToInternalName = data.displayToInternalName
+        customDisplayToInternalName = data.internalToDisplayName
     }
 
     private fun petNameToFakeInternalName(petName: String): String {
