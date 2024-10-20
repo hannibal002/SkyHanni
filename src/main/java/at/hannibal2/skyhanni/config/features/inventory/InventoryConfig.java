@@ -305,7 +305,7 @@ public class InventoryConfig {
     public boolean hexAsColorInLore = true;
 
     @Expose
-    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD to move around in the AbiPhone snake game.")
+    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean snakeGameKeybinds = true;
