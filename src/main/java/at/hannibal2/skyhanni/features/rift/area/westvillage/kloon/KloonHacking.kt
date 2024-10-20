@@ -29,14 +29,14 @@ object KloonHacking {
 
     private val config get() = RiftAPI.config.area.westVillage.hacking
 
-    private val colourPattern by RepoPattern.pattern(
-        "rift.area.westvillage.kloon.colour",
-        "You've set the color of this terminal to (?<colour>.*)!"
+    private val colorPattern by RepoPattern.pattern(
+        "rift.area.westvillage.kloon.color",
+        "You've set the color of this terminal to (?<color>.*)!"
     )
 
     private var wearingHelmet = false
     private var inTerminalInventory = false
-    private var inColourInventory = false
+    private var inColorInventory = false
     private val correctButtons = mutableListOf<String>()
     private var nearestTerminal: KloonTerminal? = null
 
@@ -53,7 +53,7 @@ object KloonHacking {
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         inTerminalInventory = false
-        inColourInventory = false
+        inColorInventory = false
         nearestTerminal = null
         if (!RiftAPI.inRift()) return
         if (!config.solver) return
@@ -67,14 +67,14 @@ object KloonHacking {
             }
         }
         if (event.inventoryName == "Hacked Terminal Color Picker") {
-            inColourInventory = true
+            inColorInventory = true
         }
     }
 
     @SubscribeEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inTerminalInventory = false
-        inColourInventory = false
+        inColorInventory = false
     }
 
     @SubscribeEvent
@@ -89,7 +89,9 @@ object KloonHacking {
                     slot highlight if (correctButton) LorenzColor.GREEN else LorenzColor.RED
                     continue
                 }
-                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 && slot.stack!!.displayName.removeColor() == correctButtons[i]) {
+                if (slot.slotIndex > i * 9 + 8 && slot.slotIndex < i * 9 + 18 &&
+                    slot.stack!!.displayName.removeColor() == correctButtons[i]
+                ) {
                     slot highlight LorenzColor.YELLOW
                 }
                 if (slot.slotIndex == i * 9 + 17) {
@@ -97,11 +99,11 @@ object KloonHacking {
                 }
             }
         }
-        if (inColourInventory) {
+        if (inColorInventory) {
             if (!config.colour) return
-            val targetColour = nearestTerminal ?: getNearestTerminal()
+            val targetColor = nearestTerminal ?: getNearestTerminal()
             for (slot in InventoryUtils.getItemsInOpenChest()) {
-                if (slot.stack.getLore().any { it.contains(targetColour?.name ?: "") }) {
+                if (slot.stack.getLore().any { it.contains(targetColor?.name.orEmpty()) }) {
                     slot highlight LorenzColor.GREEN
                 }
             }
@@ -131,10 +133,10 @@ object KloonHacking {
     fun onChat(event: LorenzChatEvent) {
         if (!RiftAPI.inRift()) return
         if (!wearingHelmet) return
-        colourPattern.matchMatcher(event.message.removeColor()) {
+        colorPattern.matchMatcher(event.message.removeColor()) {
             val storage = ProfileStorageData.profileSpecific?.rift ?: return
-            val colour = group("colour")
-            val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == colour } ?: return
+            val color = group("color")
+            val completedTerminal = KloonTerminal.entries.firstOrNull { it.name == color } ?: return
             if (completedTerminal != nearestTerminal) return
             storage.completedKloonTerminals.add(completedTerminal)
         }

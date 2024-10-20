@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.config.features.gui.customscoreboard;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
+import at.hannibal2.skyhanni.utils.RenderUtils;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
@@ -51,7 +52,6 @@ public class DisplayConfig {
     @Accordion
     public TitleAndFooterConfig titleAndFooter = new TitleAndFooterConfig();
 
-
     @Expose
     @ConfigOption(name = "Hide Vanilla Scoreboard", desc = "Hide the vanilla scoreboard.\n" +
         "§cMods that add their own scoreboard will not be affected by this setting!")
@@ -64,6 +64,16 @@ public class DisplayConfig {
         "§eNote: Will not update the preview above!")
     @ConfigEditorBoolean
     public boolean displayNumbersFirst = false;
+
+    @Expose
+    @ConfigOption(name = "Hide coins earned/lost", desc = "Hide the amount of coins earned or lost.")
+    @ConfigEditorBoolean
+    public boolean hideCoinsDifference = false;
+
+    @Expose
+    @ConfigOption(name = "Use Custom Lines", desc = "Use custom lines instead of the default ones.")
+    @ConfigEditorBoolean
+    public boolean useCustomLines = true;
 
     @Expose
     @ConfigOption(name = "Show unclaimed bits", desc = "Show the amount of available Bits that can still be claimed.")
@@ -120,13 +130,31 @@ public class DisplayConfig {
     }
 
     @Expose
+    @ConfigOption(name = "SkyBlock Time 24h Format", desc = "Display the current SkyBlock time in 24hr format rather than 12h Format.")
+    @ConfigEditorBoolean
+    public boolean skyblockTime24hFormat = false;
+
+    @Expose
+    @ConfigOption(name = "SkyBlock Time Exact Minutes", desc = "Display the exact minutes in the SkyBlock time, rather than only 10 minute increments.")
+    @ConfigEditorBoolean
+    public boolean skyblockTimeExactMinutes = true;
+
+    @Expose
     @ConfigOption(name = "Line Spacing", desc = "The amount of space between each line.")
     @ConfigEditorSlider(minValue = 0, maxValue = 20, minStep = 1)
     public int lineSpacing = 10;
 
     @Expose
-    @ConfigOption(name = "Cache Scoreboard on Island Switch",
-        desc = "Will stop the Scoreboard from updating while switching islands.\nRemoves the shaking when loading data.")
+    @ConfigOption(name = "Text Alignment", desc = "Will align the text to the left, center or right, while not overriding certain lines, like title or footer.")
+    @ConfigEditorDropdown
+    public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
+
+    @Expose
+    @ConfigOption(
+        name = "Cache Scoreboard on Island Switch",
+        desc = "Will stop the Scoreboard from updating while switching islands.\n" +
+            "Removes the shaking when loading data."
+    )
     @ConfigEditorBoolean
     public boolean cacheScoreboardOnIslandSwitch = false;
 }

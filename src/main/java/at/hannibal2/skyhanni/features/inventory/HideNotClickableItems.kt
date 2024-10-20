@@ -39,6 +39,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.hasAttributes
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isMuseumDonated
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftExportable
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRiftTransferable
@@ -276,6 +277,7 @@ object HideNotClickableItems {
         return true
     }
 
+    @Suppress("UnusedParameter")
     private fun hideComposter(chestName: String, stack: ItemStack): Boolean {
         if (!ComposterOverlay.inInventory) return false
 
@@ -298,6 +300,7 @@ object HideNotClickableItems {
 
         val list = listOf(
             "HELMET",
+            "CARNIVAL MASK",
             "CHESTPLATE",
             "LEGGINGS",
             "BOOTS",
@@ -309,7 +312,7 @@ object HideNotClickableItems {
             "BRACELET",
         )
         for (type in list) {
-            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) {// todo use item api
+            if (stack.getLore().any { it.contains("§l") && it.contains(type) }) { // todo use item api
                 showGreenLine = true
                 return false
             }
@@ -329,7 +332,7 @@ object HideNotClickableItems {
 
         showGreenLine = true
 
-        if (ItemUtils.hasAttributes(stack)) return false
+        if (stack.hasAttributes()) return false
 
         hideReason = "This item has no attributes!"
         return true
@@ -561,7 +564,8 @@ object HideNotClickableItems {
         val bazaarInventory = BazaarApi.inBazaarInventory
 
         val auctionHouseInventory =
-            chestName == "Co-op Auction House" || chestName == "Auction House" || chestName == "Create BIN Auction" || chestName == "Create Auction"
+            chestName == "Co-op Auction House" || chestName == "Auction House" ||
+                chestName == "Create BIN Auction" || chestName == "Create Auction"
         if (!bazaarInventory && !auctionHouseInventory) return false
         showGreenLine = true
 

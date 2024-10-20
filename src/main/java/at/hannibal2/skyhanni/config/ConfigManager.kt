@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.core.config.PositionList
 import at.hannibal2.skyhanni.data.jsonobjects.local.FriendsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
@@ -39,7 +40,6 @@ import java.nio.file.StandardCopyOption
 import java.util.EnumMap
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
-import kotlin.reflect.KMutableProperty1
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (LorenzUtils.isBetaVersion()) {
@@ -96,8 +96,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (LorenzEvent.isInGuardedEventHandler)
-                throw e
+            if (LorenzEvent.isInGuardedEventHandler) throw e
         }
     }
 
@@ -106,6 +105,7 @@ class ConfigManager {
         // commands
         "features.garden.GardenConfig.cropSpeedMeterPos",
         "features.misc.MiscConfig.collectionCounterPos",
+        "features.misc.MiscConfig.carryPosition",
         "features.misc.MiscConfig.lockedMouseDisplay",
 
         // debug features
@@ -125,7 +125,7 @@ class ConfigManager {
         var missingConfigLink = false
         for (field in obj.javaClass.fields) {
             field.isAccessible = true
-            if (field.type != Position::class.java) {
+            if (field.type != Position::class.java && field.type != PositionList::class.java) {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
@@ -141,12 +141,20 @@ class ConfigManager {
                 }
                 continue
             }
-            val position = field.get(obj) as Position
-            position.setLink(configLink)
+            if (field.type == Position::class.java) {
+                val position = field.get(obj) as Position
+                position.setLink(configLink)
+            } else if (field.type == PositionList::class.java) {
+                val list = field.get(obj) as PositionList
+                list.setLink(configLink)
+            }
         }
         if (missingConfigLink) {
             println("")
-            println("This crash is here to remind you to fix the missing @ConfigLink annotation over your new config position config element.")
+            println(
+                "This crash is here to remind you to fix the missing " +
+                    "@ConfigLink annotation over your new config position config element."
+            )
             println("")
             println("Steps to fix:")
             println("1. Search for `WEE WOO WEE WOO` in the console output.")
@@ -178,7 +186,7 @@ class ConfigManager {
                         try {
                             run()
                         } catch (e: Throwable) {
-                            e.printStackTrace()
+                            logger.log(e.stackTraceToString())
                             LorenzUtils.shutdownMinecraft("Config is corrupt inside development environment.")
                         }
                     } else {
@@ -190,7 +198,7 @@ class ConfigManager {
 
                 logger.log("Loaded $fileName from file")
             } catch (e: Exception) {
-                e.printStackTrace()
+                logger.log(e.stackTraceToString())
                 val backupFile = file.resolveSibling("$fileName-${SimpleTimeMark.now().toMillis()}-backup.json")
                 logger.log("Exception while reading $file. Will load blank $fileName and save backup to $backupFile")
                 logger.log("Exception was $e")
@@ -198,7 +206,7 @@ class ConfigManager {
                     file.copyTo(backupFile)
                 } catch (e: Exception) {
                     logger.log("Could not create backup for $fileName file")
-                    e.printStackTrace()
+                    logger.log(e.stackTraceToString())
                 }
             }
         }
@@ -235,7 +243,7 @@ class ConfigManager {
             move(unit, file, reason)
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
-            e.printStackTrace()
+            logger.log(e.stackTraceToString())
         }
     }
 
@@ -245,7 +253,7 @@ class ConfigManager {
                 unit.toPath(),
                 file.toPath(),
                 StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.ATOMIC_MOVE
+                StandardCopyOption.ATOMIC_MOVE,
             )
         } catch (e: AccessDeniedException) {
             if (loop == 5) {
