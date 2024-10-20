@@ -22,11 +22,6 @@ public class DebugConfig {
     public boolean commandLogs = false;
 
     @Expose
-    @ConfigOption(name = "Always in SkyBlock", desc = "Enables SkyHanni's features everywhere, not just SkyBlock.")
-    @ConfigEditorBoolean
-    public boolean alwaysInSkyblock = false;
-
-    @Expose
     @ConfigOption(
         name = "Mod Menu Log",
         desc = "Enable debug messages when the currently opened GUI changes, with the path to the gui class. " +

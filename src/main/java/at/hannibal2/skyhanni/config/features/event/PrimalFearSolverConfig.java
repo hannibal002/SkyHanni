@@ -7,14 +7,14 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class PrimalFearSolverConfig {
     @Expose
-    @ConfigOption(name = "Math Primal Fear Solver", desc = "Solver for the Math Primal Fear")
+    @ConfigOption(name = "Math", desc = "Solver for the Math Primal Fear.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean mathPrimalFear = false;
+    public boolean math = false;
 
     @Expose
-    @ConfigOption(name = "Public Speaking Primal Fear Solver", desc = "Solver for the Math Primal Fear")
+    @ConfigOption(name = "Public Speaking", desc = "Solver for the Public Speaking Primal Fear.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean publicSpeakingPrimalFear = false;
+    public boolean publicSpeaking = false;
 }

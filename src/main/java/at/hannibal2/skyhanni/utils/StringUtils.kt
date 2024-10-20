@@ -334,9 +334,9 @@ object StringUtils {
 
     fun generateRandomId() = UUID.randomUUID().toString()
 
+    private const val CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
     fun generateRandomString(length: Int): String {
-        val chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        return (1..length).map { chars.random() }.joinToString("")
+        return repeat(length) { CHARS.random() }.toString()
     }
 
     fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)

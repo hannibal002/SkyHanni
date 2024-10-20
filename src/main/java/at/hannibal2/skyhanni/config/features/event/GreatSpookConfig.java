@@ -48,14 +48,8 @@ public class GreatSpookConfig {
     @ConfigLink(owner = GreatSpookConfig.class, field = "greatSpookTimeLeft")
     public Position positionTimeLeft = new Position(40, 40, false, true);
 
-    // @Expose
-    // @ConfigOption(name = "Primal Fear Solver", desc = "Solver for the Math Primal Fear")
-    // @ConfigEditorBoolean
-    // @FeatureToggle
-    // public boolean primalFearSolver = false;
-
-    @ConfigOption(name = "Primal Fear Solvers", desc = "Solvers for the Primal Fears")
+    @ConfigOption(name = "Primal Fear Solvers", desc = "Solvers for the Primal Fears.")
     @Accordion
     @Expose
-    public PrimalFearSolverConfig primalFearSolvers = new PrimalFearSolverConfig();
+    public PrimalFearSolverConfig primalFearSolver = new PrimalFearSolverConfig();
 }
