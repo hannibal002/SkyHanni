@@ -111,7 +111,7 @@ object StashCompact {
         }
 
         ChatUtils.clickableChat(
-            "§eYou have §6$lastMaterialCount §e$typeNameFormat in stash§6${typeStringExtra} " +
+            "§eYou have §6$lastMaterialCount §e$typeNameFormat in stash§6$typeStringExtra " +
                 "§eClick to ${if (config.useViewStash) "§6view" else "§6pickup"} §eyour stash!",
             onClick = {
                 if (config.useViewStash) HypixelCommands.viewStash(lastType)
