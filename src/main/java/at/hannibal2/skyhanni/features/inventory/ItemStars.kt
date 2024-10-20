@@ -62,7 +62,7 @@ object ItemStars {
         val baseStars = getDungeonStarCount() ?: getStarCount()
         if (!internalName.isKuudraArmor()) return baseStars
         val tier = internalName.getKuudraTier() ?: return baseStars
-        return (baseStars ?: 0) + (tier-1) * 10
+        return (baseStars ?: 0) + (tier - 1) * 10
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.itemStars
