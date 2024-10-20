@@ -70,17 +70,12 @@ object StashCompact {
     private var lastSentMaterialCount = 0
     private var lastSentType = ""
 
-    private var openMessage = false
-
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        if(event.message.isEmpty() && openMessage) event.blockedReason = "stash_compact"
-
         genericAddedToStashPattern.matchMatcher(event.message) {
             event.blockedReason = "stash_compact"
-            openMessage = true
         }
 
         materialCountPattern.matchMatcher(event.message) {
@@ -104,7 +99,6 @@ object StashCompact {
             event.blockedReason = "stash_compact"
             if (lastMaterialCount <= config.hideLowWarningsThreshold) return
             if (config.hideDuplicateCounts && lastMaterialCount == lastSentMaterialCount && lastType == lastSentType) return
-            openMessage = false
 
             sendCompactedStashMessage()
         }
@@ -126,9 +120,6 @@ object StashCompact {
         )
         lastSentMaterialCount = lastMaterialCount
         lastSentType = lastType
-        // Dirty, but item stash doesn't always have differing materials count,
-        // and we don't compare this value to the last one, so we can reset it here
-        lastDifferingMaterialsCount = 0
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
