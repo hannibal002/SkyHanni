@@ -1,22 +1,7 @@
-com.mojang.blaze3d.platform.GlStateManager _bindTexture() bindTexture()
-com.mojang.blaze3d.platform.GlStateManager _blendFunc() blendFunc()
-com.mojang.blaze3d.platform.GlStateManager _clearColor() clearColor()
-com.mojang.blaze3d.platform.GlStateManager _deleteTexture() deleteTexture()
-com.mojang.blaze3d.platform.GlStateManager _depthFunc() depthFunc()
-com.mojang.blaze3d.platform.GlStateManager _depthMask() depthMask()
-com.mojang.blaze3d.platform.GlStateManager _disableBlend() disableBlend()
-com.mojang.blaze3d.platform.GlStateManager _disableCull() disableCull()
-com.mojang.blaze3d.platform.GlStateManager _disableDepthTest() disableDepth()
-com.mojang.blaze3d.platform.GlStateManager _disableLighting() disableLighting()
-com.mojang.blaze3d.platform.GlStateManager _disableRescaleNormal() disableRescaleNormal()
-com.mojang.blaze3d.platform.GlStateManager _enableBlend() enableBlend()
-com.mojang.blaze3d.platform.GlStateManager _enableCull() enableCull()
-com.mojang.blaze3d.platform.GlStateManager _enableDepthTest() enableDepth()
-com.mojang.blaze3d.platform.GlStateManager _enableLighting() enableLighting()
-com.mojang.blaze3d.platform.GlStateManager _popMatrix() popMatrix()
-com.mojang.blaze3d.platform.GlStateManager _pushMatrix() pushMatrix()
-com.mojang.blaze3d.platform.GlStateManager _viewport() viewport()
-com.mojang.blaze3d.platform.GlStateManager net.minecraft.client.renderer.GlStateManager
+
+com.mojang.blaze3d.systems.RenderSystem net.minecraft.client.renderer.GlStateManager
+com.mojang.blaze3d.systems.RenderSystem color4f() color()
+com.mojang.blaze3d.systems.RenderSystem translatef() translate()
 
 com.mojang.math.Matrix3f org.lwjgl.util.vector.Matrix3f
 com.mojang.math.Matrix4f org.lwjgl.util.vector.Matrix4f
@@ -31,6 +16,8 @@ net.minecraft.client.gui.components.ChatComponent net.minecraft.client.gui.GuiNe
 net.minecraft.client.gui.screens.Screen isPauseScreen() doesGuiPauseGame()
 net.minecraft.client.gui.screens.Screen net.minecraft.client.gui.GuiScreen
 net.minecraft.client.gui.screens.inventory.ContainerScreen net.minecraft.client.gui.inventory.GuiContainer
+
+net.minecraft.client.Minecraft submit() addScheduledTask()
 
 net.minecraft.client.multiplayer.ClientLevel net.minecraft.client.multiplayer.WorldClient
 net.minecraft.client.multiplayer.ClientLevel players() getPlayers()
@@ -47,6 +34,8 @@ net.minecraft.client.renderer.texture.TextureManager register() loadTexture()
 
 net.minecraft.client.util.math.Vector4f org.lwjgl.util.vector.Vector4f
 
+net.minecraft.nbt.CompoundTag net.minecraft.nbt.NBTTagCompound
+
 net.minecraft.network.chat.TextComponent net.minecraft.util.text.TextComponentString
 
 net.minecraft.network.protocol.Packet net.minecraft.network.Packet
@@ -55,6 +44,7 @@ net.minecraft.network.protocol.game.ClientboundAddEntityPacket net.minecraft.net
 net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.network.play.server.SPacketSpawnMob
 net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.SPacketSpawnPlayer
 net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.SPacketAnimation
+net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket net.minecraft.network.play.server.SPacketBlockChange
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
 net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
@@ -62,14 +52,26 @@ net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.ne
 net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.SPacketPlayerListItem
 net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.SPacketDestroyEntities
 net.minecraft.network.protocol.game.ClientboundRotateHeadPacket net.minecraft.network.play.server.SPacketEntityHeadLook
+net.minecraft.network.protocol.game.ClientboundSectionBlocksUpdatePacket net.minecraft.network.play.server.SPacketMultiBlockChange
+net.minecraft.network.protocol.game.ClientboundSetBorderPacket net.minecraft.network.play.server.SPacketWorldBorder
 net.minecraft.network.protocol.game.ClientboundSetEntityDataPacket net.minecraft.network.play.server.SPacketEntityMetadata
 net.minecraft.network.protocol.game.ClientboundSetEntityLinkPacket net.minecraft.network.play.server.SPacketEntityAttach
 net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecraft.network.play.server.SPacketEntityVelocity
 net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.SPacketEntityEquipment
+net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket net.minecraft.network.play.server.SPacketTeams
+net.minecraft.network.protocol.game.ClientboundSetScorePacket net.minecraft.network.play.server.SPacketUpdateScore
 net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.SPacketPlayerListHeaderFooter
 net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.SPacketEntityTeleport
 net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.SPacketEntityProperties
 net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.SPacketEntityEffect
+
+net.minecraft.network.protocol.game.ClientboundAddMobPacket getId() getEntityID()
+net.minecraft.network.protocol.game.ClientboundAddPlayerPacket getEntityId() getEntityID()
+net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket getPos() getBlockPosition()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getX() getXCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getY() getYCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZ() getZCoordinate()
+net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket getEntityIds() getEntityIDs()
 
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
@@ -104,15 +106,29 @@ net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityE
 
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
 
+net.minecraft.world.entity.player.Inventory net.minecraft.entity.player.InventoryPlayer
+
 net.minecraft.world.entity.player.Inventory armor armorInventory
+net.minecraft.world.entity.player.Inventory items mainInventory
+
 net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
 net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
+
 net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
 
+net.minecraft.world.item.Item net.minecraft.item.Item
+net.minecraft.world.item.Items net.minecraft.init.Items
+
 net.minecraft.world.level.Level getEntity() getEntityByID()
+
+net.minecraft.world.level.block.Blocks net.minecraft.init.Blocks
 net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBlockState
+
+net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
 
 net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
 
 net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
+net.minecraftforge.eventbus.api.Cancelable net.minecraftforge.fml.common.eventhandler.Cancelable
+net.minecraftforge.eventbus.api.EventPriority net.minecraftforge.fml.common.eventhandler.EventPriority
 net.minecraftforge.eventbus.api.SubscribeEvent net.minecraftforge.fml.common.eventhandler.SubscribeEvent

@@ -29,7 +29,8 @@ class ModuleProcessor(private val codeGenerator: CodeGenerator, private val logg
         minecraftForgeEvent = resolver.getClassDeclarationByName("net.minecraftforge.fml.common.eventhandler.Event")
             ?.asStarProjectedType()
             // adding support for when compiling forge 1.16.5
-            ?: resolver.getClassDeclarationByName("net.minecraftforge.eventbus.api.Event")?.asStarProjectedType()
+//             ?: resolver.getClassDeclarationByName("net.minecraftforge.eventbus.api.Event")?.asStarProjectedType()
+                ?: return emptyList()
 
         val symbols = resolver.getSymbolsWithAnnotation(SkyHanniModule::class.qualifiedName!!).toList()
         val validSymbols = symbols.mapNotNull { validateSymbol(it) }
