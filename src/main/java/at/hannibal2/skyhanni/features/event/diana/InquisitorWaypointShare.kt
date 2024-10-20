@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.diana.InquisitorFoundEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -28,7 +30,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.network.play.server.S02PacketChat
-import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.regex.Matcher
 import kotlin.time.Duration.Companion.seconds
@@ -48,14 +49,25 @@ object InquisitorWaypointShare {
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ,]+),? y: (?<y>[^ ,]+),? z: (?<z>[^ ,]+)"
     )
 
-    //Support for https://www.chattriggers.com/modules/v/inquisitorchecker
+    // Support for https://www.chattriggers.com/modules/v/inquisitorchecker
     /**
      * REGEX-TEST: §9Party §8> UserName§f: §rA MINOS INQUISITOR has spawned near [Foraging Island ] at Coords 1 2 3
      */
+    @Suppress("MaxLineLength")
     private val partyInquisitorCheckerPattern by patternGroup.pattern(
         "party.inquisitorchecker",
         "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rA MINOS INQUISITOR has spawned near \\[(?<area>.*)] at Coords (?<x>[^ ]+) (?<y>[^ ]+) (?<z>[^ ]+)"
     )
+
+    /**
+     * REGEX-TEST: §9Party §8> §b[MVP§9+§b] _088§f: §rx: 86, y: 73, z: -29 I dug up an inquisitor come over here!
+     */
+    @Suppress("MaxLineLength")
+    private val odinPattern by patternGroup.pattern(
+        "party.odin",
+        "(?<party>§9Party §8> )?(?<playerName>.+)§f: §rx: (?<x>[^ ]+), y: (?<y>[^ ]+), z: (?<z>[^ ]+) I dug up an inquisitor come over here!"
+    )
+
     private val diedPattern by patternGroup.pattern(
         "died",
         "(?<party>§9Party §8> )?(?<playerName>.*)§f: §rInquisitor dead!"
@@ -107,9 +119,9 @@ object InquisitorWaypointShare {
         inquisitorsNearby = emptyList()
     }
 
-    val inquisitorTime = mutableListOf<SimpleTimeMark>()
+    private val inquisitorTime = mutableListOf<SimpleTimeMark>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInquisitorFound(event: InquisitorFoundEvent) {
         val inquisitor = event.inquisitorEntity
         inquisitorsNearby = inquisitorsNearby.editCopy { add(inquisitor) }
@@ -152,11 +164,12 @@ object InquisitorWaypointShare {
             sendInquisitor()
         } else {
             val keyName = KeyboardManager.getKeyName(config.keyBindShare)
-            val message = "§l§bYou found a Inquisitor! Press §l§chere §l§bor §c$keyName to share the location!"
+            val message = "§l§bYou found an Inquisitor! Click §l§chere §l§bor press §c$keyName to share the location!"
             ChatUtils.clickableChat(
                 message, onClick = {
                     sendInquisitor()
                 },
+                "§eClick to share!",
                 oneTimeClick = true
             )
         }
@@ -193,13 +206,13 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("Inquisitor dead!")
     }
 
-    fun sendInquisitor() {
+    private fun sendInquisitor() {
         if (!isEnabled()) return
         if (lastShareTime.passedSince() < 5.seconds) return
         lastShareTime = SimpleTimeMark.now()
 
         if (inquisitor == -1) {
-            ChatUtils.error("No Inquisitor Found!")
+            ChatUtils.debug("Trying to send inquisitor via chat, but no Inquisitor is nearby.")
             return
         }
 
@@ -220,8 +233,8 @@ object InquisitorWaypointShare {
         HypixelCommands.partyChat("x: $x, y: $y, z: $z ")
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW, receiveCanceled = true)
-    fun onFirstChatEvent(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.HUB, priority = HandleEvent.LOW, receiveCancelled = true)
+    fun onFirstChatEvent(event: PacketReceivedEvent) {
         if (!isEnabled()) return
         val packet = event.packet
         if (packet !is S02PacketChat) return
@@ -232,13 +245,18 @@ object InquisitorWaypointShare {
 
         partyInquisitorCheckerPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
+            }
+        }
+        odinPattern.matchMatcher(message) {
+            if (detectFromChat()) {
+                event.cancel()
             }
         }
 
         partyOnlyCoordsPattern.matchMatcher(message) {
             if (detectFromChat()) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
         diedPattern.matchMatcher(message) {

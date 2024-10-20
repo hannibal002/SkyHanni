@@ -2,15 +2,18 @@ package at.hannibal2.skyhanni.features.nether
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class VolcanoExplosivityDisplay {
+@SkyHanniModule
+object VolcanoExplosivityDisplay {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle
     private val patternGroup = RepoPattern.group("crimson.volcano")
@@ -20,14 +23,21 @@ class VolcanoExplosivityDisplay {
      */
     private val statusPattern by patternGroup.pattern(
         "tablistline",
-        " *Volcano: (?<status>(?:§.)*\\S+)"
+        " *Volcano: (?<status>(?:§.)*\\S+)",
     )
     private var display = ""
 
     @SubscribeEvent
-    fun onTabListUpdate(event: TabListUpdateEvent) {
+    fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!isEnabled()) return
-        event.tabList.matchFirst(statusPattern) {
+        if (!event.isWidget(TabWidget.VOLCANO)) return
+
+        if (event.isClear()) {
+            display = ""
+            return
+        }
+        // TODO merge widget pattern with statusPattern
+        statusPattern.matchMatcher(event.lines.first()) {
             display = "§bVolcano Explosivity§7: ${group("status")}"
         }
     }

@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.features.bingo.BingoAPI
 import at.hannibal2.skyhanni.features.bingo.BingoAPI.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -17,7 +18,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class BingoCardTips {
+@SkyHanniModule
+object BingoCardTips {
 
     private val config get() = SkyHanniMod.feature.event.bingo.bingoCard
 
@@ -79,9 +81,7 @@ class BingoCardTips {
         for (line in bingoTip.guide) {
             toolTip.add(index++, " $line")
         }
-        bingoTip.found?.let {
-            toolTip.add(index++, "§7Found by: §e$it")
-        }
+        toolTip.add(index++, "§7Found by: §e${bingoTip.found}")
     }
 
     @SubscribeEvent

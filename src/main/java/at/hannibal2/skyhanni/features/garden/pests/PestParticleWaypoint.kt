@@ -1,23 +1,25 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayerIgnoreY
 import at.hannibal2.skyhanni.utils.LocationUtils.playerLocation
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
 import net.minecraft.network.play.server.S0EPacketSpawnObject
@@ -29,7 +31,8 @@ import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
 // TODO delete workaround class PestParticleLine when this class works again
-class PestParticleWaypoint {
+@SkyHanniModule
+object PestParticleWaypoint {
 
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
@@ -45,7 +48,7 @@ class PestParticleWaypoint {
     private var isPointingToPest = false
     private var color: Color? = null
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (PestAPI.hasVacuumInHand()) {
@@ -82,7 +85,7 @@ class PestParticleWaypoint {
         val yellow = LorenzVec(0.8, 0.8, 0.0)
         val redPest = LorenzVec(0.8, 0.4, 0.0)
         val redPlot = LorenzVec(0.8, 0.0, 0.0)
-        isPointingToPest = when (event.offset.round(5)) {
+        isPointingToPest = when (event.offset.roundTo(5)) {
             redPlot -> false
             redPest, yellow, darkYellow -> true
             else -> return
@@ -117,10 +120,10 @@ class PestParticleWaypoint {
         ++particles
     }
 
-    @SubscribeEvent
-    fun onFireWorkSpawn(event: PacketEvent.ReceiveEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onFireWorkSpawn(event: PacketReceivedEvent) {
         if (event.packet !is S0EPacketSpawnObject) return
-        if (!GardenAPI.inGarden() || !config.hideParticles) return
+        if (!config.hideParticles) return
         val fireworkId = 76
         if (event.packet.type == fireworkId) event.cancel()
     }
@@ -141,12 +144,11 @@ class PestParticleWaypoint {
 
         event.drawWaypointFilled(waypoint, color, beacon = true)
         event.drawDynamicText(waypoint, text, 1.3)
-        if (config.drawLine) event.draw3DLine(
-            event.exactPlayerEyeLocation(),
+        if (config.drawLine) event.drawLineToEye(
             waypoint,
             color,
             3,
-            false
+            false,
         )
     }
 
@@ -167,7 +169,7 @@ class PestParticleWaypoint {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPestUpdate(event: PestUpdateEvent) {
         if (PestAPI.scoreboardPests == 0) reset()
     }

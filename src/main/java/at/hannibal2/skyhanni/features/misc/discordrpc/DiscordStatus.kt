@@ -56,7 +56,7 @@ var beenAfkFor = SimpleTimeMark.now()
 
 fun getPetDisplay(): String = PetAPI.currentPet?.let {
     val colorCode = it.substring(1..2).first()
-    val petName = it.substring(2)
+    val petName = it.substring(2).removeColor()
     val petLevel = getCurrentPet()?.petLevel?.currentLevel ?: "?"
 
     "[Lvl $petLevel] ${colorCodeToRarity(colorCode)} $petName"
@@ -86,7 +86,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     NONE({ null }),
 
     LOCATION({
-        var location = LorenzUtils.skyBlockArea?.removeColor() ?: "invalid"
+        var location = LorenzUtils.skyBlockArea ?: "invalid"
         val island = LorenzUtils.skyBlockIsland
 
         if (location == "Your Island") location = "Private Island"
@@ -120,10 +120,10 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         val scoreboard = ScoreboardData.sidebarLinesFormatted
         // Matches coins amount in purse or piggy, with optional decimal points
         val coins = scoreboard.firstOrNull { purseRegex.matches(it.removeColor()) }?.let {
-            purseRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+            purseRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
         }
         val motes = scoreboard.firstOrNull { motesRegex.matches(it.removeColor()) }?.let {
-            motesRegex.find(it.removeColor())?.groupValues?.get(1) ?: ""
+            motesRegex.find(it.removeColor())?.groupValues?.get(1).orEmpty()
         }
         lastKnownDisplayStrings[PURSE] = when {
             coins == "1" -> "1 Coin"
@@ -131,9 +131,9 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
             motes == "1" -> "1 Mote"
             motes != "" && motes != null -> "$motes Motes"
 
-            else -> lastKnownDisplayStrings[PURSE] ?: ""
+            else -> lastKnownDisplayStrings[PURSE].orEmpty()
         }
-        lastKnownDisplayStrings[PURSE] ?: ""
+        lastKnownDisplayStrings[PURSE].orEmpty()
     }),
 
     BITS({
@@ -158,18 +158,20 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         if (ActionBarStatsData.MANA.value != "") {
             lastKnownDisplayStrings[STATS] = statString
         }
-        lastKnownDisplayStrings[STATS] ?: ""
+        lastKnownDisplayStrings[STATS].orEmpty()
     }),
 
     ITEM({
         InventoryUtils.getItemInHand()?.let {
-            String.format("Holding ${it.displayName.removeColor()}")
+            String.format(java.util.Locale.US, "Holding ${it.displayName.removeColor()}")
         } ?: "No item in hand"
     }),
 
-    TIME({
-        SkyBlockTime.now().formatted()
-    }),
+    TIME(
+        {
+            SkyBlockTime.now().formatted().removeColor()
+        },
+    ),
 
     PROFILE({
         val sbLevel = AdvancedPlayerList.tabPlayerData[LorenzUtils.getPlayerName()]?.sbLevel?.toString() ?: "?"
@@ -226,25 +228,30 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         DiscordRPCManager.config.customText.get() // custom field in the config
     }),
 
-    AUTO({
-        var autoReturn = ""
-        for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
-            // TODO, change functionality to use enum rather than ordinals
-            val autoStatus = AutoStatus.entries[statusID.ordinal]
-            val result =
-                autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
-            if (result != autoStatus.placeholderText) { // if that value is useful, display it
-                autoReturn = result
-                break
+    AUTO(
+        {
+            var autoReturn = ""
+            for (statusID in DiscordRPCManager.config.autoPriority) { // for every dynamic that the user wants to see...
+                // TODO, change functionality to use enum rather than ordinals
+                val autoStatus = AutoStatus.entries[statusID.ordinal]
+                val result =
+                    autoStatus.correspondingDiscordStatus.getDisplayString() // get what would happen if we were to display it
+                if (result != autoStatus.placeholderText) { // if that value is useful, display it
+                    autoReturn = result
+                    break
+                }
             }
-        }
-        if (autoReturn == "") { // if we didn't find any useful information, display the fallback
-            val statusNoAuto = DiscordStatus.entries.toMutableList()
-            statusNoAuto.remove(AUTO)
-            autoReturn = statusNoAuto[DiscordRPCManager.config.auto.get().ordinal].getDisplayString()
-        }
-        autoReturn
-    }),
+            if (autoReturn == "") { // if we didn't find any useful information, display the fallback
+                val fallbackID = DiscordRPCManager.config.auto.get().ordinal
+                autoReturn = if (fallbackID == 10) {
+                    NONE.getDisplayString() // 10 is this (DiscordStatus.AUTO); prevents an infinite loop
+                } else {
+                    DiscordStatus.entries[fallbackID].getDisplayString()
+                }
+            }
+            autoReturn
+        },
+    ),
 
     CROP_MILESTONES({ getCropMilestoneDisplay() }),
 
@@ -261,7 +268,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
         }
 
         val itemInHand = InventoryUtils.getItemInHand()
-        val itemName = itemInHand?.displayName?.removeColor() ?: ""
+        val itemName = itemInHand?.displayName?.removeColor().orEmpty()
 
         val extraAttributes = getExtraAttributes(itemInHand)
 
@@ -328,7 +335,7 @@ enum class DiscordStatus(private val displayMessageSupplier: (() -> String?)) {
     })
     ;
 
-    fun getDisplayString(): String = displayMessageSupplier() ?: ""
+    fun getDisplayString(): String = displayMessageSupplier().orEmpty()
 }
 
 enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatus: DiscordStatus) {
@@ -337,5 +344,4 @@ enum class AutoStatus(val placeholderText: String, val correspondingDiscordStatu
     STACKING("Stacking placeholder (should never be visible)", DiscordStatus.STACKING),
     DUNGEONS("Dungeons placeholder (should never be visible)", DiscordStatus.DUNGEONS),
     AFK("This person is not afk (should never be visible)", DiscordStatus.AFK),
-    ;
 }

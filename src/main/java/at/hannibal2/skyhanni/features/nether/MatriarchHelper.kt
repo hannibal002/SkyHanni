@@ -5,19 +5,21 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.CopyNearbyEntitiesCommand.getMobInfo
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.RenderUtils.expandBlock
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 
-class MatriarchHelper {
+@SkyHanniModule
+object MatriarchHelper {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.matriarchHelper
 
@@ -53,14 +55,14 @@ class MatriarchHelper {
         if (config.highlight) {
             val color = config.highlightColor.toChromaColor()
             pearlList.forEach {
-                event.drawFilledBoundingBox_nea(it.boundingBox.expandBlock(), color, 1.0f)
+                event.drawFilledBoundingBoxNea(it.boundingBox.expandBlock(), color, 1.0f)
             }
         }
         if (config.line) {
             val color = config.lineColor.toChromaColor()
             var prePoint = event.exactPlayerEyeLocation()
-            pearlList.forEach {
-                val point = it.baseEntity.getLorenzVec().add(y = 1.2)
+            for (mob in pearlList) {
+                val point = mob.baseEntity.getLorenzVec().up(1.2)
                 event.draw3DLine(prePoint, point, color, 10, true)
                 prePoint = point
             }

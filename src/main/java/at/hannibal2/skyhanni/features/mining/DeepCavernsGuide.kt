@@ -12,20 +12,22 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
+import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraftforge.fml.common.eventhandler.EventPriority
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DeepCavernsGuide {
+@SkyHanniModule
+object DeepCavernsGuide {
 
     private val config get() = SkyHanniMod.feature.mining.deepCavernsGuide
 
@@ -35,7 +37,7 @@ class DeepCavernsGuide {
 
     private val startIcon by lazy {
         val neuItem = "MAP".asInternalName().getItemStack()
-        Utils.createItemStack(
+        ItemUtils.createItemStack(
             neuItem.item,
             "§bDeep Caverns Guide",
             "§8(From SkyHanni)",
@@ -95,7 +97,10 @@ class DeepCavernsGuide {
             if (it.displayName != "§aObsidian Sanctuary") {
                 if (!show) {
                     start()
-                    ChatUtils.chat("Automatically enabling Deep Caverns Guide, helping you find the way to the bottom of the Deep Caverns and the path to Rhys.")
+                    ChatUtils.chat(
+                        "Automatically enabling Deep Caverns Guide, " +
+                            "helping you find the way to the bottom of the Deep Caverns and the path to Rhys."
+                    )
                 }
             }
         }
@@ -110,6 +115,7 @@ class DeepCavernsGuide {
                 onClick = {
                     SkyHanniMod.repo.updateRepo()
                 },
+                "§eClick to update the repo!",
                 prefixColor = "§c"
             )
         }
@@ -131,7 +137,7 @@ class DeepCavernsGuide {
     @SubscribeEvent(priority = EventPriority.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (showStartIcon && event.slotId == 49) {
-            event.isCanceled = true
+            event.cancel()
             ChatUtils.chat("Manually enabled Deep Caverns Guide.")
             start()
         }

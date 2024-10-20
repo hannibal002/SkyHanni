@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.SlayerAPI
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -16,7 +17,8 @@ import net.minecraft.init.Items
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class SlayerItemsOnGround {
+@SkyHanniModule
+object SlayerItemsOnGround {
 
     private val config get() = SkyHanniMod.feature.slayer.itemsOnGround
 
@@ -40,7 +42,7 @@ class SlayerItemsOnGround {
         if (!isEnabled()) return
 
         for ((item, text) in itemsOnGround) {
-            val location = event.exactLocation(item).add(y = 0.8)
+            val location = event.exactLocation(item).up(0.8)
             event.drawString(location, text)
         }
     }

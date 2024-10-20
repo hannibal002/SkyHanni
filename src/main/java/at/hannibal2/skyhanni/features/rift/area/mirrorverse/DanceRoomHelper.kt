@@ -53,7 +53,7 @@ object DanceRoomHelper {
 
         when {
             index < size && index == lineIndex -> {
-                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" } ?: ""
+                val countdown = countdown?.let { "${color.countdown.formatColor()}$it" }.orEmpty()
                 "${now.formatColor()} $format $countdown"
             }
 
@@ -115,7 +115,9 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onPlaySound(event: PlaySoundEvent) {
         if (!isEnabled() || !inRoom) return
-        if ((event.soundName == "random.burp" && event.volume == 0.8f) || (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)) {
+        if ((event.soundName == "random.burp" && event.volume == 0.8f) ||
+            (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)
+        ) {
             index = 0
             found = false
             countdown = null
@@ -131,7 +133,7 @@ object DanceRoomHelper {
     @SubscribeEvent
     fun onTitleReceived(event: TitleReceivedEvent) {
         if (!isEnabled()) return
-        if (config.hideOriginalTitle && inRoom) event.isCanceled = true
+        if (config.hideOriginalTitle && inRoom) event.cancel()
     }
 
     private fun startCountdown(seconds: Int, milliseconds: Int) {
@@ -160,7 +162,7 @@ object DanceRoomHelper {
         if (RiftAPI.inRift() && config.hidePlayers) {
             val entity = event.entity
             if (entity is EntityOtherPlayerMP && inRoom) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }

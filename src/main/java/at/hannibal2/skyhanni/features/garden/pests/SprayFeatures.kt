@@ -7,18 +7,19 @@ import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI.renderPlot
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI.getPests
-import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
-class SprayFeatures {
+@SkyHanniModule
+object SprayFeatures {
 
     private val config get() = PestAPI.config.spray
 
@@ -27,27 +28,28 @@ class SprayFeatures {
 
     private val changeMaterialPattern by RepoPattern.pattern(
         "garden.spray.material",
-        "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!"
+        "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?<spray>.*)§r§7!",
     )
+
+    private fun SprayType?.getSprayEffect(): String =
+        this?.getPests()?.takeIf { it.isNotEmpty() }?.let { pests ->
+            pests.joinToString("§7, §6") { it.displayName }
+        } ?: when (this) {
+            SprayType.FINE_FLOUR -> "§6+20☘ Farming Fortune"
+            else -> "§cUnknown Effect"
+        }
+
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!isEnabled()) return
 
-        val type = changeMaterialPattern.matchMatcher(event.message) {
+        display = changeMaterialPattern.matchMatcher(event.message) {
             val sprayName = group("spray")
-            SprayType.getByName(sprayName) ?: run {
-                ErrorManager.logErrorStateWithData(
-                    "Error reading spray material", "SprayType is null",
-                    "sprayName" to sprayName,
-                    "event.message" to event.message,
-                )
-                return
-            }
+            val type = SprayType.getByName(sprayName)
+            val sprayEffect = type.getSprayEffect()
+            "§a${type?.displayName ?: sprayName} §7(§6$sprayEffect§7)"
         } ?: return
-
-        val pests = type.getPests().joinToString("§7, §6") { it.displayName }
-        display = "§a${type.displayName} §7(§6$pests§7)"
 
         lastChangeTime = SimpleTimeMark.now()
     }

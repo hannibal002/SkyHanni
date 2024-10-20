@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.slayer.blaze
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.slayer.blaze.BlazeHellionConfig.FirstDaggerEntry
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
@@ -26,7 +28,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class BlazeSlayerDaggerHelper {
+@SkyHanniModule
+object BlazeSlayerDaggerHelper {
 
     private val config get() = SkyHanniMod.feature.slayer.blazes.hellion
 
@@ -167,7 +170,7 @@ class BlazeSlayerDaggerHelper {
     }
 
     private fun getDaggerFromStack(stack: ItemStack?): Dagger? {
-        val itemName = stack?.name ?: ""
+        val itemName = stack?.name.orEmpty()
         for (dagger in Dagger.entries) {
             if (dagger.daggerNames.any { itemName.contains(it) }) {
                 return dagger
@@ -184,12 +187,12 @@ class BlazeSlayerDaggerHelper {
 
         for (shield in HellionShield.entries) {
             if (shield.formattedName + "§r" == event.title) {
-                Dagger.entries.filter { shield in it.shields }.forEach {
-                    it.shields.forEach { shield -> shield.active = false }
-                    it.updated = true
+                for (dagger in Dagger.entries.filter { shield in it.shields }) {
+                    dagger.shields.forEach { it.active = false }
+                    dagger.updated = true
                 }
                 shield.active = true
-                event.isCanceled = true
+                event.cancel()
                 clientSideClicked = false
                 return
             }
@@ -200,7 +203,7 @@ class BlazeSlayerDaggerHelper {
         return LorenzUtils.inSkyBlock && config.daggers
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
         if (clientSideClicked) return

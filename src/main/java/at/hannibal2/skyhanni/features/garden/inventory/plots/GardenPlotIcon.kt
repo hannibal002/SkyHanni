@@ -8,10 +8,10 @@ import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.editItemInfo
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
-import io.github.moulberry.notenoughupdates.util.Utils
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
@@ -51,7 +51,7 @@ object GardenPlotIcon {
         for ((index, internalName) in plotList) {
             val old = originalStack[index]!!
             val new = internalName.getItemStack()
-            cachedStack[index] = Utils.editItemStackInfo(new, old.displayName, true, *old.getLore().toTypedArray())
+            cachedStack[index] = new.editItemInfo(old.displayName, true, old.getLore())
         }
     }
 
@@ -90,7 +90,7 @@ object GardenPlotIcon {
         if (!isEnabled()) return
         lastClickedSlotId = event.slotId
         if (event.slotId == 53) {
-            event.isCanceled = true
+            event.cancel()
             if (event.clickedButton == 0) {
                 if (editMode == 2)
                     editMode = 0
@@ -106,7 +106,7 @@ object GardenPlotIcon {
         }
         if (editMode != 0) {
             if (event.slotId in 54..89) {
-                event.isCanceled = true
+                event.cancel()
                 copyStack = event.slot?.stack?.copy()?.also {
                     it.stackSize = 1
                 } ?: return
@@ -117,7 +117,7 @@ object GardenPlotIcon {
             if (event.slotId != 53) {
                 val plotList = plotList ?: return
                 if (!whitelistedSlot.contains(event.slotId)) return
-                event.isCanceled = true
+                event.cancel()
                 if (editMode == 2) {
                     plotList.remove(event.slotId)
                     return

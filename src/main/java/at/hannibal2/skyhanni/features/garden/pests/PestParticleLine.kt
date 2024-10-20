@@ -1,21 +1,24 @@
 package at.hannibal2.skyhanni.features.garden.pests
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.isAnyOf
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.EventPriority
@@ -23,7 +26,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 // TODO remove this workaround once PestParticleWaypoint does work again
-class PestParticleLine {
+@SkyHanniModule
+object PestParticleLine {
     private val config get() = SkyHanniMod.feature.garden.pests.pestWaypoint
 
     class ParticleLocation(val location: LorenzVec, val spawnTime: SimpleTimeMark)
@@ -31,7 +35,7 @@ class PestParticleLine {
     private var lastPestTrackerUse = SimpleTimeMark.farPast()
     private val locations = mutableListOf<MutableList<ParticleLocation>>()
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onItemClick(event: ItemClickEvent) {
         if (!isEnabled()) return
         if (PestAPI.hasVacuumInHand()) {
@@ -92,6 +96,7 @@ class PestParticleLine {
     }
 
     private fun showMiddle(event: LorenzRenderWorldEvent) {
+        if (!config.showMiddle) return
         if (locations.size <= 0) return
         val plot = GardenPlotAPI.getCurrentPlot() ?: return
         val middle = plot.middle.copy(y = LocationUtils.playerLocation().y)
@@ -107,7 +112,7 @@ class PestParticleLine {
             // TODO time in config
             if (next.spawnTime.passedSince() > 5.seconds) continue
             val location = next.location
-            event.draw3DLine_nea(
+            event.draw3DLineNea(
                 prev.location,
                 location,
                 color,

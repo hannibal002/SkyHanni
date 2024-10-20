@@ -90,10 +90,10 @@ object FortuneUpgrades {
     private fun getEquipmentUpgrades() {
         val visitors = GardenAPI.storage?.uniqueVisitors?.toDouble() ?: 0.0
         for (piece in FarmingItems.equip) {
-            val item = piece.getItem() ?: return
+            val item = piece.getItem()
             // todo tell them to buy the missing item
             if (!item.getInternalName().contains("LOTUS")) return
-            val enchantments = item.getEnchantments() ?: emptyMap()
+            val enchantments = item.getEnchantments().orEmpty()
             val greenThumbLvl = enchantments["green_thumb"] ?: 0
             if (greenThumbLvl != 5 && visitors != 0.0) {
                 genericUpgrades.add(
@@ -107,11 +107,11 @@ object FortuneUpgrades {
             when (item.getReforgeName()) {
                 "rooted" -> {}
                 "blooming" -> {
-                    reforgeItem(item, FarmingReforges.ROOTED, genericUpgrades)
+                    reforgeItem(item, FarmingReforge.ROOTED, genericUpgrades)
                 }
 
                 else -> {
-                    reforgeItem(item, FarmingReforges.BLOOMING, genericUpgrades)
+                    reforgeItem(item, FarmingReforge.BLOOMING, genericUpgrades)
                 }
             }
         }
@@ -126,11 +126,11 @@ object FortuneUpgrades {
             when (item.getReforgeName()) {
                 "mossy" -> {}
                 "bustling" -> {
-                    reforgeItem(item, FarmingReforges.MOSSY, genericUpgrades)
+                    reforgeItem(item, FarmingReforge.MOSSY, genericUpgrades)
                 }
 
                 else -> {
-                    reforgeItem(item, FarmingReforges.BUSTLING, genericUpgrades, 100)
+                    reforgeItem(item, FarmingReforge.BUSTLING, genericUpgrades, 100)
                 }
             }
         }
@@ -157,7 +157,7 @@ object FortuneUpgrades {
         cropSpecificUpgrades.addAll(genericUpgrades)
         // todo tell them to get the tool if it is missing
         val crop = tool?.getCropType() ?: return
-        val enchantments = tool.getEnchantments() ?: emptyMap()
+        val enchantments = tool.getEnchantments().orEmpty()
         val turboCropLvl = enchantments[crop.getTurboCrop()] ?: 0
         val dedicationLvl = enchantments["dedication"] ?: 0
         val cultivatingLvl = enchantments["cultivating"] ?: 0
@@ -242,7 +242,7 @@ object FortuneUpgrades {
             "blessed" -> {}
             "bountiful" -> {}
             else -> {
-                reforgeItem(tool, FarmingReforges.BLESSED, cropSpecificUpgrades)
+                reforgeItem(tool, FarmingReforge.BLESSED, cropSpecificUpgrades)
             }
         }
         cropSpecificUpgrades.populateAndSort(0)
@@ -251,7 +251,7 @@ object FortuneUpgrades {
     private fun recombobulateItem(item: ItemStack, list: MutableList<FortuneUpgrade>) {
         if (item.isRecombobulated()) return
         val reforge = item.getReforgeName()?.let {
-            FarmingReforges.entries.find { enumValue ->
+            FarmingReforge.entries.find { enumValue ->
                 enumValue.name == it.uppercase()
             }
         } ?: return
@@ -265,7 +265,7 @@ object FortuneUpgrades {
 
     private fun reforgeItem(
         item: ItemStack,
-        reforge: FarmingReforges,
+        reforge: FarmingReforge,
         list: MutableList<FortuneUpgrade>,
         copperPrice: Int? = null,
     ) {
@@ -286,8 +286,6 @@ object FortuneUpgrades {
         3 -> 4
         else -> 8
     }
-
-    private val cropUpgrades = listOf(5, 10, 20, 50, 100, 500, 1000, 5000, 10000)
 
     // If they unlock in a weird order for example getting a corner before a cheaper one won't work properly
     private val compostNeeded = listOf(

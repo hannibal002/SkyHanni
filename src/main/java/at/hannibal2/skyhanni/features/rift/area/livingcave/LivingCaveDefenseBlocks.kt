@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
@@ -17,12 +17,15 @@ import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.getLorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.EnumParticleTypes
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class LivingCaveDefenseBlocks {
+@SkyHanniModule
+object LivingCaveDefenseBlocks {
 
     private val config get() = RiftAPI.config.area.livingCave.defenseBlockConfig
     private var movingBlocks = mapOf<DefenseBlock, Long>()
@@ -50,12 +53,12 @@ class LivingCaveDefenseBlocks {
         // Ignore particles around blocks
         if (staticBlocks.any { it.location.distance(location) < 3 }) {
             if (config.hideParticles) {
-                event.isCanceled = true
+                event.cancel()
             }
             return
         }
         if (config.hideParticles && movingBlocks.keys.any { it.location.distance(location) < 3 }) {
-            event.isCanceled = true
+            event.cancel()
         }
 
         if (event.type == EnumParticleTypes.CRIT_MAGIC) {
@@ -84,7 +87,7 @@ class LivingCaveDefenseBlocks {
 
             movingBlocks = movingBlocks.editCopy { this[defenseBlock] = System.currentTimeMillis() + 250 }
             if (config.hideParticles) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
@@ -138,18 +141,16 @@ class LivingCaveDefenseBlocks {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-
         for ((block, time) in movingBlocks) {
             if (block.hidden) continue
             if (time > System.currentTimeMillis()) {
                 val location = block.location
                 event.drawWaypointFilled(location, color)
-                event.draw3DLine(
-                    block.entity.getLorenzVec().add(y = 0.5),
-                    location.add(0.5, 0.5, 0.5),
+                event.drawLineToEye(
+                    location.blockCenter(),
                     color,
                     1,
-                    false
+                    false,
                 )
             }
         }
@@ -159,8 +160,8 @@ class LivingCaveDefenseBlocks {
             event.drawWaypointFilled(location, color)
 
             event.draw3DLine(
-                block.entity.getLorenzVec().add(y = 0.5),
-                location.add(0.5, 0.5, 0.5),
+                event.exactLocation(block.entity).up(0.5),
+                location.blockCenter(),
                 color,
                 3,
                 true,

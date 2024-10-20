@@ -1,9 +1,14 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.ClickedBlockType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.ScoreboardData
+import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.DungeonBlockClickEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
@@ -14,6 +19,8 @@ import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.BlockUtils
+import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.equalsOneOf
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
@@ -22,6 +29,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
+import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -29,6 +37,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.firstLetterUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -36,13 +45,10 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 object DungeonAPI {
 
     private val floorPattern = " §7⏣ §cThe Catacombs §7\\((?<floor>.*)\\)".toPattern()
-    private val uniqueClassBonus =
-        "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
+    private val uniqueClassBonus = "^Your ([A-Za-z]+) stats are doubled because you are the only player using this class!$".toRegex()
 
-    private val bossPattern =
-        "View all your (?<name>\\w+) Collection".toPattern()
-    private val levelPattern =
-        " +(?<kills>\\d+).*".toPattern()
+    private val bossPattern = "View all your (?<name>\\w+) Collection".toPattern()
+    private val levelPattern = " +(?<kills>\\d+).*".toPattern()
     private val killPattern = " +☠ Defeated (?<boss>\\w+).*".toPattern()
     private val totalKillsPattern = "§7Total Kills: §e(?<kills>.*)".toPattern()
 
@@ -55,26 +61,41 @@ object DungeonAPI {
     var isUniqueClass = false
 
     val bossStorage: MutableMap<DungeonFloor, Int>? get() = ProfileStorageData.profileSpecific?.dungeons?.bosses
-    private val timePattern =
-        "Time Elapsed:( )?(?:(?<minutes>\\d+)m)? (?<seconds>\\d+)s".toPattern() // Examples: Time Elapsed: 10m 10s, Time Elapsed: 2s
 
     private val patternGroup = RepoPattern.group("dungeon")
+    // TODO: Move to repo
+    @Suppress("MaxLineLength")
+    private const val WITHER_ESSENCE_TEXTURE =
+        "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvYzRkYjRhZGZhOWJmNDhmZjVkNDE3MDdhZTM0ZWE3OGJkMjM3MTY1OWZjZDhjZDg5MzQ3NDlhZjRjY2U5YiJ9fX0="
 
+    /**
+     * REGEX-TEST: Time Elapsed: §a01m 17s
+     * REGEX-TEST: Time Elapsed: §a14s
+     */
+    private val timePattern by patternGroup.pattern(
+        "time",
+        "Time Elapsed: §.(?:(?<minutes>\\d+)m )?(?<seconds>\\d+)s",
+    )
+
+    /**
+     * REGEX-TEST: §f                §r§cMaster Mode The Catacombs §r§8- §r§eFloor VII
+     * REGEX-TEST: §f                         §r§cThe Catacombs §r§8- §r§eFloor V
+     */
     private val dungeonComplete by patternGroup.pattern(
         "complete",
-        "§.\\s+§.§.(?:The|Master Mode) Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)"
+        "§.\\s+§.§.(?:Master Mode )?The Catacombs §.§.- §.§.(?:Floor )?(?<floor>M?[IV]{1,3}|Entrance)",
     )
     private val dungeonRoomPattern by patternGroup.pattern(
         "room",
-        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)"
+        "§7\\d+\\/\\d+\\/\\d+ §\\w+ (?<roomId>[\\w,-]+)",
     )
     private val blessingPattern by patternGroup.pattern(
         "blessings",
-        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r"
+        "§r§r§fBlessing of (?<type>\\w+) (?<amount>\\w+)§r",
     )
     private val noBlessingPattern by patternGroup.pattern(
         "noblessings",
-        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r"
+        "§r§r§7No Buffs active. Find them by exploring the Dungeon!§r",
     )
 
     enum class DungeonBlessings(var power: Int) {
@@ -93,16 +114,16 @@ object DungeonAPI {
         }
     }
 
-    fun inDungeon() = IslandType.CATACOMBS.isInIsland()
+    fun inDungeon(): Boolean = IslandType.CATACOMBS.isInIsland()
 
-    fun isOneOf(vararg floors: String) = dungeonFloor?.equalsOneOf(*floors) == true
+    fun isOneOf(vararg floors: String): Boolean = dungeonFloor?.equalsOneOf(*floors) == true
 
     fun handleBossMessage(rawMessage: String) {
         if (!inDungeon()) return
         val message = rawMessage.removeColor()
         val bossName = message.substringAfter("[BOSS] ").substringBefore(":").trim()
         if ((bossName != "The Watcher") && dungeonFloor != null && checkBossName(bossName) && !inBossRoom) {
-            DungeonBossRoomEnterEvent().postAndCatch()
+            DungeonBossRoomEnterEvent.post()
             inBossRoom = true
         }
     }
@@ -124,22 +145,17 @@ object DungeonAPI {
         return bossName.endsWith(correctBoss)
     }
 
-    fun getTime(): String {
-        ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
-            return "${group("minutes") ?: "00"}:${group("seconds")}" // 03:14
-        }
-        return ""
-    }
+    fun getTime(): String = ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
+        "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
+    }.orEmpty()
 
     fun getCurrentBoss(): DungeonFloor? {
         val floor = dungeonFloor ?: return null
         return DungeonFloor.valueOf(floor.replace("M", "F"))
     }
 
-    fun getRoomID(): String? {
-        return ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
-            group("roomId")
-        }
+    fun getRoomID(): String? = ScoreboardData.sidebarLinesFormatted.matchFirst(dungeonRoomPattern) {
+        group("roomId")
     }
 
     fun getColor(level: Int): String = when {
@@ -166,15 +182,14 @@ object DungeonAPI {
             }
         }
         if (dungeonFloor != null && playerClass == null) {
-            val playerTeam =
-                TabListData.getTabList().firstOrNull {
-                    it.contains(LorenzUtils.getPlayerName())
-                }?.removeColor() ?: ""
+            val playerTeam = TabListData.getTabList().firstOrNull {
+                it.contains(LorenzUtils.getPlayerName())
+            }?.removeColor().orEmpty()
 
-            DungeonClass.entries.forEach {
-                if (playerTeam.contains("(${it.scoreboardName} ")) {
+            for (dungeonClass in DungeonClass.entries) {
+                if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {
                     val level = playerTeam.split(" ").last().trimEnd(')').romanToDecimalIfNecessary()
-                    playerClass = it
+                    playerClass = dungeonClass
                     playerClassLevel = level
                 }
             }
@@ -184,15 +199,14 @@ object DungeonAPI {
     @SubscribeEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
-        val tabList = event.footer.split("\n")
-        tabList.forEach {
-            if (noBlessingPattern.matches(it)) {
+        for (line in event.footer.split("\n")) {
+            if (noBlessingPattern.matches(line)) {
                 DungeonBlessings.reset()
                 return
             }
-            val matcher = blessingPattern.matcher(it)
+            val matcher = blessingPattern.matcher(line)
             if (matcher.find()) {
-                val type = matcher.group("type") ?: return@forEach
+                val type = matcher.group("type") ?: continue
                 val amount = matcher.group("amount").romanToDecimalIfNecessary()
                 if (DungeonBlessings.valueOf(type.uppercase()).power != amount) {
                     DungeonBlessings.valueOf(type.uppercase()).power = amount
@@ -246,7 +260,7 @@ object DungeonAPI {
         val bossCollections = bossStorage ?: return
 
         if (event.inventoryName == "Boss Collections") {
-            readallCollections(bossCollections, event.inventoryItems)
+            readAllCollections(bossCollections, event.inventoryItems)
         } else if (event.inventoryName.endsWith(" Collection")) {
             readOneMaxCollection(bossCollections, event.inventoryItems, event.inventoryName)
         }
@@ -275,7 +289,7 @@ object DungeonAPI {
         }
     }
 
-    private fun readallCollections(
+    private fun readAllCollections(
         bossCollections: MutableMap<DungeonFloor, Int>,
         inventoryItems: Map<Int, ItemStack>,
     ) {
@@ -321,8 +335,8 @@ object DungeonAPI {
             add("playerClassLevel: $playerClassLevel")
             add("")
             add("Blessings: ")
-            for (blessing in DungeonBlessings.entries) {
-                add("  ${blessing.displayName} ${blessing.power}")
+            DungeonBlessings.entries.forEach {
+                add("  ${it.displayName} ${it.power}")
             }
         }
     }
@@ -332,7 +346,7 @@ object DungeonAPI {
         BERSERK("Berserk"),
         HEALER("Healer"),
         MAGE("Mage"),
-        TANK("Tank")
+        TANK("Tank"),
     }
 
     enum class DungeonChest(val inventory: String) {
@@ -347,5 +361,28 @@ object DungeonAPI {
         companion object {
             fun getByInventoryName(inventory: String) = entries.firstOrNull { it.inventory == inventory }
         }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onBlockClick(event: BlockClickEvent) {
+        if (event.clickType != ClickType.RIGHT_CLICK) return
+
+        val position = event.position
+        val blockType: ClickedBlockType = when (position.getBlockAt()) {
+            Blocks.chest -> ClickedBlockType.CHEST
+            Blocks.trapped_chest -> ClickedBlockType.TRAPPED_CHEST
+            Blocks.lever -> ClickedBlockType.LEVER
+            Blocks.skull -> {
+                val blockTexture = BlockUtils.getTextureFromSkull(position.toBlockPos())
+                if (blockTexture == WITHER_ESSENCE_TEXTURE) {
+                    ClickedBlockType.WITHER_ESSENCE
+                } else {
+                    return
+                }
+            }
+
+            else -> return
+        }
+        DungeonBlockClickEvent(position, blockType).post()
     }
 }

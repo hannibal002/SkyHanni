@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -12,8 +13,8 @@ import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
-import at.hannibal2.skyhanni.events.PacketEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityCollectionStats
 import at.hannibal2.skyhanni.features.garden.CropType.Companion.getCropType
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
@@ -80,17 +81,17 @@ object GardenAPI {
     // TODO USE SH-REPO
     private val otherToolsList = listOf(
         "DAEDALUS_AXE",
+        "STARRED_DAEDALUS_AXE",
         "BASIC_GARDENING_HOE",
         "ADVANCED_GARDENING_AXE",
         "BASIC_GARDENING_AXE",
         "ADVANCED_GARDENING_HOE",
         "ROOKIE_HOE",
-        "BINGHOE"
+        "BINGHOE",
     )
 
-    @SubscribeEvent
-    fun onSendPacket(event: PacketEvent.SendEvent) {
-        if (!inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onSendPacket(event: PacketSentEvent) {
         if (event.packet !is C09PacketHeldItemChange) return
         checkItemInHand()
     }
@@ -188,12 +189,18 @@ object GardenAPI {
         addItemStack(crop.icon.copy(), highlight = highlight, scale = scale)
     }
 
-    fun hideExtraGuis() = ComposterOverlay.inInventory || AnitaMedalProfit.inInventory ||
-        SkyMartCopperPrice.inInventory || FarmingContestAPI.inInventory || VisitorAPI.inInventory ||
-        FFGuideGUI.isInGui() || ChocolateShopPrice.inInventory || ChocolateFactoryAPI.inChocolateFactory ||
-        ChocolateFactoryAPI.chocolateFactoryPaused || HoppityCollectionStats.inInventory
+    fun hideExtraGuis() = ComposterOverlay.inInventory ||
+        AnitaMedalProfit.inInventory ||
+        SkyMartCopperPrice.inInventory ||
+        FarmingContestAPI.inInventory ||
+        VisitorAPI.inInventory ||
+        FFGuideGUI.isInGui() ||
+        ChocolateShopPrice.inInventory ||
+        ChocolateFactoryAPI.inChocolateFactory ||
+        ChocolateFactoryAPI.chocolateFactoryPaused ||
+        HoppityCollectionStats.inInventory
 
-    fun clearCropSpeed() {
+    fun resetCropSpeed() {
         storage?.cropsPerSecond?.clear()
         GardenBestCropTime.reset()
         updateGardenTool()
@@ -212,10 +219,8 @@ object GardenAPI {
 
     private var lastLocation: LorenzVec? = null
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBlockClick(event: BlockClickEvent) {
-        if (!inGarden()) return
-
         val blockState = event.getBlockState
         val cropBroken = blockState.getCropType() ?: return
         if (cropBroken.multiplier == 1 && blockState.isBabyCrop()) return
@@ -275,7 +280,7 @@ object GardenAPI {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<GardenJson>("Garden")
-        gardenExperience = data.garden_exp
+        gardenExperience = data.gardenExp
         totalAmountVisitorsExisting = data.visitors.size
     }
 

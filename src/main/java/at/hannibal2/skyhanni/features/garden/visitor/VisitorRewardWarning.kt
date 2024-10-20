@@ -7,13 +7,14 @@ import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.ACCEPT_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.REFUSE_SLOT
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.VisitorBlockReason
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI.lastClickedNpc
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.NumberUtil
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
@@ -23,7 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.absoluteValue
 import kotlin.time.Duration.Companion.seconds
 
-class VisitorRewardWarning {
+@SkyHanniModule
+object VisitorRewardWarning {
     private val config get() = VisitorAPI.config.rewardWarning
 
     @SubscribeEvent
@@ -64,7 +66,7 @@ class VisitorRewardWarning {
 
         val shouldBlock = blockReason?.run { blockRefusing && isRefuseSlot || !blockRefusing && isAcceptSlot } ?: false
         if (!config.bypassKey.isKeyHeld() && shouldBlock) {
-            event.isCanceled = true
+            event.cancel()
             return
         }
 
@@ -122,10 +124,10 @@ class VisitorRewardWarning {
         }
 
         blockedToolTip.add("")
-        val pricePerCopper = visitor.pricePerCopper?.let { NumberUtil.format(it) }
+        val pricePerCopper = visitor.pricePerCopper?.let { it.shortFormat() }
         // TODO remove !! - best by creating new class LoadedVisitor without any nullable objects
         val loss = visitor.totalPrice!! - visitor.totalReward!!
-        val formattedLoss = NumberUtil.format(loss.absoluteValue)
+        val formattedLoss = loss.absoluteValue.shortFormat()
         blockedToolTip.add(blockDescription(blockReason, pricePerCopper, loss, formattedLoss))
         blockedToolTip.add("  §7(Bypass by holding ${KeyboardManager.getKeyName(config.bypassKey)})")
 

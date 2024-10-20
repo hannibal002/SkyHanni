@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -15,7 +16,8 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class RiftAgaricusCap {
+@SkyHanniModule
+object RiftAgaricusCap {
 
     private val config get() = RiftAPI.config.area.dreadfarm
     private var startTime = SimpleTimeMark.farPast()
@@ -61,7 +63,7 @@ class RiftAgaricusCap {
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!isEnabled()) return
 
-        val location = location?.add(y = 0.6) ?: return
+        val location = location?.up(0.6) ?: return
 
         if (startTime.isFarFuture()) {
             event.drawDynamicText(location, "§cClick!", 1.5)

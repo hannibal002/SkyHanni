@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.matchStyledMatcher
@@ -23,7 +24,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
  */
-class PlayerChatManager {
+@SkyHanniModule
+object PlayerChatManager {
 
     private val patternGroup = RepoPattern.group("data.chat.player")
 
@@ -60,20 +62,21 @@ class PlayerChatManager {
      */
     private val guildPattern by patternGroup.pattern(
         "guild",
-        "§2Guild > (?<author>.+?)(?<guildRank> §e\\[\\w*])?§f: (?<message>.*)"
+        "§2Guild > (?<author>.+?) ?(?<guildRank>§e\\[\\w*])?§f: (?<message>.*)",
     )
 
     /**
      * REGEX-TEST: To nea89o: lol
      * REGEX-TEST: From nea89o: hiii
-     * REGEX-TEST: §eFrom stash: §r§fPufferfish
+     * REGEX-TEST: From stash: Pufferfish
+     * REGEX-TEST: From stash: Wheat
      * REGEX-TEST: To [MVP+] Eisengolem: Boop!
      * REGEX-TEST: From [MVP+] Eisengolem: Boop!
      * REGEX-TEST: To [MVP+] Eisengolem: danke
      */
     private val privateMessagePattern by patternGroup.pattern(
         "privatemessage",
-        "^(?!§eFrom stash: §r)(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
+        "^(?!From stash: )(?<direction>From|To) (?<author>[^:]*): (?<message>.*)"
     )
 
     /**
@@ -85,6 +88,7 @@ class PlayerChatManager {
      * REGEX-TEST: §b[MVP§c+§b] hannibal2§f§7 has §8[§6Heroic Aspect of the Void§8]
      * REGEX-TEST: §8[§b209§8] §b[MVP§d+§b] lrg89§f§7 is holding §8[§5Heroic Aspect of the Void§8]
      */
+    @Suppress("MaxLineLength")
     private val itemShowPattern by patternGroup.pattern(
         "itemshow",
         "(?:§8\\[(?<levelColor>§.)(?<level>\\d+)§8] )?(?<author>.*)§f§7 (?<action>is (?:holding|friends with a|wearing)|has) (?<itemName>.*)"

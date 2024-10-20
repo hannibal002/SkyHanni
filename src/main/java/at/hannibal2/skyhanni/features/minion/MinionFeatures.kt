@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ClickType
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.events.MinionOpenEvent
 import at.hannibal2.skyhanni.events.MinionStorageOpenEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.test.GriffinUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.editCopy
@@ -44,9 +44,11 @@ import at.hannibal2.skyhanni.utils.RegexUtils.find
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import at.hannibal2.skyhanni.utils.SpecialColour
-import at.hannibal2.skyhanni.utils.TimeUtils
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SpecialColor
+import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -90,6 +92,19 @@ object MinionFeatures {
         "^§aCollect All$"
     )
 
+    var lastMinion: LorenzVec? = null
+    private var lastStorage: LorenzVec? = null
+    var minionInventoryOpen = false
+    var minionStorageInventoryOpen = false
+
+    private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
+        get() {
+            return ProfileStorageData.profileSpecific?.minions
+        }
+        set(value) {
+            ProfileStorageData.profileSpecific?.minions = value
+        }
+
     @SubscribeEvent
     fun onPlayerInteract(event: PlayerInteractEvent) {
         if (!isEnabled()) return
@@ -107,7 +122,7 @@ object MinionFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onEntityClick(event: EntityClickEvent) {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -115,7 +130,7 @@ object MinionFeatures {
         lastClickedEntity = event.clickedEntity?.getLorenzVec() ?: return
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onBlockClick(event: BlockClickEvent) {
         if (!enableWithHub()) return
         if (event.clickType != ClickType.RIGHT_CLICK) return
@@ -129,7 +144,7 @@ object MinionFeatures {
         if (!config.lastClickedMinion.display) return
 
         val special = config.lastClickedMinion.color
-        val color = Color(SpecialColour.specialToChromaRGB(special), true)
+        val color = Color(SpecialColor.specialToChromaRGB(special), true)
 
         val loc = lastMinion
         if (loc != null) {
@@ -284,7 +299,7 @@ object MinionFeatures {
             System.currentTimeMillis() - lastClicked
         } ?: return "§cCan't calculate coins/day: No time data available!"
 
-        //§7Held Coins: §b151,389
+        // §7Held Coins: §b151,389
         // TODO use regex
         val coins = line.split(": §b")[1].formatDouble()
 
@@ -346,7 +361,7 @@ object MinionFeatures {
         val playerLocation = LocationUtils.playerLocation()
         val minions = minions ?: return
         for (minion in minions) {
-            val location = minion.key.add(y = 1.0)
+            val location = minion.key.up()
             if (location.distanceToPlayer() > 50) continue
 
             val lastEmptied = minion.value.lastClicked
@@ -357,14 +372,14 @@ object MinionFeatures {
                 val name = "§6" + if (config.nameOnlyTier) {
                     displayName.split(" ").last()
                 } else displayName
-                event.drawString(location.add(y = 0.65), name, true)
+                event.drawString(location.up(0.65), name, true)
             }
 
             if (config.emptiedTime.display && lastEmptied != 0L) {
-                val duration = System.currentTimeMillis() - lastEmptied
-                val format = TimeUtils.formatDuration(duration, longName = true) + " ago"
+                val passedSince = SimpleTimeMark(lastEmptied).passedSince()
+                val format = passedSince.format(longName = true) + " ago"
                 val text = "§eHopper Emptied: $format"
-                event.drawString(location.add(y = 1.15), text, true)
+                event.drawString(location.up(1.15), text, true)
             }
         }
     }
@@ -383,7 +398,7 @@ object MinionFeatures {
         if (entity.customNameTag.contains("§c❤")) {
             val loc = entity.getLorenzVec()
             if (minions.any { it.key.distance(loc) < 5 }) {
-                event.isCanceled = true
+                event.cancel()
             }
         }
     }
@@ -401,19 +416,6 @@ object MinionFeatures {
             config.hopperProfitPos.renderString(coinsPerDay, posLabel = "Minion Coins Per Day")
         }
     }
-
-    var lastMinion: LorenzVec? = null
-    var lastStorage: LorenzVec? = null
-    var minionInventoryOpen = false
-    var minionStorageInventoryOpen = false
-
-    private var minions: Map<LorenzVec, ProfileSpecificStorage.MinionConfig>?
-        get() {
-            return ProfileStorageData.profileSpecific?.minions
-        }
-        set(value) {
-            ProfileStorageData.profileSpecific?.minions = value
-        }
 
     @SubscribeEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

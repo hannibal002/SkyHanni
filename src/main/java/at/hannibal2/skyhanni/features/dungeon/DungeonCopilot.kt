@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.DungeonBossRoomEnterEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
@@ -16,7 +18,8 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
-class DungeonCopilot {
+@SkyHanniModule
+object DungeonCopilot {
 
     private val config get() = SkyHanniMod.feature.dungeon.dungeonCopilot
 
@@ -131,7 +134,7 @@ class DungeonCopilot {
         searchForKey = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonBossRoomEnter(event: DungeonBossRoomEnterEvent) {
         changeNextStep("Defeat the boss! Good luck :)")
     }

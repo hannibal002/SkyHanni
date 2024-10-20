@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.withAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -16,7 +17,9 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
+@SkyHanniModule
 object MarkedPlayerManager {
+
     val config get() = SkyHanniMod.feature.gui.markedPlayers
 
     private val playerNamesToMark = mutableListOf<String>()
@@ -60,7 +63,7 @@ object MarkedPlayerManager {
         }
     }
 
-    private fun refreshColours() =
+    private fun refreshColors() =
         markedPlayers.forEach {
             it.value.setColor()
         }
@@ -75,8 +78,8 @@ object MarkedPlayerManager {
 
     fun isMarkedPlayer(player: String): Boolean = player.lowercase() in playerNamesToMark
 
-    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected())
-        && config.highlightInWorld
+    private fun isEnabled() = (LorenzUtils.inSkyBlock || OutsideSbFeature.MARKED_PLAYERS.isSelected()) &&
+        config.highlightInWorld
 
     fun replaceInChat(string: String): String {
         if (!config.highlightInChat) return string
@@ -101,7 +104,7 @@ object MarkedPlayerManager {
                 playerNamesToMark.remove(name)
             }
         }
-        config.entityColor.onToggle(::refreshColours)
+        config.entityColor.onToggle(::refreshColors)
     }
 
     @SubscribeEvent

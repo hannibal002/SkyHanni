@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.features.inventory.SuperCraftFeatures.craftedPattern
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NEUInternalName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
@@ -19,11 +20,12 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
-class ItemAddManager {
+@SkyHanniModule
+object ItemAddManager {
     enum class Source {
         ITEM_ADD,
         SACKS,
-        ;
+        COMMAND,
     }
 
     private val ARCHFIEND_DICE = "ARCHFIEND_DICE".asInternalName()
@@ -31,7 +33,7 @@ class ItemAddManager {
 
     private val diceRollChatPattern by RepoPattern.pattern(
         "data.itemmanager.diceroll",
-        "§eYour §r§(5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤"
+        "§eYour §r§(5|6High Class )Archfiend Dice §r§erolled a §r§.(?<number>.)§r§e! Bonus: §r§.(?<hearts>.*)❤",
     )
 
     private var inSackInventory = false
@@ -87,7 +89,7 @@ class ItemAddManager {
     }
 
     private var lastDiceRoll = SimpleTimeMark.farPast()
-    private var superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
+    private val superCraftedItems = TimeLimitedSet<NEUInternalName>(30.seconds)
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {

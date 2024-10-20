@@ -2,8 +2,8 @@ package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropInfo
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson
-import at.hannibal2.skyhanni.data.jsonobjects.repo.ArmorDropsJson.DropInfo
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -13,13 +13,14 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addAsSingletonList
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
+import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import at.hannibal2.skyhanni.utils.tracker.TrackerData
@@ -40,8 +41,9 @@ object ArmorDropTracker {
 
     private var hasArmor = false
 
-    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker })
-    { drawDisplay(it) }
+    private val tracker = SkyHanniTracker("Armor Drop Tracker", { Data() }, { it.garden.armorDropTracker }) {
+        drawDisplay(it)
+    }
 
     class Data : TrackerData() {
 
@@ -83,11 +85,11 @@ object ArmorDropTracker {
         }
     }
 
-    private fun drawDisplay(data: Data): List<List<Any>> = buildList {
-        addAsSingletonList("§7Armor Drop Tracker:")
+    private fun drawDisplay(data: Data): List<Searchable> = buildList {
+        addSearchString("§7Armor Drop Tracker:")
         for ((drop, amount) in data.drops.sortedDesc()) {
             val dropName = drop.dropName
-            addAsSingletonList(" §7- §e${amount.addSeparators()}x $dropName")
+            addSearchString(" §7- §e${amount.addSeparators()}x $dropName", dropName)
         }
     }
 
@@ -126,10 +128,10 @@ object ArmorDropTracker {
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ArmorDropsJson>("ArmorDrops")
-        armorDropInfo = data.special_crops
+        armorDropInfo = data.specialCrops
     }
 
-    private var armorDropInfo = mapOf<String, DropInfo>()
+    private var armorDropInfo = mapOf<String, ArmorDropInfo>()
     private var currentArmorDropChance = 0.0
     private var lastCalculationTime = SimpleTimeMark.farPast()
 
@@ -140,7 +142,7 @@ object ArmorDropTracker {
             lastCalculationTime = SimpleTimeMark.now()
 
             val armorDropName = crop.specialDropType
-            val armorName = armorDropInfo[armorDropName]?.armor_type ?: return 0.0
+            val armorName = armorDropInfo[armorDropName]?.armorType ?: return 0.0
             val pieceCount = InventoryUtils.getArmor()
                 .mapNotNull { it?.getInternalName()?.asString() }
                 .count { it.contains(armorName) || it.contains("FERMENTO") }

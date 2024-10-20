@@ -1,22 +1,25 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
+import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzEvent
-import at.hannibal2.skyhanni.events.PreInitFinishedEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
 import java.util.TreeMap
@@ -42,7 +45,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf()
+            else regexes?.regexes.orEmpty()
         )
 
     /**
@@ -56,7 +59,7 @@ object RepoPatternManager {
      */
     private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
-    private var wasPreinitialized = false
+    private var wasPreInitialized = false
     private val isInDevEnv = try {
         Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
     } catch (_: Exception) {
@@ -76,7 +79,10 @@ object RepoPatternManager {
             }
         }
 
-    val localLoading: Boolean get() = config.forceLocal.get() || (!insideTest && LorenzUtils.isInDevEnvironment())
+    private val localLoading: Boolean
+        get() = config.forceLocal.get() || (!insideTest && PlatformUtils.isDevEnvironment) || RepoManager.usingBackupRepo
+
+    private val logger = LogManager.getLogger("SkyHanni")
 
     /**
      * Crash if in a development environment, or if inside a guarded event handler.
@@ -97,7 +103,11 @@ object RepoPatternManager {
                 val previousOwner = exclusivity[key]
                 if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
                     if (!config.tolerateDuplicateUsage)
-                        crash("Non unique access to regex at \"$key\". First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, tried to use at ${owner.ownerClass} / ${owner.property}")
+                        crash(
+                            "Non unique access to regex at \"$key\". " +
+                                "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
+                                "tried to use at ${owner.ownerClass} / ${owner.property}"
+                        )
                 } else {
                     exclusivity[key] = owner
                 }
@@ -115,13 +125,15 @@ object RepoPatternManager {
                 }
                 val previousParentOwner = previousParentOwnerMutable
 
-                if (previousParentOwner != null && previousParentOwner != parentKeyHolder && !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)) {
+                if (previousParentOwner != null && previousParentOwner != parentKeyHolder &&
+                    !(previousParentOwner.shares && previousParentOwner.parent == parentKeyHolder)
+                ) {
                     if (!config.tolerateDuplicateUsage) crash(
                         "Non unique access to array regex at \"$parent\"." +
                             " First obtained by ${previousParentOwner.ownerClass} / ${previousParentOwner.property}," +
                             " tried to use at ${owner.ownerClass} / ${owner.property}" +
                             if (parentKeyHolder != null) "with parentKeyHolder ${parentKeyHolder.ownerClass} / ${parentKeyHolder.property}"
-                            else ""
+                            else "",
                     )
                 }
             }
@@ -140,7 +152,7 @@ object RepoPatternManager {
                 if (!config.tolerateDuplicateUsage) crash(
                     "Non unique access to array regex at \"$key\"." +
                         " First obtained by ${preRegistered.ownerClass} / ${preRegistered.property}," +
-                        " tried to use at ${owner.ownerClass} / ${owner.property}"
+                        " tried to use at ${owner.ownerClass} / ${owner.property}",
                 )
             }
         }
@@ -173,6 +185,7 @@ object RepoPatternManager {
                 is RepoPatternListImpl -> loadArrayPatterns(remotePatterns, it)
                 is RepoPatternImpl -> loadStandalonePattern(remotePatterns, it)
             }
+
         }
     }
 
@@ -186,7 +199,7 @@ object RepoPatternManager {
                 return
             }
         } catch (e: PatternSyntaxException) {
-            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+            logger.error("Error while loading pattern from repo", e)
         }
         it.value = Pattern.compile(it.defaultPattern)
         it.isLoadedRemotely = false
@@ -208,8 +221,13 @@ object RepoPatternManager {
             arrayPattern.wasOverridden = false
         }
 
+        if (localLoading) {
+            setDefaultPatterns()
+            return
+        }
+
         if (patternMap.mapTo(mutableSetOf()) { it.first } != patternMap.indices.toSet()) {
-            SkyHanniMod.logger.error("Incorrect index set for $arrayPattern")
+            logger.error("Incorrect index set for $arrayPattern")
             setDefaultPatterns()
         }
 
@@ -220,7 +238,7 @@ object RepoPatternManager {
             arrayPattern.wasOverridden = patternStrings != arrayPattern.defaultPattern
             return
         } catch (e: PatternSyntaxException) {
-            SkyHanniMod.logger.error("Error while loading pattern from repo", e)
+            logger.error("Error while loading pattern from repo", e)
         }
         setDefaultPatterns()
     }
@@ -242,29 +260,29 @@ object RepoPatternManager {
             ConfigManager.gson.toJson(
                 RepoPatternDump(
                     sourceLabel,
-                    usedKeys.values.flatMap { it.dump().toList() }.toMap()
-                )
+                    usedKeys.values.flatMap { it.dump().toList() }.toMap(),
+                ),
             )
         file.parentFile.mkdirs()
         file.writeText(data)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {
-        wasPreinitialized = true
+        wasPreInitialized = true
         val dumpDirective = System.getenv("SKYHANNI_DUMP_REGEXES")
         if (dumpDirective.isNullOrBlank()) return
         val (sourceLabel, path) = dumpDirective.split(":", limit = 2)
         dump(sourceLabel, File(path))
         if (System.getenv("SKYHANNI_DUMP_REGEXES_EXIT") != null) {
-            SkyHanniMod.logger.info("Exiting after dumping RepoPattern regex patterns to $path")
+            logger.info("Exiting after dumping RepoPattern regex patterns to $path")
             FMLCommonHandler.instance().exitJava(0, false)
         }
     }
 
     fun of(key: String, fallback: String, parentKeyHolder: RepoPatternKeyOwner? = null): RepoPattern {
         verifyKeyShape(key)
-        if (wasPreinitialized && !config.tolerateLateRegistration) {
+        if (wasPreInitialized && !config.tolerateLateRegistration) {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
         }
         if (key in usedKeys) {
@@ -279,7 +297,7 @@ object RepoPatternManager {
         parentKeyHolder: RepoPatternKeyOwner? = null,
     ): RepoPatternList {
         verifyKeyShape(key)
-        if (wasPreinitialized && !config.tolerateLateRegistration) {
+        if (wasPreInitialized && !config.tolerateLateRegistration) {
             crash("Illegal late initialization of repo pattern. Repo pattern needs to be created during pre-initialization.")
         }
         if (key in usedKeys) {
@@ -299,7 +317,7 @@ object RepoPatternManager {
      * @return returns any pattern on the [prefix] key space (including list or any other complex structure, but as a simple pattern
      * */
     internal fun getUnusedPatterns(prefix: String): List<Pattern> {
-        if (config.forceLocal.get()) return emptyList()
+        if (localLoading) return emptyList()
         try {
             verifyKeyShape(prefix)
         } catch (e: IllegalArgumentException) {

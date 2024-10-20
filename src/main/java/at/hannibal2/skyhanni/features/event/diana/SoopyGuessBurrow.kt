@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.events.BurrowGuessEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.toLorenzVec
@@ -21,7 +22,8 @@ import kotlin.math.sin
 /**
  * Taken and ported from Soopyboo32's javascript module SoopyV2
  */
-class SoopyGuessBurrow {
+@SkyHanniModule
+object SoopyGuessBurrow {
 
     private var dingIndex = 0
     private var hasDinged = false
@@ -34,7 +36,7 @@ class SoopyGuessBurrow {
     private var guessPoint: LorenzVec? = null
 
     private var lastSoundPoint: LorenzVec? = null
-    private var locs = mutableListOf<LorenzVec>()
+    private var locations = mutableListOf<LorenzVec>()
 
     private var dingSlope = mutableListOf<Float>()
 
@@ -79,7 +81,7 @@ class SoopyGuessBurrow {
             lastSoundPoint = null
             firstParticlePoint = null
             distance = null
-            locs.clear()
+            locations.clear()
         }
 
         if (lastDingPitch == 0f) {
@@ -89,7 +91,7 @@ class SoopyGuessBurrow {
             lastParticlePoint2 = null
             lastSoundPoint = null
             firstParticlePoint = null
-            locs.clear()
+            locations.clear()
             return
         }
 
@@ -134,6 +136,7 @@ class SoopyGuessBurrow {
         }
     }
 
+    @Suppress("MaxLineLength")
     private fun solveEquationThing(x: LorenzVec, y: LorenzVec): LorenzVec {
         val a =
             (-y.x * x.y * x.x - y.y * x.y * x.z + y.y * x.y * x.x + x.y * x.z * y.z + x.x * x.z * y.x - x.x * x.z * y.z) / (x.y * y.x - x.y * y.z + x.x * y.z - y.x * x.z + y.y * x.z - y.y * x.x)
@@ -156,24 +159,25 @@ class SoopyGuessBurrow {
             }
         }
         if (run) {
-            if (locs.size < 100 && locs.isEmpty() || locs.last().distance(currLoc) != 0.0) {
+            if (locations.size < 100 && locations.isEmpty() || locations.last().distance(currLoc) != 0.0) {
                 var distMultiplier = 1.0
-                if (locs.size > 2) {
-                    val predictedDist = 0.06507 * locs.size + 0.259
-                    val lastPos = locs.last()
+                if (locations.size > 2) {
+                    val predictedDist = 0.06507 * locations.size + 0.259
+                    val lastPos = locations.last()
                     val actualDist = currLoc.distance(lastPos)
                     distMultiplier = actualDist / predictedDist
                 }
-                locs.add(currLoc)
+                locations.add(currLoc)
 
-                if (locs.size > 5 && guessPoint != null) {
+                if (locations.size > 5 && guessPoint != null) {
 
-                    val slopeThing = locs.zipWithNext { a, b ->
+                    val slopeThing = locations.zipWithNext { a, b ->
                         atan((a.x - b.x) / (a.z - b.z))
                     }
 
                     val (a, b, c) = solveEquationThing(
-                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1), LorenzVec(
+                        LorenzVec(slopeThing.size - 5, slopeThing.size - 3, slopeThing.size - 1),
+                        LorenzVec(
                             slopeThing[slopeThing.size - 5],
                             slopeThing[slopeThing.size - 3],
                             slopeThing[slopeThing.size - 1]
@@ -184,14 +188,14 @@ class SoopyGuessBurrow {
                     val pr2 = mutableListOf<LorenzVec>()
 
                     val start = slopeThing.size - 1
-                    val lastPos = locs[start].toDoubleArray()
-                    val lastPos2 = locs[start].toDoubleArray()
+                    val lastPos = locations[start].toDoubleArray()
+                    val lastPos2 = locations[start].toDoubleArray()
 
                     var distCovered = 0.0
 
-                    val ySpeed = locs[locs.size - 1].x - locs[locs.size - 2].x / hypot(
-                        locs[locs.size - 1].x - locs[locs.size - 2].x,
-                        locs[locs.size - 1].z - locs[locs.size - 2].x
+                    val ySpeed = locations[locations.size - 1].x - locations[locations.size - 2].x / hypot(
+                        locations[locations.size - 1].x - locations[locations.size - 2].x,
+                        locations[locations.size - 1].z - locations[locations.size - 2].x
                     )
 
                     var i = start + 1
