@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
-import at.hannibal2.skyhanni.utils.ItemUtils.extraAttributes
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzRarity
@@ -31,13 +30,13 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.hasGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
 import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
@@ -403,7 +402,7 @@ object PetAPI {
     }
 
     private fun getPetDataFromItem(item: ItemStack) {
-        val (_, _, rarity, petItem, _, petXP, _) = parsePetNBT(item.extraAttributes)
+        val (_, _, rarity, petItem, _, petXP, _) = parsePetNBT(item)
         val (internalName, name, _, _, level, _, skin) = parsePetName(item.displayName) ?: return
 
         val newPet = PetData(
@@ -418,13 +417,10 @@ object PetAPI {
         updatePet(newPet)
     }
 
-    private fun parsePetNBT(nbt: NBTTagCompound): PetData {
-        val jsonString = nbt.getString("petInfo")
-            .replace("\\", "")
-            .removePrefix("\"")
-            .removeSuffix("\"")
-        val petInfo = Gson().fromJson(jsonString, PetNBT::class.java)
+    private fun parsePetNBT(item: ItemStack): PetData {
+        val petInfo = Gson().fromJson(item.getExtraAttributes()?.getString("petInfo"), PetNBT::class.java)
 
+        println(petInfo)
         val rarity = LorenzRarity.getByName(petInfo.tier) ?: ErrorManager.skyHanniError(
             "Couldn't parse pet rarity.",
             Pair("petNBT", petInfo),

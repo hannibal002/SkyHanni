@@ -153,7 +153,7 @@ object CaptureFarmingGear {
         val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
         val items = event.inventoryItems
-        if (PetAPI.isPetMenu(event.inventoryName)) {
+        if (PetAPI.isPetMenu(event.inventoryName, event.inventoryItems)) {
             pets(items, outdatedItems)
             return
         }
