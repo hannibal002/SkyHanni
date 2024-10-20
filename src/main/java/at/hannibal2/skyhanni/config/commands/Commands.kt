@@ -208,7 +208,7 @@ object Commands {
         event.register("shcopytranslation") {
             description =
                 "Copy the translation of a message in another language to your clipboard.\n" +
-                    "Uses a 2 letter language code that can be found at the end of a translation message."
+                "Uses a 2 letter language code that can be found at the end of a translation message."
             category = CommandCategory.USERS_ACTIVE
             callback { Translator.fromNativeLanguage(it) }
         }
@@ -590,7 +590,7 @@ object Commands {
         event.register("shdebugscoreboard") {
             description =
                 "Monitors the scoreboard changes: " +
-                    "Prints the raw scoreboard lines in the console after each update, with time since last update."
+                "Prints the raw scoreboard lines in the console after each update, with time since last update."
             category = CommandCategory.DEVELOPER_DEBUG
             callback { ScoreboardData.toggleMonitor() }
         }
@@ -746,8 +746,8 @@ object Commands {
         event.register("shresetconfig") {
             description =
                 "Reloads the config manager and rendering processors of MoulConfig. " +
-                    "This §cWILL RESET §7your config, but also updating the java config files " +
-                    "(names, description, orderings and stuff)."
+                "This §cWILL RESET §7your config, but also updating the java config files " +
+                "(names, description, orderings and stuff)."
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyHanniDebugsAndTests.resetConfigCommand() }
         }
