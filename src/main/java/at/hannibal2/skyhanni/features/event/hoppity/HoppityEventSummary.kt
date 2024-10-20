@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
@@ -36,8 +37,7 @@ object HoppityEventSummary {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private val lineHeader = " ".repeat(4)
 
-    private var firstInCf = 0L
-    private var inCfNow = false
+    private var lastAddedCfMillis: SimpleTimeMark? = null
 
     private data class StatString(val string: String, val headed: Boolean = true)
 
@@ -108,15 +108,12 @@ object HoppityEventSummary {
     }
 
     private fun checkAddCfTime() {
-        if (ChocolateFactoryAPI.inChocolateFactory && !this.inCfNow) {
-            this.inCfNow = true
-            firstInCf = SkyBlockTime.now().toMillis()
-        } else if (!ChocolateFactoryAPI.inChocolateFactory && this.inCfNow) {
-            val stats = getYearStats().first ?: return
-            stats.millisInCf += (SkyBlockTime.now().toMillis() - firstInCf)
-            this.inCfNow = false
-            firstInCf = 0
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        val stats = getYearStats().first ?: return
+        lastAddedCfMillis?.let {
+            stats.millisInCf += (SimpleTimeMark.now().toMillis() - it.toMillis())
         }
+        lastAddedCfMillis = SimpleTimeMark.now()
     }
 
     private fun checkEnded() {
