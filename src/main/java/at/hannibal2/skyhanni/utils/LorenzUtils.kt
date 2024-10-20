@@ -50,7 +50,7 @@ object LorenzUtils {
 
     val isOnAlphaServer get() = onHypixel && HypixelData.hypixelAlpha
 
-    val inSkyBlock get() = onHypixel && HypixelData.skyBlock
+    val inSkyBlock get() = (onHypixel && HypixelData.skyBlock) || SkyHanniMod.feature.dev.debug.alwaysInSkyblock
 
     val inHypixelLobby get() = onHypixel && HypixelData.inLobby
 

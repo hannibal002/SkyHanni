@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.event;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
@@ -47,4 +48,14 @@ public class GreatSpookConfig {
     @ConfigLink(owner = GreatSpookConfig.class, field = "greatSpookTimeLeft")
     public Position positionTimeLeft = new Position(40, 40, false, true);
 
+    // @Expose
+    // @ConfigOption(name = "Primal Fear Solver", desc = "Solver for the Math Primal Fear")
+    // @ConfigEditorBoolean
+    // @FeatureToggle
+    // public boolean primalFearSolver = false;
+
+    @ConfigOption(name = "Primal Fear Solvers", desc = "Solvers for the Primal Fears")
+    @Accordion
+    @Expose
+    public PrimalFearSolverConfig primalFearSolvers = new PrimalFearSolverConfig();
 }
