@@ -61,6 +61,8 @@ object ChocolateFactoryCustomReminder {
 
     /**
      * REGEX-TEST: §cYou don't have enough Chocolate!
+     * REGEX-TEST: §cYou don't have the required items!
+     * REGEX-TEST: §cYou must collect 300B all-time Chocolate!
      */
     private val chatMessagePattern by patternGroup.list(
         "chat.hide",
@@ -74,11 +76,7 @@ object ChocolateFactoryCustomReminder {
         if (!isEnabled()) return
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (configReminder.hideChat) {
-
             if (chatMessagePattern.matches(event.message)) {
-                //§cYou don't have the required items!
-                //§cYou must collect 300B all-time Chocolate!
-//             if (event.message == "§cYou don't have enough Chocolate!") {
                 event.blockedReason = "custom_reminder"
             }
         }
@@ -196,12 +194,11 @@ object ChocolateFactoryCustomReminder {
         if (configUpgradeWarnings.upgradeWarningSound) {
             SoundUtils.playBeepSound()
         }
-        ChatUtils.clickableChat(
+        ChatUtils.clickToActionOrDisable(
             "You can now purchase §f$targetName §ein Chocolate factory!",
-            onClick = {
-                HypixelCommands.chocolateFactory()
-            },
-            "§eClick to run /cf!",
+            configReminder::enabled,
+            actionName = "open Chocolate Factory",
+            action = { HypixelCommands.chocolateFactory() },
         )
     }
 

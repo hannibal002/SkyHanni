@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.time.LocalDate
 import java.time.ZoneId
+import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -16,11 +17,17 @@ object TimeUtils {
 
     fun Duration.format(
         biggestUnit: TimeUnit = TimeUnit.YEAR,
-        showMilliSeconds: Boolean = this in -1.seconds..1.seconds,
+        showMilliSeconds: Boolean = this.absoluteValue < 1.seconds,
         longName: Boolean = false,
         maxUnits: Int = -1,
+        showSmallerUnits: Boolean = false,
+        showNegativeAsSoon: Boolean = true,
     ): String {
-        var millis = inWholeMilliseconds
+        var millis = inWholeMilliseconds.absoluteValue
+        val prefix = if (isNegative()) {
+            if (showNegativeAsSoon) return "Soon"
+            "-"
+        } else ""
         val parts = mutableMapOf<TimeUnit, Int>()
 
         for (unit in TimeUnit.entries) {
@@ -31,10 +38,19 @@ object TimeUtils {
             }
         }
 
+        val largestNonZeroUnit = parts.firstNotNullOfOrNull { if (it.value != 0) it.key else null } ?: TimeUnit.SECOND
+
+        if (absoluteValue < 1.seconds) {
+            val formattedMillis = (millis / 100).toInt()
+            return "${prefix}0.${formattedMillis}${TimeUnit.SECOND.getName(formattedMillis, longName)}"
+        }
+
         var currentUnits = 0
         val result = buildString {
             for ((unit, value) in parts) {
-                if (value != 0 || (unit == TimeUnit.SECOND && showMilliSeconds)) {
+                val showUnit = value != 0 || (showSmallerUnits && unit.factor <= largestNonZeroUnit.factor)
+
+                if (showUnit) {
                     val formatted = value.addSeparators()
                     val text = if (unit == TimeUnit.SECOND && showMilliSeconds) {
                         val formattedMillis = (millis / 100).toInt()
@@ -47,7 +63,7 @@ object TimeUtils {
                 }
             }
         }
-        return result.trim()
+        return prefix + result.trim()
     }
 
     fun Duration.timerColor(default: String = "§f") = when (this) {
@@ -104,10 +120,16 @@ object TimeUtils {
         dayAndMonthElement: Boolean = true,
         yearElement: Boolean = true,
         hoursAndMinutesElement: Boolean = true,
+        timeFormat24h: Boolean = false,
+        exactMinutes: Boolean = true,
     ): String {
-        val hour = (this.hour + 11) % 12 + 1
-        val timeOfDay = if (this.hour > 11) "pm" else "am"
-        val minute = this.minute.toString().padStart(2, '0')
+        val hour = if (timeFormat24h) this.hour else (this.hour + 11) % 12 + 1
+        val timeOfDay = if (!timeFormat24h) {
+            if (this.hour > 11) "pm" else "am"
+        } else ""
+        val minute = this.minute.let {
+            if (exactMinutes) it else it - (it % 10)
+        }.toString().padStart(2, '0')
         val month = SkyBlockTime.monthName(this.month)
         val day = this.day
         val daySuffix = SkyBlockTime.daySuffix(day)
@@ -129,7 +151,7 @@ object TimeUtils {
             } else {
                 "$datePart$timePart".trim()
             },
-        ) ?: ""
+        ).orEmpty()
     }
 
     fun getCurrentLocalDate(): LocalDate = LocalDate.now(ZoneId.of("UTC"))
@@ -146,7 +168,7 @@ private const val FACTOR_HOURS = FACTOR_MINUTES * 60
 private const val FACTOR_DAYS = FACTOR_HOURS * 24
 private const val FACTOR_YEARS = (FACTOR_DAYS * 365.25).toLong()
 
-enum class TimeUnit(val factor: Long, val shortName: String, val longName: String) {
+enum class TimeUnit(val factor: Long, private val shortName: String, private val longName: String) {
     YEAR(FACTOR_YEARS, "y", "Year"),
     DAY(FACTOR_DAYS, "d", "Day"),
     HOUR(FACTOR_HOURS, "h", "Hour"),
@@ -155,8 +177,13 @@ enum class TimeUnit(val factor: Long, val shortName: String, val longName: Strin
     ;
 
     fun getName(value: Int, longFormat: Boolean) = if (longFormat) {
-        " $longName" + if (value > 1) "s" else ""
+        " $longName" + if (value == 1) "" else "s"
     } else shortName
 
     fun format(value: Int, longFormat: Boolean = false) = value.addSeparators() + getName(value, longFormat)
 }
+
+val Duration.inPartialSeconds: Double get() = toDouble(DurationUnit.SECONDS)
+val Duration.inPartialMinutes: Double get() = inPartialSeconds / 60
+val Duration.inPartialHours: Double get() = inPartialSeconds / 3600
+val Duration.inPartialDays: Double get() = inPartialSeconds / 86_400

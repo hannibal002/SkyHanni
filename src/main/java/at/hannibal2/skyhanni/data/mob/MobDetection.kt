@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainTo
 import at.hannibal2.skyhanni.utils.CollectionUtils.put
@@ -31,6 +32,7 @@ import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.network.play.server.S01PacketJoinGame
 import net.minecraft.network.play.server.S0CPacketSpawnPlayer
 import net.minecraft.network.play.server.S0FPacketSpawnMob
+import net.minecraft.world.World
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -62,7 +64,42 @@ object MobDetection {
         MobData.currentMobs.map {
             it.createDeSpawnEvent()
         }.forEach { it.postAndCatch() }
+        MobData.retries.clear()
     }
+
+    // TODO this is a unused debug funciton. maybe connect with a debug commmand or remove
+    private fun watchdog() {
+        val world = LorenzUtils.getPlayer()?.worldObj ?: return
+        if (MobData.retries.any { it.value.entity.worldObj != world }) {
+            ChatUtils.chat("Watchdog: Retires")
+        }
+        if (MobData.currentMobs.any { it.watchdogCheck(world) }) {
+            ChatUtils.chat("Watchdog: Current Mobs")
+        }
+        if (MobData.players.any { it.watchdogCheck(world) }) {
+            ChatUtils.chat("Watchdog: Players")
+        }
+        if (MobData.displayNPCs.any { it.watchdogCheck(world) }) {
+            ChatUtils.chat("Watchdog: Display NPCs")
+        }
+        if (MobData.skyblockMobs.any { it.watchdogCheck(world) }) {
+            ChatUtils.chat("Watchdog: SkyBlockMobs")
+        }
+        if (MobData.summoningMobs.any { it.watchdogCheck(world) }) {
+            ChatUtils.chat("Watchdog: Summoning")
+        }
+        if (MobData.special.any { it.watchdogCheck(world) }) {
+            ChatUtils.chat("Watchdog: Special")
+        }
+        if (MobData.notSeenMobs.any { it.watchdogCheck(world) }) {
+            ChatUtils.chat("Watchdog: Not Seen Mobs")
+        }
+    }
+
+    private fun Mob.watchdogCheck(world: World): Boolean =
+        this.baseEntity.worldObj != world || (
+            this.armorStand?.let { it.worldObj != world } ?: false
+            ) || this.extraEntities.any { it.worldObj != world }
 
     @SubscribeEvent
     fun onTick(event: LorenzTickEvent) {
@@ -90,7 +127,7 @@ object MobDetection {
             MobData.currentEntityLiving.clear() // Naturally removing the mobs using the despawn
         }
 
-        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) }  // Spawn
+        (MobData.currentEntityLiving - MobData.previousEntityLiving).forEach { addRetry(it) } // Spawn
         (MobData.previousEntityLiving - MobData.currentEntityLiving).forEach { entityDeSpawn(it) } // Despawn
 
         MobData.notSeenMobs.removeIf(::canBeSeen)
@@ -122,13 +159,15 @@ object MobDetection {
 
     private fun canBeSeen(mob: Mob): Boolean {
         val isVisible = !mob.isInvisible() && mob.canBeSeen()
-        if (isVisible) when (mob.mobType) {
-            Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
-            Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
-            Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
-            Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
-            Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
-            Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+        if (isVisible) {
+            when (mob.mobType) {
+                Mob.Type.PLAYER -> MobEvent.FirstSeen.Player(mob)
+                Mob.Type.SUMMON -> MobEvent.FirstSeen.Summon(mob)
+                Mob.Type.SPECIAL -> MobEvent.FirstSeen.Special(mob)
+                Mob.Type.PROJECTILE -> MobEvent.FirstSeen.Projectile(mob)
+                Mob.Type.DISPLAY_NPC -> MobEvent.FirstSeen.DisplayNPC(mob)
+                Mob.Type.BASIC, Mob.Type.DUNGEON, Mob.Type.BOSS, Mob.Type.SLAYER -> MobEvent.FirstSeen.SkyblockMob(mob)
+            }.postAndCatch()
         }
         return isVisible
     }
@@ -266,13 +305,13 @@ object MobDetection {
             val entity = retry.entity
             if (retry.times == MAX_RETRIES) {
                 MobData.logger.log(
-                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n "
-                        + "is already Found: ${MobData.entityToMob[retry.entity] != null})."
-                        + "\n Position: ${retry.entity.getLorenzVec()}\n "
-                        + "DistanceC: ${
-                        entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
-                    }\n"
-                        + "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
+                    "`${retry.entity.name}`${retry.entity.entityId} missed {\n " +
+                        "is already Found: ${MobData.entityToMob[retry.entity] != null})." +
+                        "\n Position: ${retry.entity.getLorenzVec()}\n " +
+                        "DistanceC: ${
+                            entity.getLorenzVec().distanceChebyshevIgnoreY(LocationUtils.playerLocation())
+                        }\n" +
+                        "Relative Position: ${entity.getLorenzVec() - LocationUtils.playerLocation()}\n " +
                         "}",
                 )
                 // Uncomment this to make it closed a loop
@@ -302,7 +341,7 @@ object MobDetection {
 
     private fun handleEntityUpdate(entityID: Int): Boolean {
         val entity = EntityUtils.getEntityByID(entityID) as? EntityLivingBase ?: return false
-        getRetry(entity)?.apply { this.entity = entity }
+        getRetry(entity)?.entity = entity
         MobData.currentEntityLiving.refreshReference(entity)
         MobData.previousEntityLiving.refreshReference(entity)
         // update map
@@ -316,8 +355,9 @@ object MobDetection {
             is S0FPacketSpawnMob -> addEntityUpdate(packet.entityID)
             is S0CPacketSpawnPlayer -> addEntityUpdate(packet.entityID)
             // is S0EPacketSpawnObject -> addEntityUpdate(packet.entityID)
-            is S01PacketJoinGame -> // one of the first packets that is sent when switching servers inside the BungeeCord Network (please some prove this, I just found it out via Testing)
-            {
+            is S01PacketJoinGame -> {
+                // one of the first packets that is sent when switching servers inside the BungeeCord Network
+                // (please some prove this, I just found it out via Testing)
                 shouldClear.set(true)
                 allEntitiesViaPacketId.clear()
             }

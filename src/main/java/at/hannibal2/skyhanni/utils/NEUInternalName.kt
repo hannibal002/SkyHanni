@@ -1,5 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+
 class NEUInternalName private constructor(private val internalName: String) {
 
     companion object {
@@ -20,12 +22,30 @@ class NEUInternalName private constructor(private val internalName: String) {
         }
 
         fun fromItemNameOrNull(itemName: String): NEUInternalName? =
-            ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet"))
+            ItemNameResolver.getInternalNameOrNull(itemName.removeSuffix(" Pet")) ?: getCoins(itemName)
+
+        fun fromItemNameOrInternalName(itemName: String): NEUInternalName =
+            fromItemNameOrNull(itemName) ?: itemName.asInternalName()
+
+        private fun getCoins(itemName: String): NEUInternalName? = if (isCoins(itemName)) SKYBLOCK_COIN else null
+
+        private fun isCoins(itemName: String): Boolean =
+            itemName.lowercase().let {
+                when (it) {
+                    "coin", "coins",
+                    "skyblock coin", "skyblock coins",
+                    "skyblock_coin", "skyblock_coins",
+                    -> true
+
+                    else -> false
+                }
+            }
+
 
         fun fromItemName(itemName: String): NEUInternalName = fromItemNameOrNull(itemName) ?: run {
             val name = "itemName:$itemName"
             ItemUtils.addMissingRepoItem(name, "Could not find internal name for $name")
-            return NEUInternalName.MISSING_ITEM
+            return MISSING_ITEM
         }
     }
 
@@ -42,6 +62,7 @@ class NEUInternalName private constructor(private val internalName: String) {
 
     override fun hashCode(): Int = internalName.hashCode()
 
+    @Suppress("WrongEqualsTypeParameter")
     fun equals(other: String) = internalName == other
 
     fun contains(other: String) = internalName.contains(other)
@@ -52,4 +73,6 @@ class NEUInternalName private constructor(private val internalName: String) {
 
     fun replace(oldValue: String, newValue: String) =
         internalName.replace(oldValue.uppercase(), newValue.uppercase()).asInternalName()
+
+    fun isKnownItem(): Boolean = getItemStackOrNull() != null || this == SKYBLOCK_COIN
 }
