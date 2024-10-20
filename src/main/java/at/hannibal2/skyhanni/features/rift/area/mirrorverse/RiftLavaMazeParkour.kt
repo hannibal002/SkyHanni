@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -19,6 +20,8 @@ object RiftLavaMazeParkour {
 
     private val config get() = RiftAPI.config.area.mirrorverse.lavaMazeConfig
     private var parkourHelper: ParkourHelper? = null
+    private var inMirrorVerse = false
+
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
@@ -75,5 +78,10 @@ object RiftLavaMazeParkour {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inMirrorVerse = event.area == "Mirrorverse"
+    }
+
+    fun isEnabled() = RiftAPI.inRift() && inMirrorVerse && config.enabled
 }
