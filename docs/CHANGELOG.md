@@ -79,12 +79,19 @@
 #### Misc Improvements
 
 + Added distance display to waypoints created by Patcher's Send Coords feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2704)
++ Made multiple improvements to the Custom Scoreboard. - Empa, j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2162)
+    +  Added an option to align the text.
+    +  Improved overall performance.
+    +  Added the Party Leader to the Party Element.
+    +  Separated title and footer alignment.
+    +  Added a custom alpha footer.
 
 ### Fixes
 
 #### Dungeon Fixes
 
 + Fixed Magical Power resetting to 0 when opening "Your Bags" in the Catacombs. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2710)
++ Fixed a rare case where invisible Fels were highlighted even though they shouldn't. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2746)
 
 #### Fishing Fixes
 
@@ -107,6 +114,7 @@
 + Fixed Ashfang Blazes sometimes being highlighted with the wrong color. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
 + Fixed Ashfang Reset Cooldown counting in the wrong direction. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
 + Fixed Millennia-Aged Blaze not being highlighted by the Area Boss Highlight feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2707)
++ Fixed a small typo in Bestiary Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2748)
 
 #### Custom Scoreboard Fixes
 
@@ -120,6 +128,7 @@
 #### Garden Fixes
 
 + Fixed farming weight not disappearing when the config option is off. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2731)
++ Fixed New Visitor Ping triggering too late if the player is actively farming. - Luna (https://github.com/hannibal002/SkyHanni/pull/2767)
 
 #### Crimson Isle Fixes
 
@@ -137,9 +146,18 @@
 
 + Fixed a crash when attempting to edit the Flowstate Helper config. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2740)
 
+#### Chocolate Factory Fixes
+
++ Fixed an issue where the Time Tower Usage Warning would notify you after expiration or when you have 0 charges. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2751)
+
+#### Event Fixes
+
++ Fixed Fear Stat Display. - Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2766)
+
 #### Misc Fixes
 
 + Fixed SkyHanni messages being sent twice. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2736)
++ Fixed the formatting of negative durations. - Empa (https://github.com/hannibal002/SkyHanni/pull/2726)
 
 ### Technical Details
 
