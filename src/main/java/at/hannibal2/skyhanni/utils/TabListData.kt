@@ -18,17 +18,16 @@ import com.google.common.collect.Ordering
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
-//#if MC<1.12
-import net.minecraft.world.WorldSettings
-//#else
-//$$ import net.minecraft.world.GameType
-//#endif
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
-
+//#if MC<1.12
+import net.minecraft.world.WorldSettings
+//#else
+//$$ import net.minecraft.world.GameType
+//#endif
 
 @SkyHanniModule
 object TabListData {

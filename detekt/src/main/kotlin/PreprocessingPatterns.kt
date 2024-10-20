@@ -11,7 +11,6 @@ enum class PreprocessingPattern(val text: String) {
     val asComment: String
         get() = "//$text"
 
-
     companion object {
         fun String.containsPreprocessingPattern(): Boolean {
             return entries.any { this.contains(it.text) }
