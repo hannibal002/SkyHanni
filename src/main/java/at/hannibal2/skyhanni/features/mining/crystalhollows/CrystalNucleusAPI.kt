@@ -59,7 +59,7 @@ object CrystalNucleusAPI {
         message.takeIf { it.startsWith("    ") }?.substring(4)?.let { lootMessage ->
             ItemUtils.readItemAmount(lootMessage)?.let { pair ->
                 loot.add(
-                    when(pair.first) {
+                    when (pair.first) {
                         // Assume enchanted books are Fortune IV books
                         "§fEnchanted" -> "§9Fortune IV" to pair.second
                         "§fEnchanted Book" -> "§9Fortune IV" to pair.second

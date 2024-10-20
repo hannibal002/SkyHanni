@@ -25,7 +25,7 @@ object CrystalNucleusProfitPer {
         "ROBOTRON_REFLECTOR",
         "SUPERLITE_MOTOR",
         "SYNTHETIC_HEART",
-    ).map { it.asInternalName()}
+    ).map { it.asInternalName() }
 
     @HandleEvent(priority = HIGH)
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {

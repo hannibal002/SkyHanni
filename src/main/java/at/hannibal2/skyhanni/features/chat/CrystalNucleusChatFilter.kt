@@ -99,13 +99,11 @@ object CrystalNucleusChatFilter {
     fun block(message: String): NucleusChatFilterRes? {
         if (!isEnabled()) return null
 
-        blockCrystalCollected(message)?.let { return it }
-        blockCrystalPlaced(message)?.let { return it }
-        blockRunCompleted(message)?.let { return it }
-        blockNonToolScavenge(message)?.let { return it }
-        blockNPC(message)?.let { return it }
-
-        return null
+        return blockCrystalCollected(message)
+            ?: blockCrystalPlaced(message)
+            ?: blockRunCompleted(message)
+            ?: blockNonToolScavenge(message)
+            ?: blockNPC(message)
     }
 
     private fun blockCrystalCollected(message: String): NucleusChatFilterRes? {

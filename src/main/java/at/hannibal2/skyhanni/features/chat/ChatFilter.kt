@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import tv.twitch.chat.Chat
 import java.util.regex.Pattern
 
 @SkyHanniModule
