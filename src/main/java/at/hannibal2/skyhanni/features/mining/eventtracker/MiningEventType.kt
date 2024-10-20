@@ -71,7 +71,6 @@ enum class MiningEventType(
         },
     ),
 
-    @Suppress("MaxLineLength")
     GOBLIN_RAID(
         "GOBLIN RAID", "Raid", 5.minutes, 'c', true,
         ItemUtils.createSkull(
