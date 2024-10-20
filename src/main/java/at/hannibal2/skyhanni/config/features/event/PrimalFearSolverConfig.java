@@ -19,4 +19,9 @@ public class PrimalFearSolverConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean publicSpeaking = false;
+
+    @Expose
+    @ConfigOption(name = "Solve Key", desc = "Press this key to solve the Primal Fear.")
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int keyBindSolve = Keyboard.KEY_NONE;
 }

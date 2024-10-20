@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -69,23 +70,48 @@ object TheGreatSpook {
         "§d§lQUICK MATHS! §r§7Solve: §r§e(?<math>.*)",
     )
 
+    private val mathFearCompletionPattern by RepoPattern.pattern(
+        "chat.math.completion",
+        "§d§lQUICK MATHS! §r§e(?<name>.*) §r§7answered correctly in §r§a(?<time>\\d+)s§r§e!",
+    )
+
+    // §d§lQUICK MATHS! §r§ePlasticEating §r§7answered correctly in §r§a2s§r§e!
+
     private val speakingFearMessagePattern by RepoPattern.pattern(
         "chat.speaking",
         "§4\\[FEAR] Public Speaking Demon§r§f: (Speak|Say something interesting) (?<name>.*)!",
     )
 
+    private val speakingFearCompletionPattern by RepoPattern.pattern(
+        "chat.speaking.completion",
+        "§4\\[FEAR] Public Speaking Demon§r§f: Woohoo! Thank you for speaking out loud!",
+    )
+
+    // §4[FEAR] Public Speaking Demon§r§f: Woohoo! Thank you for speaking out loud!
+
+    private val fearTimeOutPattern by RepoPattern.pattern(
+        "chat.fear.timeout",
+        "§5§lFEAR. §r§eYour fear overcame you and ran away!",
+    )
+
+    // §5§lFEAR. §r§eYour fear overcame you and ran away!
+
+    var fearComplete: Boolean = false
+    var stringToSend: String = ""
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (isMathSolverEnabled()) {
             mathFearMessagePattern.matchMatcher(event.message) {
+                fearComplete = false
                 val math = group("math")
-                val result = NEUCalculator.calculateOrNull(math)
+                val result = NEUCalculator.calculateOrNull(math)?.toInt()
+                stringToSend = result.toString()
                 DelayedRun.runNextTick {
-                    val feature: KMutableProperty0<*> = config.primalFearSolver::math
                     if (result != null) {
                         ChatUtils.clickToActionOrDisable(
                             "The result is: $result",
-                            feature,
+                            option = config.primalFearSolver::math,
                             actionName = "Send the result",
                             action =
                             {
@@ -99,11 +125,19 @@ object TheGreatSpook {
             }
         }
 
+        if (isMathSolverEnabled()) {
+            mathFearCompletionPattern.matchMatcher(event.message) {
+                fearComplete = true
+                stringToSend = ""
+            }
+        }
+
         if (isSpeakingSolverEnabled()) {
             speakingFearMessagePattern.matchMatcher(event.message) {
+                fearComplete = false
                 DelayedRun.runNextTick {
                     val feature: KMutableProperty0<*> = config.primalFearSolver::publicSpeaking
-                    val stringToSend = "I looove SkyHanni! " + StringUtils.generateRandomString(4)
+                    stringToSend = "I looove SkyHanni! " + StringUtils.generateRandomString(4)
                     ChatUtils.clickToActionOrDisable(
                         "Click to send a random string to complete the Primal Fear",
                         feature,
@@ -116,6 +150,29 @@ object TheGreatSpook {
                 }
             }
         }
+
+        if (isSpeakingSolverEnabled()) {
+            speakingFearCompletionPattern.matchMatcher(event.message) {
+                fearComplete = true
+                stringToSend = ""
+            }
+        }
+
+        fearTimeOutPattern.matchMatcher(event.message) {
+            fearComplete = true
+            stringToSend = ""
+        }
+    }
+
+    @SubscribeEvent
+    fun onKey(event: LorenzKeyPressEvent) {
+        if (!isAnySolverEnabled()) return
+        if (event.keyCode != config.primalFearSolver.keyBindSolve) return
+
+        if (!fearComplete) {
+            HypixelCommands.allChat(stringToSend)
+            fearComplete = true
+        }
     }
 
     private fun isTimerEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearTimer
@@ -126,4 +183,6 @@ object TheGreatSpook {
 
     private fun isMathSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.math
     private fun isSpeakingSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.publicSpeaking
+
+    private fun isAnySolverEnabled(): Boolean = isMathSolverEnabled() || isSpeakingSolverEnabled()
 }
