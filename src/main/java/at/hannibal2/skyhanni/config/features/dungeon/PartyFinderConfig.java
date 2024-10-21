@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.dungeon;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -41,6 +42,31 @@ public class PartyFinderConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean markIneligibleGroups = true;
+
+    @Expose
+    @ConfigOption(name = "Mark Selected Class", desc = "Highlight groups that has selected class.")
+    @ConfigEditorDropdown
+    public ClassEntry markClass = ClassEntry.NONE;
+
+    public enum ClassEntry {
+        NONE("None"),
+        TANK("Tank"),
+        HEALER("Healer"),
+        MAGE("Mage"),
+        ARCHER("Archer"),
+        BERSERK("Berserk"),
+        ;
+        private final String str;
+
+        ClassEntry(String str) {
+            this.str = str;
+        }
+
+        @Override
+        public String toString() {
+            return str;
+        }
+    }
 
     @Expose
     @ConfigOption(name = "Mark Missing Class", desc = "Highlight groups that don't currently have any members of your selected dungeon class.")
