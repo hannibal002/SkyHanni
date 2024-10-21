@@ -38,6 +38,8 @@ object ComputerEnvDebug {
 
         event.addData {
             add("Unknown launcher!")
+            val launcherBrand = System.getProperty("minecraft.launcher.brand")
+            add("System property of 'minecraft.launcher.brand': '$launcherBrand'")
             add("firstStack: '$firstStack'")
         }
     }
