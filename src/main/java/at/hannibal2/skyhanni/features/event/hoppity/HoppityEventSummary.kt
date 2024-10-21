@@ -41,13 +41,14 @@ object HoppityEventSummary {
 
     private data class StatString(val string: String, val headed: Boolean = true)
 
+    private fun guiEnabled() = config.eventSummary.liveDisplay && HoppityAPI.isHoppityEvent() && LorenzUtils.inSkyBlock
+
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!config.eventSummary.liveDisplay || !HoppityAPI.isHoppityEvent()) return
-
-        val currentYear = SkyBlockTime.now().year
+        if (!guiEnabled()) return
         val stats = getYearStats().first ?: return
 
+        val currentYear = SkyBlockTime.now().year
         val cardRenderable = Renderable.verticalContainer(
             getStatsStrings(stats, currentYear).map {
                 Renderable.string(it.string)
