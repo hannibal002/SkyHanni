@@ -93,7 +93,7 @@ object GuiEditManager {
     @JvmStatic
     fun openGuiPositionEditor(hotkeyReminder: Boolean) {
         SkyHanniMod.screenToOpen = GuiPositionEditor(
-            currentPositions.values().toList(),
+            currentPositions.values.toList(),
             2,
             Minecraft.getMinecraft().currentScreen as? GuiContainer,
         )
