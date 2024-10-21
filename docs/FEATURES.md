@@ -231,6 +231,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a star on Enchanted Books with an Ultimate Enchant.
 + Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
     +  In Focus Mode, only the name of the item is displayed instead of the full description.
++ Added WASD keybinds to the Abiphone Snake Game. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1968)
 
 </details>
 <details open><summary>
@@ -1419,6 +1420,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Use `/shcarry` to add carries to a customer, and set a price for a slayer boss.
     + Automatically counts slayer bosses you carry.
     + Automatically tracks coins received from customers via `/trade`.
++ Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
+    +  Tracks items and profit while using the Draconic Altar in the End.
 
 </details>
 <details open><summary>
