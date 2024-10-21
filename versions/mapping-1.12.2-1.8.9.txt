@@ -1,6 +1,8 @@
 
 net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.renderer.entity.RendererLivingEntity
 
+net.minecraft.client.renderer.BufferBuilder net.minecraft.client.renderer.WorldRenderer
+
 # Workaround for it not letting stackSize be mapped to count.
 temp.net.minecraft.item.ItemStack net.minecraft.item.ItemStack
 temp.net.minecraft.item.ItemStack count stackSize
@@ -14,6 +16,9 @@ net.minecraft.network.play.client.CPacketPlayer net.minecraft.network.play.clien
 net.minecraft.network.play.client.CPacketPlayerDigging net.minecraft.network.play.client.C07PacketPlayerDigging
 net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock net.minecraft.network.play.client.C08PacketPlayerBlockPlacement
 net.minecraft.network.play.client.CPacketUseEntity net.minecraft.network.play.client.C02PacketUseEntity
+
+net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock getDirection() getPlacedBlockDirection()
+net.minecraft.network.play.client.CPacketPlayerTryUseItemOnBlock getPos() getPosition()
 
 net.minecraft.network.play.server.SPacketAnimation net.minecraft.network.play.server.S0BPacketAnimation
 net.minecraft.network.play.server.SPacketBlockChange net.minecraft.network.play.server.S23PacketBlockChange
@@ -51,12 +56,15 @@ net.minecraft.network.play.server.SPacketWorldBorder net.minecraft.network.play.
 
 net.minecraft.util.SoundCategory net.minecraft.client.audio.SoundCategory
 
-net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
-net.minecraft.util.math.BlockPos net.minecraft.util.BlockPos
 net.minecraft.util.math.AxisAlignedBB net.minecraft.util.AxisAlignedBB
-net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
-net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+net.minecraft.util.math.BlockPos net.minecraft.util.BlockPos
+net.minecraft.util.math.MathHelper net.minecraft.util.MathHelper
+net.minecraft.util.math.RayTraceResult net.minecraft.util.MovingObjectPosition
 net.minecraft.util.math.Rotations net.minecraft.util.Rotations
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+net.minecraft.util.math.Vec3d net.minecraft.util.Vec3
+
+net.minecraft.util.math.RayTraceResult$Type net.minecraft.util.math.RayTraceResult$MovingObjectType
 
 net.minecraft.util.text.TextComponentString net.minecraft.util.ChatComponentText
 net.minecraft.util.text.TextComponentTranslation net.minecraft.util.ChatComponentTranslation
