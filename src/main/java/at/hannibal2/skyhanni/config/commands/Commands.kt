@@ -60,6 +60,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
 import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
@@ -397,6 +398,11 @@ object Commands {
             description = "Resets the Fossil Excavator Profit Tracker"
             category = CommandCategory.USERS_RESET
             callback { ExcavatorProfitTracker.resetCommand() }
+        }
+        event.register("shresetcrystalnucleustracker") {
+            description = "Resets the Crystal Nucleus Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { CrystalNucleusTracker.resetCommand() }
         }
 
         // non trackers

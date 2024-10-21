@@ -11,7 +11,12 @@ public class FilterTypesConfig {
     @Expose
     @ConfigOption(name = "Powder Mining", desc = "")
     @Accordion
-    public PowderMiningFilterConfig powderMiningFilter = new PowderMiningFilterConfig();
+    public PowderMiningConfig powderMining = new PowderMiningConfig();
+
+    @Expose
+    @ConfigOption(name = "Crystal Nucleus", desc = "")
+    @Accordion
+    public CrystalNucleusConfig crystalNucleus = new CrystalNucleusConfig();
 
     @Expose
     @ConfigOption(name = "Stash Messages", desc = "")
