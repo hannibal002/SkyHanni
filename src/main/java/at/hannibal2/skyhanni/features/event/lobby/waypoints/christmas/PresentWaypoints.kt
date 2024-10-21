@@ -71,13 +71,8 @@ object PresentWaypoints {
     private fun handlePresentFound() {
         presentSet?.minByOrNull { it.position.distanceSqToPlayer() }?.let { present ->
             present.isFound = true
-            markEntranceAsFound(present)
             if (closest == present) closest = null
         }
-    }
-
-    private fun markEntranceAsFound(present: EventWaypoint) {
-        presentEntranceSet?.find { present.name == it.name }?.let { it.isFound = true }
     }
 
     private fun handleAllPresentsFound() {
@@ -105,13 +100,16 @@ object PresentWaypoints {
     }
 
     private fun LorenzRenderWorldEvent.drawWaypoints(
-        waypoints: Set<EventWaypoint>, shouldDraw: Boolean, color: LorenzColor, prefix: String,
+        waypoints: Set<EventWaypoint>,
+        shouldDraw: Boolean,
+        color: LorenzColor,
+        prefix: String,
     ) {
         if (!shouldDraw) return
         for (waypoint in waypoints) {
             if (!waypoint.shouldShow()) continue
             this.drawWaypointFilled(waypoint.position, color.toColor())
-            this.drawDynamicText(waypoint.position, "$prefix${waypoint.name}", 1.5)
+            this.drawDynamicText(waypoint.position, "${prefix}Present", 1.5)
         }
     }
 
@@ -121,7 +119,6 @@ object PresentWaypoints {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventWaypointsJson>("EventWaypoints")
         presentLocations = loadEventWaypoints(data.presents)
-        presentEntranceLocations = loadEventWaypoints(data.presentsEntrances)
     }
 
     private fun isEnabled(): Boolean =
