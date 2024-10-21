@@ -199,6 +199,8 @@ object EstimatedItemValue {
         lastToolTipTime = System.currentTimeMillis()
     }
 
+    // TODO: Refactor this code to not return listOf() 20 times
+    @Suppress("ReturnCount")
     private fun draw(stack: ItemStack): List<Renderable> {
         val internalName = stack.getInternalNameOrNull() ?: return listOf()
 
