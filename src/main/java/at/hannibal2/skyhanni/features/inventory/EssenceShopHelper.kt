@@ -153,53 +153,55 @@ object EssenceShopHelper {
     }
 
     private fun regenerateItemStack() {
-        infoItemStack = currentProgress?.let { progress ->
-            createItemStack(
-                "GOLD_NUGGET".asInternalName().getItemStack().item,
-                "§bRemaining $currentEssenceType Essence Upgrades",
-                buildList {
-                    val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
-                    if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
-                    else {
-                        add("")
-                        remaining.forEach {
-                            add(
-                                "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
-                                    it.remainingCosts.sum().addSeparators()
-                                }",
-                            )
-                        }
-                        add("")
-
-                        val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
-                        add("§7Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
-                        essenceNeeded = upgradeTotal - essenceOwned
-                        if (essenceOwned > 0) add("§7Essence Owned: §8${essenceOwned.addSeparators()}")
-                        if (essenceNeeded > 0) {
-                            add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
-                            val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
-
-                            val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
-                            val totalInstantPrice = bzInstantPrice * essenceNeeded
-                            add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
-
-                            val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
-                            val totalOrderPrice = bzOrderPrice * essenceNeeded
-                            add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
-
-                            add("")
-                            add("§e§oClick to open Bazaar!")
-                        } else addAll(listOf("", "§e§oYou have enough essence!"))
-                    }
-
-                    if (progress.nonRepoUpgrades.any()) {
-                        add("")
-                        add("§cFound upgrades not in repo§c§l:")
-                        progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
-                    }
+        val progress = currentProgress ?: return
+        val lore = buildList {
+            val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
+            if (remaining.isEmpty()) {
+                add("§a§lAll upgrades purchased!")
+            } else {
+                add("")
+                remaining.forEach {
+                    add(
+                        "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
+                            it.remainingCosts.sum().addSeparators()
+                        }",
+                    )
                 }
-            )
+                add("")
+
+                val upgradeTotal = remaining.sumOf { it.remainingCosts.sum() }
+                add("§7Sum Essence Needed: §8${upgradeTotal.addSeparators()}")
+                essenceNeeded = upgradeTotal - essenceOwned
+                if (essenceOwned > 0) add("§7Essence Owned: §8${essenceOwned.addSeparators()}")
+                if (essenceNeeded > 0) {
+                    add("§7Additional Essence Needed: §8${essenceNeeded.addSeparators()}")
+                    val essenceItem = "ESSENCE_${currentEssenceType.uppercase()}".asInternalName()
+
+                    val bzInstantPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_BUY)
+                    val totalInstantPrice = bzInstantPrice * essenceNeeded
+                    add("  §7BZ Instant Buy: §6${totalInstantPrice.addSeparators()}")
+
+                    val bzOrderPrice = essenceItem.getPrice(ItemPriceSource.BAZAAR_INSTANT_SELL)
+                    val totalOrderPrice = bzOrderPrice * essenceNeeded
+                    add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
+
+                    add("")
+                    add("§e§oClick to open Bazaar!")
+                } else addAll(listOf("", "§e§oYou have enough essence!"))
+            }
+
+            if (progress.nonRepoUpgrades.any()) {
+                add("")
+                add("§cFound upgrades not in repo§c§l:")
+                progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
+            }
         }
+        infoItemStack = createItemStack(
+            // TODO cache
+            "GOLD_NUGGET".asInternalName().getItemStack().item,
+            "§bRemaining $currentEssenceType Essence Upgrades",
+            lore,
+        )
     }
 
     private fun processInventoryEvent(event: InventoryOpenEvent) {
@@ -250,13 +252,16 @@ object EssenceShopHelper {
          * Filter out items that fall outside the bounds of 10 - 33
          */
         val upgradeStacks = inventoryItems.filter { it.key in 10..33 && it.value.item != null }
+        // TODO remove duplicate code fragment with CarnivalShopHelper
         val purchasedUpgrades: MutableMap<String, Int> = buildMap {
-            upgradeStacks.forEach {
-                essenceUpgradePattern.matchMatcher(it.value.displayName) {
+            for (value in upgradeStacks.values) {
+                // Right now Carnival and Essence Upgrade patterns are 'in-sync'
+                // This may change in the future, and this would then need its own pattern
+                essenceUpgradePattern.matchMatcher(value.displayName) {
                     val upgradeName = groupOrNull("upgrade") ?: return
                     val nextUpgradeRoman = groupOrNull("tier") ?: return
                     val nextUpgrade = nextUpgradeRoman.romanToDecimal()
-                    val isMaxed = it.value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
+                    val isMaxed = value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
                     put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
                 }
             }

@@ -96,8 +96,7 @@ object CarnivalShopHelper {
         if (currentProgress == null ||
             !repoEventShops.any {
                 it.shopName.equals(event.inventory.name, ignoreCase = true)
-            }
-        ) return
+            }) return
         shopSpecificInfoItemStack.let { event.replace(it) }
     }
 
@@ -135,21 +134,18 @@ object CarnivalShopHelper {
     }
 
     private fun checkSavedProgress() {
-        ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress?.let { storage ->
-            storage.keys.forEach { key ->
-                if (!repoEventShops.any { shop -> shop.shopName.equals(key, ignoreCase = true) }) {
-                    storage.remove(key)
-                }
+        val storage = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress ?: return
+        for (key in storage.keys) {
+            if (!repoEventShops.any { shop -> shop.shopName.equals(key, ignoreCase = true) }) {
+                storage.remove(key)
             }
         }
     }
 
     private fun saveProgress() {
-        ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress?.let { storage ->
-            currentProgress?.let { progress ->
-                storage[progress.shopName] = progress.purchasedUpgrades
-            }
-        }
+        val storage = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress ?: return
+        val progress = currentProgress ?: return
+        storage[progress.shopName] = progress.purchasedUpgrades
     }
 
     private fun MutableList<String>.addNeededRemainingTokens(cost: Int, extraFormatting: String? = null) {
@@ -163,62 +159,66 @@ object CarnivalShopHelper {
 
     private fun regenerateOverviewItemStack() {
         if (repoEventShops.isEmpty()) return
-        overviewInfoItemStack = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress?.let { storage ->
-            createItemStack(
-                "NAME_TAG".asInternalName().getItemStack().item,
-                "§bRemaining Event Shop Token Upgrades",
-                buildList {
-                    add("")
-                    var sumTokensNeeded = 0
-                    var foundShops = 0
-                    repoEventShops.forEach { repoShop ->
-                        storage[repoShop.shopName]?.let { purchasedUpgrades ->
-                            foundShops++
-                            val shopProgress = EventShopProgress(repoShop.shopName, purchasedUpgrades)
-                            when (shopProgress.remainingUpgradeSum) {
-                                0 -> add("§a${repoShop.shopName}§7: §aall upgrades purchased!")
-                                else -> add("§7${repoShop.shopName}: §8${shopProgress.remainingUpgradeSum.addSeparators()} tokens needed")
-                            }
-                            sumTokensNeeded += shopProgress.remainingUpgradeSum
-                        } ?: add("§7${repoShop.shopName}: §copen shop to load...")
-                    }
-                    val extraFormatting = if (foundShops != repoEventShops.size) "*" else ""
-                    sumTokensNeeded.takeIf { it > 0 }?.let { addNeededRemainingTokens(it, extraFormatting) }
+        val storage = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress ?: return
+        val lore = buildList {
+            add("")
+            var sumTokensNeeded = 0
+            var foundShops = 0
+            for (repoShop in repoEventShops) {
+                val purchasedUpgrades = storage[repoShop.shopName] ?: run {
+                    add("§7${repoShop.shopName}: §copen shop to load...")
+                    continue
                 }
-            )
+                foundShops++
+                val shopProgress = EventShopProgress(repoShop.shopName, purchasedUpgrades)
+                when (shopProgress.remainingUpgradeSum) {
+                    0 -> add("§a${repoShop.shopName}§7: §aall upgrades purchased!")
+                    else -> add("§7${repoShop.shopName}: §8${shopProgress.remainingUpgradeSum.addSeparators()} tokens needed")
+                }
+                sumTokensNeeded += shopProgress.remainingUpgradeSum
+            }
+            val extraFormatting = if (foundShops != repoEventShops.size) "*" else ""
+            sumTokensNeeded.takeIf { it > 0 }?.let { addNeededRemainingTokens(it, extraFormatting) }
         }
+        overviewInfoItemStack = createItemStack(
+            // TODO cache
+            "NAME_TAG".asInternalName().getItemStack().item,
+            "§bRemaining Event Shop Token Upgrades",
+            lore,
+        )
     }
 
     private fun regenerateShopSpecificItemStack() {
-        shopSpecificInfoItemStack = currentProgress?.let { progress ->
-            createItemStack(
-                "NAME_TAG".asInternalName().getItemStack().item,
-                "§bRemaining $currentEventType Token Upgrades",
-                buildList {
-                    val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
-                    if (remaining.isEmpty()) add("§a§lAll upgrades purchased!")
-                    else {
-                        add("")
-                        remaining.forEach {
-                            add(
-                                "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
-                                    it.remainingCosts.sum().addSeparators()
-                                }",
-                            )
-                        }
-                        val upgradeTotal = progress.remainingUpgradeSum
-                        tokensNeeded = upgradeTotal - tokensOwned
-                        upgradeTotal.takeIf { it > 0 }?.let { addNeededRemainingTokens(it) }
-                    }
-
-                    if (progress.nonRepoUpgrades.any()) {
-                        add("")
-                        add("§cFound upgrades not in repo§c§l:")
-                        progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
-                    }
+        val progress = currentProgress ?: return
+        val lore = buildList {
+            val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
+            if (remaining.isEmpty()) {
+                add("§a§lAll upgrades purchased!")
+            } else {
+                add("")
+                remaining.forEach {
+                    add(
+                        "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
+                            it.remainingCosts.sum().addSeparators()
+                        }",
+                    )
                 }
-            )
+                val upgradeTotal = progress.remainingUpgradeSum
+                tokensNeeded = upgradeTotal - tokensOwned
+                upgradeTotal.takeIf { it > 0 }?.let { addNeededRemainingTokens(it) }
+            }
+
+            if (progress.nonRepoUpgrades.any()) {
+                add("")
+                add("§cFound upgrades not in repo§c§l:")
+                progress.nonRepoUpgrades.forEach { add("  §4${it.key}") }
+            }
         }
+        shopSpecificInfoItemStack = createItemStack(
+            "NAME_TAG".asInternalName().getItemStack().item,
+            "§bRemaining $currentEventType Token Upgrades",
+            lore,
+        )
     }
 
     private fun processInventoryEvent(event: InventoryOpenEvent) {
@@ -247,15 +247,16 @@ object CarnivalShopHelper {
          * Filter out items outside of these bounds
          */
         val upgradeStacks = inventoryItems.filter { it.key in 11..15 && it.value.item != null }
+        // TODO remove duplicate code fragment with EssenceShopHelper
         val purchasedUpgrades: MutableMap<String, Int> = buildMap {
-            upgradeStacks.forEach {
+            for (value in upgradeStacks.values) {
                 // Right now Carnival and Essence Upgrade patterns are 'in-sync'
                 // This may change in the future, and this would then need its own pattern
-                essenceUpgradePattern.matchMatcher(it.value.displayName) {
+                essenceUpgradePattern.matchMatcher(value.displayName) {
                     val upgradeName = groupOrNull("upgrade") ?: return
                     val nextUpgradeRoman = groupOrNull("tier") ?: return
                     val nextUpgrade = nextUpgradeRoman.romanToDecimal()
-                    val isMaxed = it.value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
+                    val isMaxed = value.getLore().any { loreLine -> maxedUpgradeLorePattern.matches(loreLine) }
                     put(upgradeName, if (isMaxed) nextUpgrade else nextUpgrade - 1)
                 }
             }
