@@ -850,7 +850,7 @@ object EstimatedItemValueCalculator {
     }
 
     private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
-    ?: "no tag compound"
+        ?: "no tag compound"
 
     private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName()
