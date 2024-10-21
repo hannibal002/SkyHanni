@@ -54,3 +54,8 @@ net.minecraft.client.Minecraft:
         annotateParameter 0 org.jetbrains.annotations.Nullable
     getMusicTicker():
         annotate org.jetbrains.annotations.NotNull
+net.minecraft.util.ChatStyle:
+    getChatClickEvent():
+        annotate org.jetbrains.annotations.Nullable
+    getChatHoverEvent():
+        annotate org.jetbrains.annotations.Nullable
