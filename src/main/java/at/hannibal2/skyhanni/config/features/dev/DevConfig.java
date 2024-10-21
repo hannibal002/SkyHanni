@@ -116,6 +116,11 @@ public class DevConfig {
     public boolean numberFormatOverride = false;
 
     @Expose
+    @ConfigOption(name = "Use Hypixel Mod API", desc = "Use the Hypixel Mod API for better location data.")
+    @ConfigEditorBoolean
+    public boolean hypixelModApi = true;
+
+    @Expose
     @Category(name = "Minecraft Console", desc = "Minecraft Console Settings")
     public MinecraftConsoleConfig minecraftConsoles = new MinecraftConsoleConfig();
 
