@@ -55,8 +55,12 @@ object HoppityRabbitTheFishChecker {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        rabbitTheFishIndex?.let {
-            InventoryUtils.getItemsInOpenChest()[it] highlight LorenzColor.RED
+        rabbitTheFishIndex?.let { index ->
+            InventoryUtils.getItemsInOpenChest().firstOrNull {
+                it.slotIndex == index
+            }?.let {
+                it highlight LorenzColor.RED
+            }
         }
     }
 
@@ -80,7 +84,7 @@ object HoppityRabbitTheFishChecker {
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
             event.cancel()
             SoundUtils.playErrorSound()
-        } else if (rabbitTheFishIndex == event.slot.slotNumber) {
+        } else if (rabbitTheFishIndex == event.slot.slotIndex) {
             rabbitTheFishIndex = null
         }
     }
