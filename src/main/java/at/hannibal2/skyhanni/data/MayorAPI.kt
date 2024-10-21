@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
+import at.hannibal2.skyhanni.utils.StringUtils.pluralize
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -98,14 +99,14 @@ object MayorAPI {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val dispatcher = Dispatchers.IO
 
-    private var rawMayorData: MayorJson? = null
+    var rawMayorData: MayorJson? = null
     private var candidates = mapOf<Int, MayorCandidate>()
 
     var nextMayorTimestamp = SimpleTimeMark.farPast()
         private set
 
-    private const val ELECTION_END_MONTH = 3 // Late Spring
-    private const val ELECTION_END_DAY = 27
+    const val ELECTION_END_MONTH = 3 // Late Spring
+    const val ELECTION_END_DAY = 27
 
     /**
      * @param input: The name of the mayor
@@ -230,7 +231,11 @@ object MayorAPI {
             val currentMayorName = data.mayor.name
             if (lastMayor?.name != currentMayorName) {
                 currentMayor = setAssumeMayorJson(currentMayorName, data.mayor.perks)
-                currentMinister = data.mayor.minister?.let { setAssumeMayorJson(it.name, listOf(it.perk)) }
+                ChatUtils.debug("Mayor changed to $currentMayorName with ${pluralize(data.mayor.perks.size, "perk", withNumber = true)}")
+                currentMinister = data.mayor.minister?.let {
+                    ChatUtils.debug("Minister changed to ${it.name} with 1 perk")
+                    setAssumeMayorJson(it.name, listOf(it.perk))
+                }
             }
         }
     }
@@ -259,7 +264,7 @@ object MayorAPI {
         event.addIrrelevant {
             add("Current Mayor: ${currentMayor?.name ?: "Unknown"}")
             add("Active Perks: ${currentMayor?.activePerks}")
-            add("Last Update: ${lastUpdate.formattedDate("EEEE, MMM d h:mm a")} (${lastUpdate.passedSince()} ago)")
+            add("Last Update: ${lastUpdate.formattedDate()} (${lastUpdate.passedSince()} ago)")
             add("Time Till Next Mayor: ${nextMayorTimestamp.timeUntil()}")
             add("Current Minister: ${currentMinister?.name ?: "Unknown"}")
             add("Current Minister Perk: ${currentMinister?.activePerks}")
