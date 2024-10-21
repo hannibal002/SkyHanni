@@ -1,11 +1,16 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.client.Minecraft
@@ -142,4 +147,23 @@ object CustomLinesGui : GuiScreen() {
             CustomScoreboard.customLineConfig.customLine1 = textBox.finalText().replace("§", "&")
         }
     }
+
+    @HandleEvent
+    fun onCommand(event: CommandRegistrationEvent) {
+        event.register("shcustomlines") {
+            aliases = listOf("shcustom", "shcl")
+            description = "Opens the Custom Lines editor."
+            callback { openGui() }
+        }
+    }
+
+    @JvmStatic
+    fun openGui() {
+        if (LorenzUtils.inSkyBlock) {
+            SkyHanniMod.screenToOpen = CustomLinesGui
+        } else {
+            ChatUtils.chat("You must be in SkyBlock to use this command.")
+        }
+    }
+
 }
