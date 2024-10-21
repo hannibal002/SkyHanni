@@ -255,6 +255,10 @@ object EstimatedItemValueCalculator {
                         "internal name" to stack.getInternalName(),
                         "itemRarity" to itemRarity,
                         "item name" to stack.name,
+                        "item nbt" to {
+                            stack.tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
+                                ?: "no tag compound"
+                        }
                     )
                     return null
                 }
@@ -271,6 +275,10 @@ object EstimatedItemValueCalculator {
                 "internal name" to stack.getInternalName(),
                 "item name" to stack.name,
                 "reforgeStone" to reforgeStone,
+                "item nbt" to {
+                    stack.tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
+                        ?: "no tag compound"
+                }
             )
             null
         }
