@@ -55,13 +55,8 @@ object HoppityRabbitTheFishChecker {
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
-        rabbitTheFishIndex?.let { index ->
-            InventoryUtils.getItemsInOpenChest().firstOrNull {
-                it.slotIndex == index
-            }?.let {
-                it highlight LorenzColor.RED
-            }
-        }
+        val index = rabbitTheFishIndex ?: return
+        InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
     }
 
     @SubscribeEvent
