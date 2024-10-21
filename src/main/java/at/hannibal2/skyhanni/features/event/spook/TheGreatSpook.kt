@@ -86,10 +86,9 @@ object TheGreatSpook {
                     if (result != null) {
                         ChatUtils.clickToActionOrDisable(
                             "The result is: $result",
-                            option = config.primalFearSolver::math,
+                            config.primalFearSolver::math,
                             actionName = "Send the result",
-                            action =
-                            {
+                            action = {
                                 HypixelCommands.allChat(result.toString())
                             },
                         )
@@ -107,11 +106,10 @@ object TheGreatSpook {
                     ChatUtils.clickToActionOrDisable(
                         "Click to send a random string to complete the Primal Fear",
                         feature,
-                        "send a random string.",
-                        action =
-                        {
+                        actionName = "send a random string.",
+                        action = {
                             HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
-                        }
+                        },
                     )
                 }
             }
