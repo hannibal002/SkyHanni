@@ -84,7 +84,7 @@ object HoppityRabbitTheFishChecker {
         if (openCfSlotLorePattern.anyMatches(stack.getLore())) {
             event.cancel()
             SoundUtils.playErrorSound()
-        } else if (rabbitTheFishIndex == event.slot.slotNumber) {
+        } else if (rabbitTheFishIndex == event.slot.slotIndex) {
             rabbitTheFishIndex = null
         }
     }
