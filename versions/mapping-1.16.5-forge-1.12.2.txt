@@ -45,6 +45,7 @@ net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.networ
 net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.SPacketSpawnPlayer
 net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.SPacketAnimation
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket net.minecraft.network.play.server.SPacketBlockChange
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecraft.network.play.server.SPacketSetSlot
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
 net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
@@ -60,19 +61,35 @@ net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecra
 net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.SPacketEntityEquipment
 net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket net.minecraft.network.play.server.SPacketTeams
 net.minecraft.network.protocol.game.ClientboundSetScorePacket net.minecraft.network.play.server.SPacketUpdateScore
+net.minecraft.network.protocol.game.ClientboundSoundPacket net.minecraft.network.play.server.SPacketSoundEffect
 net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.SPacketPlayerListHeaderFooter
+net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket net.minecraft.network.play.server.SPacketCollectItem
 net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.SPacketEntityTeleport
 net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.SPacketEntityProperties
 net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.SPacketEntityEffect
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.SPacketTitle
 
 net.minecraft.network.protocol.game.ClientboundAddMobPacket getId() getEntityID()
+
 net.minecraft.network.protocol.game.ClientboundAddPlayerPacket getEntityId() getEntityID()
+
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket getPos() getBlockPosition()
+
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getContainerId() getWindowId()
+
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getX() getXCoordinate()
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getY() getYCoordinate()
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZ() getZCoordinate()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getCount() getParticleCount()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getMaxSpeed() getParticleSpeed()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getXDist() getXOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getYDist() getYOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZDist() getZOffset()
+net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket isOverrideLimiter() isLongDistance()
+
 net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket getEntityIds() getEntityIDs()
 
+net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraft.network.play.client.CPacketClickWindow
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
 net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.CPacketHeldItemChange
@@ -105,6 +122,14 @@ net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState(
 net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
 
 net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
+net.minecraft.world.inventory.Slot getItem() getStack()
+net.minecraft.world.inventory.Slot index slotNumber
+net.minecraft.world.entity.Entity removed isDead
+net.minecraft.world.entity.Entity getId() getEntityId()
+
+net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
+
+net.minecraft.world.entity.item.ItemEntity net.minecraft.entity.item.EntityItem
 
 net.minecraft.world.entity.player.Inventory net.minecraft.entity.player.InventoryPlayer
 
@@ -115,6 +140,10 @@ net.minecraft.world.entity.player.Player isModelPartShown() isWearing()
 net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlayer
 
 net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
+
+net.minecraft.world.entity.projectile.FishingHook net.minecraft.entity.projectile.EntityFishHook
+
+net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
 
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
@@ -127,6 +156,8 @@ net.minecraft.world.level.block.state.BlockState net.minecraft.block.state.IBloc
 net.minecraft.world.phys.Vec3 net.minecraft.util.math.Vec3d
 
 net.minecraft.world.scores.Team$Visibility net.minecraft.scoreboard.Team$EnumVisible
+
+net.minecraftforge.event.TickEvent net.minecraftforge.fml.common.gameevent.TickEvent
 
 net.minecraftforge.eventbus.api.Event net.minecraftforge.fml.common.eventhandler.Event
 net.minecraftforge.eventbus.api.Cancelable net.minecraftforge.fml.common.eventhandler.Cancelable
