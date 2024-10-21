@@ -4,13 +4,16 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.entity.IMerchant
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
+import net.minecraft.world.IWorldNameable
 import kotlin.time.Duration.Companion.seconds
 
 object InventoryUtils {
@@ -119,6 +122,18 @@ object InventoryUtils {
             val stack = slot.stack ?: continue
             this[slot] = stack
         }
+    }
+
+    fun Gui.getTitle() = when (this) {
+        is IWorldNameable -> {
+            name!!
+        }
+
+        is IMerchant -> {
+            displayName.unformattedText!!
+        }
+
+        else -> ""
     }
 
     fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack

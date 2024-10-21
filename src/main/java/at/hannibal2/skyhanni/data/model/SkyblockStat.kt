@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
@@ -45,7 +46,11 @@ enum class SkyblockStat(
     PET_LUCK("§d♣", " Pet Luck: §r§d♣(?<value>.*)", " §d♣ Pet Luck §f(?<value>.*)"),
     FISHING_SPEED("§b☂", " Fishing Speed: §r§b☂(?<value>.*)", " §b☂ Fishing Speed §f(?<value>.*)"),
     DOUBLE_HOOK_CHANCE("§9⚓", " Double Hook Chance: §r§9⚓(?<value>.*)", ""),
-    BONUS_PEST_CHANCE("§2ൠ", " (?:§r§7§m)?Bonus Pest Chance: (?:§r§2)?ൠ(?<value>.*)", " (?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?(?<value>.*)"),
+    BONUS_PEST_CHANCE(
+        "§2ൠ",
+        " (?:§r§7§m)?Bonus Pest Chance: (?:§r§2)?ൠ(?<value>.*)",
+        " (?:§7§m|§2)ൠ Bonus Pest Chance (?:§f)?(?<value>.*)",
+    ),
     COMBAT_WISDOM("§3☯", " Combat Wisdom: §r§3☯(?<value>.*)", " §3☯ Combat Wisdom §f(?<value>.*)"),
     MINING_WISDOM("§3☯", " Mining Wisdom: §r§3☯(?<value>.*)", " §3☯ Mining Wisdom §f(?<value>.*)"),
     FARMING_WISDOM("§3☯", " Farming Wisdom: §r§3☯(?<value>.*)", " §3☯ Farming Wisdom §f(?<value>.*)"),
@@ -94,6 +99,8 @@ enum class SkyblockStat(
         }
 
     var lastSource: StatSourceType = StatSourceType.UNKNOWN
+
+    var lastAssignment: SimpleTimeMark = SimpleTimeMark.farPast()
 
     val capitalizedName = name.lowercase().allLettersFirstUppercase()
 
@@ -168,6 +175,7 @@ enum class SkyblockStat(
                 } ?: continue
                 entry.lastKnownValue = matchResult
                 entry.lastSource = type
+                entry.lastAssignment = SimpleTimeMark.now()
                 break // Exit the inner loop once a match is found
             }
         }
