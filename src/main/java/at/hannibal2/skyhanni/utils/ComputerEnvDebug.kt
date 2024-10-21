@@ -53,6 +53,9 @@ object ComputerEnvDebug {
         if (firstStack.contains("org.prismlauncher.EntryPoint.main")) {
             return Pair("Prism", false)
         }
+        if (firstStack.contains("org.multimc.EntryPoint.main")) {
+            return Pair("MultiMC", false)
+        }
         if (firstStack.contains("net.digitalingot.vendor.")) {
             return Pair("Feather Client", true)
         }
