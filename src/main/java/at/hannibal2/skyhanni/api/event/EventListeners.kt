@@ -6,10 +6,6 @@ import java.lang.invoke.LambdaMetafactory
 import java.lang.invoke.MethodHandles
 import java.lang.invoke.MethodType
 import java.lang.reflect.Method
-import java.lang.reflect.ParameterizedType
-import java.lang.reflect.Type
-import java.lang.reflect.TypeVariable
-import java.lang.reflect.WildcardType
 import java.util.function.Consumer
 
 class EventListeners private constructor(val name: String, private val isGeneric: Boolean) {
