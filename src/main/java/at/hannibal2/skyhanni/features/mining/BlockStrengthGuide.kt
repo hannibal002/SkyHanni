@@ -12,11 +12,14 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.HypixelCommands
+import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderAndScale
@@ -138,8 +141,7 @@ object BlockStrengthGuide {
         END_STONE(
             { ItemStack(Blocks.end_stone) },
             setOf(OreBlock.END_STONE),
-        )
-        ;
+        );
 
         val icon by lazy(this.iconDel)
 
@@ -208,12 +210,18 @@ object BlockStrengthGuide {
 
     private var inMineshaft = false
 
+    // TODO Dwarven Equip (Needs a Equipment API) , Goblin Pet and Mithril Pet (need the PetAPI v2)
     private fun requestSpeed(): SpeedClass {
+        val itemInHand = InventoryUtils.getItemInHand()
         speed = SpeedClass(
-            (SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0) + if (inMineshaft)
-                HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
+            (SkyblockStat.MINING_SPEED.lastKnownValue
+                ?: 0.0) + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
             HotmData.STRONG_ARM.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
-            HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
+            (HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0) + (itemInHand?.getEnchantments()?.get("lapidary")
+                ?.times(20.0) ?: 0.0) + when (itemInHand?.getInternalNameOrNull()?.asString()) {
+                "GEMSTONE_DRILL_1", "GEMSTONE_DRILL_2", "GEMSTONE_DRILL_3", "GEMSTONE_DRILL_4" -> 800.0
+                else -> 0.0
+            },
             0.0,
             0.0,
         )
@@ -235,14 +243,13 @@ object BlockStrengthGuide {
         ).map { Renderable.string("§6$it") }
     }
 
-    private val headerHeaderLine =
-        listOf("Base", "Gemstone", "Dwarven").map {
-            Renderable.string(
-                it,
-                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-                scale = 0.75,
-            )
-        }
+    private val headerHeaderLine = listOf("Base", "Gemstone", "Dwarven").map {
+        Renderable.string(
+            it,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+            scale = 0.75,
+        )
+    }
 
     private var display: Renderable? = null
 
