@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getReadableNBTDump
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import net.minecraft.item.ItemStack
-import net.minecraft.nbt.NBTTagCompound
 
 object CopyItemCommand {
 

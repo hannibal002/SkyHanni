@@ -16,7 +16,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
@@ -204,22 +203,21 @@ object EstimatedItemValue {
         this.getInternalNameOrNull()?.let { internalName ->
             val name = this.name
             return (
-                name == "§6☘ Category: Item Ability (Passive)" ||
-                name.contains("Salesperson") ||
-                (
-                    !InventoryUtils.isSlotInPlayerInventory(this) &&
-                    InventoryUtils.openInventoryName() == "Choose a wardrobe slot"
-                    ) ||
-                internalName.startsWith("ULTIMATE_ULTIMATE_") ||
                 this.item == Items.enchanted_book ||
-                internalName.startsWith("CATACOMBS_PASS_") ||
-                internalName.startsWith("MASTER_CATACOMBS_PASS_") ||
-                internalName.startsWith("MAP-") ||
-                internalName.isRune() ||
-                internalName.contains("UNIQUE_RUNE") ||
-                internalName.contains("WISP_POTION")
-            )
-
+                    name.contains("Salesperson") ||
+                    name == "§6☘ Category: Item Ability (Passive)" ||
+                    internalName.isRune() ||
+                    internalName.startsWith("ULTIMATE_ULTIMATE_") ||
+                    internalName.startsWith("CATACOMBS_PASS_") ||
+                    internalName.startsWith("MASTER_CATACOMBS_PASS_") ||
+                    internalName.startsWith("MAP-") ||
+                    internalName.contains("UNIQUE_RUNE") ||
+                    internalName.contains("WISP_POTION") ||
+                    (
+                        !InventoryUtils.isSlotInPlayerInventory(this) &&
+                            InventoryUtils.openInventoryName() == "Choose a wardrobe slot"
+                        )
+                )
         } ?: return true
     }
 
