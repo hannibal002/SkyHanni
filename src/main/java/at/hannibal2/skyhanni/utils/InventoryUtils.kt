@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -77,6 +78,9 @@ object InventoryUtils {
     fun getBoots(): ItemStack? = getArmor()[0]
 
     val isNeuStorageEnabled by RecalculatingValue(10.seconds) {
+        if (!PlatformUtils.isNeuLoaded()) {
+            return@RecalculatingValue false
+        }
         try {
             val config = NotEnoughUpdates.INSTANCE.config
 
