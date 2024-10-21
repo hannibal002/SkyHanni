@@ -184,7 +184,14 @@ object BlockStrengthGuide {
                 ),
                 listOf(
                     Renderable.string(name.allLettersFirstUppercase()),
-                    *getTickLore(ore, speed, percentLine),
+                    Renderable.placeholder(0, 5),
+                    Renderable.string("${SkyblockStat.MINING_SPEED.icon} Your: ${speed.toInt()}"),
+                    Renderable.string(percentLine),
+                    Renderable.placeholder(0, 5),
+                    Renderable.string("Block Strength: ${ore.strength}"),
+                    Renderable.string("${SkyblockStat.MINING_SPEED.icon} Softcap: ${ore.speedSoftCap}"),
+                    Renderable.string("${SkyblockStat.MINING_SPEED.icon} Instant: ${ore.speedForInstantMine}"),
+                    Renderable.placeholder(0, 5),
                     Renderable.string("Category: ${ore.category.toString().allLettersFirstUppercase()}"),
                     Renderable.string(hoverText),
                 ),
@@ -197,25 +204,14 @@ object BlockStrengthGuide {
     private val SoftCapColor = Color(0x00, 0xFA, 0x9A)
     private val BaseColor = Color(0xFF, 0x63, 0x37)
 
-    private fun getTickLore(ore: OreBlock, speed: Double, percentLine: String): Array<Renderable> = arrayOf(
-        Renderable.placeholder(0, 5),
-        Renderable.string("${SkyblockStat.MINING_SPEED.icon} Your: ${speed.toInt()}"),
-        Renderable.string(percentLine),
-        Renderable.placeholder(0, 5),
-        Renderable.string("Block Strength: ${ore.strength}"),
-        Renderable.string("${SkyblockStat.MINING_SPEED.icon} Softcap: ${ore.speedSoftCap}"),
-        Renderable.string("${SkyblockStat.MINING_SPEED.icon} Instant: ${ore.speedForInstantMine}"),
-        Renderable.placeholder(0, 5),
-    )
-
     private lateinit var speed: SpeedClass
 
     private var inMineshaft = false
 
     private fun requestSpeed(): SpeedClass {
         speed = SpeedClass(
-            (SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0)
-                + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
+            (SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0) + if (inMineshaft)
+                HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
             HotmData.STRONG_ARM.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
             HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
             0.0,
