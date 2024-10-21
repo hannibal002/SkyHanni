@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.reflect.KMutableProperty0
 
 @SkyHanniModule
 object TheGreatSpook {
@@ -31,9 +30,11 @@ object TheGreatSpook {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (isTimerEnabled() || isNotificationEnabled()) displayTimer = checkTabList(" §r§cPrimal Fears§r§7: ")
-        if (isTimeLeftEnabled()) displayTimeLeft = checkTabList(" §r§dEnds In§r§7: ")
-        if (isNotificationEnabled()) {
+        if (!LorenzUtils.inSkyBlock) return
+
+        if (config.primalFearTimer || config.primalFearNotification) displayTimer = checkTabList(" §r§cPrimal Fears§r§7: ")
+        if (config.greatSpookTimeLeft) displayTimeLeft = checkTabList(" §r§dEnds In§r§7: ")
+        if (config.primalFearNotification) {
             if (displayTimer.endsWith("READY!!")) {
                 if (notificationSeconds > 0) {
                     SoundUtils.playBeepSound()
@@ -51,13 +52,15 @@ object TheGreatSpook {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (isTimerEnabled()) config.positionTimer.renderString(displayTimer, posLabel = "Primal Fear Timer")
-        if (isFearStatEnabled()) {
+        if (!LorenzUtils.inSkyBlock) return
+
+        if (config.primalFearTimer) config.positionTimer.renderString(displayTimer, posLabel = "Primal Fear Timer")
+        if (config.fearStatDisplay) {
             SkyblockStat.FEAR.displayValue?.let {
                 config.positionFear.renderString(it, posLabel = "Fear Stat Display")
             }
         }
-        if (isTimeLeftEnabled()) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
+        if (config.greatSpookTimeLeft) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
     }
 
     /**
@@ -76,52 +79,49 @@ object TheGreatSpook {
         "§4\\[FEAR] Public Speaking Demon§r§f: (Speak|Say something interesting) (?<name>.*)!",
     )
 
+    private fun mathSolver(math: String?) {
+        val result = math?.let { NEUCalculator.calculateOrNull(it)?.toInt() } ?: run {
+            ChatUtils.userError("Failed to solve $math!")
+            return
+        }
+        ChatUtils.clickToActionOrDisable(
+            "The result is: $result",
+            config.primalFearSolver::math,
+            actionName = "Send the result",
+            action = {
+                HypixelCommands.allChat(result.toString())
+            },
+        )
+    }
+
+    private fun publicSpeakingSolver() {
+        ChatUtils.clickToActionOrDisable(
+            "Click to send a random string to complete the Primal Fear",
+            config.primalFearSolver::publicSpeaking,
+            actionName = "send a random string.",
+            action = {
+                HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
+            },
+        )
+    }
+
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (isMathSolverEnabled()) {
-            mathFearMessagePattern.matchMatcher(event.message) {
-                val math = group("math")
-                val result = NEUCalculator.calculateOrNull(math)?.toInt()
-                DelayedRun.runNextTick {
-                    if (result != null) {
-                        ChatUtils.clickToActionOrDisable(
-                            "The result is: $result",
-                            config.primalFearSolver::math,
-                            actionName = "Send the result",
-                            action = {
-                                HypixelCommands.allChat(result.toString())
-                            },
-                        )
-                    } else {
-                        ChatUtils.chat("An unexpected error occurred while solving the math problem.")
-                    }
-                }
+        if (!LorenzUtils.inSkyBlock) return
+
+        if (config.primalFearSolver.math) {
+            val math = mathFearMessagePattern.matchMatcher(event.message) { group("math") } ?: return
+            DelayedRun.runNextTick {
+                mathSolver(math)
             }
         }
 
-        if (isSpeakingSolverEnabled()) {
+        if (config.primalFearSolver.publicSpeaking) {
             speakingFearMessagePattern.matchMatcher(event.message) {
                 DelayedRun.runNextTick {
-                    val feature: KMutableProperty0<*> = config.primalFearSolver::publicSpeaking
-                    ChatUtils.clickToActionOrDisable(
-                        "Click to send a random string to complete the Primal Fear",
-                        feature,
-                        actionName = "send a random string.",
-                        action = {
-                            HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
-                        },
-                    )
+                    publicSpeakingSolver()
                 }
             }
         }
     }
-
-    private fun isTimerEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearTimer
-
-    private fun isNotificationEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearNotification
-    private fun isFearStatEnabled(): Boolean = LorenzUtils.inSkyBlock && config.fearStatDisplay
-    private fun isTimeLeftEnabled(): Boolean = LorenzUtils.inSkyBlock && config.greatSpookTimeLeft
-
-    private fun isMathSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.math
-    private fun isSpeakingSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.publicSpeaking
 }
