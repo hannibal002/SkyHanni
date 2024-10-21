@@ -93,10 +93,7 @@ object CarnivalShopHelper {
     }
 
     private fun tryReplaceShopSpecificStack(event: ReplaceItemEvent) {
-        if (currentProgress == null ||
-            !repoEventShops.any {
-                it.shopName.equals(event.inventory.name, ignoreCase = true)
-            }) return
+        if (currentProgress == null || !repoEventShops.any { it.shopName.equals(event.inventory.name, ignoreCase = true) }) return
         shopSpecificInfoItemStack.let { event.replace(it) }
     }
 
