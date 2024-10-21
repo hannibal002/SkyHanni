@@ -3,13 +3,22 @@ package at.hannibal2.skyhanni.features.event.spook
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NEUCalculator
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TabListData
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.reflect.KMutableProperty0
 
 @SkyHanniModule
 object TheGreatSpook {
@@ -22,8 +31,6 @@ object TheGreatSpook {
 
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
-        if (isAllDisabled()) return
-
         if (isTimerEnabled() || isNotificationEnabled()) displayTimer = checkTabList(" §r§cPrimal Fears§r§7: ")
         if (isTimeLeftEnabled()) displayTimeLeft = checkTabList(" §r§dEnds In§r§7: ")
         if (isNotificationEnabled()) {
@@ -53,11 +60,70 @@ object TheGreatSpook {
         if (isTimeLeftEnabled()) config.positionTimeLeft.renderString(displayTimeLeft, posLabel = "Time Left Display")
     }
 
+    /**
+     * REGEX-TEST: §d§lQUICK MATHS! §r§7Solve: §r§e(10*2)+12*5
+     */
+    private val mathFearMessagePattern by RepoPattern.pattern(
+        "chat.math",
+        "§d§lQUICK MATHS! §r§7Solve: §r§e(?<math>.*)",
+    )
+
+    /**
+     * REGEX-TEST: §4[FEAR] Public Speaking Demon§r§f: Speak PlasticEating!
+     */
+    private val speakingFearMessagePattern by RepoPattern.pattern(
+        "chat.speaking",
+        "§4\\[FEAR] Public Speaking Demon§r§f: (Speak|Say something interesting) (?<name>.*)!",
+    )
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (isMathSolverEnabled()) {
+            mathFearMessagePattern.matchMatcher(event.message) {
+                val math = group("math")
+                val result = NEUCalculator.calculateOrNull(math)?.toInt()
+                DelayedRun.runNextTick {
+                    if (result != null) {
+                        ChatUtils.clickToActionOrDisable(
+                            "The result is: $result",
+                            option = config.primalFearSolver::math,
+                            actionName = "Send the result",
+                            action =
+                            {
+                                HypixelCommands.allChat(result.toString())
+                            },
+                        )
+                    } else {
+                        ChatUtils.chat("An unexpected error occurred while solving the math problem.")
+                    }
+                }
+            }
+        }
+
+        if (isSpeakingSolverEnabled()) {
+            speakingFearMessagePattern.matchMatcher(event.message) {
+                DelayedRun.runNextTick {
+                    val feature: KMutableProperty0<*> = config.primalFearSolver::publicSpeaking
+                    ChatUtils.clickToActionOrDisable(
+                        "Click to send a random string to complete the Primal Fear",
+                        feature,
+                        "send a random string.",
+                        action =
+                        {
+                            HypixelCommands.allChat("I looove SkyHanni! ${StringUtils.generateRandomString(4)}")
+                        }
+                    )
+                }
+            }
+        }
+    }
+
     private fun isTimerEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearTimer
 
     private fun isNotificationEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearNotification
     private fun isFearStatEnabled(): Boolean = LorenzUtils.inSkyBlock && config.fearStatDisplay
     private fun isTimeLeftEnabled(): Boolean = LorenzUtils.inSkyBlock && config.greatSpookTimeLeft
 
-    private fun isAllDisabled(): Boolean = !isTimeLeftEnabled() && !isTimerEnabled() && !isFearStatEnabled() && !isNotificationEnabled()
+    private fun isMathSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.math
+    private fun isSpeakingSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.publicSpeaking
 }
