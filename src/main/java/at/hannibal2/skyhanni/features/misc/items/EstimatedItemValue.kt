@@ -106,6 +106,7 @@ object EstimatedItemValue {
         } catch (ex: RuntimeException) {
             // "No OpenGL context found in the current thread." - caused indiscriminately by any other mod
             // that tries to over-render the tooltip, and is not explicitly something we can solve here?
+            // TODO start a deep sea activity: read mixin dumps, pinpoint the culprit, write over engineered workaround
             if (ex.message?.contains("No OpenGL context found in the current thread.") == true) return
             ErrorManager.logErrorWithData(
                 ex, "Error in Estimated Item Value renderer",

@@ -255,10 +255,7 @@ object EstimatedItemValueCalculator {
                         "internal name" to stack.getInternalName(),
                         "itemRarity" to itemRarity,
                         "item name" to stack.name,
-                        "item nbt" to {
-                            stack.tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
-                                ?: "no tag compound"
-                        }
+                        "item nbt" to stack.readNbtDump(),
                     )
                     return null
                 }
@@ -275,10 +272,7 @@ object EstimatedItemValueCalculator {
                 "internal name" to stack.getInternalName(),
                 "item name" to stack.name,
                 "reforgeStone" to reforgeStone,
-                "item nbt" to {
-                    stack.tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
-                        ?: "no tag compound"
-                }
+                "item nbt" to stack.readNbtDump(),
             )
             null
         }
@@ -855,6 +849,9 @@ object EstimatedItemValueCalculator {
         return totalPrice
     }
 
+    private fun ItemStack.readNbtDump() = tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
+    ?: "no tag compound"
+
     private fun addGemstoneSlotUnlockCost(stack: ItemStack, list: MutableList<String>): Double {
         val internalName = stack.getInternalName()
 
@@ -874,10 +871,7 @@ object EstimatedItemValueCalculator {
                 "internal name" to internalName,
                 "gemstoneUnlockCosts" to EstimatedItemValue.gemstoneUnlockCosts,
                 "item name" to stack.name,
-                "item nbt" to {
-                    stack.tagCompound?.getReadableNBTDump(includeLore = true)?.joinToString("\n")
-                        ?: "no tag compound"
-                }
+                "item nbt" to stack.readNbtDump(),
             )
             return 0.0
         }
