@@ -126,6 +126,4 @@ object TheGreatSpook {
 
     private fun isMathSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.math
     private fun isSpeakingSolverEnabled(): Boolean = LorenzUtils.inSkyBlock && config.primalFearSolver.publicSpeaking
-
-    private fun isAnySolverEnabled(): Boolean = isMathSolverEnabled() || isSpeakingSolverEnabled()
 }
