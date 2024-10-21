@@ -1,13 +1,13 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElement
-import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBank
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementBits
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementChunkedStats
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCold
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCookie
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCopper
+import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementCustomLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementDate
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementEmptyLine
 import at.hannibal2.skyhanni.features.gui.customscoreboard.elements.ScoreboardElementEvents

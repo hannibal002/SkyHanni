@@ -27,8 +27,8 @@ object CustomLinesGui : GuiScreen() {
 
     private val guiWidth = (windowWidth / (3 / 4f)).toInt()
     private val guiHeight = (windowHeight / (3 / 4f)).toInt()
-    private val columnSpacing = 10 // temp value
-    private val maxSecondColumnWidth = 300 // temp value
+    private const val COLUMN_SPACING = 10 // temp value
+    private const val MAX_SECOND_COLUMN_WIDTH = 300 // temp value
 
     private var inTextMode = false
         set(value) {
@@ -48,7 +48,7 @@ object CustomLinesGui : GuiScreen() {
     private fun getDisplay(): Renderable {
         val secondColumn = createRenderableSecondColumn()
         val secondColumnWidth = secondColumn.width
-        val firstColumnMaxWidth = guiWidth - secondColumnWidth - columnSpacing
+        val firstColumnMaxWidth = guiWidth - secondColumnWidth - COLUMN_SPACING
 
         val secondColumnRenderable = Renderable.horizontalContainer(
             listOf(
@@ -80,7 +80,7 @@ object CustomLinesGui : GuiScreen() {
             list.add(
                 Renderable.clickable(
                     Renderable.wrappedString(
-                        "${it.name} | ${it.replacement()}", maxSecondColumnWidth,
+                        "${it.name} | ${it.replacement()}", MAX_SECOND_COLUMN_WIDTH,
                     ),
                     {
                         if (inTextMode) {
