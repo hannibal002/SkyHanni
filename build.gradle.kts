@@ -384,7 +384,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MAIN
+        target == ProjectTarget.MAIN && System.getenv("SKIP_DETEKT") != "true"
     }
 
     reports {
