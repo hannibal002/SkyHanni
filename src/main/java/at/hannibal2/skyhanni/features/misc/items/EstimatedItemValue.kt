@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
+import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.isRune
@@ -199,33 +200,31 @@ object EstimatedItemValue {
         lastToolTipTime = System.currentTimeMillis()
     }
 
-    // TODO: Refactor this code to not return listOf() 20 times
-    @Suppress("ReturnCount")
+    private fun ItemStack.shouldIgnoreDraw(): Boolean {
+        this.getInternalNameOrNull()?.let { internalName ->
+            val name = this.name
+            return (
+                name == "§6☘ Category: Item Ability (Passive)" ||
+                name.contains("Salesperson") ||
+                (
+                    !InventoryUtils.isSlotInPlayerInventory(this) &&
+                    InventoryUtils.openInventoryName() == "Choose a wardrobe slot"
+                    ) ||
+                internalName.startsWith("ULTIMATE_ULTIMATE_") ||
+                this.item == Items.enchanted_book ||
+                internalName.startsWith("CATACOMBS_PASS_") ||
+                internalName.startsWith("MASTER_CATACOMBS_PASS_") ||
+                internalName.startsWith("MAP-") ||
+                internalName.isRune() ||
+                internalName.contains("UNIQUE_RUNE") ||
+                internalName.contains("WISP_POTION")
+            )
+
+        } ?: return true
+    }
+
     private fun draw(stack: ItemStack): List<Renderable> {
-        val internalName = stack.getInternalNameOrNull() ?: return listOf()
-
-        // Stats Breakdown
-        val name = stack.name
-        if (name == "§6☘ Category: Item Ability (Passive)") return listOf()
-        if (name.contains("Salesperson")) return listOf()
-
-        // Autopet rule > Create Rule
-        if (!InventoryUtils.isSlotInPlayerInventory(stack)) {
-            if (InventoryUtils.openInventoryName() == "Choose a wardrobe slot") return listOf()
-        }
-
-        // FIX neu item list
-        if (internalName.startsWith("ULTIMATE_ULTIMATE_")) return listOf()
-        // We don't need this feature to work on books at all
-        if (stack.item == Items.enchanted_book) return listOf()
-        // Block catacombs items in mort inventory
-        if (internalName.startsWith("CATACOMBS_PASS_") || internalName.startsWith("MASTER_CATACOMBS_PASS_")) return listOf()
-        // Blocks the dungeon map
-        if (internalName.startsWith("MAP-")) return listOf()
-        // Hides the rune item
-        if (internalName.isRune()) return listOf()
-        if (internalName.contains("UNIQUE_RUNE")) return listOf()
-        if (internalName.contains("WISP_POTION")) return listOf()
+        if (stack.shouldIgnoreDraw()) return listOf()
 
         val list = mutableListOf<String>()
         list.add("§aEstimated Item Value:")
