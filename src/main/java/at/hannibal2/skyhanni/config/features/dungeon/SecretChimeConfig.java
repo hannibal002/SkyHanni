@@ -12,7 +12,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
 public class SecretChimeConfig {
     @Expose
-    @ConfigOption(name = "Enabled", desc = "Play a sound effect when levers, chests, and wither essence are clicked in dungeons.")
+    @ConfigOption(name = "Enabled", desc = "Play a sound effect when a secret is found.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean enabled = false;
