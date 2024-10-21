@@ -783,7 +783,7 @@ object Commands {
             callback { GriffinBurrowHelper.setTestBurrow(it) }
         }
         event.register("shtestisland") {
-            description = "Sets the current skyblock island for testing purposes."
+            description = "Changes the SkyBlock island SkyHanni thinks you are on"
             category = CommandCategory.DEVELOPER_TEST
             callback { SkyBlockIslandTest.onCommand(it) }
         }
