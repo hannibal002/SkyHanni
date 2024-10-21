@@ -71,7 +71,7 @@ object CurrentPetDisplay {
 
     @SubscribeEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!PetAPI.isPetMenu(event.inventoryName)) return
+        if (!PetAPI.isPetMenu(event.inventoryName, event.inventoryItems)) return
 
         val lore = event.inventoryItems[4]?.getLore() ?: return
         lore.matchFirst(inventorySelectedPetPattern) {
