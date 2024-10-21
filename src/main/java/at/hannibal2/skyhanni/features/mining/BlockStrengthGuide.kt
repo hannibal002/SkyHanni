@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.mining
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.HotmData
+import at.hannibal2.skyhanni.data.HotmReward
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -12,6 +14,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.distribute
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.NumberUtil.fractionOf
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -142,26 +145,33 @@ object BlockStrengthGuide {
 
         val hoverText get() = "Block ids: " + oreBlocks.joinToString(", ") { it.name.allLettersFirstUppercase() }
 
-        fun renderable(speed: Double): Renderable {
+        fun renderable(rawSpeed: SpeedClass): Renderable {
             val ore = oreBlocks.first()
+
+            val speed = rawSpeed.base + when (ore.category) {
+                OreCategory.DWARVEN_METAL -> rawSpeed.dwarven
+                OreCategory.GEMSTONE -> rawSpeed.gemstone
+                OreCategory.ORE -> rawSpeed.ore
+                OreCategory.BLOCK -> rawSpeed.block
+            }
 
             val ticks = ore.miningTicks(speed)
 
-            val progressBar = when (ticks) {
-                1 -> Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100)
+            val (progressBar, percentLine) = when (ticks) {
+                1 -> Renderable.progressBar(1.0, InstantMineColor, InstantMineColor, width = 100) to "§6Instant Mine"
                 4 -> Renderable.progressBar(
                     speed.fractionOf(ore.speedForInstantMine),
                     SoftCapColor,
                     InstantMineColor,
                     width = 100,
-                )
+                ) to "§a${speed.fractionOf(ore.speedForInstantMine).times(100).roundTo(1)}% §fto Instant Mine"
 
                 else -> Renderable.progressBar(
                     speed.fractionOf(ore.speedSoftCap),
                     BaseColor,
                     SoftCapColor,
                     width = 100,
-                )
+                ) to "§a${speed.fractionOf(ore.speedSoftCap).times(100).roundTo(1)}% §fto Soft Cap"
             }
 
             return Renderable.hoverTips(
@@ -174,9 +184,8 @@ object BlockStrengthGuide {
                 ),
                 listOf(
                     Renderable.string(name.allLettersFirstUppercase()),
-                    Renderable.placeholder(0, 5),
-                    *getTickLore(ore),
-                    Renderable.placeholder(0, 5),
+                    *getTickLore(ore, speed, percentLine),
+                    Renderable.string("Category: ${ore.category.toString().allLettersFirstUppercase()}"),
                     Renderable.string(hoverText),
                 ),
             )
@@ -188,38 +197,115 @@ object BlockStrengthGuide {
     private val SoftCapColor = Color(0x00, 0xFA, 0x9A)
     private val BaseColor = Color(0xFF, 0x63, 0x37)
 
-    private fun getTickLore(ore: OreBlock): Array<Renderable> = arrayOf(
+    private fun getTickLore(ore: OreBlock, speed: Double, percentLine: String): Array<Renderable> = arrayOf(
+        Renderable.placeholder(0, 5),
+        Renderable.string("${SkyblockStat.MINING_SPEED.icon} Your: ${speed.toInt()}"),
+        Renderable.string(percentLine),
+        Renderable.placeholder(0, 5),
         Renderable.string("Block Strength: ${ore.strength}"),
         Renderable.string("${SkyblockStat.MINING_SPEED.icon} Softcap: ${ore.speedSoftCap}"),
         Renderable.string("${SkyblockStat.MINING_SPEED.icon} Instant: ${ore.speedForInstantMine}"),
+        Renderable.placeholder(0, 5),
     )
 
-    private val speed get() = SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0
+    private lateinit var speed: SpeedClass
+
+    private var inMineshaft = false
+
+    private fun requestSpeed(): SpeedClass {
+        speed = SpeedClass(
+            (SkyblockStat.MINING_SPEED.lastKnownValue ?: 0.0)
+                + if (inMineshaft) HotmData.EAGER_ADVENTURER.getReward()[HotmReward.MINING_SPEED] ?: 0.0 else 0.0,
+            HotmData.STRONG_ARM.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
+            HotmData.PROFESSIONAL.getReward()[HotmReward.MINING_SPEED] ?: 0.0,
+            0.0,
+            0.0,
+        )
+
+        return speed
+    }
+
+    private data class SpeedClass(
+        val base: Double,
+        val dwarven: Double,
+        val gemstone: Double,
+        val ore: Double,
+        val block: Double,
+    ) {
+        fun toRenderables() = listOf(
+            base.toInt().toString(),
+            gemstone.toInt().toString(),
+            dwarven.toInt().toString(),
+        ).map { Renderable.string("§6$it") }
+    }
+
+    private val headerHeaderLine =
+        listOf("Base", "Gemstone", "Dwarven").map {
+            Renderable.string(
+                it,
+                horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                scale = 0.75,
+            )
+        }
 
     private var display: Renderable? = null
 
-    private fun createDisplay() = Renderable.drawInsideRoundedRectWithOutline(
-        Renderable.verticalContainer(
-            listOf(
-                Renderable.string(
-                    "${speed.toInt()}  ${SkyblockStat.MINING_SPEED.iconWithName}",
-                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+    private fun createDisplay(): Renderable {
+        requestSpeed()
+        return Renderable.drawInsideRoundedRectWithOutline(
+            Renderable.verticalContainer(
+                listOf(
+                    Renderable.verticalContainer(
+                        createHeader(),
+                        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+                    ),
+                    Renderable.table(
+                        createTableContent(), 5, 3,
+                    ),
                 ),
-                Renderable.table(
-                    createTableContent(), 5, 3,
-                ),
+                spacing = 8,
             ),
-            spacing = 8,
-        ),
-        color = LorenzColor.GRAY.addOpacity(180),
-        topOutlineColor = Color(0, 0, 0, 200).rgb,
-        bottomOutlineColor = Color(0, 0, 0, 200).rgb,
-        borderOutlineThickness = 3,
-        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
-        horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
-    )
+            color = LorenzColor.GRAY.addOpacity(180),
+            topOutlineColor = Color(0, 0, 0, 200).rgb,
+            bottomOutlineColor = Color(0, 0, 0, 200).rgb,
+            borderOutlineThickness = 3,
+            verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        )
+    }
 
     private fun createTableContent(): List<List<Renderable>> = DisplayOres.entries.map { it.renderable(speed) }.distribute(3)
+
+    private fun createHeader(): List<Renderable> = listOf(
+        Renderable.string(
+            SkyblockStat.MINING_SPEED.iconWithName,
+            horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
+        ),
+        Renderable.horizontalContainer(
+            listOf(
+                Renderable.table(
+                    listOf(
+                        headerHeaderLine,
+                        speed.toRenderables(),
+                    ),
+                    xPadding = 5,
+                ),
+                Renderable.clickable(
+                    Renderable.string(
+                        "§${if (inMineshaft) 'b' else '7'}Mineshaft",
+                        scale = 0.5,
+                        verticalAlign = RenderUtils.VerticalAlignment.CENTER,
+                    ),
+                    {
+                        inMineshaft = !inMineshaft
+                        display = createDisplay()
+                    },
+                ),
+            ),
+            spacing = 3,
+        ),
+
+        )
 
     private var shouldBlockSHMenu = false
         set(value) {

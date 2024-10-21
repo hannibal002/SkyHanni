@@ -25,262 +25,269 @@ import net.minecraft.item.EnumDyeColor
 import kotlin.math.ceil
 import kotlin.math.round
 
+enum class OreCategory {
+    BLOCK,
+    ORE,
+    DWARVEN_METAL,
+    GEMSTONE,
+}
+
 enum class OreBlock(
     val checkBlock: (IBlockState) -> Boolean,
     val checkArea: () -> Boolean,
-    val isOre: Boolean,
+    val category: OreCategory,
 ) {
     // MITHRIL
     LOW_TIER_MITHRIL(
         checkBlock = ::isLowTierMithril,
         checkArea = { inDwarvenMines || inGlacite },
-        true,
+        OreCategory.DWARVEN_METAL,
     ),
     MID_TIER_MITHRIL(
         checkBlock = { it.block == Blocks.prismarine },
         checkArea = { inDwarvenMines || inCrystalHollows || inGlacite },
-        true,
+        OreCategory.DWARVEN_METAL,
     ),
     HIGH_TIER_MITHRIL(
         checkBlock = ::isHighTierMithril,
         checkArea = { inDwarvenMines || inCrystalHollows || inGlacite },
-        true,
+        OreCategory.DWARVEN_METAL,
     ),
 
     // TITANIUM
     TITANIUM(
         checkBlock = ::isTitanium,
         checkArea = { inDwarvenMines || inGlacite },
-        true,
+        OreCategory.DWARVEN_METAL,
     ),
 
     // VANILLA ORES
     STONE(
         checkBlock = ::isStone,
         checkArea = { inDwarvenMines },
-        false,
+        OreCategory.BLOCK,
     ),
     COBBLESTONE(
         checkBlock = { it.block == Blocks.cobblestone },
         checkArea = { inDwarvenMines },
-        false,
+        OreCategory.BLOCK,
     ),
     COAL_ORE(
         checkBlock = { it.block == Blocks.coal_ore },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
     IRON_ORE(
         checkBlock = { it.block == Blocks.iron_ore },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
     GOLD_ORE(
         checkBlock = { it.block == Blocks.gold_ore },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
     LAPIS_ORE(
         checkBlock = { it.block == Blocks.lapis_ore },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
     REDSTONE_ORE(
         checkBlock = { it.block.equalsOneOf(Blocks.redstone_ore, Blocks.lit_redstone_ore) },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
     EMERALD_ORE(
         checkBlock = { it.block == Blocks.emerald_ore },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
     DIAMOND_ORE(
         checkBlock = { it.block == Blocks.diamond_ore },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
 
     // NETHER
     NETHERRACK(
         checkBlock = { it.block == Blocks.netherrack },
         checkArea = { inCrimsonIsle },
-        false,
+        OreCategory.BLOCK,
     ),
     QUARTZ_ORE(
         checkBlock = { it.block == Blocks.quartz_ore },
         checkArea = { inCrystalHollows || inCrimsonIsle },
-        true,
+        OreCategory.ORE,
     ),
     GLOWSTONE(
         checkBlock = { it.block == Blocks.glowstone },
         checkArea = { inCrimsonIsle },
-        false,
+        OreCategory.BLOCK,
     ),
     MYCELIUM(
         checkBlock = { it.block == Blocks.mycelium },
         checkArea = { inCrimsonIsle },
-        false,
+        OreCategory.BLOCK,
     ),
     RED_SAND(
         checkBlock = ::isRedSand,
         checkArea = { inCrimsonIsle },
-        false,
+        OreCategory.BLOCK,
     ),
     SULPHUR(
         checkBlock = { it.block == Blocks.sponge },
         checkArea = { inCrimsonIsle },
-        true,
+        OreCategory.ORE,
     ),
 
     // SPIDER'S DEN
     GRAVEL(
         checkBlock = { it.block == Blocks.gravel },
         checkArea = { inSpidersDen },
-        false,
+        OreCategory.BLOCK,
     ),
 
     // END
     END_STONE(
         checkBlock = { it.block == Blocks.end_stone },
         checkArea = { inEnd },
-        true,
+        OreCategory.BLOCK,
     ),
     OBSIDIAN(
         checkBlock = { it.block == Blocks.obsidian },
         checkArea = { inCrystalHollows || inEnd },
-        true,
+        OreCategory.ORE,
     ),
 
     // HARD STONE
     HARD_STONE_HOLLOWS(
         checkBlock = ::isHardStoneHollows,
         checkArea = { inCrystalHollows },
-        false,
+        OreCategory.BLOCK,
     ),
     HARD_STONE_TUNNELS(
         checkBlock = ::isHardstoneTunnels,
         checkArea = { inTunnels },
-        false,
+        OreCategory.BLOCK,
     ),
     HARD_STONE_MINESHAFT(
         checkBlock = ::isHardstoneMineshaft,
         checkArea = { inMineshaft },
-        false,
+        OreCategory.BLOCK,
     ),
 
     // DWARVEN BLOCKS
     PURE_COAL(
         checkBlock = { it.block == Blocks.coal_block },
         checkArea = { inDwarvenMines || inCrystalHollows },
-        true,
+        OreCategory.ORE,
     ),
     PURE_IRON(
         // currently not detected
         checkBlock = { it.block == Blocks.iron_block },
-        checkArea = { inDwarvenMines || inCrystalHollows }, true,
+        checkArea = { inDwarvenMines || inCrystalHollows }, OreCategory.ORE,
     ),
     PURE_GOLD(
         // currently not detected
         checkBlock = { it.block == Blocks.gold_block },
-        checkArea = { inDwarvenMines || inCrystalHollows }, true,
+        checkArea = { inDwarvenMines || inCrystalHollows }, OreCategory.ORE,
     ),
     PURE_LAPIS(
         checkBlock = { it.block == Blocks.lapis_block },
-        checkArea = { inDwarvenMines || inCrystalHollows }, true,
+        checkArea = { inDwarvenMines || inCrystalHollows }, OreCategory.ORE,
     ),
     PURE_REDSTONE(
         // currently not detected
         checkBlock = { it.block == Blocks.redstone_block },
-        checkArea = { inDwarvenMines || inCrystalHollows }, true,
+        checkArea = { inDwarvenMines || inCrystalHollows }, OreCategory.ORE,
     ),
     PURE_EMERALD(
         // currently not detected
         checkBlock = { it.block == Blocks.emerald_block },
-        checkArea = { inDwarvenMines || inCrystalHollows }, true,
+        checkArea = { inDwarvenMines || inCrystalHollows }, OreCategory.ORE,
     ),
     PURE_DIAMOND(
         // currently not detected
         checkBlock = { it.block == Blocks.diamond_block },
-        checkArea = { inDwarvenMines || inCrystalHollows }, true,
+        checkArea = { inDwarvenMines || inCrystalHollows }, OreCategory.ORE,
     ),
 
     // GEMSTONES
     RUBY(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.RED) },
-        checkArea = { inCrystalHollows || inGlacite }, true,
+        checkArea = { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE,
     ),
     AMBER(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.ORANGE) },
-        checkArea = { inCrystalHollows || inGlacite }, true,
+        checkArea = { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE,
     ),
     AMETHYST(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.PURPLE) },
-        checkArea = { inCrystalHollows || inGlacite }, true,
+        checkArea = { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE,
     ),
     JADE(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.LIME) },
-        checkArea = { inCrystalHollows || inGlacite }, true,
+        checkArea = { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE,
     ),
     SAPPHIRE(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.LIGHT_BLUE) },
-        checkArea = { inCrystalHollows || inGlacite }, true,
+        checkArea = { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE,
     ),
     TOPAZ(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.YELLOW) },
-        checkArea = { inCrystalHollows || inGlacite }, true,
+        checkArea = { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE,
     ),
     JASPER(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.MAGENTA) },
-        checkArea = { inCrystalHollows || inGlacite }, true,
+        checkArea = { inCrystalHollows || inGlacite }, OreCategory.GEMSTONE,
     ),
     OPAL(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.WHITE) },
-        checkArea = { inGlacite || inCrimsonIsle }, true,
+        checkArea = { inGlacite || inCrimsonIsle }, OreCategory.GEMSTONE,
     ),
     AQUAMARINE(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.BLUE) },
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.GEMSTONE,
     ),
     CITRINE(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.BROWN) },
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.GEMSTONE,
     ),
     ONYX(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.BLACK) },
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.GEMSTONE,
     ),
     PERIDOT(
         checkBlock = { it.isGemstoneWithColor(EnumDyeColor.GREEN) },
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.GEMSTONE,
     ),
 
     // GLACIAL
     LOW_TIER_UMBER(
         checkBlock = ::isLowTierUmber,
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.DWARVEN_METAL,
     ),
     HIGH_TIER_UMBER(
         checkBlock = ::isHighTierUmber,
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.DWARVEN_METAL,
     ),
 
     LOW_TIER_TUNGSTEN_TUNNELS(
         checkBlock = ::isLowTierTungstenTunnels,
-        checkArea = { inTunnels }, true,
+        checkArea = { inTunnels }, OreCategory.DWARVEN_METAL,
     ),
     LOW_TIER_TUNGSTEN_MINESHAFT(
         checkBlock = ::isLowTierTungstenMineshaft,
-        checkArea = { inMineshaft }, true,
+        checkArea = { inMineshaft }, OreCategory.DWARVEN_METAL,
     ),
     HIGH_TIER_TUNGSTEN(
         checkBlock = { it.block == Blocks.clay },
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.DWARVEN_METAL,
     ),
 
     GLACITE(
         checkBlock = { it.block == Blocks.packed_ice },
-        checkArea = { inGlacite }, true,
+        checkArea = { inGlacite }, OreCategory.DWARVEN_METAL,
     ),
     ;
 
@@ -288,7 +295,7 @@ enum class OreBlock(
 
     val speedSoftCap get() = ceil(20.0 / 3.0 * strength).toInt()
 
-    val speedForInstantMine get() = strength * if (isOre) 60 else 30
+    val speedForInstantMine get() = strength * if (category != OreCategory.BLOCK) 60 else 30
 
     fun miningTicks(speed: Double): Int = when {
         speed >= speedForInstantMine -> 1
