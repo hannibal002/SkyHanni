@@ -336,18 +336,19 @@ object GhostTracker {
         event.move(64, "#profile.ghostCounter.data.GHOSTSINCESORROW", "#profile.ghostStorage.ghostTracker.ghostsSinceSorrow")
         event.move(64, "#profile.ghostCounter.data.MAXKILLCOMBO", "#profile.ghostStorage.ghostTracker.maxKillCombo")
         event.move(64, "#profile.ghostCounter.data.SKILLXPGAINED", "#profile.ghostStorage.ghostTracker.combatXpGained")
+        event.move(64, "#profile.ghostCounter.totalMF", "#profile.ghostStorage.ghostTracker.totalMagicFind")
 
         event.move(64, "#profile.ghostCounter.data.SORROWCOUNT", "#profile.ghostStorage.ghostTracker.items.SORROW") {
-            element -> migrateItem(element)
+            migrateItem(it)
         }
         event.move(64, "#profile.ghostCounter.data.PLASMACOUNT", "#profile.ghostStorage.ghostTracker.items.PLASMA") {
-            element -> migrateItem(element)
+            migrateItem(it)
         }
         event.move(64, "#profile.ghostCounter.data.VOLTACOUNT", "#profile.ghostStorage.ghostTracker.items.VOLTA") {
-            element -> migrateItem(element)
+            migrateItem(it)
         }
         event.move(64, "#profile.ghostCounter.data.GHOSTLYBOOTS", "#profile.ghostStorage.ghostTracker.items.GHOST_BOOTS") {
-            element -> migrateItem(element)
+            migrateItem(it)
         }
     }
 
