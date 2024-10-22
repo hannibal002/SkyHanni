@@ -38,6 +38,7 @@ import com.google.gson.Gson
 import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.collections.orEmpty
 
 @SkyHanniModule
 object PetAPI {
@@ -183,7 +184,7 @@ object PetAPI {
     fun isPetMenu(inventoryTitle: String, inventoryItems: Map<Int, ItemStack>): Boolean {
         if (!petMenuPattern.matches(inventoryTitle)) return false
 
-        val goBackLore = inventoryItems[48]?.getLore() ?: emptyList()
+        val goBackLore = inventoryItems[48]?.getLore().orEmpty()
         return !goBackLore.any { forgeBackMenuPattern.matches(it) }
     }
 
@@ -272,7 +273,7 @@ object PetAPI {
                     throwUnknownRarity(group("rarity"))
                 }
             ) ?: throwUnknownRarity(group("rarity"))
-            val petName = groupOrNull("name") ?: ""
+            val petName = groupOrNull("name").orEmpty()
             val level = groupOrNull("level")?.toInt() ?: 0
             val xp = levelToXP(level, rarity, petName) ?: return null
 
@@ -460,14 +461,14 @@ object PetAPI {
 
     private fun parsePetName(displayName: String): PetData? {
         petNameMenuPattern.matchMatcher(displayName) {
-            val name = group("name") ?: ""
+            val name = group("name").orEmpty()
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: ErrorManager.skyHanniError(
                 "Couldn't parse pet rarity.",
                 Pair("displayName", displayName),
                 Pair("rarity", group("rarity"))
             )
             val level = group("level").toInt()
-            val skin = group("skin") ?: ""
+            val skin = group("skin").orEmpty()
 
             return PetData(
                 internalName = petNameToInternalName(name, rarity),
@@ -536,7 +537,7 @@ object PetAPI {
     }
 
     private fun getCustomLeveling(petName: String): List<Int> {
-        return petsDataNEU?.get(petName)?.petLevels ?: listOf()
+        return petsDataNEU?.get(petName)?.petLevels.orEmpty()
     }
 
     private fun getRarityOffset(rarity: LorenzRarity, petName: String): Int? {
