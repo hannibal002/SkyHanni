@@ -32,7 +32,7 @@ lines.forEach((line) => {
     const cleanMessage = line.replace(/::.*?::/g, '');
 
     // Append to comment
-    comment += `- [ ] [${fileName}#L${lineNumber}](https://github.com/${GITHUB_REPOSITORY}/blob/${PR_SHA}/${cleanedFilePath}#L${lineNumber}): ${cleanMessage}\n`;
+    comment += `- [${fileName}#L${lineNumber}](https://github.com/${GITHUB_REPOSITORY}/blob/${PR_SHA}/${cleanedFilePath}#L${lineNumber}): ${cleanMessage}\n`;
 });
 
 // Write comment to file
