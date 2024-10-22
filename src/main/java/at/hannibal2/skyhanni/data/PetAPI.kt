@@ -35,7 +35,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
-import com.google.gson.JsonObject
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.collections.orEmpty
@@ -54,8 +53,6 @@ object PetAPI {
         private set
 
     private var xpLeveling: List<Int> = listOf()
-    private var customXpLeveling: JsonObject? = null
-
     private var petsDataNEU: Map<String, NEUPetData>? = null
 
     private val nameToFakeInternalNameCache = mutableMapOf<String, String>()
@@ -520,19 +517,21 @@ object PetAPI {
 
     private fun levelToXP(level: Int, rarity: LorenzRarity, petName: String): Double? {
         val newPetName = petNameToFakeInternalName(petName)
-        val petObject = customXpLeveling?.getAsJsonObject(newPetName)
 
         val rarityOffset = getRarityOffset(rarity, newPetName) ?: return null
-        if (!isValidLevel(level, petObject)) return null
+        if (!isValidLevel(level, newPetName)) return null
 
         val xpList = xpLeveling + getCustomLeveling(newPetName)
 
         return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
     }
 
-    private fun isValidLevel(level: Int, petObject: JsonObject?): Boolean {
-        val maxLevel = petObject?.get("max_level")?.asInt ?: 100
+    private fun isValidLevel(level: Int, petName: String): Boolean {
+        val petsData = petsDataNEU ?: run {
+            ErrorManager.skyHanniError("NEUPetsData is null")
+        }
 
+        val maxLevel = petsData.get(petName)?.maxLevel ?: 100
         return maxLevel >= level
     }
 
