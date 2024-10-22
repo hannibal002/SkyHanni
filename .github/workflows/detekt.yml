@@ -73,9 +73,6 @@ jobs:
                       "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}" \
                       | jq -r '.head.sha')
                     
-                    echo "Latest commit SHA: $PR_LATEST_SHA"
-                    echo "Current workflow SHA: ${{ github.sha }}"
-                    
                     # Compare the SHAs and set a result variable
                     if [[ "${PR_LATEST_SHA}" == "${{ github.sha }}" ]]; then
                       echo "::set-output name=is_latest::true"
