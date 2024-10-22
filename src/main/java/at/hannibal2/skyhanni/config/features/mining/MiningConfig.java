@@ -79,6 +79,11 @@ public class MiningConfig {
     public CrystalHighlighterConfig crystalHighlighter = new CrystalHighlighterConfig();
 
     @Expose
+    @ConfigOption(name = "Flowstate Helper", desc = "")
+    @Accordion
+    public FlowstateHelperConfig flowstateHelper = new FlowstateHelperConfig();
+
+    @Expose
     @ConfigOption(name = "Highlight Commission Mobs", desc = "Highlight mobs that are part of active commissions.")
     @ConfigEditorBoolean
     @FeatureToggle

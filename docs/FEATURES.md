@@ -57,6 +57,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + More chat filters. - Mikecraft1224 (https://github.com/hannibal002/SkyHanni/pull/1750)
     + Filters for rare dungeon chest rewards and sacrifice messages from other players.
 + Add config option to hide achievement spam on Alpha. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2076)
++ Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
 
 </details>
 <details open><summary>
@@ -115,6 +116,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Optionally draws a line to them as well.
 + Added a Secret Chime for Dungeons with adjustable pitch and sound. - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2478)
     + The sound and pitch of chimes in dungeons are customizable.
++ Added Terminal Waypoints. - Stella (https://github.com/hannibal002/SkyHanni/pull/2719)
+    +  Displays waypoints during the F7/M7 Goldor Phase.
 
 </details>
 <details open><summary>
@@ -228,6 +231,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Shows a star on Enchanted Books with an Ultimate Enchant.
 + Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
     +  In Focus Mode, only the name of the item is displayed instead of the full description.
++ Added WASD keybinds to the Abiphone Snake Game. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1968)
 
 </details>
 <details open><summary>
@@ -917,6 +921,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Precision Mining Highlighter. - Cuz_Im_Clicks (https://github.com/hannibal002/SkyHanni/pull/2614)
     +  Draws a box over the Precision Mining particles.
 + Added highlighting boxes to Crystal Nucleus crystals during Hoppity's Hunt. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2598)
++ Added Flowstate Helper. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2561)
+    +  Displays stats for the Flowstate enchantment on mining tools.
 
 </details>
 <details open><summary>
@@ -1016,6 +1022,9 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added an easier way to check your unique Hoppity Eggs collected on each island. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2625)
     +  Shows your progress in the Warp Menu.
     +  Can be automatically hidden when an island is complete.
++ Added the ability to block opening the Chocolate Factory when Booster Cookie is inactive. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2713)
++ Added a feature to block opening Hoppity's trade menu from Abiphone calls if you do not have coins in your purse. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2664)
++ Added the ability to prevent closing Meal Eggs that have Rabbit the Fish inside. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2712)
 
 ### The Carnival
 
@@ -1411,6 +1420,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + Use `/shcarry` to add carries to a customer, and set a price for a slayer boss.
     + Automatically counts slayer bosses you carry.
     + Automatically tracks coins received from customers via `/trade`.
++ Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
+    +  Tracks items and profit while using the Draconic Altar in the End.
 
 </details>
 <details open><summary>
