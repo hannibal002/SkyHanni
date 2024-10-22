@@ -9,7 +9,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.JacobContestsJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.events.LorenzEvent
-import at.hannibal2.skyhanni.events.minecraft.LanguageChangeEvent
+import at.hannibal2.skyhanni.events.minecraft.MinecraftLanguageChangeEvent
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -106,7 +106,7 @@ class ConfigManager {
     @SkyHanniModule
     object LanguageManager {
         @HandleEvent
-        fun onLanguageSwitch(event: LanguageChangeEvent) {
+        fun onLanguageSwitch(event: MinecraftLanguageChangeEvent) {
             if (SkyHanniMod.configManager.hasBeenInitiated) {
                 SkyHanniMod.configManager.recreateProcessor()
                 ConfigGuiManager.editor = null
