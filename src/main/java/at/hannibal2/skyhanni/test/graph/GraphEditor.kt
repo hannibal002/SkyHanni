@@ -27,7 +27,7 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.RaycastUtils
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine_nea
+import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLineNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -230,7 +230,7 @@ object GraphEditor {
 
     private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
-        this.draw3DLine_nea(
+        this.draw3DLineNea(
             edge.node1.position.add(0.5, 0.5, 0.5),
             edge.node2.position.add(0.5, 0.5, 0.5),
             when {
@@ -542,7 +542,11 @@ object GraphEditor {
         }
         val neighbours = GraphEditor.nodes.map { node ->
             edges.filter { it.isInEdge(node) }.map { edge ->
-                val otherNode = if (node == edge.node1) edge.node2 else edge.node1
+                val otherNode =
+                    if (node == edge.node1) edge.node2
+                    else edge.node1
+                // TODO: Fix this to not use a bang bang
+                @Suppress("MapGetWithNotNullAssertionOperator")
                 nodes[indexedTable[otherNode.id]!!] to node.position.distance(otherNode.position)
             }.sortedBy { it.second }
         }
@@ -565,6 +569,8 @@ object GraphEditor {
         val translation = graph.mapIndexed { index, node -> node to nodes[index] }.toMap()
         edges.addAll(
             graph.map { node ->
+                // TODO: Fix this to not use bang bangs
+                @Suppress("MapGetWithNotNullAssertionOperator")
                 node.neighbours.map { GraphingEdge(translation[node]!!, translation[it.key]!!) }
             }.flatten().distinct(),
         )

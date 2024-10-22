@@ -29,7 +29,7 @@ object AshfangManager {
         private set
     var lastSpawnTime = SimpleTimeMark.farPast()
         private set
-    
+
     val active get() = ashfang != null
 
     @HandleEvent

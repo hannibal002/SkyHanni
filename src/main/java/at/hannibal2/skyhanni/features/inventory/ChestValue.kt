@@ -44,7 +44,6 @@ object ChestValue {
     private val chestItems = mutableMapOf<String, Item>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
-    private var compactInventory = true
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {

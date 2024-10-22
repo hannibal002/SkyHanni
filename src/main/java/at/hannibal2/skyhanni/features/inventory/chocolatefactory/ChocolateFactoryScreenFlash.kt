@@ -4,6 +4,8 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryRabbitWarningConfig.FlashScreenTypeEntry
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI.specialRabbitTextures
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeGoldenRabbitPattern
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryDataLoader.clickMeRabbitPattern
@@ -23,7 +25,7 @@ import kotlin.math.sin
 object ChocolateFactoryScreenFlash {
 
     private val config get() = ChocolateFactoryAPI.config
-    var flashScreen = false
+    private var flashScreen = false
 
     @HandleEvent
     fun onTick(event: SecondPassedEvent) {
@@ -39,6 +41,12 @@ object ChocolateFactoryScreenFlash {
                 FlashScreenTypeEntry.NONE -> false
             }
         }
+    }
+
+    @HandleEvent
+    fun onRabbitFound(event: RabbitFoundEvent) {
+        if (event.eggType != HoppityEggType.STRAY) return
+        flashScreen = false
     }
 
     private fun isSpecial(slot: Slot) =

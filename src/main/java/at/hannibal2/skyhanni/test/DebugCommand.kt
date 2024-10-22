@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.repo.RepoManager
+import at.hannibal2.skyhanni.data.repo.RepoManager.Companion.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -145,16 +146,31 @@ object DebugCommand {
 
     private fun repoData(event: DebugDataCollectEvent) {
         event.title("Repo Information")
-        event.addIrrelevant {
-            add(" repoAutoUpdate: ${SkyHanniMod.feature.dev.repo.repoAutoUpdate}")
+        val config = SkyHanniMod.feature.dev.repo
+
+        val hasDefaultSettings = config.location.hasDefaultSettings()
+        val list = buildList {
+            add(" repoAutoUpdate: ${config.repoAutoUpdate}")
             add(" usingBackupRepo: ${RepoManager.usingBackupRepo}")
-            add(" repoLocation: '${RepoManager.getRepoLocation()}'")
+            if (hasDefaultSettings) {
+                add((" repo location: default"))
+            } else {
+                add(" non-default repo location: '${RepoManager.getRepoLocation()}'")
+            }
+
             if (RepoManager.unsuccessfulConstants.isNotEmpty()) {
                 add(" unsuccessful constants:")
                 for (constant in RepoManager.unsuccessfulConstants) {
                     add("  - $constant")
                 }
             }
+        }
+
+        val isRelevant = RepoManager.usingBackupRepo || RepoManager.unsuccessfulConstants.isNotEmpty() || !hasDefaultSettings
+        if (isRelevant) {
+            event.addData(list)
+        } else {
+            event.addIrrelevant(list)
         }
     }
 

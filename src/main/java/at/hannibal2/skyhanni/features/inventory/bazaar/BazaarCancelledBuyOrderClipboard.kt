@@ -95,6 +95,7 @@ object BazaarCancelledBuyOrderClipboard {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
+        @Suppress("UnusedPrivateProperty")
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
             group("coins").formatInt().addSeparators()
         } ?: return

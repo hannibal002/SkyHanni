@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import net.minecraft.entity.Entity
 
@@ -77,5 +76,5 @@ object RiftUpsideDownParkour {
         parkourHelper?.render(event)
     }
 
-    fun isEnabled() = RiftAPI.inRift() && LorenzUtils.skyBlockArea == "Mirrorverse" && config.enabled
+    fun isEnabled() = RiftAPI.inRift() && RiftAPI.inMirrorVerse && config.enabled
 }

@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
@@ -46,7 +45,7 @@ object ChatUtils {
      * @see DEBUG_PREFIX
      */
     fun debug(message: String) {
-        if (SkyHanniMod.feature.dev.debug.enabled && internalChat(DEBUG_PREFIX + message)) {
+        if (LorenzUtils.debug && internalChat(DEBUG_PREFIX + message)) {
             LorenzUtils.consoleLog("[Debug] $message")
         }
     }

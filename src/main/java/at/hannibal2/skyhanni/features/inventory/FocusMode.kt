@@ -19,7 +19,7 @@ object FocusMode {
     @HandleEvent(priority = HandleEvent.LOWEST)
     fun onLorenzToolTip(event: SkyHanniToolTipEvent) {
         if (!isEnabled() || !toggle) return
-        if(event.toolTip.isEmpty()) return
+        if (event.toolTip.isEmpty()) return
         event.toolTip = mutableListOf(event.toolTip.first())
     }
 

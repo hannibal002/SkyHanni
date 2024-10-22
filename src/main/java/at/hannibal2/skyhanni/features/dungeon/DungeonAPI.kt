@@ -146,7 +146,7 @@ object DungeonAPI {
 
     fun getTime(): String = ScoreboardData.sidebarLinesFormatted.matchFirst(timePattern) {
         "${groupOrNull("minutes") ?: "00"}:${group("seconds")}"
-    } ?: ""
+    }.orEmpty()
 
     fun getCurrentBoss(): DungeonFloor? {
         val floor = dungeonFloor ?: return null
@@ -183,7 +183,7 @@ object DungeonAPI {
         if (dungeonFloor != null && playerClass == null) {
             val playerTeam = TabListData.getTabList().firstOrNull {
                 it.contains(LorenzUtils.getPlayerName())
-            }?.removeColor() ?: ""
+            }?.removeColor().orEmpty()
 
             for (dungeonClass in DungeonClass.entries) {
                 if (playerTeam.contains("(${dungeonClass.scoreboardName} ")) {

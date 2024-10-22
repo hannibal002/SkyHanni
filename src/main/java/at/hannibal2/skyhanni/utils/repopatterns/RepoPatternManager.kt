@@ -44,7 +44,7 @@ object RepoPatternManager {
     private val remotePattern: NavigableMap<String, String>
         get() = TreeMap(
             if (localLoading) mapOf()
-            else regexes?.regexes ?: mapOf(),
+            else regexes?.regexes.orEmpty()
         )
 
     /**
@@ -98,9 +98,11 @@ object RepoPatternManager {
                 val previousOwner = exclusivity[key]
                 if (previousOwner != owner && previousOwner != null && !previousOwner.transient) {
                     if (!config.tolerateDuplicateUsage)
-                        crash("Non unique access to regex at \"$key\". " +
-                            "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
-                            "tried to use at ${owner.ownerClass} / ${owner.property}")
+                        crash(
+                            "Non unique access to regex at \"$key\". " +
+                                "First obtained by ${previousOwner.ownerClass} / ${previousOwner.property}, " +
+                                "tried to use at ${owner.ownerClass} / ${owner.property}"
+                        )
                 } else {
                     exclusivity[key] = owner
                 }

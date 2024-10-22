@@ -94,7 +94,7 @@ enum class TabWidget(
     ),
     EVENT(
         // language=RegExp
-        "(?:§.)*Event: (?:§.)*(?<event>.*)",
+        "(?:§.)*Event: (?<color>(?:§.)*)(?<event>.*)",
     ),
     SKILLS(
         // language=RegExp

@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option.KILLS
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.bestiaryData
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.isUsingCTGho
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.preFormat
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostUtil.prettyTime
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
-import at.hannibal2.skyhanni.features.misc.IslandAreas
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.chat
@@ -81,7 +81,7 @@ object GhostCounter {
         "skillxp",
         "[+](?<gained>[0-9,.]+) \\((?<current>[0-9,.]+)(?:/(?<total>[0-9,.]+))?\\)",
     )
-    
+
     @Suppress("MaxLineLength")
     private val combatSectionPattern by patternGroup.pattern(
         "combatsection",
@@ -284,8 +284,10 @@ object GhostCounter {
         val moneyMadeTips = buildList {
             for ((name, count, value) in priceMap) {
                 moneyMade += (count.toLong() * value.toLong())
-                add("$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} §f= " +
-                    "§6${(value.toLong() * count.toLong()).addSeparators()}")
+                add(
+                    "$name: §b${value.addSeparators()} §fx §b${count.addSeparators()} §f= " +
+                        "§6${(value.toLong() * count.toLong()).addSeparators()}"
+                )
             }
             add("§bTotal: §6${moneyMade.addSeparators()}")
             add("§eClick to copy to clipboard!")
@@ -346,8 +348,8 @@ object GhostCounter {
     }
 
     @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        inMist = IslandAreas.currentAreaName == "The Mist"
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inMist = event.area == "The Mist"
     }
 
     @HandleEvent
