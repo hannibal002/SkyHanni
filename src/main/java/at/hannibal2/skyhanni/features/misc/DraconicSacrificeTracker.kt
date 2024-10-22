@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -109,8 +109,8 @@ object DraconicSacrificeTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         sacrificeLoot.matchMatcher(event.message) {
             val amount = group("amount").toInt()
             val item = group("item")
@@ -130,7 +130,7 @@ object DraconicSacrificeTracker {
         tracker.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (config.onlyInVoidSlate && !altarArea.isPlayerInside()) return
