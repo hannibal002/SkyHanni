@@ -188,7 +188,7 @@ object EssenceShopHelper {
                     add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
 
                     add("")
-                    add("§eClick to open Bazaar")
+                    add("§eClick to open Bazaar!")
                 } else addAll(listOf("", "§eYou have enough essence"))
             }
 
