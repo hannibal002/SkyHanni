@@ -79,24 +79,24 @@ object TheGreatSpook {
         "§4\\[FEAR] Public Speaking Demon§r§f: (Speak|Say something interesting) (?<name>.*)!",
     )
 
-    private fun mathSolver(math: String?) {
-        val result = math?.let { NEUCalculator.calculateOrNull(it)?.toInt() } ?: run {
-            ChatUtils.userError("Failed to solve $math!")
+    private fun mathSolver(query: String?) {
+        val answer = query?.let { NEUCalculator.calculateOrNull(it)?.toInt() } ?: run {
+            ChatUtils.userError("Failed to solve $query!")
             return
         }
         ChatUtils.clickToActionOrDisable(
-            "The result is: $result",
+            "The answer is: $answer",
             config.primalFearSolver::math,
-            actionName = "Send the result",
+            actionName = "Send the answer",
             action = {
-                HypixelCommands.allChat(result.toString())
+                HypixelCommands.allChat(answer.toString())
             },
         )
     }
 
     private fun publicSpeakingSolver() {
         ChatUtils.clickToActionOrDisable(
-            "Click to send a random string to complete the Primal Fear",
+            "Click to complete the Primal Fear",
             config.primalFearSolver::publicSpeaking,
             actionName = "send a random string.",
             action = {
@@ -110,9 +110,8 @@ object TheGreatSpook {
         if (!LorenzUtils.inSkyBlock) return
 
         if (config.primalFearSolver.math) {
-            val math = mathFearMessagePattern.matchMatcher(event.message) { group("math") } ?: return
             DelayedRun.runNextTick {
-                mathSolver(math)
+                mathFearMessagePattern.matchMatcher(event.message) { mathSolver(group("math")) } ?: return@runNextTick
             }
         }
 
