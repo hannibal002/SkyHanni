@@ -110,8 +110,10 @@ object TheGreatSpook {
         if (!LorenzUtils.inSkyBlock) return
 
         if (config.primalFearSolver.math) {
-            DelayedRun.runNextTick {
-                mathFearMessagePattern.matchMatcher(event.message) { mathSolver(group("math")) } ?: return@runNextTick
+            mathFearMessagePattern.matchMatcher(event.message) {
+                DelayedRun.runNextTick {
+                    mathSolver(group("math"))
+                }
             }
         }
 
