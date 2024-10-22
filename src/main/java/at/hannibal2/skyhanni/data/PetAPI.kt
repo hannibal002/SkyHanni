@@ -54,10 +54,9 @@ object PetAPI {
 
     private var xpLeveling: List<Int> = listOf()
     private var customXpLeveling: JsonObject? = null
-    private var petRarityOffset = mapOf<LorenzRarity, Int>()
     private var customDisplayToInternalName = mapOf<NEUInternalName, String>()
 
-    private var NEUPetsData: Map<String, NEUPetData>? = null
+    private var petsDataNEU: Map<String, NEUPetData>? = null
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -80,26 +79,6 @@ object PetAPI {
     private val petNameMenuPattern by patternGroup.pattern(
         "menu.pet.name",
         "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$"
-    )
-
-    /**
-     * REGEX-TEST: §6Held Item: §9Mining Exp Boost
-     * REGEX-TEST: §6Held Item: §fAll Skills Exp Boost
-     * REGEX-TEST: §6Held Item: §9Dwarf Turtle Shelmet
-     */
-    private val petItemMenuPattern by patternGroup.pattern(
-        "menu.pet.item",
-        "^§6Held Item: (?<item>§.[\\w -]+)\$"
-    )
-
-    /**
-     * REGEX-TEST: §7Progress to Level 45: §e94.4%
-     * REGEX-TEST: §8▸ 25,396,280 XP
-     * REGEX-TEST: §7Progress to Level 58: §e3.3%
-     */
-    private val petXPMenuPattern by patternGroup.pattern(
-        "menu.pet.xp",
-        "§.(?:Progress to Level (?<level>\\d+): §e(?<percentage>[\\d.]+)%|▸ (?<totalXP>[\\d,.]+) XP)\$"
     )
 
     /**
@@ -147,7 +126,7 @@ object PetAPI {
      */
     private val xpWidgetPattern by patternGroup.pattern(
         "widget.xp",
-        "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflow>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6\\/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
+        "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflow>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
     )
 
     /**
@@ -284,9 +263,11 @@ object PetAPI {
 
     private fun handleWidgetPetLine(line: String, newPetLine: String): PetData? {
         return petWidgetPattern.matchMatcher(line) {
-            val rarity = LorenzRarity.getByColorCode(groupOrNull("rarity")?.get(0) ?: run {
-                throwUnknownRarity(group("rarity"))
-            }) ?: throwUnknownRarity(group("rarity"))
+            val rarity = LorenzRarity.getByColorCode(
+                groupOrNull("rarity")?.get(0) ?: run {
+                    throwUnknownRarity(group("rarity"))
+                }
+            ) ?: throwUnknownRarity(group("rarity"))
             val petName = groupOrNull("name") ?: ""
             val level = groupOrNull("level")?.toInt() ?: 0
             val xp = levelToXP(level, rarity, petName) ?: return null
@@ -446,7 +427,7 @@ object PetAPI {
             petItem,
             level,
             petXP,
-            "§r§7[Lvl $level] §r${rarity.chatColorCode}$name${if (skin != "") "§r${skin}" else ""}",
+            "§r§7[Lvl $level] §r${rarity.chatColorCode}$name${if (skin != "") "§r$skin" else ""}",
         )
         updatePet(newPet)
     }
@@ -535,10 +516,10 @@ object PetAPI {
         val newPetName = petNameToFakeInternalName(petName)
         val petObject = customXpLeveling?.getAsJsonObject(newPetName)
 
-        val rarityOffset = getRarityOffset(rarity, petObject?.getAsJsonObject("rarity_offset")) ?: return null
+        val rarityOffset = getRarityOffset(rarity, newPetName) ?: return null
         if (!isValidLevel(level, petObject)) return null
 
-        val xpList = xpLeveling + getCustomLeveling(petObject)
+        val xpList = xpLeveling + getCustomLeveling(newPetName)
 
         return xpList.slice(0 + rarityOffset..<level + rarityOffset - 1).sum().toDouble()
     }
@@ -549,18 +530,20 @@ object PetAPI {
         return maxLevel >= level
     }
 
-    private fun getCustomLeveling(petObject: JsonObject?): List<Int> {
-        return petObject?.getAsJsonArray("pet_levels")?.map { it.asInt } ?: listOf()
+    private fun getCustomLeveling(petName: String): List<Int> {
+        return petsDataNEU?.get(petName)?.petLevels ?: listOf()
     }
 
-    private fun getRarityOffset(rarity: LorenzRarity, petObject: JsonObject?): Int? {
-        return petObject?.entrySet()?.associate { (rarity, offset) ->
-            (LorenzRarity.getByName(rarity) ?: run {
-                ChatUtils.userError("Invalid Rarity '${rarity}''")
-                return null
-            }) to offset.asInt
-        }?.let { it[rarity] }
-            ?: when (rarity) {
+    private fun getRarityOffset(rarity: LorenzRarity, petName: String): Int? {
+        val petsData = petsDataNEU ?: run {
+            ErrorManager.skyHanniError("NEUPetsData is null")
+        }
+
+        return if (petName in petsData.keys) {
+            val petData = petsData[petName]
+            petData?.rarityOffset?.get(rarity)
+        } else {
+            when (rarity) {
                 LorenzRarity.COMMON -> 0
                 LorenzRarity.UNCOMMON -> 6
                 LorenzRarity.RARE -> 11
@@ -572,6 +555,7 @@ object PetAPI {
                     null
                 }
             }
+        }
     }
 
     private fun updatePet(newPet: PetData?) {
@@ -609,26 +593,28 @@ object PetAPI {
         xpLeveling = data.petLevels
         val xpLevelingCustomJson = data.customPetLeveling.getAsJsonObject()
 
-//         customXpLeveling = xpLevelingCustomJson
+        val map = mutableMapOf<String, NEUPetData>()
         for ((petName, json) in xpLevelingCustomJson.entrySet()) {
             val petData = json.asJsonObject
-            val type = try {
-                petData.get("type").asInt
-            } catch (_: Exception) {
-                null
+            val type = petData.get("type")?.asInt
+            val maxLevel = petData.get("max_level")?.asInt
+            val xpMultiplier = petData.get("xp_multiplier")?.asDouble
+            val petLevels = petData.get("pet_levels")?.asJsonArray?.map { it.asInt }
+            val rarityOffset = petData.get("rarity_offset")?.asJsonObject?.entrySet()?.associate { (rarity, offset) ->
+                (LorenzRarity.getByName(rarity) ?: throwUnknownRarity(rarity)) to offset.asInt
             }
-            val data = NEUPetData(
-                type = petData.get("type").asInt,
-                petLevels = TODO(),
-                maxLevel = TODO(),
-                rarityOffset = TODO(),
-                xpMultiplier = petData?.get("xp_multiplier")?.asDouble
-            )
-        }
 
-        petRarityOffset = data.petRarityOffset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
-            (LorenzRarity.getByName(rarity) ?: throwUnknownRarity(rarity)) to offset.asInt
+            val dataNEU = NEUPetData(
+                type = type,
+                petLevels = petLevels,
+                maxLevel = maxLevel,
+                rarityOffset = rarityOffset,
+                xpMultiplier = xpMultiplier,
+            )
+            map[petName] = dataNEU
         }
+        petsDataNEU = map
+
         customDisplayToInternalName = data.internalToDisplayName
     }
 
@@ -638,7 +624,7 @@ object PetAPI {
         if (petName in nameToInternalNameCache) return nameToInternalNameCache[petName].toString()
         val internalName = customDisplayToInternalName.entries.find { it.value == petName }?.key?.asString()
             ?: petName.uppercase().replace(" ", "_")
-        nameToInternalNameCache.put(petName, internalName)
+        nameToInternalNameCache[petName] = internalName
         return internalName
     }
 
