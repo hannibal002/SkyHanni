@@ -51,9 +51,13 @@ object UpdateManager {
         }
     }
 
+    private var hasChecked = false
+
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
+        if (hasChecked) return
+        hasChecked = true
         MinecraftForge.EVENT_BUS.unregister(this)
         if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()
