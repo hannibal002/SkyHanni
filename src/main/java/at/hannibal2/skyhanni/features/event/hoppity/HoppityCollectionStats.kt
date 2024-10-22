@@ -213,7 +213,7 @@ object HoppityCollectionStats {
             val newItemStack = if (config.rarityDyeRecolor) ItemStack(
                 Items.dye, 1,
                 when (rarity) {
-                    LorenzRarity.COMMON -> 7  // Light gray dye
+                    LorenzRarity.COMMON -> 7 // Light gray dye
                     LorenzRarity.UNCOMMON -> 10 // Lime dye
                     LorenzRarity.RARE -> 4 // Lapis lazuli
                     LorenzRarity.EPIC -> 5 // Purple dye
@@ -262,7 +262,7 @@ object HoppityCollectionStats {
                     else -> "" // Never happens
                 }
 
-                //List indexing is weird
+                // List indexing is weird
                 existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount"
                 existingLore[replaceIndex] = "§7all-time §6Chocolate."
                 return existingLore
@@ -505,7 +505,11 @@ object HoppityCollectionStats {
 
             val found = !rabbitNotFoundPattern.anyMatches(itemLore)
 
-            if (!found) continue
+            if (!found) {
+                // if the config has wrong data, remove it
+                loggedRabbits.remove(itemName)
+                continue
+            }
 
             val duplicates = duplicatesFoundPattern.firstMatcher(itemLore) {
                 group("duplicates").formatInt()
@@ -516,9 +520,9 @@ object HoppityCollectionStats {
     }
 
     // bugfix for some weird potential user errors (e.g. if users play on alpha and get rabbits)
-    fun clearSavedRabbits() {
+    fun resetSavedRabbits() {
         loggedRabbits.clear()
-        ChatUtils.chat("Cleared saved rabbit data.")
+        ChatUtils.chat("Reset saved rabbit data.")
     }
 
     fun hasFoundRabbit(rabbit: String): Boolean = loggedRabbits.containsKey(rabbit)

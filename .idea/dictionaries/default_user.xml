@@ -63,6 +63,7 @@
       <w>dicer</w>
       <w>disintegrator</w>
       <w>disintegrators</w>
+      <w>draconic</w>
       <w>dragontail</w>
       <w>dreadfarm</w>
       <w>dreadlord</w>
@@ -86,6 +87,7 @@
       <w>firedust</w>
       <w>firesale</w>
       <w>firesales</w>
+      <w>flowstate</w>
       <w>framebuffer</w>
       <w>getfromsacks</w>
       <w>ghast</w>
@@ -149,6 +151,7 @@
       <w>mineman</w>
       <w>mineshafts</w>
       <w>miniboss</w>
+      <w>minigame</w>
       <w>mirrorverse</w>
       <w>misclick</w>
       <w>missclick</w>
@@ -193,6 +196,8 @@
       <w>pling</w>
       <w>pocalypse</w>
       <w>polarvoid</w>
+      <w>powerup</w>
+      <w>powerups</w>
       <w>preinitialization</w>
       <w>procs</w>
       <w>prospection</w>
@@ -251,6 +256,7 @@
       <w>supercraft</w>
       <w>supercrafting</w>
       <w>superlite</w>
+      <w>superpair</w>
       <w>superpairs</w>
       <w>tablist</w>
       <w>terracottas</w>
