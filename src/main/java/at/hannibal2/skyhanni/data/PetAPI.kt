@@ -37,11 +37,12 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
-import kotlin.collections.orEmpty
 
 @SkyHanniModule
 object PetAPI {
     private val patternGroup = RepoPattern.group("misc.pet")
+
+    //TODO add regex test
     private val petMenuPattern by patternGroup.pattern(
         "menu.title",
         "Pets(?: \\(\\d+/\\d+\\) )?",
@@ -78,7 +79,7 @@ object PetAPI {
      */
     private val petNameMenuPattern by patternGroup.pattern(
         "menu.pet.name",
-        "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$"
+        "^(?:§e(?<favorite>⭐) )?(?:§.)*\\[Lvl (?<level>\\d+)] §(?<rarity>.)(?<name>[\\w ]+)(?<skin>§. ✦)?\$",
     )
 
     /**
@@ -86,7 +87,7 @@ object PetAPI {
      */
     private val petDespawnMenuPattern by patternGroup.pattern(
         "menu.pet.despawn",
-        "§7§cClick to despawn!"
+        "§7§cClick to despawn!",
     )
 
     /**
@@ -96,7 +97,7 @@ object PetAPI {
      */
     private val forgeBackMenuPattern by patternGroup.pattern(
         "menu.forge.goback",
-        "§7To Select Process \\(Slot #\\d\\)"
+        "§7To Select Process \\(Slot #\\d\\)",
     )
 
     /**
@@ -138,7 +139,7 @@ object PetAPI {
      */
     private val autopetMessagePattern by patternGroup.pattern(
         "chat.autopet",
-        "^§cAutopet §eequipped your §7(?<pet>\\[Lvl \\d{1,3}] §.[\\w ]+)(?:§. ✦)?§e! §a§lVIEW RULE\$"
+        "^§cAutopet §eequipped your §7(?<pet>\\[Lvl \\d{1,3}] §.[\\w ]+)(?:§. ✦)?§e! §a§lVIEW RULE\$",
     )
 
     /**
@@ -148,7 +149,7 @@ object PetAPI {
      */
     private val autopetHoverPetPattern by patternGroup.pattern(
         "chat.autopet.hover.pet",
-        "^§r, §aEquip: §r,(?: §e⭐ §r,)? §7\\[Lvl (?<level>\\d+)] §r, §(?<rarity>.)(?<pet>[\\w ]+)(?:§r, (?<skin>§. ✦))?\$"
+        "^§r, §aEquip: §r,(?: §e⭐ §r,)? §7\\[Lvl (?<level>\\d+)] §r, §(?<rarity>.)(?<pet>[\\w ]+)(?:§r, (?<skin>§. ✦))?\$",
     )
 
     /**
@@ -158,7 +159,7 @@ object PetAPI {
      */
     private val autopetHoverPetItemPattern by patternGroup.pattern(
         "chat.autopet.hover.item",
-        "^§r, §aHeld Item: §r, (?<item>§.[\\w -]+)§r]\$"
+        "^§r, §aHeld Item: §r, (?<item>§.[\\w -]+)§r]\$",
     )
 
     /**
@@ -166,7 +167,7 @@ object PetAPI {
      */
     private val petItemMessagePattern by patternGroup.pattern(
         "chat.pet.item.equip",
-        "^§aYour pet is now holding §r(?<petItem>§.[\\w -]+)§r§a\\.\$"
+        "^§aYour pet is now holding §r(?<petItem>§.[\\w -]+)§r§a\\.\$",
     )
 
     private val ignoredPetStrings = listOf(
@@ -263,128 +264,121 @@ object PetAPI {
         updatePet(newPetData.copy(xp = newPetData.xp + overflowXP))
     }
 
-    private fun handleWidgetPetLine(line: String, newPetLine: String): PetData? {
-        return petWidgetPattern.matchMatcher(line) {
-            val rarity = LorenzRarity.getByColorCode(
-                groupOrNull("rarity")?.get(0) ?: run {
-                    throwUnknownRarity(group("rarity"))
-                }
-            ) ?: throwUnknownRarity(group("rarity"))
-            val petName = groupOrNull("name").orEmpty()
-            val level = groupOrNull("level")?.toInt() ?: 0
-            val xp = levelToXP(level, rarity, petName) ?: return null
+    private fun handleWidgetPetLine(line: String, newPetLine: String): PetData? = petWidgetPattern.matchMatcher(line) {
+        val rarity = LorenzRarity.getByColorCode(
+            groupOrNull("rarity")?.get(0) ?: run {
+                throwUnknownRarity(group("rarity"))
+            },
+        ) ?: throwUnknownRarity(group("rarity"))
+        val petName = groupOrNull("name").orEmpty()
+        val level = groupOrNull("level")?.toInt() ?: 0
+        val xp = levelToXP(level, rarity, petName) ?: return null
 
-            return PetData(
-                petNameToInternalName(petName, rarity),
-                petName,
-                rarity,
-                null,
-                level,
-                xp,
-                newPetLine,
-            )
-        }
+        return PetData(
+            petNameToInternalName(petName, rarity),
+            petName,
+            rarity,
+            null,
+            level,
+            xp,
+            newPetLine,
+        )
     }
 
-    private fun handleWidgetStringLine(line: String): NEUInternalName? {
-        return widgetStringPattern.matchMatcher(line) {
-            val string = group("string")
-            if (string == "No pet selected") {
-                PetChangeEvent(pet, null).post()
-                pet = null
-                return null
-            }
-            return NEUInternalName.fromItemNameOrNull(string)
+    private fun handleWidgetStringLine(line: String): NEUInternalName? = widgetStringPattern.matchMatcher(line) {
+        val string = group("string")
+        if (string == "No pet selected") {
+            PetChangeEvent(pet, null).post()
+            pet = null
+            return null
         }
+        return NEUInternalName.fromItemNameOrNull(string)
     }
 
-    private fun handleWidgetXPLine(line: String): Double? {
-        xpWidgetPattern.matchMatcher(line) {
-            if (hasGroup("max")) return null
+    private fun handleWidgetXPLine(line: String): Double? = xpWidgetPattern.matchMatcher(line) {
+        if (hasGroup("max")) return null
 
-            return group("overflow")?.formatDouble() ?: group("currentXP")?.formatDouble()
-        }
-        return null
+        group("overflow")?.formatDouble() ?: group("currentXP")?.formatDouble()
     }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (autopetMessagePattern.matches(event.message)) {
-            val hoverMessage = event.chatComponent.hover?.siblings?.joinToString("")?.split("\n") ?: return
-
-            var internalName: NEUInternalName? = null
-            var cleanName: String? = null
-            var rarity: LorenzRarity? = null
-            var level: Int? = null
-            var xp: Double? = null
-            var rawPetName: String? = null
-            var petItem: NEUInternalName? = null
-            for (line in hoverMessage) {
-                val item = readAutopetItemMessage(line)
-                if (item != null) {
-                    petItem = item
-                    continue
-                }
-
-                val data = readAutopetMessage(line)
-                if (data != null) {
-                    internalName = data.internalName
-                    cleanName = data.cleanName
-                    rarity = data.rarity
-                    level = data.level
-                    xp = data.xp
-                    rawPetName = data.rawPetName
-                    continue
-                }
-            }
-            val petData = PetData(
-                internalName ?: return,
-                cleanName ?: return,
-                rarity ?: return,
-                petItem,
-                level ?: return,
-                xp ?: return,
-                rawPetName ?: return,
-            )
-            updatePet(petData.copy(petItem = petItem))
+            onAutopetMessage(event)
             return
         }
         petItemMessagePattern.matchMatcher(event.message) {
             val item = NEUInternalName.fromItemNameOrNull(group("petItem")) ?: ErrorManager.skyHanniError(
                 "Couldn't parse pet item name.",
                 Pair("message", event.message),
-                Pair("item", group("petItem"))
+                Pair("item", group("petItem")),
             )
             val newPet = pet?.copy(petItem = item) ?: return
             updatePet(newPet)
         }
     }
 
-    private fun readAutopetMessage(string: String): PetData? {
-        autopetHoverPetPattern.matchMatcher(string) {
-            val level = group("level").toInt()
-            val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: throwUnknownRarity(group("rarity"))
-            val petName = group("pet")
-            val hasSkin = group("skin") != null
+    // TODO change this function to be less confusing
+    private fun onAutopetMessage(event: LorenzChatEvent) {
+        val hoverMessage = event.chatComponent.hover?.siblings?.joinToString("")?.split("\n") ?: return
 
-            val fakePetLine = "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (hasSkin) "§r${group("skin")}" else ""}"
+        var internalName: NEUInternalName? = null
+        var cleanName: String? = null
+        var rarity: LorenzRarity? = null
+        var level: Int? = null
+        var xp: Double? = null
+        var rawPetName: String? = null
+        var petItem: NEUInternalName? = null
+        for (line in hoverMessage) {
+            val item = readAutopetItemMessage(line)
+            if (item != null) {
+                petItem = item
+                continue
+            }
 
-            return PetData(
-                internalName = petNameToInternalName(petName, rarity),
-                cleanName = petName,
-                rarity = rarity,
-                level = level,
-                xp = levelToXP(level, rarity, petName) ?: 0.0,
-                rawPetName = fakePetLine,
-            )
+            val data = readAutopetMessage(line)
+            if (data != null) {
+                internalName = data.internalName
+                cleanName = data.cleanName
+                rarity = data.rarity
+                level = data.level
+                xp = data.xp
+                rawPetName = data.rawPetName
+                continue
+            }
         }
-        return null
+        val petData = PetData(
+            internalName ?: return,
+            cleanName ?: return,
+            rarity ?: return,
+            petItem,
+            level ?: return,
+            xp ?: return,
+            rawPetName ?: return,
+        )
+        updatePet(petData.copy(petItem = petItem))
     }
 
-    private fun readAutopetItemMessage(string: String): NEUInternalName? {
-        return autopetHoverPetItemPattern.matchMatcher(string) {
-            NEUInternalName.fromItemNameOrNull(group("item"))
-        }
+    private fun readAutopetMessage(string: String): PetData? = autopetHoverPetPattern.matchMatcher(string) {
+        val level = group("level").toInt()
+        val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: throwUnknownRarity(group("rarity"))
+        val petName = group("pet")
+        val hasSkin = group("skin") != null
+
+        val fakePetLine = "§r§7[Lvl $level] §r${rarity.chatColorCode}$petName${if (hasSkin) "§r${group("skin")}" else ""}"
+
+        return PetData(
+            internalName = petNameToInternalName(petName, rarity),
+            cleanName = petName,
+            rarity = rarity,
+            level = level,
+            xp = levelToXP(level, rarity, petName) ?: 0.0,
+            rawPetName = fakePetLine,
+        )
+    }
+
+    private fun readAutopetItemMessage(string: String): NEUInternalName? = autopetHoverPetItemPattern.matchMatcher(string) {
+        NEUInternalName.fromItemNameOrNull(group("item"))
     }
 
     @SubscribeEvent
@@ -442,7 +436,7 @@ object PetAPI {
         val rarity = LorenzRarity.getByName(petInfo.tier) ?: ErrorManager.skyHanniError(
             "Couldn't parse pet rarity.",
             Pair("petNBT", petInfo),
-            Pair("rarity", petInfo.tier)
+            Pair("rarity", petInfo.tier),
         )
 
         return PetData(
@@ -462,7 +456,7 @@ object PetAPI {
             val rarity = LorenzRarity.getByColorCode(group("rarity")[0]) ?: ErrorManager.skyHanniError(
                 "Couldn't parse pet rarity.",
                 Pair("displayName", displayName),
-                Pair("rarity", group("rarity"))
+                Pair("rarity", group("rarity")),
             )
             val level = group("level").toInt()
             val skin = group("skin").orEmpty()
@@ -640,7 +634,7 @@ object PetAPI {
     private fun throwUnknownRarity(badRarity: String): Nothing {
         ErrorManager.skyHanniError(
             "Unknown rarity",
-            Pair("rarity", badRarity)
+            Pair("rarity", badRarity),
         )
     }
 }
@@ -657,7 +651,7 @@ data class PetNBT(
     val uuid: String,
     val uniqueId: String,
     val hideRightClick: Boolean,
-    val noMove: Boolean
+    val noMove: Boolean,
 )
 
 data class NEUPetData(

@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
+import at.hannibal2.skyhanni.features.misc.discordrpc.getPetDisplay
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
 import at.hannibal2.skyhanni.skyhannimodule.LoadedModules
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -48,6 +49,8 @@ class SkyHanniMod {
 
     @Mod.EventHandler
     fun preInit(event: FMLPreInitializationEvent?) {
+
+        getPetDisplay()
         checkIfNeuIsLoaded()
 
         HotswapSupport.load()
