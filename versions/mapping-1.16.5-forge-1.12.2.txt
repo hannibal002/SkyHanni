@@ -92,13 +92,13 @@ net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket net.minecra
 net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket net.minecraft.network.play.server.SPacketEntityEquipment
 net.minecraft.network.protocol.game.ClientboundSetPlayerTeamPacket net.minecraft.network.play.server.SPacketTeams
 net.minecraft.network.protocol.game.ClientboundSetScorePacket net.minecraft.network.play.server.SPacketUpdateScore
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.SPacketTitle
 net.minecraft.network.protocol.game.ClientboundSoundPacket net.minecraft.network.play.server.SPacketSoundEffect
 net.minecraft.network.protocol.game.ClientboundTabListPacket net.minecraft.network.play.server.SPacketPlayerListHeaderFooter
 net.minecraft.network.protocol.game.ClientboundTakeItemEntityPacket net.minecraft.network.play.server.SPacketCollectItem
 net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket net.minecraft.network.play.server.SPacketEntityTeleport
 net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket net.minecraft.network.play.server.SPacketEntityProperties
 net.minecraft.network.protocol.game.ClientboundUpdateMobEffectPacket net.minecraft.network.play.server.SPacketEntityEffect
-net.minecraft.network.protocol.game.ClientboundSetTitlesPacket net.minecraft.network.play.server.SPacketTitle
 
 net.minecraft.network.protocol.game.ClientboundAddEntityPacket getId() getEntityID()
 
@@ -135,6 +135,8 @@ net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket getId() get
 net.minecraft.network.protocol.game.ClientboundSetEquipmentPacket getEntity() getEntityID()
 
 net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getEntityId()
+
+net.minecraft.network.protocol.game.ClientboundSetTitlesPacket getText() getMessage()
 
 net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraft.network.play.client.CPacketClickWindow
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
@@ -252,7 +254,7 @@ org.lwjgl.glfw.GLFW GLFW_KEY_T KEY_T
 org.lwjgl.glfw.GLFW GLFW_KEY_U KEY_U
 org.lwjgl.glfw.GLFW GLFW_KEY_V KEY_V
 org.lwjgl.glfw.GLFW GLFW_KEY_W KEY_W
-org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_X
+org.lwjgl.glfw.GLFW GLFW_KEY_X KEY_X
 org.lwjgl.glfw.GLFW GLFW_KEY_Y KEY_Y
 org.lwjgl.glfw.GLFW GLFW_KEY_Z KEY_Z
 org.lwjgl.glfw.GLFW GLFW_KEY_LEFT_CONTROL KEY_LCONTROL
@@ -264,3 +266,11 @@ org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT_SHIFT KEY_RSHIFT
 org.lwjgl.glfw.GLFW GLFW_KEY_SPACE KEY_SPACE
 org.lwjgl.glfw.GLFW GLFW_KEY_TAB KEY_TAB
 org.lwjgl.glfw.GLFW GLFW_KEY_UNKNOWN KEY_NONE
+org.lwjgl.glfw.GLFW GLFW_KEY_F3 KEY_F3
+org.lwjgl.glfw.GLFW GLFW_KEY_LEFT KEY_LEFT
+org.lwjgl.glfw.GLFW GLFW_KEY_RIGHT KEY_RIGHT
+org.lwjgl.glfw.GLFW GLFW_KEY_UP KEY_UP
+org.lwjgl.glfw.GLFW GLFW_KEY_DOWN KEY_DOWN
+org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
+org.lwjgl.glfw.GLFW GLFW_KEY_ENTER KEY_RETURN
+org.lwjgl.glfw.GLFW GLFW_KEY_ESCAPE KEY_ESCAPE
