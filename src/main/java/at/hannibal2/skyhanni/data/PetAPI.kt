@@ -57,6 +57,8 @@ object PetAPI {
     private var petRarityOffset = mapOf<LorenzRarity, Int>()
     private var customDisplayToInternalName = mapOf<NEUInternalName, String>()
 
+    private var NEUPetsData: Map<String, NEUPetData>? = null
+
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
      * REGEX-TEST: ⭐ [Lvl 100] Black Cat ✦
@@ -607,7 +609,22 @@ object PetAPI {
         xpLeveling = data.petLevels
         val xpLevelingCustomJson = data.customPetLeveling.getAsJsonObject()
 
-        customXpLeveling = xpLevelingCustomJson
+//         customXpLeveling = xpLevelingCustomJson
+        for ((petName, json) in xpLevelingCustomJson.entrySet()) {
+            val petData = json.asJsonObject
+            val type = try {
+                petData.get("type").asInt
+            } catch (_: Exception) {
+                null
+            }
+            val data = NEUPetData(
+                type = petData.get("type").asInt,
+                petLevels = TODO(),
+                maxLevel = TODO(),
+                rarityOffset = TODO(),
+                xpMultiplier = petData?.get("xp_multiplier")?.asDouble
+            )
+        }
 
         petRarityOffset = data.petRarityOffset.getAsJsonObject().entrySet().associate { (rarity, offset) ->
             (LorenzRarity.getByName(rarity) ?: throwUnknownRarity(rarity)) to offset.asInt
@@ -615,9 +632,14 @@ object PetAPI {
         customDisplayToInternalName = data.internalToDisplayName
     }
 
+    private val nameToInternalNameCache = mutableMapOf<String, String>()
+
     private fun petNameToFakeInternalName(petName: String): String {
-        return customDisplayToInternalName.entries.find { it.value == petName }?.key?.asString()
+        if (petName in nameToInternalNameCache) return nameToInternalNameCache[petName].toString()
+        val internalName = customDisplayToInternalName.entries.find { it.value == petName }?.key?.asString()
             ?: petName.uppercase().replace(" ", "_")
+        nameToInternalNameCache.put(petName, internalName)
+        return internalName
     }
 
     private fun petNameToInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
@@ -644,4 +666,12 @@ data class PetNBT(
     val uniqueId: String,
     val hideRightClick: Boolean,
     val noMove: Boolean
+)
+
+data class NEUPetData(
+    val type: Int?,
+    val petLevels: List<Int>?,
+    val maxLevel: Int?,
+    val rarityOffset: Map<LorenzRarity, Int>?,
+    val xpMultiplier: Double?,
 )
