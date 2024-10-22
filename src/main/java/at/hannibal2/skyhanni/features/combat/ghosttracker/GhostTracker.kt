@@ -332,32 +332,25 @@ object GhostTracker {
 
     @SubscribeEvent
     fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+
+        fun migrateItem(oldData: JsonElement): JsonElement {
+            val oldAmount = oldData.asInt
+            val newData = JsonObject()
+            newData.addProperty("timesGained", oldAmount)
+            newData.addProperty("totalAmount", oldAmount)
+            newData.addProperty("hidden", false)
+            return newData
+        }
+
         event.move(64, "#profile.ghostCounter.data.KILLS", "#profile.ghostStorage.ghostTracker.kills")
         event.move(64, "#profile.ghostCounter.data.GHOSTSINCESORROW", "#profile.ghostStorage.ghostTracker.ghostsSinceSorrow")
         event.move(64, "#profile.ghostCounter.data.MAXKILLCOMBO", "#profile.ghostStorage.ghostTracker.maxKillCombo")
         event.move(64, "#profile.ghostCounter.data.SKILLXPGAINED", "#profile.ghostStorage.ghostTracker.combatXpGained")
         event.move(64, "#profile.ghostCounter.totalMF", "#profile.ghostStorage.ghostTracker.totalMagicFind")
 
-        event.move(64, "#profile.ghostCounter.data.SORROWCOUNT", "#profile.ghostStorage.ghostTracker.items.SORROW") {
-            migrateItem(it)
-        }
-        event.move(64, "#profile.ghostCounter.data.PLASMACOUNT", "#profile.ghostStorage.ghostTracker.items.PLASMA") {
-            migrateItem(it)
-        }
-        event.move(64, "#profile.ghostCounter.data.VOLTACOUNT", "#profile.ghostStorage.ghostTracker.items.VOLTA") {
-            migrateItem(it)
-        }
-        event.move(64, "#profile.ghostCounter.data.GHOSTLYBOOTS", "#profile.ghostStorage.ghostTracker.items.GHOST_BOOTS") {
-            migrateItem(it)
-        }
-    }
-
-    private fun migrateItem(oldData: JsonElement): JsonElement {
-        val oldAmount = oldData.asInt
-        val newData = JsonObject()
-        newData.addProperty("timesGained", oldAmount)
-        newData.addProperty("totalAmount", oldAmount)
-        newData.addProperty("hidden", false)
-        return newData
+        event.move(64, "#profile.ghostCounter.data.SORROWCOUNT", "#profile.ghostStorage.ghostTracker.items.SORROW", ::migrateItem)
+        event.move(64, "#profile.ghostCounter.data.PLASMACOUNT", "#profile.ghostStorage.ghostTracker.items.PLASMA", ::migrateItem)
+        event.move(64, "#profile.ghostCounter.data.VOLTACOUNT", "#profile.ghostStorage.ghostTracker.items.VOLTA", ::migrateItem)
+        event.move(64, "#profile.ghostCounter.data.GHOSTLYBOOTS", "#profile.ghostStorage.ghostTracker.items.GHOST_BOOTS", ::migrateItem)
     }
 }
