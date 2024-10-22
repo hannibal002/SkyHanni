@@ -33,6 +33,7 @@ object CarnivalShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
+    private val NAME_TAG_ITEM by lazy { "NAME_TAG".asInternalName().getItemStack().item }
 
     private var repoEventShops = mutableListOf<EventShop>()
     private var currentProgress: EventShopProgress? = null
@@ -92,8 +93,9 @@ object CarnivalShopHelper {
         tryReplaceOverviewStack(event)
     }
 
+    private fun ReplaceItemEvent.isUnknownShop() = repoEventShops.none { it.shopName.equals(this.inventory.name, ignoreCase = true) }
     private fun tryReplaceShopSpecificStack(event: ReplaceItemEvent) {
-        if (currentProgress == null || !repoEventShops.any { it.shopName.equals(event.inventory.name, ignoreCase = true) }) return
+        if (currentProgress == null || event.isUnknownShop()) return
         shopSpecificInfoItemStack.let { event.replace(it) }
     }
 
@@ -151,13 +153,14 @@ object CarnivalShopHelper {
         val tokensNeeded = cost - tokensOwned
         if (tokensOwned > 0) this.add("§7Tokens Owned: §8${tokensOwned.addSeparators()}")
         if (tokensNeeded > 0) this.add("§7Additional Tokens Needed: §8${tokensNeeded.addSeparators()}${extraFormatting.orEmpty()}")
-        else this.addAll(listOf("", "§e§oYou have enough tokens!"))
+        else this.addAll(listOf("", "§eYou have enough tokens"))
     }
 
     private fun regenerateOverviewItemStack() {
         if (repoEventShops.isEmpty()) return
         val storage = ProfileStorageData.profileSpecific?.carnival?.carnivalShopProgress ?: return
         val lore = buildList {
+            add("§8(From SkyHanni)")
             add("")
             var sumTokensNeeded = 0
             var foundShops = 0
@@ -178,8 +181,7 @@ object CarnivalShopHelper {
             sumTokensNeeded.takeIf { it > 0 }?.let { addNeededRemainingTokens(it, extraFormatting) }
         }
         overviewInfoItemStack = createItemStack(
-            // TODO cache
-            "NAME_TAG".asInternalName().getItemStack().item,
+            NAME_TAG_ITEM,
             "§bRemaining Event Shop Token Upgrades",
             lore,
         )
@@ -188,6 +190,8 @@ object CarnivalShopHelper {
     private fun regenerateShopSpecificItemStack() {
         val progress = currentProgress ?: return
         val lore = buildList {
+            add("§8(From SkyHanni)")
+            add("")
             val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
             if (remaining.isEmpty()) {
                 add("§a§lAll upgrades purchased!")
@@ -212,7 +216,7 @@ object CarnivalShopHelper {
             }
         }
         shopSpecificInfoItemStack = createItemStack(
-            "NAME_TAG".asInternalName().getItemStack().item,
+            NAME_TAG_ITEM,
             "§bRemaining $currentEventType Token Upgrades",
             lore,
         )

@@ -37,6 +37,7 @@ object EssenceShopHelper {
 
     // Where the informational item stack will be placed in the GUI
     private const val CUSTOM_STACK_LOCATION = 8
+    private val GOLD_NUGGET_ITEM by lazy { "GOLD_NUGGET".asInternalName().getItemStack().item }
 
     private var essenceShops = mutableListOf<EssenceShop>()
     private var currentProgress: EssenceShopProgress? = null
@@ -155,11 +156,12 @@ object EssenceShopHelper {
     private fun regenerateItemStack() {
         val progress = currentProgress ?: return
         val lore = buildList {
+            add("§8(From SkyHanni)")
+            add("")
             val remaining = progress.remainingUpgrades.filter { it.remainingCosts.isNotEmpty() }
             if (remaining.isEmpty()) {
                 add("§a§lAll upgrades purchased!")
             } else {
-                add("")
                 remaining.forEach {
                     add(
                         "  §a${it.upgradeName} §b${it.currentLevel} §7-> §b${it.maxLevel}§7: §8${
@@ -186,8 +188,8 @@ object EssenceShopHelper {
                     add("  §7BZ Buy Order: §6${totalOrderPrice.addSeparators()}")
 
                     add("")
-                    add("§e§oClick to open Bazaar!")
-                } else addAll(listOf("", "§e§oYou have enough essence!"))
+                    add("§eClick to open Bazaar")
+                } else addAll(listOf("", "§eYou have enough essence"))
             }
 
             if (progress.nonRepoUpgrades.any()) {
@@ -197,8 +199,7 @@ object EssenceShopHelper {
             }
         }
         infoItemStack = createItemStack(
-            // TODO cache
-            "GOLD_NUGGET".asInternalName().getItemStack().item,
+            GOLD_NUGGET_ITEM,
             "§bRemaining $currentEssenceType Essence Upgrades",
             lore,
         )
