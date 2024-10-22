@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelAPIJoinEvent
 import at.hannibal2.skyhanni.events.hypixel.modapi.HypixelAPIServerChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ScoreboardTitleUpdateEvent
@@ -33,6 +34,9 @@ object HypixelLocationAPI {
     var serverId: String? = null
         private set
 
+    var inAlpha: Boolean = false
+        private set
+
     var serverType: ServerType? = null
         private set
 
@@ -53,9 +57,17 @@ object HypixelLocationAPI {
     private var internalIsland = IslandType.NONE
 
     @HandleEvent(priority = Int.MIN_VALUE)
+    fun onHypixelJoin(event: HypixelAPIJoinEvent) {
+        logger.log(event.toString())
+        logger.log("Connected to Hypixel")
+        inAlpha = event.alpha
+        inHypixel = true
+    }
+
+    @HandleEvent(priority = Int.MIN_VALUE)
     fun onServerChange(event: HypixelAPIServerChangeEvent) {
         logger.log(event.toString())
-        checkHypixel()
+        inHypixel = true
         inSkyblock = event.serverType == GameType.SKYBLOCK
         serverType = event.serverType
         mode = event.mode
@@ -110,12 +122,6 @@ object HypixelLocationAPI {
         return
     }
 
-    private fun checkHypixel() {
-        if (inHypixel) return
-        inHypixel = true
-        // TODO: post hypixel join event
-    }
-
     @SubscribeEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Hypixel Mod API")
@@ -133,6 +139,7 @@ object HypixelLocationAPI {
         inSkyblock = false
         island = IslandType.NONE
         serverId = null
+        inAlpha = false
         serverType = null
         mode = null
         map = null
