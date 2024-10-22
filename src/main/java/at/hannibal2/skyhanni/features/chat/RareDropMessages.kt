@@ -88,11 +88,11 @@ object RareDropMessages {
         petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern, oringoPattern,
     )
 
-    private val ignoredBookIslands = listOf(
+    private val ignoredBookIslands = setOf(
         IslandType.DARK_AUCTION,
         IslandType.DUNGEON_HUB,
         IslandType.CATACOMBS,
-    ).toTypedArray()
+    )
 
     private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
 
@@ -126,7 +126,7 @@ object RareDropMessages {
         val internalName = event.internalName
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.ENCHANTED_BOOK) return
-        if (inAnyIsland(*ignoredBookIslands)) return
+        if (inAnyIsland(ignoredBookIslands)) return
 
         val anyRecent = ChatUtils.chatLines.none {
             it.passedSinceSent() < 1.seconds &&

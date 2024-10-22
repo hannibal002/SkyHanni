@@ -15,16 +15,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinChatLine implements ChatLineData {
 
     @Unique
-    private IChatComponent skyHanni$fullComponent = null;
+    private IChatComponent skyHanni$fullComponent;
 
+    @Unique
     @NotNull
     @Override
     public IChatComponent getSkyHanni_fullComponent() {
         return skyHanni$fullComponent;
     }
 
+    @Unique
     @Override
-    public void setSkyHanni_fullComponent(IChatComponent fullComponent) {
+    public void setSkyHanni_fullComponent(@NotNull IChatComponent fullComponent) {
         skyHanni$fullComponent = fullComponent;
     }
 

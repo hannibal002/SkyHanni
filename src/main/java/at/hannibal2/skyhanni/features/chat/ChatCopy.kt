@@ -18,6 +18,7 @@ import net.minecraft.client.gui.GuiChat
 import net.minecraft.client.gui.ScaledResolution
 import net.minecraft.util.MathHelper
 import net.minecraftforge.client.event.GuiScreenEvent
+import net.minecraftforge.fml.common.Loader
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Mouse
 
@@ -29,10 +30,9 @@ object ChatCopy {
     @SubscribeEvent
     fun onGuiClick(event: GuiScreenEvent.MouseInputEvent.Pre) {
         if (event.gui !is GuiChat) return
-        if (!config) return
+        if (!config || !isRightMouseClicked()) return
         val chatLine = getChatLine(Mouse.getX(), Mouse.getY()) ?: return
-        if (!isRightMouseClicked()) return
-        val formatted = (chatLine.fullComponent ?: chatLine.chatComponent).formattedText
+        val formatted = chatLine.fullComponent.formattedText
 
         val (clipboard, infoMessage) = when {
             KeyboardManager.isMenuKeyDown() -> formatted.stripHypixelMessage() to "formatted message"
@@ -72,11 +72,14 @@ object ChatCopy {
         return null
     }
 
+    private val isPatcherLoaded by lazy { Loader.isModLoaded("patcher") }
+
     private fun getOffset(): Int {
+        if (!isPatcherLoaded) return 0
         return runCatching {
             val patcherConfigClass = Class.forName("club.sk1er.patcher.config.PatcherConfig")
             if (patcherConfigClass.getDeclaredFieldOrNull("chatPosition")?.getBoolean(null) == true) 12 else 0
-        }.getOrNull() ?: 0
+        }.getOrDefault(0)
     }
 
 

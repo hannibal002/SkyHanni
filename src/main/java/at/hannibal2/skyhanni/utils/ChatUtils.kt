@@ -357,7 +357,7 @@ object ChatUtils {
     }
 
     val ChatLine.message get() = chatComponent.formattedText.stripHypixelMessage()
-    var ChatLine.fullComponent: IChatComponent?
+    var ChatLine.fullComponent: IChatComponent
         get() = (this as ChatLineData).skyHanni_fullComponent
         set(value) {
             (this as ChatLineData).skyHanni_fullComponent = value

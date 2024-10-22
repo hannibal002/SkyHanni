@@ -8,7 +8,7 @@ import net.minecraft.util.IChatComponent
 object GuiChatHook {
 
     @JvmStatic
-    var currentComponent: IChatComponent? = null
+    lateinit var currentComponent: IChatComponent
 
     lateinit var replacement: ChatComponentText
 
