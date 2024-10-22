@@ -138,7 +138,7 @@ class Mob(
         highlightColor?.let { color ->
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { condition() && !isInvisible() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { condition() && isInvisible() }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { condition() && !isInvisible() }
             }
         }
     }
