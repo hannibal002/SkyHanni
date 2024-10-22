@@ -310,6 +310,12 @@ public class InventoryConfig {
     public boolean hexAsColorInLore = true;
 
     @Expose
+    @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean snakeGameKeybinds = true;
+
+    @Expose
     @ConfigOption(name = "Highlight Active Beacon Effect", desc = "Highlights the currently selected beacon effect in the beacon inventory.")
     @ConfigEditorBoolean
     @FeatureToggle

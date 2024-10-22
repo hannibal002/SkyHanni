@@ -3,11 +3,13 @@ import at.skyhanni.sharedvariables.MultiVersionStage
 import at.skyhanni.sharedvariables.ProjectTarget
 import at.skyhanni.sharedvariables.SHVersionInfo
 import at.skyhanni.sharedvariables.versionString
+import io.gitlab.arturbosch.detekt.Detekt
+import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import net.fabricmc.loom.task.RunGameTask
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import io.gitlab.arturbosch.detekt.Detekt
-import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
+import skyhannibuildsystem.ChangelogVerification
+import skyhannibuildsystem.DownloadBackupRepo
 
 plugins {
     idea
@@ -95,6 +97,12 @@ val headlessLwjgl by configurations.creating {
     isTransitive = false
     isVisible = false
 }
+
+val includeBackupRepo by tasks.registering(DownloadBackupRepo::class) {
+    this.outputDirectory.set(layout.buildDirectory.dir("downloadedRepo"))
+    this.branch = "main"
+}
+
 tasks.runClient {
     this.javaLauncher.set(
         javaToolchains.launcherFor {
@@ -102,6 +110,13 @@ tasks.runClient {
         },
     )
 }
+
+tasks.register("checkPrDescription", ChangelogVerification::class) {
+    this.outputDirectory.set(layout.buildDirectory)
+    this.prTitle = project.findProperty("prTitle") as String
+    this.prBody = project.findProperty("prBody") as String
+}
+
 val shot = shots.shot("minecraft", rootProject.file("shots.txt"))
 
 dependencies {
@@ -137,6 +152,9 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
+    } else if (target == ProjectTarget.MODERN)  {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -144,7 +162,8 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
+    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
@@ -205,6 +224,7 @@ kotlin {
 
 // Tasks:
 tasks.processResources {
+    from(includeBackupRepo)
     inputs.property("version", version)
     filesMatching(listOf("mcmod.info", "fabric.mod.json")) {
         expand("version" to version)
@@ -233,6 +253,10 @@ if (target == ProjectTarget.MAIN) {
     tasks.compileJava {
         dependsOn(tasks.processResources)
     }
+}
+
+tasks.withType<KotlinCompile> {
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
 }
 
 if (target.parent == ProjectTarget.MAIN) {
@@ -315,7 +339,8 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
 
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
+    vars.put("FORGE", if (target.isForge) 1 else 0)
+    vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
@@ -359,7 +384,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        false // TODO: Remove onlyIf when we're ready to enforce
+        target == ProjectTarget.MAIN && System.getenv("SKIP_DETEKT") != "true"
     }
 
     reports {
