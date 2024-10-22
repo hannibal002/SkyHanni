@@ -173,6 +173,7 @@ object HypixelLocationAPI {
         if (!config) return
         val data = debugData
         logger.log("ERROR: ${data.joinToString(transform = ::dataToString)}")
+        @Suppress("SpreadOperator")
         ErrorManager.logErrorStateWithData(
             "$message check comparison with HypixelModAPI failed. Please report in discord.",
             "$message comparison failed",
