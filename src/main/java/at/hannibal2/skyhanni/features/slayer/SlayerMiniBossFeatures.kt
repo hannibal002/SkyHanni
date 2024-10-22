@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
@@ -37,7 +38,7 @@ object SlayerMiniBossFeatures {
         if (!SlayerAPI.isInAnyArea) return
         if (!config.slayerMinibossLine) return
         for (mob in miniBosses) {
-            if (mob.baseEntity.distanceToPlayer() > 10) continue
+            if (!mob.baseEntity.canBeSeen(10)) continue
             event.drawLineToEye(
                 mob.baseEntity.getLorenzVec().up(),
                 LorenzColor.AQUA.toColor(),
