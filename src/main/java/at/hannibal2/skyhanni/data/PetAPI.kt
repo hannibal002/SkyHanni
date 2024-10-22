@@ -236,12 +236,18 @@ object PetAPI {
         val newPetLine = petWidgetPattern.firstMatches(event.lines)?.trim() ?: return
         if (newPetLine == pet?.rawPetName) return
 
-        var newPetData = PetData()
+        var internalName: NEUInternalName? = null
+        var cleanName: String? = null
+        var rarity: LorenzRarity? = null
+        var level: Int? = null
+        var xp: Double? = null
+        var rawPetName: String? = null
+        var petItem: NEUInternalName? = null
         var overflowXP = 0.0
         for (line in event.lines) {
             val tempPetItem = handleWidgetStringLine(line)
             if (tempPetItem != null) {
-                newPetData = newPetData.copy(petItem = tempPetItem)
+                petItem = tempPetItem
                 continue
             }
 
@@ -253,17 +259,24 @@ object PetAPI {
 
             val tempPetMisc = handleWidgetPetLine(line, newPetLine)
             if (tempPetMisc != null) {
-                newPetData = newPetData.copy(
-                    internalName = tempPetMisc.internalName,
-                    cleanName = tempPetMisc.cleanName,
-                    rarity = tempPetMisc.rarity,
-                    level = tempPetMisc.level,
-                    xp = tempPetMisc.xp,
-                    rawPetName = tempPetMisc.rawPetName,
-                )
+                internalName = tempPetMisc.internalName
+                cleanName = tempPetMisc.cleanName
+                rarity = tempPetMisc.rarity
+                level = tempPetMisc.level
+                xp = tempPetMisc.xp
+                rawPetName = tempPetMisc.rawPetName
                 continue
             }
         }
+        val newPetData = PetData(
+            internalName ?: return,
+            cleanName ?: return,
+            rarity ?: return,
+            petItem,
+            level ?: return,
+            xp ?: return,
+            rawPetName ?: return,
+        )
         updatePet(newPetData.copy(xp = newPetData.xp + overflowXP))
     }
 
@@ -314,7 +327,12 @@ object PetAPI {
         if (autopetMessagePattern.matches(event.message)) {
             val hoverMessage = event.chatComponent.hover?.siblings?.joinToString("")?.split("\n") ?: return
 
-            var petData = PetData()
+            var internalName: NEUInternalName? = null
+            var cleanName: String? = null
+            var rarity: LorenzRarity? = null
+            var level: Int? = null
+            var xp: Double? = null
+            var rawPetName: String? = null
             var petItem: NEUInternalName? = null
             for (line in hoverMessage) {
                 val item = readAutopetItemMessage(line)
@@ -325,10 +343,24 @@ object PetAPI {
 
                 val data = readAutopetMessage(line)
                 if (data != null) {
-                    petData = data
+                    internalName = data.internalName
+                    cleanName = data.cleanName
+                    rarity = data.rarity
+                    level = data.level
+                    xp = data.xp
+                    rawPetName = data.rawPetName
                     continue
                 }
             }
+            val petData = PetData(
+                internalName ?: return,
+                cleanName ?: return,
+                rarity ?: return,
+                petItem,
+                level ?: return,
+                xp ?: return,
+                rawPetName ?: return,
+            )
             updatePet(petData.copy(petItem = petItem))
             return
         }
@@ -428,9 +460,13 @@ object PetAPI {
         )
 
         return PetData(
+            internalName = NEUInternalName.NONE,
+            cleanName = "",
+            level = 0,
             rarity = rarity,
             petItem = petInfo.heldItem?.asInternalName(),
             xp = petInfo.exp,
+            rawPetName = "",
         )
     }
 
@@ -449,7 +485,9 @@ object PetAPI {
                 internalName = petNameToInternalName(name, rarity),
                 cleanName = name,
                 rarity = rarity,
+                petItem = null,
                 level = level,
+                xp = 0.0,
                 rawPetName = skin,
             )
         }
