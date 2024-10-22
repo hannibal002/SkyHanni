@@ -86,17 +86,15 @@ object AttributeAPI {
         }
     }
 
-    fun ItemStack.getAttributesLevels(): Pair<Attribute, Attribute>? {
-        return getAttributes()?.takeIf { it.isNotEmpty() }?.mapNotNull { (name, level) ->
+    fun ItemStack.getAttributesLevels(): Pair<Attribute, Attribute>? =
+        getAttributes()?.takeIf { it.isNotEmpty() }?.mapNotNull { (name, level) ->
             AttributeType.getByInternalNameOrNull(name.lowercase())?.let { Attribute(it, level) }
         }?.toPair()
-    }
 
-    fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NEUInternalName): Boolean {
-        return goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->
+    fun Pair<Attribute, Attribute>.isGoodRoll(internalName: NEUInternalName): Boolean =
+        goodRolls.firstOrNull { it.regex.matches(internalName.asString()) }?.let { goodRoll ->
             val attributes = first.type to second.type
             goodRoll.attributes.any { it.equalsIgnoreOrder(attributes) }
         } ?: false
-    }
 
 }
