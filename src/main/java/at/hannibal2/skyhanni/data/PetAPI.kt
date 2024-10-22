@@ -104,6 +104,7 @@ object PetAPI {
      * REGEX-TEST:  §r§7[Lvl 200] §r§8[§r§6108§r§8§r§4✦§r§8] §r§6Golden Dragon
      * REGEX-TEST:  §r§7[Lvl 100] §r§dBlack Cat§r§d ✦
      */
+    @Suppress("MaxLineLength")
     private val petWidgetPattern by patternGroup.pattern(
         "widget.pet",
         "^ §r§7\\[Lvl (?<level>\\d+)](?: (?:§.)+\\[(?:§.)+(?<overflow>\\d+)(?:§.)+✦(?:§.)+])? §r§(?<rarity>.)(?<name>[\\w ]+)(?:§r(?<skin>§. ✦))?\$",
@@ -124,6 +125,7 @@ object PetAPI {
      * REGEX-TEST:  §r§6+§r§e21,248,020.7 XP
      * REGEX-TEST:  §r§e15,986.6§r§6/§r§e29k XP §r§6(53.6%)
      */
+    @Suppress("MaxLineLength")
     private val xpWidgetPattern by patternGroup.pattern(
         "widget.xp",
         "^ §r§.(?:§l(?<max>MAX LEVEL)|\\+§r§e(?<overflow>[\\d,.]+) XP|(?<currentXP>[\\d,.]+)§r§6/§r§e(?<maxXP>[\\d.km]+) XP §r§6\\((?<percentage>[\\d.%]+)\\))$",
@@ -416,6 +418,7 @@ object PetAPI {
         getPetDataFromItem(item)
     }
 
+    @Suppress("DestructuringDeclarationWithTooManyEntries")
     private fun getPetDataFromItem(item: ItemStack) {
         val (_, _, rarity, petItem, _, petXP, _) = parsePetNBT(item)
         val (internalName, name, _, _, level, _, skin) = parsePetName(item.displayName) ?: return
@@ -633,7 +636,8 @@ object PetAPI {
     }
 
     private fun throwUnknownRarity(badRarity: String): Nothing {
-        ErrorManager.skyHanniError("Unknown rarity",
+        ErrorManager.skyHanniError(
+            "Unknown rarity",
             Pair("rarity", badRarity)
         )
     }
