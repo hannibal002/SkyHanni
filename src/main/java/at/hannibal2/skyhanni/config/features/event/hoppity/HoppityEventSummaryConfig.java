@@ -53,7 +53,11 @@ public class HoppityEventSummaryConfig {
         HoppityStat.EMPTY_1,
         HoppityStat.NEW_RABBITS,
         HoppityStat.EMPTY_2,
-        HoppityStat.DUPLICATE_RABBITS
+        HoppityStat.DUPLICATE_RABBITS,
+        HoppityStat.EMPTY_3,
+        HoppityStat.TIME_IN_CF,
+        HoppityStat.RABBIT_THE_FISH_FINDS,
+        HoppityStat.LEADERBOARD_CHANGE
     ));
 
     public enum HoppityStat {
@@ -66,9 +70,11 @@ public class HoppityEventSummaryConfig {
         EMPTY_2(""),
         DUPLICATE_RABBITS("§7Duplicate Rabbits: §c10\n §f4 §7- §a3 §7- §92 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+250,000,000 Chocolate"),
         EMPTY_3(""),
-        STRAY_RABBITS("§7Stray Rabbits: §f20\n §f10 §7- §a6 §7- §93 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+8,000,000 Chocolate\n  §c* §c§oRequires Stray Tracker being enabled to work."),
+        STRAY_RABBITS("§7Stray Rabbits: §f20\n §f10 §7- §a6 §7- §93 §7- §51 §7- §60 §7- §d0 §7- §b0\n §6+8,000,000 Chocolate\n  §4* §c§oRequires Stray Tracker being enabled to work§4§o."),
         EMPTY_4(""),
         TIME_IN_CF("§7You spent §b4h 36m §7in the §6Chocolate Factory§7."),
+        RABBIT_THE_FISH_FINDS("§7You found §cRabbit the Fish §7in Meal Eggs §b2 §7times."),
+        LEADERBOARD_CHANGE("§6Leaderboard Change§7: §b#107 §c-> §b#99\n §7(§a+8 Spots§7) Top §a0.003% §c-> §7Top §a0.002%\n§4* §c§oSyncs on first §4§o/cf §c§orun per server swap§4§o.")
         ;
 
         private final String display;

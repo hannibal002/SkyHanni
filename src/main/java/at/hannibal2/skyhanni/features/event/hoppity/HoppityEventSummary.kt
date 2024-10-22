@@ -4,9 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
@@ -19,6 +21,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -37,11 +40,29 @@ object HoppityEventSummary {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private val lineHeader = " ".repeat(4)
 
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
+     */
+    private val rabbitTheFishPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.thefish",
+        "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish§(?:§.)*!.*"
+    )
+
     private var lastAddedCfMillis: SimpleTimeMark? = null
 
     private data class StatString(val string: String, val headed: Boolean = true)
 
     private fun guiEnabled() = config.eventSummary.liveDisplay && HoppityAPI.isHoppityEvent() && LorenzUtils.inSkyBlock
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if(!HoppityAPI.isHoppityEvent()) return
+        val stats = getYearStats().first ?: return
+
+        if (rabbitTheFishPattern.matches(event.message)) {
+            stats.rabbitTheFishFinds++
+        }
+    }
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
@@ -135,6 +156,17 @@ object HoppityEventSummary {
     // First event was year 346 -> #1, 20th event was year 365, etc.
     private fun getHoppityEventNumber(skyblockYear: Int): Int = (skyblockYear - 345)
 
+    fun updateCfPosition(position: Int?, percentile: Double?) {
+        if (!HoppityAPI.isHoppityEvent() || position == null || percentile == null) return
+        val stats = getYearStats().first ?: return
+        val snapshot = LeaderboardPosition()
+        snapshot.position = position
+        snapshot.percentile = percentile
+
+        stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot
+        stats.finalLeaderboardPosition = snapshot
+    }
+
     fun addStrayCaught(rarity: LorenzRarity, chocGained: Long) {
         if (!HoppityAPI.isHoppityEvent()) return
         val stats = getYearStats().first ?: return
@@ -218,7 +250,26 @@ object HoppityEventSummary {
             }
 
             put(HoppityStat.TIME_IN_CF) { sl, stats, _ ->
-                sl.add(StatString("§7You spent §b${stats.millisInCf.milliseconds.format(maxUnits = 2)} §7in the §6Chocolate Factory§7."))
+                val cfTimeFormat = stats.millisInCf.milliseconds.format(maxUnits = 2)
+                sl.add(StatString("§7You spent §b$cfTimeFormat §7in the §6Chocolate Factory§7."))
+            }
+
+            put(HoppityStat.RABBIT_THE_FISH_FINDS) { sl, stats, _ ->
+                stats.rabbitTheFishFinds.takeIf { it > 0 }?.let {
+                    val timesFormat = StringUtils.pluralize(it, "time")
+                    sl.add(StatString("§7You found §cRabbit the Fish §7in Meal Eggs §b$it §7$timesFormat."))
+                }
+            }
+
+            put(HoppityStat.LEADERBOARD_CHANGE) { sl, stats, _ ->
+                val initial = stats.initialLeaderboardPosition
+                val final = stats.finalLeaderboardPosition
+                if (
+                    initial.position == -1 || final.position == -1 ||
+                    initial.percentile == -1.0 || final.percentile == -1.0 ||
+                    initial.position == final.position
+                    ) return@put
+                sl.add(StatString(getFullLeaderboardMessage(initial, final)))
             }
 
             val emptyStatString = StatString("", false)
@@ -226,6 +277,31 @@ object HoppityEventSummary {
             put(HoppityStat.EMPTY_2) { sl, _, _ -> sl.add(emptyStatString) }
             put(HoppityStat.EMPTY_3) { sl, _, _ -> sl.add(emptyStatString) }
             put(HoppityStat.EMPTY_4) { sl, _, _ -> sl.add(emptyStatString) }
+        }
+    }
+
+    private fun getFullLeaderboardMessage(initial: LeaderboardPosition, final: LeaderboardPosition): String =
+        "§6Leaderboard Change§7: ${getPrimaryLbString(initial, final)}\n ${getSecondaryLbLine(initial, final)}"
+
+    private fun getPrimaryLbString(initial: LeaderboardPosition, final: LeaderboardPosition): String {
+        val iPo = initial.position
+        val fPo = final.position
+        return "§b#${iPo.addSeparators()} §c-> §b#${fPo.addSeparators()}"
+    }
+
+    private fun getSecondaryLbLine(initial: LeaderboardPosition, final: LeaderboardPosition): String {
+        val iPo = initial.position
+        val fPo = final.position
+        val dPo = fPo - iPo
+        val iPe = initial.percentile
+        val fPe = final.percentile
+        val dPe = fPe - iPe
+        val color = if (iPo > fPo) "§a+" else "§c"
+
+        return buildString {
+            "§7(§b#$color${dPo.addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)"
+            if (dPe != 0.0) append(" §7Top §a$iPe% §c-> §7Top §a$fPe%")
+            else append(" §7Top §a$iPe%")
         }
     }
 
