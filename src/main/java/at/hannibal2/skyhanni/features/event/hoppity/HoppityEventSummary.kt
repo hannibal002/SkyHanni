@@ -56,7 +56,7 @@ object HoppityEventSummary {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if(!HoppityAPI.isHoppityEvent()) return
+        if (!HoppityAPI.isHoppityEvent()) return
         val stats = getYearStats().first ?: return
 
         if (rabbitTheFishPattern.matches(event.message)) {
@@ -268,7 +268,7 @@ object HoppityEventSummary {
                     initial.position == -1 || final.position == -1 ||
                     initial.percentile == -1.0 || final.percentile == -1.0 ||
                     initial.position == final.position
-                    ) return@put
+                ) return@put
                 sl.add(StatString(getFullLeaderboardMessage(initial, final)))
             }
 
