@@ -18,7 +18,6 @@
     <ID>CyclomaticComplexMethod:GardenBestCropTime.kt$GardenBestCropTime$fun drawBestDisplay(currentCrop: CropType?): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$private fun drawProgressDisplay(crop: CropType): List&lt;Renderable&gt;</ID>
     <ID>CyclomaticComplexMethod:GardenVisitorFeatures.kt$GardenVisitorFeatures$private fun readToolTip(visitor: VisitorAPI.Visitor, itemStack: ItemStack?, toolTip: MutableList&lt;String&gt;)</ID>
-    <ID>CyclomaticComplexMethod:GhostCounter.kt$GhostCounter$private fun drawDisplay()</ID>
     <ID>CyclomaticComplexMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>CyclomaticComplexMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>CyclomaticComplexMethod:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NEUInternalName?</ID>
@@ -36,7 +35,6 @@
     <ID>InjectDispatcher:MayorAPI.kt$MayorAPI$IO</ID>
     <ID>LongMethod:CopyNearbyEntitiesCommand.kt$CopyNearbyEntitiesCommand$fun command(args: Array&lt;String&gt;)</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
-    <ID>LongMethod:GhostCounter.kt$GhostCounter$private fun drawDisplay()</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
     <ID>LongMethod:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$private fun getStackTip(item: ItemStack): String?</ID>
     <ID>LongMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
@@ -187,7 +185,6 @@
     <ID>UnsafeCallOnNullableType:GardenCropMilestoneDisplay.kt$GardenCropMilestoneDisplay$cultivatingData[crop]!!</ID>
     <ID>UnsafeCallOnNullableType:GardenCropMilestonesCommunityFix.kt$GardenCropMilestonesCommunityFix$map[crop]!!</ID>
     <ID>UnsafeCallOnNullableType:GardenPlotIcon.kt$GardenPlotIcon$originalStack[index]!!</ID>
-    <ID>UnsafeCallOnNullableType:GhostCounter.kt$GhostCounter$storage?.totalMF!!</ID>
     <ID>UnsafeCallOnNullableType:Graph.kt$Graph.Companion$position!!</ID>
     <ID>UnsafeCallOnNullableType:Graph.kt$distances.distances[end]!!</ID>
     <ID>UnsafeCallOnNullableType:GriffinBurrowHelper.kt$GriffinBurrowHelper$particleBurrows[targetLocation]!!</ID>
@@ -270,7 +267,6 @@
     <ID>VarCouldBeVal:GardenPlotIcon.kt$GardenPlotIcon$private var originalStack = mutableMapOf&lt;Int, ItemStack&gt;()</ID>
     <ID>VarCouldBeVal:GardenPlotMenuHighlighting.kt$GardenPlotMenuHighlighting$private var highlightedPlots = mutableMapOf&lt;GardenPlotAPI.Plot, PlotStatusType&gt;()</ID>
     <ID>VarCouldBeVal:GardenVisitorColorNames.kt$GardenVisitorColorNames$private var visitorColors = mutableMapOf&lt;String, String&gt;() // name -&gt; color code</ID>
-    <ID>VarCouldBeVal:GhostData.kt$GhostData$private var session = mutableMapOf( Option.KILLS to 0.0, Option.SORROWCOUNT to 0.0, Option.VOLTACOUNT to 0.0, Option.PLASMACOUNT to 0.0, Option.GHOSTLYBOOTS to 0.0, Option.BAGOFCASH to 0.0, Option.TOTALDROPS to 0.0, Option.SCAVENGERCOINS to 0.0, Option.MAXKILLCOMBO to 0.0, Option.SKILLXPGAINED to 0.0 )</ID>
     <ID>VarCouldBeVal:GraphEditor.kt$GraphEditor$var vector = LocationUtils.calculatePlayerFacingDirection()</ID>
     <ID>VarCouldBeVal:HoppityCollectionStats.kt$HoppityCollectionStats$private var highlightMap = mutableMapOf&lt;String, LorenzColor&gt;()</ID>
     <ID>VarCouldBeVal:HoppityEggLocations.kt$HoppityEggLocations$// TODO add gui/command to show total data/missing islands private var collectedEggStorage: MutableMap&lt;IslandType, MutableSet&lt;LorenzVec&gt;&gt; get() = ChocolateFactoryAPI.profileStorage?.collectedEggLocations ?: mutableMapOf() set(value) { ChocolateFactoryAPI.profileStorage?.collectedEggLocations = value }</ID>
