@@ -152,6 +152,12 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
+    } else if (target == ProjectTarget.BRIDGE116FABRIC)  {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
+    } else if (target == ProjectTarget.MODERN)  {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
     }
 
     implementation(kotlin("stdlib-jdk8"))
@@ -159,7 +165,8 @@ dependencies {
         exclude(group = "org.jetbrains.kotlin")
     }
 
-    modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.1.0")
+    if (target.isForge) modRuntimeOnly("me.djtheredstoner:DevAuth-forge-legacy:1.2.1")
+    else modRuntimeOnly("me.djtheredstoner:DevAuth-fabric:1.2.1")
 
     modCompileOnly("com.github.hannibal002:notenoughupdates:4957f0b:all") {
         exclude(module = "unspecified")
@@ -251,6 +258,10 @@ if (target == ProjectTarget.MAIN) {
     }
 }
 
+tasks.withType<KotlinCompile> {
+    compilerOptions.jvmTarget.set(JvmTarget.fromTarget(target.minecraftVersion.formattedJavaLanguageVersion))
+}
+
 if (target.parent == ProjectTarget.MAIN) {
     val mainRes = project(ProjectTarget.MAIN.projectPath).tasks.getAt("processResources")
     tasks.named("processResources") {
@@ -331,7 +342,8 @@ if (!MultiVersionStage.activeState.shouldCompile(target)) {
 
 preprocess {
     vars.put("MC", target.minecraftVersion.versionNumber)
-    vars.put("FORGE", if (target.forgeDep != null) 1 else 0)
+    vars.put("FORGE", if (target.isForge) 1 else 0)
+    vars.put("FABRIC", if (target.isFabric) 1 else 0)
     vars.put("JAVA", target.minecraftVersion.javaVersion)
     patternAnnotation.set("at.hannibal2.skyhanni.utils.compat.Pattern")
 }
@@ -375,7 +387,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        System.getenv("SKIP_DETEKT") != "true"
+        target == ProjectTarget.MAIN && System.getenv("SKIP_DETEKT") != "true"
     }
 
     reports {
