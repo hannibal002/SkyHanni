@@ -61,6 +61,24 @@ object ItemUtils {
         return list
     }
 
+    fun NBTTagCompound?.getReadableNBTDump(initSeparator: String = "  ", includeLore: Boolean = false): List<String> {
+        this ?: return emptyList()
+        val tagList = mutableListOf<String>()
+        for (s in this.keySet) {
+            if (s == "Lore" && !includeLore) continue
+            val tag = this.getTag(s)
+
+            if (tag !is NBTTagCompound) {
+                tagList.add("$initSeparator$s: $tag")
+            } else {
+                val element = this.getCompoundTag(s)
+                tagList.add("$initSeparator$s:")
+                tagList.addAll(element.getReadableNBTDump("$initSeparator  ", includeLore))
+            }
+        }
+        return tagList
+    }
+
     fun getDisplayName(compound: NBTTagCompound?): String? {
         compound ?: return null
         val name = compound.getCompoundTag("display").getString("Name")
