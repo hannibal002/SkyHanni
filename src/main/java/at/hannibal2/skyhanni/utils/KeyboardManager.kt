@@ -156,11 +156,14 @@ object KeyboardManager {
             object : Iterator<KeyBinding> {
 
                 var current = w
+                var finished = false
 
                 override fun hasNext(): Boolean =
-                    current != down
+                    !finished
 
                 override fun next(): KeyBinding {
+                    if (!hasNext()) throw NoSuchElementException()
+
                     return current.also {
                         current = when (it) {
                             w -> a
@@ -168,7 +171,10 @@ object KeyboardManager {
                             s -> d
                             d -> up
                             up -> down
-                            else -> throw java.lang.IndexOutOfBoundsException()
+                            else -> {
+                                finished = true
+                                throw NoSuchElementException()
+                            }
                         }
                     }
                 }
