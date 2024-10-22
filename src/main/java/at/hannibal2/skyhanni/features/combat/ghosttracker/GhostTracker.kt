@@ -157,8 +157,8 @@ object GhostTracker {
                         data.totalMagicFindKills
                     )
                 }"
-            GhostTrackerLines.BESTIARY_KILLS -> "§7Bestiary Kills: §e" +
-                if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators()
+            GhostTrackerLines.BESTIARY_KILLS ->
+                "§7Bestiary Kills: §e" + if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators()
         }
     }
 
