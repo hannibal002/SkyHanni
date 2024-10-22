@@ -32,11 +32,11 @@ object LavaReplacement {
         }
 
     }
-    enum class IslandsToReplace(private val displayName: String)
+    enum class IslandsToReplace(private val displayName: String, public val island: IslandType)
     {
-        KUUDRA("Kuudra"),
-        CATACOMBS("Dungeons"),
-        CRIMSON_ISLE("Crimson Isle"),
+        KUUDRA("§4Kuudra", IslandType.KUUDRA_ARENA),
+        CATACOMBS("§2Dungeons", IslandType.CATACOMBS),
+        CRIMSON_ISLE("§cCrimson Isle", IslandType.CRIMSON_ISLE),
         ;
         override fun toString() = displayName
 
