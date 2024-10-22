@@ -102,7 +102,7 @@ object DungeonLividFinder {
 
     private fun Mob.isLividColor(color: LorenzColor): Boolean {
         val chatColor = color.getChatColor()
-        return armorStand?.name?.startsWith("${chatColor}﴾ ${chatColor}§lLivid") ?: false
+        return armorStand?.name?.startsWith("$chatColor﴾ $chatColor§lLivid") ?: false
     }
 
     @SubscribeEvent
