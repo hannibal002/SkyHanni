@@ -18,6 +18,10 @@
 + Added Focus Mode. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/2694)
     +  In Focus Mode, only the name of the item is displayed instead of the full description.
 + Added WASD keybinds to the Abiphone Snake Game. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/1968)
++ Added Attribute Overlay. - Empa (https://github.com/hannibal002/SkyHanni/pull/2001)
+    +  Options to highlight good rolls in different colors, show only certain attributes, etc.
++ Added helpers for Essence Shops and Carnival Event Upgrade Shops. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2423)
+    +  Assists with maxing upgrades.
 
 #### Fishing Features
 
@@ -42,10 +46,15 @@
 
 + Added chat compacting for 'items in stash' warnings. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2639)
 
-#### Combat features
+#### Combat Features
 
 + Added Draconic Sacrifice Tracker. - HiZe (https://github.com/hannibal002/SkyHanni/pull/2077)
     +  Tracks items and profit while using the Draconic Altar in the End.
+
+#### Event Features
+
++ Added chat solvers for Primal Fears. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/2771)
+    +  Added solvers for Math and Public Speaking Primal Fears.
 
 ### Improvements
 
@@ -118,6 +127,7 @@
 + Fixed Chest Value Display on Carpentry Chests. - fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2743)
 + Fixed Compact Item Stars. - Empa, Fazfoxy (https://github.com/hannibal002/SkyHanni/pull/2741)
 + Fixed an Estimated Item Value issue where +10 stars were accidentally added to certain items and unstarred items were not showing stars. - Fazfoxy and Empa (https://github.com/hannibal002/SkyHanni/pull/2758)
++ Fixed an issue with Estimated Item Value erroring when multiple mods affect the same item. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2787)
 
 #### Combat Fixes
 
@@ -126,17 +136,21 @@
 + Fixed Ashfang Reset Cooldown counting in the wrong direction. - Empa (https://github.com/hannibal002/SkyHanni/pull/2112)
 + Fixed Millennia-Aged Blaze not being highlighted by the Area Boss Highlight feature. - jani (https://github.com/hannibal002/SkyHanni/pull/2707)
 + Fixed a small typo in Bestiary Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2748)
++ Fixed `Line to Slayer Miniboss` not checking for walls. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/2788)
 
 #### Custom Scoreboard Fixes
 
 + Fixed Custom Scoreboard not showing the Second Barbarian Quest. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2709)
 + Fixed Custom Scoreboard duplicating the Party Leader. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2780)
 + Fixed some Custom Scoreboard errors. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2779)
++ Fixed party leader not displaying correctly in the Custom Scoreboard. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2783)
 
 #### Hoppity Fixes
 
 + Fixed the chocolate egg share message sometimes displaying the wrong location name. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2711)
 + Fixed El Dorado not receiving a compacted chat message. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2742)
++ Fixed issues with El Dorado stray detection. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2786)
++ Fixed an error when Rabbit the Fish was found in Meal Eggs. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2785)
 
 #### Garden Fixes
 
@@ -163,6 +177,7 @@
 #### Chocolate Factory Fixes
 
 + Fixed an issue where the Time Tower Usage Warning would notify you after expiration or when you have 0 charges. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/2751)
++ Fixed Choc Factory screen flashing not disappearing in a timely manner after clicking some strays. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2782)
 
 #### Event Fixes
 
@@ -181,6 +196,8 @@
 
 + Fixed SkyHanni messages being sent twice. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2736)
 + Fixed the formatting of negative durations. - Empa (https://github.com/hannibal002/SkyHanni/pull/2726)
++ Fixed debug messages not sending when debug mode is enabled. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2793)
++ Fixed TPS display not working outside Skyblock. - Empa (https://github.com/hannibal002/SkyHanni/pull/2791)
 
 ### Technical Details
 
@@ -205,6 +222,11 @@
 + Migrated some LorenzEvents without parameters to SkyHanniEvents. - Empa (https://github.com/hannibal002/SkyHanni/pull/2744)
 + Changed SkyHanniEvents without parameters to be objects. - Empa (https://github.com/hannibal002/SkyHanni/pull/2744)
 + Added a custom import ordering Detekt rule. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2775)
++ Added a method to retrieve a readable dump of an item's NBT tag(s). - Daveed (https://github.com/hannibal002/SkyHanni/pull/2787)
++ Added MultiMC to the list of known launchers. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2784)
++ Added informative comments on PRs when failures are detected. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2790)
++ Added in-file annotations when 'Detekt' failures occur. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2790)
++ Added some preprocessing mappings. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/2776)
 
 ## Version 0.27
 
