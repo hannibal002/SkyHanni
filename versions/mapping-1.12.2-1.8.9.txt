@@ -3,6 +3,8 @@ net.minecraft.client.renderer.entity.RenderLivingBase net.minecraft.client.rende
 
 net.minecraft.client.renderer.BufferBuilder net.minecraft.client.renderer.WorldRenderer
 
+net.minecraft.entity.player.EntityPlayer getHeldItemMainhand() getHeldItem()
+
 # Workaround for it not letting stackSize be mapped to count.
 temp.net.minecraft.item.ItemStack net.minecraft.item.ItemStack
 temp.net.minecraft.item.ItemStack count stackSize
