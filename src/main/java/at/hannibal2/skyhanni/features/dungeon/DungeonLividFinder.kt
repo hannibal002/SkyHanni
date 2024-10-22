@@ -16,14 +16,11 @@ import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.RecalculatingValue
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
-import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBox_nea
-import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
-import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.RenderUtils.exactBoundingBox
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import net.minecraft.block.BlockStainedGlass
 import net.minecraft.client.Minecraft
@@ -39,9 +36,10 @@ object DungeonLividFinder {
     private val config get() = SkyHanniMod.feature.dungeon.lividFinder
     private val blockLocation = LorenzVec(6, 109, 43)
 
-    private val isBlind = RecalculatingValue(2.ticks, ::isCurrentlyBlind)
+    private val isBlind by RecalculatingValue(2.ticks, ::isCurrentlyBlind)
 
     var livid: Mob? = null
+        private set
     private var lividArmorStandId: Int? = null
 
     val lividEntity: Entity?
@@ -110,7 +108,7 @@ object DungeonLividFinder {
     @SubscribeEvent
     fun onRenderWorld(event: LorenzRenderWorldEvent) {
         if (!inLividBossRoom() || !config.enabled) return
-        if (isBlind.getValue()) return
+        if (isBlind) return
 
         val entity = lividEntity ?: return
         val lorenzColor = color ?: return
@@ -121,10 +119,10 @@ object DungeonLividFinder {
         event.drawDynamicText(location, lorenzColor.getChatColor() + "Livid", 1.5)
 
         val color = lorenzColor.toColor()
-        event.drawFilledBoundingBox_nea(boundingBox, color, 0.5f)
+        event.drawFilledBoundingBoxNea(boundingBox, color, 0.5f)
 
         if (location.distanceSqToPlayer() > 50) {
-            event.draw3DLine(event.exactPlayerEyeLocation(), location.add(0.5, 0.0, 0.5), color, 3, true)
+            event.drawLineToEye(location.add(x = 0.5, z = 0.5), color, 3, true)
         }
     }
 
