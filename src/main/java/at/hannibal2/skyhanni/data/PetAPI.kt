@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -35,6 +36,7 @@ import at.hannibal2.skyhanni.utils.StringUtils.convertToUnformatted
 import at.hannibal2.skyhanni.utils.chat.Text.hover
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.Gson
+import com.google.gson.annotations.SerializedName
 import net.minecraft.item.ItemStack
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -590,29 +592,7 @@ object PetAPI {
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NEUPetsJson>("pets")
         xpLeveling = data.petLevels
-        val xpLevelingCustomJson = data.customPetLeveling
-
-        val map = mutableMapOf<String, NEUPetData>()
-        for ((petName, json) in xpLevelingCustomJson.entrySet()) {
-            val petData = json.asJsonObject
-            val type = petData.get("type")?.asInt
-            val maxLevel = petData.get("max_level")?.asInt
-            val xpMultiplier = petData.get("xp_multiplier")?.asDouble
-            val petLevels = petData.get("pet_levels")?.asJsonArray?.map { it.asInt }
-            val rarityOffset = petData.get("rarity_offset")?.asJsonObject?.entrySet()?.associate { (rarity, offset) ->
-                (LorenzRarity.getByName(rarity) ?: throwUnknownRarity(rarity)) to offset.asInt
-            }
-
-            val dataNEU = NEUPetData(
-                type = type,
-                petLevels = petLevels,
-                maxLevel = maxLevel,
-                rarityOffset = rarityOffset,
-                xpMultiplier = xpMultiplier,
-            )
-            map[petName] = dataNEU
-        }
-        petsDataNEU = map
+        petsDataNEU = data.customPetLeveling
 
         data.internalToDisplayName.forEach { (internalName, displayName) ->
             nameToFakeInternalNameCache.put(displayName, internalName.asString())
@@ -652,12 +632,4 @@ data class PetNBT(
     val uniqueId: String,
     val hideRightClick: Boolean,
     val noMove: Boolean,
-)
-
-data class NEUPetData(
-    val type: Int?,
-    val petLevels: List<Int>?,
-    val maxLevel: Int?,
-    val rarityOffset: Map<LorenzRarity, Int>?,
-    val xpMultiplier: Double?,
 )
