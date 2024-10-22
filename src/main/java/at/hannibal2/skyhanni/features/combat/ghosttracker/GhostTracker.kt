@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.combat.ghosttracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
@@ -32,6 +33,8 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
+import com.google.gson.JsonElement
+import com.google.gson.JsonObject
 import com.google.gson.annotations.Expose
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -93,7 +96,7 @@ object GhostTracker {
 
             return listOf(
                 "§7Dropped §e${timesGained.addSeparators()} §7times.",
-                "§7Your drop chance per kill: §c$perKill"
+                "§7Your drop chance per kill: §c$perKill",
             )
         }
 
@@ -103,7 +106,7 @@ object GhostTracker {
             val coinsFormat = item.totalAmount.shortFormat()
             return listOf(
                 "§7Killing ghosts gives you coins (more with scavenger).",
-                "§7You got §6$coinsFormat coins §7that way."
+                "§7You got §6$coinsFormat coins §7that way.",
             )
         }
     }
@@ -112,15 +115,15 @@ object GhostTracker {
 
     private val itemDropPattern by patternGroup.pattern(
         "itemdrop",
-        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)"
+        "§6§lRARE DROP! §r§9(?<item>[^§]*) §r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)",
     )
     private val killComboEndPattern by patternGroup.pattern(
         "killcombo.end",
-        "§cYour Kill Combo has expired! You reached a (?<kill>\\d+) Kill Combo!"
+        "§cYour Kill Combo has expired! You reached a (?<kill>\\d+) Kill Combo!",
     )
     private val bagOfCashPattern by patternGroup.pattern(
         "bagofcash",
-        "§eThe ghost's death materialized §r§61,000,000 coins §r§efrom the mists!"
+        "§eThe ghost's death materialized §r§61,000,000 coins §r§efrom the mists!",
     )
 
     /**
@@ -128,11 +131,11 @@ object GhostTracker {
      */
     private val bestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiary",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)/(?<killsToNext>[\\d,.]+)"
+        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*(?<kills>[\\d,.]+)/(?<killsToNext>[\\d,.]+)",
     )
     private val maxBestiaryTablistPattern by patternGroup.pattern(
         "tablist.bestiarymax",
-        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*MAX"
+        "\\s*Ghost (?<level>\\d+|[XVI]+)(?:§.)*: (?:§.)*MAX",
     )
 
     private val SORROW = "SORROW".asInternalName()
@@ -156,9 +159,10 @@ object GhostTracker {
                 "§7Average Magic Find: §e${
                     getAverageMagicFind(
                         data.totalMagicFind,
-                        data.totalMagicFindKills
+                        data.totalMagicFindKills,
                     )
                 }"
+
             GhostTrackerLines.BESTIARY_KILLS ->
                 "§7Bestiary Kills: §e" + if (currentBestiaryKills >= MAX_BESTIARY_KILLS) "MAX" else currentBestiaryKills.addSeparators()
         }
@@ -298,6 +302,7 @@ object GhostTracker {
         }
     }
 
+    // TODO: In the future move to a utils class and use neu bestiary data
     private fun getBestiaryKillsUntilLevel(level: Int): Int {
         var killsUntilLevel = 0
         for (i in 1..level) {
@@ -323,5 +328,35 @@ object GhostTracker {
             22, 23, 24, 25 -> 20_000
             else -> 0
         }
+    }
+
+    @SubscribeEvent
+    fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(64, "#profile.ghostCounter.data.KILLS", "#profile.ghostStorage.ghostTracker.kills")
+        event.move(64, "#profile.ghostCounter.data.GHOSTSINCESORROW", "#profile.ghostStorage.ghostTracker.ghostsSinceSorrow")
+        event.move(64, "#profile.ghostCounter.data.MAXKILLCOMBO", "#profile.ghostStorage.ghostTracker.maxKillCombo")
+        event.move(64, "#profile.ghostCounter.data.SKILLXPGAINED", "#profile.ghostStorage.ghostTracker.combatXpGained")
+
+        event.move(64, "#profile.ghostCounter.data.SORROWCOUNT", "#profile.ghostStorage.ghostTracker.items.SORROW") {
+            element -> migrateItem(element)
+        }
+        event.move(64, "#profile.ghostCounter.data.PLASMACOUNT", "#profile.ghostStorage.ghostTracker.items.PLASMA") {
+            element -> migrateItem(element)
+        }
+        event.move(64, "#profile.ghostCounter.data.VOLTACOUNT", "#profile.ghostStorage.ghostTracker.items.VOLTA") {
+            element -> migrateItem(element)
+        }
+        event.move(64, "#profile.ghostCounter.data.GHOSTLYBOOTS", "#profile.ghostStorage.ghostTracker.items.GHOST_BOOTS") {
+            element -> migrateItem(element)
+        }
+    }
+
+    private fun migrateItem(oldData: JsonElement): JsonElement {
+        val oldAmount = oldData.asInt
+        val newData = JsonObject()
+        newData.addProperty("timesGained", oldAmount)
+        newData.addProperty("totalAmount", oldAmount)
+        newData.addProperty("hidden", false)
+        return newData
     }
 }

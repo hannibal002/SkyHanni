@@ -8,7 +8,6 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree;
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade;
 import at.hannibal2.skyhanni.data.model.SkyblockStat;
 import at.hannibal2.skyhanni.features.combat.endernodetracker.EnderNodeTracker;
-import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData;
 import at.hannibal2.skyhanni.features.combat.ghosttracker.GhostTracker;
 import at.hannibal2.skyhanni.features.dungeon.CroesusChestTracker;
 import at.hannibal2.skyhanni.features.dungeon.DungeonFloor;
@@ -207,7 +206,7 @@ public class ProfileSpecificStorage {
     }
 
     @Expose
-    public Map<SkyblockStat,Double> stats = new HashMap<>(SkyblockStat.getEntries().size());
+    public Map<SkyblockStat, Double> stats = new HashMap<>(SkyblockStat.getEntries().size());
 
     @Expose
     public MaxwellPowerStorage maxwell = new MaxwellPowerStorage();
@@ -488,35 +487,6 @@ public class ProfileSpecificStorage {
 
         @Expose
         public VinylType activeVinyl = null;
-    }
-
-    // TODO: Merge data with GhostProfitTracker at a later date
-    @Expose
-    public GhostCounter ghostCounter = new GhostCounter();
-
-    public static class GhostCounter {
-
-        @Expose
-        public Map<GhostData.Option, Double> data = new HashMap<>();
-
-        @Expose
-        public boolean ctDataImported = false;
-
-        @Expose
-        public double bestiaryNextLevel = 0;
-
-        @Expose
-        public double bestiaryCurrentKill = 0;
-
-        @Expose
-        public double bestiaryKillNeeded = 0;
-
-        @Expose
-        public double totalMF = 0;
-
-        @Expose
-        public int configUpdateVersion = 0;
-
     }
 
     @Expose
