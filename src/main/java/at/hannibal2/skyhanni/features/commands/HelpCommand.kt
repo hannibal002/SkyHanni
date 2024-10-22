@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.config.commands.CommandBuilder
 import at.hannibal2.skyhanni.config.commands.Commands.commandList
-import at.hannibal2.skyhanni.config.commands.Commands.commands
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.chat.Text.hover
