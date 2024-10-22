@@ -249,7 +249,7 @@ object GhostTracker {
 
     @SubscribeEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
-        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghost_drops.toSet()
+        allowedDrops = event.getConstant<GhostDrops>("GhostDrops").ghostDrops.toSet()
     }
 
     @HandleEvent
