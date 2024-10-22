@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.LorenzUtils.round
 import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
@@ -88,11 +89,11 @@ object RareDropMessages {
         petDroppedPattern, petFishedPattern, petClaimedPattern, petObtainedPattern, oringoPattern,
     )
 
-    private val ignoredBookIslands = listOf(
+    private val ignoredBookIslands = setOf(
         IslandType.DARK_AUCTION,
         IslandType.DUNGEON_HUB,
         IslandType.CATACOMBS,
-    ).toTypedArray()
+    )
 
     private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
 
@@ -126,7 +127,7 @@ object RareDropMessages {
         val internalName = event.internalName
         val category = internalName.getItemStackOrNull()?.getItemCategoryOrNull() ?: return
         if (category != ItemCategory.ENCHANTED_BOOK) return
-        if (inAnyIsland(*ignoredBookIslands)) return
+        if (inAnyIsland(ignoredBookIslands)) return
 
         val anyRecent = ChatUtils.chatLines.none {
             it.passedSinceSent() < 1.seconds &&
@@ -136,7 +137,7 @@ object RareDropMessages {
         if (anyRecent) {
             var message = "§r§6§lRARE DROP! ${internalName.itemName}"
             userLuck?.takeIf { it != 0f }?.let { luck ->
-                var luckString = luck.round(2).toString()
+                var luckString = luck.roundTo(2).toString()
                 if (luck > 0) luckString = "+$luckString"
                 message += " §a($luckString ✴ SkyHanni User Luck"
             }
