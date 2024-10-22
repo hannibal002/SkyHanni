@@ -777,6 +777,8 @@ object RenderUtils {
         drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
     }
 
+    // Todo: Gauge whether or not partialTicks is actually necessary, or if it can be removed
+    @Suppress("UnusedParameter")
     fun drawCylinderInWorld(
         color: Color,
         x: Double,
@@ -1198,7 +1200,7 @@ object RenderUtils {
     }
 
     // TODO nea please merge with 'drawFilledBoundingBox'
-    fun LorenzRenderWorldEvent.drawFilledBoundingBox_nea(
+    fun LorenzRenderWorldEvent.drawFilledBoundingBoxNea(
         aabb: AxisAlignedBB,
         c: Color,
         alphaMultiplier: Float = 1f,
@@ -1209,11 +1211,10 @@ object RenderUtils {
         renderRelativeToCamera: Boolean = false,
         drawVerticalBarriers: Boolean = true,
     ) {
-        drawFilledBoundingBox_nea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
+        drawFilledBoundingBoxNea(aabb, c, alphaMultiplier, renderRelativeToCamera, drawVerticalBarriers, partialTicks)
     }
 
-    @Suppress("ktlint:standard:function-naming")
-    fun drawWireframeBoundingBox_nea(
+    fun drawWireframeBoundingBoxNea(
         aabb: AxisAlignedBB,
         color: Color,
         partialTicks: Float,
@@ -1510,7 +1511,7 @@ object RenderUtils {
         }
     }
 
-    fun drawFilledBoundingBox_nea(
+    fun drawFilledBoundingBoxNea(
         aabb: AxisAlignedBB,
         c: Color,
         alphaMultiplier: Float = 1f,
@@ -1620,7 +1621,7 @@ object RenderUtils {
     }
 
     // TODO nea please merge with 'draw3DLine'
-    fun LorenzRenderWorldEvent.draw3DLine_nea(
+    fun LorenzRenderWorldEvent.draw3DLineNea(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,
