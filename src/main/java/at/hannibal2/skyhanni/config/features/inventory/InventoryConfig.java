@@ -310,6 +310,12 @@ public class InventoryConfig {
     public boolean hexAsColorInLore = true;
 
     @Expose
+    @ConfigOption(name = "Essence Shop Helper", desc = "Show extra information about remaining upgrades in essence shops.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean essenceShopHelper = true;
+  
+    @Expose
     @ConfigOption(name = "Snake Game Keybinds", desc = "Use WASD-Keys to move around in the Abiphone snake game.")
     @ConfigEditorBoolean
     @FeatureToggle
@@ -320,4 +326,5 @@ public class InventoryConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean highlightActiveBeaconEffect = true;
+
 }
