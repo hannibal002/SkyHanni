@@ -54,9 +54,11 @@ object PetAPI {
 
     private var xpLeveling: List<Int> = listOf()
     private var customXpLeveling: JsonObject? = null
-    private var customDisplayToInternalName = mapOf<NEUInternalName, String>()
 
     private var petsDataNEU: Map<String, NEUPetData>? = null
+
+    private val nameToFakeInternalNameCache = mutableMapOf<String, String>()
+    private val nameToInternalNameCache = mutableMapOf<String, NEUInternalName>()
 
     /**
      * REGEX-TEST: §e⭐ §7[Lvl 200] §6Golden Dragon§d ✦
@@ -594,7 +596,7 @@ object PetAPI {
     fun onNEURepoReload(event: NeuRepositoryReloadEvent) {
         val data = event.getConstant<NEUPetsJson>("pets")
         xpLeveling = data.petLevels
-        val xpLevelingCustomJson = data.customPetLeveling.getAsJsonObject()
+        val xpLevelingCustomJson = data.customPetLeveling
 
         val map = mutableMapOf<String, NEUPetData>()
         for ((petName, json) in xpLevelingCustomJson.entrySet()) {
@@ -618,21 +620,21 @@ object PetAPI {
         }
         petsDataNEU = map
 
-        customDisplayToInternalName = data.internalToDisplayName
+        data.internalToDisplayName.forEach { (internalName, displayName) ->
+            nameToFakeInternalNameCache.put(displayName, internalName.asString())
+        }
     }
 
-    private val nameToInternalNameCache = mutableMapOf<String, String>()
-
     private fun petNameToFakeInternalName(petName: String): String {
-        if (petName in nameToInternalNameCache) return nameToInternalNameCache[petName].toString()
-        val internalName = customDisplayToInternalName.entries.find { it.value == petName }?.key?.asString()
-            ?: petName.uppercase().replace(" ", "_")
-        nameToInternalNameCache[petName] = internalName
-        return internalName
+        return nameToFakeInternalNameCache.getOrPut(petName) {
+            petName.uppercase().replace(" ", "_")
+        }
     }
 
     private fun petNameToInternalName(petName: String, rarity: LorenzRarity): NEUInternalName {
-        return "${petNameToFakeInternalName(petName)};${rarity.id}".asInternalName()
+        return nameToInternalNameCache.getOrPut("$petName;${rarity.id}") {
+            "${petNameToFakeInternalName(petName)};${rarity.id}".asInternalName()
+        }
     }
 
     private fun throwUnknownRarity(badRarity: String): Nothing {
