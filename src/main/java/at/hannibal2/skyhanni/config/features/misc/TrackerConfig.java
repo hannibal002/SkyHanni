@@ -10,7 +10,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
-import scala.sys.Prop;
 
 public class TrackerConfig {
 
@@ -99,7 +98,7 @@ public class TrackerConfig {
     public boolean hideItemTrackersOutsideInventory = false;
 
     @Expose
-    @ConfigOption(name = "Tracker Search", desc = "Enable the search bar in tracker GUIs.")
+    @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")
     @ConfigEditorBoolean
-    public Property<Boolean> trackerSearch = Property.of(true);
+    public Property<Boolean> trackerSearchEnabled = Property.of(true);
 }

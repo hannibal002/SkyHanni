@@ -85,17 +85,17 @@ open class SkyHanniTracker<Data : TrackerData>(
             update()
         }
 
-        val thisRunSearchEnabled = config.trackerSearch.get()
+        val thisRunSearchEnabled = config.trackerSearchEnabled.get()
         if (dirty || TrackerManager.dirty || (thisRunSearchEnabled != lastRunSearchEnabled)) {
             display = getSharedTracker()?.let {
                 val data = it.get(getDisplayMode())
                 val searchables = drawDisplay(data)
-                if (config.trackerSearch.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
+                if (config.trackerSearchEnabled.get()) buildFinalDisplay(searchables.buildSearchBox(textInput))
                 else buildFinalDisplay(Renderable.verticalContainer(searchables.toRenderable()))
             }.orEmpty()
             dirty = false
         }
-        lastRunSearchEnabled = config.trackerSearch.get()
+        lastRunSearchEnabled = config.trackerSearchEnabled.get()
 
         position.renderRenderables(display, posLabel = name)
     }
