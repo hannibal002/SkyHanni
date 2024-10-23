@@ -4,12 +4,14 @@ import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import org.lwjgl.input.Keyboard;
 
 public class FocusModeConfig {
 
     @Expose
     @ConfigOption(name = "Enabled", desc = "In focus mode you only see the name of the item instead of the whole description.")
+    @SearchTag("compact hide")
     @ConfigEditorBoolean
     public boolean enabled = false;
 
