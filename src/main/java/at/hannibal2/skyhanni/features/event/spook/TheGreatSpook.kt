@@ -37,7 +37,7 @@ object TheGreatSpook {
     private val config get() = SkyHanniMod.feature.event.spook
 
     private var isGreatSpookActive = false
-    private var greatSpookTimeRange: LongRange? = null
+    private var greatSpookTimeRange: ClosedRange<SimpleTimeMark>? = null
     private var greatSpookEnd = SimpleTimeMark.farPast()
 
     private var displayMobCooldown: Renderable? = null
@@ -68,19 +68,12 @@ object TheGreatSpook {
         "§5§lFEAR\\. §r§eA §r§dPrimal Fear §r§ehas been summoned!",
     )
 
-    private var noFearMessageCooldown = SimpleTimeMark.farPast()
-
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isGreatSpookActive) return
 
-        val fear = SkyblockStat.FEAR.lastKnownValue ?: run {
-            if (noFearMessageCooldown.isInPast() && (config.primalFearNotification || config.primalFearTimer))
-                noFearMessageCooldown = SimpleTimeMark.now().plus(2.minutes)
-            ChatUtils.userError("Fear stat not found! Please enable the Stats widget and enable the Fear stat for the best results.")
-            0.0
-        }
+        val fear = SkyblockStat.FEAR.lastKnownValue ?: 0.0
         val mobCooldown = timeUntilNextMob.minus((3 * fear).seconds)
         val mobCooldownString = if (mobCooldown.isInFuture()) {
             "§5Next fear in: ${mobCooldown.timeUntil().format(
@@ -98,7 +91,7 @@ object TheGreatSpook {
             SoundUtils.playPlingSound()
         }
 
-        val greatSpookEnd = SimpleTimeMark(greatSpookTimeRange?.last ?: return)
+        val greatSpookEnd = greatSpookTimeRange?.endInclusive ?: return
         val timeLeftString = if (greatSpookEnd.isInFuture()) {
             "§5Time left: ${greatSpookEnd.timeUntil().format(
                 biggestUnit = TimeUnit.DAY,
@@ -116,7 +109,7 @@ object TheGreatSpook {
     fun onConfigLoad(event: ConfigLoadEvent) {
         val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
         config.afterChange {
-            if (config.get() == true) {
+            if (config.get()) {
                 isGreatSpookActive = true
                 greatSpookEnd = SimpleTimeMark.farFuture()
             } else {
@@ -126,15 +119,15 @@ object TheGreatSpook {
                     greatSpookEnd = SimpleTimeMark.farPast()
                     return@afterChange
                 }
-                isGreatSpookActive = SimpleTimeMark.now().toMillis() in timeRange
-                greatSpookEnd = SimpleTimeMark(timeRange.last)
+                isGreatSpookActive = SimpleTimeMark.now() in timeRange
+                greatSpookEnd = timeRange.endInclusive
             }
         }
     }
 
     @SubscribeEvent
     fun onWorldSwitch(event: IslandChangeEvent) {
-        val currentTime = SimpleTimeMark.now().toMillis()
+        val currentTime = SimpleTimeMark.now()
         val timeRange = greatSpookTimeRange ?: run {
             isGreatSpookActive = false
             return
@@ -198,6 +191,11 @@ object TheGreatSpook {
 
         if (primalFearSpawnPattern.matches(event.message)) {
             timeUntilNextMob = SimpleTimeMark.now().plus(6.minutes)
+            if (SkyblockStat.FEAR.lastKnownValue == null &&
+                (config.primalFearNotification || config.primalFearTimer)
+            ) {
+                ChatUtils.userError("Fear stat not found! Please enable the Stats widget and enable the Fear stat for the best results.")
+            }
             return
         }
 
@@ -222,14 +220,14 @@ object TheGreatSpook {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<EventsJson>("Events").greatSpook
 
-        val startTime = data["start_time"] ?: 0
-        val endTime = data["end_time"] ?: 0
+        val startTime = data["start_time"] ?: SimpleTimeMark.farPast()
+        val endTime = data["end_time"] ?: SimpleTimeMark.farPast()
 
         greatSpookTimeRange = startTime..endTime
         if (SkyHanniMod.feature.dev.debug.forceGreatSpook.get()) {
             greatSpookEnd = SimpleTimeMark.farFuture()
         } else {
-            greatSpookEnd = SimpleTimeMark(endTime)
+            greatSpookEnd = endTime
         }
     }
 
@@ -238,9 +236,9 @@ object TheGreatSpook {
         event.title("Great Spook")
 
         event.addIrrelevant {
-            add("isGreatSpookActive: $isGreatSpookActive")
-            add("greatSpookTimeRange: $greatSpookTimeRange")
-            add("greatSpookEnd: $greatSpookEnd")
+            add("isActive: $isGreatSpookActive")
+            add("activeTimeRange: $greatSpookTimeRange")
+            add("eventEnd: $greatSpookEnd")
             add("timeUntilNextMob: $timeUntilNextMob")
         }
     }
