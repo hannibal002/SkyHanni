@@ -39,7 +39,6 @@ object LockMouseLook {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        println(!unlockMousePattern.matches(event.message))
         if (!unlockMousePattern.matches(event.message)) return
         if (lockedMouse) toggleLock()
     }
