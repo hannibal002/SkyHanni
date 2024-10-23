@@ -37,7 +37,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
     private var display = emptyList<Renderable>()
     private var sessionResetTime = SimpleTimeMark.farPast()
-    private var lastRunSearchEnabled = true
+    private var lastRunSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
     private val textInput = TextInput()
 
