@@ -1,12 +1,17 @@
 package at.hannibal2.skyhanni.features.event.spook
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EventsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.ConditionalUtils.afterChange
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -30,12 +35,13 @@ object TheGreatSpook {
     private val config get() = SkyHanniMod.feature.event.spook
 
     private var isGreatSpookActive = false
+    private var greatSpookTimeRange: LongRange? = null
+    private var greatSpookEnd = SimpleTimeMark.farPast()
 
     private var displayMobCooldown: Renderable? = null
     private var displayGreatSpookEnd: Renderable? = null
 
     private var timeUntilNextMob = SimpleTimeMark.farPast()
-    private var greatSpookEnd = SimpleTimeMark(1730523600000)
 
     private val patternGroup = RepoPattern.group("event.greatspook")
     /**
@@ -80,6 +86,7 @@ object TheGreatSpook {
         }
         displayMobCooldown = Renderable.string(mobCooldownString)
 
+        val greatSpookEnd = SimpleTimeMark(greatSpookTimeRange?.last ?: return)
         val timeLeftString = if (greatSpookEnd.isInFuture()) {
             "§5Time left: ${greatSpookEnd.timeUntil().format(
                 biggestUnit = TimeUnit.DAY,
@@ -91,6 +98,37 @@ object TheGreatSpook {
             "§5§lThe Great Spook has ended!"
         }
         displayGreatSpookEnd = Renderable.string(timeLeftString)
+    }
+
+    @SubscribeEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        val config = SkyHanniMod.feature.dev.debug.forceGreatSpook
+        config.afterChange {
+            if (config.get() == true) {
+                isGreatSpookActive = true
+                greatSpookEnd = SimpleTimeMark.farFuture()
+            } else {
+                val timeRange = greatSpookTimeRange
+                if (timeRange == null) {
+                    isGreatSpookActive = false
+                    greatSpookEnd = SimpleTimeMark.farPast()
+                    return@afterChange
+                }
+                isGreatSpookActive = SimpleTimeMark.now().toMillis() in timeRange
+                greatSpookEnd = SimpleTimeMark(timeRange.last)
+            }
+        }
+    }
+
+    @SubscribeEvent
+    fun onWorldSwitch(event: IslandChangeEvent) {
+        val currentTime = SimpleTimeMark.now().toMillis()
+        val timeRange = greatSpookTimeRange ?: run {
+            isGreatSpookActive = false
+            return
+        }
+
+        isGreatSpookActive = currentTime in timeRange
     }
 
     @SubscribeEvent
@@ -164,5 +202,15 @@ object TheGreatSpook {
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        val data = event.getConstant<EventsJson>("Events").greatSpook
+
+        val startTime = data["start_time"] ?: 0
+        val endTime = data["end_time"] ?: 0
+
+        greatSpookTimeRange = startTime..endTime
     }
 }
