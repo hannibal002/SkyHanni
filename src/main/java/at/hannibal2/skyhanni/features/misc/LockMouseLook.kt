@@ -8,12 +8,19 @@ import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.SensitivityReducer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LockMouseLook {
+
+    private val gardenTeleportPattern by RepoPattern.pattern(
+        "chat.garden.teleport",
+        "§aTeleported you to .*",
+    )
 
     private val config get() = SkyHanniMod.feature.misc
     private val storage get() = SkyHanniMod.feature.storage
@@ -32,7 +39,7 @@ object LockMouseLook {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!event.message.startsWith("§aTeleported you to §r§aPlot")) return
+        if (!gardenTeleportPattern.matches(event.message)) return
         if (lockedMouse) toggleLock()
     }
 
