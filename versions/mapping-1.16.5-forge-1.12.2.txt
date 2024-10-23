@@ -138,6 +138,7 @@ net.minecraft.network.protocol.game.ClientboundTeleportEntityPacket getId() getE
 
 net.minecraft.network.protocol.game.ClientboundSetTitlesPacket getText() getMessage()
 
+net.minecraft.network.protocol.game.ServerboundChatPacket net.minecraft.network.play.client.CPacketChatMessage
 net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraft.network.play.client.CPacketClickWindow
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
@@ -146,6 +147,10 @@ net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.netw
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
+
+net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
+net.minecraft.world.entity.ExperienceOrb net.minecraft.entity.item.EntityXPOrb
+net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
 
 net.minecraft.world.entity.Entity level getEntityWorld()
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity
@@ -156,29 +161,62 @@ net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
 
-net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
-
 net.minecraft.world.entity.LivingEntity getEffect() getActivePotionEffect()
 net.minecraft.world.entity.LivingEntity getItemBySlot() getItemStackFromSlot()
 net.minecraft.world.entity.LivingEntity getMainHandItem() getHeldItemMainhand()
 net.minecraft.world.entity.LivingEntity getOffhandItem() getHeldItemOffhand()
-net.minecraft.world.entity.LivingEntity net.minecraft.entity.EntityLivingBase
+
+net.minecraft.world.entity.Entity removed isDead
+net.minecraft.world.entity.Entity getId() getEntityId()
+
+net.minecraft.world.entity.ambient.Bat net.minecraft.entity.passive.EntityBat
+
+net.minecraft.world.entity.animal.Animal net.minecraft.entity.passive.EntityAnimal
+net.minecraft.world.entity.animal.Chicken net.minecraft.entity.passive.EntityChicken
+net.minecraft.world.entity.animal.Cow net.minecraft.entity.passive.EntityCow
+net.minecraft.world.entity.animal.IronGolem net.minecraft.entity.monster.EntityIronGolem
+net.minecraft.world.entity.animal.SnowGolem net.minecraft.entity.monster.EntitySnowman
+net.minecraft.world.entity.animal.MushroomCow net.minecraft.entity.passive.EntityMooshroom
+net.minecraft.world.entity.animal.Ocelot net.minecraft.entity.passive.EntityOcelot
+net.minecraft.world.entity.animal.Pig net.minecraft.entity.passive.EntityPig
+net.minecraft.world.entity.animal.Rabbit net.minecraft.entity.passive.EntityRabbit
+net.minecraft.world.entity.animal.Sheep net.minecraft.entity.passive.EntitySheep
+net.minecraft.world.entity.animal.Squid net.minecraft.entity.passive.EntitySquid
+net.minecraft.world.entity.animal.Wolf net.minecraft.entity.passive.EntityWolf
+
+net.minecraft.world.entity.animal.horse.Horse net.minecraft.entity.passive.EntityHorse
+
+net.minecraft.world.entity.boss.enderdragon.EnderDragon net.minecraft.entity.boss.EntityDragon
+
+net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
+
+net.minecraft.world.entity.decoration.ItemFrame net.minecraft.entity.item.EntityItemFrame
 
 net.minecraft.world.entity.decoration.ArmorStand getArmorSlots() getArmorInventoryList()
 net.minecraft.world.entity.decoration.ArmorStand net.minecraft.entity.item.EntityArmorStand
 
-net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
-net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
-
-net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
-net.minecraft.world.inventory.Slot getItem() getStack()
-net.minecraft.world.inventory.Slot index slotNumber
-net.minecraft.world.entity.Entity removed isDead
-net.minecraft.world.entity.Entity getId() getEntityId()
-
-net.minecraft.world.entity.boss.wither.WitherBoss net.minecraft.entity.boss.EntityWither
-
 net.minecraft.world.entity.item.ItemEntity net.minecraft.entity.item.EntityItem
+
+net.minecraft.world.entity.monster.Blaze net.minecraft.entity.monster.EntityBlaze
+net.minecraft.world.entity.monster.CaveSpider net.minecraft.entity.monster.EntityCaveSpider
+net.minecraft.world.entity.monster.Creeper net.minecraft.entity.monster.EntityCreeper
+net.minecraft.world.entity.monster.EnderMan net.minecraft.entity.monster.EntityEnderman
+net.minecraft.world.entity.monster.Endermite net.minecraft.entity.monster.EntityEndermite
+net.minecraft.world.entity.monster.Ghast net.minecraft.entity.monster.EntityGhast
+net.minecraft.world.entity.monster.Giant net.minecraft.entity.monster.EntityGiantZombie
+net.minecraft.world.entity.monster.Guardian net.minecraft.entity.monster.EntityGuardian
+net.minecraft.world.entity.monster.MagmaCube net.minecraft.entity.monster.EntityMagmaCube
+net.minecraft.world.entity.monster.Silverfish net.minecraft.entity.monster.EntitySilverfish
+net.minecraft.world.entity.monster.Skeleton net.minecraft.entity.monster.EntitySkeleton
+net.minecraft.world.entity.monster.Slime net.minecraft.entity.monster.EntitySlime
+net.minecraft.world.entity.monster.Spider net.minecraft.entity.monster.EntitySpider
+net.minecraft.world.entity.monster.Witch net.minecraft.entity.monster.EntityWitch
+net.minecraft.world.entity.monster.Zombie net.minecraft.entity.monster.EntityZombie
+net.minecraft.world.entity.monster.ZombifiedPiglin net.minecraft.entity.monster.EntityPigZombie
+
+net.minecraft.world.entity.monster.EnderMan getCarriedBlock() getHeldBlockState()
+
+net.minecraft.world.entity.npc.Villager net.minecraft.entity.passive.EntityVillager
 
 net.minecraft.world.entity.player.Inventory net.minecraft.entity.player.InventoryPlayer
 
@@ -192,10 +230,15 @@ net.minecraft.world.entity.player.Player net.minecraft.entity.player.EntityPlaye
 net.minecraft.world.entity.player.PlayerModelPart net.minecraft.entity.player.EnumPlayerModelParts
 
 net.minecraft.world.entity.projectile.Arrow net.minecraft.entity.projectile.EntityArrow
-
+net.minecraft.world.entity.projectile.Fireball net.minecraft.entity.projectile.EntityFireball
 net.minecraft.world.entity.projectile.FishingHook net.minecraft.entity.projectile.EntityFishHook
+net.minecraft.world.entity.projectile.SmallFireball net.minecraft.entity.projectile.EntitySmallFireball
 
 net.minecraft.world.entity.projectile.FishingHook getPlayerOwner() getAngler()
+
+net.minecraft.world.inventory.Slot net.minecraft.inventory.Slot
+net.minecraft.world.inventory.Slot getItem() getStack()
+net.minecraft.world.inventory.Slot index slotNumber
 
 net.minecraft.world.item.Item net.minecraft.item.Item
 net.minecraft.world.item.Items net.minecraft.init.Items
