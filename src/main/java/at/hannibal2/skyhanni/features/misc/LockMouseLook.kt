@@ -17,9 +17,9 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object LockMouseLook {
 
-    private val unlockMousePattern by RepoPattern.pattern(
-        "unlockmouse",
-        "§aTeleported you to (.*)",
+    private val gardenTeleportPattern by RepoPattern.pattern(
+        "chat.garden.teleport",
+        "§aTeleported you to .*",
     )
 
     private val config get() = SkyHanniMod.feature.misc
@@ -39,7 +39,7 @@ object LockMouseLook {
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
-        if (!unlockMousePattern.matches(event.message)) return
+        if (!gardenTeleportPattern.matches(event.message)) return
         if (lockedMouse) toggleLock()
     }
 
