@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
@@ -92,6 +93,10 @@ object TheGreatSpook {
             "§5§lPrimal Fear Ready!"
         }
         displayMobCooldown = Renderable.string(mobCooldownString)
+
+        if (config.primalFearNotification && mobCooldown.isInFuture()) {
+            SoundUtils.playPlingSound()
+        }
 
         val greatSpookEnd = SimpleTimeMark(greatSpookTimeRange?.last ?: return)
         val timeLeftString = if (greatSpookEnd.isInFuture()) {
