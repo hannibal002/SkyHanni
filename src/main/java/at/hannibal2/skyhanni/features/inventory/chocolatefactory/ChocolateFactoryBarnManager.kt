@@ -61,13 +61,26 @@ object ChocolateFactoryBarnManager {
             HoppityEggsCompactChat.compactChat(event, lastDuplicateAmount = amount)
             HoppityAPI.attemptFireRabbitFound(lastDuplicateAmount = amount)
 
+            var changedMessage = event.message
+
             if (hoppityConfig.showDuplicateNumber && !hoppityConfig.compactChat) {
                 (HoppityCollectionStats.getRabbitCount(HoppityAPI.getLastRabbit())).takeIf { it > 0 }?.let {
-                    event.chatComponent = ChatComponentText(
-                        event.message.replace("§7§lDUPLICATE RABBIT!", "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"),
+                    changedMessage = changedMessage.replace(
+                        "§7§lDUPLICATE RABBIT!",
+                        "§7§lDUPLICATE RABBIT! §7(Duplicate §b#$it§7)§r"
                     )
                 }
             }
+
+            if (hoppityConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) {
+                // Replace §6\+(?<amount>[\d,]+) Chocolate with §6\+§d(?<amount>[\d,]+) §6Chocolate
+                changedMessage = changedMessage.replace(
+                    "§6\\+(?<amount>[\\d,]+) Chocolate",
+                    "§6\\+§d${group("amount")} §6Chocolate"
+                )
+            }
+
+            if (event.message != changedMessage) event.chatComponent = ChatComponentText(changedMessage)
         }
 
         rabbitCrashedPattern.matchMatcher(event.message) {
