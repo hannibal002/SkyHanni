@@ -28,7 +28,7 @@ jobs:
                         echo "exists=false" >> $GITHUB_OUTPUT
                     fi
             -   name: Annotate detekt failures
-                if: ${{ steps.check_sarif.outputs.exists == 'true' }}
+                if: ${{ !cancelled() && steps.check_sarif.outputs.exists == 'true' }}
                 run: |
                     chmod +x .github/scripts/process_detekt_sarif.sh
                     ./.github/scripts/process_detekt_sarif.sh versions/1.8.9/build/reports/detekt/main.sarif
