@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.attribute
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.getAttributesLevels
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeAPI.isGoodRoll
@@ -18,7 +19,7 @@ object AttributeOverlay {
 
     private val config get() = SkyHanniMod.feature.inventory.attributeOverlay
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemOverlayPost(event: GuiRenderItemEvent.RenderOverlayEvent.GuiRenderItemPost) {
         if (!isEnabled()) return
 

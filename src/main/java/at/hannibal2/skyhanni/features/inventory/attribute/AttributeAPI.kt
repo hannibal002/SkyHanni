@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.attribute
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.AttributeGoodRollsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -72,7 +73,7 @@ object AttributeAPI {
 
     private data class GoodRollItem(val regex: Pattern, val attributes: List<Pair<AttributeType, AttributeType>>)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<AttributeGoodRollsJson>("AttributeGoodRolls")
         goodRolls = data.goodRolls.values.map {

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuEssenceShopJson
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -108,14 +109,14 @@ object EssenceShopHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled() || essenceShops.isEmpty() || currentProgress == null || event.slot != CUSTOM_STACK_LOCATION) return
         if (!essenceShopPattern.matches(event.inventory.name)) return
         infoItemStack.let { event.replace(it) }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (currentProgress == null || event.slotId != CUSTOM_STACK_LOCATION) return
         val currentEssenceItem = currentEssenceItem ?: return
@@ -126,7 +127,7 @@ object EssenceShopHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val repoEssenceShops = event.readConstant<Map<String, Map<String, NeuEssenceShopJson>>>("essenceshops")
         essenceShops = repoEssenceShops.map { (key, value) ->
@@ -134,7 +135,7 @@ object EssenceShopHelper {
         }.toMutableList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         currentProgress = null
         currentEssenceType = ""
@@ -143,12 +144,12 @@ object EssenceShopHelper {
         essenceNeeded = 0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         processInventoryEvent(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         processInventoryEvent(event)
     }
