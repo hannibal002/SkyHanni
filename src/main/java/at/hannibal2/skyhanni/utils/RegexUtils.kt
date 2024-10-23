@@ -2,6 +2,9 @@ package at.hannibal2.skyhanni.utils
 
 import java.util.regex.Matcher
 import java.util.regex.Pattern
+//#if MC>=11605
+//$$ import net.minecraft.network.chat.Component
+//#endif
 
 object RegexUtils {
     inline fun <T> Pattern.matchMatcher(text: String, consumer: Matcher.() -> T) =
@@ -9,6 +12,13 @@ object RegexUtils {
 
     inline fun <T> Pattern.findMatcher(text: String, consumer: Matcher.() -> T) =
         matcher(text).let { if (it.find()) consumer(it) else null }
+
+    //#if MC>1.12.2
+    //$$ inline fun <T> Pattern.matchMatcher(text: Component, consumer: Matcher.() -> T) =
+    //$$     this.matchMatcher(text.string, consumer)
+    //$$ inline fun <T> Pattern.findMatcher(text: Component, consumer: Matcher.() -> T) =
+    //$$     this.findMatcher(text.string, consumer)
+    //#endif
 
     @Deprecated("", ReplaceWith("pattern.firstMatcher(this) { consumer() }"))
     inline fun <T> Sequence<String>.matchFirst(pattern: Pattern, consumer: Matcher.() -> T): T? =
@@ -61,6 +71,11 @@ object RegexUtils {
 
     fun Pattern.matches(string: String?): Boolean = string?.let { matcher(it).matches() } ?: false
     fun Pattern.find(string: String?) = string?.let { matcher(it).find() } ?: false
+
+    //#if MC>1.12.2
+    //$$ fun Pattern.matches(component: Component?): Boolean = matches(component?.string)
+    //$$ fun Pattern.find(component: Component?): Boolean = find(component?.string)
+    //#endif
 
     fun Pattern.anyMatches(list: List<String>?): Boolean = list?.any { matches(it) } ?: false
     fun Pattern.anyMatches(list: Sequence<String>?): Boolean = anyMatches(list?.toList())
