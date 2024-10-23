@@ -221,7 +221,8 @@ object PlayerChatManager {
         chatComponent: IChatComponent,
     ) {
         if (cancelled) {
-            //u shouldnt be able to cancel this its not possible
+            // This event can't be cancelled this is a lie
+
         }
         blockedReason?.let {
             this.blockedReason = it

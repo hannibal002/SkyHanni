@@ -36,7 +36,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.io.File
 import kotlin.time.Duration.Companion.milliseconds

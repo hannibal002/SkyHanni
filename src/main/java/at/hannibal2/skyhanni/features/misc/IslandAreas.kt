@@ -33,7 +33,6 @@ import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityPlayerSP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule

@@ -24,12 +24,12 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     constructor(event: Class<T>, listeners: List<EventListeners.Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
         listeners.sortedBy { it.options.priority }.toList(),
-        listeners.any { it.options.receiveCancelled }
+        listeners.any { it.options.receiveCancelled },
     )
 
     companion object {
         private var eventHandlerDepth by object : ThreadLocal<Int>() {
-            override fun initialValue():Int {
+            override fun initialValue(): Int {
                 return 0
             }
         }

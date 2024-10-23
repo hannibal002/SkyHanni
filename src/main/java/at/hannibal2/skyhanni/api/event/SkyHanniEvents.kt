@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.api.event
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
