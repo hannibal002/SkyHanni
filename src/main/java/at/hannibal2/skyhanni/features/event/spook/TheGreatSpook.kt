@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.data.jsonobjects.repo.EventsJson
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
@@ -66,14 +67,20 @@ object TheGreatSpook {
         "§5§lFEAR\\. §r§eA §r§dPrimal Fear §r§ehas been summoned!",
     )
 
+    private var noFearMessageCooldown = SimpleTimeMark.farPast()
+
     @SubscribeEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        if (!isGreatSpookActive) return
+
         val fear = SkyblockStat.FEAR.lastKnownValue ?: run {
-            if (config.primalFearNotification || config.primalFearTimer)
-                ChatUtils.userError("Fear stat not found! Please enable the Stats widget and enable the Fear stat for the best results.")
+            if (noFearMessageCooldown.isInPast() && (config.primalFearNotification || config.primalFearTimer))
+                noFearMessageCooldown = SimpleTimeMark.now().plus(2.minutes)
+            ChatUtils.userError("Fear stat not found! Please enable the Stats widget and enable the Fear stat for the best results.")
             0.0
         }
-        val mobCooldown = timeUntilNextMob.minus((3*fear).seconds)
+        val mobCooldown = timeUntilNextMob.minus((3 * fear).seconds)
         val mobCooldownString = if (mobCooldown.isInFuture()) {
             "§5Next fear in: ${mobCooldown.timeUntil().format(
                 biggestUnit = TimeUnit.MINUTE,
@@ -134,6 +141,7 @@ object TheGreatSpook {
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (!isGreatSpookActive) return
 
         if (config.primalFearTimer) {
             displayMobCooldown.let {
@@ -181,6 +189,7 @@ object TheGreatSpook {
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
+        if (!isGreatSpookActive) return
 
         if (primalFearSpawnPattern.matches(event.message)) {
             timeUntilNextMob = SimpleTimeMark.now().plus(6.minutes)
@@ -212,5 +221,22 @@ object TheGreatSpook {
         val endTime = data["end_time"] ?: 0
 
         greatSpookTimeRange = startTime..endTime
+        if (SkyHanniMod.feature.dev.debug.forceGreatSpook.get()) {
+            greatSpookEnd = SimpleTimeMark.farFuture()
+        } else {
+            greatSpookEnd = SimpleTimeMark(endTime)
+        }
+    }
+
+    @SubscribeEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Great Spook")
+
+        event.addIrrelevant {
+            add("isGreatSpookActive: $isGreatSpookActive")
+            add("greatSpookTimeRange: $greatSpookTimeRange")
+            add("greatSpookEnd: $greatSpookEnd")
+            add("timeUntilNextMob: $timeUntilNextMob")
+        }
     }
 }
