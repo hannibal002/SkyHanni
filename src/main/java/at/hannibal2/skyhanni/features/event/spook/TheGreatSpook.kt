@@ -85,7 +85,7 @@ object TheGreatSpook {
             return
         }
         ChatUtils.clickToActionOrDisable(
-            "The answer is: §3$answer",
+            "The answer is: §b$answer",
             config.primalFearSolver::math,
             actionName = "Send the answer",
             action = {
