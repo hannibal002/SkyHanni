@@ -21,10 +21,11 @@ object SlayerMiniBossFeatures {
     @SubscribeEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!SlayerAPI.isInAnyArea) return
-        val slayer = SlayerAPI.activeSlayer?.miniBossType ?: return
-        if (slayer.names.none { event.mob.name in it }) return
-        miniBosses += event.mob
-        if (config.slayerMinibossHighlight) event.mob.highlight(LorenzColor.AQUA.toColor())
+        val miniBossType = SlayerAPI.getSlayerTypeForCurrentArea()?.miniBossType ?: return
+        val mob = event.mob
+        if (mob.name !in miniBossType.names) return
+        miniBosses += mob
+        if (config.slayerMinibossHighlight) mob.highlight(LorenzColor.AQUA.toColor())
     }
 
     @SubscribeEvent
