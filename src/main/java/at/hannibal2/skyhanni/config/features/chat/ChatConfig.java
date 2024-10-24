@@ -142,4 +142,9 @@ public class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean petRarityDropMessage = true;
+
+    @Expose
+    @ConfigOption(name = "Sound Responses", desc = "")
+    @Accordion
+    public SoundResponseConfig soundResponse = new SoundResponseConfig();
 }
