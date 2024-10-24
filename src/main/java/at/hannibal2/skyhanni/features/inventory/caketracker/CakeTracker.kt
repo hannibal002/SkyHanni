@@ -208,7 +208,7 @@ object CakeTracker {
         val currentYears = InventoryUtils.getItemsInOpenChest().mapNotNull { item ->
             cakeNamePattern.matchMatcher(item.stack.displayName) {
                 group("year")?.toInt()
-            }
+                cakeNamePattern.matchGroup(item.stack.displayName, "year")?.toInt()
         }
 
         val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }
