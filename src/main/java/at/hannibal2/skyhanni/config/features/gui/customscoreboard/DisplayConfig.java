@@ -152,7 +152,7 @@ public class DisplayConfig {
     @Expose
     @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
     @ConfigEditorBoolean
-    public boolean showProfileName = true;
+    public boolean showProfileName = false;
 
     @Expose
     @ConfigOption(
