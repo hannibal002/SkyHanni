@@ -94,11 +94,11 @@ object CrystalNucleusAPI {
                     when (pair.first) {
                         // Enchanted books are checked in the pickup event handler.
                         "§fEnchanted" -> {
-                            unCheckedBooks++
+                            unCheckedBooks += pair.second
                             return
                         }
                         "§fEnchanted Book" -> {
-                            unCheckedBooks++
+                            unCheckedBooks += pair.second
                             return
                         }
                         else -> pair
