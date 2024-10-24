@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.STRAY
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.eggFoundPattern
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggsManager.getEggType
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryTimeTowerManager
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
@@ -89,7 +90,7 @@ object HoppityEggsCompactChat {
 
         val rarityConfig = HoppityEggsManager.config.rarityInCompact
         return if (duplicate) {
-            val format = lastDuplicateAmount?.shortFormat() ?: "?"
+            val dupeChocFormat = lastDuplicateAmount?.shortFormat() ?: "?"
             val timeFormatted = lastDuplicateAmount?.let {
                 ChocolateFactoryAPI.timeUntilNeed(it).format(maxUnits = 2)
             } ?: "?"
@@ -101,9 +102,15 @@ object HoppityEggsCompactChat {
             } else ""
 
             val showDupeRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.DUPE }
+            val rarityFormat = if (showDupeRarity) "$lastRarity " else ""
+
             val timeStr = if (config.showDuplicateTime) ", §a+§b$timeFormatted§7" else ""
-            "$mealNameFormat! §7Duplicate ${if (showDupeRarity) "$lastRarity " else ""}" +
-                "$lastName$dupeNumberFormat §7(§6+$format Chocolate§7$timeStr)"
+            val dupeChocColor =
+                if (eventConfig.recolorTTChocolate && ChocolateFactoryTimeTowerManager.timeTowerActive()) "§d"
+                else "§6"
+
+            "$mealNameFormat! §7Duplicate $rarityFormat $lastName$dupeNumberFormat " +
+                "§7(§6+$dupeChocColor$dupeChocFormat §6Chocolate§7$timeStr)"
         } else if (newRabbit) {
             val showNewRarity = rarityConfig.let { it == RarityType.BOTH || it == RarityType.NEW }
             "$mealNameFormat! §d§lNEW ${if (showNewRarity) "$lastRarity " else ""}$lastName §7($lastProfit§7)"
