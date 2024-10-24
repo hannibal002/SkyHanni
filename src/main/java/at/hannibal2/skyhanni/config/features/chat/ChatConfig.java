@@ -21,6 +21,16 @@ public class ChatConfig {
     public int peekChat = Keyboard.KEY_NONE;
 
     @Expose
+    @ConfigOption(
+        name = "Copy Chat",
+        desc = "Right click a chat message to copy it. Holding Shift will copy the\n" +
+            "message with Shwords applied, and holding Ctrl will copy only one line."
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean copyChat = false;
+
+    @Expose
     @ConfigOption(name = "Chat Filter Types", desc = "")
     @Accordion
     // TODO move into own sub category
@@ -32,6 +42,11 @@ public class ChatConfig {
     @Accordion
     // TODO move into own sub category
     public PlayerMessagesConfig playerMessage = new PlayerMessagesConfig();
+
+    @Expose
+    @ConfigOption(name = "Rare Drop Messages", desc = "")
+    @Accordion
+    public RareDropMessagesConfig rareDropMessages = new RareDropMessagesConfig();
 
     @Expose
     @ConfigOption(name = "Dungeon Filters", desc = "Hide specific message types in Dungeons.")
