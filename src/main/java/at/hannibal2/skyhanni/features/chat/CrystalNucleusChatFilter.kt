@@ -26,6 +26,7 @@ object CrystalNucleusChatFilter {
     private var unclosedCrystalCollected = false
     private var crystalCount = 0
     private var crystalCollected = ""
+    private var lastKeeper = ""
 
     /**
      * REGEX-TEST: §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
@@ -87,6 +88,17 @@ object CrystalNucleusChatFilter {
     private val scavengeSecondaryPattern by patternGroup.pattern(
         "divan.scavenge.secondary",
         "§6§lPICK IT UP!",
+    )
+
+    /**
+     * REGEX-TEST: §e[NPC] §6Keeper of Gold§f: §rExcellent! You have returned the §cScavenged Golden Hammer §rto its rightful place!
+     * REGEX-TEST: §e[NPC] §6Keeper of Diamond§f: §rExcellent! You have returned the §cScavenged Diamond Axe §rto its rightful place!
+     * REGEX-TEST: §e[NPC] §6Keeper of Emerald§f: §rExcellent! You have returned the §cScavenged Emerald Hammer §rto its rightful place!
+     * REGEX-TEST: §e[NPC] §6Keeper of Lapis§f: §rYou found all of the items! Behold... the §aJade Crystal§r!
+     */
+    private val genericKeeperMessage by patternGroup.pattern(
+        "npc.keeper",
+        "§e\\[NPC\\] §6Keeper of (?<keepertype>.*)§f: §r(?<message>.*)",
     )
 
     /**
@@ -236,8 +248,12 @@ object CrystalNucleusChatFilter {
         if (!shouldBlock(CrystalNucleusMessageTypes.NPC_DIVAN_KEEPERS)) return null
         if (!message.startsWith("§e[NPC] §6Keeper of ")) return null
 
+        genericKeeperMessage.matchMatcher(message) {
+            lastKeeper = group("keepertype")
+        }
+
         if (message.contains("You found all of the items!")) {
-            return NucleusChatFilterRes("", "§e[NPC] §6Keeper of §k§6Gold§f: §rAll tools submitted.")
+            return NucleusChatFilterRes("", "§e[NPC] §6Keeper of §6${lastKeeper}§f: §rAll tools submitted.")
         }
 
         return NucleusChatFilterRes("npc_divan_keeper")
