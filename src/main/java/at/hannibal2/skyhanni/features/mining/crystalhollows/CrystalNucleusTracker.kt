@@ -8,8 +8,10 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
+import at.hannibal2.skyhanni.features.inventory.patternGroup
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.jungleKeyItem
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfitPer.robotPartItems
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,8 +20,10 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
@@ -31,6 +35,21 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 @SkyHanniModule
 object CrystalNucleusTracker {
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusTracker
+
+    /**
+     * REGEX-TEST: §b[MVP§r§2+§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * REGEX-TEST: §6[MVP§r§2++§r§b] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * REGEX-TEST: oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     * REGEX-TEST: §c[§fYOUTUBE§c] oBlazin§r§f §r§ehas obtained §r§a§r§7[Lvl 1] §r§6Bal§r§e!
+     */
+    @Suppress("MaxLineLength")
+    private val balObtainedPattern by patternGroup.pattern(
+        "bal.obtained",
+        "(?:(?:§.)*\\[.*(?:§.)*\\+*(?:§.)*\\] )?(?<player>.*)§r§f §r§ehas obtained §r§a§r§7\\[Lvl 1\\] §r§(?<raritycolor>[65])Bal§r§e!"
+    )
+
+    private val EPIC_BAL_ITEM by lazy { "BAL;3".asInternalName() }
+    private val LEGENDARY_BAL_ITEM by lazy { "BAL;4".asInternalName() }
 
     private val tracker = SkyHanniItemTracker(
         "Crystal Nucleus Tracker",
@@ -58,6 +77,23 @@ object CrystalNucleusTracker {
 
         @Expose
         var runsCompleted = 0L
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!LorenzUtils.inSkyBlock) return
+        balObtainedPattern.matchMatcher(event.message) {
+            if (!group("player").equals(LorenzUtils.getPlayerName(), ignoreCase = true)) return@matchMatcher
+
+            val item = when(group("raritycolor")) {
+                "6" -> LEGENDARY_BAL_ITEM
+                "5" -> EPIC_BAL_ITEM
+                else -> return@matchMatcher
+            }
+            tracker.modify {
+                it.addItem(item, 1, false)
+            }
+        }
     }
 
     @HandleEvent
