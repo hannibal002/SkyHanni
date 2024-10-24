@@ -155,6 +155,11 @@ public class DisplayConfig {
     public boolean showProfileName = false;
 
     @Expose
+    @ConfigOption(name = "Date in Lobby Code", desc = "Show the current date infront of the server name, like Hypixel does.")
+    @ConfigEditorBoolean
+    public boolean dateInLobbyCode = true;
+
+    @Expose
     @ConfigOption(
         name = "Cache Scoreboard on Island Switch",
         desc = "Will stop the Scoreboard from updating while switching islands.\n" +
