@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.transformAt
 import at.hannibal2.skyhanni.utils.ConditionalUtils.transformIf
@@ -12,7 +13,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object StockOfStonkFeature {
@@ -55,20 +55,20 @@ object StockOfStonkFeature {
 
     var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (isEnabled()) {
             inInventory = inventoryPattern.matches(event.inventoryName)
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }
 
-    @SubscribeEvent
-    fun onLorenzToolTip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onLorenzToolTip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
         if (!itemPattern.matches(event.itemStack.displayName)) return

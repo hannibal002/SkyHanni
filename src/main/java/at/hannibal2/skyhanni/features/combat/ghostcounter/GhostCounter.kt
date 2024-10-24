@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.combat.ghostcounter.GhostData.Option
@@ -59,7 +59,6 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import io.github.moulberry.notenoughupdates.util.XPInformation
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.commons.io.FilenameUtils
 import java.io.File
 import java.text.NumberFormat
@@ -125,7 +124,7 @@ object GhostCounter {
     private val PLASMA = "PLASMA".asInternalName()
     private val VOLTA = "VOLTA".asInternalName()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (config.onlyOnMist && !inMist) return
@@ -301,7 +300,7 @@ object GhostCounter {
         addAsSingletonList(moneyMadeWithClickableTips)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -352,7 +351,7 @@ object GhostCounter {
         inMist = event.area == "The Mist"
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarUpdate(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         if (!inMist) return
@@ -408,7 +407,7 @@ object GhostCounter {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.tabList) {
@@ -419,8 +418,8 @@ object GhostCounter {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         for (opt in Option.entries) {
             val pattern = opt.pattern ?: continue
@@ -483,7 +482,7 @@ object GhostCounter {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onPurseChange(event: PurseChangeEvent) {
         if (!isEnabled()) return
         if (LorenzUtils.skyBlockArea != "The Mist") return
@@ -492,7 +491,7 @@ object GhostCounter {
         Option.SCAVENGERCOINS.add(event.coins)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val inventoryName = event.inventoryName
@@ -516,7 +515,7 @@ object GhostCounter {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         if (storage?.configUpdateVersion == 0) {
             config.textFormatting.bestiaryFormatting.base = "  &6Bestiary %display%: &b%value%"
@@ -525,7 +524,7 @@ object GhostCounter {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ghostCounter", "combat.ghostCounter")
         event.transform(11, "combat.ghostCounter.ghostDisplayText") { element ->

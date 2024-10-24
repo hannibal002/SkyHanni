@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.rift.everywhere
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ActionBarStatsData
 import at.hannibal2.skyhanni.events.ActionBarValueUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -42,15 +42,15 @@ object RiftTimer {
     private var latestTime = 0.seconds
     private val changes = mutableMapOf<Long, String>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         display = emptyList()
         maxTime = 0.seconds
         latestTime = 0.seconds
         currentTime = 0.seconds
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onActionBarValueUpdate(event: ActionBarValueUpdateEvent) {
         if (event.updated != ActionBarStatsData.RIFT_TIME) return
         if (!isEnabled() || RiftAPI.inRiftRace) return
@@ -65,8 +65,8 @@ object RiftTimer {
 
     // prevents rift time from pausing during Rift Race
     // (hypixel hides the action bar during the race)
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !RiftAPI.inRiftRace) return
         if (!event.isMod(5)) return
         val newTime = TimeUtils.getDuration(Minecraft.getMinecraft().thePlayer.experienceLevel.toString() + " s")
@@ -110,7 +110,7 @@ object RiftTimer {
         changes[System.currentTimeMillis()] = diffFormat
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(
             config.percentage,
@@ -122,7 +122,7 @@ object RiftTimer {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (RiftAPI.inMirrorVerse) return
@@ -130,7 +130,7 @@ object RiftTimer {
         config.timerPosition.renderStrings(display, posLabel = "Rift Timer")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthDisplay(event: EntityHealthDisplayEvent) {
         if (!RiftAPI.inRift() || !config.nametag) return
         val time = nametagPattern.matchMatcher(event.text) {

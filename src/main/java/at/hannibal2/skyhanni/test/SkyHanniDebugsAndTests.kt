@@ -11,10 +11,10 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
 import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
@@ -68,7 +68,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -102,8 +101,8 @@ object SkyHanniDebugsAndTests {
 
     private var testLocation: LorenzVec? = null
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         testLocation?.let {
             event.drawWaypointFilled(it, LorenzColor.WHITE.toColor())
             event.drawDynamicText(it, "Test", 1.5)
@@ -404,7 +403,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat(result.joinToString("\n"), prefix = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!debugConfig.copyInternalName.isKeyHeld()) return
         val focussedSlot = event.guiContainer.slotUnderMouse ?: return
@@ -415,8 +414,8 @@ object SkyHanniDebugsAndTests {
         ChatUtils.chat("§eCopied internal name §7$rawInternalName §eto the clipboard!")
     }
 
-    @SubscribeEvent
-    fun onShowInternalName(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onShowInternalName(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showInternalName) return
         val itemStack = event.itemStack
@@ -425,8 +424,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Internal Name: '${internalName.asString()}'")
     }
 
-    @SubscribeEvent
-    fun showItemRarity(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun showItemRarity(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemRarity) return
         val itemStack = event.itemStack
@@ -435,8 +434,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item rarity: $rarity")
     }
 
-    @SubscribeEvent
-    fun showItemCategory(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun showItemCategory(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemCategory) return
         val itemStack = event.itemStack
@@ -445,8 +444,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item category: $category")
     }
 
-    @SubscribeEvent
-    fun onShowNpcPrice(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onShowNpcPrice(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showNpcPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
@@ -455,8 +454,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("§7NPC price: ${npcPrice.addSeparators()}")
     }
 
-    @SubscribeEvent
-    fun onShowCraftPrice(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onShowCraftPrice(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showCraftPrice) return
         val price = event.itemStack.getInternalNameOrNull()?.getRawCraftCostOrNull() ?: return
@@ -464,8 +463,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("§7Craft price: ${price.addSeparators()}")
     }
 
-    @SubscribeEvent
-    fun onShowBzPrice(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onShowBzPrice(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showBZPrice) return
         val internalName = event.itemStack.getInternalNameOrNull() ?: return
@@ -478,8 +477,8 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("§7BZ sellOfferPrice: ${sellOfferPrice.addSeparators()}")
     }
 
-    @SubscribeEvent
-    fun onShowItemName(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onShowItemName(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!debugConfig.showItemName) return
         val itemStack = event.itemStack
@@ -492,12 +491,12 @@ object SkyHanniDebugsAndTests {
         event.toolTip.add("Item name: '$name§7'")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     @Suppress("EmptyFunctionBlock")
-    fun onChat(event: LorenzChatEvent) {
+    fun onChat(event: SkyHanniChatEvent) {
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -535,7 +534,7 @@ object SkyHanniDebugsAndTests {
         config.debugPos.renderStringsAndItems(displayList, posLabel = "Test Display")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         @Suppress("ConstantConditionIf")
         if (false) {
@@ -612,7 +611,7 @@ object SkyHanniDebugsAndTests {
         ChatUtils.debug("Mined: $originalOre(${extraBlocks.joinToString()})")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
 //        val particleType = event.type
 //        val distance = LocationUtils.playerLocation().distance(event.location).roundTo(2)
@@ -637,7 +636,7 @@ object SkyHanniDebugsAndTests {
 //        println("offset: $offset")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "dev.debugEnabled", "dev.debug.enabled")
         event.move(3, "dev.showInternalName", "dev.debug.showInternalName")

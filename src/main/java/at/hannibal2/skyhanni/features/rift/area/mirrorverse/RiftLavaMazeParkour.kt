@@ -1,17 +1,18 @@
 package at.hannibal2.skyhanni.features.rift.area.mirrorverse
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.ParkourHelper
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.entity.Entity
 
 @SkyHanniModule
 object RiftLavaMazeParkour {
@@ -20,7 +21,7 @@ object RiftLavaMazeParkour {
     private var parkourHelper: ParkourHelper? = null
 
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("RiftLavaMazeParkour")
         parkourHelper = ParkourHelper(
@@ -32,8 +33,8 @@ object RiftLavaMazeParkour {
         updateConfig()
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<Entity>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
 
@@ -44,8 +45,8 @@ object RiftLavaMazeParkour {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         if (event.message == "§c§lEEK! THE LAVA OOFED YOU!") {
@@ -53,7 +54,7 @@ object RiftLavaMazeParkour {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
@@ -68,8 +69,8 @@ object RiftLavaMazeParkour {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         parkourHelper?.render(event)

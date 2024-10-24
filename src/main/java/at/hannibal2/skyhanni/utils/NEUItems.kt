@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
@@ -108,13 +109,13 @@ object NEUItems {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
         ignoreItemsFilter.load(ignoredItems)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         allItemsCache = readAllNeuItems()
     }
@@ -124,7 +125,7 @@ object NEUItems {
         val apiData = event.data ?: return
         try {
             val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
-            NeuProfileDataLoadedEvent(playerData).postAndCatch()
+            NeuProfileDataLoadedEvent(playerData).post()
 
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(

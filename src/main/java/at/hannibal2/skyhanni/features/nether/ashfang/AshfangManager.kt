@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.nether.ashfang
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ashfang.AshfangConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils.isAtFullHealth
@@ -16,8 +17,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -33,7 +32,7 @@ object AshfangManager {
 
     val active get() = ashfang != null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         val mob = event.mob
@@ -52,7 +51,7 @@ object AshfangManager {
         if (config.highlightBlazes) mob.highlight(color.toColor().addAlpha(40))
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobFirstSeen(event: MobEvent.FirstSeen.SkyblockMob) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (!event.mob.name.contains("Ashfang ")) return
@@ -60,7 +59,7 @@ object AshfangManager {
         lastSpawnTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         val mob = event.mob
         ashfangMobs -= mob
@@ -70,7 +69,7 @@ object AshfangManager {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!active || !config.hide.fullNames) return
         val mob = event.entity.mob ?: return
@@ -78,12 +77,12 @@ object AshfangManager {
         if (mob.baseEntity.isAtFullHealth()) event.cancel()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastSpawnTime = SimpleTimeMark.farPast()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "ashfang.nextResetCooldown", "crimsonIsle.ashfang.nextResetCooldown")
         event.move(2, "ashfang.highlightBlazes", "crimsonIsle.ashfang.highlightBlazes")

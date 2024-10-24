@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -11,8 +12,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.player.InventoryPlayer
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -34,7 +33,7 @@ object BazaarOpenPriceWebsite {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         BazaarApi.currentlyOpenedProduct ?: return
@@ -45,7 +44,7 @@ object BazaarOpenPriceWebsite {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         val lastItem = BazaarApi.currentlyOpenedProduct ?: return

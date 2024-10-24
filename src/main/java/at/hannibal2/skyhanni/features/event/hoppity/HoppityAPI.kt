@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
@@ -33,8 +34,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getMinecraftId
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -104,7 +103,7 @@ object HoppityAPI {
         "§7Spend §6(?<amount>[\\d.MBk]*) Chocolate §7in.*",
     )
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onTick(event: SecondPassedEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         InventoryUtils.getItemsInOpenChest().filter {
@@ -144,7 +143,7 @@ object HoppityAPI {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val index = event.slot?.slotIndex?.takeIf { it != -999 } ?: return
 
@@ -175,8 +174,8 @@ object HoppityAPI {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         eggFoundPattern.matchMatcher(event.message) {

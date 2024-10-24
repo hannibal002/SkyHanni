@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 import com.google.gson.JsonPrimitive
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ChocolateFactoryStats {
@@ -24,14 +24,14 @@ object ChocolateFactoryStats {
 
     private var display = listOf<Renderable>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!ChocolateFactoryAPI.chocolateFactoryPaused) return
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!ChocolateFactoryAPI.inChocolateFactory && !ChocolateFactoryAPI.chocolateFactoryPaused) return
         if (!config.statsDisplay) return
@@ -151,7 +151,7 @@ object ChocolateFactoryStats {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(42, "event.chocolateFactory.statsDisplayList") { element ->
             addToDisplayList(element, "TIME_TOWER", "TIME_TO_PRESTIGE")

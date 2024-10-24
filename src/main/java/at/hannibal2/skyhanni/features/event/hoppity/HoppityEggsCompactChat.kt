@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.BOUGHT
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.CHOCOLATE_FACTORY_MILESTONE
@@ -22,7 +22,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.fromNow
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,7 +41,7 @@ object HoppityEggsCompactChat {
     private val config get() = ChocolateFactoryAPI.config
     private val eventConfig get() = SkyHanniMod.feature.event.hoppityEggs
 
-    fun compactChat(event: LorenzChatEvent? = null, lastDuplicateAmount: Long? = null) {
+    fun compactChat(event: SkyHanniChatEvent? = null, lastDuplicateAmount: Long? = null) {
         if (!HoppityEggsManager.config.compactChat) return
         lastDuplicateAmount?.let {
             this.lastDuplicateAmount = it
@@ -152,8 +151,8 @@ object HoppityEggsCompactChat {
         if (hoppityEggChat.size == 3) sendCompact()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         eggFoundPattern.matchMatcher(event.message) {
             resetCompactData()

@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.data.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -35,7 +35,7 @@ object HypixelBazaarFetcher {
     private var failedAttempts = 0
     private var nextFetchIsManual = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Bazaar Data Fetcher from API")
 
@@ -53,8 +53,8 @@ object HypixelBazaarFetcher {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!canFetch()) return
         SkyHanniMod.coroutineScope.launch {
             fetchAndProcessBazaarData()

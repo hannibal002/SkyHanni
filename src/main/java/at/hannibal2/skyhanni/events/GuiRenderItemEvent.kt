@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import net.minecraft.client.gui.FontRenderer
 import net.minecraft.item.ItemStack
 
-abstract class GuiRenderItemEvent : LorenzEvent() {
+abstract class GuiRenderItemEvent : SkyHanniEvent() {
     abstract class RenderOverlayEvent(
         open val fontRenderer: FontRenderer,
         open val stack: ItemStack?,

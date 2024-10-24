@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.isBlowgun
 import at.hannibal2.skyhanni.features.rift.everywhere.EnigmaSoulWaypoints.soulLocations
@@ -30,7 +30,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.block.BlockButtonWood
 import net.minecraft.init.Blocks
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -55,7 +54,7 @@ object WoodenButtonsHelper {
     private var currentSpot: GraphNode? = null
     private var lastBlowgunFire = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<RiftWoodenButtonsJson>("rift/RiftWoodenButtons")
         buttonLocations = mutableMapOf<String, List<LorenzVec>>().apply {
@@ -67,15 +66,15 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         hitButtons.clear()
         RiftAPI.allButtonsHit = false
         currentSpot = null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         findClosestSpot()
         checkBlowgunActivatedButtons()
     }
@@ -146,8 +145,8 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!checkButtons()) return
 
         buttonHitPattern.matchMatcher(event.message) {
@@ -167,8 +166,8 @@ object WoodenButtonsHelper {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!showButtons()) return
 
         val spot = currentSpot ?: return

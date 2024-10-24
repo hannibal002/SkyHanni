@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.inventory.wardrobe
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
@@ -37,7 +38,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.min
 import kotlin.time.Duration.Companion.milliseconds
@@ -57,7 +57,7 @@ object CustomWardrobe {
     private var lastScreenSize: Pair<Int, Int>? = null
     private var guiName = "Custom Wardrobe"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRender(event: GuiContainerEvent.PreDraw) {
         if (!isEnabled() || editMode) return
         val renderable = displayRenderable ?: run {
@@ -103,7 +103,7 @@ object CustomWardrobe {
     }
 
     // Edit button in normal wardrobe while in edit mode
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!editMode) return
@@ -115,7 +115,7 @@ object CustomWardrobe {
         Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = guiName, addToGuiManager = false)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
         DelayedRun.runDelayed(300.milliseconds) {
@@ -125,7 +125,7 @@ object CustomWardrobe {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigUpdate(event: ConfigLoadEvent) {
         with(config.spacing) {
             ConditionalUtils.onToggle(
@@ -141,7 +141,7 @@ object CustomWardrobe {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryUpdate(event: InventoryUpdatedEvent) {
         if (!isEnabled() || editMode) return
         DelayedRun.runNextTick {
@@ -246,7 +246,7 @@ object CustomWardrobe {
             val mcSlotId = slot.inventorySlots[armorIndex]
             // if the slot is null, we don't fire LorenzToolTipEvent at all.
             val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
-            LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
+            SkyHanniToolTipEvent(mcSlot, stack, toolTips).post()
 
             return toolTips
         } catch (e: Exception) {

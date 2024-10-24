@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.Mayor
 import at.hannibal2.skyhanni.data.MayorAPI
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -17,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.splitLines
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MinisterInCalendar {
@@ -38,7 +38,7 @@ object MinisterInCalendar {
         "§7of their perks active.",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
         if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
@@ -50,14 +50,14 @@ object MinisterInCalendar {
         ministerItemStack = changeItem(ministerColor, minister, itemStack)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
         if (!MayorAPI.calendarGuiPattern.matches(InventoryUtils.openInventoryName())) return
         ministerItemStack = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         if (event.inventory !is ContainerLocalMenu || event.slot != MINISTER_SLOT) return

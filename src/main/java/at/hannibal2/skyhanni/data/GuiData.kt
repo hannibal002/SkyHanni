@@ -3,8 +3,8 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.NEURenderEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.features.inventory.wardrobe.CustomWardrobeKeybinds
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -29,7 +29,7 @@ object GuiData {
         if (preDrawEventCancelled) event.cancel()
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onClick(event: GuiContainerEvent.SlotClickEvent) {
         if (preDrawEventCancelled) event.cancel()
     }
@@ -59,7 +59,7 @@ object GuiData {
         if (preDrawEventCancelled) event.isCanceled = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         DelayedRun.runNextTick {
             if (Minecraft.getMinecraft().currentScreen !is GuiChest) {
@@ -68,8 +68,8 @@ object GuiData {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         preDrawEventCancelled = false
     }
 

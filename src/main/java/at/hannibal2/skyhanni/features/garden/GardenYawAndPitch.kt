@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -22,7 +22,7 @@ object GardenYawAndPitch {
     private var lastYaw = 0f
     private var lastPitch = 0f
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.onHypixel) return
         if (!isEnabled()) return
@@ -54,7 +54,7 @@ object GardenYawAndPitch {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastChange = SimpleTimeMark.farPast()
     }
@@ -65,7 +65,7 @@ object GardenYawAndPitch {
                 (LorenzUtils.inSkyBlock && (GardenAPI.inGarden() || config.showOutsideGarden))
             )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(18, "garden.yawPitchDisplay.showEverywhere", "garden.yawPitchDisplay.showOutsideGarden")
     }

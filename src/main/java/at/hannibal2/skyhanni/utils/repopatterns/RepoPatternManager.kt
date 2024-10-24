@@ -1,12 +1,12 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.utils.PreInitFinishedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.substringBeforeLastOrNull
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.launchwrapper.Launch
 import net.minecraftforge.fml.common.FMLCommonHandler
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.apache.logging.log4j.LogManager
 import java.io.File
 import java.util.NavigableMap
@@ -60,11 +59,6 @@ object RepoPatternManager {
     private var usedKeys: NavigableMap<String, CommonPatternInfo<*, *>> = TreeMap()
 
     private var wasPreInitialized = false
-    private val isInDevEnv = try {
-        Launch.blackboard["fml.deobfuscatedEnvironment"] as Boolean
-    } catch (_: Exception) {
-        true
-    }
 
     private val insideTest = Launch.blackboard == null
 
@@ -88,8 +82,9 @@ object RepoPatternManager {
      * Crash if in a development environment, or if inside a guarded event handler.
      */
     fun crash(reason: String) {
-        if (isInDevEnv || LorenzEvent.isInGuardedEventHandler)
+        if (EventHandler.isInEventHandler) {
             throw RuntimeException(reason)
+        }
     }
 
     /**
@@ -159,7 +154,7 @@ object RepoPatternManager {
         checkExclusivity(owner, key)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         loadPatternsFromDump(event.getConstant<RepoPatternDump>("regexes"))
     }
@@ -170,7 +165,7 @@ object RepoPatternManager {
         reloadPatterns()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         config.forceLocal.afterChange { reloadPatterns() }
     }

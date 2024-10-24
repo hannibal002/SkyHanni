@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.rift.area.westvillage
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.jsonobjects.repo.ParkourJson
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
@@ -16,8 +17,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isNPC
 import at.hannibal2.skyhanni.utils.ParkourHelper
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.entity.player.EntityPlayer
 
 @SkyHanniModule
 object RiftGunthersRace {
@@ -54,17 +54,17 @@ object RiftGunthersRace {
         "§3§lRIFT RACING §r§cRace cancelled!.*"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         parkourHelper?.reset()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         RiftAPI.inRiftRace = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ParkourJson>("rift/RiftRace")
         parkourHelper = ParkourHelper(
@@ -76,7 +76,7 @@ object RiftGunthersRace {
         updateConfig()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.rainbowColor, config.monochromeColor, config.lookAhead) {
             updateConfig()
@@ -91,8 +91,8 @@ object RiftGunthersRace {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         raceStartedPattern.matchMatcher(event.message) {
@@ -108,20 +108,20 @@ object RiftGunthersRace {
         }
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
+    @HandleEvent
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityPlayer>) {
         if (!isEnabled()) return
         if (!config.hidePlayers) return
         if (!RiftAPI.inRiftRace) return
 
         val entity = event.entity
-        if (entity is EntityOtherPlayerMP && !entity.isNPC()) {
+        if (!entity.isNPC()) {
             event.cancel()
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled() || !RiftAPI.inRiftRace) return
 
         parkourHelper?.render(event)

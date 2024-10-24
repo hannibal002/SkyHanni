@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.features.dungeon
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DungeonBossPhaseChangeEvent
 import at.hannibal2.skyhanni.events.DungeonCompleteEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI.dungeonFloor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonBossAPI {
@@ -156,18 +156,18 @@ object DungeonBossAPI {
         bossPhase = newPhase
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         bossPhase = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDungeonEnd(event: DungeonCompleteEvent) {
         bossPhase = null
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         handlePhaseMessage(event.message)

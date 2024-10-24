@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.garden.visitor
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.CropClickEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorArrivalEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -60,12 +60,12 @@ object GardenVisitorTimer {
             }
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onVisitorArrival(event: VisitorArrivalEvent) {
         visitorJustArrived = true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = null
         lastMillis = 0.seconds
@@ -74,7 +74,7 @@ object GardenVisitorTimer {
         sixthVisitorReady = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -180,15 +180,15 @@ object GardenVisitorTimer {
         onClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.pos.renderRenderable(display, posLabel = "Garden Visitor Timer")
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastVisitors = -1
         GardenAPI.storage?.nextSixthVisitorArrival?.let {
             if (it.isFarFuture() && it.toMillis() != -9223370336633802065) {
@@ -199,7 +199,7 @@ object GardenVisitorTimer {
         lastMillis = sixthVisitorArrivalTime.timeUntil()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCropClick(event: CropClickEvent) {
         if (!isEnabled()) return
         sixthVisitorArrivalTime -= 100.milliseconds
@@ -220,7 +220,7 @@ object GardenVisitorTimer {
     private fun isSixthVisitorWarningEnabled() = config.sixthVisitorWarning
     private fun isEnabled() = GardenAPI.inGarden() && config.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.visitorTimerEnabled", "garden.visitors.timer.enabled")
         event.move(3, "garden.visitorTimerSixthVisitorEnabled", "garden.visitors.timer.sixthVisitorEnabled")

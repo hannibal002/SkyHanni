@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.misc.update
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.About.UpdateStream
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.APIUtils
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -21,7 +22,6 @@ import moe.nea.libautoupdate.UpdateTarget
 import moe.nea.libautoupdate.UpdateUtils
 import net.minecraft.client.Minecraft
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.concurrent.CompletableFuture
 import javax.net.ssl.HttpsURLConnection
 
@@ -44,16 +44,20 @@ object UpdateManager {
         return potentialUpdate?.update?.versionNumber?.asString
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         SkyHanniMod.feature.about.updateStream.onToggle {
             reset()
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    private var hasChecked = false
+
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         Minecraft.getMinecraft().thePlayer ?: return
+        if (hasChecked) return
+        hasChecked = true
         MinecraftForge.EVENT_BUS.unregister(this)
         if (config.autoUpdates || config.fullAutoUpdates)
             checkUpdate()

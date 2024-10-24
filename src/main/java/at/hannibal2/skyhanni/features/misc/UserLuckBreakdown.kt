@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -71,7 +71,7 @@ object UserLuckBreakdown {
 
     private var skillOverflowLuck = mutableMapOf<SkillType, Int>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!config.userluckEnabled) return
         if (event.inventory !is ContainerLocalMenu) return
@@ -113,7 +113,7 @@ object UserLuckBreakdown {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun openInventory(event: InventoryOpenEvent) {
         if (event.inventoryName != "Your Stats Breakdown") {
             inMiscStats = false
@@ -135,7 +135,7 @@ object UserLuckBreakdown {
         return
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun closeInventory(event: InventoryCloseEvent) {
         inMiscStats = false
         inCustomBreakdown = false
@@ -152,8 +152,8 @@ object UserLuckBreakdown {
         return null
     }
 
-    @SubscribeEvent
-    fun onHoverItem(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onHoverItem(event: SkyHanniToolTipEvent) {
         if (!config.userluckEnabled) return
         if (!LorenzUtils.inSkyBlock) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
@@ -168,7 +168,7 @@ object UserLuckBreakdown {
         }
     }
 
-    private fun equipmentMenuTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
+    private fun equipmentMenuTooltip(event: SkyHanniToolTipEvent, limboLuck: Float) {
         if (event.slot.slotIndex != 25) return
         if (limboLuck == 0.0f && !showAllStats) return
 
@@ -181,7 +181,7 @@ object UserLuckBreakdown {
         event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
     }
 
-    private fun statsBreakdownLoreTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
+    private fun statsBreakdownLoreTooltip(event: SkyHanniToolTipEvent, limboLuck: Float) {
         if (!inMiscStats) return
         if (inCustomBreakdown && event.slot.slotIndex == 48) {
             event.toolTip[1] = "§7To Your Stats Breakdown"
@@ -195,7 +195,7 @@ object UserLuckBreakdown {
         event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f$luckString")
     }
 
-    private fun skyblockMenuTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
+    private fun skyblockMenuTooltip(event: SkyHanniToolTipEvent, limboLuck: Float) {
         if (event.slot.slotIndex != 13) return
         val lastIndex = event.toolTip.indexOfLast { it == "§5§o" }
         if (lastIndex == -1) return
@@ -214,7 +214,7 @@ object UserLuckBreakdown {
         else string
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.userluckEnabled) return
         if (!inMiscStats) return

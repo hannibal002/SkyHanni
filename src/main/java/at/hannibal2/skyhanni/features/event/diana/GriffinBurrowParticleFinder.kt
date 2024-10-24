@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.BurrowDugEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaAPI.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -20,7 +20,6 @@ import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -36,7 +35,7 @@ object GriffinBurrowParticleFinder {
     // This exists to detect the unlucky timing when the user opens a burrow before it gets fully detected
     private var fakeBurrow: LorenzVec? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Griffin Burrow Particle Finder")
 
@@ -83,7 +82,7 @@ object GriffinBurrowParticleFinder {
 
                 if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
                     if (!burrow.found) {
-                        BurrowDetectEvent(burrow.location, burrow.getType()).postAndCatch()
+                        BurrowDetectEvent(burrow.location, burrow.getType()).post()
                         burrow.found = true
                     }
                 }
@@ -128,8 +127,8 @@ object GriffinBurrowParticleFinder {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         reset()
     }
 
@@ -138,8 +137,8 @@ object GriffinBurrowParticleFinder {
         recentlyDugParticleBurrows.clear()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (!config.burrowsSoopyGuess) return
         val message = event.message
@@ -166,7 +165,7 @@ object GriffinBurrowParticleFinder {
         recentlyDugParticleBurrows.add(location)
         lastDugParticleBurrow = null
 
-        BurrowDugEvent(burrow.location).postAndCatch()
+        BurrowDugEvent(burrow.location).post()
         return true
     }
 

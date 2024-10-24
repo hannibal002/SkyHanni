@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.api.SkillAPI.lastUpdate
 import at.hannibal2.skyhanni.api.SkillAPI.oldSkillInfoMap
 import at.hannibal2.skyhanni.api.SkillAPI.showDisplay
 import at.hannibal2.skyhanni.api.SkillAPI.skillXPInfoMap
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressConfig
 import at.hannibal2.skyhanni.events.ActionBarUpdateEvent
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
@@ -35,8 +36,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.horizontalContainer
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.ceil
 import kotlin.time.Duration.Companion.milliseconds
@@ -59,7 +58,7 @@ object SkillProgress {
     private var maxWidth = 182
     var hideInActionBar = listOf<String>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
@@ -77,7 +76,7 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (display.isEmpty()) return
@@ -133,7 +132,7 @@ object SkillProgress {
         config.barPosition.renderRenderables(listOf(progress), posLabel = "Skill Progress Bar")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         allDisplay = emptyList()
@@ -141,7 +140,7 @@ object SkillProgress {
         skillExpPercentage = 0.0
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         if (lastUpdate.passedSince() > 3.seconds) showDisplay = config.alwaysShow.get()
@@ -155,7 +154,7 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onLevelUp(event: SkillOverflowLevelUpEvent) {
         if (!isEnabled()) return
         if (!config.overflowConfig.enableInChat) return
@@ -193,7 +192,7 @@ object SkillProgress {
         SoundUtils.createSound("random.levelup", 1f, 1f).playSound()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             config.enabled,
@@ -216,10 +215,10 @@ object SkillProgress {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOW)
+    @HandleEvent(priority = HandleEvent.LOW)
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!config.hideInActionBar || !isEnabled()) return
-        if (event.isCanceled) return
+        if (event.isCancelled) return
         var msg = event.actionBar
         for (line in hideInActionBar) {
             msg = msg.replace(Regex("\\s*" + Regex.escape(line)), "")

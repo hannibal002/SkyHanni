@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.reflect.KMutableProperty0
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -47,7 +47,7 @@ object BroodmotherFeatures {
     private var broodmotherSpawnTime = SimpleTimeMark.farPast()
     private var display = ""
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.BROODMOTHER)) return
         val newStage = event.widget.matchMatcherFirstLine { group("stage") }.orEmpty()
@@ -139,15 +139,15 @@ object BroodmotherFeatures {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         broodmotherSpawnTime = SimpleTimeMark.farPast()
         lastStage = null
         currentStage = null
         display = ""
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isCountdownEnabled()) return
         if (display.isEmpty()) return
@@ -158,7 +158,7 @@ object BroodmotherFeatures {
         config.countdownPosition.renderString(display, posLabel = "Broodmother Countdown")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isCountdownEnabled()) return
 

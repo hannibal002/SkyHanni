@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.mining.MiningEventConfig
 import at.hannibal2.skyhanni.data.IslandType
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object MiningEventDisplay {
@@ -25,12 +25,12 @@ object MiningEventDisplay {
 
     private val islandEventData = mutableMapOf<IslandType, MiningIslandEventInfo>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!shouldDisplay()) return
         config.position.renderRenderables(display, posLabel = "Upcoming Mining Events")
@@ -125,7 +125,7 @@ object MiningEventDisplay {
     private fun shouldDisplay() =
         LorenzUtils.inSkyBlock && config.enabled && !(!config.outsideMining && !MiningEventTracker.isMiningIsland())
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(46, "mining.miningEvent.compressedFormat") {
             ConfigUtils.migrateBooleanToEnum(it, CompressFormat.COMPACT_TEXT, CompressFormat.DEFAULT)

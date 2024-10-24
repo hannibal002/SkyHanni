@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryAPI
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.SoundUtils
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 
 @SkyHanniModule
@@ -51,7 +51,7 @@ object HoppityRabbitTheFishChecker {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
     private var rabbitTheFishIndex: Int? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -59,7 +59,7 @@ object HoppityRabbitTheFishChecker {
         InventoryUtils.getItemsInOpenChest().firstOrNull { it.slotIndex == index }?.highlight(LorenzColor.RED)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled() || !mealEggInventoryPattern.matches(event.inventoryName)) return
 
@@ -70,7 +70,7 @@ object HoppityRabbitTheFishChecker {
         }?.key
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled() || rabbitTheFishIndex == null) return
 

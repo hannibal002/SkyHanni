@@ -33,7 +33,6 @@ import io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.input.Keyboard
 import kotlin.math.roundToLong
 
@@ -50,13 +49,13 @@ object EstimatedItemValue {
 
     fun isCurrentlyShowing() = currentlyShowing && Minecraft.getMinecraft().currentScreen != null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         gemstoneUnlockCosts =
             event.readConstant<HashMap<NEUInternalName, HashMap<String, List<String>>>>("gemstonecosts")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<ItemsJson>("Items")
         bookBundleAmount = data.bookBundleAmount
@@ -82,7 +81,7 @@ object EstimatedItemValue {
      */
     private var renderedItems = 0
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         renderedItems = 0
     }
@@ -116,7 +115,7 @@ object EstimatedItemValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         tryRendering()
     }
@@ -132,12 +131,12 @@ object EstimatedItemValue {
         return true
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         cache.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         with(config) {
             ConditionalUtils.onToggle(
@@ -154,7 +153,7 @@ object EstimatedItemValue {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTooltip(event: RenderItemTooltipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.enabled) return
@@ -246,7 +245,7 @@ object EstimatedItemValue {
         return newDisplay
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.estimatedIemValueEnabled", "misc.estimatedItemValues.enabled")
         event.move(3, "misc.estimatedItemValueHotkey", "misc.estimatedItemValues.hotkey")

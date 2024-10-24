@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.StringUtils
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
@@ -25,14 +25,14 @@ object ChocolateFactoryTimeTowerManager {
     private var warnAboutNewCharge = false
     private var wasTimeTowerRecentlyActive = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         wasTimeTowerRecentlyActive = false
     }
 
     private const val HOVER_TEXT = "§eClick to run /cf!"
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val profileStorage = profileStorage ?: return
@@ -149,7 +149,7 @@ object ChocolateFactoryTimeTowerManager {
         return endTime - currentTime
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileChange(event: ProfileJoinEvent) {
         lastTimeTowerWarning = SimpleTimeMark.farPast()
     }

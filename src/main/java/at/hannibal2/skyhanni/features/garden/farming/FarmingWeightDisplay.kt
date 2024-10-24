@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden.farming
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.HypixelData
@@ -11,9 +12,9 @@ import at.hannibal2.skyhanni.data.jsonobjects.other.EliteWeightsJson
 import at.hannibal2.skyhanni.data.jsonobjects.other.UpcomingLeaderboardPlayer
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropSpeed.getSpeed
@@ -36,14 +37,13 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonObject
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object FarmingWeightDisplay {
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (GardenAPI.hideExtraGuis()) return
         val shouldShow = apiError || (config.ignoreLow || weight >= 200)
@@ -52,19 +52,19 @@ object FarmingWeightDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         // Reset speed
         weightPerSecond = -1.0
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         // We want to try to connect to the api again after a world switch.
         resetData()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         display = emptyList()
         profileId = ""
@@ -74,8 +74,8 @@ object FarmingWeightDisplay {
         rankGoal = -1
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!event.isMod(5)) return
         update()
@@ -85,7 +85,7 @@ object FarmingWeightDisplay {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(1, "garden.eliteFarmingWeightoffScreenDropMessage")
         event.move(3, "garden.eliteFarmingWeightDisplay", "garden.eliteFarmingWeights.display")

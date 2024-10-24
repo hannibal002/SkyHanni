@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.auctionhouse
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -16,8 +17,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -39,7 +38,7 @@ object AuctionHouseOpenPriceWebsite {
     private var searchTerm = ""
     private var displayItem: ItemStack? = null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
         ahSearchPattern.matchMatcher(event.inventoryName) {
@@ -59,12 +58,12 @@ object AuctionHouseOpenPriceWebsite {
         "§7on §csky.coflnet.com"
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         displayItem = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
         if (!isEnabled()) return
         if (event.inventory is InventoryPlayer) return
@@ -76,7 +75,7 @@ object AuctionHouseOpenPriceWebsite {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         displayItem ?: return

@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.garden.fortuneguide
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.PetAPI
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.garden.CropType
 import at.hannibal2.skyhanni.features.garden.FarmingFortuneDisplay
 import at.hannibal2.skyhanni.features.garden.GardenAPI
@@ -30,7 +31,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.round
 import kotlin.time.Duration.Companion.days
 
@@ -142,12 +142,12 @@ object CaptureFarmingGear {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         captureFarmingGear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val storage = GardenAPI.storage?.fortune ?: return
@@ -330,8 +330,8 @@ object CaptureFarmingGear {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
         val storage = GardenAPI.storage?.fortune ?: return
         val outdatedItems = outdatedItems ?: return
@@ -394,7 +394,7 @@ object CaptureFarmingGear {
         storage.outdatedItems.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigUpdaterMigratorConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(48, "#profile.garden.fortune.carrotFortune", "#profile.garden.fortune.carrolyn.CARROT")
         event.move(48, "#profile.garden.fortune.pumpkinFortune", "#profile.garden.fortune.carrolyn.PUMPKIN")

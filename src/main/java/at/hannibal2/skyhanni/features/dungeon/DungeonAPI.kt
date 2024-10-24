@@ -14,10 +14,10 @@ import at.hannibal2.skyhanni.events.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.DungeonEnterEvent
 import at.hannibal2.skyhanni.events.DungeonStartEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
@@ -39,7 +39,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonAPI {
@@ -172,13 +171,13 @@ object DungeonAPI {
         else -> "§7"
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (dungeonFloor == null) {
             ScoreboardData.sidebarLinesFormatted.matchFirst(floorPattern) {
                 val floor = group("floor")
                 dungeonFloor = floor
-                DungeonEnterEvent(floor).postAndCatch()
+                DungeonEnterEvent(floor).post()
             }
         }
         if (dungeonFloor != null && playerClass == null) {
@@ -196,7 +195,7 @@ object DungeonAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabUpdate(event: TablistFooterUpdateEvent) {
         if (!inDungeon()) return
         for (line in event.footer.split("\n")) {
@@ -215,8 +214,8 @@ object DungeonAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         dungeonFloor = null
         started = false
         inBossRoom = false
@@ -227,12 +226,12 @@ object DungeonAPI {
         DungeonBlessings.reset()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         val floor = dungeonFloor ?: return
         if (event.message == "§e[NPC] §bMort§f: §rHere, I found this map when I first entered the dungeon.") {
             started = true
-            DungeonStartEvent(floor).postAndCatch()
+            DungeonStartEvent(floor).post()
         }
         if (event.message.removeColor().matches(uniqueClassBonus)) {
             isUniqueClass = true
@@ -249,13 +248,13 @@ object DungeonAPI {
         }
         dungeonComplete.matchMatcher(event.message) {
             completed = true
-            DungeonCompleteEvent(floor).postAndCatch()
+            DungeonCompleteEvent(floor).post()
             return
         }
     }
 
     // This returns a map of boss name to the integer for the amount of kills the user has in the collection
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val bossCollections = bossStorage ?: return
 
@@ -315,7 +314,7 @@ object DungeonAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Dungeon")
 

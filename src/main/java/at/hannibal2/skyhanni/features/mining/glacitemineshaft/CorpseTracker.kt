@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.glacitemineshaft
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MiningAPI
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.tracker.BucketedItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData.TrackedItem
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniBucketedItemTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.EnumMap
 
 @SkyHanniModule
@@ -69,7 +69,7 @@ object CorpseTracker {
 
     private fun addLootedCorpse(type: CorpseType) = tracker.modify { it.corpsesLooted.addOrPut(type, 1) }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onCorpseLooted(event: CorpseLootedEvent) {
         addLootedCorpse(event.corpseType)
         for ((itemName, amount) in event.loot) {
@@ -129,13 +129,13 @@ object CorpseTracker {
         tracker.addPriceFromButton(this)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         tracker.renderDisplay(config.position)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (event.newIsland == IslandType.MINESHAFT || event.newIsland == IslandType.DWARVEN_MINES) {
             tracker.firstUpdate()

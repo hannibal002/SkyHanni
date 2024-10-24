@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.test.graph
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandGraphs
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -32,8 +33,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
 import kotlinx.coroutines.runBlocking
 import net.minecraft.client.settings.KeyBinding
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable
 import java.awt.Color
 
@@ -95,15 +94,15 @@ object GraphEditor {
     private val edgeDijkstraColor = LorenzColor.DARK_BLUE.addOpacity(150)
     private val edgeSelectedColor = LorenzColor.DARK_RED.addOpacity(150)
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
-    fun onRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent(priority = HandleEvent.HIGHEST)
+    fun onRender(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         nodes.forEach { event.drawNode(it) }
         edges.forEach { event.drawEdge(it) }
         drawGhostPosition(event)
     }
 
-    private fun drawGhostPosition(event: LorenzRenderWorldEvent) {
+    private fun drawGhostPosition(event: SkyHanniRenderWorldEvent) {
         val ghostPosition = ghostPosition ?: return
         if (ghostPosition.distanceToPlayer() >= config.maxNodeDistance) return
 
@@ -116,7 +115,7 @@ object GraphEditor {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.infoDisplay.renderStrings(buildDisplay(), posLabel = "Graph Info")
@@ -184,15 +183,15 @@ object GraphEditor {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         input()
         if (nodes.isEmpty()) return
         closestNode = nodes.minBy { it.position.distanceSqToPlayer() }
     }
 
-    private fun LorenzRenderWorldEvent.drawNode(node: GraphingNode) {
+    private fun SkyHanniRenderWorldEvent.drawNode(node: GraphingNode) {
         if (node.position.distanceToPlayer() > config.maxNodeDistance) return
         this.drawWaypointFilled(
             node.position,
@@ -229,7 +228,7 @@ object GraphEditor {
         )
     }
 
-    private fun LorenzRenderWorldEvent.drawEdge(edge: GraphingEdge) {
+    private fun SkyHanniRenderWorldEvent.drawEdge(edge: GraphingEdge) {
         if (edge.node1.position.distanceToPlayer() > config.maxNodeDistance) return
         this.draw3DLineNea(
             edge.node1.position.add(0.5, 0.5, 0.5),

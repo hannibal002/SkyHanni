@@ -3,10 +3,10 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.ItemAddInInventoryEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -27,7 +27,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.network.play.client.C0EPacketClickWindow
 import net.minecraft.network.play.server.S0DPacketCollectItem
 import net.minecraft.network.play.server.S2FPacketSetSlot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -54,7 +53,7 @@ object OwnInventoryData {
                 val slot = packet.func_149173_d()
                 val item = packet.func_149174_e() ?: return
                 DelayedRun.runNextTick {
-                    OwnInventoryItemUpdateEvent(item, slot).postAndCatch()
+                    OwnInventoryItemUpdateEvent(item, slot).post()
                 }
             }
         }
@@ -69,8 +68,8 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (itemAmounts.isEmpty()) {
             itemAmounts = getCurrentItems()
@@ -95,8 +94,8 @@ object OwnInventoryData {
         return map
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         itemAmounts = emptyMap()
     }
 
@@ -109,14 +108,14 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         val item = Minecraft.getMinecraft().thePlayer.inventory.itemStack ?: return
         val internalNameOrNull = item.getInternalNameOrNull() ?: return
         ignoreItem(500.milliseconds) { it == internalNameOrNull }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         ignoreItem(500.milliseconds) { true }
 
@@ -161,8 +160,8 @@ object OwnInventoryData {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         sackToInventoryChatPattern.matchMatcher(event.message) {
             val name = group("name")
             ignoreItem(500.milliseconds) { it.itemName.contains(name) }
@@ -187,6 +186,6 @@ object OwnInventoryData {
 
         if (internalName.startsWith("MAP-")) return
 
-        ItemAddInInventoryEvent(internalName, add).postAndCatch()
+        ItemAddInInventoryEvent(internalName, add).post()
     }
 }

@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.SackData
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -19,8 +20,6 @@ import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TabListData
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -35,7 +34,7 @@ object ProfileStorageData {
     var sackProfiles: SackData.ProfileSpecific? = null
     var hypixelDataLoaded = false
 
-    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    @HandleEvent(priority = HandleEvent.HIGHEST)
     fun onProfileJoin(event: ProfileJoinEvent) {
         val playerSpecific = playerSpecific
         val sackPlayers = sackPlayers
@@ -51,7 +50,7 @@ object ProfileStorageData {
         }
 
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
     private fun workaroundIn10SecondsProfileStorage(profileName: String) {
@@ -72,17 +71,17 @@ object ProfileStorageData {
             ErrorManager.skyHanniError("sackPlayers is null in ProfileJoinEvent!")
         }
         loadProfileSpecific(playerSpecific, sackPlayers, profileName)
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PROFILE)) return
         noTabListTime = if (event.isClear()) SimpleTimeMark.now() else SimpleTimeMark.farPast()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (noTabListTime == SimpleTimeMark.farPast()) return
 
@@ -122,19 +121,19 @@ object ProfileStorageData {
         profileSpecific = playerSpecific.profiles.getOrPut(profileName) { ProfileSpecificStorage() }
         sackProfiles = sackProfile.profiles.getOrPut(profileName) { SackData.ProfileSpecific() }
         loaded = true
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
         val playerUuid = LorenzUtils.getRawPlayerUuid()
         playerSpecific = SkyHanniMod.feature.storage.players.getOrPut(playerUuid) { PlayerSpecificStorage() }
         sackPlayers = SkyHanniMod.sackData.players.getOrPut(playerUuid) { SackData.PlayerSpecific() }
-        ConfigLoadEvent().postAndCatch()
+        ConfigLoadEvent.post()
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         hypixelDataLoaded = false
     }
 

@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.MobEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -29,7 +29,7 @@ object DungeonMobManager {
     private val staredInvisible = mutableSetOf<Mob>()
     private val felOnTheGround = mutableSetOf<Mob>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         onToggle(
             starredConfig.highlight,
@@ -57,14 +57,14 @@ object DungeonMobManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         handleStar(event.mob)
         handleFel(event.mob)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (event.mob.mobType != Mob.Type.DUNGEON) return
         if (starredConfig.highlight.get()) {
@@ -73,14 +73,14 @@ object DungeonMobManager {
         handleFelDespawn(event.mob)
     }
 
-    @SubscribeEvent
-    fun onLorenzTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onLorenzTick(event: SkyHanniTickEvent) {
         if (!IslandType.CATACOMBS.isInIsland()) return
         handleInvisibleStar()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!fel.highlight.get()) return
         if (fel.line) {
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {

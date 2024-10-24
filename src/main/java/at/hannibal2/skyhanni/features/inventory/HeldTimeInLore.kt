@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrInsert
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getBottleOfJyrreSec
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getSecondsHeld
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -21,8 +21,8 @@ object HeldTimeInLore {
     private val jyrreBottle by lazy { "NEW_BOTTLE_OF_JYRRE".asInternalName() }
     private val cacaoTruffle by lazy { "DARK_CACAO_TRUFFLE".asInternalName() }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.timeHeldInLore) return
 

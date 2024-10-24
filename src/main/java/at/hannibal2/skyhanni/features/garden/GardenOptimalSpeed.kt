@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GardenToolChangeEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -60,8 +61,8 @@ object GardenOptimalSpeed {
     private var display = listOf<Renderable>()
     private var lastToolSwitch = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!GardenAPI.inGarden()) return
         currentSpeed = (Minecraft.getMinecraft().thePlayer.capabilities.walkSpeed * 1000).toInt()
 
@@ -120,7 +121,7 @@ object GardenOptimalSpeed {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGardenToolChange(event: GardenToolChangeEvent) {
         lastToolSwitch = SimpleTimeMark.now()
         cropInHand = event.crop
@@ -128,7 +129,7 @@ object GardenOptimalSpeed {
         optimalSpeed = cropInHand?.getOptimalSpeed()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         for (value in CropType.entries) {
             ConditionalUtils.onToggle(value.getConfig()) {
@@ -156,7 +157,7 @@ object GardenOptimalSpeed {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!GardenAPI.inGarden()) return
 
@@ -204,7 +205,7 @@ object GardenOptimalSpeed {
 
     private fun isRancherOverlayEnabled() = GardenAPI.inGarden() && config.signEnabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.optimalSpeedEnabled", "garden.optimalSpeeds.enabled")
         event.move(3, "garden.optimalSpeedWarning", "garden.optimalSpeeds.warning")

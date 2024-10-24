@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuSacksJson
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
 import at.hannibal2.skyhanni.events.SackDataUpdateEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.features.fishing.trophy.TrophyRarity
 import at.hannibal2.skyhanni.features.inventory.SackDisplay
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeNonAscii
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SackAPI {
@@ -85,7 +85,7 @@ object SackAPI {
     var sackListNames = emptySet<String>()
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inSackInventory = false
         isRuneSack = false
@@ -97,7 +97,7 @@ object SackAPI {
         stackList.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         val isNewInventory = inventoryName != lastOpenedInventory
@@ -225,8 +225,8 @@ object SackAPI {
 
     private val sackChangeRegex = Regex("""([+-][\d,]+) (.+) \((.+)\)""")
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!event.message.removeColor().startsWith("[Sacks]")) return
 
         val sackAddText = event.chatComponent.siblings.firstNotNullOfOrNull { sibling ->
@@ -257,13 +257,13 @@ object SackAPI {
         }
         val sackEvent = SackChangeEvent(sackChanges, otherItemsAdded, otherItemsRemoved)
         updateSacks(sackEvent)
-        sackEvent.postAndCatch()
+        sackEvent.post()
         if (chatConfig.hideSacksChange) {
             event.blockedReason = "sacks_change"
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
         val sacksData = event.readConstant<NeuSacksJson>("sacks").sacks
         val uniqueSackItems = mutableSetOf<NEUInternalName>()

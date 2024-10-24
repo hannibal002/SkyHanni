@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.mining.eventtracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.BossbarData
@@ -8,9 +9,9 @@ import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BossbarUpdateEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.APIUtils
@@ -24,7 +25,6 @@ import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
 import kotlinx.coroutines.launch
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.IOException
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
@@ -65,13 +65,13 @@ object MiningEventTracker {
 
     val apiError get() = apiErrorCount > 0
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         eventEndTime = SimpleTimeMark.farPast()
         lastSentEvent = null
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBossbarChange(event: BossbarUpdateEvent) {
         if (!isMiningIsland()) return
         if (LorenzUtils.lastWorldSwitch.passedSince() < 5.seconds) return
@@ -87,8 +87,8 @@ object MiningEventTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isMiningIsland()) return
 
         eventStartedPattern.matchMatcher(event.message) {
@@ -99,7 +99,7 @@ object MiningEventTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!config.enabled) return
         if (!LorenzUtils.inSkyBlock || (!config.outsideMining && !isMiningIsland())) return
@@ -183,7 +183,7 @@ object MiningEventTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         if (apiError) {
             canRequestAt = SimpleTimeMark.now()
@@ -232,7 +232,7 @@ object MiningEventTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(29, "mining.miningEvent.showType") { element ->
             if (element.asString == "BOTH") JsonPrimitive("ALL") else element

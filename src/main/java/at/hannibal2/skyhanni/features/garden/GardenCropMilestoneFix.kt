@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.garden
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.GardenCropMilestones
 import at.hannibal2.skyhanni.data.GardenCropMilestones.getCounter
 import at.hannibal2.skyhanni.data.GardenCropMilestones.setCounter
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.garden.farming.GardenCropMilestoneDisplay
 import at.hannibal2.skyhanni.features.garden.pests.PestAPI
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.romanToDecimalIfNecessary
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object GardenCropMilestoneFix {
@@ -49,8 +49,8 @@ object GardenCropMilestoneFix {
 
     private val tabListCropProgress = mutableMapOf<CropType, Long>()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         levelUpPattern.matchMatcher(event.message) {
             val cropName = group("crop")
             val crop = CropType.getByNameOrNull(cropName) ?: return
@@ -87,7 +87,7 @@ object GardenCropMilestoneFix {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.CROP_MILESTONE)) return
         event.lines.matchFirst(tabListPattern) {

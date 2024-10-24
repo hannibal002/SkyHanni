@@ -1,14 +1,15 @@
 package at.hannibal2.skyhanni.features.fishing.tracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.FishingProfitItemsJson
 import at.hannibal2.skyhanni.events.FishingBobberCastEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fishing.FishingAPI
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.tracker.ItemTrackerData
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniItemTracker
 import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker
 import com.google.gson.annotations.Expose
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -103,7 +103,7 @@ object FishingProfitTracker {
 
     private var itemCategories = mapOf<String, List<NEUInternalName>>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         itemCategories = event.getConstant<FishingProfitItemsJson>("FishingProfitItems").categories
     }
@@ -186,7 +186,7 @@ object FishingProfitTracker {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (!isEnabled()) return
 
@@ -200,8 +200,8 @@ object FishingProfitTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         coinsChatPattern.matchMatcher(event.message) {
             tryAddItem(NEUInternalName.SKYBLOCK_COIN, group("coins").formatInt(), command = false)
             addCatch()
@@ -215,7 +215,7 @@ object FishingProfitTracker {
         lastCatchTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
 
@@ -225,8 +225,8 @@ object FishingProfitTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         lastCatchTime = SimpleTimeMark.farPast()
     }
 
@@ -243,7 +243,7 @@ object FishingProfitTracker {
 
     private fun isAllowedItem(internalName: NEUInternalName) = itemCategories.any { internalName in it.value }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobberThrow(event: FishingBobberCastEvent) {
         tracker.firstUpdate()
     }

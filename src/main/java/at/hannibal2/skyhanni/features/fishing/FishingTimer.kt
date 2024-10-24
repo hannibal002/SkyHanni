@@ -1,16 +1,17 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceTo
@@ -28,7 +29,6 @@ import at.hannibal2.skyhanni.utils.TimeUnit
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -62,7 +62,7 @@ object FishingTimer {
     private var currentCount = 0
     private var startTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         rightLocation = updateLocation()
@@ -81,7 +81,7 @@ object FishingTimer {
 
     private fun playSound() = SoundUtils.repeatSound(250, 4, SoundUtils.plingSound)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobSpawn(event: MobEvent.Spawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
@@ -95,7 +95,7 @@ object FishingTimer {
         handle()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onMobDeSpawn(event: MobEvent.DeSpawn.SkyblockMob) {
         if (!isEnabled()) return
         val mob = event.mob
@@ -112,7 +112,7 @@ object FishingTimer {
         updateInfo()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
@@ -153,8 +153,8 @@ object FishingTimer {
         updateInfo()
     }
 
-    @SubscribeEvent
-    fun onKeyPress(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyPress(event: KeyPressEvent) {
         if (!isEnabled()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (config.manualResetTimer.isKeyClicked()) {
@@ -183,8 +183,8 @@ object FishingTimer {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
         if (currentCount == 0) return
@@ -193,7 +193,7 @@ object FishingTimer {
         display = createDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!rightLocation) return
@@ -213,8 +213,8 @@ object FishingTimer {
         return "$timeColor$timeFormat §8($countColor$currentCount §b$name§8)"
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         mobDespawnTime.clear()
         recentMobs.clear()
         babyMagmaSlugsToFind = 0
@@ -229,7 +229,7 @@ object FishingTimer {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled.get()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "fishing.barnTimer", "fishing.barnTimer.enabled")
         event.move(3, "fishing.barnTimerAlertTime", "fishing.barnTimer.alertTime")

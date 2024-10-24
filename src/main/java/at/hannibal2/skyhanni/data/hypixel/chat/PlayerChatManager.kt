@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.hypixel.chat
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.hypixel.chat.event.AbstractChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.CoopChatEvent
@@ -10,7 +11,7 @@ import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerAllChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PlayerShowItemChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.PrivateMessageChatEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ComponentMatcher
 import at.hannibal2.skyhanni.utils.ComponentMatcherUtils.intoSpan
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.ComponentSpan
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 /**
  * Reading normal chat events, and splitting them up into many different player chat events, with all available extra information
@@ -113,8 +113,8 @@ object PlayerChatManager {
         "(?<prefix>.*)(?<guest>§a\\[✌] )(?<suffix>.*)"
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         val chatComponent = event.chatComponent.intoSpan().stripHypixelMessage()
         coopPattern.matchStyledMatcher(chatComponent) {
             val author = groupOrThrow("author")
@@ -166,7 +166,7 @@ object PlayerChatManager {
         sendSystemMessage(event)
     }
 
-    private fun ComponentMatcher.isGlobalChat(event: LorenzChatEvent): Boolean {
+    private fun ComponentMatcher.isGlobalChat(event: SkyHanniChatEvent): Boolean {
         var author = groupOrThrow("author")
         val message = groupOrThrow("message").removePrefix("§f")
         if (author.getText().contains("[NPC]")) {
@@ -203,25 +203,26 @@ object PlayerChatManager {
         return true
     }
 
-    private fun sendSystemMessage(event: LorenzChatEvent) {
+    private fun sendSystemMessage(event: SkyHanniChatEvent) {
         with(SystemMessageEvent(event.message, event.chatComponent)) {
-            val cancelled = postAndCatch()
+            val cancelled = post()
             event.handleChat(cancelled, blockedReason, chatComponent)
         }
     }
 
-    private fun AbstractChatEvent.postChat(event: LorenzChatEvent) {
-        val cancelled = postAndCatch()
+    private fun AbstractChatEvent.postChat(event: SkyHanniChatEvent) {
+        val cancelled = post()
         event.handleChat(cancelled, blockedReason, chatComponent)
     }
 
-    private fun LorenzChatEvent.handleChat(
+    private fun SkyHanniChatEvent.handleChat(
         cancelled: Boolean,
         blockedReason: String?,
         chatComponent: IChatComponent,
     ) {
         if (cancelled) {
-            this.cancel()
+            // This event can't be cancelled this is a lie
+
         }
         blockedReason?.let {
             this.blockedReason = it

@@ -4,9 +4,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.garden.pests.PestFinderConfig.VisibilityType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
+import at.hannibal2.skyhanni.events.KeyPressEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.garden.pests.PestUpdateEvent
 import at.hannibal2.skyhanni.features.garden.GardenAPI
 import at.hannibal2.skyhanni.features.garden.GardenPlotAPI
@@ -33,8 +33,6 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -101,13 +99,13 @@ object PestFinder {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
         display = listOf()
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
         if (!isEnabled()) return
         if (!config.showDisplay) return
@@ -122,8 +120,8 @@ object PestFinder {
     private fun timePassedDisabled() = PestAPI.lastTimeVacuumHold.passedSince() > config.showBorderForSeconds.seconds
 
     // priority to low so that this happens after other renderPlot calls.
-    @SubscribeEvent(priority = EventPriority.LOW)
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent(priority = HandleEvent.LOW)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!config.showPlotInWorld) return
         if (heldItemDisabled() && timePassedDisabled()) return
@@ -151,7 +149,7 @@ object PestFinder {
     private fun drawName(
         plot: GardenPlotAPI.Plot,
         playerLocation: LorenzVec,
-        event: LorenzRenderWorldEvent,
+        event: SkyHanniRenderWorldEvent,
     ) {
         val pests = plot.pests
         val pestsName = StringUtils.pluralize(pests, "pest")
@@ -170,16 +168,16 @@ object PestFinder {
 
     private var lastKeyPress = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!GardenAPI.inGarden()) return
         if (!config.noPestTitle) return
 
         if (noPestsChatPattern.matches(event.message)) LorenzUtils.sendTitle("§eNo pests!", 2.seconds)
     }
 
-    @SubscribeEvent
-    fun onKeyClick(event: LorenzKeyPressEvent) {
+    @HandleEvent
+    fun onKeyClick(event: KeyPressEvent) {
         if (!GardenAPI.inGarden()) return
         if (Minecraft.getMinecraft().currentScreen != null) return
         if (NEUItems.neuHasFocus()) return

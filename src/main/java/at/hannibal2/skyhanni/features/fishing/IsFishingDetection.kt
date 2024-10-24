@@ -1,7 +1,8 @@
 package at.hannibal2.skyhanni.features.fishing
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.FishingBobberInLiquidEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LocationUtils
@@ -10,7 +11,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.entity.item.EntityArmorStand
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -25,14 +25,14 @@ object IsFishingDetection {
     private var lastSeaCreatureKillArea: LorenzVec? = null
     private var lastSeaCreatureKillAreaTime = SimpleTimeMark.farPast()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBobber(event: FishingBobberInLiquidEvent) {
         lastRodCastLocation = LocationUtils.playerLocation()
         lastRodCastTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (inRodCastArea()) {

@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object CollectionAPI {
@@ -44,12 +44,12 @@ object CollectionAPI {
         "Mushroom" to "RED_MUSHROOM".asInternalName()
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         collectionValue.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
@@ -87,7 +87,7 @@ object CollectionAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onItemAdd(event: ItemAddEvent) {
         if (event.source == ItemAddManager.Source.COMMAND) return
         val internalName = event.internalName

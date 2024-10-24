@@ -5,9 +5,9 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.WinterAPI
 import at.hannibal2.skyhanni.events.EntityCustomNameUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
@@ -27,7 +27,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object UniqueGiftingOpportunitiesFeatures {
@@ -70,10 +69,9 @@ object UniqueGiftingOpportunitiesFeatures {
         addGiftedPlayer(matchedPlayer.name)
     }
 
-    @SubscribeEvent
-    fun onEntityChangeName(event: EntityCustomNameUpdateEvent) {
-        val entity = event.entity as? EntityArmorStand ?: return
-        analyzeArmorStand(entity)
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityChangeName(event: EntityCustomNameUpdateEvent<EntityArmorStand>) {
+        analyzeArmorStand(event.entity)
     }
 
     @HandleEvent
@@ -101,16 +99,16 @@ object UniqueGiftingOpportunitiesFeatures {
     private fun isIronman(entity: EntityLivingBase) =
         !LorenzUtils.noTradeMode && entity.displayName.formattedText.endsWith("♲§r")
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         giftedPattern.matchMatcher(event.message) {
             addGiftedPlayer(group(1))
             UniqueGiftCounter.addUniqueGift()
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         holdingGift = false
 
         if (!LorenzUtils.inSkyBlock) return
@@ -120,8 +118,8 @@ object UniqueGiftingOpportunitiesFeatures {
         holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         holdingGift = false
     }
 }

@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.garden.composter.ComposterOverlay
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
@@ -49,8 +50,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -76,7 +75,7 @@ object HideNotClickableItems {
 
     private val netherWart by lazy { "NETHER_STALK".asInternalName() }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val hideNotClickable = event.getConstant<HideNotClickableItemsJson>("HideNotClickableItems")
         hideNpcSellFilter.load(hideNotClickable.hideNpcSell)
@@ -98,7 +97,7 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!isEnabled()) return
@@ -117,8 +116,8 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent(priority = HandleEvent.LOWEST)
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
         if (bypassActive()) return
 
@@ -147,7 +146,7 @@ object HideNotClickableItems {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (!config.itemsBlockClicks) return
@@ -607,7 +606,7 @@ object HideNotClickableItems {
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.items
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "inventory.hideNotClickableItems", "inventory.hideNotClickable.items")
         event.move(3, "inventory.hideNotClickableItemsBlockClicks", "inventory.hideNotClickable.itemsBlockClicks")

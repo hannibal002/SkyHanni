@@ -1,13 +1,14 @@
 package at.hannibal2.skyhanni.features.rift.everywhere.motes
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.rift.motes.RiftInventoryValueConfig.NumberFormatEntry
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.features.rift.RiftAPI.motesNpcPrice
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -25,7 +26,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ShowMotesNpcSellPrice {
@@ -42,7 +42,7 @@ object ShowMotesNpcSellPrice {
     private var inInventory = false
     private val slotList = mutableListOf<Int>()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isInventoryValueEnabled()) return
         if (inInventory) {
@@ -54,15 +54,15 @@ object ShowMotesNpcSellPrice {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isInventoryValueEnabled()) return
         if (!event.isMod(10, 1)) return
         processItems()
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isShowPriceEnabled()) return
 
         val itemStack = event.itemStack
@@ -81,12 +81,12 @@ object ShowMotesNpcSellPrice {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         reset()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         reset()
     }
@@ -118,8 +118,8 @@ object ShowMotesNpcSellPrice {
         update()
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!RiftAPI.inRift()) return
         burgerPattern.matchMatcher(event.message) {
             config.burgerStacks = group("amount").toInt()
@@ -194,7 +194,7 @@ object ShowMotesNpcSellPrice {
 
     private fun isInventoryValueEnabled() = RiftAPI.inRift() && config.inventoryValue.enabled
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(15, "rift.motes.inventoryValue.formatType") { element ->
             ConfigUtils.migrateIntToEnum(element, NumberFormatEntry::class.java)

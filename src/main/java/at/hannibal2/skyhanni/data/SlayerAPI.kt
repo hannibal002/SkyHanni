@@ -1,8 +1,9 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.SlayerChangeEvent
 import at.hannibal2.skyhanni.events.SlayerProgressChangeEvent
 import at.hannibal2.skyhanni.events.SlayerQuestCompleteEvent
@@ -19,7 +20,6 @@ import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
@@ -57,7 +57,7 @@ object SlayerAPI {
             }
         }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Slayer")
 
@@ -74,8 +74,8 @@ object SlayerAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (event.message.contains("§r§5§lSLAYER QUEST STARTED!")) {
@@ -101,8 +101,8 @@ object SlayerAPI {
         return null
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         // wait with sending SlayerChangeEvent until profile is detected
@@ -112,12 +112,12 @@ object SlayerAPI {
         if (slayerQuest != latestSlayerCategory) {
             val old = latestSlayerCategory
             latestSlayerCategory = slayerQuest
-            SlayerChangeEvent(old, latestSlayerCategory).postAndCatch()
+            SlayerChangeEvent(old, latestSlayerCategory).post()
         }
 
         val slayerProgress = ScoreboardData.sidebarLinesFormatted.nextAfter("Slayer Quest", 2).orEmpty()
         if (latestSlayerProgress != slayerProgress) {
-            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).postAndCatch()
+            SlayerProgressChangeEvent(latestSlayerProgress, slayerProgress).post()
             latestSlayerProgress = slayerProgress
         }
 

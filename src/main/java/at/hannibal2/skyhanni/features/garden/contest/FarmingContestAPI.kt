@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.garden.contest
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.FarmingContestEvent
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -58,12 +58,12 @@ object FarmingContestAPI {
         ContestBracket.entries.forEach { it.bracketPattern }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
         if (internalContest && startTime.passedSince() > 20.minutes) {
-            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+            FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
             internalContest = false
         }
 
@@ -78,17 +78,17 @@ object FarmingContestAPI {
 
         if (inContest != currentContest) {
             if (currentContest) {
-                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).postAndCatch()
+                FarmingContestEvent(currentCrop!!, FarmingContestPhase.START).post()
                 startTime = SimpleTimeMark.now()
             } else {
                 if (startTime.passedSince() > 2.minutes) {
-                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).postAndCatch()
+                    FarmingContestEvent(contestCrop!!, FarmingContestPhase.STOP).post()
                 }
             }
             internalContest = currentContest
         } else {
             if (currentCrop != contestCrop && currentCrop != null) {
-                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).postAndCatch()
+                FarmingContestEvent(currentCrop, FarmingContestPhase.CHANGE).post()
                 startTime = SimpleTimeMark.now()
             }
         }
@@ -102,14 +102,14 @@ object FarmingContestAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (event.inventoryName == "Your Contests") {
             inInventory = true
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
     }

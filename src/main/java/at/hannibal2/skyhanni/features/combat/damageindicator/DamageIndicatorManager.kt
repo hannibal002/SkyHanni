@@ -11,11 +11,11 @@ import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
 import at.hannibal2.skyhanni.events.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
@@ -59,8 +59,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
@@ -116,19 +114,19 @@ object DamageIndicatorManager {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         mobFinder = MobFinder()
         data = emptyMap()
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent(receiveCancelled = true)
+    fun onChat(event: SkyHanniChatEvent) {
         mobFinder?.handleChat(event.message)
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onWorldRender(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         GlStateManager.disableDepth()
@@ -326,8 +324,8 @@ object DamageIndicatorManager {
         return color.getChatColor() + format
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         data = data.editCopy {
             EntityUtils.getEntities<EntityLivingBase>()
@@ -372,7 +370,7 @@ object DamageIndicatorManager {
                 checkDamage(entityData, health, lastHealth)
                 tickDamage(entityData.damageCounter)
 
-                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).postAndCatch()
+                BossHealthChangeEvent(entityData, lastHealth, health, maxHealth).post()
             }
             entityData.lastHealth = health
 
@@ -837,13 +835,13 @@ object DamageIndicatorManager {
             entityResult.bossType,
             foundTime = SimpleTimeMark.now(),
         )
-        DamageIndicatorDetectedEvent(entityData).postAndCatch()
+        DamageIndicatorDetectedEvent(entityData).post()
         return entityData
     }
 
     private fun checkFinalBoss(finalBoss: Boolean, id: Int) {
         if (finalBoss) {
-            DamageIndicatorFinalBossEvent(id).postAndCatch()
+            DamageIndicatorFinalBossEvent(id).post()
         }
     }
 
@@ -862,7 +860,7 @@ object DamageIndicatorManager {
 
     private val dummyDamageCache = mutableListOf<UUID>()
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
         val entity = event.entity
 
@@ -898,18 +896,18 @@ object DamageIndicatorManager {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onEntityHealthUpdate(event: EntityHealthUpdateEvent) {
         val data = data[event.entity.uniqueID] ?: return
         if (event.health <= 1) {
             if (!data.firstDeath) {
                 data.firstDeath = true
-                DamageIndicatorDeathEvent(event.entity, data).postAndCatch()
+                DamageIndicatorDeathEvent(event.entity, data).post()
             }
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "damageIndicator", "combat.damageIndicator")
         event.move(3, "slayer.endermanPhaseDisplay", "slayer.endermen.phaseDisplay")

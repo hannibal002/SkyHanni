@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.PurseChangeCause
 import at.hannibal2.skyhanni.events.PurseChangeEvent
@@ -11,7 +12,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -30,12 +30,12 @@ object PurseAPI {
     var currentPurse = 0.0
         private set
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inventoryCloseTime = SimpleTimeMark.now()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         event.scoreboard.matchFirst(coinsPattern) {
             val newPurse = group("coins").formatDouble()
@@ -43,7 +43,7 @@ object PurseAPI {
             if (diff == 0.0) return
             currentPurse = newPurse
 
-            PurseChangeEvent(diff, getCause(diff)).postAndCatch()
+            PurseChangeEvent(diff, getCause(diff)).post()
         }
     }
 

@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.data
 import at.hannibal2.skyhanni.api.HotmAPI
 import at.hannibal2.skyhanni.api.HotmAPI.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmAPI.SkymallPerk
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.TabWidget
@@ -10,9 +11,9 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -33,7 +34,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.Slot
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.pow
 
 private fun calculateCoreOfTheMountainLoot(level: Int): Map<HotmReward, Double> = buildMap {
@@ -676,7 +676,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
             if (!LorenzUtils.inSkyBlock) return
 
@@ -691,7 +691,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryClose(event: InventoryCloseEvent) {
             if (!inInventory) return
             inInventory = false
@@ -699,7 +699,7 @@ enum class HotmData(
             heartItem = null
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onInventoryFullyOpen(event: InventoryFullyOpenedEvent) {
             if (!LorenzUtils.inSkyBlock) return
             inInventory = inventoryPattern.matches(event.inventoryName)
@@ -712,7 +712,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onWidgetUpdate(event: WidgetUpdateEvent) {
             if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach {
@@ -728,8 +728,8 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
-        fun onChat(event: LorenzChatEvent) {
+        @HandleEvent
+        fun onChat(event: SkyHanniChatEvent) {
             if (!LorenzUtils.inSkyBlock) return
             if (resetChatPattern.matches(event.message)) {
                 resetTree()
@@ -766,14 +766,14 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onWorldSwitch(event: IslandChangeEvent) {
             if (HotmAPI.mineshaftMayhem == null) return
             HotmAPI.mineshaftMayhem = null
             ChatUtils.debug("resetting mineshaftMayhem")
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onProfileSwitch(event: ProfileJoinEvent) {
             HotmAPI.PowderType.entries.forEach {
                 if (it.getStorage() == null) {
@@ -785,7 +785,7 @@ enum class HotmData(
             }
         }
 
-        @SubscribeEvent
+        @HandleEvent
         fun onDebug(event: DebugDataCollectEvent) {
             event.title("HotM")
             event.addIrrelevant {

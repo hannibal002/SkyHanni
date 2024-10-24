@@ -1,9 +1,9 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ScoreboardPattern {
@@ -12,7 +12,7 @@ object ScoreboardPattern {
     // Lines from the scoreboard
     private val scoreboardGroup by group.exclusiveGroup("scoreboard")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepositoryReload(event: RepositoryReloadEvent) {
         UnknownLinesHandler.remoteOnlyPatterns = scoreboardGroup.getUnusedPatterns().toTypedArray()
     }

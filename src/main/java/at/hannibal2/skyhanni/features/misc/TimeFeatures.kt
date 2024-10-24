@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
 import at.hannibal2.skyhanni.data.IslandType
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.text.SimpleDateFormat
 import kotlin.time.Duration.Companion.days
 import kotlin.time.Duration.Companion.seconds
@@ -32,7 +32,7 @@ object TimeFeatures {
         SkyBlockTime(year = SkyBlockTime.now().year + 1).asTimeMark()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock && !OutsideSbFeature.REAL_TIME.isSelected()) return
 
@@ -55,7 +55,7 @@ object TimeFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.timeConfigs.winterTime", "event.winter.islandCloseTime")
         event.move(2, "misc.timeConfigs.winterTimePos", "event.winter.islandCloseTimePosition")

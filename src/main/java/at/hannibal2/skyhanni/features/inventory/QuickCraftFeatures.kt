@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAllItems
@@ -16,8 +17,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object QuickCraftFeatures {
@@ -36,13 +35,13 @@ object QuickCraftFeatures {
         InventoryType.MORE_QUICK_CRAFT_OPTIONS -> slotNumber !in 10..44
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         quickCraftableItems = event.getConstant<List<String>>("QuickCraftableItems")
     }
 
-    @SubscribeEvent
-    fun onToolTip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: SkyHanniToolTipEvent) {
         val inventoryType = getInventoryType() ?: return
         if (inventoryType.ignoreSlot(event.slot.slotNumber)) return
 
@@ -56,7 +55,7 @@ object QuickCraftFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         val inventoryType = getInventoryType() ?: return
         if (KeyboardManager.isModifierKeyDown()) return
@@ -72,7 +71,7 @@ object QuickCraftFeatures {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         val inventoryType = getInventoryType() ?: return
         if (inventoryType.ignoreSlot(event.slot?.slotNumber)) return

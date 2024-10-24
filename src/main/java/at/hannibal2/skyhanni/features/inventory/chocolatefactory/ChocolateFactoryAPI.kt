@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.inventory.chocolatefactory
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.inventory.chocolatefactory.ChocolateFactoryConfig
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFactoryStorage
@@ -26,7 +27,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.UtilsPatterns
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.TreeSet
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
@@ -104,7 +104,7 @@ object ChocolateFactoryAPI {
     var specialRabbitTextures = listOf<String>()
     var warningSound = SoundUtils.createSound("note.pling", 1f)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
 
@@ -126,7 +126,7 @@ object ChocolateFactoryAPI {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<HoppityEggLocationsJson>("HoppityEggLocations")
 
@@ -153,7 +153,7 @@ object ChocolateFactoryAPI {
         ChocolateFactoryUpgrade.updateIgnoredSlots()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         val old = "event.chocolateFactory"
         val new = "inventory.chocolateFactory"

@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.features.inventory.AuctionsHighlighter
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValueCalculator
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,7 +19,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import net.minecraft.client.player.inventory.ContainerLocalMenu
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 
 @SkyHanniModule
@@ -31,7 +31,7 @@ object AuctionHousePriceComparison {
     private var worstPrice = 0L
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         inInventory = false
         if (!event.inventoryName.startsWith("Auctions")) return
@@ -73,7 +73,7 @@ object AuctionHousePriceComparison {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -105,8 +105,8 @@ object AuctionHousePriceComparison {
         }
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
 
         val diff = slotPriceMap[event.slot.slotIndex] ?: return
@@ -122,7 +122,7 @@ object AuctionHousePriceComparison {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(31, "inventory.auctionsPriceComparison", "inventory.auctions.auctionsPriceComparison")
     }

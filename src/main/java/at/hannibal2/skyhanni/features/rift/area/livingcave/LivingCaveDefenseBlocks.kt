@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.rift.area.livingcave
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.rift.RiftAPI
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
 import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object LivingCaveDefenseBlocks {
@@ -33,13 +33,13 @@ object LivingCaveDefenseBlocks {
 
     class DefenseBlock(val entity: EntityOtherPlayerMP, val location: LorenzVec, var hidden: Boolean = false)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         staticBlocks = staticBlocks.editCopy { removeIf { it.entity.isDead } }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
 
@@ -104,7 +104,7 @@ object LivingCaveDefenseBlocks {
         else -> false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
@@ -137,8 +137,8 @@ object LivingCaveDefenseBlocks {
     private fun getNearestStaticDefenseBlock(location: LorenzVec) =
         staticBlocks.filter { it.location.distance(location) < 15 }.minByOrNull { it.location.distance(location) }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         for ((block, time) in movingBlocks) {
@@ -173,7 +173,7 @@ object LivingCaveDefenseBlocks {
 
     fun isEnabled() = RiftAPI.inRift() && config.enabled && RiftAPI.inLivingCave()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(9, "rift.area.livingCaveConfig", "rift.area.livingCave")
     }

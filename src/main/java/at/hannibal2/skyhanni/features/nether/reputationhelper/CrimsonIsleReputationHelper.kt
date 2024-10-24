@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.crimsonisle.ReputationHelperConfig.ShowLocationEntry
 import at.hannibal2.skyhanni.data.IslandType
@@ -8,9 +9,9 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.CrimsonIsleReputationJson
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SackChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.DailyQuestHelper
 import at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest.QuestLoader
 import at.hannibal2.skyhanni.features.nether.reputationhelper.kuudra.DailyKuudraBossHelper
@@ -28,8 +29,6 @@ import at.hannibal2.skyhanni.utils.TabListData
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiInventory
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
 
@@ -62,7 +61,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         skyHanniMod.loadModule(kuudraBossHelper)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val data = event.getConstant<CrimsonIsleReputationJson>("CrimsonIsleReputation")
         miniBossHelper.onRepoReload(data.MINIBOSS)
@@ -77,7 +76,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ProfileStorageData.profileSpecific?.crimsonIsle?.let {
             miniBossHelper.loadData(it)
@@ -86,13 +85,13 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSackChange(event: SackChangeEvent) {
         dirty = true
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
         if (!config.enabled.get()) return
         if (!dirty && display.isEmpty()) {
@@ -117,7 +116,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigInit(event: ConfigLoadEvent) {
         config.hideComplete.afterChange {
             updateRender()
@@ -144,7 +143,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         display = newList
     }
 
-    @SubscribeEvent(priority = EventPriority.LOWEST)
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!config.enabled.get()) return
         if (!IslandType.CRIMSON_ISLE.isInIsland()) return
@@ -169,7 +168,7 @@ class CrimsonIsleReputationHelper(skyHanniMod: SkyHanniMod) {
         return config.hotkey.isKeyHeld()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "misc.crimsonIsleReputationHelper", "crimsonIsle.reputationHelper.enabled")
         event.move(2, "misc.reputationHelperUseHotkey", "crimsonIsle.reputationHelper.useHotkey")

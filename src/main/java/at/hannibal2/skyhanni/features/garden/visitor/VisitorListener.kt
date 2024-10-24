@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorOpenEvent
 import at.hannibal2.skyhanni.events.garden.visitor.VisitorRenderEvent
@@ -36,7 +36,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.network.play.client.C02PacketUseEntity
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -50,7 +49,7 @@ object VisitorListener {
 
     private val logger = LorenzLogger("garden/visitors/listener")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         VisitorAPI.reset()
     }
@@ -68,7 +67,7 @@ object VisitorListener {
         lastClickedNpc = entityId
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!GardenAPI.inGarden()) return
         if (!event.isWidget(TabWidget.VISITORS)) return
@@ -94,7 +93,7 @@ object VisitorListener {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!GardenAPI.inGarden()) return
         val npcItem = event.inventoryItems[INFO_SLOT] ?: return
@@ -118,15 +117,15 @@ object VisitorListener {
         visitor.offersAccepted = offersAcceptedPattern.matchMatcher(lore[3]) { group("offersAccepted").toInt() }
         visitor.entityId = lastClickedNpc
         visitor.offer = visitorOffer
-        VisitorOpenEvent(visitor).postAndCatch()
+        VisitorOpenEvent(visitor).post()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         VisitorAPI.inInventory = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onKeybind(event: GuiKeyPressEvent) {
         if (!VisitorAPI.inInventory) return
         if (!config.acceptHotkey.isKeyHeld()) return
@@ -144,20 +143,19 @@ object VisitorListener {
         GardenVisitorFeatures.onTooltip(visitor, event.itemStack, event.toolTip)
     }
 
-    @SubscribeEvent
-    fun onCheckRender(event: CheckRenderEntityEvent<*>) {
-        if (!GardenAPI.inGarden()) return
+    @HandleEvent(onlyOnIsland = IslandType.GARDEN)
+    fun onCheckRender(event: CheckRenderEntityEvent<EntityArmorStand>) {
         if (!GardenAPI.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
 
         val entity = event.entity
-        if (entity is EntityArmorStand && entity.name == "§e§lCLICK") {
+        if (entity.name == "§e§lCLICK") {
             event.cancel()
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!GardenAPI.inGarden()) return
         if (!GardenAPI.onBarnPlot) return
         if (config.highlightStatus != VisitorConfig.HighlightMode.NAME && config.highlightStatus != VisitorConfig.HighlightMode.BOTH) return
@@ -165,7 +163,7 @@ object VisitorListener {
         for (visitor in VisitorAPI.getVisitors()) {
             visitor.getNameTagEntity()?.let {
                 if (it.distanceToPlayer() > 15) return@let
-                VisitorRenderEvent(visitor, event.exactLocation(it), event).postAndCatch()
+                VisitorRenderEvent(visitor, event.exactLocation(it), event).post()
             }
         }
     }

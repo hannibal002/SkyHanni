@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.nether.reputationhelper.dailyquest
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
@@ -8,9 +9,9 @@ import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.features.nether.kuudra.KuudraTier
 import at.hannibal2.skyhanni.features.nether.reputationhelper.CrimsonIsleReputationHelper
@@ -47,7 +48,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
@@ -70,14 +70,14 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
 
     private val config get() = SkyHanniMod.feature.crimsonIsle.reputationHelper
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
         questLoader.checkInventory(event)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.enabled) {
             if (IslandType.CRIMSON_ISLE.isInIsland()) {
@@ -86,7 +86,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.FACTION_QUESTS)) return
         if (!isEnabled()) return
@@ -94,7 +94,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         questLoader.loadFromTabList()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -107,7 +107,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         reputationHelper.update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
 
@@ -128,8 +128,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
 
         val message = event.message
@@ -181,8 +181,8 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         update()
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (!reputationHelper.showLocations()) return
 
@@ -198,7 +198,7 @@ class DailyQuestHelper(val reputationHelper: CrimsonIsleReputationHelper) {
         renderTownBoard(event)
     }
 
-    private fun renderTownBoard(event: LorenzRenderWorldEvent) {
+    private fun renderTownBoard(event: SkyHanniRenderWorldEvent) {
         if (!quests.any { it.needsTownBoardLocation() }) return
         val location = when (reputationHelper.factionType) {
             FactionType.BARBARIAN -> townBoardBarbarian

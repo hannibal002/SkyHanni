@@ -11,9 +11,9 @@ import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.EntityMoveEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
@@ -32,8 +32,7 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlinx.coroutines.launch
-import net.minecraft.client.Minecraft
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import net.minecraft.client.entity.EntityPlayerSP
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -47,8 +46,8 @@ object IslandAreas {
     var currentAreaName = ""
     private val textInput = TextInput()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         nodes = emptyMap()
         display = null
         targetNode = null
@@ -85,8 +84,8 @@ object IslandAreas {
 
     private var hasMoved = false
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!IslandGraphs.existsForThisIsland) return
 
@@ -96,12 +95,10 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
-    fun onPlayerMove(event: EntityMoveEvent) {
-        if (isEnabled()) {
-            if (event.entity == Minecraft.getMinecraft().thePlayer) {
-                hasMoved = true
-            }
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onPlayerMove(event: EntityMoveEvent<EntityPlayerSP>) {
+        if (event.isLocalPlayer) {
+            hasMoved = true
         }
     }
 
@@ -109,7 +106,7 @@ object IslandAreas {
         display = buildDisplay().buildSearchBox(textInput)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
@@ -120,7 +117,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOverlay(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         if (!config.pathfinder.enabled) return
@@ -238,8 +235,8 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!config.inWorld) return
         for ((node, distance) in nodes) {
@@ -253,7 +250,7 @@ object IslandAreas {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         ConditionalUtils.onToggle(config.pathfinder.color) {
             targetNode?.let {

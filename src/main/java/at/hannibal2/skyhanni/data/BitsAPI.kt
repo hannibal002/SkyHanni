@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.FameRanks.getFameRankByNameOrNull
 import at.hannibal2.skyhanni.events.BitsUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.nextAfter
@@ -21,7 +22,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.removeResets
 import at.hannibal2.skyhanni.utils.StringUtils.trimWhiteSpace
 import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.days
 
 @SkyHanniModule
@@ -143,7 +143,7 @@ object BitsAPI {
         "^(§aCommunity Shop|§eFame Rank)$",
     )
 
-    @SubscribeEvent
+    @HandleEvent
     fun onScoreboardChange(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.scoreboard) {
@@ -166,8 +166,8 @@ object BitsAPI {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         val message = event.message.trimWhiteSpace().removeResets()
 
@@ -206,7 +206,7 @@ object BitsAPI {
 
     fun bitsPerCookie(): Int = (defaultCookieBits * (currentFameRank?.bitsMultiplier ?: 1.0)).toInt()
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!isEnabled()) return
 
@@ -311,14 +311,14 @@ object BitsAPI {
     fun hasCookieBuff() = cookieBuffTime?.isInFuture() ?: false
 
     private fun sendBitsGainEvent(difference: Int) =
-        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).postAndCatch()
+        BitsUpdateEvent.BitsGain(bits, bitsAvailable, difference).post()
 
-    private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).postAndCatch()
-    private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).postAndCatch()
+    private fun sendBitsSpentEvent() = BitsUpdateEvent.BitsSpent(bits, bitsAvailable).post()
+    private fun sendBitsAvailableGainedEvent() = BitsUpdateEvent.BitsAvailableGained(bits, bitsAvailable).post()
 
     fun isEnabled() = LorenzUtils.inSkyBlock && profileStorage != null
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(35, "#profile.bits.bitsToClaim", "#profile.bits.bitsAvailable")
     }

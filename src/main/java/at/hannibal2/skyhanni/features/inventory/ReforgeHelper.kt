@@ -2,13 +2,14 @@ package at.hannibal2.skyhanni.features.inventory
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.ReforgeAPI
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.model.SkyblockStat
 import at.hannibal2.skyhanni.data.model.SkyblockStatList
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
@@ -34,7 +35,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.inventory.Container
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import java.util.concurrent.atomic.AtomicBoolean
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.string as renderableString
@@ -112,7 +112,7 @@ object ReforgeHelper {
         updateDisplay()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!isEnabled()) return
         if (event.slot?.slotNumber == reforgeButton) {
@@ -144,8 +144,8 @@ object ReforgeHelper {
         return false
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         when {
             reforgeChatMessage.matches(event.message) -> {
@@ -169,7 +169,7 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.inSkyBlock) return
         when {
@@ -194,7 +194,7 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onClose(event: InventoryCloseEvent) {
         if (!isInReforgeMenu) return
         isInReforgeMenu = false
@@ -358,13 +358,13 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!isEnabled()) return
         config.position.renderRenderables(display, posLabel = "Reforge Overlay")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onForegroundDrawn(event: GuiContainerEvent.ForegroundDrawnEvent) {
         if (!isEnabled()) return
         if (currentReforge == null) return
@@ -374,7 +374,7 @@ object ReforgeHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiContainerBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (hoveredReforge != null && isInHexReforgeMenu) {
             if (hoveredReforge != currentReforge) {

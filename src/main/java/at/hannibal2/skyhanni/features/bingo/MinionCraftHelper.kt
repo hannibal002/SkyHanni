@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.features.bingo
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -28,7 +29,6 @@ import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import net.minecraft.client.Minecraft
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -49,13 +49,13 @@ object MinionCraftHelper {
     private val allIngredients = mutableListOf<NEUInternalName>()
     private val alreadyNotified = mutableListOf<String>()
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         alreadyNotified.clear()
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
 
@@ -241,7 +241,7 @@ object MinionCraftHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (!config.minionCraftHelperEnabled) return
@@ -264,7 +264,7 @@ object MinionCraftHelper {
 
     private fun isMinionName(itemName: String) = itemName.contains(" Minion ") && !itemName.contains(" Minion Skin")
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!LorenzUtils.isBingoProfile) return
         if (event.inventoryName != "Crafted Minions") return
@@ -278,7 +278,7 @@ object MinionCraftHelper {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.transform(26, "#player.bingoSessions") { element ->
             for ((_, data) in element.asJsonObject.entrySet()) {

@@ -44,7 +44,7 @@ object DebugCommand {
         profileName(event)
         profileType(event)
 
-        event.postAndCatch()
+        event.post()
 
         if (event.empty) {
             list.add("")

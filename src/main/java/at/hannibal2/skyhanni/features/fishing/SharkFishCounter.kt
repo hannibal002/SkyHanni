@@ -1,16 +1,16 @@
 package at.hannibal2.skyhanni.features.fishing
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.SeaCreatureFishEvent
+import at.hannibal2.skyhanni.events.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object SharkFishCounter {
@@ -19,7 +19,7 @@ object SharkFishCounter {
     private var display = ""
     private var hasWaterRodInHand = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSeaCreatureFish(event: SeaCreatureFishEvent) {
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
@@ -38,8 +38,8 @@ object SharkFishCounter {
         else -> 0
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return
 
@@ -48,8 +48,8 @@ object SharkFishCounter {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (event.message != "§b§lFISHING FESTIVAL §r§eThe festival has concluded! Time to dry off and repair your rods!") return
         val count = counter.sum()
         if (count == 0) return
@@ -77,7 +77,7 @@ object SharkFishCounter {
 
     private fun isWaterFishingRod() = FishingAPI.isFishing() && !FishingAPI.holdingLavaRod
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!LorenzUtils.inSkyBlock) return
         if (!SkyHanniMod.feature.fishing.sharkFishCounter) return

@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.garden
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigFileType
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
@@ -40,7 +41,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.Display
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -98,7 +98,7 @@ object GardenNextJacobContest {
     var fetchedFromElite = false
     private var isSendingContests = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onDebugDataCollect(event: DebugDataCollectEvent) {
         event.title("Garden Next Jacob Contest")
 
@@ -137,7 +137,7 @@ object GardenNextJacobContest {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onTabListUpdate(event: TabListUpdateEvent) {
         var next = false
         val newList = mutableListOf<String>()
@@ -176,7 +176,7 @@ object GardenNextJacobContest {
         return diffA < 30.minutes || diffB < 30.minutes
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
 
@@ -184,7 +184,7 @@ object GardenNextJacobContest {
         update()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (inCalendar) {
             inCalendar = false
@@ -192,7 +192,7 @@ object GardenNextJacobContest {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         if (!config.display) return
         monthPattern.matchMatcher(event.inventoryName) {
@@ -278,7 +278,7 @@ object GardenNextJacobContest {
         SkyHanniMod.configManager.saveConfig(ConfigFileType.JACOB_CONTESTS, "Save contests")
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
         val savedContests = SkyHanniMod.jacobContestsData.contestTimes
         val year = savedContests.firstNotNullOfOrNull {
@@ -490,7 +490,7 @@ object GardenNextJacobContest {
 
     private fun warnForCrop(): Boolean = nextContestCrops.any { it in config.warnFor }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
@@ -501,7 +501,7 @@ object GardenNextJacobContest {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!config.display) return
         if (!inCalendar) return
@@ -641,7 +641,7 @@ object GardenNextJacobContest {
 
     fun isNextCrop(cropName: CropType) = nextContestCrops.contains(cropName) && config.otherGuis
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "garden.nextJacobContestDisplay", "garden.nextJacobContests.display")
         event.move(3, "garden.nextJacobContestEverywhere", "garden.nextJacobContests.everywhere")

@@ -1,9 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSbFeature
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.RenderEntityOutlineEvent
+import at.hannibal2.skyhanni.events.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.CustomRenderGlobal
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -17,8 +18,6 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.BlockPos
 import net.minecraftforge.client.MinecraftForgeClient
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import org.lwjgl.opengl.GL13
 import org.lwjgl.opengl.GL30
@@ -359,9 +358,9 @@ object EntityOutlineRenderer {
      *
      * @param event the client tick event
      */
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!(event.phase == EventPriority.NORMAL && isEnabled())) return
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
+        if (!isEnabled()) return
 
         val renderGlobal = try {
             mc.renderGlobal as CustomRenderGlobal
@@ -375,13 +374,13 @@ object EntityOutlineRenderer {
             // These events need to be called in this specific order for the xray to have priority over the no xray
             // Get all entities to render xray outlines
             val xrayOutlineEvent = RenderEntityOutlineEvent(RenderEntityOutlineEvent.Type.XRAY, null)
-            xrayOutlineEvent.postAndCatch()
+            xrayOutlineEvent.post()
             // Get all entities to render no xray outlines, using pre-filtered entities (no need to test xray outlined entities)
             val noXrayOutlineEvent = RenderEntityOutlineEvent(
                 RenderEntityOutlineEvent.Type.NO_XRAY,
                 xrayOutlineEvent.entitiesToChooseFrom
             )
-            noXrayOutlineEvent.postAndCatch()
+            noXrayOutlineEvent.post()
             // Cache the entities for future use
             entityRenderCache.xrayCache = xrayOutlineEvent.entitiesToOutline
             entityRenderCache.noXrayCache = noXrayOutlineEvent.entitiesToOutline

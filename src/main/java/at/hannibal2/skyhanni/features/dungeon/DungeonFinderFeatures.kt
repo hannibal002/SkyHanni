@@ -1,12 +1,13 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
 import at.hannibal2.skyhanni.events.RenderInventoryItemTipEvent
+import at.hannibal2.skyhanni.events.SkyHanniToolTipEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
@@ -20,7 +21,6 @@ import at.hannibal2.skyhanni.utils.StringUtils.createCommaSeparatedList
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 // TODO Remove all removeColor calls in this class. Deal with the color code in regex.
 @SkyHanniModule
@@ -131,7 +131,7 @@ object DungeonFinderFeatures {
     private var toolTipMap = mapOf<Int, List<String>>()
     private var inInventory = false
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryOpenEvent) {
         if (!isEnabled()) return
 
@@ -303,8 +303,8 @@ object DungeonFinderFeatures {
         return map
     }
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onTooltip(event: SkyHanniToolTipEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
 
@@ -324,7 +324,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRenderItemTip(event: RenderInventoryItemTipEvent) {
         if (!isEnabled()) return
         if (!config.floorAsStackSize) return
@@ -333,7 +333,7 @@ object DungeonFinderFeatures {
         event.stackTip = (floorStackSize[slot.slotIndex]?.takeIf { it.isNotEmpty() } ?: return)
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inInventory) return
@@ -343,7 +343,7 @@ object DungeonFinderFeatures {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
         floorStackSize = emptyMap()
@@ -351,7 +351,7 @@ object DungeonFinderFeatures {
         toolTipMap = emptyMap()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(2, "dungeon.partyFinderColoredClassLevel", "dungeon.partyFinder.coloredClassLevel")
     }
