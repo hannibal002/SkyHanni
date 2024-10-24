@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -61,7 +62,7 @@ object CrystalNucleusChatFilter {
      */
     private val crystalCollectedIdentifierPattern by patternGroup.pattern(
         "crystal.collected.id",
-        "§f *§r(?<crystal>(.* Crystal)) *",
+        "§f *§r(?<crystal>.* Crystal) *",
     )
 
     /**
@@ -115,7 +116,7 @@ object CrystalNucleusChatFilter {
     @Suppress("MaxLineLength")
     private val componentSubmittedPattern by patternGroup.pattern(
         "precursor.submitted",
-        ".*(Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>(\\d|one)) more).*",
+        "(Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>(\\d|one)) more).*",
     )
 
     fun block(message: String): NucleusChatFilterRes? {
@@ -199,26 +200,24 @@ object CrystalNucleusChatFilter {
     private fun blockNPC(message: String): NucleusChatFilterRes? {
         if (!message.startsWith("§e[NPC]")) return null
 
-        blockProfessorRobot(message)?.let { return it }
-        blockKingYolkar(message)?.let { return it }
-        blockKeepers(message)?.let { return it }
-
-        return null
+        return blockProfessorRobot(message)
+            ?: blockKingYolkar(message)
+            ?: blockKeepers(message)
     }
 
     private fun blockProfessorRobot(message: String): NucleusChatFilterRes? {
         if (!shouldBlock(CrystalNucleusMessageTypes.NPC_PROF_ROBOT)) return null
         if (!message.startsWith("§e[NPC] Professor Robot")) return null
 
-        componentSubmittedPattern.matchMatcher(message) {
+        componentSubmittedPattern.findMatcher(message) {
             if (message.contains("brought me all") || message.contains("This will work just fine.")) {
                 return NucleusChatFilterRes("", "§e[NPC] Professor Robot§f: §rAll components submitted.")
-            } else {
-                return NucleusChatFilterRes(
-                    "",
-                    "§e[NPC] Professor Robot§f: ${group("component")} submitted. ${group("remaining")} components left.",
-                )
             }
+
+            return NucleusChatFilterRes(
+                "",
+                "§e[NPC] Professor Robot§f: ${group("component")} submitted. ${group("remaining")} components left.",
+            )
         }
 
         return NucleusChatFilterRes("npc_prof_robot")
@@ -228,20 +227,21 @@ object CrystalNucleusChatFilter {
         if (!shouldBlock(CrystalNucleusMessageTypes.NPC_KING_YOLKAR)) return null
         if (!message.startsWith("§e[NPC] §6King Yolkar")) return null
 
-        // §e[NPC] §6King Yolkar§f: §r*rumble* *rumble*
-        if (message.contains("*rumble* *rumble*")) {
-            return NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: ...")
-        }
-        // §e[NPC] §6King Yolkar§f: §rBring me back a §9Goblin Egg §rof any type and we can teach her a lesson!
-        if (message.contains("Bring me back a §9Goblin Egg")) {
-            return NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: §rBring me a §9Goblin Egg §rof any type.")
-        }
-        // §e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain.
-        if (message.contains("This egg will help me stomach my pain.")) {
-            return NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: §2King's Scent§r applied.")
-        }
+        return when {
+            // §e[NPC] §6King Yolkar§f: §r*rumble* *rumble*
+            message.contains("*rumble* *rumble*") ->
+                NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: ...")
 
-        return NucleusChatFilterRes("npc_king_yolkar")
+            // §e[NPC] §6King Yolkar§f: §rBring me back a §9Goblin Egg §rof any type and we can teach her a lesson!
+            message.contains("Bring me back a §9Goblin Egg") ->
+                NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: §rBring me a §9Goblin Egg §rof any type.")
+
+            // §e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain.
+            message.contains("This egg will help me stomach my pain.") ->
+                NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: §2King's Scent§r applied.")
+
+            else -> NucleusChatFilterRes("npc_king_yolkar")
+        }
     }
 
     private fun blockKeepers(message: String): NucleusChatFilterRes? {

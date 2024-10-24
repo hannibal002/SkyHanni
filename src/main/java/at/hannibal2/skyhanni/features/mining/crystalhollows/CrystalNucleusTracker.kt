@@ -85,7 +85,7 @@ object CrystalNucleusTracker {
         balObtainedPattern.matchMatcher(event.message) {
             if (!group("player").equals(LorenzUtils.getPlayerName(), ignoreCase = true)) return@matchMatcher
 
-            val item = when(group("raritycolor")) {
+            val item = when (group("raritycolor")) {
                 "6" -> LEGENDARY_BAL_ITEM
                 "5" -> EPIC_BAL_ITEM
                 else -> return@matchMatcher
@@ -101,7 +101,7 @@ object CrystalNucleusTracker {
         event.register("shresetcrystalnucleustracker") {
             description = "Resets the Crystal Nucleus Tracker"
             category = CommandCategory.USERS_RESET
-            callback { resetCommand() }
+            callback { tracker.resetCommand() }
         }
     }
 
@@ -180,10 +180,6 @@ object CrystalNucleusTracker {
         if (event.newIsland == IslandType.CRYSTAL_HOLLOWS) {
             tracker.firstUpdate()
         }
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 
     private fun isCfEnabled() = !config.hideInCf || !ChocolateFactoryAPI.inChocolateFactory

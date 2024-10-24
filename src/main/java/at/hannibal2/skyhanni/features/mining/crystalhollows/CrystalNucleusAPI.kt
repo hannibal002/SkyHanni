@@ -6,6 +6,8 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -23,7 +25,7 @@ object CrystalNucleusAPI {
      */
     private val startPattern by patternGroup.pattern(
         "loot.start",
-        " {2}§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE.*",
+        " \\s*§r§5§lCRYSTAL NUCLEUS LOOT BUNDLE.*",
     )
 
     /**
@@ -36,15 +38,15 @@ object CrystalNucleusAPI {
 
     private var inLoot = false
     private var unCheckedBooks: Int = 0
-    private val loot = mutableListOf<Pair<String, Int>>()
+    private val loot = mutableMapOf<String, Int>()
 
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
         if (event.itemStack.displayName != "§fEnchanted Book") return
         when (event.itemStack.getEnchantments()?.keys?.firstOrNull() ?: return) {
-            "lapidary" -> loot.add("§9Lapidary I" to 1)
-            "fortune" -> loot.add("§9Fortune IV" to 1)
+            "lapidary" -> loot.addOrPut("§9Lapidary I", 1)
+            "fortune" -> loot.addOrPut("§9Fortune IV", 1)
         }
         unCheckedBooks--
         if (unCheckedBooks == 0) {
@@ -55,7 +57,10 @@ object CrystalNucleusAPI {
 
     @SubscribeEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (unCheckedBooks == 0 || event.oldIsland != IslandType.CRYSTAL_HOLLOWS) return
+        if (unCheckedBooks == 0 ||
+            event.oldIsland != IslandType.CRYSTAL_HOLLOWS ||
+            event.newIsland == IslandType.CRYSTAL_HOLLOWS
+        ) return
         unCheckedBooks = 0
         if (loot.isNotEmpty()) {
             CrystalNucleusLootEvent(loot).post()
@@ -90,21 +95,16 @@ object CrystalNucleusAPI {
         // This also nerfs the "§r§a§lREWARDS" message.
         message.takeIf { it.startsWith("    ") }?.substring(4)?.let { lootMessage ->
             ItemUtils.readItemAmount(lootMessage)?.let { pair ->
-                loot.add(
-                    when (pair.first) {
-                        // Enchanted books are checked in the pickup event handler.
-                        "§fEnchanted" -> {
-                            unCheckedBooks += pair.second
-                            return
-                        }
-                        "§fEnchanted Book" -> {
-                            unCheckedBooks += pair.second
-                            return
-                        }
-                        else -> pair
-                    }
-                )
-            }
+                if (pair.first.startsWith("§fEnchanted")) {
+                    unCheckedBooks += pair.second
+                    return
+                }
+                loot.addOrPut(pair.first, pair.second)
+            } ?: ErrorManager.logErrorStateWithData(
+                "Failed to read item amount",
+                "",
+                "message" to lootMessage,
+            )
         }
     }
 }
