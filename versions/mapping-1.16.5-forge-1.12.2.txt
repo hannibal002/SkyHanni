@@ -76,11 +76,13 @@ net.minecraft.network.protocol.game.ClientboundAddMobPacket net.minecraft.networ
 net.minecraft.network.protocol.game.ClientboundAddPlayerPacket net.minecraft.network.play.server.SPacketSpawnPlayer
 net.minecraft.network.protocol.game.ClientboundAnimatePacket net.minecraft.network.play.server.SPacketAnimation
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket net.minecraft.network.play.server.SPacketBlockChange
+net.minecraft.network.protocol.game.ClientboundContainerClosePacket net.minecraft.network.play.server.SPacketCloseWindow
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket net.minecraft.network.play.server.SPacketSetSlot
 net.minecraft.network.protocol.game.ClientboundEntityEventPacket net.minecraft.network.play.server.SPacketEntityStatus
 net.minecraft.network.protocol.game.ClientboundLevelEventPacket net.minecraft.network.play.server.SPacketEffect
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket net.minecraft.network.play.server.SPacketParticles
 net.minecraft.network.protocol.game.ClientboundMoveEntityPacket net.minecraft.network.play.server.SPacketEntity
+net.minecraft.network.protocol.game.ClientboundOpenScreenPacket net.minecraft.network.play.server.SPacketOpenWindow
 net.minecraft.network.protocol.game.ClientboundPlayerInfoPacket net.minecraft.network.play.server.SPacketPlayerListItem
 net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket net.minecraft.network.play.server.SPacketDestroyEntities
 net.minecraft.network.protocol.game.ClientboundRotateHeadPacket net.minecraft.network.play.server.SPacketEntityHeadLook
@@ -111,6 +113,7 @@ net.minecraft.network.protocol.game.ClientboundAnimatePacket getId() getEntityID
 net.minecraft.network.protocol.game.ClientboundBlockUpdatePacket getPos() getBlockPosition()
 
 net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getContainerId() getWindowId()
+net.minecraft.network.protocol.game.ClientboundContainerSetSlotPacket getItem() getStack()
 
 net.minecraft.network.protocol.game.ClientboundLevelEventPacket getPos() getSoundPos()
 
@@ -123,6 +126,9 @@ net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getXDist() g
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getYDist() getYOffset()
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket getZDist() getZOffset()
 net.minecraft.network.protocol.game.ClientboundLevelParticlesPacket isOverrideLimiter() isLongDistance()
+
+net.minecraft.network.protocol.game.ClientboundOpenScreenPacket getContainerId() getWindowId()
+net.minecraft.network.protocol.game.ClientboundOpenScreenPacket getTitle() getWindowTitle()
 
 net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket getEntityIds() getEntityIDs()
 
@@ -143,6 +149,8 @@ net.minecraft.network.protocol.game.ServerboundContainerClickPacket net.minecraf
 net.minecraft.network.protocol.game.ServerboundInteractPacket net.minecraft.network.play.client.CPacketUseEntity
 net.minecraft.network.protocol.game.ServerboundMovePlayerPacket net.minecraft.network.play.client.CPacketPlayer
 net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.network.play.client.CPacketHeldItemChange
+
+net.minecraft.network.protocol.game.ServerboundInteractPacket getTarget() getEntityFromWorld()
 
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
