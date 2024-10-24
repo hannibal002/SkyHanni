@@ -152,6 +152,9 @@ dependencies {
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
         annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
+    } else if (target == ProjectTarget.BRIDGE116FABRIC)  {
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN)  {
         modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
         modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
@@ -384,7 +387,7 @@ detekt {
 
 tasks.withType<Detekt>().configureEach {
     onlyIf {
-        target == ProjectTarget.MAIN
+        target == ProjectTarget.MAIN && System.getenv("SKIP_DETEKT") != "true"
     }
 
     reports {
