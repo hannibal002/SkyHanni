@@ -100,6 +100,10 @@ object HypixelCommands {
         send("wiki $text")
     }
 
+    fun partyAccept(player: String) {
+        send("party accept $player")
+    }
+
     fun partyWarp() {
         send("party warp")
     }
