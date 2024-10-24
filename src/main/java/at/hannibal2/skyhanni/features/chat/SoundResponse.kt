@@ -36,8 +36,8 @@ private const val END_PATTERN = "(?: |§.|!|\\?|\\.)*(?:\$| .*\$)"
 enum class SoundResponseTypes(soundLocation: String, triggersOn: List<String>) {
     CAT("mob.cat.meow", listOf("meow")),
     DOG("mob.wolf.bark", listOf("bark", "arf", "woof")),
-    SHEEP("mob.sheep.say", listOf("baa", "baah", "baaa", "baaaa", "baaaaa")),
-    COW("mob.cow.say", listOf("moo", "mooo", "moooo")),
+    SHEEP("mob.sheep.say", listOf("baa+h*")),
+    COW("mob.cow.say", listOf("moo+")),
     PIG("mob.pig.say", listOf("oink")),
     CHICKEN("mob.chicken.say", listOf("cluck")),
     ;
