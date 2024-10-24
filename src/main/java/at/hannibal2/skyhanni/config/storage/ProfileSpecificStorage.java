@@ -742,6 +742,12 @@ public class ProfileSpecificStorage {
     @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
+    @Expose
+    public Boolean hoppityStatLiveDisplayToggled = false;
+
+    @Expose
+    public Integer hoppityStatLiveDisplayYear = -1;
+
     public static class HoppityEventStats {
         @Expose
         public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
@@ -768,6 +774,23 @@ public class ProfileSpecificStorage {
 
         @Expose
         public long millisInCf = 0;
+
+        @Expose
+        public int rabbitTheFishFinds = 0;
+
+        public static class LeaderboardPosition {
+            @Expose
+            public int position = -1;
+
+            @Expose
+            public double percentile = -1.0;
+        }
+
+        @Expose
+        public LeaderboardPosition initialLeaderboardPosition = new LeaderboardPosition();
+
+        @Expose
+        public LeaderboardPosition finalLeaderboardPosition = new LeaderboardPosition();
 
         @Expose
         public boolean summarized = false;

@@ -2,10 +2,16 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.RabbitData
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
@@ -18,22 +24,129 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_DAY_MILLIS
 import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_HOUR_MILLIS
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
+import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object HoppityEventSummary {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val lineHeader = " ".repeat(4)
 
-    private var firstInCf = 0L
-    private var inCfNow = false
+    /**
+     * REGEX-TEST: §d§lHOPPITY'S HUNT §r§7You found §r§cRabbit the Fish§r§7!
+     */
+    private val rabbitTheFishPattern by ChocolateFactoryAPI.patternGroup.pattern(
+        "rabbit.thefish",
+        "(?:§.)*HOPPITY'S HUNT (?:§.)*You found (?:§.)*Rabbit the Fish§(?:§.)*!.*"
+    )
+
+    private var lastAddedCfMillis: SimpleTimeMark? = null
+
+    private data class StatString(val string: String, val headed: Boolean = true)
+
+    private fun liveDisplayEnabled(): Boolean {
+        val profileStorage = ProfileStorageData.profileSpecific ?: return false
+        val isEnabled = liveDisplayConfig.enabled
+        val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
+        val isToggledOff = profileStorage.hoppityStatLiveDisplayToggled
+
+        return LorenzUtils.inSkyBlock && isEnabled && !isToggledOff && isEventEnabled
+    }
+
+    @SubscribeEvent
+    fun onKeyPress(event: LorenzKeyPressEvent) {
+        if (liveDisplayConfig.enabled) return
+        if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
+        val profileStorage = ProfileStorageData.profileSpecific ?: return
+        profileStorage.hoppityStatLiveDisplayToggled = !profileStorage.hoppityStatLiveDisplayToggled
+    }
+
+    @SubscribeEvent
+    fun onChat(event: LorenzChatEvent) {
+        if (!HoppityAPI.isHoppityEvent()) return
+        val stats = getYearStats().first ?: return
+
+        if (rabbitTheFishPattern.matches(event.message)) {
+            stats.rabbitTheFishFinds++
+        }
+    }
+
+    @SubscribeEvent
+    fun onRenderOverlay(event: GuiRenderEvent) {
+        if (!liveDisplayEnabled()) return
+        val profileStorage = ProfileStorageData.profileSpecific ?: return
+        val statYear = profileStorage.hoppityStatLiveDisplayYear.takeIf { it != -1 }
+            ?: SkyBlockTime.now().year
+
+        val stats = getYearStats(statYear).first
+        val cardRenderable = Renderable.verticalContainer(
+            if(stats == null) mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}."))
+            else getStatsStrings(stats, statYear).map {
+                Renderable.string(it.string)
+            }.toMutableList()
+        )
+
+        config.eventSummary.liveDisplayPosition.renderRenderables(
+            mutableListOf(
+                Renderable.string(
+                    "§d§lHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                ),
+                buildYearSwitcherContainer(statYear),
+                cardRenderable
+            ).filterNotNull(),
+            posLabel = "Hoppity's Hunt Stats",
+        )
+    }
+
+    private fun buildYearSwitcherContainer(currentStatYear: Int): Renderable? {
+        val profileStorage = ProfileStorageData.profileSpecific ?: return null
+        val statsStorage = profileStorage.hoppityEventStats
+        val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
+
+        val predecessorYear = statsYearList.filter { it < currentStatYear }.takeIf { it.any() }?.max()
+        val successorYear = statsYearList.filter { it > currentStatYear }.takeIf { it.any() }?.min()
+        if (predecessorYear == null && successorYear == null) return null
+
+        val predecessorRenderable = predecessorYear?.let {
+            Renderable.clickable(
+                Renderable.string("§d§l← §r§dHunt #${getHoppityEventNumber(it)}"),
+                onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+            )
+        }
+        val successorRenderable = successorYear?.let {
+            Renderable.clickable(
+                Renderable.string("§dHunt #${getHoppityEventNumber(it)} §r§d§l→"),
+                onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+            )
+        }
+
+        return Renderable.verticalContainer(
+            listOf(
+                Renderable.horizontalContainer(
+                    mutableListOf(
+                        predecessorRenderable,
+                        successorRenderable
+                    ).filterNotNull(),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                ),
+                Renderable.string("")
+            )
+        )
+    }
 
     @HandleEvent
     fun onRabbitFound(event: RabbitFoundEvent) {
@@ -62,6 +175,15 @@ object HoppityEventSummary {
         checkEnded()
     }
 
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shhoppitystats") {
+            description = "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
+            category = CommandCategory.USERS_ACTIVE
+            callback { sendStatsMessage(it) }
+        }
+    }
+
     private fun checkInit() {
         val statStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
         val currentYear = SkyBlockTime.now().year
@@ -77,15 +199,12 @@ object HoppityEventSummary {
     }
 
     private fun checkAddCfTime() {
-        if (ChocolateFactoryAPI.inChocolateFactory && !this.inCfNow) {
-            this.inCfNow = true
-            firstInCf = SkyBlockTime.now().toMillis()
-        } else if (!ChocolateFactoryAPI.inChocolateFactory && this.inCfNow) {
-            val stats = getYearStats().first ?: return
-            stats.millisInCf += (SkyBlockTime.now().toMillis() - firstInCf)
-            this.inCfNow = false
-            firstInCf = 0
+        if (!ChocolateFactoryAPI.inChocolateFactory) return
+        val stats = getYearStats().first ?: return
+        lastAddedCfMillis?.let {
+            stats.millisInCf += (SimpleTimeMark.now().toMillis() - it.toMillis())
         }
+        lastAddedCfMillis = SimpleTimeMark.now()
     }
 
     private fun checkEnded() {
@@ -106,6 +225,17 @@ object HoppityEventSummary {
     // First event was year 346 -> #1, 20th event was year 365, etc.
     private fun getHoppityEventNumber(skyblockYear: Int): Int = (skyblockYear - 345)
 
+    fun updateCfPosition(position: Int?, percentile: Double?) {
+        if (!HoppityAPI.isHoppityEvent() || position == null || percentile == null) return
+        val stats = getYearStats().first ?: return
+        val snapshot = LeaderboardPosition()
+        snapshot.position = position
+        snapshot.percentile = percentile
+
+        stats.initialLeaderboardPosition = stats.initialLeaderboardPosition.takeIf { it.position != -1 } ?: snapshot
+        stats.finalLeaderboardPosition = snapshot
+    }
+
     fun addStrayCaught(rarity: LorenzRarity, chocGained: Long) {
         if (!HoppityAPI.isHoppityEvent()) return
         val stats = getYearStats().first ?: return
@@ -118,16 +248,18 @@ object HoppityEventSummary {
         appendLine("$lineHeader$line")
     }
 
-    private fun StringBuilder.addExtraChocFormatLine(chocGained: Long) {
+    private fun MutableList<StatString>.addExtraChocFormatLine(chocGained: Long) {
         if (chocGained <= 0) return
-        appendHeadedLine(
-            buildString {
-                append(" §6+${chocGained.addSeparators()} Chocolate")
-                if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
-                    val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(chocGained).format(maxUnits = 2)
-                    append(" §7(§a+§b$timeFormatted§7)")
-                }
-            },
+        add(
+            StatString(
+                buildString {
+                    append(" §6+${chocGained.addSeparators()} Chocolate")
+                    if (SkyHanniMod.feature.inventory.chocolateFactory.showDuplicateTime) {
+                        val timeFormatted = ChocolateFactoryAPI.timeUntilNeed(chocGained).format(maxUnits = 2)
+                        append(" §7(§a+§b$timeFormatted§7)")
+                    }
+                },
+            )
         )
     }
 
@@ -136,77 +268,131 @@ object HoppityEventSummary {
             (mealsFound[HoppityEggType.CHOCOLATE_SHOP_MILESTONE] ?: 0)
 
     private val summaryOperationList by lazy {
-        buildMap<HoppityStat, (sb: StringBuilder, stats: HoppityEventStats, year: Int) -> Unit> {
-            put(HoppityStat.MEAL_EGGS_FOUND) { sb, stats, year ->
+        buildMap<HoppityStat, (statList: MutableList<StatString>, stats: HoppityEventStats, year: Int) -> Unit> {
+            put(HoppityStat.MEAL_EGGS_FOUND) { sl, stats, year ->
                 stats.getEggsFoundFormat(year).takeIf { it != null }?.let {
-                    sb.appendHeadedLine(it)
+                    sl.add(StatString(it))
                 }
             }
 
-            put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { sb, stats, _ ->
+            put(HoppityStat.HOPPITY_RABBITS_BOUGHT) { sl, stats, _ ->
                 stats.mealsFound[HoppityEggType.BOUGHT]?.let {
-                    sb.appendHeadedLine("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7.")
+                    sl.add(StatString("§7You bought §b$it §f${StringUtils.pluralize(it, "Rabbit")} §7from §aHoppity§7."))
                 }
             }
 
-            put(HoppityStat.SIDE_DISH_EGGS) { sb, stats, _ ->
+            put(HoppityStat.SIDE_DISH_EGGS) { sl, stats, _ ->
                 stats.mealsFound[HoppityEggType.SIDE_DISH]?.let {
-                    sb.appendHeadedLine(
-                        "§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 " +
-                            "§7in the §6Chocolate Factory§7.",
+                    sl.add(
+                        StatString(
+                            "§7You found §b$it §6§lSide Dish §r§6${StringUtils.pluralize(it, "Egg")}§7 " +
+                                "§7in the §6Chocolate Factory§7.",
+                        ),
                     )
                 }
             }
 
-            put(HoppityStat.MILESTONE_RABBITS) { sb, stats, _ ->
+            put(HoppityStat.MILESTONE_RABBITS) { sl, stats, _ ->
                 stats.getMilestoneCount().takeIf { it > 0 }?.let {
-                    sb.appendHeadedLine("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7.")
+                    sl.add(StatString("§7You claimed §b$it §6§lMilestone §r§6${StringUtils.pluralize(it, "Rabbit")}§7."))
                 }
             }
 
-            put(HoppityStat.NEW_RABBITS) { sb, stats, _ ->
+            put(HoppityStat.NEW_RABBITS) { sl, stats, _ ->
                 getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.uniques }, "Unique").forEach {
-                    sb.appendHeadedLine(it)
+                    sl.add(StatString(it))
                 }
             }
 
-            put(HoppityStat.DUPLICATE_RABBITS) { sb, stats, _ ->
+            put(HoppityStat.DUPLICATE_RABBITS) { sl, stats, _ ->
                 getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.dupes }, "Duplicate").forEach {
-                    sb.appendHeadedLine(it)
+                    sl.add(StatString(it))
                 }
-                sb.addExtraChocFormatLine(stats.dupeChocolateGained)
+                sl.addExtraChocFormatLine(stats.dupeChocolateGained)
             }
 
-            put(HoppityStat.STRAY_RABBITS) { sb, stats, _ ->
+            put(HoppityStat.STRAY_RABBITS) { sl, stats, _ ->
                 getRabbitsFormat(stats.rabbitsFound.mapValues { m -> m.value.strays }, "Stray").forEach {
-                    sb.appendHeadedLine(it)
+                    sl.add(StatString(it))
                 }
-                sb.addExtraChocFormatLine(stats.strayChocolateGained)
+                sl.addExtraChocFormatLine(stats.strayChocolateGained)
             }
 
-            put(HoppityStat.TIME_IN_CF) { sb, stats, _ ->
-                sb.appendHeadedLine("§7You spent §b${stats.millisInCf.milliseconds.format(maxUnits = 2)} §7in the §6Chocolate Factory§7.")
+            put(HoppityStat.TIME_IN_CF) { sl, stats, _ ->
+                val cfTimeFormat = stats.millisInCf.milliseconds.format(maxUnits = 2)
+                sl.add(StatString("§7You spent §b$cfTimeFormat §7in the §6Chocolate Factory§7."))
             }
 
-            put(HoppityStat.EMPTY_1) { sb, _, _ -> sb.appendLine() }
-            put(HoppityStat.EMPTY_2) { sb, _, _ -> sb.appendLine() }
-            put(HoppityStat.EMPTY_3) { sb, _, _ -> sb.appendLine() }
-            put(HoppityStat.EMPTY_4) { sb, _, _ -> sb.appendLine() }
+            put(HoppityStat.RABBIT_THE_FISH_FINDS) { sl, stats, _ ->
+                stats.rabbitTheFishFinds.takeIf { it > 0 }?.let {
+                    val timesFormat = StringUtils.pluralize(it, "time")
+                    val eggsFormat = StringUtils.pluralize(it, "Egg")
+                    sl.add(StatString("§7You found §cRabbit the Fish §7in Meal $eggsFormat §b$it §7$timesFormat."))
+                }
+            }
+
+            put(HoppityStat.LEADERBOARD_CHANGE) { sl, stats, _ ->
+                val initial = stats.initialLeaderboardPosition
+                val final = stats.finalLeaderboardPosition
+                if (
+                    initial.position == -1 || final.position == -1 ||
+                    initial.percentile == -1.0 || final.percentile == -1.0 ||
+                    initial.position == final.position
+                ) return@put
+                sl.add(StatString(getFullLeaderboardMessage(initial, final)))
+            }
+
+            val emptyStatString = StatString("", false)
+            put(HoppityStat.EMPTY_1) { sl, _, _ -> sl.add(emptyStatString) }
+            put(HoppityStat.EMPTY_2) { sl, _, _ -> sl.add(emptyStatString) }
+            put(HoppityStat.EMPTY_3) { sl, _, _ -> sl.add(emptyStatString) }
+            put(HoppityStat.EMPTY_4) { sl, _, _ -> sl.add(emptyStatString) }
         }
     }
 
-    fun sendStatsMessage(it: Array<String>) {
+    private fun getFullLeaderboardMessage(initial: LeaderboardPosition, final: LeaderboardPosition): String =
+        "§6Leaderboard Change§7: ${getPrimaryLbString(initial, final)}\n ${getSecondaryLbLine(initial, final)}"
+
+    private fun getPrimaryLbString(initial: LeaderboardPosition, final: LeaderboardPosition): String {
+        val iPo = initial.position
+        val fPo = final.position
+        return "§b#${iPo.addSeparators()} §c-> §b#${fPo.addSeparators()}"
+    }
+
+    private fun getSecondaryLbLine(initial: LeaderboardPosition, final: LeaderboardPosition): String {
+        val iPo = initial.position
+        val fPo = final.position
+        val dPo = fPo - iPo
+        val iPe = initial.percentile
+        val fPe = final.percentile
+        val dPe = fPe - iPe
+        val color = if (iPo > fPo) "§a+" else "§c"
+
+        return buildString {
+            "§7(§b#$color${dPo.addSeparators()} ${StringUtils.pluralize(dPo, "spot")} §7)"
+            if (dPe != 0.0) append(" §7Top §a$iPe% §c-> §7Top §a$fPe%")
+            else append(" §7Top §a$iPe%")
+        }
+    }
+
+    private fun sendStatsMessage(it: Array<String>) {
         val statsStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
         val currentYear = SkyBlockTime.now().year
         val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
         val statsYearFormatList = statsStorage.keys.takeIf { it.isNotEmpty() }?.map {
-            "§b$it${if (it == currentYear && HoppityAPI.isHoppityEvent()) " §a(Current)§r" else ""}"
+            val additionalText =
+                if (it == currentYear && HoppityAPI.isHoppityEvent()) " §a(Current)§r"
+                else ""
+
+            "§b${getHoppityEventNumber(it)}$additionalText"
         }?.toMutableList() ?: mutableListOf()
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
         val availableYearsFormat =
-            "§eHoppity Event Stats are available for the following years:§r\n${statsYearFormatList.joinToString("§e, ") { it }}"
+            "§eHoppity Event Stats are available for the following events:§r\n" +
+                statsYearFormatList.joinToString("§e, ") { it } +
+                "\n§7Use §b/shhoppitystats <year>§7 to view stats for a specific event."
 
         if (parsedInt == null) {
             if (HoppityAPI.isHoppityEvent()) {
@@ -221,6 +407,29 @@ object HoppityEventSummary {
         }
     }
 
+    // Return the StatString list for the stats to be displayed
+    private fun getStatsStrings(stats: HoppityEventStats, eventYear: Int?): MutableList<StatString> {
+        if (eventYear == null) return mutableListOf()
+        val statList = mutableListOf<StatString>()
+
+        // Various stats from config
+        config.eventSummary.statDisplayList.forEach {
+            summaryOperationList[it]?.invoke(statList, stats, eventYear)
+        }
+
+        // Remove any consecutive empty lines
+        val iterator = statList.iterator()
+        while (iterator.hasNext()) {
+            val next = iterator.next()
+            if (next.string.isEmpty() && iterator.hasNext()) {
+                val nextNext = iterator.next()
+                if (nextNext.string.isEmpty()) iterator.remove()
+            }
+        }
+
+        return statList
+    }
+
     private fun sendStatsMessage(stats: HoppityEventStats, eventYear: Int?) {
         if (eventYear == null) return
         val summaryBuilder: StringBuilder = StringBuilder()
@@ -232,8 +441,9 @@ object HoppityEventSummary {
 
         // Various stats from config
         val statsBuilder: StringBuilder = StringBuilder()
-        config.eventSummary.statDisplayList.forEach {
-            summaryOperationList[it]?.invoke(statsBuilder, stats, eventYear)
+        getStatsStrings(stats, eventYear).forEach {
+            if (it.headed) statsBuilder.appendHeadedLine(it.string)
+            else statsBuilder.appendLine(it.string)
         }
 
         // If no stats are found, display a message
@@ -242,11 +452,8 @@ object HoppityEventSummary {
             statsBuilder.appendHeadedLine("§c§oGo find some eggs!")
         }
 
-        // Remove any consecutive empty lines in the stats
-        val statsBuilderString = statsBuilder.toString().replace(Regex("\n{4,}"), "\n".repeat(3))
-
         // Append stats
-        summaryBuilder.append(statsBuilderString)
+        summaryBuilder.append(statsBuilder)
 
         // Footer
         summaryBuilder.append("§d§l${"▬".repeat(64)}")

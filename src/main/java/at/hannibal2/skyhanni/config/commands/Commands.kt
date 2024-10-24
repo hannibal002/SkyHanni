@@ -290,11 +290,6 @@ object Commands {
             category = CommandCategory.USERS_ACTIVE
             callback { PestFinder.teleportNearestInfestedPlot() }
         }
-        event.register("shhoppitystats") {
-            description = "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
-            category = CommandCategory.USERS_ACTIVE
-            callback { HoppityEventSummary.sendStatsMessage(it) }
-        }
         event.register("shcolors") {
             description = "Prints a list of all Minecraft color & formatting codes in chat."
             category = CommandCategory.USERS_ACTIVE
