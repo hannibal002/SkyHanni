@@ -3,6 +3,8 @@ package at.hannibal2.skyhanni.features.mining.crystalhollows
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -56,6 +58,15 @@ object CrystalNucleusTracker {
 
         @Expose
         var runsCompleted = 0L
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetcrystalnucleustracker") {
+            description = "Resets the Crystal Nucleus Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { resetCommand() }
+        }
     }
 
     @HandleEvent(priority = HIGH)

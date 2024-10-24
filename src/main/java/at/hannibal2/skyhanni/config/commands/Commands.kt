@@ -393,11 +393,6 @@ object Commands {
             category = CommandCategory.USERS_RESET
             callback { ExcavatorProfitTracker.resetCommand() }
         }
-        event.register("shresetcrystalnucleustracker") {
-            description = "Resets the Crystal Nucleus Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { CrystalNucleusTracker.resetCommand() }
-        }
 
         // non trackers
         event.register("shresetghostcounter") {
