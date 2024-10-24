@@ -47,7 +47,9 @@ object MayorAPI {
 
     private val group = RepoPattern.group("mayorapi")
 
-    // TODO: Add Regex-test
+    /**
+     * REGEX-TEST: Schedules an extra §bFishing Festival §7event during the year.
+     */
     val foxyExtraEventPattern by group.pattern(
         "foxy.extraevent",
         "Schedules an extra §.(?<event>.*) §.event during the year\\.",
@@ -98,7 +100,7 @@ object MayorAPI {
     private var lastUpdate = SimpleTimeMark.farPast()
     private val dispatcher = Dispatchers.IO
 
-    private var rawMayorData: MayorJson? = null
+    var rawMayorData: MayorJson? = null
     private var candidates = mapOf<Int, MayorCandidate>()
 
     var nextMayorTimestamp = SimpleTimeMark.farPast()
