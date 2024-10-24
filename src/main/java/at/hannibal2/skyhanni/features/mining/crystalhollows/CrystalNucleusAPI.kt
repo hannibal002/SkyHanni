@@ -43,7 +43,7 @@ object CrystalNucleusAPI {
         if (unCheckedBooks == 0) return
         if (event.itemStack.displayName != "§fEnchanted Book") return
         when (event.itemStack.getEnchantments()?.keys?.firstOrNull() ?: return) {
-            "lapidary" -> loot.add("§6Lapidary I" to 1)
+            "lapidary" -> loot.add("§9Lapidary I" to 1)
             "fortune" -> loot.add("§9Fortune IV" to 1)
         }
         unCheckedBooks--
