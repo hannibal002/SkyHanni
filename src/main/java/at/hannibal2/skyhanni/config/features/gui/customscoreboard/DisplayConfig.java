@@ -150,6 +150,11 @@ public class DisplayConfig {
     public RenderUtils.HorizontalAlignment textAlignment = RenderUtils.HorizontalAlignment.LEFT;
 
     @Expose
+    @ConfigOption(name = "Show Profile Name", desc = "Show profile name instead of the type in the profile element.")
+    @ConfigEditorBoolean
+    public boolean showProfileName = true;
+
+    @Expose
     @ConfigOption(
         name = "Cache Scoreboard on Island Switch",
         desc = "Will stop the Scoreboard from updating while switching islands.\n" +
