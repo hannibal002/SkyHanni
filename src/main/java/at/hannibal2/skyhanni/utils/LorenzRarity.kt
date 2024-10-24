@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 
 // TODO: replace id with ordinal
 enum class LorenzRarity(val color: LorenzColor, val id: Int) {
@@ -18,8 +19,9 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     ULTIMATE(LorenzColor.DARK_RED, 10),
     ;
 
-    val chatColorCode by lazy { color.getChatColor() }
+    val chatColorCode = color.getChatColor()
     val rawName = name.replace("_", " ")
+    val formattedName = "$chatColorCode${name.allLettersFirstUppercase()}"
 
     fun oneBelow(logError: Boolean = true): LorenzRarity? {
         val rarityBelow = getById(ordinal - 1)
@@ -34,15 +36,15 @@ enum class LorenzRarity(val color: LorenzColor, val id: Int) {
     }
 
     fun oneAbove(logError: Boolean = true): LorenzRarity? {
-        val rarityBelow = getById(ordinal + 1)
-        if (rarityBelow == null && logError) {
+        val rarityAbove = getById(ordinal + 1)
+        if (rarityAbove == null && logError) {
             ErrorManager.logErrorStateWithData(
                 "Problem with item rarity detected.",
                 "Trying to get an item rarity above special",
                 "ordinal" to ordinal,
             )
         }
-        return rarityBelow
+        return rarityAbove
     }
 
     fun isAtLeast(other: LorenzRarity): Boolean = this.ordinal >= other.ordinal

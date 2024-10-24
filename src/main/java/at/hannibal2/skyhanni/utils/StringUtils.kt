@@ -514,7 +514,11 @@ object StringUtils {
 
     fun IChatComponent.contains(string: String): Boolean = formattedText.contains(string)
 
-    fun String.width(): Int = Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    fun String.width(): Int {
+        return Minecraft.getMinecraft().fontRendererObj.getStringWidth(this)
+    }
+
+    fun String.convertToInternalNameString(): String = this.uppercase().replace(" ", "_")
 
     fun String.lastColorCode(): String? = minecraftColorCodesPattern.findAll(this).lastOrNull()
 
