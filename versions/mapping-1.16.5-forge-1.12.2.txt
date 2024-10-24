@@ -145,6 +145,7 @@ net.minecraft.network.protocol.game.ServerboundPickItemPacket net.minecraft.netw
 net.minecraft.server.packs.resources.ResourceManager net.minecraft.client.resources.IResourceManager
 
 net.minecraft.world.effect.MobEffect net.minecraft.potion.Potion
+net.minecraft.world.effect.MobEffects net.minecraft.init.PotionTypes
 
 net.minecraft.world.entity.Entity level getEntityWorld()
 net.minecraft.world.entity.Entity net.minecraft.entity.Entity
@@ -154,8 +155,6 @@ net.minecraft.world.entity.Entity yOld prevPosY
 net.minecraft.world.entity.Entity yo posY
 net.minecraft.world.entity.Entity zOld prevPosZ
 net.minecraft.world.entity.Entity zo posZ
-
-net.minecraft.world.effect.MobEffects net.minecraft.init.PotionTypes
 
 net.minecraft.world.entity.EquipmentSlot net.minecraft.inventory.EntityEquipmentSlot
 

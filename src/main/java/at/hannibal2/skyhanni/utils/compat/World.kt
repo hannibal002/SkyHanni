@@ -1,13 +1,5 @@
 package at.hannibal2.skyhanni.utils.compat
 
-//#if MC > 1.16
-//$$import net.minecraft.ChatFormatting
-//$$import net.minecraft.network.chat.TextColor
-//#endif
-//#if MC > 1.20
-//$$import net.minecraft.text.MutableText
-//$$import net.minecraft.text.PlainTextContent
-//#endif
 import net.minecraft.client.Minecraft
 import net.minecraft.client.multiplayer.WorldClient
 import net.minecraft.entity.Entity
@@ -15,6 +7,17 @@ import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.player.EntityPlayer
 import net.minecraft.potion.Potion
 import net.minecraft.util.IChatComponent
+//#if MC > 1.12
+//$$ import net.minecraft.init.PotionTypes
+//#endif
+//#if MC > 1.16
+//$$ import net.minecraft.ChatFormatting
+//$$ import net.minecraft.network.chat.TextColor
+//#endif
+//#if MC > 1.20
+//$$ import net.minecraft.text.MutableText
+//$$ import net.minecraft.text.PlainTextContent
+//#endif
 
 fun WorldClient.getLoadedPlayers(): List<EntityPlayer> =
 //#if MC < 1.14
@@ -23,18 +26,17 @@ fun WorldClient.getLoadedPlayers(): List<EntityPlayer> =
 //$$ this.players()
 //#endif
 
-
 fun Entity.getNameAsString(): String =
     this.name
 //#if MC >= 1.14
-//$$ .getString()
+//$$ .string
 //#endif
 
 fun EntityArmorStand.getArmorOrFullInventory() =
 //#if MC < 1.12
     this.inventory
 //#else
-//$$ this.getArmorInventoryList()
+//$$ this.armorInventoryList
 //#endif
 
 fun Minecraft.isOnMainThread() =
@@ -52,6 +54,7 @@ fun IChatComponent.getDirectlyContainedText() =
 //#else
 //$$        (this.content as? PlainTextContent)?.string() ?: ""
 //#endif
+
 fun IChatComponent.getFormattedTextCompat() =
 //#if MC < 1.16
     this.formattedText
@@ -78,6 +81,7 @@ fun IChatComponent.getFormattedTextCompat() =
 //$$    return sequenceOf(this) + siblings.asSequence().flatMap { it.iterator() } // TODO: in theory we want to properly inherit styles here
 //$$}
 //#endif
+
 //#if MC > 1.20
 //$$fun MutableText.withColor(formatting: Formatting): Text {
 //$$    return this.styled { it.withColor(formatting) }
@@ -89,8 +93,6 @@ object Effects {
         //#if MC <1.12
         Potion.invisibility
     //#else
-    //$$    net.minecraft.init.PotionTypes.INVISIBILITY
+    //$$    PotionTypes.INVISIBILITY
     //#endif
 }
-
-
