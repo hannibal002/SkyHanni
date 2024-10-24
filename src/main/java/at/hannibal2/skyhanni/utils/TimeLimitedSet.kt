@@ -3,10 +3,11 @@ package at.hannibal2.skyhanni.utils
 import com.google.common.cache.RemovalCause
 import kotlin.time.Duration
 
+@Suppress("UnstableApiUsage")
 class TimeLimitedSet<T : Any>(
     expireAfterWrite: Duration,
     private val removalListener: (T, RemovalCause) -> Unit = { _, _ -> },
-) : Iterable<T> {
+) : MutableIterable<T> {
 
     private val cache = TimeLimitedCache<T, Unit>(expireAfterWrite) { key, _, cause ->
         key?.let {
@@ -26,13 +27,15 @@ class TimeLimitedSet<T : Any>(
 
     fun remove(element: T) = cache.remove(element)
 
-    operator fun minusAssign(element: T) = remove(element)
+    operator fun minusAssign(element: T) {
+        remove(element)
+    }
 
     operator fun contains(element: T): Boolean = cache.containsKey(element)
 
     fun clear() = cache.clear()
 
-    fun toSet(): Set<T> = HashSet(cache.keys())
+    fun toSet(): MutableSet<T> = cache.keys
 
-    override fun iterator(): Iterator<T> = toSet().iterator()
+    override fun iterator(): MutableIterator<T> = toSet().iterator()
 }
