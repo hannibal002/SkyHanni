@@ -17,6 +17,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusProfit
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addSearchString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NEUInternalName
@@ -108,12 +109,10 @@ object CrystalNucleusTracker {
     @HandleEvent(priority = HIGH)
     fun onCrystalNucleusLoot(event: CrystalNucleusLootEvent) {
         addCompletedRun()
-        for ((itemName, amount) in event.loot) {
+        for ((internalName, amount) in event.loot) {
             // Gemstone and Mithril Powder
-            if (itemName.contains(" Powder")) continue
-            NEUInternalName.fromItemNameOrNull(itemName)?.let {
-                tracker.addItem(it, amount, false)
-            }
+            if (internalName.itemName.contains(" Powder")) continue
+            tracker.addItem(internalName, amount, false)
         }
     }
 

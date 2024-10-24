@@ -10,6 +10,9 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
+import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
+import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.fromItemNameOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -38,15 +41,18 @@ object CrystalNucleusAPI {
 
     private var inLoot = false
     private var unCheckedBooks: Int = 0
-    private val loot = mutableMapOf<String, Int>()
+    private val loot = mutableMapOf<NEUInternalName, Int>()
+
+    private val LAPIDARY_I_BOOK_ITEM by lazy { "LAPIDARY;1".asInternalName() }
+    private val FORTUNE_IV_BOOK_ITEM by lazy { "FORTUNE;4".asInternalName() }
 
     @SubscribeEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
         if (event.itemStack.displayName != "§fEnchanted Book") return
         when (event.itemStack.getEnchantments()?.keys?.firstOrNull() ?: return) {
-            "lapidary" -> loot.addOrPut("§9Lapidary I", 1)
-            "fortune" -> loot.addOrPut("§9Fortune IV", 1)
+            "lapidary" -> loot.addOrPut(LAPIDARY_I_BOOK_ITEM, 1)
+            "fortune" -> loot.addOrPut(FORTUNE_IV_BOOK_ITEM, 1)
         }
         unCheckedBooks--
         if (unCheckedBooks == 0) {
@@ -99,7 +105,8 @@ object CrystalNucleusAPI {
                     unCheckedBooks += pair.second
                     return
                 }
-                loot.addOrPut(pair.first, pair.second)
+                val item = fromItemNameOrNull(pair.first) ?: return
+                loot.addOrPut(item, pair.second)
             } ?: ErrorManager.logErrorStateWithData(
                 "Failed to read item amount",
                 "",

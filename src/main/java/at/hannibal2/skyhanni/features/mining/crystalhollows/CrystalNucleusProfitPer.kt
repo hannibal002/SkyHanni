@@ -6,9 +6,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGH
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
@@ -34,16 +35,14 @@ object CrystalNucleusProfitPer {
 
         var totalProfit = 0.0
         val map = mutableMapOf<String, Double>()
-        for ((name, amount) in loot) {
+        for ((internalName, amount) in loot) {
             // Gemstone and Mithril Powder
-            if (name.contains(" Powder")) continue
-            NEUInternalName.fromItemNameOrNull(name)?.let {
-                it.getPrice().takeIf { price -> price != -1.0 }?.let { pricePer ->
-                    val profit = amount * pricePer
-                    val text = "§eFound $name §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
-                    map[text] = profit
-                    totalProfit += profit
-                }
+            if (internalName.itemName.contains(" Powder")) continue
+            internalName.getPrice().takeIf { price -> price != -1.0 }?.let { pricePer ->
+                val profit = amount * pricePer
+                val text = "§eFound ${internalName.itemName} §8${amount.addSeparators()}x §7(§6${profit.shortFormat()}§7)"
+                map.addOrPut(text, profit)
+                totalProfit += profit
             }
         }
 
@@ -57,8 +56,9 @@ object CrystalNucleusProfitPer {
         totalProfit -= robotPartsPrice
 
         val hover = map.sortedDesc().filter {
-            it.value >= config.profitPerMinimum || it.value < 0
+            (it.value >= config.profitPerMinimum) || it.value < 0
         }.keys.toMutableList()
+
         if (hover.size != map.size) hover.add("§7${map.size - hover.size} cheap items are hidden.")
         val profitPrefix =
             if (totalProfit < 0) "§c"
