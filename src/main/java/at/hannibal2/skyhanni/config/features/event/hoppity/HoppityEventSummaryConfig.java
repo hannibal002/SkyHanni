@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.event.hoppity;
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorInfoText;
@@ -22,10 +23,9 @@ public class HoppityEventSummaryConfig {
     public boolean enabled = true;
 
     @Expose
-    @ConfigOption(name = "Live Display", desc = "Show the preview card in a GUI element during Hoppity's Hunt.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean liveDisplay = false;
+    @Accordion
+    @ConfigOption(name = "Live Display", desc = "")
+    public HoppityEventSummaryLiveDisplayConfig liveDisplay = new HoppityEventSummaryLiveDisplayConfig();
 
     @Expose
     @ConfigLink(owner = HoppityEventSummaryConfig.class, field = "liveDisplay")

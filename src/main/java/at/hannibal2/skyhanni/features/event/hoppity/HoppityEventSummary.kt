@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEventSummaryConfig.HoppityStat
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventStats.LeaderboardPosition
@@ -9,6 +11,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.HoppityEventS
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.LorenzKeyPressEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.hoppity.RabbitFoundEvent
@@ -33,11 +36,13 @@ import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import org.lwjgl.input.Keyboard
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object HoppityEventSummary {
     private val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val liveDisplayConfig get() = config.eventSummary.liveDisplay
     private val lineHeader = " ".repeat(4)
 
     /**
@@ -52,7 +57,22 @@ object HoppityEventSummary {
 
     private data class StatString(val string: String, val headed: Boolean = true)
 
-    private fun guiEnabled() = config.eventSummary.liveDisplay && HoppityAPI.isHoppityEvent() && LorenzUtils.inSkyBlock
+    private fun liveDisplayEnabled(): Boolean {
+        val profileStorage = ProfileStorageData.profileSpecific ?: return false
+        val isEnabled = liveDisplayConfig.enabled
+        val isEventEnabled = !liveDisplayConfig.onlyDuringEvent || HoppityAPI.isHoppityEvent()
+        val isToggledOff = profileStorage.hoppityStatLiveDisplayToggled
+
+        return LorenzUtils.inSkyBlock && isEnabled && !isToggledOff && isEventEnabled
+    }
+
+    @SubscribeEvent
+    fun onKeyPress(event: LorenzKeyPressEvent) {
+        if (liveDisplayConfig.enabled) return
+        if (liveDisplayConfig.toggleKeybind == Keyboard.KEY_NONE || liveDisplayConfig.toggleKeybind != event.keyCode) return
+        val profileStorage = ProfileStorageData.profileSpecific ?: return
+        profileStorage.hoppityStatLiveDisplayToggled = !profileStorage.hoppityStatLiveDisplayToggled
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -66,25 +86,65 @@ object HoppityEventSummary {
 
     @SubscribeEvent
     fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!guiEnabled()) return
-        val stats = getYearStats().first ?: return
+        if (!liveDisplayEnabled()) return
+        val profileStorage = ProfileStorageData.profileSpecific ?: return
+        val statYear = profileStorage.hoppityStatLiveDisplayYear.takeIf { it != -1 }
+            ?: SkyBlockTime.now().year
 
-        val currentYear = SkyBlockTime.now().year
+        val stats = getYearStats(statYear).first
         val cardRenderable = Renderable.verticalContainer(
-            getStatsStrings(stats, currentYear).map {
+            if(stats == null) mutableListOf(Renderable.string("§cNo stats found for Hunt #${getHoppityEventNumber(statYear)}."))
+            else getStatsStrings(stats, statYear).map {
                 Renderable.string(it.string)
             }.toMutableList()
         )
 
         config.eventSummary.liveDisplayPosition.renderRenderables(
-            listOf(
+            mutableListOf(
                 Renderable.string(
-                    "§d§lHoppity's Hunt #${getHoppityEventNumber(currentYear)} Stats",
+                    "§d§lHoppity's Hunt #${getHoppityEventNumber(statYear)} Stats",
                     horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
                 ),
+                buildYearSwitcherContainer(statYear),
                 cardRenderable
-            ),
+            ).filterNotNull(),
             posLabel = "Hoppity's Hunt Stats",
+        )
+    }
+
+    private fun buildYearSwitcherContainer(currentStatYear: Int): Renderable? {
+        val profileStorage = ProfileStorageData.profileSpecific ?: return null
+        val statsStorage = profileStorage.hoppityEventStats
+        val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
+
+        val predecessorYear = statsYearList.filter { it < currentStatYear }.takeIf { it.any() }?.max()
+        val successorYear = statsYearList.filter { it > currentStatYear }.takeIf { it.any() }?.min()
+        if (predecessorYear == null && successorYear == null) return null
+
+        val predecessorRenderable = predecessorYear?.let {
+            Renderable.clickable(
+                Renderable.string("§d§l← §r§dHunt #${getHoppityEventNumber(it)}"),
+                onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+            )
+        }
+        val successorRenderable = successorYear?.let {
+            Renderable.clickable(
+                Renderable.string("§dHunt #${getHoppityEventNumber(it)} §r§d§l→"),
+                onClick = { profileStorage.hoppityStatLiveDisplayYear = it }
+            )
+        }
+
+        return Renderable.verticalContainer(
+            listOf(
+                Renderable.horizontalContainer(
+                    mutableListOf(
+                        predecessorRenderable,
+                        successorRenderable
+                    ).filterNotNull(),
+                    horizontalAlign = RenderUtils.HorizontalAlignment.CENTER
+                ),
+                Renderable.string("")
+            )
         )
     }
 
@@ -113,6 +173,15 @@ object HoppityEventSummary {
     @SubscribeEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
         checkEnded()
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shhoppitystats") {
+            description = "Look up stats for a Hoppity's Event (by SkyBlock year).\nRun standalone for a list of years that have stats."
+            category = CommandCategory.USERS_ACTIVE
+            callback { sendStatsMessage(it) }
+        }
     }
 
     private fun checkInit() {
@@ -306,18 +375,24 @@ object HoppityEventSummary {
         }
     }
 
-    fun sendStatsMessage(it: Array<String>) {
+    private fun sendStatsMessage(it: Array<String>) {
         val statsStorage = ProfileStorageData.profileSpecific?.hoppityEventStats ?: return
         val currentYear = SkyBlockTime.now().year
         val statsYearList = statsStorage.keys.takeIf { it.isNotEmpty() } ?: mutableListOf()
         val statsYearFormatList = statsStorage.keys.takeIf { it.isNotEmpty() }?.map {
-            "§b$it${if (it == currentYear && HoppityAPI.isHoppityEvent()) " §a(Current)§r" else ""}"
+            val additionalText =
+                if (it == currentYear && HoppityAPI.isHoppityEvent()) " §a(Current)§r"
+                else ""
+
+            "§b${getHoppityEventNumber(it)}$additionalText"
         }?.toMutableList() ?: mutableListOf()
 
         val parsedInt: Int? = if (it.size == 1) it[0].toIntOrNull() else null
 
         val availableYearsFormat =
-            "§eHoppity Event Stats are available for the following years:§r\n${statsYearFormatList.joinToString("§e, ") { it }}"
+            "§eHoppity Event Stats are available for the following events:§r\n" +
+                statsYearFormatList.joinToString("§e, ") { it } +
+                "\n§7Use §b/shhoppitystats <year>§7 to view stats for a specific event."
 
         if (parsedInt == null) {
             if (HoppityAPI.isHoppityEvent()) {

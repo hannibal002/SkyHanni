@@ -738,6 +738,12 @@ public class ProfileSpecificStorage {
     @Expose
     public Map<Integer, HoppityEventStats> hoppityEventStats = new HashMap<>();
 
+    @Expose
+    public Boolean hoppityStatLiveDisplayToggled = false;
+
+    @Expose
+    public Integer hoppityStatLiveDisplayYear = -1;
+
     public static class HoppityEventStats {
         @Expose
         public Map<HoppityEggType, Integer> mealsFound = new HashMap<>();
