@@ -25,6 +25,7 @@ public class CrystalNucleusConfig {
         NPC_DIVAN_KEEPERS("§e[NPC] §6Keepers §7(§2Mines of Divan§7)"),
         NPC_PROF_ROBOT("§e[NPC] Professor Robot"),
         NPC_KING_YOLKAR("§e[NPC] §6King Yolkar"),
+        NPC_GOBLIN_GUARDS("§c[GUARD]§7s (§6Goblin Den§7)"),
         NON_TOOL_SCAVENGE("§7Non-Tool §cMetal Detector §7loot")
         ;
 
@@ -50,6 +51,7 @@ public class CrystalNucleusConfig {
         CrystalNucleusMessageTypes.NPC_DIVAN_KEEPERS,
         CrystalNucleusMessageTypes.NPC_PROF_ROBOT,
         CrystalNucleusMessageTypes.NPC_KING_YOLKAR,
+        CrystalNucleusMessageTypes.NPC_GOBLIN_GUARDS,
         CrystalNucleusMessageTypes.NON_TOOL_SCAVENGE
     ));
 }

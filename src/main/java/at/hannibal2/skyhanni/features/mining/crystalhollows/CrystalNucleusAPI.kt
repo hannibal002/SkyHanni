@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.mining.crystalhollows
 
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
@@ -32,7 +35,33 @@ object CrystalNucleusAPI {
     )
 
     private var inLoot = false
+    private var unCheckedBooks: Int = 0
     private val loot = mutableListOf<Pair<String, Int>>()
+
+    @SubscribeEvent
+    fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
+        if (unCheckedBooks == 0) return
+        if (event.itemStack.displayName != "§fEnchanted Book") return
+        when (event.itemStack.getEnchantments()?.keys?.firstOrNull() ?: return) {
+            "lapidary" -> loot.add("§6Lapidary I" to 1)
+            "fortune" -> loot.add("§9Fortune IV" to 1)
+        }
+        unCheckedBooks--
+        if (unCheckedBooks == 0) {
+            CrystalNucleusLootEvent(loot).post()
+            loot.clear()
+        }
+    }
+
+    @SubscribeEvent
+    fun onIslandChange(event: IslandChangeEvent) {
+        if (unCheckedBooks == 0 || event.oldIsland != IslandType.CRYSTAL_HOLLOWS) return
+        unCheckedBooks = 0
+        if (loot.isNotEmpty()) {
+            CrystalNucleusLootEvent(loot).post()
+            loot.clear()
+        }
+    }
 
     @SubscribeEvent
     fun onChat(event: LorenzChatEvent) {
@@ -47,9 +76,12 @@ object CrystalNucleusAPI {
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
+            // If there are unchecked books, the loot is not complete, and will be finished in the
+            // pickup event handler.
+            inLoot = false
+            if (unCheckedBooks > 0) return
             CrystalNucleusLootEvent(loot).post()
             loot.clear()
-            inLoot = false
             return
         }
 
@@ -60,9 +92,15 @@ object CrystalNucleusAPI {
             ItemUtils.readItemAmount(lootMessage)?.let { pair ->
                 loot.add(
                     when (pair.first) {
-                        // Assume enchanted books are Fortune IV books
-                        "§fEnchanted" -> "§9Fortune IV" to pair.second
-                        "§fEnchanted Book" -> "§9Fortune IV" to pair.second
+                        // Enchanted books are checked in the pickup event handler.
+                        "§fEnchanted" -> {
+                            unCheckedBooks++
+                            return
+                        }
+                        "§fEnchanted Book" -> {
+                            unCheckedBooks++
+                            return
+                        }
                         else -> pair
                     }
                 )

@@ -90,10 +90,11 @@ object CrystalNucleusChatFilter {
      * REGEX-TEST: Thanks for bringing me the §9Electron Transmitter§r! Bring me one more component to fix the giant!
      * REGEX-TEST: §rYou've brought me all of the components!
      * REGEX-TEST: §rYou've brought me all of the components... I think? To be honest, I kind of lost count...
+     * REGEX-TEST: Wait a minute. This will work just fine.
      */
     private val componentSubmittedPattern by patternGroup.pattern(
         "precursor.submitted",
-        ".*(You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>(\\d|one)) more).*",
+        ".*(Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>(\\d|one)) more).*",
     )
 
     fun block(message: String): NucleusChatFilterRes? {
@@ -169,6 +170,7 @@ object CrystalNucleusChatFilter {
         blockProfessorRobot(message)?.let { return it }
         blockKingYolkar(message)?.let { return it }
         blockKeepers(message)?.let { return it }
+        blockGoblinGuards(message)?.let { return it }
 
         return null
     }
@@ -178,7 +180,7 @@ object CrystalNucleusChatFilter {
         if (!message.startsWith("§e[NPC] Professor Robot")) return null
 
         componentSubmittedPattern.matchMatcher(message) {
-            if (message.contains("brought me all")) {
+            if (message.contains("brought me all") || message.contains("This will work just fine.")) {
                 return NucleusChatFilterRes("", "§e[NPC] Professor Robot§f: §rAll components submitted.")
             } else {
                 return NucleusChatFilterRes(
@@ -195,17 +197,26 @@ object CrystalNucleusChatFilter {
         if (!shouldBlock(CrystalNucleusMessageTypes.NPC_KING_YOLKAR)) return null
         if (!message.startsWith("§e[NPC] §6King Yolkar")) return null
 
+        // §e[NPC] §6King Yolkar§f: §r*rumble* *rumble*
         if (message.contains("*rumble* *rumble*")) {
             return NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: ...")
         }
-        if (message.contains("Bring me back §a3 §9Goblin Egg")) {
+        // §e[NPC] §6King Yolkar§f: §rBring me back a §9Goblin Egg §rof any type and we can teach her a lesson!
+        if (message.contains("Bring me back a §9Goblin Egg")) {
             return NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: §rBring me §a3 §9Goblin Egg §rof any type.")
         }
-        if (message.contains("These eggs will help me stomach my pain.")) {
+        // §e[NPC] §6King Yolkar§f: §rThis egg will help me stomach my pain.
+        if (message.contains("This egg will help me stomach my pain.")) {
             return NucleusChatFilterRes("", "§e[NPC] §6King Yolkar§f: §2King's Scent§r applied.")
         }
 
         return NucleusChatFilterRes("npc_king_yolkar")
+    }
+
+    private fun blockGoblinGuards(message: String): NucleusChatFilterRes? {
+        if (!shouldBlock(CrystalNucleusMessageTypes.NPC_GOBLIN_GUARDS)) return null
+        if (!message.startsWith("§c[GUARD]")) return null
+        return NucleusChatFilterRes("npc_goblin_guard")
     }
 
     private fun blockKeepers(message: String): NucleusChatFilterRes? {
