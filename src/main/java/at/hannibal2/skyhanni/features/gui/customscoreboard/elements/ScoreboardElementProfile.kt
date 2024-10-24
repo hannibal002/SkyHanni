@@ -22,7 +22,7 @@ object ScoreboardElementProfile : ScoreboardElement() {
         }
     }
 
-    override val configLine = "§7♲ Blueberry"
+    override val configLine = "§7♲ Ironman"
 }
 
 // click: does a command for profile management exist?
