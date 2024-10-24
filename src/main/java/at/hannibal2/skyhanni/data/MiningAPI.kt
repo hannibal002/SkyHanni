@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.MiningJson
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ColdUpdateEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.mining.OreMinedEvent
@@ -123,6 +125,8 @@ object MiningAPI {
 
     var currentAreaOreBlocks = setOf<OreBlock>()
         private set
+
+    val blockStrengths = mutableMapOf<OreBlock, Int>()
 
     private val allowedSoundNames = setOf("dig.glass", "dig.stone", "dig.gravel", "dig.cloth", "random.orb")
 
@@ -423,5 +427,16 @@ object MiningAPI {
         inSpidersDen = IslandType.SPIDER_DEN.isInIsland()
 
         currentAreaOreBlocks = OreBlock.entries.filter { it.checkArea() }.toSet()
+    }
+
+    @SubscribeEvent
+    fun onRepositoryReload(event: RepositoryReloadEvent) {
+        val repo = event.getConstant<MiningJson>("Mining")
+
+        blockStrengths.clear()
+        repo.blockStrengths.forEach { (key, value) ->
+            val ore = OreBlock.getByNameOrNull(key) ?: return@forEach
+            blockStrengths[ore] = value
+        }
     }
 }
