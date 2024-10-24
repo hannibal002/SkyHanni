@@ -92,6 +92,7 @@ object CrystalNucleusChatFilter {
      * REGEX-TEST: §rYou've brought me all of the components... I think? To be honest, I kind of lost count...
      * REGEX-TEST: Wait a minute. This will work just fine.
      */
+    @Suppress("MaxLineLength")
     private val componentSubmittedPattern by patternGroup.pattern(
         "precursor.submitted",
         ".*(Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>(\\d|one)) more).*",
