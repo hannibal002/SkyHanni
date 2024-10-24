@@ -21,6 +21,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -108,7 +109,7 @@ object CakeTracker {
         val cakesOwned: MutableSet<Int> = mutableSetOf()
 
         @Expose
-        val cakesMissing: MutableSet<Int> = mutableSetOf()
+        var cakesMissing: MutableSet<Int> = mutableSetOf()
     }
 
     private fun addCake(cakeYear: Int) {
@@ -221,6 +222,7 @@ object CakeTracker {
             cakeNamePattern.matchMatcher(item.stack.displayName) {
                 group("year")?.toInt()
                 cakeNamePattern.matchGroup(item.stack.displayName, "year")?.toInt()
+            }
         }
 
         val addedYears = currentYears.filter { it !in knownCakesInCurrentInventory }
@@ -235,10 +237,9 @@ object CakeTracker {
     }
 
     private fun recalculateMissingCakes() {
-        val cakeTrackerData = getCakeTrackerData() ?: return
         tracker.modify {
             it.cakesMissing = (1..currentYear).filterNot { year ->
-                cakeTrackerData.cakesOwned.contains(year)
+                year !in it.cakesOwned
             }.toMutableSet()
         }
     }
