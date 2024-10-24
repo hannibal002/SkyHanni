@@ -253,7 +253,7 @@ object CrystalNucleusChatFilter {
         }
 
         if (message.contains("You found all of the items!")) {
-            return NucleusChatFilterRes("", "§e[NPC] §6Keeper of §6${lastKeeper}§f: §rAll tools submitted.")
+            return NucleusChatFilterRes("", "§e[NPC] §6Keeper of §6$lastKeeper§f: §rAll tools submitted.")
         }
 
         return NucleusChatFilterRes("npc_divan_keeper")
