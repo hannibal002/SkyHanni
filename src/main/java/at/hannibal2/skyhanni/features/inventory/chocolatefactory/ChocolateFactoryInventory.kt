@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawBorder
 import at.hannibal2.skyhanni.utils.RegexUtils.matchFirst
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSlotText
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
@@ -26,13 +27,27 @@ object ChocolateFactoryInventory {
         if (!ChocolateFactoryAPI.inChocolateFactory) return
         if (!config.highlightUpgrades) return
 
-
         for (slot in InventoryUtils.getItemsInOpenChest()) {
             if (slot.stack == null) continue
             val slotIndex = slot.slotNumber
 
             if (slotIndex == ChocolateFactoryAPI.bestPossibleSlot) {
-                event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, "§6✦", 1f)
+                slot drawBorder LorenzColor.GOLD.addOpacity(255)
+            }
+
+            if (config.showAllBestUpgrades && slotIndex in ChocolateFactoryAPI.allBestPossibleUpgrades.keys) {
+                val current = ChocolateFactoryAPI.factoryUpgrades.find { it.slotIndex == slotIndex }
+                val upgrades = ChocolateFactoryAPI.allBestPossibleUpgrades[slotIndex] ?: continue
+                if (upgrades.isEmpty()) continue
+
+                val upgrade = upgrades.last()
+
+                if (current?.isMaxed == true) continue
+
+                val dif = upgrade.level - (current?.level ?: 0) + 1
+
+                val color = LorenzColor.AQUA
+                event.drawSlotText(slot.xDisplayPosition + 18, slot.yDisplayPosition, color.getChatColor() + dif, 1f)
             }
         }
     }
@@ -52,6 +67,7 @@ object ChocolateFactoryInventory {
                     slot highlight LorenzColor.GREEN.addOpacity(75)
                 }
             }
+
             if (slotIndex == ChocolateFactoryAPI.bestAffordableSlot) {
                 slot highlight LorenzColor.GREEN.addOpacity(200)
             }
