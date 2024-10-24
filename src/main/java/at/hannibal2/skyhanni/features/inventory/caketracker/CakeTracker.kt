@@ -1,6 +1,9 @@
 package at.hannibal2.skyhanni.features.inventory.caketracker
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -81,7 +84,7 @@ object CakeTracker {
      */
     private val auctionBrowserPattern by patternGroup.pattern(
         "auction.search",
-        "^(?:Auctions Browser|Auctions: \".*)$",
+        "Auctions Browser|Auctions: \".*",
     )
 
     /**
@@ -102,15 +105,15 @@ object CakeTracker {
         }
 
         @Expose
-        var cakesOwned: MutableSet<Int> = mutableSetOf()
+        val cakesOwned: MutableSet<Int> = mutableSetOf()
 
         @Expose
-        var cakesMissing: MutableSet<Int> = mutableSetOf()
+        val cakesMissing: MutableSet<Int> = mutableSetOf()
     }
 
     private fun addCake(cakeYear: Int) {
         val cakeTrackerData = getCakeTrackerData() ?: return
-        if (!cakeTrackerData.cakesOwned.contains(cakeYear)) {
+        if (cakeYear !in cakeTrackerData.cakesOwned) {
             tracker.modify {
                 it.cakesOwned.add(cakeYear)
             }
@@ -120,7 +123,7 @@ object CakeTracker {
 
     private fun removeCake(cakeYear: Int) {
         val cakeTrackerData = getCakeTrackerData() ?: return
-        if (cakeTrackerData.cakesOwned.contains(cakeYear)) {
+        if (cakeYear in cakeTrackerData.cakesOwned) {
             tracker.modify {
                 it.cakesOwned.remove(cakeYear)
             }
@@ -129,6 +132,15 @@ object CakeTracker {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetcaketracker") {
+            description = "Resets the New Year Cake Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
+    }
 
     @SubscribeEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -366,9 +378,5 @@ object CakeTracker {
 
             cakeRanges.forEach { add(it.getRenderable(config.displayType).toSearchable("${it.start}")) }
         }
-    }
-
-    fun resetCommand() {
-        tracker.resetCommand()
     }
 }

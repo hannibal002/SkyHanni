@@ -56,7 +56,6 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FFGuideGUI
 import at.hannibal2.skyhanni.features.garden.pests.PestFinder
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorDropStatistics
-import at.hannibal2.skyhanni.features.inventory.caketracker.CakeTracker
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.mining.KingTalismanHelper
@@ -392,11 +391,6 @@ object Commands {
             description = "Resets the Fossil Excavator Profit Tracker"
             category = CommandCategory.USERS_RESET
             callback { ExcavatorProfitTracker.resetCommand() }
-        }
-        event.register("shresetcaketracker") {
-            description = "Resets the New Year Cake Tracker"
-            category = CommandCategory.USERS_RESET
-            callback { CakeTracker.resetCommand() }
         }
 
         // non trackers
