@@ -130,6 +130,7 @@ object CustomScoreboard {
     internal val alignmentConfig get() = displayConfig.alignment
     internal val arrowConfig get() = displayConfig.arrow
     internal val chunkedConfig get() = displayConfig.chunkedStats
+    internal val customLineConfig get() = displayConfig.customLines
     internal val eventsConfig get() = displayConfig.events
     internal val mayorConfig get() = displayConfig.mayor
     internal val partyConfig get() = displayConfig.party

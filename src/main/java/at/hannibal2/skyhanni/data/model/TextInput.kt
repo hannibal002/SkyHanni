@@ -119,11 +119,11 @@ class TextInput {
             }
             val carriage = carriage
 
-            if (Keyboard.KEY_LEFT.isKeyClicked()) {
+            if (Keyboard.KEY_LEFT.isKeyHeld()) {
                 this.carriage = carriage?.moveCarriageLeft() ?: (textBox.length - 1)
                 return
             }
-            if (Keyboard.KEY_RIGHT.isKeyClicked()) {
+            if (Keyboard.KEY_RIGHT.isKeyHeld()) {
                 this.carriage = when {
                     carriage == null -> null
                     (carriage >= textBox.length - 1) -> null
