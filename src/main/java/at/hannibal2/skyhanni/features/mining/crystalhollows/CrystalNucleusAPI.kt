@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
@@ -50,6 +51,7 @@ object CrystalNucleusAPI {
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
         if (unCheckedBooks == 0) return
         if (event.itemStack.displayName != "§fEnchanted Book") return
+        ChatUtils.chat("Adding book. Loot size: ${loot.size}, unCheckedBooks: $unCheckedBooks")
         when (event.itemStack.getEnchantments()?.keys?.firstOrNull() ?: return) {
             "lapidary" -> loot.addOrPut(LAPIDARY_I_BOOK_ITEM, 1)
             "fortune" -> loot.addOrPut(FORTUNE_IV_BOOK_ITEM, 1)
@@ -81,12 +83,14 @@ object CrystalNucleusAPI {
         val message = event.message
 
         if (startPattern.matches(message)) {
+            unCheckedBooks = 0
             inLoot = true
             return
         }
         if (!inLoot) return
 
         if (endPattern.matches(message)) {
+            ChatUtils.chat("End pattern matched. Loot size: ${loot.size}, unCheckedBooks: $unCheckedBooks")
             // If there are unchecked books, the loot is not complete, and will be finished in the
             // pickup event handler.
             inLoot = false
@@ -103,6 +107,7 @@ object CrystalNucleusAPI {
             ItemUtils.readItemAmount(lootMessage)?.let { pair ->
                 if (pair.first.startsWith("§fEnchanted")) {
                     unCheckedBooks += pair.second
+                    ChatUtils.chat("Found enchanted book: ${pair.first}, amount: ${pair.second}, unCheckedBooks: $unCheckedBooks")
                     return
                 }
                 val item = fromItemNameOrNull(pair.first) ?: return
