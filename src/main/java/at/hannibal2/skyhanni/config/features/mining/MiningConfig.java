@@ -38,6 +38,11 @@ public class MiningConfig {
     public AreaWallsConfig crystalHollowsAreaWalls = new AreaWallsConfig();
 
     @Expose
+    @ConfigOption(name = "Crystal Nucleus Tracker", desc = "")
+    @Accordion
+    public CrystalNucleusTrackerConfig crystalNucleusTracker = new CrystalNucleusTrackerConfig();
+
+    @Expose
     @ConfigOption(name = "Cold Overlay", desc = "")
     @Accordion
     public ColdOverlayConfig coldOverlay = new ColdOverlayConfig();
