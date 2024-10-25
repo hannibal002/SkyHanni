@@ -29,6 +29,7 @@ jobs:
                 run: |
                   ./gradlew detektMain --stacktrace
             -   name: Check if SARIF file exists
+                if: always()
                 id: check_sarif
                 run: |
                     if [ -f "versions/1.8.9/build/reports/detekt/main.sarif" ]; then
