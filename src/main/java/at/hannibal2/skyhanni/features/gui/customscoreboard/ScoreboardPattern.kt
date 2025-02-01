@@ -637,10 +637,20 @@ object ScoreboardPattern {
 
     /**
      * REGEX-TEST: §d5th Anniversary§f 167:59:54
+     * REGEX-TEST: §bCentury Raffle§f 124:00:00
      */
     val anniversaryPattern by miscSB.pattern(
         "anniversary",
-        "§d\\d+(?:st|nd|rd|th) Anniversary§f (?:\\d|:)+",
+        "(?:§d\\d+(?:st|nd|rd|th) Anniversary|§bCentury Raffle)§f (?:\\d|:)+",
+    )
+
+    /**
+     * REGEX-TEST: §bCentury Raffle§f 124:00:00
+     * To fix custom scoreboard erroring every second
+     */
+    val tempRafflePattern by miscSB.pattern(
+        "tempfix",
+        "§bCentury Raffle§f (?:\\d|:)+",
     )
 
     // this thirdObjectiveLinePattern includes all those weird objective lines that go into a third (and fourth) scoreboard line
@@ -663,10 +673,13 @@ object ScoreboardPattern {
      * REGEX-TEST: §eFind a Jungle Key
      * REGEX-TEST: §eFind the 4 Missing Pieces
      * REGEX-TEST: §eTalk to the Goblin King
+     * REGEX-TEST: §eBring items to Moby
+     * REGEX-TEST:  Glowing Mushroom §8x8
      */
+    @Suppress("MaxLineLength")
     val wtfAreThoseLinesPattern by miscSB.pattern(
         "wtfarethoselines",
-        "§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King",
+        "§eMine \\d+ .*|§eKill 100 Automatons|§eFind a Jungle Key|§eFind the \\d+ Missing Pieces?|§eTalk to the Goblin King|§eBring items to Moby| Glowing Mushroom §8x\\d",
     )
     val darkAuctionCurrentItemPattern by miscSB.pattern(
         "darkauction.currentitem",
