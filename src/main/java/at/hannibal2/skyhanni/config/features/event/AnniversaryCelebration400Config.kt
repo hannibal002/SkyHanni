@@ -17,7 +17,7 @@ class AnniversaryCelebration400Config {
     @FeatureToggle
     var teamFinder: Boolean = true
 
-    @ConfigOption(name = "Pink", desc = "Change all the colors!")
+    @ConfigOption(name = "Color", desc = "Change all the colors!")
     @Accordion
     @Expose
     var colors: AnniversaryTeamFinderColorConfig = AnniversaryTeamFinderColorConfig()
