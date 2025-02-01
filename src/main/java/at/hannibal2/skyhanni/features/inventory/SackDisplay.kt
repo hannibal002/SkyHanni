@@ -213,7 +213,7 @@ object SackDisplay {
             addRenderableButton<ItemPriceSource>(
                 label = "Price Source",
                 current = config.priceSource,
-                getName = { it?.sellName.orEmpty() },
+                getName = { it.sellName },
                 onChange = {
                     config.priceSource = it
                     update(false)

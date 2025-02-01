@@ -156,7 +156,7 @@ object FishingProfitTracker {
                 current = currentCategory,
                 getName = { it + " §7(" + amounts[it] + ")" },
                 onChange = {
-                    currentCategory = it ?: error("category can not be null")
+                    currentCategory = it
                     tracker.update()
                 },
                 universe = list,

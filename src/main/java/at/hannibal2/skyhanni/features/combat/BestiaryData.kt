@@ -366,21 +366,22 @@ object BestiaryData {
             },
         )
 
-        // TODO add boolean support
+        // TODO add function that expects a boolean
         addRenderableButton<NumberType>(
             label = "Number Type",
             current = NumberType.entries[if (config.replaceRoman) 0 else 1],
-            getName = { it?.type.orEmpty() },
+            getName = { it.type },
             onChange = {
                 config.replaceRoman = !config.replaceRoman
                 update()
             },
         )
 
+        // TODO add function that expects a boolean
         addRenderableButton<HideMaxed>(
             label = "Hide Maxed",
             current = HideMaxed.entries[if (config.hideMaxed) 1 else 0],
-            getName = { it?.type.orEmpty() },
+            getName = { it.type },
             onChange = {
                 config.hideMaxed = !config.hideMaxed
                 update()

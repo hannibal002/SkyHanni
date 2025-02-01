@@ -20,7 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
@@ -154,11 +154,11 @@ open class SkyHanniTracker<Data : TrackerData>(
     private val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + extraDisplayModes.keys
 
     private fun MutableList<Renderable>.buildDisplayModeView() {
-        addRenderableButton<DisplayMode>(
+        addRenderableNullableButton<DisplayMode>(
             label = "Display Mode",
             current = getDisplayMode(),
             onChange = { new ->
-                if (new == null) return@addRenderableButton
+                if (new == null) return@addRenderableNullableButton
                 displayMode = new
                 storedTrackers[name] = new
                 update()
@@ -252,7 +252,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             lists.addButton<ItemPriceSource>(
                 label = "Price Source",
                 current = config.priceSource,
-                getName = { it?.sellName.orEmpty() },
+                getName = { it.sellName },
                 onChange = {
                     config.priceSource = it
                     update()

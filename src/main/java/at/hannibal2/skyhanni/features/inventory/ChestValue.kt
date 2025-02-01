@@ -164,11 +164,11 @@ object ChestValue {
             },
         )
 
-        // TODO boolean support
+        // TODO add function that expects a boolean
         addRenderableButton<DisplayType>(
             label = "Display Type",
             current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
-            getName = { it?.type.orEmpty() },
+            getName = { it.type },
             onChange = {
                 config.alignedDisplay = !config.alignedDisplay
                 update()
