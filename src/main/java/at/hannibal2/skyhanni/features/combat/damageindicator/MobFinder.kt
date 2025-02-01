@@ -239,7 +239,7 @@ class MobFinder {
             val (extraDelay, bossType) = checkExtraF6GiantsDelay(entity)
             return EntityResult(
                 floor6GiantsSpawnTime + extraDelay,
-                floor6GiantsSpawnTime + extraDelay > System.currentTimeMillis(),
+                floor6GiantsSpawnTime + extraDelay + 1_000 > System.currentTimeMillis(),
                 bossType = bossType,
             )
         }
@@ -469,15 +469,15 @@ class MobFinder {
     private fun checkExtraF6GiantsDelay(entity: EntityGiantZombie): Pair<Long, BossType> {
         val uuid = entity.uniqueID
 
-        floor6GiantsSeparateDelay[uuid]?.let {
-            return it
+        if (floor6GiantsSeparateDelay.contains(uuid)) {
+            return floor6GiantsSeparateDelay[uuid]!!
         }
 
         val middle = LorenzVec(-8, 0, 56)
 
         val loc = entity.getLorenzVec()
 
-        val pos: Int
+        var pos = 0
 
         val type: BossType
         if (loc.x > middle.x && loc.z > middle.z) {
@@ -502,7 +502,7 @@ class MobFinder {
         }
 
         val extraDelay = 900L * pos
-        val pair = extraDelay to type
+        val pair = Pair(extraDelay, type)
         floor6GiantsSeparateDelay[uuid] = pair
 
         return pair
@@ -592,7 +592,7 @@ class MobFinder {
             "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
                 floor6Giants = false
                 floor6Sadan = true
-                floor6SadanSpawnTime = System.currentTimeMillis() + 32_500 - 11_500
+                floor6SadanSpawnTime = System.currentTimeMillis() + 32_500
             }
 
             "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
