@@ -151,15 +151,15 @@ object FishingProfitTracker {
         }
 
         if (tracker.isInventoryOpen()) {
-            // TODO change
-            addButton(
-                prefix = "§7Category: ",
-                getName = currentCategory + " §7(" + amounts[currentCategory] + ")",
+            addButton<String>(
+                label = "Category",
+                current = currentCategory,
+                getName = { it + " §7(" + amounts[it] + ")" },
                 onChange = {
-                    val id = list.indexOf(currentCategory)
-                    currentCategory = list[(id + 1) % list.size]
+                    currentCategory = it ?: error("category can not be null")
                     tracker.update()
                 },
+                universe = list,
             )
         }
 

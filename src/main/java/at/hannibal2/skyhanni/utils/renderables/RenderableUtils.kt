@@ -212,34 +212,6 @@ internal object RenderableUtils {
         }.toSearchable()
     }
 
-    @Deprecated("do not use", ReplaceWith(""))
-    inline fun MutableList<Searchable>.addButton(
-        prefix: String,
-        getName: String,
-        crossinline onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                ChatUtils.lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-        add(
-            Renderable.line {
-                addString(prefix)
-                addString("§a[")
-                if (tips.isEmpty()) {
-                    add(Renderable.link("§e$getName", false, onClick))
-                } else {
-                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                }
-                addString("§a]")
-            }.toSearchable(),
-        )
-    }
-
     fun MutableList<Renderable>.addCenteredString(string: String) =
         this.add(Renderable.string(string, horizontalAlign = HorizontalAlignment.CENTER))
 }
