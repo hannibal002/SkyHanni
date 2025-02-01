@@ -67,8 +67,12 @@ object Year400Features {
         if (colorInHand == new) return
         colorInHand = new
 
-        new?.let {
-            updateAllPlayers(it)
+        if (new != null) {
+            updateAllPlayers(new)
+        } else {
+            for (mob in MobData.players) {
+                mob.highlight(null)
+            }
         }
     }
 
@@ -114,9 +118,9 @@ object Year400Features {
         }
         playerColors[mob] = cakeColor
 
-        colorInHand?.let {
-            mob.setColor(cakeColor.color, it)
-        }
+        val colorInHand = colorInHand ?: return
+        val lorenzColor = if (colorInHand == cakeColor) colorInHand.color else LorenzColor.DARK_GRAY
+        mob.setColor(lorenzColor, colorInHand)
     }
 
     private fun Mob.setColor(color: LorenzColor, currentHand: CakeColor?) {
