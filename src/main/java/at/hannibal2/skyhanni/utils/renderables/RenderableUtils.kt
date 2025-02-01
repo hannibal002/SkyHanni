@@ -141,8 +141,8 @@ internal object RenderableUtils {
             createButtonNew(
                 label,
                 current,
-                getName = { getName(it!!) },
-                onChange = { onChange(it!!) },
+                getName = { getName(it ?: error("it is null in non-nullable getName()")) },
+                onChange = { onChange(it ?: error("it is null in non-nullable onChange()")) },
                 universe,
                 enableUniverseScroll,
             ),
@@ -161,8 +161,8 @@ internal object RenderableUtils {
             createButtonNew(
                 label,
                 current,
-                getName = { getName(it!!) },
-                onChange = { onChange(it!!) },
+                getName = { getName(it ?: error("it is null in non-nullable getName()")) },
+                onChange = { onChange(it ?: error("it is null in non-nullable onChange()")) },
                 universe,
                 enableUniverseScroll,
             ).renderable,
