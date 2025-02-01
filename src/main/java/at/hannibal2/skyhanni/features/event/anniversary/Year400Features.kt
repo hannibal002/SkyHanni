@@ -2,9 +2,11 @@ package at.hannibal2.skyhanni.features.event.anniversary
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.features.event.AnniversaryTeamFinderColorConfig
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
 import at.hannibal2.skyhanni.data.mob.Mob
 import at.hannibal2.skyhanni.data.mob.MobData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
@@ -12,7 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -21,10 +23,12 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.client.entity.EntityOtherPlayerMP
-import net.minecraft.entity.EntityLivingBase
+import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
@@ -76,13 +80,24 @@ object Year400Features {
         }
     }
 
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        with(config.colors) {
+            ConditionalUtils.onToggle(wrong, pink, blue, yellow, green, red) {
+                colorInHand?.let {
+                    updateAllPlayers(it)
+                }
+            }
+        }
+    }
+
     private fun updateAllPlayers(colorInHand: CakeColor) {
         val correctColor = colorInHand.color
 
         val correctPlayers = playerColors.filter { it.value == colorInHand }.keys
 
         for (mob in MobData.players) {
-            val color = if (mob in correctPlayers) correctColor else LorenzColor.DARK_GRAY
+            val color = if (mob in correctPlayers) correctColor else wrongColor()
             mob.setColor(color, colorInHand)
         }
     }
@@ -102,13 +117,13 @@ object Year400Features {
             group("color")
         } ?: run {
             if (colorInHand != null) {
-                mob.setColor(LorenzColor.DARK_GRAY, null)
+                mob.setColor(wrongColor(), null)
             }
             return
         }
 
         val color = colorCode.toCharArray().first().toLorenzColor()
-        val cakeColor = CakeColor.entries.find { it.color == color } ?: run {
+        val cakeColor = CakeColor.entries.find { it.lorenzColor == color } ?: run {
             ErrorManager.logErrorStateWithData(
                 "Unknown slice of cake color",
                 "Unknown slice of cake color",
@@ -121,12 +136,12 @@ object Year400Features {
         playerColors[mob] = cakeColor
 
         val colorInHand = colorInHand ?: return
-        val lorenzColor = if (colorInHand == cakeColor) colorInHand.color else LorenzColor.DARK_GRAY
+        val lorenzColor = if (colorInHand == cakeColor) colorInHand.color else wrongColor()
         mob.setColor(lorenzColor, colorInHand)
     }
 
-    private fun Mob.setColor(color: LorenzColor, currentHand: CakeColor?) {
-        highlight(color.toColor().addAlpha(1)) { config.teamFinder && colorInHand == currentHand }
+    private fun Mob.setColor(color: Color, currentHand: CakeColor?) {
+        highlight(color) { config.teamFinder && colorInHand == currentHand }
     }
 
     @HandleEvent
@@ -156,16 +171,25 @@ object Year400Features {
         lastClickedPlayer = null
         lastClickedPlayerTime = SimpleTimeMark.farPast()
 
-        lastPlayer.setColor(LorenzColor.DARK_GRAY, colorInHand)
+        lastPlayer.setColor(wrongColor(), colorInHand)
+        config
     }
 
-    enum class CakeColor(val id: String, val color: LorenzColor) {
-        PINK("SLICE_OF_STRAWBERRY_SHORTCAKE", LorenzColor.LIGHT_PURPLE),
-        BLUE("SLICE_OF_BLUEBERRY_CAKE", LorenzColor.BLUE),
-        YELLOW("SLICE_OF_CHEESECAKE", LorenzColor.YELLOW),
-        GREEN("SLICE_OF_GREEN_VELVET_CAKE", LorenzColor.GREEN),
-        RED("SLICE_OF_RED_VELVET_CAKE", LorenzColor.RED),
+    private fun wrongColor() = config.colors.wrong.get().toSpecialColor()
+
+    enum class CakeColor(
+        id: String,
+        val lorenzColor: LorenzColor,
+        private val colorConfig: (AnniversaryTeamFinderColorConfig) -> Property<String>,
+    ) {
+        PINK("SLICE_OF_STRAWBERRY_SHORTCAKE", LorenzColor.LIGHT_PURPLE, { it.pink }),
+        BLUE("SLICE_OF_BLUEBERRY_CAKE", LorenzColor.BLUE, { it.blue }),
+        YELLOW("SLICE_OF_CHEESECAKE", LorenzColor.YELLOW, { it.yellow }),
+        GREEN("SLICE_OF_GREEN_VELVET_CAKE", LorenzColor.GREEN, { it.green }),
+        RED("SLICE_OF_RED_VELVET_CAKE", LorenzColor.RED, { it.red }),
         ;
+
+        val color: Color get() = colorConfig(config.colors).get().toSpecialColor()
 
         val internalName = id.toInternalName()
     }
