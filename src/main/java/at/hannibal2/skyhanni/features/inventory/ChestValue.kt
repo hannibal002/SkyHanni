@@ -149,7 +149,6 @@ object ChestValue {
         addRenderableButton<SortingTypeEntry>(
             label = "Price Sorting",
             current = config.sortingType,
-            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.sortingType = it
                 update()
@@ -159,7 +158,6 @@ object ChestValue {
         addRenderableButton<NumberFormatEntry>(
             label = "Value Format",
             current = config.formatType,
-            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.formatType = it
                 update()

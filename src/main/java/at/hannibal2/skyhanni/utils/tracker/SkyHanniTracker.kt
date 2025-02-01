@@ -157,7 +157,6 @@ open class SkyHanniTracker<Data : TrackerData>(
         addRenderableButton<DisplayMode>(
             label = "Display Mode",
             current = getDisplayMode(),
-            getName = { it?.displayName.orEmpty() },
             onChange = { new ->
                 if (new == null) return@addRenderableButton
                 displayMode = new
@@ -263,10 +262,13 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    enum class DisplayMode(val displayName: String) {
+    enum class DisplayMode(private val displayName: String) {
         TOTAL("Total"),
         SESSION("This Session"),
         MAYOR("This Mayor"),
+        ;
+
+        override fun toString(): String = displayName
     }
 
     enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {

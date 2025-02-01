@@ -194,7 +194,6 @@ object SackDisplay {
         addRenderableButton<SortingTypeEntry>(
             label = "Sorted By",
             current = config.sortingType,
-            getName = { it?.displayName.orEmpty() },
             onChange = {
                 config.sortingType = it
                 update(false)
@@ -204,7 +203,6 @@ object SackDisplay {
         addRenderableButton<NumberFormatEntry>(
             label = "Number Format",
             current = config.numberFormat,
-            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.numberFormat = it
                 update(false)
@@ -225,7 +223,6 @@ object SackDisplay {
             addRenderableButton<PriceFormatEntry>(
                 label = "Price Source",
                 current = config.priceFormat,
-                getName = { it?.displayName.orEmpty() },
                 onChange = {
                     config.priceFormat = it
                     update(false)

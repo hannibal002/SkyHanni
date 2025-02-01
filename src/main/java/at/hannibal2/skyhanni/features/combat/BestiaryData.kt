@@ -351,7 +351,6 @@ object BestiaryData {
         addRenderableButton<NumberFormatEntry>(
             label = "Number Format",
             current = config.numberFormat,
-            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.numberFormat = it
                 update()
@@ -361,7 +360,6 @@ object BestiaryData {
         addRenderableButton<DisplayTypeEntry>(
             label = "Display Type",
             current = config.displayType,
-            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.displayType = it
                 update()

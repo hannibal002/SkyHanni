@@ -91,7 +91,7 @@ public class SackDisplayConfig {
         DESC_PRICE("Price Descending", 2),
         ASC_PRICE("Price Ascending", 3);
 
-        public final String displayName;
+        private final String displayName;
         private final int legacyId;
 
         SortingTypeEntry(String displayName, int legacyId) {
@@ -146,7 +146,7 @@ public class SackDisplayConfig {
         FORMATTED("Formatted", 0),
         UNFORMATTED("Unformatted", 1);
 
-        public final String displayName;
+        private final String displayName;
         private final int legacyId;
 
         PriceFormatEntry(String displayName, int legacyId) {

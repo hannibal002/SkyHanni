@@ -141,7 +141,7 @@ internal object RenderableUtils {
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableButton(
         label: String,
         current: T?,
-        crossinline getName: (T?) -> String,
+        crossinline getName: (T?) -> String = { it?.toString().orEmpty() },
         crossinline onChange: (T?) -> Unit,
         universe: List<T?> = enumValues<T>().toList(),
         enableUniverseScroll: Boolean = true,
