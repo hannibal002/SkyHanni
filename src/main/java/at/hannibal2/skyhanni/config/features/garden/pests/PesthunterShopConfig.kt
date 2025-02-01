@@ -12,9 +12,9 @@ class PesthunterShopConfig {
     @ConfigOption(name = "Enable", desc = "Enable the Pesthunter Shop Profit display.")
     @ConfigEditorBoolean
     @FeatureToggle
-    var pesthunterProfitEnabled: Boolean = false
+    var profitEnabled: Boolean = false
 
     @Expose
-    @ConfigLink(owner = PesthunterShopConfig::class, field = "pesthunterProfitEnabled")
-    var pesthunterProfitPos: Position = Position(206, 158, false, true)
+    @ConfigLink(owner = PesthunterShopConfig::class, field = "profitEnabled")
+    var profitPosition: Position = Position(160, 120)
 }

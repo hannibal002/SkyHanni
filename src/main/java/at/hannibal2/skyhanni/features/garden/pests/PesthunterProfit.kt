@@ -57,7 +57,7 @@ object PesthunterProfit {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
-        if (!config.pesthunterProfitEnabled) return
+        if (!config.profitEnabled) return
         if (event.inventoryName != "Pesthunter's Wares") return
 
         inInventory = true
@@ -131,7 +131,7 @@ object PesthunterProfit {
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         if (!inInventory) return
-        config.pesthunterProfitPos.renderRenderables(
+        config.profitPosition.renderRenderables(
             display,
             extraSpace = 5,
             posLabel = "Pesthunter Profit",
