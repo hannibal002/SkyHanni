@@ -4,13 +4,13 @@ import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils.openInventoryName
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -29,13 +29,14 @@ object ExperimentationTableApi {
 
     val superpairInventory = InventoryDetector(
         openInventory = { name ->
-            openExperiment = superpairsPattern.matchMatcher(name) {
+            currentExperiment = superpairsPattern.matchMatcher(name) {
                 Experiment.entries.find { it.nameString == group("experiment") }
             }
         },
-    ) { name -> superpairsPattern.matches(name) }
+    ) { name -> inventoriesPattern.matches(name) }
 
-    private var openExperiment: Experiment? = null
+    var currentExperiment: Experiment? = null
+        private set
 
     // <editor-fold desc="Patterns">
     /**
@@ -155,23 +156,26 @@ object ExperimentationTableApi {
     )
     // </editor-fold>
 
-    @Deprecated("outdated", ReplaceWith("this.openExperiment"))
-    fun getCurrentExperiment(): Experiment? = openExperiment
-
-    @HandleEvent
-    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
-        if (LorenzUtils.skyBlockIsland != IslandType.PRIVATE_ISLAND || !inTable) return
-
-        val entity = EntityUtils.getEntities<EntityArmorStand>().find {
-            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
-        } ?: return
-        val vec = entity.getLorenzVec()
-        if (storage?.tablePos != vec) storage?.tablePos = vec
-    }
-
     fun inDistanceToTable(max: Double): Boolean {
         val vec = LorenzVec.getBlockBelowPlayer()
         return storage?.tablePos?.let { it.distance(vec) <= max } ?: false
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onInventoryClosed(event: InventoryCloseEvent) {
+        currentExperiment = null
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.PRIVATE_ISLAND)
+    fun onInventoryUpdated(event: InventoryUpdatedEvent) {
+        if (!inTable) {
+            currentExperiment = null
+            return
+        }
+
+        storage?.tablePos = EntityUtils.getEntities<EntityArmorStand>().find {
+            it.wearingSkullTexture(EXPERIMENTATION_TABLE_SKULL)
+        }?.getLorenzVec().takeIf { it != storage?.tablePos } ?: return
     }
 
     fun guardianPetActive(): Boolean = CurrentPetApi.currentPet?.cleanName == "Guardian"
