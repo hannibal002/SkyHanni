@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.core.config.gui.GuiPositionEditor
 import at.hannibal2.skyhanni.config.features.skillprogress.SkillProgressBarConfig
 import at.hannibal2.skyhanni.data.GuiData
 import at.hannibal2.skyhanni.data.HighlightOnHoverSlot
+import at.hannibal2.skyhanni.data.RenderData
 import at.hannibal2.skyhanni.data.ToolTipData
 import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.features.chroma.ChromaShaderManager
@@ -18,11 +19,12 @@ import at.hannibal2.skyhanni.utils.GuiRenderUtils
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.renderOnScreen
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
@@ -45,6 +47,7 @@ import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
+@Suppress("TooManyFunctions")
 interface Renderable {
 
     val width: Int
@@ -70,7 +73,6 @@ interface Renderable {
 
         val logger = LorenzLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
-            set
 
         fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition
@@ -82,7 +84,7 @@ interface Renderable {
             }
         }
 
-        fun fromAny(any: Any?, itemScale: Double = NEUItems.itemFontSize): Renderable? = when (any) {
+        fun fromAny(any: Any?, itemScale: Double = NeuItems.itemFontSize): Renderable? = when (any) {
             null -> placeholder(12)
             is Renderable -> any
             is String -> string(any)
@@ -116,7 +118,6 @@ interface Renderable {
                     highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
                 onClick,
-                0,
                 bypassChecks,
                 condition,
             )
@@ -153,7 +154,22 @@ interface Renderable {
         fun clickable(
             render: Renderable,
             onClick: () -> Unit,
-            button: Int = 0,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+        ) = leftAndRightClickable(
+            render,
+            onClick = { if (it == Direction.LEFT) onClick() },
+            bypassChecks, condition,
+        )
+
+        enum class Direction {
+            LEFT,
+            RIGHT,
+        }
+
+        fun leftAndRightClickable(
+            render: Renderable,
+            onClick: (Direction) -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
         ) = object : Renderable {
@@ -163,8 +179,43 @@ interface Renderable {
             override val verticalAlign = render.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()) {
-                    onClick()
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
+                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+                }
+                render.render(posX, posY)
+            }
+        }
+
+        fun clickableAndScrollable(
+            render: Renderable,
+            onClick: (Direction) -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            scrollValue: ScrollValue = ScrollValue(),
+        ) = object : Renderable {
+            override val width = render.width
+            override val height = render.height
+            override val horizontalAlign = render.horizontalAlign
+            override val verticalAlign = render.verticalAlign
+
+            private val pureScrollInput = ScrollInput.Companion.PureVertical(scrollValue)
+
+            private fun ScrollInput.Companion.PureVertical.tryUpdateScroll() {
+                pureScrollInput.update(true)
+                when (asInt()) {
+                    -1 -> onClick(Direction.RIGHT) // Scroll Up -> Right Click
+                    1 -> onClick(Direction.LEFT) // Scroll Down -> Left Click
+                    else -> return
+                }
+                dispose()
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
+                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+                    else pureScrollInput.tryUpdateScroll()
                 }
                 render.render(posX, posY)
             }
@@ -241,8 +292,18 @@ interface Renderable {
             val guiScreen = Minecraft.getMinecraft().currentScreen
 
             val isGuiScreen = guiScreen != null
+
+            if (!isGuiScreen) {
+                return false
+            }
+
+//             never support grayed out inventories
+            if (RenderData.outsideInventory) {
+                return false
+            }
+
             if (bypassChecks) {
-                return isGuiScreen
+                return true
             }
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
@@ -253,7 +314,7 @@ interface Renderable {
 
             val openGui = guiScreen?.javaClass?.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
-            val neuFocus = NEUItems.neuHasFocus()
+            val neuFocus = NeuItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
             val isInSkytilsSettings =
                 openGui.let { it.startsWith("gg.skytils.vigilance.gui.") || it.startsWith("gg.skytils.skytilsmod.gui.") }
@@ -363,7 +424,7 @@ interface Renderable {
 
         fun itemStackWithTip(
             item: ItemStack,
-            scale: Double = NEUItems.itemFontSize,
+            scale: Double = NeuItems.itemFontSize,
             xSpacing: Int = 2,
             ySpacing: Int = 0,
             rescaleSkulls: Boolean = true,
@@ -379,13 +440,13 @@ interface Renderable {
                 horizontalAlign = horizontalAlign,
                 verticalAlign = verticalAlign,
             ),
-            item.getTooltip(Minecraft.getMinecraft().thePlayer, false),
+            item.getTooltipCompat(false),
             stack = item,
         )
 
         fun itemStack(
             item: ItemStack,
-            scale: Double = NEUItems.itemFontSize,
+            scale: Double = NeuItems.itemFontSize,
             xSpacing: Int = 2,
             ySpacing: Int = 1,
             rescaleSkulls: Boolean = true,
@@ -865,6 +926,10 @@ interface Renderable {
             }
         }
 
+        fun line(builderAction: MutableList<Renderable>.() -> Unit): Renderable {
+            return horizontalContainer(buildList { builderAction() })
+        }
+
         fun horizontalContainer(
             content: List<Renderable>,
             spacing: Int = 0,
@@ -974,8 +1039,12 @@ interface Renderable {
             bypassChecks: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+            showScrollableTipsInList: Boolean = false,
         ) = object : Renderable {
-            override val width = list.maxOf { it.width }
+            private val scrollUpTip = string("§7§oMore items above (scroll)")
+            private val scrollDownTip = string("§7§oMore items below (scroll)")
+
+            override var width = list.maxOf { it.width }
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1000,6 +1069,23 @@ interface Renderable {
                 var renderY = 0
                 var virtualY = 0
                 var found = false
+
+                // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
+                // there are more items above
+                if (showScrollableTipsInList && scroll.asInt() > 0) {
+                    width = maxOf(width, scrollUpTip.width)
+                    scrollUpTip.renderXAligned(posX, posY, width)
+                    GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                    renderY += scrollUpTip.height
+                    virtualY += scrollUpTip.height
+                }
+
+                val atScrollEnd = scroll.asInt() == virtualHeight - height
+                if (!atScrollEnd) {
+                    virtualY += scrollDownTip.height
+                    renderY += scrollDownTip.height
+                }
+
                 for (renderable in list) {
                     if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
                         renderable.renderXAligned(posX, posY + renderY, width)
@@ -1015,6 +1101,15 @@ interface Renderable {
                     }
                     virtualY += renderable.height
                 }
+
+                // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
+                // there are more items below
+                if (showScrollableTipsInList && virtualY > end) {
+                    width = maxOf(width, scrollDownTip.width)
+                    scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
+                    GlStateManager.translate(0f, scrollDownTip.height.toFloat(), 0f)
+                }
+
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }
@@ -1372,7 +1467,7 @@ interface Renderable {
             height: Int = 100,
             entityScale: Int = 30,
             padding: Int = 5,
-            color: Int? = null,
+            color: Color? = null,
             colorCondition: () -> Boolean = { true },
         ) = object : Renderable {
             override val width = width + 2 * padding

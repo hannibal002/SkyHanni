@@ -1,16 +1,15 @@
 package at.hannibal2.skyhanni.features.combat
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.features.combat.FlareConfig
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColor
-import at.hannibal2.skyhanni.utils.ColorUtils.toChromaColorInt
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.canBeSeen
 import at.hannibal2.skyhanni.utils.EntityUtils.hasSkullTexture
@@ -23,6 +22,8 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -32,7 +33,6 @@ import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.util.EnumParticleTypes
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.math.sin
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.minutes
@@ -43,7 +43,8 @@ object FlareDisplay {
 
     private val config get() = SkyHanniMod.feature.combat.flare
     private var display = emptyList<Renderable>()
-    private var flares = mutableListOf<Flare>()
+    private val flares = mutableListOf<Flare>()
+    private val enabled get() = config.enabled
 
     private var activeWarning = false
 
@@ -59,30 +60,30 @@ object FlareDisplay {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
+
+        if (config.flashScreen && activeWarning) {
+            val minecraft = Minecraft.getMinecraft()
+            val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+            Gui.drawRect(
+                0,
+                0,
+                minecraft.displayWidth,
+                minecraft.displayHeight,
+                (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
+            )
+            GlStateManager.color(1F, 1F, 1F, 1F)
+        }
+
         if (config.displayType == FlareConfig.DisplayType.WORLD) return
         config.position.renderRenderables(display, posLabel = "Flare Timer")
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
-        if (!isEnabled()) return
-        if (config.displayType == FlareConfig.DisplayType.GUI) return
-
-        for (flare in flares) {
-            val location = flare.location.add(-0.5, 0.0, -0.5)
-            val name = flare.type.displayName
-            val time = "§b${getRemainingTime(flare).format()}"
-            event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
-            event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
-        }
-    }
-
-    @SubscribeEvent
-    fun onSecondsPassed(event: SecondPassedEvent) {
-        if (!isEnabled()) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onSecondPassed(event: SecondPassedEvent) {
+        if (!enabled) return
         flares.removeIf { !it.entity.isEntityAlive }
         for (entity in EntityUtils.getAllEntities().filterIsInstance<EntityArmorStand>()) {
             if (!entity.canBeSeen()) continue
@@ -151,15 +152,26 @@ object FlareDisplay {
     private fun isAlreadyKnownFlare(entity: EntityArmorStand): Boolean =
         flares.any { it.entity.entityId == entity.entityId }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         flares.clear()
         display = emptyList()
     }
 
-    @SubscribeEvent
-    fun onRender(event: LorenzRenderWorldEvent) {
-        if (!isEnabled()) return
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!enabled) return
+
+        if (config.displayType != FlareConfig.DisplayType.GUI) {
+            for (flare in flares) {
+                val location = flare.location.add(-0.5, 0.0, -0.5)
+                val name = flare.type.displayName
+                val time = "§b${getRemainingTime(flare).format()}"
+                event.drawDynamicText(location, name, 1.5, ignoreBlocks = false)
+                event.drawDynamicText(location, time, 1.5, yOff = 10f, ignoreBlocks = false)
+            }
+        }
+
         if (config.outlineType == FlareConfig.OutlineType.NONE) return
 
         for (flare in flares) {
@@ -170,7 +182,7 @@ object FlareDisplay {
                 FlareType.WARNING -> config.warningColor
                 FlareType.ALERT -> config.alertColor
                 FlareType.SOS -> config.sosColor
-            }.toChromaColor()
+            }.toSpecialColor()
 
             when (config.outlineType) {
                 FlareConfig.OutlineType.FILLED -> {
@@ -190,24 +202,9 @@ object FlareDisplay {
         }
     }
 
-    @SubscribeEvent
-    fun onRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled() || !config.flashScreen || !activeWarning) return
-        val minecraft = Minecraft.getMinecraft()
-        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
-        Gui.drawRect(
-            0,
-            0,
-            minecraft.displayWidth,
-            minecraft.displayHeight,
-            (alpha shl 24) or (config.flashColor.toChromaColorInt() and 0xFFFFFF),
-        )
-        GlStateManager.color(1F, 1F, 1F, 1F)
-    }
-
-    @SubscribeEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
-        if (!isEnabled()) return
+        if (!enabled) return
         if (!config.hideParticles) return
 
         val location = event.location
@@ -224,6 +221,4 @@ object FlareDisplay {
         ALERT("§9Alert Flare", "+50%"),
         WARNING("§aWarning Flare", null),
     }
-
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
 }

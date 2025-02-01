@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.misc.reminders
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -17,7 +19,6 @@ import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.chat.Text.suggest
 import at.hannibal2.skyhanni.utils.chat.Text.wrap
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -33,8 +34,6 @@ object ReminderManager {
 
     private val storage get() = SkyHanniMod.feature.storage.reminders
     private val config get() = SkyHanniMod.feature.misc.reminders
-
-    private var listPage = 1
 
     private fun getSortedReminders() = storage.entries.sortedBy { it.value.remindAt }
 
@@ -102,7 +101,7 @@ object ReminderManager {
             if (args.size < arguments.size + 1) return ChatUtils.userError("/shremind $command -l $argumentText")
             if (storage[args.drop(1).first()] == null) return ChatUtils.userError("Reminder not found!")
             action(args.drop(2), storage[args.drop(1).first()]!!).apply {
-                listReminders(listPage)
+                listReminders(1)
                 sendMessage(this)
             }
         } else if (storage[args.first()] == null) {
@@ -154,7 +153,7 @@ object ReminderManager {
         Text.createDivider().send()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         val remindersToSend = mutableListOf<IChatComponent>()
 
@@ -198,12 +197,20 @@ object ReminderManager {
         }
     }
 
-    fun command(args: Array<String>) = when (args.firstOrNull()) {
+    private fun command(args: Array<String>) = when (args.firstOrNull()) {
         "list" -> listReminders(args.drop(1).firstOrNull()?.toIntOrNull() ?: 1)
         "remove", "delete" -> removeReminder(args.drop(1))
         "edit", "update" -> editReminder(args.drop(1))
         "move" -> moveReminder(args.drop(1))
         "help" -> help()
         else -> createReminder(args)
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shremind") {
+            description = "Set a reminder for yourself"
+            callback { command(it) }
+        }
     }
 }

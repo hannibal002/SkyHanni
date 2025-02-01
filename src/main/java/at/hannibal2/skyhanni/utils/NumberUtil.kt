@@ -38,9 +38,6 @@ object NumberUtil {
         ),
     )
 
-    @Deprecated("outdated", ReplaceWith("value.shortFormat(preciseBillions)"))
-    fun format(value: Number, preciseBillions: Boolean = false): String = value.shortFormat(preciseBillions)
-
     // 1234 -> 1.2k
     fun Number.shortFormat(preciseBillions: Boolean = false): String {
         return compactFormat(this, preciseBillions)
@@ -87,12 +84,6 @@ object NumberUtil {
     }
 
     fun Float.roundTo(precision: Int): Float = toDouble().roundTo(precision).toFloat()
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun Double.roundToPrecision(precision: Int) = this.roundTo(precision)
-
-    @Deprecated("Use roundTo instead", ReplaceWith("this.roundTo(precision)"))
-    fun Float.roundToPrecision(precision: Int) = this.roundTo(precision)
 
     fun Number.ordinal(): String {
         val long = this.toLong()
@@ -263,13 +254,15 @@ object NumberUtil {
 
     // Sometimes we just take an L, never find it and forget to write it down
     val Int.million get() = this * 1_000_000.0
-    private val Int.billion get() = this * 1_000_000_000.0
+    val Int.billion get() = this * 1_000_000_000.0
     val Double.million get() = (this * 1_000_000.0).toLong()
 
     /** @return clamped to [0.0, 1.0]**/
     fun Number.fractionOf(maxValue: Number) = maxValue.toDouble().takeIf { it != 0.0 }?.let { max ->
         this.toDouble() / max
     }?.coerceIn(0.0, 1.0) ?: 1.0
+
+    fun Int?.isPositive(): Boolean = (this ?: 0) > 0
 
     fun interpolate(now: Float, last: Float, lastUpdate: Long): Float {
         var interp = now
@@ -280,5 +273,7 @@ object NumberUtil {
         }
         return interp
     }
+
+    fun Int.intPow(n: Int): Int = toDouble().pow(n).toInt()
 
 }

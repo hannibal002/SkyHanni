@@ -47,6 +47,7 @@
       <w>chumcap</w>
       <w>cinderbat</w>
       <w>citrine</w>
+      <w>clickables</w>
       <w>clientbound</w>
       <w>coflnet</w>
       <w>coords</w>
@@ -143,7 +144,7 @@
       <w>livids</w>
       <w>locraw</w>
       <w>magmafish</w>
-      <w>matriach</w>
+      <w>matriarch</w>
       <w>mawdredge</w>
       <w>maxor</w>
       <w>mcmod</w>
@@ -249,6 +250,7 @@
       <w>soulflow</w>
       <w>soulsand</w>
       <w>soulweaver</w>
+      <w>spawnable</w>
       <w>sprayonator</w>
       <w>statspocalypse</w>
       <w>stillgore</w>
@@ -273,6 +275,7 @@
       <w>typhoeus</w>
       <w>ultrasequencer</w>
       <w>unobtained</w>
+      <w>unsummarized</w>
       <w>untrackable</w>
       <w>vermins</w>
       <w>viewrecipe</w>
@@ -284,6 +287,7 @@
       <w>wyld</w>
       <w>yoggie</w>
       <w>yolkar</w>
+      <w>zorros</w>
     </words>
   </dictionary>
 </component>

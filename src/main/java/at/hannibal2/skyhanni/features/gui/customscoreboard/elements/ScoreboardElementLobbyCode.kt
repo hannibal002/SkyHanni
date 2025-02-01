@@ -1,21 +1,25 @@
 package at.hannibal2.skyhanni.features.gui.customscoreboard.elements
 
+import at.hannibal2.skyhanni.data.DateFormat
 import at.hannibal2.skyhanni.data.HypixelData
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.data.MiningApi
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.gui.customscoreboard.CustomScoreboard
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
+import at.hannibal2.skyhanni.features.gui.customscoreboard.ScoreboardPattern
 
 // internal
 // update on island change and every second while in dungeons
 object ScoreboardElementLobbyCode : ScoreboardElement() {
-    private val formatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
-
     override fun getDisplay() = buildString {
-        if (CustomScoreboard.displayConfig.dateInLobbyCode) append("§7${LocalDate.now().format(formatter)} ")
-        HypixelData.serverId?.let { append("§8$it") }
-        DungeonAPI.roomId?.let { append(" §8$it") }
-    }
+        if (CustomScoreboard.displayConfig.dateInLobbyCode) append("§7${CustomScoreboard.displayConfig.dateFormat}")
+        listOfNotNull(
+            HypixelData.serverId,
+            DungeonApi.roomId,
+            MiningApi.mineshaftRoomId,
+        ).forEach { append(" §8$it") }
+    }.trim()
 
-    override val configLine = "§710/23/2024 §8mega77CK"
+    override val configLine = "§7${DateFormat.US_SLASH_MMDDYYYY} §8mega77CK"
+
+    override val elementPatterns = listOf(ScoreboardPattern.lobbyCodePattern)
 }
