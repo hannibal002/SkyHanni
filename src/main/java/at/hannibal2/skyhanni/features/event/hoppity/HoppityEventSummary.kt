@@ -551,8 +551,7 @@ object HoppityEventSummary {
 
     private fun checkEnded() {
         if (!config.eventSummary.enabled) return
-        val sbTimeNow = SkyBlockTime.now()
-        if (sbTimeNow.isSeasonBorder()) return
+        if (SkyBlockTime.now().isSeasonBorder()) return
 
         getUnsummarizedYearStats().filter {
             it.key < currentSbYear || (it.key == currentSbYear && !SkyblockSeason.SPRING.isSeason()) &&

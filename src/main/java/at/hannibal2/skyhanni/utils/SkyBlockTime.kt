@@ -54,7 +54,7 @@ data class SkyBlockTime(
         fun fromSBYear(year: Int): SkyBlockTime =
             fromInstant(Instant.ofEpochMilli(SKYBLOCK_EPOCH_START_MILLIS + (SKYBLOCK_YEAR_MILLIS * year)))
 
-        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeason.SkyblockSeasonModifier? = null): SkyBlockTime {
+        fun fromSeason(year: Int, season: SkyblockSeason, modifier: SkyblockSeasonModifier? = null): SkyBlockTime {
             return fromInstant(
                 Instant.ofEpochMilli(
                     SKYBLOCK_EPOCH_START_MILLIS +
