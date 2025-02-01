@@ -54,6 +54,11 @@ public class EventConfig {
     @Expose
     public CenturyConfig century = new CenturyConfig();
 
+    @ConfigOption(name = "400þ Anniversary Celebration", desc = "Features for the 400þ year of SkyBlock")
+    @Accordion
+    @Expose
+    public AnniversaryCelebration400Config anniversaryCelebration400 = new AnniversaryCelebration400Config();
+
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose
     public LobbyWaypointsConfig lobbyWaypoints = new LobbyWaypointsConfig();
