@@ -20,12 +20,18 @@ object TradeValue {
     val config get() = SkyHanniMod.feature.inventory.trade
 
     // other person's trade slots
-    val list = (5..8).flatMap { x ->
+    val otherList = (5..8).flatMap { x ->
         (0..3).map { y -> x + 9 * y }
     }.toSet()
 
-    private var prevTotal = 0.0
-    private var display = emptyList<Renderable>()
+    val yourList = (0..3).flatMap { x ->
+        (0..3).map { y -> x + 9 * y }
+    }.toSet()
+
+    private var otherPrevTotal = 0.0
+    private var yourPrevTotal = 0.0
+    private var otherDisplay = emptyList<Renderable>()
+    private var yourDisplay = emptyList<Renderable>()
 
     // Detects trade menu thx NEU
     val inventory = InventoryDetector { name -> name.startsWith("You     ") }
@@ -35,7 +41,8 @@ object TradeValue {
             inventory,
             condition = { isEnabled() },
         ) {
-            config.position.renderRenderables(display, posLabel = "Trade Value")
+            config.otherPosition.renderRenderables(otherDisplay, posLabel = "Trade Value")
+            config.yourPosition.renderRenderables(yourDisplay, posLabel = "Trade Value")
         }
     }
 
@@ -46,34 +53,61 @@ object TradeValue {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!inventory.isInside()) {
-            prevTotal = 0.0
-            update(emptyMap())
+            otherPrevTotal = 0.0
+            yourPrevTotal = 0.0
+            update(emptyMap(), TradeSide.You.ordinal)
+            update(emptyMap(), TradeSide.Other.ordinal)
             return
         }
-        var total = 0.0
-        val map = mutableMapOf<Int, ItemStack>()
+        var otherTotal = 0.0
+        var yourTotal = 0.0
+        val otherMap = mutableMapOf<Int, ItemStack>()
+        val yourMap = mutableMapOf<Int, ItemStack>()
         // Gets total value of trade
         for (slot in InventoryUtils.getItemsInOpenChest()) {
-            if (slot.slotIndex in list) {
-                map[slot.slotIndex] = slot.stack
+            // Gets value of their trade
+            if (slot.slotIndex in otherList) {
+                otherMap[slot.slotIndex] = slot.stack
                 val stack = slot.stack
-                total += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * stack.stackSize)
+                otherTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
+            }
+            // Gets value of your trade
+            if (slot.slotIndex in yourList) {
+                yourMap[slot.slotIndex] = slot.stack
+                val stack = slot.stack
+                yourTotal += (EstimatedItemValueCalculator.calculate(stack, mutableListOf()).first * (stack.stackSize))
             }
         }
-        println("total: ${total.shortFormat()}")
-        if (total != prevTotal) {
-            prevTotal = total
-            val items = ChestValue.createItems(map)
+        println("total: ${otherTotal.shortFormat()}")
+        println("total: ${yourTotal.shortFormat()}")
+        if (otherTotal != otherPrevTotal) {
+            otherPrevTotal = otherTotal
+            val otherItems = ChestValue.createItems(otherMap)
+            update(otherItems, TradeSide.Other.ordinal)
+        }
+        if (yourTotal != yourPrevTotal) {
+            yourPrevTotal = yourTotal
+            val yourItems = ChestValue.createItems(yourMap)
 
-            update(items)
+            update(yourItems, TradeSide.You.ordinal)
         }
     }
 
     // Display trade value breakdown
-    private fun update(items: Map<String, ChestValue.Item>) {
-        display = buildList {
-            addToList(items.values, "§eTrade Value")
+    private fun update(items: Map<String, ChestValue.Item>, indicator: Int = 0) {
+        if (indicator == 0) {
+            yourDisplay = buildList {
+                addToList(items.values, "§eTrade Value")
+            }
+        } else {
+            otherDisplay = buildList {
+                addToList(items.values, "§eTrade Value")
+            }
         }
     }
+}
 
+enum class TradeSide {
+    You,
+    Other
 }

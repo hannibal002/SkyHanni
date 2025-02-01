@@ -11,7 +11,7 @@ class TradeConfig {
     @Expose
     @ConfigOption(
         name = "Enabled",
-        desc = "Displays an overlay showing the total combined value of the items being offered by the other party",
+        desc = "Displays an overlay showing the total combined value of the trade",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -19,5 +19,9 @@ class TradeConfig {
 
     @Expose
     @ConfigLink(owner = TradeConfig::class, field = "enabled")
-    var position: Position = Position(-256, 140, false, true)
+    var otherPosition: Position = Position(-256, 140, false, true)
+
+    @Expose
+    @ConfigLink(owner = TradeConfig::class, field = "enabled")
+    var yourPosition: Position = Position(256, 140, false, true)
 }
