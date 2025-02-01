@@ -3,19 +3,20 @@ package at.hannibal2.skyhanni.features.event.anniversary
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.hypixel.chat.event.SystemMessageEvent
+import at.hannibal2.skyhanni.data.mob.Mob
+import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.DelayedRun
-import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
+import at.hannibal2.skyhanni.utils.MobUtils.mob
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -32,8 +33,8 @@ object Year400Features {
     private val config get() = SkyHanniMod.feature.event.anniversaryCelebration400
 
     private var colorInHand: CakeColor? = null
-    private val playerColors = mutableMapOf<Int, CakeColor?>()
-    private var lastClickedPlayer: Int? = null
+    private val playerColors = mutableMapOf<Mob, CakeColor?>()
+    private var lastClickedPlayer: Mob? = null
     private var lastClickedPlayerTime = SimpleTimeMark.farPast()
 
     private val chatGroup = RepoPattern.group("event.anniversary-celebration.400.team-finder")
@@ -66,17 +67,18 @@ object Year400Features {
         if (colorInHand == new) return
         colorInHand = new
 
-        updateAllPlayers(new)
+        new?.let {
+            updateAllPlayers(it)
+        }
     }
 
-    private fun updateAllPlayers(colorInHand: CakeColor?) {
-        val correctColor = colorInHand?.color ?: LorenzColor.DARK_GRAY
+    private fun updateAllPlayers(colorInHand: CakeColor) {
+        val correctColor = colorInHand.color
         val correctPlayers = playerColors.filter { it.value == colorInHand }.keys
 
-        for (entity in EntityUtils.getEntities<EntityOtherPlayerMP>()) {
-            if (entity.isNpc()) continue
-            val color = if (entity.entityId in correctPlayers) correctColor else LorenzColor.DARK_GRAY
-            entity.setColor(color, colorInHand)
+        for (mob in MobData.players) {
+            val color = if (mob in correctPlayers) correctColor else LorenzColor.DARK_GRAY
+            mob.setColor(color, colorInHand)
         }
     }
 
@@ -84,17 +86,17 @@ object Year400Features {
     fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
         val entity = event.mob.baseEntity
         DelayedRun.runDelayed(1.seconds) {
-            addPlayer(entity)
+            addPlayer(event.mob, entity)
         }
     }
 
-    private fun addPlayer(entity: EntityLivingBase) {
+    private fun addPlayer(mob: Mob, entity: EntityLivingBase) {
         val displayName = entity.displayName.formattedText
         val colorCode = playerColorNametagPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {
             if (colorInHand != null) {
-                entity.setColor(LorenzColor.DARK_GRAY, null)
+                mob.setColor(LorenzColor.DARK_GRAY, null)
             }
             return
         }
@@ -110,20 +112,20 @@ object Year400Features {
             )
             return
         }
-        playerColors[entity.entityId] = cakeColor
+        playerColors[mob] = cakeColor
 
         colorInHand?.let {
-            entity.setColor(cakeColor.color, it)
+            mob.setColor(cakeColor.color, it)
         }
     }
 
-    private fun EntityLivingBase.setColor(color: LorenzColor, currentHand: CakeColor?) {
-        RenderLivingEntityHelper.setEntityColor(this, color.toColor().addAlpha(1)) { config.teamFinder && colorInHand == currentHand }
+    private fun Mob.setColor(color: LorenzColor, currentHand: CakeColor?) {
+        highlight(color.toColor().addAlpha(1)) { config.teamFinder && colorInHand == currentHand }
     }
 
     @HandleEvent
     fun onRealPlayerDeSpawnEvent(event: MobEvent.DeSpawn.Player) {
-        playerColors.remove(event.mob.baseEntity.entityId)
+        playerColors.remove(event.mob)
     }
 
     @HandleEvent
@@ -133,7 +135,8 @@ object Year400Features {
         if (entity !is EntityOtherPlayerMP) return
         if (entity.isNpc()) return
 
-        lastClickedPlayer = entity.entityId
+        val mob = entity.mob ?: return
+        lastClickedPlayer = mob
         lastClickedPlayerTime = SimpleTimeMark.now()
     }
 
@@ -147,11 +150,7 @@ object Year400Features {
         lastClickedPlayer = null
         lastClickedPlayerTime = SimpleTimeMark.farPast()
 
-        EntityUtils.getEntityByID(lastPlayer)?.let {
-            if (it is EntityLivingBase) {
-                it.setColor(LorenzColor.DARK_GRAY, colorInHand)
-            }
-        }
+        lastPlayer.setColor(LorenzColor.DARK_GRAY, colorInHand)
     }
 
     enum class CakeColor(val id: String, val color: LorenzColor) {

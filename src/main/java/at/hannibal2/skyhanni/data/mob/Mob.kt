@@ -61,7 +61,7 @@ import java.util.UUID
  * Gives back the second additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
- * @property id Unique identifier for each Mob instance
+ * @property uniqueId Unique identifier for each Mob instance
  */
 class Mob(
     var baseEntity: EntityLivingBase,
@@ -75,7 +75,8 @@ class Mob(
     val levelOrTier: Int = -1,
 ) {
 
-    private val id: UUID = UUID.randomUUID()
+    private val uniqueId: UUID = UUID.randomUUID()
+    val id = baseEntity.entityId
 
     val owner: MobUtils.OwnerShip?
 
@@ -132,11 +133,17 @@ class Mob(
         }
     }
 
-    private fun internalHighlight() {
+    fun highlight(color: Color, condition: () -> Boolean) {
+        if (color == highlightColor) return
+        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+        internalHighlight(condition)
+    }
+
+    private fun internalHighlight(condition: () -> Boolean = { true }) {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() && condition() }
             }
         }
     }
@@ -235,7 +242,7 @@ class Mob(
 
     val centerCords get() = boundingBox.getBoxCenter()
 
-    override fun hashCode() = id.hashCode()
+    override fun hashCode() = uniqueId.hashCode()
 
     override fun toString(): String = "$name - ${baseEntity.entityId}"
 
@@ -243,7 +250,7 @@ class Mob(
         if (this === other) return true
         if (other !is Mob) return false
 
-        return id == other.id
+        return uniqueId == other.uniqueId
     }
 
     // TODO add max distance
