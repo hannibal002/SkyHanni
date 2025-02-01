@@ -221,7 +221,7 @@ object SackDisplay {
             )
 
             addRenderableButton<PriceFormatEntry>(
-                label = "Price Source",
+                label = "Price Format",
                 current = config.priceFormat,
                 onChange = {
                     config.priceFormat = it
