@@ -351,7 +351,7 @@ object BestiaryData {
         addRenderableButton<NumberFormatEntry>(
             label = "Number Format",
             current = config.numberFormat,
-            getName = { it?.displayName.orEmpty() },
+            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.numberFormat = it
                 update()
@@ -361,7 +361,7 @@ object BestiaryData {
         addRenderableButton<DisplayTypeEntry>(
             label = "Display Type",
             current = config.displayType,
-            getName = { it?.displayName.orEmpty() },
+            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.displayType = it
                 update()
@@ -456,17 +456,6 @@ object BestiaryData {
         INT("Normal (1, 2, 3)"),
         ROMAN("Roman (I, II, III)")
     }
-
-//     enum class DisplayType(val type: String) {
-//         GLOBAL_MAX("Global display (to max)"),
-//         GLOBAL_TIER("Global display (to next tier)"),
-//         LOWEST_TOTAL("Lowest total kills"),
-//         HIGHEST_TOTAL("Highest total kills"),
-//         LOWEST_NEEDED_MAX("Lowest kills needed to max"),
-//         HIGHEST_NEEDED_MAX("Highest kills needed to max"),
-//         LOWEST_NEEDED_TIER("Lowest kills needed to next tier"),
-//         HIGHEST_NEEDED_TIER("Highest kills needed to next tier"),
-//     }
 
     enum class HideMaxed(val type: String) {
         NO("Show"),

@@ -204,7 +204,7 @@ object SackDisplay {
         addRenderableButton<NumberFormatEntry>(
             label = "Number Format",
             current = config.numberFormat,
-            getName = { it?.displayName.orEmpty() },
+            getName = { it?.toString().orEmpty() },
             onChange = {
                 config.numberFormat = it
                 update(false)

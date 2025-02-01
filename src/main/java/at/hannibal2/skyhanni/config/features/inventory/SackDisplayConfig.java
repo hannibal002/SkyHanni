@@ -48,7 +48,7 @@ public class SackDisplayConfig {
         FORMATTED("Formatted", 1),
         UNFORMATTED("Unformatted", 2);
 
-        public final String displayName;
+        private final String displayName;
         private final int legacyId;
 
         NumberFormatEntry(String displayName, int legacyId) {
