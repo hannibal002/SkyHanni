@@ -96,8 +96,11 @@ object Year400Features {
 
         val correctPlayers = playerColors.filter { it.value == colorInHand }.keys
 
+        val wrongColor = wrongColor()
         for (mob in MobData.players) {
-            val color = if (mob in correctPlayers) correctColor else wrongColor()
+            val color = if (mob in correctPlayers) correctColor else {
+                wrongColor
+            }
             mob.setColor(color, colorInHand)
         }
     }
