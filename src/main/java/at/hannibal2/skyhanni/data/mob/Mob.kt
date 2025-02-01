@@ -63,6 +63,7 @@ import java.util.UUID
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
  * @property uniqueId Unique identifier for each Mob instance
  */
+@Suppress("TooManyFunctions")
 class Mob(
     var baseEntity: EntityLivingBase,
     val mobType: Type,

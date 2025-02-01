@@ -45,7 +45,7 @@ object Year400Features {
      */
     private val playerColorNametagPattern by chatGroup.pattern(
         "player-color-nametag",
-        ".* §(?<color>.)⛃(?:§7♲)?§r",
+        ".* §(?<color>.)⛃.*",
     )
 
     /**
@@ -91,13 +91,13 @@ object Year400Features {
     fun onTick(event: SkyHanniTickEvent) {
         for (mob in MobData.players) {
             if (mob !in playerColors) {
-                addPlayer(mob, mob.baseEntity)
+                addPlayer(mob)
             }
         }
     }
 
-    private fun addPlayer(mob: Mob, entity: EntityLivingBase) {
-        val displayName = entity.displayName.formattedText
+    private fun addPlayer(mob: Mob) {
+        val displayName = mob.baseEntity.displayName.formattedText
         val colorCode = playerColorNametagPattern.matchMatcher(displayName) {
             group("color")
         } ?: run {
