@@ -119,6 +119,7 @@ class Mob(
     fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getWholeInventory().isNullOrEmpty()
 
     private var highlightColor: Color? = null
+    private var condition: () -> Boolean = { true }
 
     /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
      * If [color] is set to null it removes a highlight*/
@@ -136,10 +137,11 @@ class Mob(
     fun highlight(color: Color, condition: () -> Boolean) {
         if (color == highlightColor) return
         highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
-        internalHighlight(condition)
+        this.condition = condition
+        internalHighlight()
     }
 
-    private fun internalHighlight(condition: () -> Boolean = { true }) {
+    private fun internalHighlight() {
         highlightColor?.let { color ->
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() && condition() }
             extraEntities.forEach {
