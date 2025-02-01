@@ -8,11 +8,11 @@ import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.entity.EntityClickEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -26,7 +26,6 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.entity.EntityLivingBase
 import kotlin.time.Duration.Companion.milliseconds
-import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object Year400Features {
@@ -42,10 +41,11 @@ object Year400Features {
     /**
      * REGEX-TEST: §r§8[§2172§8] §b_EliteNefarious §9⛃§r
      * REGEX-TEST: §r§8[§f72§8] §bBee181204 §a⛃§r
+     * REGEX-TEST: §r§8[§729§8] §ajeeerzy §e⛃§7♲§r
      */
     private val playerColorNametagPattern by chatGroup.pattern(
         "player-color-nametag",
-        ".* §(?<color>.)⛃§r",
+        ".* §(?<color>.)⛃(?:§7♲)?§r",
     )
 
     /**
@@ -78,6 +78,7 @@ object Year400Features {
 
     private fun updateAllPlayers(colorInHand: CakeColor) {
         val correctColor = colorInHand.color
+
         val correctPlayers = playerColors.filter { it.value == colorInHand }.keys
 
         for (mob in MobData.players) {
@@ -87,10 +88,11 @@ object Year400Features {
     }
 
     @HandleEvent(onlyOnSkyblock = true)
-    fun onPlayerSpawn(event: MobEvent.Spawn.Player) {
-        val entity = event.mob.baseEntity
-        DelayedRun.runDelayed(1.seconds) {
-            addPlayer(event.mob, entity)
+    fun onTick(event: SkyHanniTickEvent) {
+        for (mob in MobData.players) {
+            if (mob !in playerColors) {
+                addPlayer(mob, mob.baseEntity)
+            }
         }
     }
 

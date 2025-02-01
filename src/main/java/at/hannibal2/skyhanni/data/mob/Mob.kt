@@ -135,7 +135,6 @@ class Mob(
     }
 
     fun highlight(color: Color, condition: () -> Boolean) {
-        if (color == highlightColor) return
         highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
         this.condition = condition
         internalHighlight()
