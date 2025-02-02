@@ -331,7 +331,7 @@ object SkyBlockItemModifierUtils {
 
         companion object {
 
-            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name == name || it.displayName == name}
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name == name || it.displayName == name }
         }
     }
 

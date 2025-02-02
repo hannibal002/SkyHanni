@@ -210,9 +210,18 @@ object SackApi {
             ) ?: return@matchAll
 
             val (multiplier, priceUpdater) = when (quality) {
-                GemstoneQuality.ROUGH -> Pair(1) { price: Long -> gem.roughPrice = price; gem.rough = stored }
-                GemstoneQuality.FLAWED -> Pair(80) { price: Long -> gem.flawedPrice = price; gem.flawed = stored }
-                GemstoneQuality.FINE -> Pair(80 * 80) { price: Long -> gem.finePrice = price; gem.fine = stored }
+                GemstoneQuality.ROUGH -> Pair(1) { price: Long ->
+                    gem.roughPrice = price
+                    gem.rough = stored
+                }
+                GemstoneQuality.FLAWED -> Pair(80) { price: Long ->
+                    gem.flawedPrice = price
+                    gem.flawed = stored
+                }
+                GemstoneQuality.FINE -> Pair(80 * 80) { price: Long ->
+                    gem.finePrice = price
+                    gem.fine = stored
+                }
                 else -> return@matchAll
             }
 
@@ -275,7 +284,7 @@ object SackApi {
         if (savingSacks) sackData = ProfileStorageData.sackProfiles?.sackContents ?: return
         for (stackEntry in stackList) {
             when {
-                isGemstoneSack -> { stackEntry.processGemstoneItem(savingSacks)}
+                isGemstoneSack -> { stackEntry.processGemstoneItem(savingSacks) }
                 isRuneSack -> { stackEntry.processRuneItem(savingSacks) }
                 else -> { stackEntry.processOtherItem(savingSacks) }
             }
