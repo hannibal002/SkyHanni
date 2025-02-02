@@ -14,6 +14,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
+import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils
@@ -51,20 +53,35 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
 
     override val inventoryPattern: Pattern by patternGroup.pattern("inventory", "Daily Tasks")
     private val incompletePattern by patternGroup.pattern("incomplete", "§c§lINCOMPLETE")
+
+    /**REGEX-TEST: §6§lDAILY TASK! §eYou completed the §eRun the Nucleus §edaily task and earned §b+1 Raffle Ticket §eand a slice of cake!
+     */
     private val preChatPattern by patternGroup.pattern(
         "chat",
         "§6§lDAILY TASK! §eYou completed the (?<task>.*) §edaily task and earned §b\\+1 Raffle Ticket §eand a slice of cake!",
     )
 
+    private val endTime = SkyBlockTime.fromSBYear(401).asTimeMark()
+
+    override fun isEnabled(): Boolean {
+        return super.isEnabled() && endTime.isInFuture()
+    }
+
     private val scroll = ScrollValue()
 
-    override fun createDisplay(data: Set<Task>): Renderable = Renderable.scrollList(
-        data.sorted().map { it.render },
-        225,
-        velocity = 4.0,
-        scrollValue = scroll,
-        showScrollableTipsInList = true,
-    )
+    override fun createDisplay(data: Set<Task>): Renderable =
+        Renderable.verticalContainer(
+            listOf(
+                Renderable.string("§6400Year Daily"),
+                Renderable.scrollList(
+                    data.sorted().map { it.render },
+                    225,
+                    velocity = 4.0,
+                    scrollValue = scroll,
+                    showScrollableTipsInList = true,
+                ),
+            ),
+        )
 
     override fun preItemFilter(slot: Int, stack: ItemStack): Pair<String, Boolean>? {
         val lore = stack.getLore()

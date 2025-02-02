@@ -37,7 +37,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
     abstract fun preItemFilter(slot: Int, stack: ItemStack): O?
     open fun chatFilter(msg: String): String? = msg
 
-    private val enabled: Boolean get() = configToggle.get()
+    protected open fun isEnabled(): Boolean = configToggle.get()
 
     private var display: Renderable = Renderable.placeholder(0, 0)
     private var resetIndex = 0
@@ -76,7 +76,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
     // All HandleEvents do nothing, but at least to declare that those are events that get called
     @HandleEvent(onlyOnSkyblock = true)
     fun onInventory(event: InventoryFullyOpenedEvent) {
-        if (!enabled) return
+        if (!isEnabled()) return
         if (!inventoryPattern.matches(event.inventoryName)) return
         event.inventoryItems.mapNotNull { preItemFilter(it.key, it.value) }.forEach { input ->
             tasks.forEach {
@@ -87,7 +87,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onSystemMessage(event: SystemMessageEvent) {
-        if (!enabled) return
+        if (!isEnabled()) return
         val pre = chatFilter(event.message) ?: return
         tasks.forEach {
             it.storageManipulation(it.checkChat(pre))
@@ -96,7 +96,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onGuiRender(event: GuiRenderEvent) {
-        if (!enabled) return
+        if (!isEnabled()) return
         if (displayDirty) {
             display = createDisplay(storage)
             displayDirty = false
