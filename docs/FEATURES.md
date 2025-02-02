@@ -122,6 +122,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
     + The sound and pitch of chimes in dungeons are customizable.
 + Added Terminal Waypoints. - Stella (https://github.com/hannibal002/SkyHanni/pull/2719)
     +  Displays waypoints during the F7/M7 Goldor Phase.
++ Added mute for chest open and lever click sounds in dungeons (toggleable). - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2521)
 
 </details>
 <details open><summary>
@@ -555,6 +556,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Option to click in the bingo card viewer on goals to mark them as highlighted. - hannibal2
     + If at least one goal is highlighted, non-highlighted goals will be hidden.
 + Send a chat message with the change of community goal percentages after opening the bingo card inventory. - hannibal2
++ Added Bingo Boop for Party Invite. - NetheriteMiner (https://github.com/hannibal002/SkyHanni/pull/2005)
 
 </details>
 <details open><summary>
@@ -787,6 +789,7 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added No Pests Title. - saga (https://github.com/hannibal002/SkyHanni/pull/1957)
     + Shows a title when you use the Pest Tracker without any pests to clear.
 + Added Carrolyn Fetch Helper to fetch items for permanent farming buffs. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3096)
++ Added Pesthunter Shop profit display. - not_a_cow + Daveed. (https://github.com/hannibal002/SkyHanni/pull/3279)
 
 </details>
 <details open><summary>
@@ -1081,6 +1084,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 
 + Added chat solvers for Primal Fears. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/2771)
     +  Added solvers for Math and Public Speaking Primal Fears.
+
+#### Anniversary Celebration
+
++ Added Century Daily Task Highlight. - Thunderbalde73 (https://github.com/hannibal002/SkyHanni/pull/3355)
++ Added Slice of Cake team finder for Anniversary Celebration. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3354)
+    + Added highlight for players in the correct team when holding a Slice of Cake item.
 
 </details>
 <details open><summary>
