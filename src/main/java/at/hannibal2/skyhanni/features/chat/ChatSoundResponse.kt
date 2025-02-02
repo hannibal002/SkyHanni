@@ -9,9 +9,9 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
+import at.hannibal2.skyhanni.utils.json.toJsonArray
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import com.google.gson.JsonPrimitive
-import at.hannibal2.skyhanni.utils.json.toJsonArray
 
 @SkyHanniModule
 object ChatSoundResponse {
@@ -45,15 +45,15 @@ object ChatSoundResponse {
                     listOf(
                         JsonPrimitive("CATPURR"),
                         JsonPrimitive("CATPURREOW"),
-                        JsonPrimitive("CATHISS")
+                        JsonPrimitive("CATHISS"),
                     ).toJsonArray()
                 },
                 JsonPrimitive("DOG") to lazy {
                     listOf(
                         JsonPrimitive("DOGGROWL"),
-                        JsonPrimitive("DOGHOWL")
+                        JsonPrimitive("DOGHOWL"),
                     ).toJsonArray()
-                }
+                },
             ).forEach {
                 if (array.contains(it.key)) {
                     array.addAll(it.value.value)
