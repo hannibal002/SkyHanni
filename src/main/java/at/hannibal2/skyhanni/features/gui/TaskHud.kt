@@ -35,7 +35,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
     abstract fun createDisplay(data: Set<T>): Renderable
 
     abstract fun preItemFilter(slot: Int, stack: ItemStack): O?
-    open fun chatFilter(msg: String): String = msg
+    open fun chatFilter(msg: String): String? = msg
 
     private val enabled: Boolean get() = configToggle.get()
 
@@ -73,7 +73,8 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true) // All HandleEvents do nothing, but at least to declare that those are events that get called
+    // All HandleEvents do nothing, but at least to declare that those are events that get called
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventory(event: InventoryFullyOpenedEvent) {
         if (!enabled) return
         if (!inventoryPattern.matches(event.inventoryName)) return
@@ -87,7 +88,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
     @HandleEvent(onlyOnSkyblock = true)
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!enabled) return
-        val pre = chatFilter(event.message)
+        val pre = chatFilter(event.message) ?: return
         tasks.forEach {
             it.storageManipulation(it.checkChat(pre))
         }

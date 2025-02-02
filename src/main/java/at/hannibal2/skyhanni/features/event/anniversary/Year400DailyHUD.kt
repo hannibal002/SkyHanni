@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.event.anniversary
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.features.gui.PlayerTask
@@ -10,6 +11,7 @@ import at.hannibal2.skyhanni.features.gui.TaskHud
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
@@ -37,16 +39,22 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
 
     override val configToggle: Property<Boolean> = config.dailyTasksHud
     override val position: Position = config.dailyTaskPosition
-    override val storage: MutableSet<Task> get() = ProfileStorageData.playerSpecific!!.anniversary400Dailies
+    override val storage: MutableSet<Task> get() = playerStorage.anniversary400Dailies
+
+    private val playerStorage get() = ProfileStorageData.playerSpecific ?: PlayerSpecificStorage()
 
     private var lastLogin
-        get() = ProfileStorageData.playerSpecific!!.lastLoginInAnniversary400
+        get() = playerStorage.lastLoginInAnniversary400
         set(value) {
-            ProfileStorageData.playerSpecific!!.lastLoginInAnniversary400 = value
+            playerStorage.lastLoginInAnniversary400 = value
         }
 
     override val inventoryPattern: Pattern by patternGroup.pattern("inventory", "Daily Tasks")
     private val incompletePattern by patternGroup.pattern("incomplete", "§c§lINCOMPLETE")
+    private val preChatPattern by patternGroup.pattern(
+        "chat",
+        "§6§lDAILY TASK! §eYou completed the (?<task>.*) §edaily task and earned §b\\+1 Raffle Ticket §eand a slice of cake!",
+    )
 
     private val scroll = ScrollValue()
 
@@ -67,18 +75,12 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         return name to complete
     }
 
-    override fun chatFilter(msg: String): String {
-        // TODO
-        return super.chatFilter(msg)
-    }
+    override fun chatFilter(msg: String): String? = preChatPattern.matchGroup(msg, "task")
 
     private var wasLoggedIn = false
 
     @HandleEvent
     fun onHypixelJoin(event: HypixelJoinEvent) {
-
-        reset() // TODO remove after testing
-
         resetSchedule()
         if (wasLoggedIn) return
         wasLoggedIn = true
