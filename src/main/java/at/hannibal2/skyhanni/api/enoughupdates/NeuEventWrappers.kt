@@ -58,6 +58,7 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
+        // Because of varying Gson dependencies, we can't directly use .data from NEU
         val apiData = event::class.java.getDeclaredField("data").get(event) as? JsonObject ?: return
         try {
             val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
