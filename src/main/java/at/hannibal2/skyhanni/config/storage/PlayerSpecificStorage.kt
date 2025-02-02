@@ -1,11 +1,13 @@
 package at.hannibal2.skyhanni.config.storage
 
 import at.hannibal2.skyhanni.features.bingo.card.goals.BingoGoal
+import at.hannibal2.skyhanni.features.event.anniversary.Year400DailyHUD
 import at.hannibal2.skyhanni.features.fame.UpgradeReminder.CommunityShopUpgrade
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
+import java.time.LocalDate
 
 class PlayerSpecificStorage {
     @Expose
@@ -67,4 +69,10 @@ class PlayerSpecificStorage {
         @Expose
         var userLuck: Float = 0f
     }
+
+    @Expose
+    var anniversary400Dailies = mutableSetOf<Year400DailyHUD.Task>()
+
+    @Expose
+    var lastLoginInAnniversary400: LocalDate? = null
 }
