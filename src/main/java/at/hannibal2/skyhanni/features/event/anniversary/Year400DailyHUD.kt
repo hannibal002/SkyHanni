@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.StringUtils.allLettersFirstUppercase
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.TimeUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
@@ -118,10 +117,10 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
     }
 
     // Reset Time is 0:00 EST
-    private fun getDate(): LocalDate = ZonedDateTime.now(TimeUtils.ZoneOffset_MDT).toLocalDate()
+    private fun getDate(): LocalDate = ZonedDateTime.now().toLocalDate()
 
     override fun resetTime(): SimpleTimeMark {
-        val now = ZonedDateTime.now(TimeUtils.ZoneOffset_MDT)
+        val now = ZonedDateTime.now()
         val ourNow = SimpleTimeMark.now()
 
         val resetAt = now.toLocalDate().plusDays(1L).atTime(0, 0)
