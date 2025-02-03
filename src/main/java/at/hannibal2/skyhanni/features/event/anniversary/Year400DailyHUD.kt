@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.anniversary
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.PlayerSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
@@ -96,6 +98,15 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
     private fun String.makeNameSave() = removeColor().uppercase().replace("[ \\-!&'?]".toRegex(), "_").trim()
 
     override fun chatFilter(msg: String): String? = preChatPattern.matchGroup(msg, "task")?.makeNameSave()
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetyear400hud") {
+            category = CommandCategory.USERS_BUG_FIX
+            description = "Resets the year 400 Hud"
+            callback { reset() }
+        }
+    }
 
     private var wasLoggedIn = false
 
