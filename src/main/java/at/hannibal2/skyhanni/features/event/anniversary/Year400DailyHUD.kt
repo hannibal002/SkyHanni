@@ -212,7 +212,7 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         KUUDRA_KILLER("Complete any Kuudra"),
         ;
 
-        val render = Renderable.string(display ?: (LorenzColor.YELLOW.getChatColor() + name.allLettersFirstUppercase()))
+        val render = Renderable.string(LorenzColor.YELLOW.getChatColor() + (display ?: name.allLettersFirstUppercase()))
 
         override fun checkChat(msg: String): Boolean? = name == msg
         override fun isTaskDoneViaItem(input: Pair<String, Boolean>): Boolean? {
