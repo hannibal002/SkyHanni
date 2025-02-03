@@ -85,7 +85,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
         }
     }
 
-    @HandleEvent(onlyOnSkyblock = true)
+    @HandleEvent()
     fun onSystemMessage(event: SystemMessageEvent) {
         if (!isEnabled()) return
         val pre = chatFilter(event.message) ?: return
@@ -134,7 +134,7 @@ abstract class TaskHud<T : PlayerTask<O>, O>(
         fun onGuiRender(event: GuiRenderEvent) =
             instances.forEach { it.onGuiRender(event) }
 
-        @HandleEvent(onlyOnSkyblock = true)
+        @HandleEvent()
         fun onSystemMessage(event: SystemMessageEvent) = instances.forEach { it.onSystemMessage(event) }
 
         @HandleEvent(onlyOnSkyblock = true)

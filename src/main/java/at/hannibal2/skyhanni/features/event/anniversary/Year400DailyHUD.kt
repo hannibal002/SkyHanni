@@ -56,6 +56,7 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
 
     /**REGEX-TEST: §6§lDAILY TASK! §eYou completed the §eRun the Nucleus §edaily task and earned §b+1 Raffle Ticket §eand a slice of cake!
      * REGEX-TEST: §6§lDAILY TASK! §eYou completed the §aReforger §edaily task and earned §b+1 Raffle Ticket §eand a slice of cake!
+     * REGEX-TEST: §6§lDAILY TASK! §eYou completed the §aAlternate Dimension §edaily task and earned §b+1 Raffle Ticket §eand a slice of cake!
      */
     private val preChatPattern by patternGroup.pattern(
         "chat",
