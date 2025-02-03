@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.repopatterns.RepoPatternGroup
 import io.github.notenoughupdates.moulconfig.observer.Property
 import net.minecraft.item.ItemStack
 import java.time.LocalDate
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.regex.Pattern
 import kotlin.time.toKotlinDuration
@@ -117,10 +118,10 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
     }
 
     // Reset Time is 0:00 EST
-    private fun getDate(): LocalDate = ZonedDateTime.now().toLocalDate()
+    private fun getDate(): LocalDate = ZonedDateTime.now(ZoneOffset.UTC).toLocalDate()
 
     override fun resetTime(): SimpleTimeMark {
-        val now = ZonedDateTime.now()
+        val now = ZonedDateTime.now(ZoneOffset.UTC)
         val ourNow = SimpleTimeMark.now()
 
         val resetAt = now.toLocalDate().plusDays(1L).atTime(0, 0)

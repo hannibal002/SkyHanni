@@ -6,7 +6,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.ZoneOffset
 import kotlin.math.absoluteValue
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
@@ -179,8 +178,6 @@ object TimeUtils {
     val Int.ticks get() = (this * 50).milliseconds
 
     val Float.minutes get() = toDouble().minutes
-
-    val ZoneOffset_MDT: ZoneOffset = ZoneOffset.of("-6")
 }
 
 private const val FACTOR_SECONDS = 1000L
