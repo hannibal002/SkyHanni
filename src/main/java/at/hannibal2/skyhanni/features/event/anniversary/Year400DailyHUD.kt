@@ -55,6 +55,7 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
     private val incompletePattern by patternGroup.pattern("incomplete", "§c§lINCOMPLETE")
 
     /**REGEX-TEST: §6§lDAILY TASK! §eYou completed the §eRun the Nucleus §edaily task and earned §b+1 Raffle Ticket §eand a slice of cake!
+     * REGEX-TEST: §6§lDAILY TASK! §eYou completed the §aReforger §edaily task and earned §b+1 Raffle Ticket §eand a slice of cake!
      */
     private val preChatPattern by patternGroup.pattern(
         "chat",
@@ -87,12 +88,14 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         val lore = stack.getLore()
         if (lore.isEmpty()) return null
         val complete = !lore.any { incompletePattern.matches(it) }
-        val name = stack.displayName.removeColor().uppercase().replace("[ \\-!&'?]".toRegex(), "_").trim()
+        val name = stack.displayName.makeNameSave()
         println(name)
         return name to complete
     }
 
-    override fun chatFilter(msg: String): String? = preChatPattern.matchGroup(msg, "task")
+    private fun String.makeNameSave() = removeColor().uppercase().replace("[ \\-!&'?]".toRegex(), "_").trim()
+
+    override fun chatFilter(msg: String): String? = preChatPattern.matchGroup(msg, "task")?.makeNameSave()
 
     private var wasLoggedIn = false
 
