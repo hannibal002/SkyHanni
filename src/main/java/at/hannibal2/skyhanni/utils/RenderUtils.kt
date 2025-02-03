@@ -1037,7 +1037,7 @@ object RenderUtils {
         val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
         val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
         val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        val eyeHeight = thePlayer.eyeHeight
+        val eyeHeight = thePlayer.getEyeHeight()
 
         val dX = (x - renderOffsetX) * (x - renderOffsetX)
         val dY = (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight))
@@ -1413,8 +1413,10 @@ object RenderUtils {
             }
         }
 
-        fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
-            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), lorenzVec, color, lineWidth, depth)
+        fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+            val player = Minecraft.getMinecraft().thePlayer
+            draw3DLine(inverseView.add(y = player.getEyeHeight().toDouble()), lorenzVec, color, lineWidth, depth)
+        }
 
         fun drawBezier2(
             p1: LorenzVec,
