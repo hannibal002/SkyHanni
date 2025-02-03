@@ -136,6 +136,7 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         return ourNow + kDiff
     }
 
+    // The enum entry names have a lot of wierd _ since every special character will get mapped to _
     enum class Task(display: String? = null) : PlayerTask<Pair<String, Boolean>>, Comparable<Task> {
         ENCHANTER("Enchant an item"),
         REFORGER("Reforge an item"),
