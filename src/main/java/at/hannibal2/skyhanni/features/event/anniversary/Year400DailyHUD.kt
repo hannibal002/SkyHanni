@@ -153,9 +153,9 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         ALTERNATE_DIMENSION("Enter Rift"),
         NOT_SO_SUPREME("Kill a Leach Supreme"),
 
-        RANGER("Hunt a §f§lTRACKABLE"),
-        RANGER_II("Hunt a §9§lUNDETECTED"),
-        RANGER_III("Hunt a §6§lELUSIVE"),
+        RANGER("Hunt a §f§lTRACKABLE§r"),
+        RANGER_II("Hunt a §9§lUNDETECTED§r"),
+        RANGER_III("Hunt a §6§lELUSIVE§r"),
         EXTERMINATOR("Vacuum up a Pest"),
         FARMHAND("Complete one Visitor"),
         PODIUM_PLACE("§l§cBRONZE §r§eJacob Contest"),
