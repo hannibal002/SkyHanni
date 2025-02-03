@@ -90,7 +90,6 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         if (lore.isEmpty()) return null
         val complete = !lore.any { incompletePattern.matches(it) }
         val name = stack.displayName.makeNameSave()
-        println(name)
         return name to complete
     }
 
