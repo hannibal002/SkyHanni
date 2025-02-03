@@ -183,7 +183,7 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         GOBLIN_SUMMONER("Spawn Golden Goblin"),
         SHINY_GOBLIN_SUMMONER("Spawn Diamond Goblin"),
         FROZEN_MINESHAFT_DELVER("Spawn Mineshaft"),
-        COLD_LOOT("Loot Umber/Tungsten Corp"),
+        COLD_LOOT("Loot Umber/Tungsten Corpse"),
 
         ENDERMAN_KILLER("Kill Enderman"),
         AN_EYE_FOR_AN_EYE("Spawn Special Zealot"),
