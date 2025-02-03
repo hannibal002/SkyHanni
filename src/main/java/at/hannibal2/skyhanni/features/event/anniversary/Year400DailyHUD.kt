@@ -168,8 +168,8 @@ object Year400DailyHUD : TaskHud<Year400DailyHUD.Task, Pair<String, Boolean>>(
         CATCH_OF_THE_DAY("Catch Sea Creature"),
         CATCH_OF_THE_WEEK("§5§lEPIC §r§eSea Creature"),
         CATCH_OF_THE_MONTH("§6§lLEGENDARY §r§eSea Creature"),
-        FISHERMAN("§l§fSILVER §e§rTrophy Fish"),
-        THERE_S_GOLD_IN_THEM_THERE_SEAS("§l§6GOLD §e§rTrophy Fish"),
+        FISHERMAN("§l§fSILVER §r§eTrophy Fish"),
+        THERE_S_GOLD_IN_THEM_THERE_SEAS("§l§6GOLD §r§eTrophy Fish"),
 
         DWARVEN_MINES_COMMISSIONER("Commission §2Dwarven Mines"),
         CRYSTAL_HOLLOWS_COMMISSIONER("Commission §5Crystal Hollows"),
