@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusSpeedr
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusSpeedrunTracker.Data.SpeedrunTransitionType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
@@ -50,6 +51,7 @@ object CrystalNucleusSpeedrunTracker {
         { it.mining.crystalNucleusSpeedrunTracker },
     ) { drawDisplay(it) }
 
+    // <editor-fold desc="Data Class">
     class Data : TrackerData() {
         @Expose var runsCompleted: Int = 0
         @Expose var goldSplits: MutableMap<NucleusCrystalType, Duration> = mutableMapOf()
@@ -137,6 +139,11 @@ object CrystalNucleusSpeedrunTracker {
             RUN_ABORTED,
             CRYSTAL_PLACED,
         }
+    }
+    // </editor-fold>
+
+    init {
+        tracker.initRenderer({ config.position }) { shouldShowDisplay() }
     }
 
     private const val CRYSTALS_TO_PLACE = 5
@@ -235,6 +242,8 @@ object CrystalNucleusSpeedrunTracker {
     private fun drawDisplay(data: Data): List<Searchable> {
         return emptyList() // Todo
     }
+
+    private fun shouldShowDisplay() = config.enabled && IslandType.CRYSTAL_HOLLOWS.isInIsland() && currentRun != null
 
     private fun forceUpdate(transitionType: SpeedrunTransitionType? = null) {
         val currentState = currentRun?.state ?: return

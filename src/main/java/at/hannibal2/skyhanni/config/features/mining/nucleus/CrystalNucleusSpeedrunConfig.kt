@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.config.features.mining.nucleus
 
+import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
@@ -8,6 +9,7 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
@@ -17,6 +19,10 @@ class CrystalNucleusSpeedrunConfig {
     @ConfigOption(name = "Enable", desc = "Enable the Nucleus Speedrun timer.")
     @ConfigEditorBoolean
     var enabled: Boolean = false
+
+    @Expose
+    @ConfigLink(owner = CrystalNucleusSpeedrunConfig::class, field = "enabled")
+    var position: Position = Position(100, 100)
 
     @Expose
     @ConfigOption(name = "Quick Disable", desc = "You can use §e/shnucspeedrun §rto quickly toggle all functions of this module.")
