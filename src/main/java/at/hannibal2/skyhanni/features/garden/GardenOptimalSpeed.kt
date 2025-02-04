@@ -42,6 +42,8 @@ object GardenOptimalSpeed {
     private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
     private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
 
+
+    
     /**
      * This speed value represents the walking speed, not the speed stat.
      * Blocks per second = 4.317 * speed / 100
