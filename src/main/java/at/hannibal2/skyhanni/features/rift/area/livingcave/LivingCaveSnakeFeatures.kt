@@ -102,9 +102,13 @@ object LivingCaveSnakeFeatures {
         }
     }
 
+    private var lastClickedBlock: LorenzVec? = null
+
     @HandleEvent
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
+
+        lastClickedBlock = event.position
 
         val snake = getClosest() ?: return
         if (event.position !in snake.blocks) return
@@ -143,8 +147,8 @@ object LivingCaveSnakeFeatures {
         snakes.removeIf {
             val invalidSize = it.invalidSize()
             val invalidHead = it.invalidHead()
-            if (invalidSize && LorenzUtils.debug) ChatUtils.chat("invalidSize")
-            if (invalidHead && LorenzUtils.debug) ChatUtils.chat("invalidHead")
+            if (invalidSize && LorenzUtils.debug) ChatUtils.chat("Snake remove because of invalid size")
+            if (invalidHead && LorenzUtils.debug) ChatUtils.chat("Snake remove because of invalid head")
             invalidSize || invalidHead
         }
         snakes.forEach { it.tick() }
@@ -262,6 +266,8 @@ object LivingCaveSnakeFeatures {
         }
 
         fun removeSnakeBlock(location: LorenzVec) {
+            // hypixel sends the packet information again when clicking
+            if (head == location && location == lastClickedBlock && blocks.size > 1) return
             blocks.remove(location)
             if (blocks.isEmpty()) {
                 snakes.remove(this)
