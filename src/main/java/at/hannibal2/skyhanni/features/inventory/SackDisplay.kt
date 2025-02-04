@@ -266,7 +266,7 @@ object SackDisplay {
         if (SackApi.gemstoneItem.isEmpty()) return 0L
 
         val filterType = SackApi.gemstoneStackFilter
-        val filterFormat = filterType?.let { " ($it)" }.orEmpty()
+        val filterFormat = filterType?.let { " ($it§7)" }.orEmpty()
 
         addString("§7Gemstones$filterFormat§7:")
         var totalPrice = 0L
