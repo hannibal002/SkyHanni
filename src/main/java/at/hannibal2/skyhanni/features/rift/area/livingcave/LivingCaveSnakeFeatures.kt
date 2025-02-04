@@ -33,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object LivingCaveSnakeFeatures {
     private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
-    private val snakes = ConcurrentLinkedQueue<Snake>()
+    private val snakes = mutableListOf<Snake>()
     private val edges = LocationUtils.generateCubeEdges(0.005)
 
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
@@ -106,7 +106,7 @@ object LivingCaveSnakeFeatures {
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
-        val snake = snakes.getClosest() ?: return
+        val snake = getClosest() ?: return
         if (event.position !in snake.blocks) return
 
         selectedSnake = snake
@@ -148,7 +148,6 @@ object LivingCaveSnakeFeatures {
             invalidSize || invalidHead
         }
         snakes.forEach { it.tick() }
-
     }
 
     @HandleEvent
@@ -175,8 +174,8 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    private fun ConcurrentLinkedQueue<Snake>.getClosest(): Snake? =
-        minByOrNull { it.blocks.minOfOrNull { block -> block.distanceSqToPlayer() } ?: Double.MAX_VALUE }
+    private fun getClosest(): Snake? =
+        snakes.minByOrNull { it.blocks.minOfOrNull { block -> block.distanceSqToPlayer() } ?: Double.MAX_VALUE }
 
     private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
 
