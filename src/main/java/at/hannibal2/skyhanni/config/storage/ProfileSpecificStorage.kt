@@ -37,6 +37,7 @@ import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactor
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
 import at.hannibal2.skyhanni.features.mining.MineshaftPityDisplay.PityData
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusSpeedrunTracker
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusTracker
 import at.hannibal2.skyhanni.features.mining.fossilexcavator.ExcavatorProfitTracker
 import at.hannibal2.skyhanni.features.mining.glacitemineshaft.CorpseTracker
@@ -561,9 +562,9 @@ class ProfileSpecificStorage {
     )
 
     @Expose
-    var mining: MiningConfig = MiningConfig()
+    var mining: MiningStorage = MiningStorage()
 
-    class MiningConfig {
+    class MiningStorage {
         @Expose
         var kingsTalkedTo: MutableList<String> = mutableListOf()
 
@@ -609,6 +610,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var crystalNucleusTracker: CrystalNucleusTracker.Data = CrystalNucleusTracker.Data()
+
+        @Expose
+        var crystalNucleusSpeedrunTracker: CrystalNucleusSpeedrunTracker.Data = CrystalNucleusSpeedrunTracker.Data()
     }
 
     @Expose

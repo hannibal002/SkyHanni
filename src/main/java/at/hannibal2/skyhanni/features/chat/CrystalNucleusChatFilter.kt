@@ -3,6 +3,20 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.CrystalNucleusConfig.CrystalNucleusMessageTypes
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.componentListPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.componentListPreamblePattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.componentSubmittedPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.crystalCollectedCountPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.crystalCollectedIdentifierPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.crystalCollectedWrapperPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.crystalPlacedPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.genericKeeperMessage
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.goblinGuardExitMessagePattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.runCompletedWrapperPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.scavengeLootPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.scavengeSecondaryPattern
+import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.unclosedCrystalCollected
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -23,135 +37,12 @@ object CrystalNucleusChatFilter {
     }
 
     private val config get() = SkyHanniMod.feature.chat.filterType.crystalNucleus
-    private val patternGroup = RepoPattern.group("filter.crystalnucleus")
 
     private var unclosedRunCompleted = false
-    private var unclosedCrystalCollected = false
     private var crystalCount = 0
     private var crystalCollected = ""
     private var lastKeeper = ""
     private var inCompListPreamble = false
-
-    /**
-     * REGEX-TEST: §3§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-     */
-    private val runCompletedWrapperPattern by patternGroup.pattern(
-        "run.completed",
-        "§3§l▬{64}",
-    )
-
-    /**
-     * REGEX-TEST: §5§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬
-     */
-    private val crystalCollectedWrapperPattern by patternGroup.pattern(
-        "crystal.collected.wrapper",
-        "§5§l▬{64}",
-    )
-
-    /**
-     * REGEX-TEST: §f                       §r§5§l✦ CRYSTAL FOUND §r§7(1§r§7/5§r§7)
-     */
-    private val crystalCollectedCountPattern by patternGroup.pattern(
-        "crystal.collected.count",
-        "§f *§r§5§l✦ CRYSTAL FOUND §r§7\\((?<count>\\d)§r§7/5§r§7\\)",
-    )
-
-    /**
-     * REGEX-TEST: §f                              §r§5Amethyst Crystal
-     * REGEX-TEST: §f                              §r§bSapphire Crystal
-     * REGEX-TEST: §f                                §r§6Amber Crystal
-     * REGEX-TEST: §f                                §r§eTopaz Crystal
-     * REGEX-TEST: §f                                §r§aJade Crystal
-     */
-    val crystalCollectedIdentifierPattern by patternGroup.pattern(
-        "crystal.collected.id",
-        "§f *§r(?<crystal>.* Crystal) *",
-    )
-
-    /**
-     * REGEX-TEST: §5§l✦ §r§dYou placed the §r§bSapphire Crystal§r§d!
-     */
-    private val crystalPlacedPattern by patternGroup.pattern(
-        "crystal.placed",
-        "§5§l✦ §r§dYou placed the §r(?<crystal>.* Crystal)§r§d!",
-    )
-
-    /**
-     * REGEX-TEST: §aYou found §r§cScavenged Diamond Axe §r§awith your §r§cMetal Detector§r§a!
-     * REGEX-TEST: §aYou found §r§cScavenged Emerald Hammer §r§awith your §r§cMetal Detector§r§a!
-     * REGEX-TEST: §aYou found §r§a☘ Flawed Jade Gemstone §r§8x2 §r§awith your §r§cMetal Detector§r§a!
-     */
-    private val scavengeLootPattern by patternGroup.pattern(
-        "divan.scavenge",
-        "§aYou found §r(?<loot>.*) §r§awith your §r§cMetal Detector§r§a!",
-    )
-
-    /**
-     * REGEX-TEST: §6§lPICK IT UP!
-     */
-    private val scavengeSecondaryPattern by patternGroup.pattern(
-        "divan.scavenge.secondary",
-        "§6§lPICK IT UP!",
-    )
-
-    /**
-     * REGEX-TEST: §e[NPC] §6Keeper of Gold§f: §rExcellent! You have returned the §cScavenged Golden Hammer §rto its rightful place!
-     * REGEX-TEST: §e[NPC] §6Keeper of Diamond§f: §rExcellent! You have returned the §cScavenged Diamond Axe §rto its rightful place!
-     * REGEX-TEST: §e[NPC] §6Keeper of Emerald§f: §rExcellent! You have returned the §cScavenged Emerald Hammer §rto its rightful place!
-     * REGEX-TEST: §e[NPC] §6Keeper of Lapis§f: §rYou found all of the items! Behold... the §aJade Crystal§r!
-     */
-    private val genericKeeperMessage by patternGroup.pattern(
-        "npc.keeper",
-        "§e\\[NPC\\] §6Keeper of (?<keepertype>.*)§f: §r(?<message>.*)",
-    )
-
-    /**
-     * REGEX-TEST: Thanks for bringing me the §9Synthetic Heart§r! Bring me 5 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Robotron Reflector§r! Bring me 5 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Superlite Motor§r! Bring me 4 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Synthetic Heart§r! Bring me 3 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9FTX 3070§r! Bring me 2 more components to fix the giant!
-     * REGEX-TEST: Thanks for bringing me the §9Electron Transmitter§r! Bring me one more component to fix the giant!
-     * REGEX-TEST: §rYou've brought me all of the components!
-     * REGEX-TEST: §rYou've brought me all of the components... I think? To be honest, I kind of lost count...
-     * REGEX-TEST: Wait a minute. This will work just fine.
-     */
-    @Suppress("MaxLineLength")
-    private val componentSubmittedPattern by patternGroup.pattern(
-        "precursor.submitted",
-        "(?:Wait a minute. This will work just fine.|You've brought me all|me the (?<component>.*)§r! Bring me (?<remaining>\\d|one) more).*",
-    )
-
-    /**
-     * REGEX-TEST: §rThat's not one of the components I need! Bring me one of the missing components:
-     */
-    private val componentListPreamblePattern by patternGroup.pattern(
-        "component.list.preamble",
-        "§rThat's not one of the components I need! Bring me one of the missing components:",
-    )
-
-    /**
-     * REGEX-TEST:   §r§9FTX 3070
-     * REGEX-TEST:   §r§9Electron Transmitter
-     * REGEX-TEST:   §r§9Superlite Motor
-     * REGEX-TEST:   §r§9Synthetic Heart
-     * REGEX-TEST:   §r§9Control Switch
-     * REGEX-TEST:   §r§9Robotron Reflector
-     */
-    private val componentListPattern by patternGroup.pattern(
-        "component.list",
-        " {2}§r§9(?<component>.*)",
-    )
-
-    /**
-     * REGEX-TEST: §8§oWhew! That was a close one, better get out of here...
-     * REGEX-TEST: §cThe Goblin King's §r§afoul stench §r§chas dissipated!
-     */
-    private val goblinGuardExitMessagePattern by patternGroup.pattern(
-        "goblin.guard.exit",
-        "§8§oWhew! That was a close one, better get out of here\\.{3}|§cThe Goblin King's §r§afoul stench §r§chas dissipated!",
-    )
-
 
     fun block(message: String): NucleusChatFilterRes? {
         if (!isEnabled()) return null
@@ -166,8 +57,8 @@ object CrystalNucleusChatFilter {
 
     private fun blockCrystalCollected(message: String): NucleusChatFilterRes? {
         if (!shouldBlock(CrystalNucleusMessageTypes.CRYSTAL_COLLECTED)) return null
+        if (CrystalNucleusApi.unclosedCrystalCollected)
         if (crystalCollectedWrapperPattern.matches(message)) {
-            unclosedCrystalCollected = !unclosedCrystalCollected
             return NucleusChatFilterRes("crystal_collected")
         }
 

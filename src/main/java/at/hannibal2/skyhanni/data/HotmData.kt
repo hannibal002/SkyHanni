@@ -789,7 +789,7 @@ enum class HotmData(
                 if (it.getStorage() == null) {
                     ProfileStorageData.profileSpecific?.mining?.powder?.put(
                         it,
-                        ProfileSpecificStorage.MiningConfig.PowderStorage(),
+                        ProfileSpecificStorage.MiningStorage.PowderStorage(),
                     )
                 }
             }
