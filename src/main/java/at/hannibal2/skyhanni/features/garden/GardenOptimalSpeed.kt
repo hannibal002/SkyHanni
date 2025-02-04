@@ -41,8 +41,6 @@ object GardenOptimalSpeed {
     private val sneaking get() = Minecraft.getMinecraft().thePlayer.isSneaking
     private val sneakingPersistent get() = sneakingSince.passedSince() > 5.seconds
     private val rancherBoots = "RANCHERS_BOOTS".toInternalName()
-
-
     
     /**
      * This speed value represents the walking speed, not the speed stat.
