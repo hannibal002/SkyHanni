@@ -74,5 +74,5 @@ object NucleusBarriersBox {
     }
 
     private fun eventEnabled() = HoppityApi.isHoppityEvent() || !config.onlyDuringHoppity
-    private fun isEnabled() =  eventEnabled() && config.enabled && inNucleus
+    private fun isEnabled() = eventEnabled() && config.enabled && inNucleus
 }

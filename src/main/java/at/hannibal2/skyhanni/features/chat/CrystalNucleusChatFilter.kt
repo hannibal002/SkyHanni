@@ -3,7 +3,6 @@ package at.hannibal2.skyhanni.features.chat
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.chat.CrystalNucleusConfig.CrystalNucleusMessageTypes
 import at.hannibal2.skyhanni.data.IslandType
-import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.componentListPattern
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.componentListPreamblePattern
 import at.hannibal2.skyhanni.features.mining.crystalhollows.CrystalNucleusApi.componentSubmittedPattern
@@ -24,7 +23,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -57,7 +55,6 @@ object CrystalNucleusChatFilter {
 
     private fun blockCrystalCollected(message: String): NucleusChatFilterRes? {
         if (!shouldBlock(CrystalNucleusMessageTypes.CRYSTAL_COLLECTED)) return null
-        if (CrystalNucleusApi.unclosedCrystalCollected)
         if (crystalCollectedWrapperPattern.matches(message)) {
             return NucleusChatFilterRes("crystal_collected")
         }

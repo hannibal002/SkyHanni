@@ -139,22 +139,25 @@ object CrystalNucleusSpeedrunTracker {
         }
     }
 
+    private const val CRYSTALS_TO_PLACE = 5
+    private val lastCollectedCrystal: MutableMap<NucleusCrystalType, SimpleTimeMark> = mutableMapOf()
     private val config get() = SkyHanniMod.feature.mining.crystalNucleusSpeedrun
+
     private val currentRun: Data.CrystalNucleusSpeedrun? get() {
         var run: Data.CrystalNucleusSpeedrun? = null
         tracker.modify { run = it.currentRun }
         return run
     }
+
     private val bestRun: Data.CrystalNucleusSpeedrun? get() {
         var run: Data.CrystalNucleusSpeedrun? = null
         tracker.modify { run = it.bestRun }
         return run
     }
+
     private val crystalSplitOrder: List<NucleusCrystalType> get() =
         config.manualSplitOrder.takeIf { it.size == CRYSTALS_TO_PLACE } ?: config.defaultSplitOrder
-    private const val CRYSTALS_TO_PLACE = 5
 
-    private var lastCollectedCrystal: MutableMap<NucleusCrystalType, SimpleTimeMark> = mutableMapOf()
     private var lastHotkeyClick: SimpleTimeMark = farPast()
     private var waitingAfterSplit: Boolean = false
     private var tpSinceSplit: Boolean = false
@@ -184,6 +187,7 @@ object CrystalNucleusSpeedrunTracker {
     fun onWarp(event: SkyHanniWarpEvent) {
         if (!config.enabled || !waitingAfterSplit) return
         tpSinceSplit = true
+        forceUpdate()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
@@ -191,6 +195,7 @@ object CrystalNucleusSpeedrunTracker {
         if (!event.isLocalPlayer || !waitingAfterSplit || !tpSinceSplit) return
         lastLorenzVec = event.entity.getLorenzVec().takeIf { it != lastLorenzVec } ?: return
         movedSinceSplit = true
+        forceUpdate()
     }
 
     @HandleEvent
@@ -226,6 +231,7 @@ object CrystalNucleusSpeedrunTracker {
         if (event.newIsland != IslandType.CRYSTAL_HOLLOWS) forceUpdate(SpeedrunTransitionType.RUN_ABORTED)
     }
 
+    @Suppress("UnusedParameter")
     private fun drawDisplay(data: Data): List<Searchable> {
         return emptyList() // Todo
     }
@@ -362,10 +368,17 @@ object CrystalNucleusSpeedrunTracker {
      */
     private val transitionStateMapLogic: Map<SpeedrunState, () -> Unit> =
         mapOf(
+            SpeedrunState.IN_PROGRESS to {
+                // Reset the tp and move checks
+                tpSinceSplit = false
+                movedSinceSplit = false
+                waitingAfterSplit = false
+            },
             SpeedrunState.IDLE_WAITING to {
                 // Reset the tp and move checks
                 tpSinceSplit = false
                 movedSinceSplit = false
+                waitingAfterSplit = true
             },
             SpeedrunState.SPLITTING to {
                 // Determine next crystal
