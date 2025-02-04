@@ -8,6 +8,8 @@ import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.OwnInventoryItemUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.mining.CrystalNucleusLootEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
+import at.hannibal2.skyhanni.features.chat.CrystalNucleusChatFilter.crystalCollectedIdentifierPattern
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -15,7 +17,9 @@ import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.fromItemNameOrNull
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -44,6 +48,8 @@ object CrystalNucleusApi {
     private var inLootLoop = false
     private var unCheckedBooks: Int = 0
     private val loot = mutableMapOf<NeuInternalName, Int>()
+    var inNucleus = false
+        private set
 
     private val LAPIDARY_I_BOOK_ITEM = "LAPIDARY;1".toInternalName()
     private val FORTUNE_IV_BOOK_ITEM = "FORTUNE;4".toInternalName()
@@ -59,6 +65,11 @@ object CrystalNucleusApi {
         "SUPERLITE_MOTOR",
         "SYNTHETIC_HEART",
     ).map { it.toInternalName() }
+
+    @HandleEvent
+    fun onAreaChange(event: GraphAreaChangeEvent) {
+        inNucleus = event.area == "Crystal Nucleus"
+    }
 
     @HandleEvent
     fun onOwnInventoryItemUpdate(event: OwnInventoryItemUpdateEvent) {
@@ -90,8 +101,17 @@ object CrystalNucleusApi {
 
     @HandleEvent(onlyOnIsland = IslandType.CRYSTAL_HOLLOWS)
     fun onChat(event: SkyHanniChatEvent) {
-        val message = event.message
+        event.handleLootLoop()
+    }
 
+    private fun SkyHanniChatEvent.handleCrystalFound() {
+        crystalCollectedIdentifierPattern.matchMatcher(message) {
+            val crystal = group("crystal") ?: return@matchMatcher
+            SkyBlockItemModifierUtils.GemstoneType
+        }
+    }
+
+    private fun SkyHanniChatEvent.handleLootLoop() {
         if (startPattern.matches(message)) {
             unCheckedBooks = 0
             inLootLoop = true
@@ -100,7 +120,7 @@ object CrystalNucleusApi {
         if (!inLootLoop) return
 
         // Add the loot to the map.
-        event.getLoot()?.let { (item, amount) ->
+        getLoot()?.let { (item, amount) ->
             loot.addOrPut(item, amount)
         }
 

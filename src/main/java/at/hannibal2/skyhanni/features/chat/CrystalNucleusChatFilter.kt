@@ -63,7 +63,7 @@ object CrystalNucleusChatFilter {
      * REGEX-TEST: §f                                §r§eTopaz Crystal
      * REGEX-TEST: §f                                §r§aJade Crystal
      */
-    private val crystalCollectedIdentifierPattern by patternGroup.pattern(
+    val crystalCollectedIdentifierPattern by patternGroup.pattern(
         "crystal.collected.id",
         "§f *§r(?<crystal>.* Crystal) *",
     )
