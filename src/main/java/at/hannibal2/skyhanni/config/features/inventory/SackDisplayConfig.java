@@ -86,10 +86,10 @@ public class SackDisplayConfig {
     public SortingTypeEntry sortingType = SortingTypeEntry.DESC_STORED;
 
     public enum SortingTypeEntry implements HasLegacyId {
-        DESC_STORED("Descending (Stored)", 0),
-        ASC_STORED("Ascending (Stored)", 1),
-        DESC_PRICE("Descending (Price)", 2),
-        ASC_PRICE("Ascending (Price)", 3);
+        DESC_STORED("Stored Descending", 0),
+        ASC_STORED("Stored Ascending", 1),
+        DESC_PRICE("Price Descending", 2),
+        ASC_PRICE("Price Ascending", 3);
 
         private final String displayName;
         private final int legacyId;
