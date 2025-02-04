@@ -216,7 +216,7 @@ object ExperimentsProfitTracker {
     fun onInventoryClose(event: InventoryCloseEvent) {
         if (!isEnabled()) return
 
-        if (ExperimentationTableApi.getCurrentExperiment() != null) {
+        if (ExperimentationTableApi.currentExperiment != null) {
             tracker.modify {
                 it.experimentsDone++
             }
@@ -248,7 +248,10 @@ object ExperimentsProfitTracker {
     }
 
     init {
-        tracker.initRenderer(config.position) { isEnabled() }
+        tracker.initRenderer(
+            { config.position },
+            ExperimentationTableApi.superpairInventory,
+        ) { isEnabled() }
     }
 
     @HandleEvent
