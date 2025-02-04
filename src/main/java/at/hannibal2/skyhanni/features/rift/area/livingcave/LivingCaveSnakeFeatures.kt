@@ -32,7 +32,7 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LivingCaveSnakeFeatures {
-    private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
+    private val config get() = RiftApi.config.area.livingCave.snakeHelper
     private val snakes = mutableListOf<Snake>()
     private val edges = LocationUtils.generateCubeEdges(0.005)
 
@@ -183,7 +183,7 @@ object LivingCaveSnakeFeatures {
 
     private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
 
-    private fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.enabled
+    private fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.highlight
 
     private class Snake(
         val blocks: MutableList<LorenzVec>,

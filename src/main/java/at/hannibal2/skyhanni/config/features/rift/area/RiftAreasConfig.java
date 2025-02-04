@@ -39,7 +39,7 @@ public class RiftAreasConfig {
 //        public VillagePlazaConfig villagePlaza = new VillagePlazaConfig();
 
     @Expose
-    @ConfigOption(name = "Living Cave", desc = "")
+    @ConfigOption(name = "Living Metal Cave", desc = "")
     @Accordion
     public LivingCaveConfig livingCave = new LivingCaveConfig();
 
