@@ -21,7 +21,7 @@ enum class BossType(
     NETHER_VANQUISHER("§5Vanquisher", Type.VANQUISHER),
 
     END_ENDSTONE_PROTECTOR("§cEndstone Protector", Type.ENDERSTONE_PROTECTOR),
-    END_ENDER_DRAGON("Ender Dragon", Type.ENDER_DRAGON), // TODO fix totally
+    END_ENDER_DRAGON("Dragon", Type.ENDER_DRAGON),
 
     SLAYER_ZOMBIE_1("§aRevenant Horror 1", Type.REVENANT_HORROR, "§aRev 1", showDeathTime = true),
     SLAYER_ZOMBIE_2("§eRevenant Horror 2", Type.REVENANT_HORROR, "§eRev 2", showDeathTime = true),
