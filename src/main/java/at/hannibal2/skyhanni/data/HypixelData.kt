@@ -12,10 +12,12 @@ import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.events.hypixel.HypixelLeaveEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.SkyBlockLeaveEvent
 import at.hannibal2.skyhanni.features.bingo.BingoApi
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -416,13 +418,23 @@ object HypixelData {
             checkProfileName()
         }
 
-        if (!LorenzUtils.onHypixel) {
-            checkHypixel()
-            if (LorenzUtils.onHypixel) {
+        val wasOnHypixel = LorenzUtils.onHypixel
+        checkHypixel()
+        val nowOnHypixel = LorenzUtils.onHypixel
+        when {
+            !wasOnHypixel && nowOnHypixel -> {
                 HypixelJoinEvent.post()
                 RepoManager.displayRepoStatus(true)
             }
+            wasOnHypixel && !nowOnHypixel -> {
+                if (skyBlock) {
+                    skyBlock = false
+                    SkyBlockLeaveEvent.post()
+                }
+                HypixelLeaveEvent.post()
+            }
         }
+
         if (!LorenzUtils.onHypixel) return
 
         if (!event.isMod(5)) return
@@ -431,6 +443,10 @@ object HypixelData {
         if (inSkyBlock) {
             checkSidebar()
             checkCurrentServerId()
+        } else {
+            if (!skyBlock) {
+                SkyBlockLeaveEvent.post()
+            }
         }
 
         if (inSkyBlock == skyBlock) return
@@ -442,6 +458,13 @@ object HypixelData {
         if (LorenzUtils.onHypixel && locrawData == null && lastLocRaw.passedSince() > 15.seconds) {
             lastLocRaw = SimpleTimeMark.now()
             HypixelCommands.locraw()
+        }
+    }
+
+    @HandleEvent
+    fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
+        if (skyBlockIsland != IslandType.NONE) {
+            IslandChangeEvent(IslandType.NONE, skyBlockIsland)
         }
     }
 
