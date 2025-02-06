@@ -38,16 +38,7 @@ class LivingCaveSnake(
 
     private fun isNotTouchingAir(): Boolean = blocks.any { it.isNotTouchingAir() }
 
-    private val directions = setOf(
-        LorenzVec(1, 0, 0),
-        LorenzVec(-1, 0, 0),
-        LorenzVec(0, 1, 0),
-        LorenzVec(0, -1, 0),
-        LorenzVec(0, 0, 1),
-        LorenzVec(0, 0, -1),
-    )
-
-    private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
+    private fun LorenzVec.isNotTouchingAir(): Boolean = LorenzVec.directions.none { plus(it).getBlockAt() == Blocks.air }
 
     private fun isSelected() = LivingCaveSnakeFeatures.selectedSnake == this
 
