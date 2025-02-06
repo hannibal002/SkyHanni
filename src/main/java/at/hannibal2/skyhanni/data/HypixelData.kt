@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.data
 
-import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.api.hypixelapi.HypixelLocationApi
 import at.hannibal2.skyhanni.config.ConfigManager.Companion.gson
 import at.hannibal2.skyhanni.data.model.TabWidget
+import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
@@ -287,14 +287,10 @@ object HypixelData {
         scoreboardVisitingAmountPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             return group("maxamount").toInt() + playerAmountOnIsland
         }
-
-        return when (skyBlockIsland) {
-            IslandType.MINESHAFT -> 4
-            IslandType.CATACOMBS -> 5
-            IslandType.CRYSTAL_HOLLOWS -> 24
-            IslandType.CRIMSON_ISLE -> 24
-            else -> if (serverId?.startsWith("mega") == true) 80 else 26
+        if (serverId?.startsWith("mega") == true) {
+            return IslandType.maxPlayersMega
         }
+        return skyBlockIsland.islandData?.maxPlayers ?: IslandType.maxPlayers
     }
 
     // This code is modified from NEU, and depends on NEU (or another mod) sending /locraw.
@@ -420,7 +416,7 @@ object HypixelData {
             checkHypixel()
             if (LorenzUtils.onHypixel) {
                 HypixelJoinEvent.post()
-                SkyHanniMod.repo.displayRepoStatus(true)
+                RepoManager.displayRepoStatus(true)
             }
         }
         if (!LorenzUtils.onHypixel) return
