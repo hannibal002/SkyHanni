@@ -230,7 +230,6 @@ object SlayerRngMeterDisplay {
     }
 
     private fun makeLink(text: String) =
-        
         Renderable.clickAndHover(
             text, listOf("§eClick to open RNG Meter Inventory."),
             onClick = {
