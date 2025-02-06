@@ -70,7 +70,7 @@ object LivingCaveLivingMetalHelper {
         if (animationStartTime.passedSince() > 4.seconds) return
 
         val maxTime = 500.milliseconds
-        val location = LocationUtils.slopeOverTime(animationStartTime, maxTime, a, b)
+        val location = LocationUtils.interpolateOverTime(animationStartTime, maxTime, a, b)
         event.drawWaypointFilled(
             location,
             color,

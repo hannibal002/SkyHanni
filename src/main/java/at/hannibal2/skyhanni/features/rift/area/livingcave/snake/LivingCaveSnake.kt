@@ -51,13 +51,13 @@ class LivingCaveSnake(
         val size = blocks.size
         if (size > 1 && state == State.CALM && currentRole == LivingCaveSnakeFeatures.Role.BREAK) {
             val location = lastBrokenBlock?.let {
-                LocationUtils.slopeOverTime(lastRemoveTime, 300.milliseconds, it, tail)
+                LocationUtils.interpolateOverTime(lastRemoveTime, 300.milliseconds, it, tail)
             } ?: tail
             event.renderBlock(location)
         }
         if (currentRole == LivingCaveSnakeFeatures.Role.CALM || size == 1 || state != State.CALM) {
             val location = if (size > 1) {
-                LocationUtils.slopeOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
+                LocationUtils.interpolateOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
             } else head
             event.renderBlock(location)
         }

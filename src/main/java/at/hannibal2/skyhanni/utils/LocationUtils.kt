@@ -132,17 +132,19 @@ object LocationUtils {
         }
     }
 
-    fun slopeOverTime(
+    fun interpolateOverTime(
         startTime: SimpleTimeMark,
         maxTime: Duration,
         from: LorenzVec,
         to: LorenzVec,
     ): LorenzVec {
         if (startTime == SimpleTimeMark.farPast()) return from
-        val diff = startTime.toMillis() + maxTime.inWholeMilliseconds - System.currentTimeMillis()
-        val location = if (diff > 0) {
-            val percentage = diff.toDouble() / maxTime.inWholeMilliseconds
-            from.slope(to, 1 - percentage)
+        val now = SimpleTimeMark.now()
+
+        val diff = now - startTime
+        val location = if (diff < maxTime) {
+            val percentage = diff / maxTime
+            from.interpolate(to, percentage)
         } else to
         return location
     }
