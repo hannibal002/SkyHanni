@@ -1071,7 +1071,7 @@ interface Renderable {
                 var virtualY = 0
                 var found = false
 
-                var space = end
+                var negativeSpace = end
 
                 // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
                 // there are more items above
@@ -1079,24 +1079,24 @@ interface Renderable {
                     scrollUpTip.renderXAligned(posX, posY, width)
                     GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
                     renderY += scrollUpTip.height
-                    space -= scrollUpTip.height
+                    negativeSpace -= scrollUpTip.height
                 }
 
                 val atScrollEnd = scroll.asInt() >= virtualHeight - height
                 if (!atScrollEnd) {
                     renderY += scrollDownTip.height
-                    space -= scrollDownTip.height
+                    negativeSpace -= scrollDownTip.height
                 }
 
                 for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..space) {
+                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..(end + negativeSpace)) {
                         renderable.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
                         renderY += renderable.height
                         found = true
                     } else if (found) {
                         found = false
-                        if (renderY + renderable.height <= height) {
+                        if (renderY + renderable.height <= height + negativeSpace) {
                             renderable.renderXAligned(posX, posY + renderY, width)
                         }
                         break
