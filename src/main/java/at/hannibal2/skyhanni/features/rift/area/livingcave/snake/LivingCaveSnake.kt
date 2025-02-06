@@ -49,10 +49,12 @@ class LivingCaveSnake(
 
     private fun LorenzVec.isNotTouchingAir(): Boolean = directions.none { plus(it).getBlockAt() == Blocks.air }
 
-    fun render(event: SkyHanniRenderWorldEvent, selectedSnake: LivingCaveSnake?, currentRole: LivingCaveSnakeFeatures.Role) {
+    private fun isSelected() = LivingCaveSnakeFeatures.selectedSnake == this
+
+    fun render(event: SkyHanniRenderWorldEvent, currentRole: LivingCaveSnakeFeatures.Role) {
         if (blocks.isEmpty()) return
         if (LorenzUtils.debug) {
-            event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", this == selectedSnake)
+            event.drawString(head.add(0.5, 0.8, 0.5), "§fstate = $state", isSelected())
         }
 
         val size = blocks.size
@@ -60,13 +62,13 @@ class LivingCaveSnake(
             val location = lastBrokenBlock?.let {
                 LocationUtils.slopeOverTime(lastRemoveTime, 300.milliseconds, it, tail)
             } ?: tail
-            event.renderBlock(location, selectedSnake)
+            event.renderBlock(location)
         }
         if (currentRole == LivingCaveSnakeFeatures.Role.CALM || size == 1 || state != State.CALM) {
             val location = if (size > 1) {
                 LocationUtils.slopeOverTime(lastAddTime, 200.milliseconds, blocks[1], head)
             } else head
-            event.renderBlock(location, selectedSnake)
+            event.renderBlock(location)
         }
         for (block in blocks) {
             if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
@@ -76,8 +78,8 @@ class LivingCaveSnake(
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec, selectedSnake: LivingCaveSnake?) {
-        val isSelected = this@LivingCaveSnake == selectedSnake
+    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec) {
+        val isSelected = isSelected()
         drawColor(location, state.color.toColor(), alpha = 1f, seeThroughBlocks = isSelected)
         if (isSelected) {
             drawString(location.add(0.5, 0.5, 0.5), state.display, seeThroughBlocks = true)

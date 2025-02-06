@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.rift.area.livingcave
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
 import at.hannibal2.skyhanni.events.ItemInHandChangeEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
@@ -16,6 +17,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalNames
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.block.Block
 import net.minecraft.client.Minecraft
@@ -29,7 +31,7 @@ object LivingCaveSnakeFeatures {
 
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
 
-    private var selectedSnake: LivingCaveSnake? = null
+    var selectedSnake: LivingCaveSnake? = null
 
     private val FROZEN_WATER_PUNGI = "FROZEN_WATER_PUNGI".toInternalName()
 
@@ -39,14 +41,14 @@ object LivingCaveSnakeFeatures {
         "ANTI_SENTIENT_PICKAXE",
         "EON_PICKAXE",
         "CHRONO_PICKAXE",
-    ).map { it.toInternalName() }
+    ).toInternalNames()
 
     private var currentRole: Role? = null
 
     private val addedList = ConcurrentLinkedQueue<LorenzVec>()
     private val removedList = ConcurrentLinkedQueue<LorenzVec>()
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockChange(event: ServerBlockChangeEvent) {
         if (!isEnabled()) return
         val location = event.location
@@ -88,7 +90,7 @@ object LivingCaveSnakeFeatures {
 
     private var lastClickedBlock: LorenzVec? = null
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
         if (!isEnabled()) return
 
@@ -107,7 +109,7 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
 
@@ -139,13 +141,13 @@ object LivingCaveSnakeFeatures {
         snakes.forEach { it.tick() }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         if (currentRole == null) return
 
         currentRole?.let { role ->
-            snakes.forEach { it.render(event, selectedSnake, role) }
+            snakes.forEach { it.render(event, role) }
         }
     }
 
@@ -165,7 +167,7 @@ object LivingCaveSnakeFeatures {
         }
     }
 
-    private fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.highlight
+    private fun isEnabled() = (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.highlight
 
     enum class Role {
         BREAK,
