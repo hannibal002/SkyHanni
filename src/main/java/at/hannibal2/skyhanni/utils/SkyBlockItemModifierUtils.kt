@@ -251,9 +251,9 @@ object SkyBlockItemModifierUtils {
                 }
 
                 val rawType = key.split("_")[0]
-                val type = GemstoneType.getByName(rawType)
+                val type = GemstoneType.getByNameOrNull(rawType)
 
-                val quality = GemstoneQuality.getByName(value)
+                val quality = GemstoneQuality.getByNameOrNull(value)
                 if (quality == null) {
                     ChatUtils.debug("Gemstone quality is null for item $name§7: ('$key' = '$value')")
                     continue
@@ -262,7 +262,7 @@ object SkyBlockItemModifierUtils {
                     list.add(GemstoneSlot(type, quality))
                 } else {
                     val newKey = gemstones.getString(key + "_gem")
-                    val newType = GemstoneType.getByName(newKey)
+                    val newType = GemstoneType.getByNameOrNull(newKey)
                     if (newType == null) {
                         ChatUtils.debug("Gemstone type is null for item $name§7: ('$newKey' with '$key' = '$value')")
                         continue
@@ -296,38 +296,42 @@ object SkyBlockItemModifierUtils {
         fun getInternalName() = "${quality}_${type}_GEM".toInternalName()
     }
 
-    enum class GemstoneQuality(val displayName: String) {
-        ROUGH("Rough"),
-        FLAWED("Flawed"),
-        FINE("Fine"),
-        FLAWLESS("Flawless"),
-        PERFECT("Perfect"),
+    enum class GemstoneQuality(private val displayName: String, private val color: LorenzColor) {
+        ROUGH("Rough", LorenzColor.WHITE),
+        FLAWED("Flawed", LorenzColor.GREEN),
+        FINE("Fine", LorenzColor.BLUE),
+        FLAWLESS("Flawless", LorenzColor.DARK_PURPLE),
+        PERFECT("Perfect", LorenzColor.GOLD),
         ;
+
+        override fun toString() = "${color.getChatColor()}$displayName"
 
         companion object {
 
-            fun getByName(name: String) = entries.firstOrNull { it.name == name }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name.lowercase() == name.lowercase() }
         }
     }
 
-    enum class GemstoneType(val displayName: String) {
-        JADE("Jade"),
-        AMBER("Amber"),
-        TOPAZ("Topaz"),
-        SAPPHIRE("Sapphire"),
-        AMETHYST("Amethyst"),
-        JASPER("Jasper"),
-        RUBY("Ruby"),
-        OPAL("Opal"),
-        ONYX("Onyx"),
-        AQUAMARINE("Aquamarine"),
-        CITRINE("Citrine"),
-        PERIDOT("Peridot"),
+    enum class GemstoneType(val displayName: String, private val color: LorenzColor) {
+        JADE("Jade", LorenzColor.GREEN),
+        AMBER("Amber", LorenzColor.GOLD),
+        TOPAZ("Topaz", LorenzColor.YELLOW),
+        SAPPHIRE("Sapphire", LorenzColor.BLUE),
+        AMETHYST("Amethyst", LorenzColor.DARK_PURPLE),
+        JASPER("Jasper", LorenzColor.LIGHT_PURPLE),
+        RUBY("Ruby", LorenzColor.RED),
+        OPAL("Opal", LorenzColor.WHITE),
+        ONYX("Onyx", LorenzColor.DARK_GRAY),
+        AQUAMARINE("Aquamarine", LorenzColor.AQUA),
+        CITRINE("Citrine", LorenzColor.DARK_RED),
+        PERIDOT("Peridot", LorenzColor.DARK_GREEN),
         ;
+
+        override fun toString() = "${color.getChatColor()}$displayName"
 
         companion object {
 
-            fun getByName(name: String) = entries.firstOrNull { it.name == name }
+            fun getByNameOrNull(name: String) = entries.firstOrNull { it.name == name || it.displayName == name }
         }
     }
 

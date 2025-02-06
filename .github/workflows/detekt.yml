@@ -74,7 +74,7 @@ jobs:
             group: detekt-comment-${{ github.event.pull_request.number }}
             cancel-in-progress: true
         needs: detekt
-        if: ${{ needs.detekt.outputs.sarif_exists == 'true' && failure() }}
+        if: ${{ needs.detekt.outputs.sarif_exists == 'true' && failure() && github.event.pull_request.draft == false }}
         permissions:
             pull-requests: write
         steps:
