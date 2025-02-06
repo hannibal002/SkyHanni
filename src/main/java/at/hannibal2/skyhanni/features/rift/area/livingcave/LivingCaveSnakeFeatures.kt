@@ -19,8 +19,8 @@ import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
+import at.hannibal2.skyhanni.utils.RenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.block.Block
@@ -34,7 +34,6 @@ import kotlin.time.Duration.Companion.seconds
 object LivingCaveSnakeFeatures {
     private val config get() = RiftApi.config.area.livingCave.snakeHelper
     private val snakes = mutableListOf<Snake>()
-    private val edges = LocationUtils.generateCubeEdges(0.005)
 
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
 
@@ -232,9 +231,7 @@ object LivingCaveSnakeFeatures {
                 if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
                     continue
                 }
-                for ((x, y) in edges) {
-                    event.draw3DLine(block + x, block + y, state.color.toColor(), 2, true)
-                }
+                event.drawEdges(block, state.color.toColor(), 2, true)
             }
         }
 

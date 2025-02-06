@@ -42,6 +42,7 @@ class ParkourHelper(
         visible = false
     }
 
+    @Suppress("HandleEventInspection")
     fun render(event: SkyHanniRenderWorldEvent) {
         if (locations.isEmpty()) {
             ErrorManager.logErrorWithData(
