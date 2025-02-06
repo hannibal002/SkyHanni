@@ -120,7 +120,7 @@ object ChatManager {
             event.cancel()
             messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
         }
-        if(trimmedMessage.startsWith("/") && CommandSentEvent(
+        if (trimmedMessage.startsWith("/") && CommandSentEvent(
                 trimmedMessage,
                 trimmedMessage.split(" ")[0].removePrefix("/"),
                 trimmedMessage.split(" "),

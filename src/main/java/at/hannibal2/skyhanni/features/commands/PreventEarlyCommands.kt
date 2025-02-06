@@ -35,10 +35,10 @@ object PreventEarlyCommands {
 
     @HandleEvent
     fun onCommand(event: CommandSentEvent) {
-        if(!config.preventEarlyExecution) return
+        if (!config.preventEarlyExecution) return
         command = event.command
 
-        if(command == "locraw") return
+        if (command == "locraw") return
 
         ChatUtils.debug("Setting command to $command")
         commandExecuted = SimpleTimeMark.now()
@@ -51,8 +51,8 @@ object PreventEarlyCommands {
 
     @HandleEvent
     fun onRecieveChatMessage(event: SkyHanniChatEvent) {
-        if(!config.preventEarlyExecution) return
-        if(cooldownPattern.matches(event.message)) {
+        if (!config.preventEarlyExecution) return
+        if (cooldownPattern.matches(event.message)) {
             val cooldown = cooldownPattern.matchMatcher(event.message) {
                 group("cooldown")
             }
