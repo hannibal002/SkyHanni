@@ -60,7 +60,7 @@ object PageScrolling {
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         if (InventoryUtils.inStorage() && InventoryUtils.isNeuStorageEnabled) return
-        if (!(currentlyScrollable || cooldown.isInFuture())) return
+        if (!currentlyScrollable && cooldown.isInFuture()) return
         if (!scroll.isMouseEventValid()) return
 
         val inventoryName = InventoryUtils.openInventoryName()
