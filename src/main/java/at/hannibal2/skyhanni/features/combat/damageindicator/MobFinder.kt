@@ -271,6 +271,11 @@ class MobFinder {
         if (entity is EntitySlime && entity.baseMaxHealth == 1_000) {
             return EntityResult(bossType = BossType.BACTE)
         }
+        if (entity is EntityOtherPlayerMP && entity.baseMaxHealth == 250 && entity.name == "Sun Gecko") {
+            entity.hasNameTagWith(15, "§e﴾ §8[§7Lv500§8] §l§4§lMagma Boss§r ")
+            return EntityResult(bossType = BossType.SUN_GECKO)
+
+        }
         return null
     }
 

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.rift.area.mountaintop
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.features.rift.area.mountaintop.SunGeckoConfig
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.mob.Mob
@@ -13,7 +12,7 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.events.ScoreboardUpdateEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.skyblock.ScoreboardAreaChangeEvent
+import at.hannibal2.skyhanni.events.skyblock.GraphAreaChangeEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
@@ -34,7 +33,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object SunGeckoHelper {
     private val config: SunGeckoConfig get() = SkyHanniMod.feature.rift.area.mountaintop.sunGecko
-    private val pos: Position get() = config.pos
+
     private val display = mutableListOf<String>()
     private val modifiers: MutableSet<Modifiers> = mutableSetOf()
     private val patternGroup = RepoPattern.group("rift.area.mountaintop.sun-gecko")
@@ -51,10 +50,12 @@ object SunGeckoHelper {
         "actionbar",
         "(?<firstHalf>§[ac]\\[.*) §e§lx(?<combo>\\d+) (?<secondHalf>§[ac].*)]",
     )
+
     private val sunGeckoActiveModifiers by patternGroup.pattern(
         "modifiers",
-        "§f                           §r§c§lACTIVE MODIFIERS!",
+        "§f {27}§r§c§lACTIVE MODIFIERS!",
     )
+
     private val sunGeckoChatLine by patternGroup.pattern(
         "chatline",
         "§6§l▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬",
@@ -110,7 +111,8 @@ object SunGeckoHelper {
         }
         val timeLeft = timeSinceLastHit + expiryTime
         if (timeLeft.timeUntil().inWholeMilliseconds > expiryTime.inWholeMilliseconds - 800.milliseconds.inWholeMilliseconds ||
-            timeLeft.isInPast()) {
+            timeLeft.isInPast()
+        ) {
             display.add("§aCombo Timer: ${expiryTime.format()}/${expiryTime.format()}")
         } else {
             display.add("§aCombo Timer: ${timeLeft.timeUntil().format(showMilliSeconds = true)}/${expiryTime.format()}")
@@ -129,25 +131,28 @@ object SunGeckoHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onMobSpawn(event: MobEvent.Spawn) {
-        if (!event.mob.name.contains("Sun Gecko")) return
-        if (event.mob.name.contains("?") && config.highlightFakeBoss) {
-            event.mob.highlight(Color.RED.addAlpha(80))
+        val mob = event.mob
+        val name = mob.name
+        if (!name.contains("Sun Gecko")) return
+        if (name.contains("?") && config.highlightFakeBoss) {
+            mob.highlight(Color.RED.addAlpha(80))
         } else {
             if (config.highlightRealBoss) {
-                event.mob.highlight(Color.GREEN.addAlpha(80))
+                mob.highlight(Color.GREEN.addAlpha(80))
             }
             if (currentBoss == null) {
-                currentBoss = event.mob
+                currentBoss = mob
             } else {
                 if (currentBoss?.baseEntity?.isEntityAlive == false ||
-                    (currentBoss?.health?.toInt() ?: 0) < 20) {
-                    currentBoss = event.mob
+                    (currentBoss?.health?.toInt() ?: 0) < 20
+                ) {
+                    currentBoss = mob
                 }
             }
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled() || !inTimeChamber) return
 
@@ -168,14 +173,14 @@ object SunGeckoHelper {
         totalHealth = boss.maxHealth
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onGuiRender(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled() || !inTimeChamber) return
 
-        pos.renderStrings(display, 0, "Sun Gecko Helper")
+        config.position.renderStrings(display, 0, "Sun Gecko Helper")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onInventoryUpdated(event: InventoryUpdatedEvent) {
         if (!isEnabled()) return
         if (event.inventoryName != "Modifiers") return
@@ -190,7 +195,7 @@ object SunGeckoHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onActionBar(event: ActionBarUpdateEvent) {
         if (!isEnabled()) return
         sunGeckoActionBar.findMatcher(event.actionBar) {
@@ -228,7 +233,7 @@ object SunGeckoHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onScoreboardUpdate(event: ScoreboardUpdateEvent) {
         if (!isEnabled()) return
         for (line in event.full) {
@@ -239,7 +244,7 @@ object SunGeckoHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         if (sunGeckoActiveModifiers.matches(event.message)) {
@@ -258,14 +263,14 @@ object SunGeckoHelper {
         }
     }
 
-    @HandleEvent
-    fun onAreaChanged(event: ScoreboardAreaChangeEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onAreaChanged(event: GraphAreaChangeEvent) {
         if (!isEnabled()) return
         reset()
         inTimeChamber = event.area == "Time Chamber"
     }
 
-    private fun isEnabled() = RiftApi.inRift() && config.enabled && RiftApi.inMountainTop()
+    private fun isEnabled() = config.enabled && RiftApi.inMountainTop()
 
     private enum class Modifiers(val slot: Int, val formattedName: String) {
         REVIVAL(19, "Revival"), // spawns a second dude

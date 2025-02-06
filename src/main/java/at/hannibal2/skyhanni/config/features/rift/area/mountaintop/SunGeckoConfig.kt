@@ -31,5 +31,5 @@ class SunGeckoConfig {
 
     @Expose
     @ConfigLink(owner = SunGeckoConfig::class, field = "enabled")
-    var pos: Position = Position(-256, 140, false, true)
+    var position: Position = Position(-256, 140)
 }
