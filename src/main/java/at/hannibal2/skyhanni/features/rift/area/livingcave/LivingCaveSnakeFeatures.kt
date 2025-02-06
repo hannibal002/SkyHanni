@@ -13,7 +13,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.drainForEach
 import at.hannibal2.skyhanni.utils.InventoryUtils
-import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
@@ -31,6 +30,8 @@ object LivingCaveSnakeFeatures {
     private val originalBlocks = mutableMapOf<LorenzVec, Block>()
 
     private var selectedSnake: LivingCaveSnake? = null
+
+    private val FROZEN_WATER_PUNGI = "FROZEN_WATER_PUNGI".toInternalName()
 
     // TODO maybe move this in repo
     private val pickaxes = setOf(
@@ -79,7 +80,7 @@ object LivingCaveSnakeFeatures {
     @HandleEvent
     fun onItemInHandChange(event: ItemInHandChangeEvent) {
         currentRole = when (event.newItem) {
-            "FROZEN_WATER_PUNGI".toInternalName() -> Role.CALM
+            FROZEN_WATER_PUNGI -> Role.CALM
             in pickaxes -> Role.BREAK
             else -> null
         }
@@ -93,12 +94,11 @@ object LivingCaveSnakeFeatures {
 
         lastClickedBlock = event.position
 
-        val snake = getClosest() ?: return
-        if (event.position !in snake.blocks) return
+        val snake = snakes.find { event.position in it.blocks } ?: return
 
         selectedSnake = snake
         if (event.clickType == ClickType.RIGHT_CLICK) {
-            if (InventoryUtils.itemInHandId == "FROZEN_WATER_PUNGI".toInternalName())
+            if (InventoryUtils.itemInHandId == FROZEN_WATER_PUNGI)
                 snake.lastCalmTime = SimpleTimeMark.now()
         } else {
             if (InventoryUtils.itemInHandId in pickaxes) {
@@ -164,9 +164,6 @@ object LivingCaveSnakeFeatures {
             found.firstOrNull()
         }
     }
-
-    private fun getClosest(): LivingCaveSnake? =
-        snakes.minByOrNull { it.blocks.minOfOrNull { block -> block.distanceSqToPlayer() } ?: Double.MAX_VALUE }
 
     private fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.highlight
 
