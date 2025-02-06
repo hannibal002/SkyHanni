@@ -59,7 +59,7 @@ _Frequently Asked Questions_
 
 > **12: Why can I still see the normal Scoreboard when using Custom Scoreboard?**
 > Most of the time, this is a mod conflict.
-> If you are using [Feather Client](https://feathermc.com/), please disable their own Scoreboard Feature (or just uninstall Feather it).
+> If you are using [Feather Client](https://feathermc.com/), please disable their own Scoreboard Feature (or just uninstall Feather).
 > If you are using [Sidebar Mod](https://github.com/Alexdoru/SidebarMod), please remove this mod.
 > If you are using [VanillaHUD](https://modrinth.com/mod/vanillahud), please update to 2.2.9 or newer to resolve this issue.
 > If you are using [Apec](https://github.com/BananaFructa/Apec/) and want to remove their Scoreboard, you need to remove Apec since they don't have an option to disable their Scoreboard.
