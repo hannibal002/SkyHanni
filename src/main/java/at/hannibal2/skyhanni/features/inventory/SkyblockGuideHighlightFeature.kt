@@ -260,6 +260,12 @@ class SkyblockGuideHighlightFeature private constructor(
                 "\\w+ Collections|Collections",
                 "§7Progress to .*|§7Find this item to add it to your|§7Kill this boss once to view collection|§7(?:Boss )?Collections (?:Unlocked|Maxed Out): §e.*",
             )
+            SkyblockGuideHighlightFeature(
+                { SkyHanniMod.feature.event.anniversaryCelebration400.highlightDailyTasks },
+                "century",
+                "Daily Tasks",
+                "§c§lINCOMPLETE",
+            )
         }
     }
 }
