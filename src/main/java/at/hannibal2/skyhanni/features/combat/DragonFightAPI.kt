@@ -36,7 +36,7 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST: Dragon HP: §a4,824,217 §c❤
+     * REGEX-TEST: Dragon HP: 4,824,217 ❤
      */
     private val scoreboardHPPattern by group.pattern(
         "scoreboard.hp",
@@ -44,7 +44,7 @@ object DragonFightAPI {
     )
 
     /**
-     * REGEX-TEST: Your Damage: §c0
+     * REGEX-TEST: Your Damage: 0
      */
     private val scoreboardYourDamagePattern by group.pattern(
         "scoreboard.your-damage",

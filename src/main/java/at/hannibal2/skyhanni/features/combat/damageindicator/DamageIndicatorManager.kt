@@ -494,7 +494,7 @@ object DamageIndicatorManager {
         }
         return DragonFightAPI.currentHp?.let {
             "§c" + it.shortFormat()
-        } ?: ""
+        }.orEmpty()
     }
 
     private fun checkBacte(entityData: EntityData): String {
