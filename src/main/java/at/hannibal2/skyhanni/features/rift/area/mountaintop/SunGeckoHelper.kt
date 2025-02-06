@@ -51,6 +51,13 @@ object SunGeckoHelper {
         "(?<firstHalf>§[ac]\\[.*) §e§lx(?<combo>\\d+) (?<secondHalf>§[ac].*)]",
     )
 
+    /**
+     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
+     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
+     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
+     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
+     * REGEX-TEST: §f                           §r§c§lACTIVE MODIFIERS!
+     */
     private val sunGeckoActiveModifiers by patternGroup.pattern(
         "modifiers",
         "§f {27}§r§c§lACTIVE MODIFIERS!",
