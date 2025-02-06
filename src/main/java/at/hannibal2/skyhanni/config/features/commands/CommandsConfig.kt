@@ -69,4 +69,12 @@ class CommandsConfig {
     @ConfigOption(name = "Transfer Cooldown Message", desc = "Sends a message in chat when the transfer cooldown ends.")
     @ConfigEditorBoolean
     var transferCooldownMessage: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Prevent Early Commands",
+        desc = ""
+    )
+    @Accordion
+    var preventEarlyExecutionConfig: PreventEarlyExecutionConfig = PreventEarlyExecutionConfig()
 }

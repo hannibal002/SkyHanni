@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.features.commands
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.CommandSentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -18,6 +19,8 @@ import kotlin.time.DurationUnit
 
 @SkyHanniModule
 object PreventEarlyCommands {
+    private val config get() = SkyHanniMod.feature.misc.commands.preventEarlyExecutionConfig
+
     private var commandExecuted: SimpleTimeMark = SimpleTimeMark.farPast()
     private var worldChanged: SimpleTimeMark = SimpleTimeMark.farPast()
     private var command: String = ""
@@ -32,6 +35,7 @@ object PreventEarlyCommands {
 
     @HandleEvent
     fun onCommand(event: CommandSentEvent) {
+        if(!config.preventEarlyExecution) return
         command = event.command
 
         if(command == "locraw") return
@@ -47,6 +51,7 @@ object PreventEarlyCommands {
 
     @HandleEvent
     fun onRecieveChatMessage(event: SkyHanniChatEvent) {
+        if(!config.preventEarlyExecution) return
         if(cooldownPattern.matches(event.message)) {
             val cooldown = cooldownPattern.matchMatcher(event.message) {
                 group("cooldown")
