@@ -5,6 +5,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.CommandSentEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
 import at.hannibal2.skyhanni.features.chat.ChatFilterGui
@@ -114,6 +115,15 @@ object ChatManager {
                 trimmedMessage,
                 trimmedMessage.split(" "),
                 originatingModContainer
+            ).post()
+        ) {
+            event.cancel()
+            messageHistory[IdentityCharacteristics(component)] = result.copy(actionKind = ActionKind.OUTGOING_BLOCKED)
+        }
+        if(trimmedMessage.startsWith("/") && CommandSentEvent(
+                trimmedMessage,
+                trimmedMessage.split(" ")[0].removePrefix("/"),
+                trimmedMessage.split(" "),
             ).post()
         ) {
             event.cancel()
