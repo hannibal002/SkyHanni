@@ -24,6 +24,7 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import net.minecraft.item.ItemStack
 import java.awt.Color
 import kotlin.time.Duration.Companion.milliseconds
 
@@ -105,26 +106,31 @@ object CenturyPartyInvitation {
                 read = true
                 continue
             }
-            if (!read) continue
-            val colorCode = itemMissingColorLinePattern.matchMatcher(line) {
-                group("color")
-            } ?: run {
-                break
+            if (read) {
+                readLine(line, hand)?.let {
+                    set.add(it)
+                }
             }
-            val foundColor = colorCode.toCharArray().first().toLorenzColor() ?: run {
-                ErrorManager.logErrorStateWithData(
-                    "Error reading Cenutry Party Invitation colors missing",
-                    "unknown color code detected",
-                    "colorCode" to colorCode,
-                    "line" to line,
-                    "lore" to hand.getLore(),
-                )
-                break
-            }
-            set.add(foundColor)
         }
 
         return set
+    }
+
+    private fun readLine(line: String, hand: ItemStack): LorenzColor? {
+        val colorCode = itemMissingColorLinePattern.matchMatcher(line) {
+            group("color")
+        } ?: return null
+
+        return colorCode.toCharArray().first().toLorenzColor() ?: run {
+            ErrorManager.logErrorStateWithData(
+                "Error reading Cenutry Party Invitation colors missing",
+                "unknown color code detected",
+                "colorCode" to colorCode,
+                "line" to line,
+                "lore" to hand.getLore(),
+            )
+            return null
+        }
     }
 
     @HandleEvent
