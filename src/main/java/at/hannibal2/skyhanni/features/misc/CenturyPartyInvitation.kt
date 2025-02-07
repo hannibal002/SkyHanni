@@ -59,7 +59,7 @@ object CenturyPartyInvitation {
      * REGEX-TEST: §aYou had already gained the bonus, so... at least everyone is now invited!
      */
     private val chatFoundAllPattern by chatGroup.pattern(
-        "chat-message.party-add",
+        "chat-message.found-all",
         "§aYou had already gained the bonus, so\\.\\.\\. at least everyone is now invited!",
     )
 
