@@ -238,14 +238,14 @@ class MobFinder {
         if (floor6Giants && entity.posY > 68) {
             val (extraDelay, bossType) = checkExtraF6GiantsDelay(entity)
             return EntityResult(
-                floor6GiantsSpawnTime + extraDelay,
+                floor6GiantsSpawnTime + extraDelay + 5_000,
                 floor6GiantsSpawnTime + extraDelay > System.currentTimeMillis(),
                 bossType = bossType,
             )
         }
 
         if (floor6Sadan) {
-            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true, bossType = BossType.DUNGEON_F6_SADAN)
+            return EntityResult(floor6SadanSpawnTime, finalDungeonBoss = true, bossType = BossType.DUNGEON_F6_SADAN, ignoreBlocks = true)
         }
         return null
     }
@@ -590,13 +590,13 @@ class MobFinder {
             // F6
             "§c[BOSS] Sadan§r§f: ENOUGH!" -> {
                 floor6Giants = true
-                floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400
+                floor6GiantsSpawnTime = System.currentTimeMillis() + 7_400 - 4_600
             }
 
             "§c[BOSS] Sadan§r§f: You did it. I understand now, you have earned my respect." -> {
                 floor6Giants = false
                 floor6Sadan = true
-                floor6SadanSpawnTime = System.currentTimeMillis() + 32_500 - 11_500
+                floor6SadanSpawnTime = System.currentTimeMillis() + 11_500
             }
 
             "§c[BOSS] Sadan§r§f: NOOOOOOOOO!!! THIS IS IMPOSSIBLE!!" -> {
