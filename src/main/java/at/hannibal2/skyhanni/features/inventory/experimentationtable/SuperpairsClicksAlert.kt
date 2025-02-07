@@ -69,7 +69,7 @@ object SuperpairsClicksAlert {
         event.inventoryName.contains("Ultrasequencer") &&
             event.inventoryItems.entries
                 .filter { it.key < 45 }
-                .any { it.value.stackSize >= roundsNeeded }
+                .any { it.value.stackSize > roundsNeeded - 1 }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
