@@ -271,6 +271,10 @@ class MobFinder {
         if (entity is EntitySlime && entity.baseMaxHealth == 1_000) {
             return EntityResult(bossType = BossType.BACTE)
         }
+        if (entity is EntityOtherPlayerMP && entity.baseMaxHealth == 250 && entity.name == "Sun Gecko") {
+            return EntityResult(bossType = BossType.SUN_GECKO)
+
+        }
         return null
     }
 

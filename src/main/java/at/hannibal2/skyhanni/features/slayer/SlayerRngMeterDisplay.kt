@@ -43,30 +43,34 @@ object SlayerRngMeterDisplay {
     private val patternGroup = RepoPattern.group("slayer.rngmeter")
     private val inventoryNamePattern by patternGroup.pattern(
         "inventoryname",
-        "(?<name>.*) RNG Meter"
+        "(?<name>.*) RNG Meter",
     )
     private val slayerInventoryNamePattern by patternGroup.pattern(
         "inventoryname.slayer",
-        "Slayer"
+        "Slayer",
     )
     private val updatePattern by patternGroup.pattern(
         "update",
-        " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP"
+        " {3}§dRNG Meter §f- §d(?<exp>.*) Stored XP",
     )
     private val changedItemPattern by patternGroup.pattern(
         "changeditem",
-        "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!"
+        "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!",
     )
+
     /**
      * REGEX-TEST: §aEnchanted Book (§d§lDuplex I§a)
      */
     private val bookFormatPattern by patternGroup.pattern(
         "book.format",
-        "§aEnchanted Book \\((?<name>.*)§a\\)"
+        "§aEnchanted Book \\((?<name>.*)§a\\)",
     )
 
     private var display = emptyList<Renderable>()
     private var lastItemDroppedTime = SimpleTimeMark.farPast()
+    private var lastRngMeterUpdate = SimpleTimeMark.farPast()
+    private var timesUpdatedTotal = 0
+    private var timesUpdatedSinceLastDrop = 0
 
     var rngScore = mapOf<String, Map<NeuInternalName, Long>>()
 
@@ -98,6 +102,8 @@ object SlayerRngMeterDisplay {
         val currentMeter = updatePattern.matchMatcher(event.message) {
             group("exp").formatLong()
         } ?: return
+        timesUpdatedTotal++
+        timesUpdatedSinceLastDrop++
 
         val storage = getStorage() ?: return
         val old = storage.currentMeter
@@ -123,13 +129,32 @@ object SlayerRngMeterDisplay {
                 var rawPercentage = old.toDouble() / storage.goalNeeded
                 if (rawPercentage > 1) rawPercentage = 1.0
                 val percentage = LorenzUtils.formatPercentage(rawPercentage)
+                if (storage.goalNeeded == -1L) {
+                    ErrorManager.logErrorStateWithData(
+                        "Error Calculating Slayer RNG Meter",
+                        "gaol needed is -1, this should never be the case!",
+                        "goalNeeded" to storage.goalNeeded,
+                        "currentMeter" to storage.currentMeter,
+                        "gainPerBoss" to storage.gainPerBoss,
+                        "itemGoal" to storage.itemGoal,
+                        "rawPercentage" to rawPercentage,
+                        "percentage" to percentage,
+                        "old" to old,
+                        "lastItemDroppedTime" to lastItemDroppedTime,
+                        "lastRngMeterUpdate" to lastRngMeterUpdate,
+                        "timesUpdatedTotal" to timesUpdatedTotal,
+                        "timesUpdatedSinceLastDrop" to timesUpdatedSinceLastDrop,
+                    )
+                }
                 ChatUtils.chat("§dRNG Meter §7dropped at §e$percentage §7XP ($from/$to§7)")
                 lastItemDroppedTime = SimpleTimeMark.now()
+                timesUpdatedSinceLastDrop = 0
             }
             if (blockChat) {
                 event.blockedReason = "slayer_rng_meter"
             }
         }
+        lastRngMeterUpdate = SimpleTimeMark.farPast()
         update()
     }
 
@@ -189,7 +214,7 @@ object SlayerRngMeterDisplay {
                     "RNG Meter goal setting failed",
                     "internalName" to internalName,
                     "currentSlayer" to getCurrentSlayer(),
-                    "repo" to rngScore
+                    "repo" to rngScore,
                 )
         }
         update()
