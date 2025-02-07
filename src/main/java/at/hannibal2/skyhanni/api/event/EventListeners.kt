@@ -17,7 +17,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
         GenericSkyHanniEvent::class.java.isAssignableFrom(event),
     )
 
-    fun addListener(method: Method, instance: Any, options: HandleEvent) {
+    fun addListener(method: Method, instance: Any, options: HandleEventCached) {
         require(method.parameterCount == 1)
         val generic: Class<*>? = if (isGeneric) {
             ReflectionUtils.resolveUpperBoundSuperClassGenericParameter(
@@ -68,15 +68,31 @@ class EventListeners private constructor(val name: String, private val isGeneric
     class Listener(
         val name: String,
         val invoker: Consumer<Any>,
-        val options: HandleEvent,
+        val options: HandleEventCached,
         val generic: Class<*>?,
     ) {
         val onlyOnIslandTypes: Set<IslandType> = getIslands(options)
 
         companion object {
-            private fun getIslands(options: HandleEvent): Set<IslandType> =
+            private fun getIslands(options: HandleEventCached): Set<IslandType> =
                 if (options.onlyOnIslands.isEmpty()) setOf(options.onlyOnIsland)
                 else options.onlyOnIslands.toSet()
         }
+    }
+
+    data class HandleEventCached(
+        val onlyOnSkyblock: Boolean,
+        val onlyOnIsland: IslandType,
+        val onlyOnIslands: Array<out IslandType>,
+        val priority: Int,
+        val receiveCancelled: Boolean
+    ) {
+        constructor(event: HandleEvent) : this(
+            event.onlyOnSkyblock,
+            event.onlyOnIsland,
+            event.onlyOnIslands,
+            event.priority,
+            event.receiveCancelled
+        )
     }
 }

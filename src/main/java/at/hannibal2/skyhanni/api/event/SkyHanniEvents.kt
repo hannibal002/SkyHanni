@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.api.event
 
+import at.hannibal2.skyhanni.api.event.EventListeners.HandleEventCached
 import at.hannibal2.skyhanni.data.MinecraftData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledEventsJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -38,7 +39,8 @@ object SkyHanniEvents {
     @Suppress("UNCHECKED_CAST")
     private fun registerMethod(method: Method, instance: Any) {
         if (method.parameterCount != 1) return
-        val options = method.getAnnotation(HandleEvent::class.java) ?: return
+        val annotation = method.getAnnotation(HandleEvent::class.java) ?: return
+        val options = HandleEventCached(annotation)
         val event = method.parameterTypes[0]
         if (!SkyHanniEvent::class.java.isAssignableFrom(event)) return
         listeners.getOrPut(event as Class<SkyHanniEvent>) { EventListeners(event) }
