@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -1128,48 +1129,15 @@ object RenderUtils {
 
     fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         LineDrawer.draw3D(partialTicks) {
-            for ((p1, p2) in location.edges) {
-                draw3DLine(p1, p2, color, lineWidth, depth)
-            }
+            drawEdges(location, color, lineWidth, depth)
         }
     }
 
     fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
         // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
         LineDrawer.draw3D(partialTicks) {
-            for ((p1, p2) in axisAlignedBB.calculateEdges()) {
-                draw3DLine(p1, p2, color, lineWidth, depth)
-            }
+            drawEdges(axisAlignedBB, color, lineWidth, depth)
         }
-    }
-
-    fun AxisAlignedBB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
-        val bottomLeftFront = LorenzVec(minX, minY, minZ)
-        val bottomLeftBack = LorenzVec(minX, minY, maxZ)
-        val topLeftFront = LorenzVec(minX, maxY, minZ)
-        val topLeftBack = LorenzVec(minX, maxY, maxZ)
-        val bottomRightFront = LorenzVec(maxX, minY, minZ)
-        val bottomRightBack = LorenzVec(maxX, minY, maxZ)
-        val topRightFront = LorenzVec(maxX, maxY, minZ)
-        val topRightBack = LorenzVec(maxX, maxY, maxZ)
-
-        return setOf(
-            // Bottom face
-            bottomLeftFront to bottomLeftBack,
-            bottomLeftBack to bottomRightBack,
-            bottomRightBack to bottomRightFront,
-            bottomRightFront to bottomLeftFront,
-            // Top face
-            topLeftFront to topLeftBack,
-            topLeftBack to topRightBack,
-            topRightBack to topRightFront,
-            topRightFront to topLeftFront,
-            // Vertical edges
-            bottomLeftFront to topLeftFront,
-            bottomLeftBack to topLeftBack,
-            bottomRightBack to topRightBack,
-            bottomRightFront to topRightFront,
-        )
     }
 
     fun SkyHanniRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
@@ -1444,6 +1412,19 @@ object RenderUtils {
                     val p2 = it.second
                     drawBezier2(p1, p2, p3, color, lineWidth, depth)
                 }
+            }
+        }
+
+        fun drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+            for ((p1, p2) in location.edges) {
+                draw3DLine(p1, p2, color, lineWidth, depth)
+            }
+        }
+
+        fun drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
+            // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+            for ((p1, p2) in axisAlignedBB.calculateEdges()) {
+                draw3DLine(p1, p2, color, lineWidth, depth)
             }
         }
 

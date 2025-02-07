@@ -7,8 +7,8 @@ import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.RenderUtils.LineDrawer
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
-import at.hannibal2.skyhanni.utils.RenderUtils.drawEdges
 import at.hannibal2.skyhanni.utils.RenderUtils.drawString
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.init.Blocks
@@ -61,11 +61,13 @@ class LivingCaveSnake(
             } else head
             event.renderBlock(location)
         }
-        for (block in blocks) {
-            if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
-                continue
+        LineDrawer.draw3D(event.partialTicks) {
+            for (block in blocks) {
+                if (block == head && lastAddTime.passedSince() < 200.milliseconds) {
+                    continue
+                }
+                drawEdges(block, state.color.toColor(), 2, true)
             }
-            event.drawEdges(block, state.color.toColor(), 2, true)
         }
     }
 

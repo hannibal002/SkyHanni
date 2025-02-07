@@ -148,4 +148,33 @@ object LocationUtils {
         } else to
         return location
     }
+
+    fun AxisAlignedBB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
+        val bottomLeftFront = LorenzVec(minX, minY, minZ)
+        val bottomLeftBack = LorenzVec(minX, minY, maxZ)
+        val topLeftFront = LorenzVec(minX, maxY, minZ)
+        val topLeftBack = LorenzVec(minX, maxY, maxZ)
+        val bottomRightFront = LorenzVec(maxX, minY, minZ)
+        val bottomRightBack = LorenzVec(maxX, minY, maxZ)
+        val topRightFront = LorenzVec(maxX, maxY, minZ)
+        val topRightBack = LorenzVec(maxX, maxY, maxZ)
+
+        return setOf(
+            // Bottom face
+            bottomLeftFront to bottomLeftBack,
+            bottomLeftBack to bottomRightBack,
+            bottomRightBack to bottomRightFront,
+            bottomRightFront to bottomLeftFront,
+            // Top face
+            topLeftFront to topLeftBack,
+            topLeftBack to topRightBack,
+            topRightBack to topRightFront,
+            topRightFront to topLeftFront,
+            // Vertical edges
+            bottomLeftFront to topLeftFront,
+            bottomLeftBack to topLeftBack,
+            bottomRightBack to topRightBack,
+            bottomRightFront to topRightFront,
+        )
+    }
 }
