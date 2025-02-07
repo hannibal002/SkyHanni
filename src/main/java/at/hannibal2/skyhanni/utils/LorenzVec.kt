@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
@@ -24,6 +25,8 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
+    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).expand(0.0001, 0.0001, 0.0001).calculateEdges() }
+
     constructor() : this(0.0, 0.0, 0.0)
 
     constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
@@ -201,11 +204,20 @@ data class LorenzVec(
         return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
 
-    fun middle(other: LorenzVec): LorenzVec = this.plus(other.minus(this) / 2)
+    fun middle(other: LorenzVec): LorenzVec = this + ((other - this) / 2)
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
     companion object {
+
+        val directions = setOf(
+            LorenzVec(1, 0, 0),
+            LorenzVec(-1, 0, 0),
+            LorenzVec(0, 1, 0),
+            LorenzVec(0, -1, 0),
+            LorenzVec(0, 0, 1),
+            LorenzVec(0, 0, -1),
+        )
 
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180

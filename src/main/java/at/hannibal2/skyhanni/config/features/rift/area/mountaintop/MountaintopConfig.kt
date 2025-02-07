@@ -5,6 +5,11 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
 class MountaintopConfig {
+    
+    @ConfigOption(name = "Sun Gecko", desc = "")
+    @Accordion
+    var sunGecko: SunGeckoConfig = SunGeckoConfig()
+    
     @Expose
     @ConfigOption(name = "Timite", desc = "")
     @Accordion
