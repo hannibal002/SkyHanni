@@ -132,11 +132,11 @@ object LivingCaveSnakeFeatures {
         }
 
         snakes.removeIf {
-            val invalidSize = it.invalidSize()
+            val invalidShape = it.invalidShape()
             val invalidHead = it.invalidHead()
-            if (invalidSize && LorenzUtils.debug) ChatUtils.chat("LivingCaveSnake remove because of invalid size")
+            if (invalidShape && LorenzUtils.debug) ChatUtils.chat("LivingCaveSnake remove because of invalid shape")
             if (invalidHead && LorenzUtils.debug) ChatUtils.chat("LivingCaveSnake remove because of invalid head")
-            invalidSize || invalidHead
+            invalidShape || invalidHead
         }
         snakes.forEach { it.tick() }
     }

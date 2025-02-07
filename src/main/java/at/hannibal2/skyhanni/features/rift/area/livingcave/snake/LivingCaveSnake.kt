@@ -28,7 +28,7 @@ class LivingCaveSnake(
     val head get() = blocks.first()
     private val tail get() = blocks.last()
 
-    fun invalidSize(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
+    fun invalidShape(): Boolean = blocks.isEmpty() || blocks.zipWithNext().any { (a, b) ->
         a.distance(b) > 3
     }
 
