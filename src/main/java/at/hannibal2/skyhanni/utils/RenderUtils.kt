@@ -47,7 +47,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-@Suppress("LargeClass")
+@Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {
@@ -1037,7 +1037,7 @@ object RenderUtils {
         val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
         val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
         val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        val eyeHeight = thePlayer.eyeHeight
+        val eyeHeight = thePlayer.getEyeHeight()
 
         val dX = (x - renderOffsetX) * (x - renderOffsetX)
         val dY = (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight))
@@ -1130,9 +1130,9 @@ object RenderUtils {
 
     fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
-        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        val eyeHeight = player.getEyeHeight().toDouble()
         PatcherFixes.onPlayerEyeLine()
-        return exactLocation(player) + add
+        return exactLocation(player).add(y = eyeHeight)
     }
 
     fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
@@ -1413,9 +1413,6 @@ object RenderUtils {
             }
         }
 
-        fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
-            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), lorenzVec, color, lineWidth, depth)
-
         fun drawBezier2(
             p1: LorenzVec,
             p2: LorenzVec,
@@ -1471,8 +1468,6 @@ object RenderUtils {
                 GlStateManager.disableTexture2D()
                 GlStateManager.disableCull()
                 GlStateManager.disableAlpha()
-
-                val tessellator = Tessellator.getInstance()
 
                 GlStateManager.pushMatrix()
                 val inverseView = getViewerPos(partialTicks)
