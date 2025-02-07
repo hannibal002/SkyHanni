@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.data.mob
 
+import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -13,6 +14,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -79,6 +81,8 @@ class Mob(
     val id = baseEntity.entityId
 
     val owner: MobUtils.OwnerShip?
+
+    fun belongsToPlayer(): Boolean = owner?.equals(LorenzUtils.getPlayerName()) ?: false
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }

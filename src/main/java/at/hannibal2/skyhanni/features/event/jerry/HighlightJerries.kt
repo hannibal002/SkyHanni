@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
 import at.hannibal2.skyhanni.utils.LorenzColor
-import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 
@@ -30,7 +29,7 @@ object HighlightJerries {
 
     private fun parseJerry(mob: Mob) {
         val type = jerryPattern.matchGroup(mob.name, "color") ?: return
-        if (mob.owner?.equals(LorenzUtils.getPlayerName()) != true) return
+        if (!mob.belongsToPlayer()) return
         val color = when (type) {
             "Green" -> LorenzColor.GREEN
             "Blue" -> LorenzColor.BLUE
