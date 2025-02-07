@@ -7,7 +7,7 @@ import at.hannibal2.skyhanni.data.mob.MobData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ConditionalUtils.onTurnOn
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onEnable
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -44,7 +44,7 @@ object HighlightJerries {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        config.highlightJerries.onTurnOn { MobData.skyblockMobs.forEach { parseJerry(it) } }
-        config.lineJerries.onTurnOn { MobData.skyblockMobs.forEach { parseJerry(it) } }
+        config.highlightJerries.onEnable { MobData.skyblockMobs.forEach { parseJerry(it) } }
+        config.lineJerries.onEnable { MobData.skyblockMobs.forEach { parseJerry(it) } }
     }
 }

@@ -30,7 +30,7 @@ object ConditionalUtils {
         whenChanged { _, new -> observer(new) }
     }
 
-    fun Property<out Boolean>.onTurnOn(observer: Runnable) {
+    fun Property<out Boolean>.onEnable(observer: Runnable) {
         whenChanged { _, _ ->
             if (this.get()) {
                 observer.run()
