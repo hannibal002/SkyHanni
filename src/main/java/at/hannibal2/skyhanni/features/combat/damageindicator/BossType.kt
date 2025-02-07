@@ -106,6 +106,7 @@ enum class BossType(
     // The Rift
     LEECH_SUPREME("§cLeech Supreme", Type.THE_RIFT_BOSSES),
     BACTE("§aBacte", Type.THE_RIFT_BOSSES),
+    SUN_GECKO("§cSun Gecko", Type.THE_RIFT_BOSSES),
 
     WINTER_REINDRAKE("Reindrake", Type.REINDRAKE), // TODO fix totally
 
