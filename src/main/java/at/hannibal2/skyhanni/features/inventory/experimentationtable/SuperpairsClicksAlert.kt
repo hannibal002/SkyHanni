@@ -69,6 +69,7 @@ object SuperpairsClicksAlert {
         event.inventoryName.contains("Ultrasequencer") &&
             event.inventoryItems.entries
                 .filter { it.key < 45 }
+                // We substract 1 due to a Hypixel bug causing one less round to be required
                 .any { it.value.stackSize > roundsNeeded - 1 }
 
     @HandleEvent
