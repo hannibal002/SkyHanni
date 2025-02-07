@@ -1,6 +1,5 @@
 package at.hannibal2.skyhanni.data.mob
 
-import at.hannibal2.skyhanni.data.mob.Mob.Type
 import at.hannibal2.skyhanni.data.mob.MobFilter.summonOwnerPattern
 import at.hannibal2.skyhanni.events.MobEvent
 import at.hannibal2.skyhanni.features.rift.RiftApi
@@ -256,6 +255,8 @@ class Mob(
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean = { true }) =
+        LineToMobHandler.register(this, color, lineWidth, depth, condition)
+
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 }
