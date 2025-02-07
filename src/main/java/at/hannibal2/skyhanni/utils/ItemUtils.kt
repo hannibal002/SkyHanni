@@ -647,10 +647,13 @@ object ItemUtils {
         val input = args.joinToString(" ")
         Text.text("§eProcessing..").send(testItemMessageId)
 
+        // running .getPrice() on thousands of items may take ~500ms
         SkyHanniMod.coroutineScope.launch {
             buildTestItemMessage(input).send(testItemMessageId)
         }
     }
+
+    private val testItemMessageId = ChatUtils.getUniqueMessageId()
 
     private fun buildTestItemMessage(input: String) = buildList {
         add("".asComponent())
@@ -676,7 +679,10 @@ object ItemUtils {
                 matches.add(internalName)
             }
         }
-        // somehow enchantments arent part of NeuItems.allItemsCache
+        // TODO add all enchantments to NeuItems.allItemsCache
+        // somehow, enchantments arent part of NeuItems.allItemsCache atm
+        // itemNameCache contains bazaar enchantments
+        // the non bz enchantments are only in the cache after found in game
         for ((internalName, name) in itemNameCache) {
             if (name.contains(input, ignoreCase = true)) {
                 matches.add(internalName)
@@ -699,8 +705,6 @@ object ItemUtils {
         }
     }
 
-    private val testItemMessageId = ChatUtils.getUniqueMessageId()
-
     private fun MutableList<ChatComponentText>.formatTestItem(internalName: NeuInternalName, price: Double) {
         val priceColor = if (price > 0) "§6" else "§7"
         val name = internalName.itemName
@@ -713,8 +717,8 @@ object ItemUtils {
             listOf(
                 name,
                 "",
-                "§ePrice: $priceFormat",
-                "§eInternal name: §8${internalName.asString()}",
+                "§7Price: $priceFormat",
+                "§7Internal name: §8${internalName.asString()}",
                 "",
                 "§eClick to copy internal name to clipboard!",
             ),
