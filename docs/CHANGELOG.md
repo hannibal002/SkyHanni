@@ -34,6 +34,12 @@
 + Added Bacte Phase Display to the Damage Indicator. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
 + Added waypoints for Bacte's Tentacles with hit counts. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
     + Shows hit counts instead of HP display due to varying max health values.
++ Added Rift Snake Highlighter. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/321)
+    + Highlights moving snakes in the Living Cave in the Rift.
+    + Uses colors to indicate different snake states.
+    + Highlights head or tail based on whether the held item calms or breaks the snake.
++ Added Sun Gecko Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/3097)
+    + Displays health, combo, combo progress, combo timeout, and active modifiers.
 
 #### Mining
 
@@ -49,6 +55,10 @@
 + Added Century Daily Task Highlight. - Thunderbalde73 (https://github.com/hannibal002/SkyHanni/pull/3355)
 + Added Slice of Cake team finder for Anniversary Celebration. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3354)
     + Added highlight for players in the correct team when holding a Slice of Cake item.
++ Added Line to Jerry. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3388)
+    + Shows a line to your spawned Jerry from Jerrypocalypse.
++ Added Player Highlighter for Century Party Invitation item. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3360)
+    + Highlights players eligible for a Century Party invitation.
 
 #### Dungeon
 
@@ -81,6 +91,7 @@
     + Added Trade Overlay, Equipment Overlay, and Storage Overlay support.
 + Made the "Open Last Storage" feature persistent across instances. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3182)
 + Made searches in Sack display GUIs sack-specific. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3338)
++ "Craft materials from bazaar" now supports purchasing from AH. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3386)
 
 #### Mining Improvements
 
@@ -100,6 +111,7 @@
 + Added filtering by Pest Type in Pest Profit Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2987)
     + Best-effort mapping of existing data; coins and common items may be misattributed or missing per pest.
 + Pest Profit Tracker now tracks the sprays that you use. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2987)
++ Disabled "Block Refusing New Visitors" on Bingo. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3391)
 
 #### Event Improvements
 
@@ -139,6 +151,7 @@
 + Fixed Motes Session incorrectly showing negative changes as gained motes. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3166)
 + Fixed Rift Blood Effigies detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/3179)
 + Fixed Rift Dance Room Helper always hiding players. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3244)
++ Fixed Motes per Session when leaving Hypixel. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3374)
 
 #### Chocolate Factory Bug Fixes
 
@@ -150,6 +163,10 @@
 #### Event Bug Fixes
 
 + Fixed "Tokens Owned" not always updating in Carnival Shop. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3153)
++ Fixed issue with Hitman statistics. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3210)
++ Fixed Jerry highlight being too aggressive. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3388)
+    + Now only highlights your Jerrys.
+    + No longer shows false positives during the Great Spook Festival.
 
 #### Inventory Bug Fixes
 
@@ -178,6 +195,13 @@
 + Fixed bits spent calculation in Experimentation Table. - YoGoUrT_20 (https://github.com/hannibal002/SkyHanni/pull/3326)
 + Fixed various issues with Experimentation Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3351)
 + Fixed gemstone sack filter causing Sack Value Display issues. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3359)
++ Fixed applied gemstone costs not being factored into Estimated Item Value. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3381)
++ Fixed Bazaar Instant Buy counting toward item trackers. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3385)
++ Added workaround for Minion Upgrade Helper appearing in incorrect inventories. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3384)
++ Fixed delayed chat message when reaching max additional clicks in Ultrasequencer. - YoGoUrT_20 (https://github.com/hannibal002/SkyHanni/pull/3390)
++ Fixed Experimentation Table bits spent calculation. - YoGoUrT_20 (https://github.com/hannibal002/SkyHanni/pull/3390)
++ Fixed Harp GUI scale not resetting after being kicked to Limbo. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3383)
++ Fixed page scrolling with inverted bypass. - Cédric Ab (https://github.com/hannibal002/SkyHanni/pull/3206)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -204,15 +228,12 @@
 #### Combat Bug Fixes
 
 + Fixed /shcarry tracker not working when reusing the same customer name. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3221)
++ Fixed Damage Indicator not showing HP and type during Ender Dragon fights. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3376)
 
 #### Crimson Isle Bug Fixes
 
 + Fixed Crimson Quests with two mini-bosses via Tab Widget. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3224)
 + Fixed Town Board waypoint not showing with an incomplete Fetch quest in the Crimson Isle. - Luna (https://github.com/hannibal002/SkyHanni/pull/3233)
-
-#### Event Bug Fixes
-
-+ Fixed issue with Hitman statistics. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3210)
 
 #### Mining Bug Fixes
 
@@ -232,10 +253,15 @@
 
 + Fixed incorrect Livid highlighting in F5/M5 sometimes. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2897)
 + Fixed the "Clean End" feature from hiding mobs even after restarting a run. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3336)
++ Fixed Damage Indicator timing issues in Dungeon F6/M6. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3356)
 
 #### Fishing Bug Fixes
 
 + Fixed chat message about missing attribute shards in the Fishing Profit Tracker. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3289)
+
+#### Bingo Bug Fixes
+
++ Fixed Bingo Minion Craft Helper not working. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3392)
 
 #### Misc Bug Fixes
 
@@ -261,6 +287,7 @@
 + Fixed error in Year Slice 400 team finder with Banker emblem. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3367)
 + Fixed NEU's `/pv` command not functioning for your profile. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3361)
 + Fixed occasional offsets in in-world text render positions. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3364)
++ Fixed TPS calculation error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3378)
 
 ### Technical Details
 
@@ -332,6 +359,11 @@
 + Resolved deprecations in TickEvent.repeatSeconds(). - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3098)
 + Restructured several outlier modules to the `@SkyHanniModule` format. - Luna (https://github.com/hannibal002/SkyHanni/pull/3149)
 + Translated Position Class to Kotlin. - Empa (https://github.com/hannibal002/SkyHanni/pull/2855)
++ Added `HypixelLeaveEvent` and `SkyBlockLeaveEvent`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3374)
++ Added `ItemBuyApi`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3386)
++ Added partial match logic to debug command `/shtestitem`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3389)
++ Changed `PowderGainEvent` to `PowderEvent` with Gain/Spent inherited events. - Empa (https://github.com/hannibal002/SkyHanni/pull/2839)
++ Moved IslandType data to the repo. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3035)
 
 ## Version 1.0.0
 
