@@ -11,6 +11,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.CollectionUtils.sublistAfter
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -30,6 +31,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object CenturyPartyInvitation {
+
     private val config get() = SkyHanniMod.feature.misc.centuryPartyInvitation
 
     private val playerColors = mutableMapOf<Mob, LorenzColor>()
@@ -100,16 +102,9 @@ object CenturyPartyInvitation {
         if (hand.getInternalNameOrNull() != "CENTURY_PARTY_INVITATION".toInternalName()) return emptySet()
 
         val set = mutableSetOf<LorenzColor>()
-        var read = false
-        for (line in hand.getLore()) {
-            if (itemMissingLineSeparatorPattern.matches(line)) {
-                read = true
-                continue
-            }
-            if (read) {
-                readLine(line, hand)?.let {
-                    set.add(it)
-                }
+        for (line in hand.getLore().sublistAfter({ itemMissingLineSeparatorPattern.matches(it) })) {
+            readLine(line, hand)?.let {
+                set.add(it)
             }
         }
 

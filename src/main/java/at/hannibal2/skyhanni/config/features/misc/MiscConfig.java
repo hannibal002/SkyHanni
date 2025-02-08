@@ -134,6 +134,11 @@ public class MiscConfig {
     @Expose
     public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
 
+    @ConfigOption(name = "Fruit Bowl", desc = "Features for Fruit Bowl")
+    @Accordion
+    @Expose
+    public FruitBowlConfig fruitBowl = new FruitBowlConfig();
+
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
