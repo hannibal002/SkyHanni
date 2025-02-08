@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.RenderItemTipEvent
 import at.hannibal2.skyhanni.events.minecraft.ClientDisconnectEvent
 import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
@@ -125,6 +126,13 @@ object HarpFeatures {
 
     @HandleEvent
     fun onDisconnect(event: ClientDisconnectEvent) {
+        if (!config.guiScale) return
+        unSetGUIScale()
+
+    }
+
+    @HandleEvent
+    fun onIslandChange(event: IslandChangeEvent) {
         if (!config.guiScale) return
         unSetGUIScale()
     }
