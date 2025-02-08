@@ -1412,8 +1412,10 @@ object RenderUtils {
             }
         }
 
+        private val playerPos by lazy { inverseView.add(y = Minecraft.getMinecraft().thePlayer.getEyeHeight().toDouble()) }
+
         fun drawLineToEye(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) = draw3DLine(
-            inverseView.add(y = Minecraft.getMinecraft().thePlayer.getEyeHeight().toDouble()),
+            playerPos,
             lorenzVec,
             color,
             lineWidth,
