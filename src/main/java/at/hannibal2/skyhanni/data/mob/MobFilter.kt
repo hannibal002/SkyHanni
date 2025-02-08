@@ -88,9 +88,9 @@ object MobFilter {
         "^(?:(?<points>\\d+) pts|(?<empty>\\w+))$",
     )
 
-    /**REGEX-TEST: [Lv3] TheNewArrow's Purple Jerry 5 Hits
-     * REGEX-TEST: [Lv3] aheNewarrow's Purple Jerry 5 Hits
-     * REGEX-TEST: [Lv1] aThunderblade73's Green Jerrya 7 Hits
+    /** REGEX-TEST: [Lv3] TheNewArrow's Purple Jerry 5 Hits
+     *  REGEX-TEST: [Lv3] aheNewarrow's Purple Jerry 5 Hits
+     *  REGEX-TEST: [Lv1] aThunderblade73's Green Jerrya 7 Hits
      */
     val jerryPattern by patternGroup.pattern(
         "jerry",
