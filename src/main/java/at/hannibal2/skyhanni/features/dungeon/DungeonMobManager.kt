@@ -11,9 +11,8 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onToggle
-import at.hannibal2.skyhanni.utils.RenderUtils.draw3DLine
+import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import java.awt.Color
@@ -82,9 +81,8 @@ object DungeonMobManager {
         if (!fel.highlight.get()) return
         if (fel.line) {
             felOnTheGround.filter { it.canBeSeen(30) }.forEach {
-                event.draw3DLine(
+                event.drawLineToEye(
                     it.baseEntity.getLorenzVec().add(y = 0.15),
-                    event.exactPlayerEyeLocation(),
                     fel.colour.get().toSpecialColor(),
                     3,
                     true,
