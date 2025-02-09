@@ -261,6 +261,20 @@ object SlayerProfitTracker {
 
             old
         }
+
+        event.transform(74, "#profile.slayerProfitData") { old ->
+            for (data in old.asJsonObject.entrySet().map { it.value.asJsonObject }) {
+                val items = data.get("items").asJsonObject
+                for ((key, value) in items.entrySet()) {
+                    if (key == "WISP_POTION") {
+                        items.remove(key)
+                        items.add("POTION_WISP_ICE;1", value)
+                    }
+                }
+            }
+            old
+        }
+
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
