@@ -4,44 +4,16 @@ import at.hannibal2.skyhanni.config.commands.ComplexCommand
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
-import java.util.TreeMap
 
 object CommandUtils {
 
-    class ItemGroup(val name: String, vararg items: Pair<String, Int>, val collection: String = "") {
-
-        val icon = items.first().first.toInternalName()
-
-        val items = items.associate { it.first.toInternalName() to it.second }
-
-        init {
-            entries[name] = this
-        }
-
-        companion object {
-
-            private val entries = TreeMap<String, ItemGroup>()
-
-            fun groupStartingWith(start: String): Collection<ItemGroup> = StringUtils.subMapOfStringsStartingWith(start, entries).values
-
-            fun groupNameStartingWith(start: String): List<String> = groupStartingWith(start).map { it.name }
-
-            fun findGroup(string: String): ItemGroup? {
-                val search = string.replace(" ", "_").uppercase()
-                return entries[search]
-            }
-        }
-    }
-
     private enum class NameSource {
         INTERNAL_NAME,
-        ITEM_NAME,
-        GROUP
+        ITEM_NAME
     }
 
     private val namePattern = "^(?i)(name:)(.*)".toRegex()
     private val internalPattern = "^(?i)(internal:)(.*)".toRegex()
-    private val groupPattern = "(?i)^(group:|collection:)(.*)".toRegex()
 
     private val removeApostrophe = "[\"']".toRegex()
 
@@ -58,7 +30,6 @@ object CommandUtils {
         val expected = when {
             namePattern.matches(first) -> NameSource.ITEM_NAME
             internalPattern.matches(first) -> NameSource.INTERNAL_NAME
-            groupPattern.matches(first) -> NameSource.GROUP
             else -> null
         }
 
@@ -69,7 +40,6 @@ object CommandUtils {
         val item: Any? = when (expected) {
             NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$2").replace(" ", "_").toInternalName()
             NameSource.ITEM_NAME -> NeuInternalName.fromItemNameOrNull(collected.replace(namePattern, "$2").replace("_", " "))
-            NameSource.GROUP -> ItemGroup.findGroup(collected.replace(groupPattern, "$2"))
             null -> {
                 val fromItemName = NeuInternalName.fromItemNameOrNull(collected.replace("_", " "))
                 if (fromItemName?.getItemStackOrNull() != null) {
@@ -79,13 +49,13 @@ object CommandUtils {
                     if (internalName.getItemStackOrNull() != null) {
                         internalName
                     } else {
-                        ItemGroup.findGroup(collected)
+                        null
                     }
                 }
             }
         }
 
-        if ((item as? NeuInternalName)?.getItemStackOrNull() == null && (item as? ItemGroup) == null) {
+        if ((item as? NeuInternalName)?.getItemStackOrNull() == null) {
             context.errorMessage = "Could not find a valid item for: '$collected'"
         }
 
@@ -97,7 +67,6 @@ object CommandUtils {
         val expected = when {
             namePattern.matches(start) -> NameSource.ITEM_NAME
             internalPattern.matches(start) -> NameSource.INTERNAL_NAME
-            groupPattern.matches(start) -> NameSource.GROUP
             else -> null
         }
 
@@ -128,10 +97,8 @@ object CommandUtils {
         when (expected) {
             NameSource.INTERNAL_NAME -> resultAdd(internalPattern, start, uppercaseStart, NeuItems::findInternalNameStartingWithWithoutNPCs)
             NameSource.ITEM_NAME -> resultAdd(namePattern, start, lowercaseStart, NeuItems::findItemNameStartingWithWithoutNPCs)
-            NameSource.GROUP -> resultAdd(groupPattern, start, uppercaseStart, ItemGroup::groupNameStartingWith)
             null -> {
                 val lastSpaceIndex = start.indexOfLast { it == ' ' } + 1
-                addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name.substring(lastSpaceIndex) })
                 addAll(NeuItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart).map { it.substring(lastSpaceIndex) })
                 // 200 is here to limit the max amount of results since more than that can introduce performance issues for the client
                 if (size < 200) {
