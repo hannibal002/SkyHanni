@@ -104,7 +104,7 @@ object BazaarCancelledBuyOrderClipboard {
         val lastClicked = lastClickedItem ?: error("last clicked bz item is null")
 
         val message = "Bazaar buy order cancelled. Click to re-order.\n" +
-            "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e for §6$coins coins§e)"
+            "§e(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e for §6$coins coins§e)"
         ChatUtils.clickableChat(
             message,
             onClick = {
