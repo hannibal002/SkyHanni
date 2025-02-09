@@ -1055,7 +1055,7 @@ interface Renderable {
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
                 0,
-                virtualHeight - height + if (showScrollableTipsInList) scrollUpTip.height else 0,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
@@ -1071,7 +1071,7 @@ interface Renderable {
                 var virtualY = 0
                 var found = false
 
-                var negativeSpace = end
+                var negativeSpace = 0
 
                 // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
                 // there are more items above
@@ -1084,12 +1084,13 @@ interface Renderable {
 
                 val atScrollEnd = scroll.asInt() >= virtualHeight - height
                 if (!atScrollEnd) {
-                    renderY += scrollDownTip.height
                     negativeSpace -= scrollDownTip.height
                 }
 
+                val window = scroll.asInt()..(end + negativeSpace)
+
                 for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..(end + negativeSpace)) {
+                    if ((virtualY..virtualY + renderable.height) in window) {
                         renderable.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
                         renderY += renderable.height
