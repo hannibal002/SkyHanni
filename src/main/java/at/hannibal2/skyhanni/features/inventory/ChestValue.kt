@@ -168,13 +168,12 @@ object ChestValue {
             scrollValue = scrollValue,
         )
 
-        // TODO add function that expects a boolean
-        addRenderableButton<DisplayType>(
+        addRenderableButton(
             label = "Display Type",
-            current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
-            getName = { it.type },
+            config = config::alignedDisplay,
+            enabled = "Aligned",
+            disabled = "Normal",
             onChange = {
-                config.alignedDisplay = !config.alignedDisplay
                 update()
             },
             scrollValue = scrollValue,
@@ -225,11 +224,6 @@ object ChestValue {
             NumberFormatEntry.LONG -> this.addSeparators()
             else -> "0"
         }
-    }
-
-    enum class DisplayType(val type: String) {
-        NORMAL("Normal"),
-        COMPACT("Aligned")
     }
 
     private fun isValidStorage(): Boolean {
