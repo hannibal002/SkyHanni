@@ -35,7 +35,7 @@ object HighlightMissingRepoItems {
         if (NeuItems.allInternalNames.isEmpty()) return
         for (slot in slots) {
             val internalName = slot.stack?.getInternalNameOrNull() ?: continue
-            if (NeuItems.allInternalNames.contains(internalName)) continue
+            if (NeuItems.allInternalNames[internalName.asString()] != null) continue
             if (NeuItems.ignoreItemsFilter.match(internalName.asString())) continue
 
             slot highlight LorenzColor.RED

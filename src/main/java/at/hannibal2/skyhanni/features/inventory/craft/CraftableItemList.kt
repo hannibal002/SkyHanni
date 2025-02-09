@@ -79,7 +79,7 @@ object CraftableItemList {
         lines: MutableMap<NeuInternalName, Searchable>,
     ) {
         val availableMaterial = readItems()
-        for (internalName in NeuItems.allInternalNames) {
+        for (internalName in NeuItems.allInternalNames.values) {
             if (config.excludeVanillaItems && internalName.isVanillaItem()) continue
 
             val recipes = NeuItems.getRecipes(internalName)
