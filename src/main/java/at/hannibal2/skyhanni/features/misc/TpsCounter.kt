@@ -73,7 +73,7 @@ object TpsCounter {
                 val newTps = tpsList.average().roundTo(1).coerceIn(0.0..20.0)
                 tps = newTps
                 val legacyColor = format(newTps)
-                "$legacyColor${newTps}"
+                "$legacyColor$newTps"
             }
         }
         display = "§eTPS: $text"
