@@ -56,7 +56,7 @@ object HelpCommand {
         ) { createCommandEntry(it) }
     }
 
-    private fun onCommand(args: Array<String>, commands: List<CommandBuilderBase>) {
+    fun onCommand(args: Array<String>, commands: List<CommandBuilderBase>) {
         val page: Int
         val search: String
         if (args.firstOrNull() == "-p") {

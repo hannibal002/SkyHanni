@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.config.commands.ComplexCommand
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -42,6 +43,10 @@ object CommandUtils {
     private val internalPattern = "^(?i)(internal:)(.*)".toRegex()
     private val groupPattern = "(?i)^(group:|collection:)(.*)".toRegex()
 
+    private val removeApostrophe = "[\"']".toRegex()
+
+    private val itemNamePattern = "[a-zA-Z:_\"';]+([:\\-;]\\d+)?".toPattern()
+
     fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, Any?> {
         // This replacement does not work for iterable interface. Therefore, the suppression.
         @Suppress("ReplaceSizeZeroCheckWithIsEmpty") if (args.count() == 0) {
@@ -57,9 +62,9 @@ object CommandUtils {
             else -> null
         }
 
-        val grabbed = args.takeWhile { "[a-zA-Z:_\"';]+([:\\-;]\\d+)?".toPattern().matches(it) }
+        val grabbed = args.takeWhile { itemNamePattern.matches(it) }
 
-        val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
+        val collected = grabbed.joinToString(" ").replace(removeApostrophe, "")
 
         val item: Any? = when (expected) {
             NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$2").replace(" ", "_").toInternalName()
@@ -99,17 +104,22 @@ object CommandUtils {
         val uppercaseStart = start.uppercase().replace(" ", "_")
         val lowercaseStart = start.lowercase().replace("_", " ")
 
-        fun MutableList<String>.resultAdd(pattern: Regex, start: String, transformedStart: String, f: (String) -> Collection<String>) {
+        fun MutableList<String>.resultAdd(
+            pattern: Regex,
+            start: String,
+            transformedStart: String,
+            similar: (String) -> Collection<String>,
+        ) {
             val prefix = start.replace(pattern, "$1")
             val withoutPrefix = transformedStart.replace(pattern, "$2")
             if (withoutPrefix.isEmpty()) return
             val lastSpaceIndex = start.replace(pattern, "$2").indexOfLast { it == ' ' } + 1
             this@resultAdd.addAll(
-                f(withoutPrefix).map { r ->
+                similar(withoutPrefix).map { result ->
                     if (lastSpaceIndex == 0) {
-                        prefix + r
+                        prefix + result
                     } else {
-                        r.substring(lastSpaceIndex)
+                        result.substring(lastSpaceIndex)
                     }
                 },
             )
@@ -123,10 +133,11 @@ object CommandUtils {
                 val lastSpaceIndex = start.indexOfLast { it == ' ' } + 1
                 addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name.substring(lastSpaceIndex) })
                 addAll(NeuItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart).map { it.substring(lastSpaceIndex) })
+                // 200 is here to limit the max amount of results since more than that can introduce performance issues for the client
                 if (size < 200) {
                     addAll(
-                        NeuItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { r ->
-                            r.substring(lastSpaceIndex).replace(" ", "_")
+                        NeuItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { result ->
+                            result.substring(lastSpaceIndex).replace(" ", "_")
                         },
                     )
                 }
@@ -142,18 +153,53 @@ object CommandUtils {
     }
 }
 
+/**
+ * Interface that needs to be implemented for a context object for a [ComplexCommand].
+ * The implementer should store the state during processing the [CommandArgument]'s of the specific [ComplexCommand].
+ * @property errorMessage Setting this to none null will print the [errorMessage] as a user error and terminates the command handling.
+ * @property post It is executed after all arguments have been handled. Here should all the processing happen / the execution of the command.
+ */
 interface CommandContextAwareObject {
-    /** Setting this to none null will print the [errorMessage] as a user error and terminates the command handling */
+
     var errorMessage: String?
 
-    /** Function that is executed after all arguments have been handled */
     fun post()
 }
 
+/**
+ * An Argument that is used by a [ComplexCommand].
+ * [T] is the [CommandContextAwareObject] that should be mutated by the [ComplexCommand].
+ * @param documentation User facing descriptor of the argument.
+ *
+ * It should start with a listing of the parameters it takes in followed by a " - " and the description of what it does.
+ *
+ * A needed parameter should be specified with: "&lt;>", inside the brackets there should be short name of what type it is
+ * eg: "&lt;item>", "&lt;number>", "&lt;number/calculation>".
+ * If no argument is present prefix it with: "&lt;> - " and then add the rest.
+ * @param prefix A prefix that can be used to directly access that argument. Eg: "-i", "-p", "-cc".
+ * @param defaultPosition The position where it is expected to be called if no prefix was specified by the user.
+ *
+ * 0>= Index where it is expected to be used , -1 = can only be called with a prefix, -2 = expected position as last element.
+ * @param validity Check the [CommandContextAwareObject] if this argument can be called with the current state
+ * @param tabComplete This is called if the [ComplexCommand.tabParse] thinks this is valid
+ * eg: The prefix is present before that. Or the [defaultPosition] matches
+ * The input is the partial written input the user gave.
+ * The return value should be all possible completions of that.
+ * All return values need to start with partial input that start with the last space (exclusive) till the end of the input.
+ * @param handler This is called on the execution of the command.
+ * (Note: It is also called inside the [ComplexCommand.tabParse] to get the state of the [CommandContextAwareObject]
+ * correct for the [tabComplete] of the following arguments)
+ *
+ * For error handling inside that function set the [CommandContextAwareObject.errorMessage] instead.
+ *
+ * The first input is the remaining elements that can/should be processed. The elements are simply the input split by spaces.
+ * The return value is the amount of elements that got processed (must be >=0).
+ * The second input is the [CommandContextAwareObject] at its current stage of execution.
+ * This function should mutate the [CommandContextAwareObject] but shouldn't have any other side effects.
+ */
 data class CommandArgument<T : CommandContextAwareObject>(
     val documentation: String,
     val prefix: String = "",
-    /** -1 = invalid, -2 last element else index of the position of defaults */
     val defaultPosition: Int = -1,
     val validity: (T) -> Boolean = { true },
     val tabComplete: (String) -> Collection<String> = { emptyList() },
@@ -163,10 +209,10 @@ data class CommandArgument<T : CommandContextAwareObject>(
     constructor(
         documentation: String,
         prefix: String = "",
-        /** -1 = invalid, -2 last element else index of the position of defaults */
         defaultPosition: Int = -1,
         validity: (T) -> Boolean = { true },
         tabComplete: (String) -> Collection<String> = { emptyList() },
+        /** Used to declare that this argument shouldn't be used for creating a certain help call. Used for polymorphic commands*/
         noDocumentationFor: List<MutableSet<CommandArgument<T>>> = emptyList(),
         handler: (Iterable<String>, T) -> Int,
     ) : this(documentation, prefix, defaultPosition, validity, tabComplete, handler) {
