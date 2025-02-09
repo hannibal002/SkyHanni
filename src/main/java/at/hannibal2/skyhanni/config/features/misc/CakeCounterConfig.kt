@@ -47,7 +47,7 @@ class CakeCounterConfig {
     @Expose
     @ConfigOption(
         name = "Tracking Mode",
-        desc = "Choose how offline cakes are counted: Since last leaving or since last joining your Private Island.",
+        desc = "Choose how \"Offline Cake Counter\" tracks: Since last leaving or since last joining your Private Island.",
     )
     @ConfigEditorDropdown
     var offlineTrackingMode: OfflineTrackingMode = OfflineTrackingMode.SINCE_LAST_LEFT
