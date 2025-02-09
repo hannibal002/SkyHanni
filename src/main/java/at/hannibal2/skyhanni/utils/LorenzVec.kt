@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.entity.Entity
@@ -24,6 +25,8 @@ data class LorenzVec(
     val y: Double,
     val z: Double,
 ) {
+    val edges by lazy { boundingToOffset(1.0, 1.0, 1.0).expand(0.0001, 0.0001, 0.0001).calculateEdges() }
+
     constructor() : this(0.0, 0.0, 0.0)
 
     constructor(x: Int, y: Int, z: Int) : this(x.toDouble(), y.toDouble(), z.toDouble())
@@ -73,8 +76,6 @@ data class LorenzVec(
 
     fun add(x: Int = 0, y: Int = 0, z: Int = 0): LorenzVec = LorenzVec(this.x + x, this.y + y, this.z + z)
 
-    override fun toString() = "LorenzVec{x=$x, y=$y, z=$z}"
-
     fun dotProduct(other: LorenzVec): Double = (x * other.x) + (y * other.y) + (z * other.z)
 
     fun angleAsCos(other: LorenzVec) = normalize().dotProduct(other.normalize())
@@ -117,6 +118,8 @@ data class LorenzVec(
 
     fun toCleanString(separator: String = ", "): String = listOf(x, y, z).joinToString(separator)
 
+    fun asStoredString(): String = "$x:$y:$z"
+
     fun lengthSquared(): Double = x * x + y * y + z * z
     fun length(): Double = sqrt(lengthSquared())
 
@@ -130,21 +133,6 @@ data class LorenzVec(
     fun toFloatArray(): Array<Float> = arrayOf(x.toFloat(), y.toFloat(), z.toFloat())
 
     fun equalsIgnoreY(other: LorenzVec) = x == other.x && z == other.z
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-
-        return (other as? LorenzVec)?.let {
-            x == it.x && y == it.y && z == it.z
-        } ?: super.equals(other)
-    }
-
-    override fun hashCode(): Int {
-        var result = x.hashCode()
-        result = 31 * result + y.hashCode()
-        result = 31 * result + z.hashCode()
-        return result
-    }
 
     fun roundTo(precision: Int) = LorenzVec(x.roundTo(precision), y.roundTo(precision), z.roundTo(precision))
 
@@ -216,11 +204,20 @@ data class LorenzVec(
         return (nearestPointOnLine(startPos, endPos) - this).lengthSquared()
     }
 
-    fun middle(other: LorenzVec): LorenzVec = this.plus(other.minus(this) / 2)
+    fun middle(other: LorenzVec): LorenzVec = this + ((other - this) / 2)
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
     companion object {
+
+        val directions = setOf(
+            LorenzVec(1, 0, 0),
+            LorenzVec(-1, 0, 0),
+            LorenzVec(0, 1, 0),
+            LorenzVec(0, -1, 0),
+            LorenzVec(0, 0, 1),
+            LorenzVec(0, 0, -1),
+        )
 
         fun getFromYawPitch(yaw: Double, pitch: Double): LorenzVec {
             val yaw: Double = (yaw + 90) * Math.PI / 180

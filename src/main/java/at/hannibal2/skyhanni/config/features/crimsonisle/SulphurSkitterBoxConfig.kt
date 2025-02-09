@@ -1,50 +1,39 @@
-package at.hannibal2.skyhanni.config.features.crimsonisle;
+package at.hannibal2.skyhanni.config.features.crimsonisle
 
-import at.hannibal2.skyhanni.config.FeatureToggle;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.FeatureToggle
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class SulphurSkitterBoxConfig {
-
+class SulphurSkitterBoxConfig {
     @Expose
     @ConfigOption(name = "Enabled", desc = "Render a box around the closest sulphur block.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean enabled = false;
+    var enabled: Boolean = false
 
     @Expose
     @ConfigOption(name = "Box Type", desc = "Choose the look of the box.")
     @ConfigEditorDropdown
-    public BoxType boxType = BoxType.WIREFRAME;
+    var boxType: BoxType = BoxType.WIREFRAME
 
-    public enum BoxType {
+    enum class BoxType(private val displayName: String) {
         FULL("Full"),
         WIREFRAME("Wireframe"),
-
         ;
-        private final String str;
 
-        BoxType(String str) {
-            this.str = str;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
-
+        override fun toString() = displayName
     }
 
     @Expose
     @ConfigOption(name = "Box Color", desc = "Choose the color of the box.")
     @ConfigEditorColour
-    public String boxColor = "0:102:255:216:0";
+    var boxColor: String = "0:102:255:216:0"
 
     @Expose
     @ConfigOption(name = "Only With Rods", desc = "Render the box only when holding a lava fishing rod.")
     @ConfigEditorBoolean
-    public boolean onlyWithRods = true;
+    var onlyWithRods: Boolean = true
 }

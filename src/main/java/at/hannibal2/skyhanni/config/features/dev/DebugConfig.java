@@ -66,6 +66,11 @@ public class DebugConfig {
     public boolean showNpcPrice = false;
 
     @Expose
+    @ConfigOption(name = "Show Base Values", desc = "Show item base values in item lore.")
+    @ConfigEditorBoolean
+    public boolean showBaseValues = false;
+
+    @Expose
     @ConfigOption(name = "Show Craft Price", desc = "Show craft price in item lore.")
     @ConfigEditorBoolean
     public boolean showCraftPrice = false;
@@ -141,6 +146,11 @@ public class DebugConfig {
     @ConfigOption(name = "Ore Event Messages", desc = "Shows debug messages every time the Ore Event happens.")
     @ConfigEditorBoolean
     public boolean oreEventMessages = false;
+
+    @Expose
+    @ConfigOption(name = "Powder Messages", desc = "Shows debug messages every time Hotm Powder changes.")
+    @ConfigEditorBoolean
+    public boolean powderMessages = false;
 
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")

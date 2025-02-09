@@ -2,11 +2,12 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.Perk
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryOpenEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,17 +15,16 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.init.Blocks
+import net.minecraft.init.Items
+import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -38,20 +38,24 @@ object UserLuckBreakdown {
     private val config get() = SkyHanniMod.feature.misc
 
     private lateinit var mainLuckItem: ItemStack
-    private val mainLuckID = "ENDER_PEARL".toInternalName()
+    private val mainLuckID = Items.ender_pearl
     private const val MAIN_LUCK_NAME = "§a✴ SkyHanni User Luck"
 
     private lateinit var fillerItem: ItemStack
-    private val fillerID = "STAINED_GLASS_PANE".toInternalName()
+    private val fillerID = Item.getItemFromBlock(Blocks.stained_glass_pane)
     private const val FILLER_NAME = " "
 
     private lateinit var limboItem: ItemStack
-    private val limboID = "ENDER_PEARL".toInternalName()
+    private val limboID = Items.ender_pearl
     private const val LIMBO_NAME = "§a✴ Limbo Personal Best"
 
     private lateinit var skillsItem: ItemStack
-    private val skillsID = "DIAMOND_SWORD".toInternalName()
+    private val skillsID = Items.diamond_sword
     private const val SKILLS_NAME = "§a✴ Category: Skills"
+
+    private lateinit var jerryItem: ItemStack
+    private val jerryID = Items.paper
+    private const val JERRY_NAME = "§a✴ Statspocalypse"
 
     private var showAllStats = true
 
@@ -103,19 +107,20 @@ object UserLuckBreakdown {
 
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
+            12 -> event.replace(jerryItem)
 
             in validItemSlots -> event.remove()
 
             in invalidItemSlots -> {
-                if (event.originalItem.item == limboID.getItemStack().item) return
+                if (event.originalItem.item == limboID || event.originalItem.item == jerryID) return
                 event.replace(fillerItem)
                 return
             }
         }
     }
 
-    @SubscribeEvent
-    fun openInventory(event: InventoryOpenEvent) {
+    @HandleEvent
+    fun onInventoryOpen(event: InventoryOpenEvent) {
         if (event.inventoryName != "Your Stats Breakdown") {
             inMiscStats = false
             return
@@ -136,8 +141,8 @@ object UserLuckBreakdown {
         return
     }
 
-    @SubscribeEvent
-    fun closeInventory(event: InventoryCloseEvent) {
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
         inMiscStats = false
         inCustomBreakdown = false
     }
@@ -153,10 +158,9 @@ object UserLuckBreakdown {
         return null
     }
 
-    @SubscribeEvent
-    fun onHoverItem(event: LorenzToolTipEvent) {
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onTooltip(event: ToolTipEvent) {
         if (!config.userluckEnabled) return
-        if (!LorenzUtils.inSkyBlock) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
             skillCalcCoolDown = SimpleTimeMark.now()
             calcSkillLuck()
@@ -169,20 +173,23 @@ object UserLuckBreakdown {
         }
     }
 
-    private fun equipmentMenuTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
+    private fun equipmentMenuTooltip(event: ToolTipEvent, limboLuck: Float) {
         if (event.slot.slotIndex != 25) return
         if (limboLuck == 0.0f && !showAllStats) return
 
         val skillLuck = skillOverflowLuck.values.sum()
-        val totalLuck = skillLuck + limboLuck
+        var totalLuck = skillLuck + limboLuck
         val lastIndex = event.toolTip.indexOfLast { it == "§5§o" }
         if (lastIndex == -1) return
 
+        if (Perk.STATSPOCALYPSE.isActive) {
+            totalLuck *= 1.1f
+        }
         val luckString = tryTruncateFloat(totalLuck)
         event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
     }
 
-    private fun statsBreakdownLoreTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
+    private fun statsBreakdownLoreTooltip(event: ToolTipEvent, limboLuck: Float) {
         if (!inMiscStats) return
         if (inCustomBreakdown && event.slot.slotIndex == 48) {
             event.toolTip[1] = "§7To Your Stats Breakdown"
@@ -191,19 +198,25 @@ object UserLuckBreakdown {
         if (limboLuck == 0.0f && !showAllStats) return
 
         val skillLuck = skillOverflowLuck.values.sum()
-        val totalLuck = skillLuck + limboLuck
+        var totalLuck = skillLuck + limboLuck
+        if (Perk.STATSPOCALYPSE.isActive) {
+            totalLuck *= 1.1f
+        }
         val luckString = tryTruncateFloat(totalLuck)
         event.toolTip.add("§5§o §a✴ SkyHanni User Luck §f$luckString")
     }
 
-    private fun skyblockMenuTooltip(event: LorenzToolTipEvent, limboLuck: Float) {
+    private fun skyblockMenuTooltip(event: ToolTipEvent, limboLuck: Float) {
         if (event.slot.slotIndex != 13) return
         val lastIndex = event.toolTip.indexOfLast { it == "§5§o" }
         if (lastIndex == -1) return
 
         val skillLuck = skillOverflowLuck.values.sum()
-        val totalLuck = skillLuck + limboLuck
+        var totalLuck = skillLuck + limboLuck
         if (totalLuck == 0f) return
+        if (Perk.STATSPOCALYPSE.isActive) {
+            totalLuck *= 1.1f
+        }
 
         val luckString = tryTruncateFloat(totalLuck)
         event.toolTip.add(lastIndex, "$LUCK_TOOLTIP$luckString")
@@ -215,8 +228,8 @@ object UserLuckBreakdown {
         else string
     }
 
-    @SubscribeEvent
-    fun onStackClick(event: GuiContainerEvent.SlotClickEvent) {
+    @HandleEvent
+    fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.userluckEnabled) return
         if (!inMiscStats) return
         val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
@@ -229,17 +242,19 @@ object UserLuckBreakdown {
                 event.cancel()
                 inCustomBreakdown = true
             }
+
             48 -> {
                 if (!inCustomBreakdown) return
                 inCustomBreakdown = false
             }
+
             else -> return
         }
     }
 
     private fun createItems() {
         fillerItem = ItemUtils.createItemStack(
-            fillerID.getItemStack().item,
+            fillerID,
             FILLER_NAME,
             listOf(),
             1,
@@ -248,23 +263,35 @@ object UserLuckBreakdown {
 
         val limboLuck = storage?.limbo?.userLuck ?: 0.0f
         val skillLuck = skillOverflowLuck.values.sum()
-        val totalLuck = skillLuck + limboLuck
+        var totalLuck = skillLuck + limboLuck
+        var jerryLuck = 0f
+        if (Perk.STATSPOCALYPSE.isActive) {
+            jerryLuck = totalLuck * .1f
+        }
+        totalLuck += jerryLuck
 
         mainLuckItem = ItemUtils.createItemStack(
-            mainLuckID.getItemStack().item,
+            mainLuckID,
             "$MAIN_LUCK_NAME §f${tryTruncateFloat(totalLuck)}",
             createItemLore("mainMenu", totalLuck),
         )
         limboItem = ItemUtils.createItemStack(
-            limboID.getItemStack().item,
+            limboID,
             LIMBO_NAME,
             createItemLore("limbo", limboLuck),
         )
         skillsItem = ItemUtils.createItemStack(
-            skillsID.getItemStack().item,
+            skillsID,
             SKILLS_NAME,
             createItemLore("skills"),
         )
+        if (jerryLuck > 0) {
+            jerryItem = ItemUtils.createItemStack(
+                jerryID,
+                JERRY_NAME,
+                createItemLore("jerry", jerryLuck),
+            )
+        }
     }
 
     private fun createItemLore(type: String, luckInput: Float = 0.0f): Array<String> {
@@ -330,6 +357,18 @@ object UserLuckBreakdown {
                 }
                 finalList.addAll(secondHalf)
                 finalList.toTypedArray()
+            }
+
+            "jerry" -> {
+                val luckString = tryTruncateFloat(luckInput.roundTo(2))
+                arrayOf(
+                    "§8Elected Mayor",
+                    "",
+                    "§7Value: §a+$luckString✴",
+                    "",
+                    "§8Stats from the currently elected",
+                    "§8mayor. Proof that voting does matter.",
+                )
             }
 
             else -> arrayOf("")

@@ -10,14 +10,17 @@ import at.hannibal2.skyhanni.events.BossHealthChangeEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDeathEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorDetectedEvent
 import at.hannibal2.skyhanni.events.DamageIndicatorFinalBossEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.SkyHanniRenderEntityEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthUpdateEvent
-import at.hannibal2.skyhanni.features.dungeon.DungeonAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.combat.DragonFightAPI
+import at.hannibal2.skyhanni.features.dungeon.DungeonApi
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi
+import at.hannibal2.skyhanni.features.rift.area.colosseum.BacteApi.currentPhase
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShield
 import at.hannibal2.skyhanni.features.slayer.blaze.HellionShieldHelper.setHellionShield
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -58,8 +61,6 @@ import net.minecraft.entity.monster.EntityEnderman
 import net.minecraft.entity.monster.EntityMagmaCube
 import net.minecraft.entity.monster.EntityZombie
 import net.minecraft.entity.passive.EntityWolf
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.UUID
 import kotlin.math.max
 import kotlin.time.Duration
@@ -79,8 +80,8 @@ object DamageIndicatorManager {
     private var data = mapOf<UUID, EntityData>()
     private val damagePattern = "[✧✯]?(\\d+[⚔+✧❤♞☄✷ﬗ✯]*)".toPattern()
 
-    fun isDamageSplash(entity: EntityLivingBase): Boolean {
-        if (entity.ticksExisted > 300 || entity !is EntityArmorStand) return false
+    fun isDamageSplash(entity: EntityArmorStand): Boolean {
+        if (entity.ticksExisted > 300) return false
         if (!entity.hasCustomName()) return false
         if (entity.isDead) return false
         val name = entity.customNameTag.removeColor().replace(",", "")
@@ -113,19 +114,19 @@ object DamageIndicatorManager {
         }
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         mobFinder = MobFinder()
         data = emptyMap()
     }
 
-    @SubscribeEvent(receiveCanceled = true)
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         mobFinder?.handleChat(event.message)
     }
 
-    @SubscribeEvent
-    fun onWorldRender(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
 
         // only render when actually enabled
@@ -325,8 +326,8 @@ object DamageIndicatorManager {
         return color.getChatColor() + format
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
         data = data.editCopy {
             EntityUtils.getEntities<EntityLivingBase>()
@@ -338,7 +339,7 @@ object DamageIndicatorManager {
     private fun checkEntity(entity: EntityLivingBase): Pair<UUID, EntityData>? {
         try {
             val entityData = grabData(entity) ?: return null
-            if (DungeonAPI.inDungeon()) {
+            if (DungeonApi.inDungeon()) {
                 checkFinalBoss(entityData.finalDungeonBoss, entity.entityId)
             }
 
@@ -404,7 +405,7 @@ object DamageIndicatorManager {
             BossType.DUNGEON_F4_THORN -> {
                 val thorn = checkThorn(health, maxHealth)
                 if (thorn == null) {
-                    val floor = DungeonAPI.dungeonFloor
+                    val floor = DungeonApi.dungeonFloor
                     ErrorManager.logErrorStateWithData(
                         "Could not detect thorn",
                         "checkThorn returns null",
@@ -472,8 +473,34 @@ object DamageIndicatorManager {
                 entityData.ignoreBlocks = location.y == 117.0 && location.distanceToPlayer() < 15
             }
 
+            BossType.BACTE,
+            -> {
+                return checkBacte(entityData)
+            }
+
+            BossType.END_ENDER_DRAGON,
+            -> {
+                return checkEnderDragon(entityData)
+            }
+
             else -> return ""
         }
+        return ""
+    }
+
+    private fun checkEnderDragon(entityData: EntityData): String {
+        DragonFightAPI.currentType?.let {
+            entityData.namePrefix = "§c§l$it "
+        }
+        return DragonFightAPI.currentHp?.let {
+            "§c" + it.shortFormat()
+        }.orEmpty()
+    }
+
+    private fun checkBacte(entityData: EntityData): String {
+        if (!config.showBactePhase) return ""
+        if (currentPhase == BacteApi.Phase.NOT_ACTIVE) return ""
+        entityData.namePrefix = "§c${currentPhase.ordinal}/${BacteApi.Phase.PHASE_5.ordinal} "
         return ""
     }
 
@@ -742,7 +769,7 @@ object DamageIndicatorManager {
     @Suppress("CyclomaticComplexMethod", "ReturnCount")
     private fun checkThorn(realHealth: Long, realMaxHealth: Long): String? {
         val maxHealth: Int
-        val health = if (DungeonAPI.isOneOf("F4")) {
+        val health = if (DungeonApi.isOneOf("F4")) {
             maxHealth = 4
 
             if (realMaxHealth == 300_000L) {
@@ -768,7 +795,7 @@ object DamageIndicatorManager {
                     else -> return null
                 }
             }
-        } else if (DungeonAPI.isOneOf("M4")) {
+        } else if (DungeonApi.isOneOf("M4")) {
             maxHealth = 6
 
             if (realMaxHealth == 900_000L) {
@@ -802,7 +829,7 @@ object DamageIndicatorManager {
             ErrorManager.logErrorStateWithData(
                 "Thorn in wrong floor detected",
                 "Invalid floor for thorn",
-                "dungeonFloor" to DungeonAPI.dungeonFloor,
+                "dungeonFloor" to DungeonApi.dungeonFloor,
             )
             return null
         }
@@ -864,8 +891,8 @@ object DamageIndicatorManager {
 
     private val dummyDamageCache = mutableListOf<UUID>()
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityLivingBase>) {
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onRenderLiving(event: SkyHanniRenderEntityEvent.Specials.Pre<EntityArmorStand>) {
         if (!isEnabled()) return
         val entity = event.entity
 

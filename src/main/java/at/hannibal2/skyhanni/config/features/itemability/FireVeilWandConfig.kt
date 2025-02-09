@@ -1,51 +1,29 @@
-package at.hannibal2.skyhanni.config.features.itemability;
+package at.hannibal2.skyhanni.config.features.itemability
 
-import at.hannibal2.skyhanni.config.HasLegacyId;
-import com.google.gson.annotations.Expose;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import at.hannibal2.skyhanni.config.HasLegacyId
+import com.google.gson.annotations.Expose
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
+import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
-public class FireVeilWandConfig {
+class FireVeilWandConfig {
     @Expose
     @ConfigOption(name = "Fire Veil Design", desc = "Change the flame particles of the Fire Veil Wand ability.")
     @ConfigEditorDropdown
-    public DisplayEntry display = DisplayEntry.PARTICLES;
+    var display: DisplayEntry = DisplayEntry.PARTICLES
 
-    public enum DisplayEntry implements HasLegacyId {
+    enum class DisplayEntry(private val displayName: String, private val legacyId: Int = -1) : HasLegacyId {
         PARTICLES("Particles", 0),
         LINE("Line", 1),
         OFF("Off", 2),
         ;
-        private final String str;
-        private final int legacyId;
 
-        DisplayEntry(String str, int legacyId) {
-            this.str = str;
-            this.legacyId = legacyId;
-        }
-
-        // Constructor if new enum elements are added post-migration
-        DisplayEntry(String str) {
-            this(str, -1);
-        }
-
-        @Override
-        public int getLegacyId() {
-            return legacyId;
-        }
-
-        @Override
-        public String toString() {
-            return str;
-        }
+        override fun getLegacyId() = legacyId
+        override fun toString() = displayName
     }
 
     @Expose
-    @ConfigOption(
-        name = "Line Color",
-        desc = "Change the color of the Fire Veil Wand line."
-    )
+    @ConfigOption(name = "Line Color", desc = "Change the color of the Fire Veil Wand line.")
     @ConfigEditorColour
-    public String displayColor = "0:245:255:85:85";
+    var displayColor: String = "0:245:255:85:85"
 }

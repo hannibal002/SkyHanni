@@ -1,7 +1,12 @@
 package at.hannibal2.skyhanni.data
 
-enum class IslandType(val displayName: String) {
-    // TODO USE SH-REPO (for displayName only)
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent.Companion.HIGHEST
+import at.hannibal2.skyhanni.data.jsonobjects.repo.IslandTypeJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+
+enum class IslandType(private val nameFallback: String) {
     PRIVATE_ISLAND("Private Island"),
     PRIVATE_ISLAND_GUEST("Private Island Guest"),
     THE_END("The End"),
@@ -30,11 +35,65 @@ enum class IslandType(val displayName: String) {
     UNKNOWN("???"),
     ;
 
+    fun guestVariant(): IslandType = when (this) {
+        PRIVATE_ISLAND -> PRIVATE_ISLAND_GUEST
+        GARDEN -> GARDEN_GUEST
+        else -> this
+    }
+
+    // TODO: IslandTags
+    fun hasGuestVariant(): Boolean = when (this) {
+        PRIVATE_ISLAND, GARDEN -> true
+        else -> false
+    }
+
+    var islandData: IslandData? = null
+        private set
+
+    val displayName: String get() = islandData?.name ?: nameFallback
+
+    @SkyHanniModule
     companion object {
+        /**
+         * The maximum amount of players that can be on an island.
+         */
+        var maxPlayers = 24
+            private set
 
-        fun getByNameOrUnknown(name: String) = getByNameOrNull(name) ?: UNKNOWN
-        fun getByName(name: String) = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
+        /**
+         * The maximum amount of players that can be on a mega hub.
+         */
+        var maxPlayersMega = 80
+            private set
 
-        fun getByNameOrNull(name: String) = entries.firstOrNull { it.displayName == name }
+        fun getByName(name: String): IslandType = getByNameOrNull(name) ?: error("IslandType not found: '$name'")
+        fun getByNameOrUnknown(name: String): IslandType = getByNameOrNull(name) ?: UNKNOWN
+        fun getByNameOrNull(name: String): IslandType? = entries.find { it.displayName == name }
+
+        fun getByIdOrNull(id: String): IslandType? = entries.find { it.islandData?.apiName == id }
+        fun getByIdOrUnknown(id: String): IslandType = getByIdOrNull(id) ?: UNKNOWN
+
+        @HandleEvent(priority = HIGHEST)
+        fun onRepoReload(event: RepositoryReloadEvent) {
+            val data = event.getConstant<IslandTypeJson>("misc/IslandType")
+
+            val islandDataMap = data.islands.mapValues {
+                val island = it.value
+                IslandData(island.name, island.apiName, island.maxPlayers ?: data.maxPlayers)
+            }
+
+            entries.forEach { islandType ->
+                islandType.islandData = islandDataMap[islandType.name]
+            }
+
+            maxPlayers = data.maxPlayers
+            maxPlayersMega = data.maxPlayersMega
+        }
     }
 }
+
+data class IslandData(
+    val name: String,
+    val apiName: String?,
+    val maxPlayers: Int,
+)

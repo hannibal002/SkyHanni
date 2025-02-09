@@ -4,25 +4,28 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.BlockClickEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.ServerBlockChangeEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.milliseconds
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object LivingCaveLivingMetalHelper {
 
-    private val config get() = RiftAPI.config.area.livingCave.livingCaveLivingMetalConfig
+    private val config get() = RiftApi.config.area.livingCave.livingCaveLivingMetalConfig
     private var lastClicked: LorenzVec? = null
     private var pair: Pair<LorenzVec, LorenzVec>? = null
-    private var startTime = 0L
+    private var animationStartTime = SimpleTimeMark.farPast()
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onBlockClick(event: BlockClickEvent) {
@@ -55,23 +58,19 @@ object LivingCaveLivingMetalHelper {
             val distance = location.distance(it)
             if (distance < 2) {
                 pair = Pair(it, location)
-                startTime = System.currentTimeMillis()
+                animationStartTime = SimpleTimeMark.now()
             }
         }
     }
 
-    @SubscribeEvent
-    fun onRenderWorld(event: LorenzRenderWorldEvent) {
+    @HandleEvent
+    fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
         val (a, b) = pair ?: return
-        if (System.currentTimeMillis() > startTime + 5_000) return
+        if (animationStartTime.passedSince() > 4.seconds) return
 
-        val maxTime = 500
-        val diff = startTime + maxTime - System.currentTimeMillis()
-        val location = if (diff > 0) {
-            val percentage = diff.toDouble() / maxTime
-            a.slope(b, 1 - percentage)
-        } else b
+        val maxTime = 500.milliseconds
+        val location = LocationUtils.interpolateOverTime(animationStartTime, maxTime, a, b)
         event.drawWaypointFilled(
             location,
             color,
@@ -79,7 +78,7 @@ object LivingCaveLivingMetalHelper {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!config.hideParticles) return
@@ -101,5 +100,5 @@ object LivingCaveLivingMetalHelper {
 
     val color get() = config.color.get().toSpecialColor()
 
-    fun isEnabled() = RiftAPI.inRift() && (RiftAPI.inLivingCave() || RiftAPI.inLivingStillness()) && config.enabled
+    fun isEnabled() = RiftApi.inRift() && (RiftApi.inLivingCave() || RiftApi.inLivingStillness()) && config.enabled
 }

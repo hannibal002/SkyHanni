@@ -1,10 +1,15 @@
 package at.hannibal2.skyhanni.features.dungeon
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.events.LorenzChatEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages.excludedMessages
+import at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages.messageContainsList
+import at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages.messageEndsWithList
+import at.hannibal2.skyhanni.features.dungeon.DungeonBossMessages.messageList
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DungeonBossMessages {
@@ -13,13 +18,13 @@ object DungeonBossMessages {
     private val bossPattern = "§([cd4])\\[BOSS] (.*)".toPattern()
 
     private val excludedMessages = listOf(
-        "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass."
+        "§c[BOSS] The Watcher§r§f: You have proven yourself. You may pass.",
     )
 
     private val messageList = listOf(
         // M7 – Dragons
         "§cThe Crystal withers your soul as you hold it in your hands!",
-        "§cIt doesn't seem like that is supposed to go there."
+        "§cIt doesn't seem like that is supposed to go there.",
     )
 
     private val messageContainsList = listOf(
@@ -35,21 +40,20 @@ object DungeonBossMessages {
         " Storm§r§c: ",
         " Goldor§r§c: ",
         " Necron§r§c: ",
-        " §r§4§kWither King§r§c:"
+        " §r§4§kWither King§r§c:",
     )
 
     private val messageEndsWithList = listOf(
         " Necron§r§c: That is enough, fool!",
         " Necron§r§c: Adventurers! Be careful of who you are messing with..",
-        " Necron§r§c: Before I have to deal with you myself."
+        " Necron§r§c: Before I have to deal with you myself.",
     )
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
-        if (!DungeonAPI.inDungeon()) return
+    @HandleEvent(onlyOnIsland = IslandType.CATACOMBS)
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isBoss(event.message)) return
 
-        DungeonAPI.handleBossMessage(event.message)
+        DungeonApi.handleBossMessage(event.message)
 
         if (config.dungeonBossMessages) {
             event.blockedReason = "dungeon_boss"

@@ -1,13 +1,15 @@
 package at.hannibal2.skyhanni.utils
 
-//#if MC<1.12
+//#if MC < 1.12
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
 import at.hannibal2.skyhanni.events.TabListUpdateEvent
 import at.hannibal2.skyhanni.events.TablistFooterUpdateEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.mixins.hooks.tabListGuard
 import at.hannibal2.skyhanni.mixins.transformers.AccessorGuiPlayerTabOverlay
@@ -23,7 +25,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.client.network.NetworkPlayerInfo
 import net.minecraft.network.play.server.S38PacketPlayerListItem
 import net.minecraft.world.WorldSettings
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import net.minecraftforge.fml.relauncher.Side
 import net.minecraftforge.fml.relauncher.SideOnly
 import kotlin.time.Duration.Companion.seconds
@@ -64,7 +65,7 @@ object TabListData {
         }
     }
 
-    fun toggleDebug() {
+    private fun toggleDebug() {
         if (debugCache != null) {
             ChatUtils.chat("Disabled tab list debug.")
             debugCache = null
@@ -120,7 +121,7 @@ object TabListData {
                 o2.gameType != WorldSettings.GameType.SPECTATOR,
                 //#else
                 //$$ o1.gameType != GameType.SPECTATOR,
-                //$$ o2.gameType != GameType.SPECTATOR
+                //$$ o2.gameType != GameType.SPECTATOR,
                 //#endif
             )
                 .compare(
@@ -145,7 +146,8 @@ object TabListData {
             result.add(name.stripHypixelMessage())
         }
         tabListGuard = false
-        return result.dropLast(1)
+        return if (result.size < 80) result.dropLast(1)
+        else result.subList(0, 80)
     }
 
     var dirty = false
@@ -157,8 +159,8 @@ object TabListData {
         }
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         if (!dirty) return
         dirty = false
 
@@ -187,6 +189,15 @@ object TabListData {
                 println("workaroundDelayedTabListUpdateAgain")
                 TabListUpdateEvent(getTabList()).post()
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtesttablist") {
+            description = "Set your clipboard as a fake tab list."
+            category = CommandCategory.DEVELOPER_TEST
+            callback { toggleDebug() }
         }
     }
 }

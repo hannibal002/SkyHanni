@@ -7,16 +7,18 @@ import at.hannibal2.skyhanni.data.GuiEditManager.getAbsY
 import at.hannibal2.skyhanni.data.model.Graph
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
-import at.hannibal2.skyhanni.events.LorenzRenderWorldEvent
 import at.hannibal2.skyhanni.events.RenderGuiItemOverlayEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.features.misc.PatcherFixes
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleOutlineShader
 import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
+import at.hannibal2.skyhanni.utils.RenderUtils.drawRoundRect
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -47,7 +49,7 @@ import kotlin.math.sqrt
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 
-@Suppress("LargeClass")
+@Suppress("LargeClass", "TooManyFunctions")
 object RenderUtils {
 
     enum class HorizontalAlignment(private val value: String) {
@@ -134,7 +136,7 @@ object RenderUtils {
         GlStateManager.enableLighting()
     }
 
-    fun LorenzRenderWorldEvent.drawColor(
+    fun SkyHanniRenderWorldEvent.drawColor(
         location: LorenzVec,
         color: LorenzColor,
         beacon: Boolean = false,
@@ -143,11 +145,12 @@ object RenderUtils {
         drawColor(location, color.toColor(), beacon, alpha)
     }
 
-    fun LorenzRenderWorldEvent.drawColor(
+    fun SkyHanniRenderWorldEvent.drawColor(
         location: LorenzVec,
         color: Color,
         beacon: Boolean = false,
         alpha: Float = -1f,
+        seeThroughBlocks: Boolean = false,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
@@ -159,7 +162,9 @@ object RenderUtils {
         } else {
             alpha
         }
-        GlStateManager.disableDepth()
+        if (seeThroughBlocks) {
+            GlStateManager.disableDepth()
+        }
         GlStateManager.disableCull()
         drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
@@ -170,7 +175,9 @@ object RenderUtils {
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
-        GlStateManager.enableDepth()
+        if (seeThroughBlocks) {
+            GlStateManager.enableDepth()
+        }
         GlStateManager.enableCull()
     }
 
@@ -301,7 +308,7 @@ object RenderUtils {
         tessellator.draw()
     }
 
-    fun LorenzRenderWorldEvent.drawWaypointFilled(
+    fun SkyHanniRenderWorldEvent.drawWaypointFilled(
         location: LorenzVec,
         color: Color,
         seeThroughBlocks: Boolean = false,
@@ -344,7 +351,7 @@ object RenderUtils {
         }
     }
 
-    fun LorenzRenderWorldEvent.drawString(
+    fun SkyHanniRenderWorldEvent.drawString(
         location: LorenzVec,
         text: String,
         seeThroughBlocks: Boolean = false,
@@ -509,7 +516,7 @@ object RenderUtils {
 
     fun Position.renderString(string: String?, offsetX: Int = 0, offsetY: Int = 0, posLabel: String) {
         if (string.isNullOrBlank()) return
-        val x = renderString0(string, offsetX, offsetY, isCenter)
+        val x = renderString0(string, offsetX, offsetY, centerX)
         GuiEditManager.add(this, posLabel, x, 10)
     }
 
@@ -632,7 +639,7 @@ object RenderUtils {
     fun Position.renderStringsAndItems(
         list: List<List<Any?>>,
         extraSpace: Int = 0,
-        itemScale: Double = NEUItems.itemFontSize,
+        itemScale: Double = NeuItems.itemFontSize,
         posLabel: String,
     ) {
         if (list.isEmpty()) return
@@ -646,26 +653,7 @@ object RenderUtils {
         this.renderRenderablesDouble(render, extraSpace, posLabel, true)
     }
 
-    /**
-     * Accepts a single line to print.
-     * This line is a list of things to print. Can print String or ItemStack objects.
-     */
-    @Deprecated("use List<Renderable>", ReplaceWith(""))
-    fun Position.renderSingleLineWithItems(
-        list: List<Any?>,
-        posLabel: String,
-    ) {
-        if (list.isEmpty()) return
-        renderRenderable(
-            Renderable.horizontalContainer(
-                list.mapNotNull { Renderable.fromAny(it) },
-            ),
-            posLabel = posLabel,
-        )
-        // TODO Future write that better
-    }
-
-    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NEUItems.itemFontSize): Int {
+    private fun Position.renderLine(line: List<Any?>, offsetY: Int, itemScale: Double = NeuItems.itemFontSize): Int {
         GlStateManager.pushMatrix()
         val (x, y) = transform()
         GlStateManager.translate(0f, offsetY.toFloat(), 0F)
@@ -734,7 +722,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun LorenzRenderWorldEvent.drawCylinderInWorld(
+    fun SkyHanniRenderWorldEvent.drawCylinderInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
@@ -743,7 +731,7 @@ object RenderUtils {
         drawCylinderInWorld(color, location.x, location.y, location.z, radius, height, partialTicks)
     }
 
-    fun LorenzRenderWorldEvent.drawPyramid(
+    fun SkyHanniRenderWorldEvent.drawPyramid(
         topPoint: LorenzVec,
         baseCenterPoint: LorenzVec,
         baseEdgePoint: LorenzVec,
@@ -867,7 +855,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun LorenzRenderWorldEvent.drawSphereInWorld(
+    fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
@@ -875,7 +863,7 @@ object RenderUtils {
         drawSphereInWorld(color, location.x, location.y, location.z, radius)
     }
 
-    fun LorenzRenderWorldEvent.drawSphereInWorld(
+    fun SkyHanniRenderWorldEvent.drawSphereInWorld(
         color: Color,
         x: Double,
         y: Double,
@@ -939,7 +927,7 @@ object RenderUtils {
         GlStateManager.popMatrix()
     }
 
-    fun LorenzRenderWorldEvent.drawSphereWireframeInWorld(
+    fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         location: LorenzVec,
         radius: Float,
@@ -947,7 +935,7 @@ object RenderUtils {
         drawSphereWireframeInWorld(color, location.x, location.y, location.z, radius)
     }
 
-    fun LorenzRenderWorldEvent.drawSphereWireframeInWorld(
+    fun SkyHanniRenderWorldEvent.drawSphereWireframeInWorld(
         color: Color,
         x: Double,
         y: Double,
@@ -1035,7 +1023,7 @@ object RenderUtils {
         TextRenderUtils.drawStringScaled(str, fr, x, y, shadow, color, factor)
     }
 
-    fun LorenzRenderWorldEvent.drawDynamicText(
+    fun SkyHanniRenderWorldEvent.drawDynamicText(
         location: LorenzVec,
         text: String,
         scaleMultiplier: Double,
@@ -1056,7 +1044,7 @@ object RenderUtils {
         val renderOffsetX = viewer.lastTickPosX + (viewer.posX - viewer.lastTickPosX) * partialTicks
         val renderOffsetY = viewer.lastTickPosY + (viewer.posY - viewer.lastTickPosY) * partialTicks
         val renderOffsetZ = viewer.lastTickPosZ + (viewer.posZ - viewer.lastTickPosZ) * partialTicks
-        val eyeHeight = thePlayer.eyeHeight
+        val eyeHeight = thePlayer.getEyeHeight()
 
         val dX = (x - renderOffsetX) * (x - renderOffsetX)
         val dY = (y - (renderOffsetY + eyeHeight)) * (y - (renderOffsetY + eyeHeight))
@@ -1140,32 +1128,45 @@ object RenderUtils {
         }
     }
 
-    fun LorenzRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
+    fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        LineDrawer.draw3D(partialTicks) {
+            drawEdges(location, color, lineWidth, depth)
+        }
+    }
+
+    fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
+        // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+        LineDrawer.draw3D(partialTicks) {
+            drawEdges(axisAlignedBB, color, lineWidth, depth)
+        }
+    }
+
+    fun SkyHanniRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
         LineDrawer.draw3D(partialTicks) {
             draw3DLine(p1, p2, color, lineWidth, depth)
         }
 
-    fun LorenzRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
+    fun SkyHanniRenderWorldEvent.exactLocation(entity: Entity) = exactLocation(entity, partialTicks)
 
-    fun LorenzRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(): LorenzVec {
         val player = Minecraft.getMinecraft().thePlayer
-        val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
+        val eyeHeight = player.getEyeHeight().toDouble()
         PatcherFixes.onPlayerEyeLine()
-        return exactLocation(player) + add
+        return exactLocation(player).add(y = eyeHeight)
     }
 
-    fun LorenzRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
+    fun SkyHanniRenderWorldEvent.exactBoundingBox(entity: Entity): AxisAlignedBB {
         if (entity.isDead) return entity.entityBoundingBox
         val offset = exactLocation(entity) - entity.getLorenzVec()
         return entity.entityBoundingBox.offset(offset.x, offset.y, offset.z)
     }
 
-    fun LorenzRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
+    fun SkyHanniRenderWorldEvent.exactPlayerEyeLocation(player: Entity): LorenzVec {
         val add = if (player.isSneaking) LorenzVec(0.0, 1.54, 0.0) else LorenzVec(0.0, 1.62, 0.0)
         return exactLocation(player) + add
     }
 
-    fun LorenzRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+    fun SkyHanniRenderWorldEvent.drawLineToEye(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
         draw3DLine(exactPlayerEyeLocation(), location, color, lineWidth, depth)
     }
 
@@ -1243,7 +1244,7 @@ object RenderUtils {
     }
 
     // TODO nea please merge with 'drawFilledBoundingBox'
-    fun LorenzRenderWorldEvent.drawFilledBoundingBoxNea(
+    fun SkyHanniRenderWorldEvent.drawFilledBoundingBoxNea(
         aabb: AxisAlignedBB,
         c: Color,
         alphaMultiplier: Float = 1f,
@@ -1341,7 +1342,7 @@ object RenderUtils {
         )
     }
 
-    fun LorenzRenderWorldEvent.draw3DPathWithWaypoint(
+    fun SkyHanniRenderWorldEvent.draw3DPathWithWaypoint(
         path: Graph,
         colorLine: Color,
         lineWidth: Int,
@@ -1415,6 +1416,19 @@ object RenderUtils {
             }
         }
 
+        fun drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+            for ((p1, p2) in location.edges) {
+                draw3DLine(p1, p2, color, lineWidth, depth)
+            }
+        }
+
+        fun drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
+            // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+            for ((p1, p2) in axisAlignedBB.calculateEdges()) {
+                draw3DLine(p1, p2, color, lineWidth, depth)
+            }
+        }
+
         fun draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
             GL11.glLineWidth(lineWidth.toFloat())
             if (!depth) {
@@ -1431,9 +1445,6 @@ object RenderUtils {
                 GlStateManager.depthMask(true)
             }
         }
-
-        fun draw3DLineFromPlayer(lorenzVec: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
-            draw3DLine(inverseView.add(y = Minecraft.getMinecraft().thePlayer.eyeHeight.toDouble()), lorenzVec, color, lineWidth, depth)
 
         fun drawBezier2(
             p1: LorenzVec,
@@ -1490,8 +1501,6 @@ object RenderUtils {
                 GlStateManager.disableTexture2D()
                 GlStateManager.disableCull()
                 GlStateManager.disableAlpha()
-
-                val tessellator = Tessellator.getInstance()
 
                 GlStateManager.pushMatrix()
                 val inverseView = getViewerPos(partialTicks)
@@ -1650,7 +1659,7 @@ object RenderUtils {
         GlStateManager.disableBlend()
     }
 
-    fun LorenzRenderWorldEvent.outlineTopFace(
+    fun SkyHanniRenderWorldEvent.outlineTopFace(
         boundingBox: AxisAlignedBB,
         lineWidth: Int,
         color: Color,
@@ -1664,7 +1673,7 @@ object RenderUtils {
     }
 
     // TODO nea please merge with 'draw3DLine'
-    fun LorenzRenderWorldEvent.draw3DLineNea(
+    fun SkyHanniRenderWorldEvent.draw3DLineNea(
         p1: LorenzVec,
         p2: LorenzVec,
         color: Color,
@@ -1708,7 +1717,7 @@ object RenderUtils {
         GlStateManager.enableCull()
     }
 
-    fun LorenzRenderWorldEvent.drawHitbox(
+    fun SkyHanniRenderWorldEvent.drawHitbox(
         boundingBox: AxisAlignedBB,
         lineWidth: Int,
         color: Color,

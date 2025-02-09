@@ -1,11 +1,12 @@
 package at.hannibal2.skyhanni.events
 
+import at.hannibal2.skyhanni.api.event.SkyHanniEvent
 import at.hannibal2.skyhanni.data.OtherInventoryData
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.toPrimitiveStackOrNull
 import net.minecraft.item.ItemStack
 
-open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : LorenzEvent() {
+open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventory) : SkyHanniEvent() {
 
     val inventoryId: Int get() = inventory.windowId
     val inventoryName: String get() = inventory.title
@@ -35,7 +36,7 @@ open class InventoryOpenEvent(private val inventory: OtherInventoryData.Inventor
  * This approach is faster than to wait a fix duration after the inventory open packet is detected.
  *
  * Since this logic only works via packets, and the player inventory (pressing E) is client side,
- * this event does not get fired when opening the invenotory via pressingE.
+ * this event does not get fired when opening the inventory via pressing E.
  */
 class InventoryFullyOpenedEvent(inventory: OtherInventoryData.Inventory) : InventoryOpenEvent(inventory)
 

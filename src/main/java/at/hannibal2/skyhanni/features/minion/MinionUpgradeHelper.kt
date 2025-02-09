@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.features.minion
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.GetFromSackAPI
+import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacksOrNull
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -14,17 +17,17 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.setLore
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.EventPriority
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MinionUpgradeHelper {
@@ -32,7 +35,7 @@ object MinionUpgradeHelper {
 
     private var displayItem: ItemStack? = null
     private var itemsNeeded: Int = 0
-    private var internalName: NEUInternalName? = null
+    private var internalName: NeuInternalName? = null
     private var itemsInSacks: Int = 0
 
     /**
@@ -43,12 +46,15 @@ object MinionUpgradeHelper {
         "§7§cYou need §6(?<amount>\\d+) §cmore (?<itemName>.+)\\.",
     )
 
+    private var lastMinionOpen = SimpleTimeMark.farPast()
+
     @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.minionConfigHelper) return
+        lastMinionOpen = SimpleTimeMark.now()
         val lore = event.inventoryItems[50]?.getLore()?.joinToString(" ") ?: return
         requiredItemsPattern.findMatcher(lore) {
-            internalName = NEUInternalName.fromItemName(group("itemName").removeColor())
+            internalName = NeuInternalName.fromItemName(group("itemName").removeColor())
             itemsNeeded = group("amount")?.toInt() ?: 0
         } ?: resetItems()
 
@@ -61,8 +67,27 @@ object MinionUpgradeHelper {
 
     @HandleEvent
     fun onMinionClose(event: MinionCloseEvent) {
-        if (!config.minionConfigHelper) return
         resetItems()
+    }
+
+    // TODO make this event not necessary here.
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        resetItems()
+    }
+
+    // TODO make this event not necessary here.
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        resetItems()
+    }
+
+    // TODO make this event not necessary here.
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (lastMinionOpen.passedSince() > 2.seconds) {
+            resetItems()
+        }
     }
 
     private fun resetItems() {
@@ -72,12 +97,12 @@ object MinionUpgradeHelper {
         displayItem = null
     }
 
-    private fun createDisplayItem(internalName: NEUInternalName): ItemStack {
+    private fun createDisplayItem(internalName: NeuInternalName): ItemStack {
         val lore = createLore(internalName)
         return ItemStack(Blocks.diamond_block).setLore(lore).setStackDisplayName("§bGet Required Items")
     }
 
-    private fun createLore(internalName: NEUInternalName): List<String> {
+    private fun createLore(internalName: NeuInternalName): List<String> {
         val itemPrice = internalName.getPriceOrNull() ?: 0.0
         val lore = buildList {
             val itemsRemaining = itemsNeeded - itemsInSacks
@@ -116,7 +141,7 @@ object MinionUpgradeHelper {
         }
     }
 
-    @SubscribeEvent(priority = EventPriority.HIGH)
+    @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!config.minionConfigHelper || displayItem == null || event.slotId != 51) return
         event.cancel()
@@ -125,7 +150,7 @@ object MinionUpgradeHelper {
         if (remainingItems > 0) {
             BazaarApi.searchForBazaarItem(internalName, remainingItems)
         } else {
-            GetFromSackAPI.getFromSack(internalName, itemsNeeded)
+            GetFromSackApi.getFromSack(internalName, itemsNeeded)
         }
     }
 }

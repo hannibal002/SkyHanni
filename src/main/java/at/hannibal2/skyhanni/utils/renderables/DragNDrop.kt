@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.renderables
 
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
@@ -7,7 +8,6 @@ import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyHeld
 import net.minecraft.client.renderer.GlStateManager
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DragNDrop {
@@ -16,18 +16,16 @@ object DragNDrop {
 
     private var isInvalidDrop = false
 
-    private const val BUTTON = 0
-
-    private const val BUTTON_MAPPED = BUTTON - 100
+    private const val BUTTON_MAPPED = -100
 
     private val invalidItem = Renderable.itemStack(ItemStack(Blocks.barrier), 1.0)
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiContainerBeforeDraw(event: GuiContainerEvent.PreDraw) {
         isInvalidDrop = false
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiContainerAfterDraw(event: GuiContainerEvent.PostDraw) {
         val item = currentDrag ?: return
         if (!BUTTON_MAPPED.isKeyHeld()) {
@@ -52,7 +50,6 @@ object DragNDrop {
     ) = Renderable.clickable(
         display,
         onClick = { currentDrag = item() },
-        button = BUTTON,
         bypassChecks = bypassChecks,
         condition = condition,
     )

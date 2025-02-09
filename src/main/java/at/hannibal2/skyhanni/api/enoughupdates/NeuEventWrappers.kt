@@ -3,12 +3,12 @@ package at.hannibal2.skyhanni.api.enoughupdates
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelApiTrophyFish
 import at.hannibal2.skyhanni.data.jsonobjects.other.HypixelPlayerApiJson
 import at.hannibal2.skyhanni.events.NeuProfileDataLoadedEvent
-import at.hannibal2.skyhanni.events.NeuRepositoryReloadEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NumberUtil.isInt
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.json.fromJson
+import com.google.gson.JsonObject
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonToken
@@ -58,7 +58,8 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {
-        val apiData = event.data ?: return
+        // Because of varying Gson dependencies, we can't directly use .data from NEU
+        val apiData = event::class.java.getDeclaredField("data").get(event) as? JsonObject ?: return
         try {
             val playerData = hypixelApiGson.fromJson<HypixelPlayerApiJson>(apiData)
             NeuProfileDataLoadedEvent(playerData).post()
@@ -73,6 +74,6 @@ object NeuEventWrappers {
 
     @SubscribeEvent
     fun onNeuRepoReload(event: RepositoryReloadEvent) {
-        NeuRepositoryReloadEvent.post()
+        EnoughUpdatesManager.reloadRepo()
     }
 }

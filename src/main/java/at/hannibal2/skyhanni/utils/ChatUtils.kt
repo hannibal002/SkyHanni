@@ -1,8 +1,12 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.events.LorenzTickEvent
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.ChatUtils.CHAT_PREFIX
+import at.hannibal2.skyhanni.utils.ChatUtils.DEBUG_PREFIX
+import at.hannibal2.skyhanni.utils.ChatUtils.USER_ERROR_PREFIX
 import at.hannibal2.skyhanni.utils.ConfigUtils.jumpToEditor
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text
@@ -18,7 +22,6 @@ import net.minecraft.client.Minecraft
 import net.minecraft.util.ChatComponentText
 import net.minecraft.util.ChatStyle
 import net.minecraft.util.IChatComponent
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.util.LinkedList
 import java.util.Queue
 import kotlin.reflect.KMutableProperty0
@@ -180,7 +183,7 @@ object ChatUtils {
 
     private var lastUniqueMessageId = 123242
 
-    private fun getUniqueMessageId() = lastUniqueMessageId++
+    fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
@@ -264,8 +267,8 @@ object ChatUtils {
     fun getTimeWhenNewlyQueuedMessageGetsExecuted() =
         (lastMessageSent + sendQueue.size * messageDelay).takeIf { !it.isInPast() } ?: SimpleTimeMark.now()
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
+    @HandleEvent
+    fun onTick(event: SkyHanniTickEvent) {
         val player = Minecraft.getMinecraft().thePlayer
         if (player == null) {
             sendQueue.clear()

@@ -1,10 +1,11 @@
 package at.hannibal2.skyhanni.features.bingo.card
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiContainerEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.bingo.BingoAPI
-import at.hannibal2.skyhanni.features.bingo.BingoAPI.getData
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.features.bingo.BingoApi
+import at.hannibal2.skyhanni.features.bingo.BingoApi.getData
 import at.hannibal2.skyhanni.features.bingo.card.goals.GoalType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -16,7 +17,6 @@ import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object BingoCardTips {
@@ -34,11 +34,11 @@ object BingoCardTips {
      */
     private val rewardPattern by patternGroup.pattern(
         "reward",
-        "(§.)+Reward",
+        "(?:§.)+Reward",
     )
     private val contributionRewardsPattern by patternGroup.pattern(
         "reward.contribution",
-        "(§.)+Contribution Rewards.*",
+        "(?:§.)+Contribution Rewards.*",
     )
 
     /**
@@ -46,16 +46,16 @@ object BingoCardTips {
      */
     private val rowNamePattern by patternGroup.pattern(
         "row.name",
-        "(§.)+Row #.*",
+        "(?:§.)+Row #.*",
     )
 
-    @SubscribeEvent
-    fun onTooltip(event: LorenzToolTipEvent) {
+    @HandleEvent
+    fun onToolTip(event: ToolTipEvent) {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
 
         val slot = event.slot
-        val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: return
+        val goal = BingoApi.bingoGoals[slot.slotNumber] ?: return
 
         val toolTip = event.toolTip
         // When hovering over a row
@@ -94,7 +94,7 @@ object BingoCardTips {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onBackgroundDrawn(event: GuiContainerEvent.BackgroundDrawnEvent) {
         if (!isEnabled()) return
         if (!inventoryPattern.matches(InventoryUtils.openInventoryName())) return
@@ -102,7 +102,7 @@ object BingoCardTips {
         val guiChest = event.gui
         val chest = guiChest.inventorySlots as ContainerChest
         for ((slot, _) in chest.getAllItems()) {
-            val goal = BingoAPI.bingoGoals[slot.slotNumber] ?: continue
+            val goal = BingoApi.bingoGoals[slot.slotNumber] ?: continue
             if (config.hideDoneDifficulty && goal.done) continue
 
             val color = goal.getData()?.let {
