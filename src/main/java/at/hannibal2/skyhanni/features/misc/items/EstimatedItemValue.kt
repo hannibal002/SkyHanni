@@ -251,7 +251,6 @@ object EstimatedItemValue {
                     internalName.startsWith("MASTER_CATACOMBS_PASS_") ||
                     internalName.startsWith("MAP-") ||
                     internalName.contains("UNIQUE_RUNE") ||
-//                     internalName.contains("WISP_POTION") ||
                     (
                         !InventoryUtils.isSlotInPlayerInventory(this) &&
                             InventoryUtils.openInventoryName() == "Choose a wardrobe slot"

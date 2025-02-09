@@ -226,9 +226,6 @@ object ItemUtils {
     }
 
     private fun ItemStack.grabInternalNameOrNull(): NeuInternalName? {
-//         if (name == "§fWisp's Ice-Flavored Water I Splash Potion") {
-//             return NeuInternalName.WISP_POTION
-//         }
         val internalName = NeuItems.getInternalName(this)?.replace("ULTIMATE_ULTIMATE_", "ULTIMATE_")
         return internalName?.let { ItemNameResolver.fixEnchantmentName(it) }
     }
@@ -549,9 +546,6 @@ object ItemUtils {
         get() = asString().replace("_", " ").lowercase()
 
     private fun NeuInternalName.grabItemName(): String {
-//         if (this == NeuInternalName.WISP_POTION) {
-//             return "§fWisp's Ice-Flavored Water"
-//         }
         if (this == NeuInternalName.SKYBLOCK_COIN) {
             return "§6Coins"
         }

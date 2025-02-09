@@ -39,7 +39,6 @@ object ItemPriceUtils {
             NeuInternalName.JASPER_CRYSTAL -> return 0.0
             NeuInternalName.RUBY_CRYSTAL -> return 0.0
             NeuInternalName.SKYBLOCK_COIN -> return 1.0
-//             NeuInternalName.WISP_POTION -> return 20_000.0
             NeuInternalName.ENCHANTED_HAY_BLOCK -> return 7_776.0
             NeuInternalName.TIGHTLY_TIED_HAY_BALE -> return 1_119_744.0
         }
@@ -94,9 +93,6 @@ object ItemPriceUtils {
     fun NeuInternalName.getNpcPrice(): Double = getNpcPriceOrNull() ?: 0.0
 
     fun NeuInternalName.getNpcPriceOrNull(): Double? {
-//         if (this == NeuInternalName.WISP_POTION) {
-//             return 20_000.0
-//         }
         return HypixelItemApi.getNpcPrice(this)
     }
 
