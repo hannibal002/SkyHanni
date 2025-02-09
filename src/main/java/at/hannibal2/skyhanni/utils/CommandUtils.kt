@@ -234,16 +234,26 @@ data class CommandArgument<T : CommandContextAwareObject>(
             context: O,
             amountNoPrefixArguments: Int,
             amountNoPrefixArgumentsIncrement: () -> Unit,
-        ): Pair<A?, Int> = (
-            firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
-                ?: firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }?.let {
-                    amountNoPrefixArgumentsIncrement()
-                    it to -1
-                } ?: firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
-                    amountNoPrefixArgumentsIncrement()
-                    it to -1
-                } ?: (null to 0)
-            )
+        ): Pair<A?, Int> {
+            val specifierWithPrefix = firstOrNull { it.prefix == current && it.validity(context) }
+            if (specifierWithPrefix != null) {
+                return specifierWithPrefix to 0
+            }
+
+            val specifierAtDefaultPos = firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }
+            if (specifierAtDefaultPos != null) {
+                amountNoPrefixArgumentsIncrement()
+                return specifierAtDefaultPos to -1
+            }
+
+            val specifierAtMinusTwo = firstOrNull { it.defaultPosition == -2 && it.validity(context) }
+            if (specifierAtMinusTwo != null) {
+                amountNoPrefixArgumentsIncrement()
+                return specifierAtMinusTwo to -1
+            }
+
+            return null to 0
+        }
 
         fun <A : CommandArgument<O>, O : CommandContextAwareObject> Collection<A>.findSpecifierAndGetResult(
             args: Array<String>,

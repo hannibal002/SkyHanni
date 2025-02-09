@@ -114,10 +114,10 @@ data class ComplexCommand<O : CommandContextAwareObject>(
     override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? {
         val rawArgs = args.toList()
         val isPartial = rawArgs.last().isNotEmpty()
-        val args = if (isPartial) rawArgs.dropLast(1) else rawArgs
+        val newArgs = if (isPartial) rawArgs.dropLast(1) else rawArgs
 
         val partial = if (isPartial) rawArgs.last() else null
 
-        return tabParse(args.toTypedArray(), partial)
+        return tabParse(newArgs.toTypedArray(), partial)
     }
 }
