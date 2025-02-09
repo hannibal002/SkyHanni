@@ -1,21 +1,21 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.CollectionAPI
-import at.hannibal2.skyhanni.api.CollectionAPI.getMultipleMap
-import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.CollectionApi
+import at.hannibal2.skyhanni.api.CollectionApi.getMultipleMap
+import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.SackAPI.getAmountInSacks
+import at.hannibal2.skyhanni.data.SackApi.getAmountInSacks
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.HypixelJoinEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
 import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.ProfileLeaveEvent
-import at.hannibal2.skyhanni.events.mining.PowderGainEvent
+import at.hannibal2.skyhanni.events.mining.PowderEvent
 import at.hannibal2.skyhanni.features.gui.shtrack.ShTrack.DocumentationExcludes.itemTrack
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
@@ -28,9 +28,9 @@ import at.hannibal2.skyhanni.utils.CommandUtils.itemCheck
 import at.hannibal2.skyhanni.utils.CommandUtils.numberCalculate
 import at.hannibal2.skyhanni.utils.InventoryUtils.getAmountInInventory
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -39,7 +39,6 @@ import com.google.gson.JsonElement
 import com.google.gson.TypeAdapter
 import com.google.gson.stream.JsonReader
 import com.google.gson.stream.JsonWriter
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object ShTrack {
@@ -105,10 +104,10 @@ object ShTrack {
         CommandArgument(
             "<powder> - Powder to be tracked.",
             defaultPosition = 0, validity = { it.state == ContextObject.StateType.POWDER },
-            tabComplete = { s -> HotmAPI.PowderType.entries.filter { it.name.startsWith(s.uppercase()) }.map { it.name } },
+            tabComplete = { s -> HotmApi.PowderType.entries.filter { it.name.startsWith(s.uppercase()) }.map { it.name } },
             noDocumentationFor = listOf(itemTrack),
         ) { a, c ->
-            val entry = HotmAPI.PowderType.getValue(a.first())
+            val entry = HotmApi.PowderType.getValue(a.first())
             c.item = entry
             1
         },
@@ -229,7 +228,7 @@ object ShTrack {
 
         override var errorMessage: String? = null
 
-        private fun fetchCollection(it: NEUInternalName): Long = CollectionAPI.getCollectionCounter(it) ?: run {
+        private fun fetchCollection(it: NeuInternalName): Long = CollectionApi.getCollectionCounter(it) ?: run {
             errorMessage = "Collection amount is unknown"
             0L
         }
@@ -240,7 +239,7 @@ object ShTrack {
                 StateType.ITEM -> {
                     val current: Long
                     val item = item
-                    val currentSelector: (NEUInternalName) -> Long = when (currentFetch) {
+                    val currentSelector: (NeuInternalName) -> Long = when (currentFetch) {
                         CurrentFetch.INVENTORY -> {
                             { it.getAmountInInventory().toLong() }
                         }
@@ -262,14 +261,14 @@ object ShTrack {
                     when (item) {
                         is ItemGroup -> {
                             current = currentAmount
-                                ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(item.collection.asInternalName())
+                                ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(item.collection.toInternalName())
                                 else item.items.keys.sumOf(currentSelector)
                             result = ItemGroupElement(item, current, targetAmount, currentFetch != CurrentFetch.INVENTORY)
                         }
 
-                        is NEUInternalName -> {
+                        is NeuInternalName -> {
                             if (multiItem) {
-                                val base = NEUItems.getPrimitiveMultiplier(item)
+                                val base = NeuItems.getPrimitiveMultiplier(item)
                                 current =
                                     currentAmount?.let { it * base.amount } ?: if (currentFetch == CurrentFetch.COLLECTION) fetchCollection(
                                         base.internalName,
@@ -290,11 +289,11 @@ object ShTrack {
                 }
 
                 StateType.POWDER -> {
-                    val type = item as? HotmAPI.PowderType ?: run {
+                    val type = item as? HotmApi.PowderType ?: run {
                         errorMessage = "No powder specified"
                         return
                     }
-                    val current = currentAmount ?: type.getCurrent()
+                    val current = currentAmount ?: type.current
                     result = PowderTrackingElement(type, current, targetAmount)
                 }
 
@@ -381,7 +380,7 @@ object ShTrack {
         }
     }
 
-    val itemTrackers: MutableMap<NEUInternalName, MutableList<ItemTrackingInterface>> = mutableMapOf()
+    val itemTrackers: MutableMap<NeuInternalName, MutableList<ItemTrackingInterface>> = mutableMapOf()
     val powderTracker = mutableListOf<PowderTrackingElement>()
 
     @HandleEvent
@@ -401,7 +400,7 @@ object ShTrack {
     }
 
     @HandleEvent
-    fun onPowderGain(event: PowderGainEvent) {
+    fun onPowderGain(event: PowderEvent) {
         powderTracker.forEach {
             if (it.type == event.powder) {
                 it.update(event.amount)
@@ -439,7 +438,7 @@ object ShTrack {
         }
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRenderGuiOverlayRender(event: GuiRenderEvent) {
         if (!isEnabled()) return
         val tracker = tracker

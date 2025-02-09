@@ -6,7 +6,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 
 @SkyHanniModule
 object CommandsRegistry {
-    private val builders = mutableListOf<CommandBuilder>()
+    private val builders = mutableListOf<CommandBuilderBase>()
 
     @HandleEvent
     fun onPreInitFinished(event: PreInitFinishedEvent) {

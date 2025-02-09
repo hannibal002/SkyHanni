@@ -69,7 +69,6 @@ import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraftforge.common.MinecraftForge
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.io.File
 import kotlin.time.Duration.Companion.seconds
 
@@ -479,7 +478,7 @@ object SkyHanniDebugsAndTests {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onGuiRenderChestGuiOverlayRender2(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
         config.debugPos.renderRenderable(
             test,

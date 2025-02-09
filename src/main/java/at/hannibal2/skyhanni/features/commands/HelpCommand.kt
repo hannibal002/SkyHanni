@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.features.commands
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.commands.CommandBuilder
 import at.hannibal2.skyhanni.config.commands.CommandBuilderBase
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -57,7 +56,7 @@ object HelpCommand {
         ) { createCommandEntry(it) }
     }
 
-    private fun onCommand(args: Array<String>, commands: List<CommandBuilder>) {
+    private fun onCommand(args: Array<String>, commands: List<CommandBuilderBase>) {
         val page: Int
         val search: String
         if (args.firstOrNull() == "-p") {

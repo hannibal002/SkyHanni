@@ -1,15 +1,15 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 
 class ItemTrackingElement(
-    val item: NEUInternalName,
+    val item: NeuInternalName,
     override var current: Long,
     override val target: Long?,
     override val includeSack: Boolean,

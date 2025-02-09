@@ -1,10 +1,10 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
-import at.hannibal2.skyhanni.api.HotmAPI
+import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 
-class PowderTrackingElement(val type: HotmAPI.PowderType, override var current: Long, override val target: Long?) :
+class PowderTrackingElement(val type: HotmApi.PowderType, override var current: Long, override val target: Long?) :
     TrackingElement<Long>() {
 
     override val name = "${type.displayNameWithColor} Powder"
@@ -36,7 +36,7 @@ class PowderTrackingElement(val type: HotmAPI.PowderType, override var current: 
         fun fromJson(read: Map<String, JsonElement>): PowderTrackingElement =
             PowderTrackingElement(extractType(read), read["current"]?.asLong ?: 0, read["target"]?.asLong)
 
-        private fun extractType(read: Map<String, JsonElement>) = HotmAPI.PowderType.getValue(read["name"]!!.asString)!!
+        private fun extractType(read: Map<String, JsonElement>) = HotmApi.PowderType.getValue(read["name"]!!.asString)!!
     }
 
 }

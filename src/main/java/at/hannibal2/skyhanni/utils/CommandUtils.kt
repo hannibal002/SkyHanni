@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.utils
 
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.asInternalName
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import java.util.TreeMap
 
@@ -9,9 +9,9 @@ object CommandUtils {
 
     class ItemGroup(val name: String, vararg items: Pair<String, Int>, val collection: String = "") {
 
-        val icon = items.first().first.asInternalName()
+        val icon = items.first().first.toInternalName()
 
-        val items = items.associate { it.first.asInternalName() to it.second }
+        val items = items.associate { it.first.toInternalName() to it.second }
 
         init {
             entries[name] = this
@@ -62,15 +62,15 @@ object CommandUtils {
         val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
 
         val item: Any? = when (expected) {
-            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$2").replace(" ", "_").asInternalName()
-            NameSource.ITEM_NAME -> NEUInternalName.fromItemNameOrNull(collected.replace(namePattern, "$2").replace("_", " "))
+            NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$2").replace(" ", "_").toInternalName()
+            NameSource.ITEM_NAME -> NeuInternalName.fromItemNameOrNull(collected.replace(namePattern, "$2").replace("_", " "))
             NameSource.GROUP -> ItemGroup.findGroup(collected.replace(groupPattern, "$2"))
             null -> {
-                val fromItemName = NEUInternalName.fromItemNameOrNull(collected.replace("_", " "))
+                val fromItemName = NeuInternalName.fromItemNameOrNull(collected.replace("_", " "))
                 if (fromItemName?.getItemStackOrNull() != null) {
                     fromItemName
                 } else {
-                    val internalName = collected.replace(" ", "_").asInternalName()
+                    val internalName = collected.replace(" ", "_").toInternalName()
                     if (internalName.getItemStackOrNull() != null) {
                         internalName
                     } else {
@@ -80,7 +80,7 @@ object CommandUtils {
             }
         }
 
-        if ((item as? NEUInternalName)?.getItemStackOrNull() == null && (item as? ItemGroup) == null) {
+        if ((item as? NeuInternalName)?.getItemStackOrNull() == null && (item as? ItemGroup) == null) {
             context.errorMessage = "Could not find a valid item for: '$collected'"
         }
 
@@ -116,16 +116,16 @@ object CommandUtils {
         }
 
         when (expected) {
-            NameSource.INTERNAL_NAME -> resultAdd(internalPattern, start, uppercaseStart, NEUItems::findInternalNameStartingWithWithoutNPCs)
-            NameSource.ITEM_NAME -> resultAdd(namePattern, start, lowercaseStart, NEUItems::findItemNameStartingWithWithoutNPCs)
+            NameSource.INTERNAL_NAME -> resultAdd(internalPattern, start, uppercaseStart, NeuItems::findInternalNameStartingWithWithoutNPCs)
+            NameSource.ITEM_NAME -> resultAdd(namePattern, start, lowercaseStart, NeuItems::findItemNameStartingWithWithoutNPCs)
             NameSource.GROUP -> resultAdd(groupPattern, start, uppercaseStart, ItemGroup::groupNameStartingWith)
             null -> {
                 val lastSpaceIndex = start.indexOfLast { it == ' ' } + 1
                 addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name.substring(lastSpaceIndex) })
-                addAll(NEUItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart).map { it.substring(lastSpaceIndex) })
+                addAll(NeuItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart).map { it.substring(lastSpaceIndex) })
                 if (size < 200) {
                     addAll(
-                        NEUItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { r ->
+                        NeuItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { r ->
                             r.substring(lastSpaceIndex).replace(" ", "_")
                         },
                     )
@@ -135,7 +135,7 @@ object CommandUtils {
     }
 
     fun <T : CommandContextAwareObject> numberCalculate(args: Iterable<String>, context: T, use: (T, Long) -> Unit): Int {
-        NEUCalculator.calculateOrNull(args.firstOrNull())?.toLong()?.let { use(context, it) } ?: {
+        NeuCalculator.calculateOrNull(args.firstOrNull())?.toLong()?.let { use(context, it) } ?: {
             context.errorMessage = "Invalid number/calculation: '${args.firstOrNull()}'"
         }
         return args.firstOrNull()?.let { 1 } ?: 0
@@ -190,13 +190,13 @@ data class CommandArgument<T : CommandContextAwareObject>(
             amountNoPrefixArgumentsIncrement: () -> Unit,
         ): Pair<A?, Int> = (
             firstOrNull { it.prefix == current && it.validity(context) }?.let { it to 0 }
-            ?: firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }?.let {
+                ?: firstOrNull { it.defaultPosition == amountNoPrefixArguments && it.validity(context) }?.let {
                     amountNoPrefixArgumentsIncrement()
                     it to -1
                 } ?: firstOrNull { it.defaultPosition == -2 && it.validity(context) }?.let {
-                amountNoPrefixArgumentsIncrement()
-                it to -1
-            } ?: (null to 0)
+                    amountNoPrefixArgumentsIncrement()
+                    it to -1
+                } ?: (null to 0)
             )
 
         fun <A : CommandArgument<O>, O : CommandContextAwareObject> Collection<A>.findSpecifierAndGetResult(

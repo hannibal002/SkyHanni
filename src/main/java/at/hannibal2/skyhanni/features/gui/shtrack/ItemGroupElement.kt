@@ -1,7 +1,7 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
 import at.hannibal2.skyhanni.utils.CommandUtils
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 

@@ -14,19 +14,18 @@ import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NumberUtil.formatLong
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
-object CollectionAPI {
+object CollectionApi {
     private val patternGroup = RepoPattern.group("data.collection.api")
 
     /**
@@ -54,7 +53,7 @@ object CollectionAPI {
         "§7Progress to .* I: .*",
     )
 
-    val collectionValue = mutableMapOf<NEUInternalName, Long>()
+    val collectionValue = mutableMapOf<NeuInternalName, Long>()
 
     // TODO repo
     private val incorrectCollectionNames = mapOf(
@@ -66,7 +65,7 @@ object CollectionAPI {
         collectionValue.clear()
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onInventoryOpen(event: InventoryFullyOpenedEvent) {
         val inventoryName = event.inventoryName
         if (inventoryName.endsWith(" Collection")) {
@@ -74,7 +73,7 @@ object CollectionAPI {
             singleCounterPattern.firstMatcher(stack.getLore()) {
                 val counter = group("amount").formatLong()
                 val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
-                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
+                val internalName = incorrectCollectionNames[name] ?: NeuInternalName.fromItemName(name)
                 collectionValue[internalName] = counter
             }
             CollectionUpdateEvent.post()
@@ -94,7 +93,7 @@ object CollectionAPI {
                     name = name.split(" ").dropLast(1).joinToString(" ")
                 }
 
-                val internalName = incorrectCollectionNames[name] ?: NEUInternalName.fromItemName(name)
+                val internalName = incorrectCollectionNames[name] ?: NeuInternalName.fromItemName(name)
                 counterPattern.firstMatcher(lore) {
                     val counter = group("amount").formatLong()
                     collectionValue[internalName] = counter
@@ -108,7 +107,7 @@ object CollectionAPI {
     fun onItemAdd(event: ItemAddEvent) {
         if (event.source == ItemAddManager.Source.COMMAND) return
         val internalName = event.internalName
-        val amount = NEUItems.getPrimitiveMultiplier(internalName).amount
+        val amount = NeuItems.getPrimitiveMultiplier(internalName).amount
         if (amount > 1) return
 
         // TODO add support for replenish (higher collection than actual items in inv)
@@ -120,18 +119,18 @@ object CollectionAPI {
     }
 
     fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
-    fun getCollectionCounter(internalName: NEUInternalName): Long? = collectionValue[internalName]
+    fun getCollectionCounter(internalName: NeuInternalName): Long? = collectionValue[internalName]
 
-    fun NEUInternalName.getMultipleMap() = CollectionAPI.findAllMultiples()[this] ?: mapOf(this to 1)
+    fun NeuInternalName.getMultipleMap() = findAllMultiples()[this] ?: mapOf(this to 1)
 
-    fun findAllMultiples(): Map<NEUInternalName, MutableMap<NEUInternalName, Int>> {
-        val entries = mutableMapOf<NEUInternalName, MutableMap<NEUInternalName, Int>>()
-        NEUItems.allInternalNames.values.filter {
+    fun findAllMultiples(): Map<NeuInternalName, MutableMap<NeuInternalName, Int>> {
+        val entries = mutableMapOf<NeuInternalName, MutableMap<NeuInternalName, Int>>()
+        NeuItems.allInternalNames.values.filter {
             it.getItemStackOrNull()?.getItemCategoryOrNull()?.let {
                 ItemCategory.nonGear.contains(it)
             } == true
         }.map {
-            it!! to NEUItems.getPrimitiveMultiplier(it)
+            it!! to NeuItems.getPrimitiveMultiplier(it)
         }.forEach {
             entries.compute(it.second.internalName) { _, v ->
                 val pair = it.first to it.second.amount

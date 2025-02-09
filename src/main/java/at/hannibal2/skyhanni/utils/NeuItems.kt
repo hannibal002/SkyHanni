@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils
 
+import at.hannibal2.skyhanni.api.enoughupdates.EnoughUpdatesManager
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.data.jsonobjects.repo.MultiFilterJson
@@ -13,7 +14,7 @@ import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.name
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack.Companion.makePrimitiveStack
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -38,26 +39,25 @@ import net.minecraft.init.Items
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import org.lwjgl.opengl.GL11
 import java.util.NavigableMap
 import java.util.TreeMap
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object NEUItems {
+object NeuItems {
 
     val manager: NEUManager get() = NotEnoughUpdates.INSTANCE.manager
-    private val multiplierCache = mutableMapOf<NEUInternalName, PrimitiveItemStack>()
-    private val recipesCache = mutableMapOf<NEUInternalName, Set<PrimitiveRecipe>>()
+    private val multiplierCache = mutableMapOf<NeuInternalName, PrimitiveItemStack>()
+    private val recipesCache = mutableMapOf<NeuInternalName, Set<PrimitiveRecipe>>()
     private val ingredientsCache = mutableMapOf<PrimitiveRecipe, Set<PrimitiveIngredient>>()
-    private val itemIdCache = mutableMapOf<Item, List<NEUInternalName>>()
+    private val itemIdCache = mutableMapOf<Item, List<NeuInternalName>>()
 
-    var allItemsCache = mapOf<String, NEUInternalName>() // item name -> internal name
-    var itemNamesWithoutColor: NavigableMap<String, List<NEUInternalName>> = TreeMap()
+    var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
+    var itemNamesWithoutColor: NavigableMap<String, List<NeuInternalName>> = TreeMap()
 
     /** Keys are internal names as String */
-    val allInternalNames: NavigableMap<String, NEUInternalName> = TreeMap()
+    val allInternalNames: NavigableMap<String, NeuInternalName> = TreeMap()
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
@@ -68,7 +68,7 @@ object NEUItems {
         )
     }
 
-    @SubscribeEvent
+    @HandleEvent
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
         ignoreItemsFilter.load(ignoredItems)
@@ -79,10 +79,10 @@ object NEUItems {
         allItemsCache = readAllNeuItems()
     }
 
-    fun readAllNeuItems(): Map<String, NEUInternalName> {
+    fun readAllNeuItems(): Map<String, NeuInternalName> {
         allInternalNames.clear()
-        val map = mutableMapOf<String, NEUInternalName>()
-        val noColor = TreeMap<String, MutableList<NEUInternalName>>()
+        val map = mutableMapOf<String, NeuInternalName>()
+        val noColor = TreeMap<String, MutableList<NeuInternalName>>()
         for (rawInternalName in allNeuRepoItems().keys) {
             var name = manager.createItem(rawInternalName).displayName.lowercase()
 
@@ -113,7 +113,7 @@ object NEUItems {
             allInternalNames[rawInternalName] = internalName
         }
         @Suppress("UNCHECKED_CAST")
-        itemNamesWithoutColor = noColor as NavigableMap<String, List<NEUInternalName>>
+        itemNamesWithoutColor = noColor as NavigableMap<String, List<NeuInternalName>>
         return map
     }
 
@@ -122,29 +122,29 @@ object NEUItems {
         .withItemStack(itemStack)
         .resolveInternalName()
 
-    fun getInternalNameOrNull(nbt: NBTTagCompound): NEUInternalName? =
+    fun getInternalNameOrNull(nbt: NBTTagCompound): NeuInternalName? =
         ItemResolutionQuery(manager).withItemNBT(nbt).resolveInternalName()?.toInternalName()
 
     // TODO check if getItemId is necessary here. getItemStackOrNull should already return null if invalid
-    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NEUInternalName? {
+    fun getInternalNameFromHypixelIdOrNull(hypixelId: String): NeuInternalName? {
         val internalName = hypixelId.replace(':', '-')
         return internalName.toInternalName().takeIf { it.getItemStackOrNull()?.getItemId() == internalName }
     }
 
-    fun getInternalNameFromHypixelId(hypixelId: String): NEUInternalName =
+    fun getInternalNameFromHypixelId(hypixelId: String): NeuInternalName =
         getInternalNameFromHypixelIdOrNull(hypixelId)
             ?: error("hypixel item id does not match internal name: $hypixelId")
 
-    fun transHypixelNameToInternalName(hypixelId: String): NEUInternalName =
+    fun transHypixelNameToInternalName(hypixelId: String): NeuInternalName =
         manager.auctionManager.transformHypixelBazaarToNEUItemId(hypixelId).toInternalName()
 
-    fun NEUInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
+    fun NeuInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery(manager)
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()
 
     fun getItemStackOrNull(internalName: String) = internalName.toInternalName().getItemStackOrNull()
 
-    fun NEUInternalName.getItemStack(): ItemStack =
+    fun NeuInternalName.getItemStack(): ItemStack =
         getItemStackOrNull() ?: run {
             getPriceOrNull() ?: return@run fallbackItem
             if (ignoreItemsFilter.match(this.asString())) return@run fallbackItem
@@ -156,9 +156,9 @@ object NEUItems {
 
     fun isVanillaItem(item: ItemStack): Boolean = item.getInternalName().isVanillaItem()
 
-    fun NEUInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
+    fun NeuInternalName.isVanillaItem(): Boolean = manager.auctionManager.isVanillaItem(this.asString())
 
-    fun NEUInternalName.removePrefix(prefix: String): NEUInternalName {
+    fun NeuInternalName.removePrefix(prefix: String): NeuInternalName {
         if (prefix.isEmpty()) return this
         val string = asString()
         if (!string.startsWith(prefix)) return this
@@ -241,7 +241,7 @@ object NEUItems {
 
     fun allNeuRepoItems(): NavigableMap<String, JsonObject> = NotEnoughUpdates.INSTANCE.manager.itemInformation
 
-    fun getInternalNamesForItemId(item: Item): List<NEUInternalName> {
+    fun getInternalNamesForItemId(item: Item): List<NeuInternalName> {
         itemIdCache[item]?.let {
             return it
         }
@@ -267,7 +267,7 @@ object NEUItems {
 
     fun findItemNameStartingWith(prefix: String): Set<String> = StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor).keys
 
-    fun getPrimitiveMultiplier(internalName: NEUInternalName, tryCount: Int = 0): PrimitiveItemStack {
+    fun getPrimitiveMultiplier(internalName: NeuInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }
         if (tryCount == 10) {
             ErrorManager.logErrorStateWithData(
@@ -280,7 +280,7 @@ object NEUItems {
         for (recipe in getRecipes(internalName)) {
             if (!recipe.isCraftingRecipe()) continue
 
-            val map = mutableMapOf<NEUInternalName, Int>()
+            val map = mutableMapOf<NeuInternalName, Int>()
             for (ingredient in recipe.getCachedIngredients().toPrimitiveItemStacks()) {
                 val amount = ingredient.amount
                 var internalItemId = ingredient.internalName
@@ -324,11 +324,7 @@ object NEUItems {
         return result
     }
 
-    fun getRecipes(internalName: NEUInternalName): Set<PrimitiveRecipe> {
-        return recipesCache.getOrPut(internalName) {
-            PrimitiveRecipe.convertMultiple(manager.getRecipesFor(internalName.asString())).toSet()
-        }
-    }
+    fun getRecipes(internalName: NeuInternalName): Set<PrimitiveRecipe> = EnoughUpdatesManager.getRecipesFor(internalName)
 
     fun PrimitiveRecipe.getCachedIngredients() = ingredientsCache.getOrPut(this) { ingredients }
 

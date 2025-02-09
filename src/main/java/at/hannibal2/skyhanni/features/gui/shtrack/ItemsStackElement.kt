@@ -1,18 +1,18 @@
 package at.hannibal2.skyhanni.features.gui.shtrack
 
-import at.hannibal2.skyhanni.api.CollectionAPI.getMultipleMap
+import at.hannibal2.skyhanni.api.CollectionApi.getMultipleMap
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.NEUInternalName
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
-import at.hannibal2.skyhanni.utils.NEUItems
-import at.hannibal2.skyhanni.utils.NEUItems.getItemStack
+import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
 
 class ItemsStackElement(
-    val main: NEUInternalName,
+    val main: NeuInternalName,
     override var current: Long,
     override val target: Long?,
     override val includeSack: Boolean,
@@ -21,7 +21,7 @@ class ItemsStackElement(
     override val name get() = main.itemName
     override val saveName = main.asString()
 
-    val map = NEUItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()
+    val map = NeuItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()
 
     private val mappedCurrent get() = map[main]?.let { current.div(it) } ?: current
 

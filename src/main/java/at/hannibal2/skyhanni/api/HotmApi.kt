@@ -86,20 +86,18 @@ object HotmApi {
 
         fun resetTree() {
             current = total
-            PowderEvent(this).post()
+            PowderEvent(this, 0).post()
         }
 
         fun resetFull() {
             current = 0L
             total = 0L
-            PowderEvent(this).post()
+            PowderEvent(this, 0).post()
         }
 
         companion object {
             private val shouldSendDebug: Boolean get() = SkyHanniMod.feature.dev.debug.powderMessages
-        }
 
-        companion object {
             fun getValue(s: String) = entries.firstOrNull { it.name == s.uppercase() }
         }
     }
