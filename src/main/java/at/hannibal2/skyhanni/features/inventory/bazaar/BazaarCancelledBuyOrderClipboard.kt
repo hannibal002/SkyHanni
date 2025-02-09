@@ -95,7 +95,6 @@ object BazaarCancelledBuyOrderClipboard {
     @HandleEvent
     fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
-        @Suppress("UnusedPrivateProperty")
         val coins = cancelledMessagePattern.matchMatcher(event.message) {
             group("coins").formatInt().addSeparators()
         } ?: return
@@ -104,8 +103,8 @@ object BazaarCancelledBuyOrderClipboard {
         event.blockedReason = "bazaar cancelled buy order clipboard"
         val lastClicked = lastClickedItem ?: error("last clicked bz item is null")
 
-        val message = "Bazaar buy order cancelled. Click to re-order. " +
-            "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e)"
+        val message = "Bazaar buy order cancelled. Click to re-order.\n" +
+            "(§8${latestAmount.addSeparators()}x §r${lastClicked.itemName}§e for §6$coins coins§e)"
         ChatUtils.clickableChat(
             message,
             onClick = {
