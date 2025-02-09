@@ -204,34 +204,6 @@ object LorenzUtils {
         }
     }
 
-    @Deprecated("do not use List<Any>, use List<Renderable> instead", ReplaceWith(""))
-    inline fun MutableList<List<Any>>.addButton(
-        prefix: String,
-        getName: String,
-        crossinline onChange: () -> Unit,
-        tips: List<String> = emptyList(),
-    ) {
-        val onClick = {
-            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                onChange()
-                SoundUtils.playClickSound()
-                ChatUtils.lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-        add(
-            buildList {
-                add(prefix)
-                add("§a[")
-                if (tips.isEmpty()) {
-                    add(Renderable.link("§e$getName", false, onClick))
-                } else {
-                    add(Renderable.clickAndHover("§e$getName", tips, false, onClick))
-                }
-                add("§a]")
-            },
-        )
-    }
-
     fun IslandType.isInIsland() = inSkyBlock && skyBlockIsland == this
 
     fun inAnyIsland(vararg islandTypes: IslandType) = inSkyBlock && HypixelData.skyBlockIsland in islandTypes
