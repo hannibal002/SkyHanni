@@ -1,4 +1,8 @@
-import at.skyhanni.sharedvariables.*
+import at.skyhanni.sharedvariables.MinecraftVersion
+import at.skyhanni.sharedvariables.MultiVersionStage
+import at.skyhanni.sharedvariables.ProjectTarget
+import at.skyhanni.sharedvariables.SHVersionInfo
+import at.skyhanni.sharedvariables.versionString
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import moe.nea.shot.ShotParser
@@ -43,12 +47,6 @@ java {
     // causing crashes during tests. You can still manually select DCEVM in the Minecraft Client
     // IntelliJ run configuration.
     toolchain.vendor.set(JvmVendorSpec.ADOPTIUM)
-}
-// We need gradle > 2.2.4 (dependency provided) for the toolchains to work.
-configurations.all {
-    resolutionStrategy.eachDependency {
-        if (requested.group == "com.google.code.gson" && requested.name == "gson") useVersion("2.11.0")
-    }
 }
 val runDirectory = rootProject.file("run")
 runDirectory.mkdirs()
