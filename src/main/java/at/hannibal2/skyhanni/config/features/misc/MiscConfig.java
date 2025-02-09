@@ -135,6 +135,11 @@ public class MiscConfig {
     public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
 
     @Expose
+    @ConfigOption(name = "Cake Counter Features", desc = "")
+    @Accordion
+    public CakeCounterConfig cakeCounter = new CakeCounterConfig();
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     public boolean resetSearchGuiOnClose = true;
@@ -262,12 +267,6 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean serverRestartTitle = true;
-
-    @Expose
-    @ConfigOption(name = "Offline Cake Counter", desc = "Send a chat message with Century Cakes eaten and any Cake Souls found while you were away from your Private Island.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean offlineCakeCounter = false;
 
     @Expose
     @ConfigOption(name = "Piece Of Wizard Portal", desc = "Restore the Earned By lore line on bought Piece Of Wizard Portal.")
