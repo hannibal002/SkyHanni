@@ -291,9 +291,8 @@ object SkyBlockItemModifierUtils {
 
     fun ItemStack.getExtraAttributes() = tagCompound?.extraAttributes
 
-    class GemstoneSlot(val type: GemstoneType, val quality: GemstoneQuality) {
-
-        fun getInternalName() = "${quality}_${type}_GEM".toInternalName()
+    class GemstoneSlot(private val type: GemstoneType, private val quality: GemstoneQuality) {
+        fun getInternalName() = "${quality.name}_${type.name}_GEM".toInternalName()
     }
 
     enum class GemstoneQuality(private val displayName: String, private val color: LorenzColor) {
@@ -304,7 +303,8 @@ object SkyBlockItemModifierUtils {
         PERFECT("Perfect", LorenzColor.GOLD),
         ;
 
-        override fun toString() = "${color.getChatColor()}$displayName"
+        override fun toString() = displayName
+        fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
 
@@ -327,7 +327,8 @@ object SkyBlockItemModifierUtils {
         PERIDOT("Peridot", LorenzColor.DARK_GREEN),
         ;
 
-        override fun toString() = "${color.getChatColor()}$displayName"
+        override fun toString() = displayName
+        fun toDisplayString() = "${color.getChatColor()}$displayName"
 
         companion object {
 

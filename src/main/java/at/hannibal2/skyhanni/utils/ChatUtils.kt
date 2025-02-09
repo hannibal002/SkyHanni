@@ -180,7 +180,7 @@ object ChatUtils {
 
     private var lastUniqueMessageId = 123242
 
-    private fun getUniqueMessageId() = lastUniqueMessageId++
+    fun getUniqueMessageId() = lastUniqueMessageId++
 
     /**
      * Sends a message to the user that they can click and run a command
