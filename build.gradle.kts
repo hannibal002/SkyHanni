@@ -171,7 +171,7 @@ dependencies {
             isTransitive = false
         }
         annotationProcessor("org.spongepowered:mixin:0.8.5-SNAPSHOT")
-        annotationProcessor("com.google.code.gson:gson:2.11.0")
+        annotationProcessor("com.google.code.gson:gson:2.10.1")
         annotationProcessor("com.google.guava:guava:17.0")
     } else if (target == ProjectTarget.BRIDGE116FABRIC) {
         modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
@@ -200,7 +200,6 @@ dependencies {
         isTransitive = false
     }
 
-    shadowModImpl(libs.gson)
     shadowModImpl(libs.moulconfig)
     shadowImpl(libs.libautoupdate) {
         exclude(module = "gson")
@@ -350,7 +349,6 @@ tasks.shadowJar {
     }
     exclude("META-INF/versions/**")
     mergeServiceFiles()
-    relocate("com.google.gson", "at.hannibal2.skyhanni.deps.gson")
     relocate("io.github.notenoughupdates.moulconfig", "at.hannibal2.skyhanni.deps.moulconfig")
     relocate("moe.nea.libautoupdate", "at.hannibal2.skyhanni.deps.libautoupdate")
     relocate("com.jagrosh.discordipc", "at.hannibal2.skyhanni.deps.discordipc")
