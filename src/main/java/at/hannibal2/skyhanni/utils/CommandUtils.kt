@@ -57,7 +57,7 @@ object CommandUtils {
             else -> null
         }
 
-        val grabbed = args.takeWhile { "[a-zA-Z:_\"';]+([:-;]\\d+)?".toPattern().matches(it) }
+        val grabbed = args.takeWhile { "[a-zA-Z:_\"';]+([:\\-;]\\d+)?".toPattern().matches(it) }
 
         val collected = grabbed.joinToString(" ").replace("[\"']".toRegex(), "")
 

@@ -1,8 +1,5 @@
 package at.hannibal2.skyhanni.config.commands
 
-import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.events.chat.TabCompletionEvent
-import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CommandArgument
@@ -55,10 +52,6 @@ data class ComplexCommand<O : CommandContextAwareObject>(
                     appendLine(it.documentation)
                 }
             }
-    }
-
-    init {
-        entries[name] = this
     }
 
     private fun handleCommand(args: Array<String>) {
@@ -118,37 +111,13 @@ data class ComplexCommand<O : CommandContextAwareObject>(
         return result
     }
 
-    // TODO use
     override fun addTabCompletionOptions(sender: ICommandSender, args: Array<String>, pos: BlockPos): List<String>? {
-        return null
-    }
+        val rawArgs = args.toList()
+        val isPartial = rawArgs.last().isNotEmpty()
+        val args = if (isPartial) rawArgs.dropLast(1) else rawArgs
 
-    @SkyHanniModule
-    companion object {
-        val entries = mutableMapOf<String, ComplexCommand<*>>()
+        val partial = if (isPartial) rawArgs.last() else null
 
-        // TODO clear on chat close
-        private var tabCachedCommand: ComplexCommand<*>? = null
-        private var tabCached = emptyList<String>()
-        private var tabBeginString = ""
-
-        @HandleEvent
-        fun onTabCompletion(event: TabCompletionEvent) {
-            val command = entries[event.command] ?: return
-            if (tabCachedCommand == command && event.leftOfCursor == tabBeginString) {
-                event.addSuggestions(tabCached)
-                return
-            }
-            tabCachedCommand = command
-            val rawArgs = event.leftOfCursor.split(" ").drop(1)
-            val isPartial = rawArgs.last().isNotEmpty()
-            val args = if (isPartial) rawArgs.dropLast(1) else rawArgs
-
-            val partial = if (isPartial) rawArgs.last() else null
-
-            tabBeginString = event.leftOfCursor
-            tabCached = command.tabParse(args.toTypedArray(), partial)
-            event.addSuggestions(tabCached)
-        }
+        return tabParse(args.toTypedArray(), partial)
     }
 }
