@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -80,6 +81,8 @@ class Mob(
     val id = baseEntity.entityId
 
     val owner: MobUtils.OwnerShip?
+
+    fun belongsToPlayer(): Boolean = owner?.equals(LorenzUtils.getPlayerName()) ?: false
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
@@ -256,6 +259,8 @@ class Mob(
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean = { true }) =
+        LineToMobHandler.register(this, color, lineWidth, depth, condition)
+
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 }
