@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.mixins.hooks.getValue
 import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.Text
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
@@ -23,15 +20,13 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
     constructor(event: Class<T>, listeners: List<EventListeners.Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
-        listeners.sortedBy { it.options.priority }.toList(),
-        listeners.any { it.options.receiveCancelled },
+        listeners.sortedBy { it.priority }.toList(),
+        listeners.any { it.receiveCancelled },
     )
 
     companion object {
         private var eventHandlerDepth by object : ThreadLocal<Int>() {
-            override fun initialValue(): Int {
-                return 0
-            }
+            override fun initialValue(): Int = 0
         }
 
         /**
@@ -52,7 +47,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
         eventHandlerDepth++
         for (listener in listeners) {
-            if (!shouldInvoke(event, listener)) continue
+            if (!listener.shouldInvoke(event)) continue
             try {
                 listener.invoker.accept(event)
             } catch (throwable: Throwable) {
@@ -78,20 +73,5 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             )
         }
         return event.isCancelled
-    }
-
-    private fun shouldInvoke(event: SkyHanniEvent, listener: EventListeners.Listener): Boolean {
-        if (SkyHanniEvents.isDisabledInvoker(listener.name)) return false
-        if (listener.options.onlyOnSkyblock && !LorenzUtils.inSkyBlock) return false
-        if (IslandType.ANY !in listener.onlyOnIslandTypes && !inAnyIsland(listener.onlyOnIslandTypes)) return false
-        if (event.isCancelled && !listener.options.receiveCancelled) return false
-        if (
-            event is GenericSkyHanniEvent<*> &&
-            listener.generic != null &&
-            !listener.generic.isAssignableFrom(event.type)
-        ) {
-            return false
-        }
-        return true
     }
 }
