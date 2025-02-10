@@ -8,6 +8,7 @@ import at.hannibal2.skyhanni.features.misc.visualwords.VisualWordGui
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.SkyHanniDebugsAndTests
 import at.hannibal2.skyhanni.utils.ConfigUtils
+import at.hannibal2.skyhanni.utils.RenderCache
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
@@ -67,7 +68,7 @@ object RenderData {
 
     fun renderOverlay() {
         outsideInventory = true
-        GuiRenderEvent.GuiOverlayRenderEvent().post()
+        RenderCache.onFrame()
         outsideInventory = false
     }
 }

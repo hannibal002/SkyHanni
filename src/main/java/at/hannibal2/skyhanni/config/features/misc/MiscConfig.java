@@ -395,4 +395,10 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnAboutPcTimeOffset = true;
+
+    @Expose
+    @ConfigOption(name = "Cache Render", desc = "Caching render actions on a tick basis. will break smoooth animations in GUI's, but will also increase performance.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public boolean cacheRender = false;
 }
