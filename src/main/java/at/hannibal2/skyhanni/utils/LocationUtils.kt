@@ -5,6 +5,7 @@ import net.minecraft.entity.Entity
 import net.minecraft.util.AxisAlignedBB
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.time.Duration
 
 object LocationUtils {
 
@@ -129,5 +130,51 @@ object LocationUtils {
             yaw < 315 -> LorenzVec(-1, 0, 0)
             else -> LorenzVec(0, 0, -1)
         }
+    }
+
+    fun interpolateOverTime(
+        startTime: SimpleTimeMark,
+        maxTime: Duration,
+        from: LorenzVec,
+        to: LorenzVec,
+    ): LorenzVec {
+        if (startTime == SimpleTimeMark.farPast()) return from
+        val now = SimpleTimeMark.now()
+
+        val diff = now - startTime
+        val location = if (diff < maxTime) {
+            val percentage = diff / maxTime
+            from.interpolate(to, percentage)
+        } else to
+        return location
+    }
+
+    fun AxisAlignedBB.calculateEdges(): Set<Pair<LorenzVec, LorenzVec>> {
+        val bottomLeftFront = LorenzVec(minX, minY, minZ)
+        val bottomLeftBack = LorenzVec(minX, minY, maxZ)
+        val topLeftFront = LorenzVec(minX, maxY, minZ)
+        val topLeftBack = LorenzVec(minX, maxY, maxZ)
+        val bottomRightFront = LorenzVec(maxX, minY, minZ)
+        val bottomRightBack = LorenzVec(maxX, minY, maxZ)
+        val topRightFront = LorenzVec(maxX, maxY, minZ)
+        val topRightBack = LorenzVec(maxX, maxY, maxZ)
+
+        return setOf(
+            // Bottom face
+            bottomLeftFront to bottomLeftBack,
+            bottomLeftBack to bottomRightBack,
+            bottomRightBack to bottomRightFront,
+            bottomRightFront to bottomLeftFront,
+            // Top face
+            topLeftFront to topLeftBack,
+            topLeftBack to topRightBack,
+            topRightBack to topRightFront,
+            topRightFront to topLeftFront,
+            // Vertical edges
+            bottomLeftFront to topLeftFront,
+            bottomLeftBack to topLeftBack,
+            bottomRightBack to topRightBack,
+            bottomRightFront to topRightFront,
+        )
     }
 }
