@@ -31,6 +31,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
@@ -46,6 +47,7 @@ object ChestValue {
     private var chestItems = mapOf<String, Item>()
     private val inInventory get() = isValidStorage()
     private var inOwnInventory = false
+    private val scrollValue = ScrollValue()
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
@@ -153,6 +155,7 @@ object ChestValue {
                 config.sortingType = it
                 update()
             },
+            scrollValue = scrollValue,
         )
 
         addRenderableButton<NumberFormatEntry>(
@@ -162,6 +165,7 @@ object ChestValue {
                 config.formatType = it
                 update()
             },
+            scrollValue = scrollValue,
         )
 
         // TODO add function that expects a boolean
@@ -173,6 +177,7 @@ object ChestValue {
                 config.alignedDisplay = !config.alignedDisplay
                 update()
             },
+            scrollValue = scrollValue,
         )
     }
 

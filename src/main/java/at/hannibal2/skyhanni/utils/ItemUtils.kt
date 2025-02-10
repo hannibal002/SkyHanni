@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
@@ -14,10 +16,13 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -27,8 +32,14 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
+import at.hannibal2.skyhanni.utils.chat.Text.onClick
+import at.hannibal2.skyhanni.utils.chat.Text.onHover
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -36,6 +47,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
 import java.util.regex.Matcher
@@ -46,7 +58,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ItemUtils {
 
-    private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
+    val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
 
     // This map might not contain all stats the item has, compare with itemBaseStatsRaw if unclear
     private var itemBaseStats = mapOf<NeuInternalName, Map<SkyblockStat, Int>>()
@@ -550,6 +562,7 @@ object ItemUtils {
             return "§cBugged Item"
         }
 
+        // We do not use NeuItems.allItemsCache here since we need itemStack below
         val itemStack = getItemStackOrNull()
         val name = itemStack?.name ?: run {
             val name = toString()
@@ -615,6 +628,103 @@ object ItemUtils {
     ): Double = neededItems(this).map {
         it.key.getPrice(priceSource, pastRecipes) * it.value
     }.sum()
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestitem") {
+            description = "test item internal name resolving"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { testItemCommand(it) }
+        }
+    }
+
+    private fun testItemCommand(args: Array<String>) {
+        if (args.isEmpty()) {
+            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+            return
+        }
+
+        val input = args.joinToString(" ")
+        Text.text("§eProcessing..").send(testItemMessageId)
+
+        // running .getPrice() on thousands of items may take ~500ms
+        SkyHanniMod.coroutineScope.launch {
+            buildTestItemMessage(input).send(testItemMessageId)
+        }
+    }
+
+    private val testItemMessageId = ChatUtils.getUniqueMessageId()
+
+    private fun buildTestItemMessage(input: String) = buildList {
+        add("".asComponent())
+        add("§bSkyHanni Test Item".asComponent())
+        add("§eInput: '§f$input§e'".asComponent())
+
+        NeuInternalName.fromItemNameOrNull(input)?.let<NeuInternalName, Nothing> { internalName ->
+            formatTestItem(internalName, internalName.getPrice())
+            return@buildList
+        }
+
+        input.toInternalName().getItemStackOrNull()?.let<ItemStack, Nothing> { item ->
+            val internalName = item.getInternalName()
+            formatTestItem(internalName, internalName.getPrice())
+            return@buildList
+        }
+
+        val matches = mutableSetOf<NeuInternalName>()
+        for ((name, internalName) in NeuItems.allItemsCache) {
+            if (name.contains(input, ignoreCase = true)) {
+                matches.add(internalName)
+            } else if (internalName.asString().contains(input.replace(" ", "_"), ignoreCase = true)) {
+                matches.add(internalName)
+            }
+        }
+        // TODO add all enchantments to NeuItems.allItemsCache
+        // somehow, enchantments arent part of NeuItems.allItemsCache atm
+        // itemNameCache contains bazaar enchantments
+        // the non bz enchantments are only in the cache after found in game
+        for ((internalName, name) in itemNameCache) {
+            if (name.contains(input, ignoreCase = true)) {
+                matches.add(internalName)
+            } else if (internalName.asString().contains(input.replace(" ", "_"), ignoreCase = true)) {
+                matches.add(internalName)
+            }
+        }
+
+        if (matches.isEmpty()) {
+            add("§cNothing found!".asComponent())
+        } else {
+            add("§eNo exact match! Show partial matches:".asComponent())
+            val max = 10
+            if (matches.size > max) {
+                add("§7(Showing only the first $max results of ${matches.size.addSeparators()} total)".asComponent())
+            }
+            for ((internalName, price) in matches.associateWith { it.getPrice() }.sortedDesc().entries.take(max)) {
+                formatTestItem(internalName, price)
+            }
+        }
+    }
+
+    private fun MutableList<ChatComponentText>.formatTestItem(internalName: NeuInternalName, price: Double) {
+        val priceColor = if (price > 0) "§6" else "§7"
+        val name = internalName.itemName
+        val priceFormat = "$priceColor${price.shortFormat()}"
+        val componentText = " §8- §r$name $priceFormat".asComponent()
+        componentText.onClick {
+            ClipboardUtils.copyToClipboard(internalName.asString())
+        }
+        componentText.onHover(
+            listOf(
+                name,
+                "",
+                "§7Price: $priceFormat",
+                "§7Internal name: §8${internalName.asString()}",
+                "",
+                "§eClick to copy internal name to clipboard!",
+            ),
+        )
+        add(componentText)
+    }
 
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
