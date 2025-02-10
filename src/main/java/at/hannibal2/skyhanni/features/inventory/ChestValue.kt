@@ -36,6 +36,7 @@ import at.hannibal2.skyhanni.utils.renderables.addLine
 import net.minecraft.client.Minecraft
 import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
+import net.minecraft.client.resources.I18n
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
 
@@ -248,9 +249,9 @@ object ChestValue {
         }
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
+        val inNormalChest = I18n.format("container.chest") == name || I18n.format("container.chestDouble") == name
         // TODO: Use repo for this
-        return name == "Chest" || name == "Large Chest" || inMinion ||
-            name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
+        return inNormalChest || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
