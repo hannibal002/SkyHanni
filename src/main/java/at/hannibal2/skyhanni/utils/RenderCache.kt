@@ -177,6 +177,11 @@ object RenderCache {
     }
 
     fun onFrame() {
+        if (!useCache) {
+            heavyRenderCall()
+            return
+        }
+
         // Trigger debug logging for one second when the player is sneaking.
         val player = Minecraft.getMinecraft().thePlayer
         if (player != null && player.isSneaking && debugGLLoggingStartTime < 0L) {
@@ -191,10 +196,6 @@ object RenderCache {
         // Update the FBO if display size changed.
         updateFBOIfNeeded()
 
-        if (!useCache) {
-            heavyRenderCall()
-            return
-        }
 
         if (updateCache) {
             renderToFBO(frameBufferId, width, height)
