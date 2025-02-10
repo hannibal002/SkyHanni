@@ -162,6 +162,11 @@ class DebugConfig {
     var oreEventMessages: Boolean = false
 
     @Expose
+    @ConfigOption(name = "Powder Messages", desc = "Shows debug messages every time Hotm Powder changes.")
+    @ConfigEditorBoolean
+    public boolean powderMessages = false;
+
+    @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
     @ConfigEditorDropdown
     var assumeMayor: Property<ElectionCandidate> = Property.of(ElectionCandidate.DISABLED)
