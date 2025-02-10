@@ -20,6 +20,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.drawSphereWireframeInWorld
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
@@ -65,13 +66,13 @@ object FlareDisplay {
         if (!enabled) return
 
         if (config.flashScreen && activeWarning) {
-            val minecraft = Minecraft.getMinecraft()
-            val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+            val mc = Minecraft.getMinecraft()
+            val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() % 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
             Gui.drawRect(
                 0,
                 0,
-                minecraft.displayWidth,
-                minecraft.displayHeight,
+                mc.displayWidth,
+                mc.displayHeight,
                 (alpha shl 24) or (config.flashColor.toSpecialColorInt() and 0xFFFFFF),
             )
             GlStateManager.color(1F, 1F, 1F, 1F)

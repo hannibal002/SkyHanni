@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColorInt
@@ -161,7 +162,7 @@ object ChocolateFactoryStrayWarning {
         if (!ChocolateFactoryApi.inChocolateFactory) return
         if (!flashScreen && !config.partyMode.get()) return
         val minecraft = Minecraft.getMinecraft()
-        val alpha = ((2 + sin(System.currentTimeMillis().toDouble() / 1000)) * 255 / 4).toInt().coerceIn(0..255)
+        val alpha = ((2 + sin(SimpleTimeMark.now().toMillis() / 1000.0)) * 255 / 4).toInt().coerceIn(0..255)
         val toUse = if (config.partyMode.get()) CHROMA_COLOR else warningConfig.flashColor
         val color = (alpha shl 24) or (toUse.toSpecialColorInt() and 0xFFFFFF)
         Gui.drawRect(0, 0, minecraft.displayWidth, minecraft.displayHeight, color)

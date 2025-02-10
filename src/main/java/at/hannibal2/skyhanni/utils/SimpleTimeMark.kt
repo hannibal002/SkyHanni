@@ -61,7 +61,7 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
 
     fun toMillis() = millis
 
-    fun toSkyBlockTime() = SkyBlockTime.fromInstant(Instant.ofEpochMilli(millis))
+    fun toSkyBlockTime() = SkyBlockTime.fromTimeMark(this)
 
     companion object {
 
@@ -75,6 +75,8 @@ value class SimpleTimeMark(private val millis: Long) : Comparable<SimpleTimeMark
         fun Duration.fromNow() = now() + this
 
         fun Long.asTimeMark() = SimpleTimeMark(this)
+
+        @Deprecated("Use toTimeMark() instead", ReplaceWith("this.toTimeMark()"))
         fun SkyBlockTime.asTimeMark() = SimpleTimeMark(toMillis())
     }
 }

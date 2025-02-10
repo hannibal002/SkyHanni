@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SoundUtils
 import at.hannibal2.skyhanni.utils.SoundUtils.playSound
@@ -20,11 +21,12 @@ import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
+@Suppress("SKyHanniModuleInspection", "unused")
 // @SkyHanniModule
 object Year300RaffleEvent {
 
     private val config get() = SkyHanniMod.feature.event.century
-    val displayItem by lazy { NeuItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
+    private val displayItem by lazy { NeuItems.getItemStackOrNull("EPOCH_CAKE_ORANGE") ?: ItemStack(Items.clock) }
 
     private var lastTimerReceived = SimpleTimeMark.farPast()
     private var lastTimeAlerted = SimpleTimeMark.farPast()
@@ -38,8 +40,7 @@ object Year300RaffleEvent {
         }
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer &&
-        Instant.now().isBefore(SkyBlockTime(301).toInstant())
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enableActiveTimer && SimpleTimeMark.now() < SkyBlockTime(301).asTimeMark()
 
     @HandleEvent
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {

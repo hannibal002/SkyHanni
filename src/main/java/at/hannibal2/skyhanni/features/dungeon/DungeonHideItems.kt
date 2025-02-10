@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.holdingSkullTexture
 import at.hannibal2.skyhanni.utils.ItemUtils.cleanName
 import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
@@ -23,14 +24,15 @@ import net.minecraft.entity.Entity
 import net.minecraft.entity.item.EntityArmorStand
 import net.minecraft.entity.item.EntityItem
 import net.minecraft.util.EnumParticleTypes
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object DungeonHideItems {
 
     private val config get() = SkyHanniMod.feature.dungeon.objectHider
 
-    private val hideParticles = mutableMapOf<EntityArmorStand, Long>()
-    private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, Long>()
+    private val hideParticles = mutableMapOf<EntityArmorStand, SimpleTimeMark>()
+    private val movingSkeletonSkulls = mutableMapOf<EntityArmorStand, SimpleTimeMark>()
 
     private val SOUL_WEAVER_HIDER by lazy { SkullTextureHolder.getTexture("DUNGEONS_SOUL_WEAVER") }
     private val BLESSING_TEXTURE by lazy { SkullTextureHolder.getTexture("DUNGEONS_BLESSING") }
@@ -69,7 +71,7 @@ object DungeonHideItems {
 
             if (head != null && head.cleanName() == "Superboom TNT") {
                 event.cancel()
-                hideParticles[entity] = System.currentTimeMillis()
+                hideParticles[entity] = SimpleTimeMark.now()
             }
         }
 
@@ -90,14 +92,14 @@ object DungeonHideItems {
 
             if (skullTexture == REVIVE_STONE_TEXTURE) {
                 event.cancel()
-                hideParticles[entity] = System.currentTimeMillis()
+                hideParticles[entity] = SimpleTimeMark.now()
             }
         }
 
         if (config.hidePremiumFlesh) {
             if (entity.name == "§9Premium Flesh") {
                 event.cancel()
-                hideParticles[entity] = System.currentTimeMillis()
+                hideParticles[entity] = SimpleTimeMark.now()
             }
 
             if (skullTexture == PREMIUM_FLESH_TEXTURE) {
@@ -108,10 +110,8 @@ object DungeonHideItems {
         if (isSkeletonSkull(entity)) {
             EntityMovementData.addToTrack(entity)
             if (config.hideSkeletonSkull) {
-                val lastMove = movingSkeletonSkulls.getOrDefault(entity, 0)
-                if (lastMove + 100 > System.currentTimeMillis()) {
-                    return
-                }
+                val lastMove = movingSkeletonSkulls.getOrElse(entity) { SimpleTimeMark.farPast() }
+                if (lastMove.passedSince() < 100.milliseconds) return
                 event.cancel()
             }
         }
@@ -129,7 +129,7 @@ object DungeonHideItems {
                 DAMAGE_ORB_TEXTURE,
                 -> {
                     event.cancel()
-                    hideParticles[entity] = System.currentTimeMillis()
+                    hideParticles[entity] = SimpleTimeMark.now()
                     return
                 }
             }
@@ -155,7 +155,7 @@ object DungeonHideItems {
         if (!config.hideSuperboomTNT && !config.hideReviveStone) return
 
         val packetLocation = event.location
-        for (armorStand in hideParticles.filter { it.value + 100 > System.currentTimeMillis() }.map { it.key }) {
+        for (armorStand in hideParticles.filterValues { it.passedSince() < 100.milliseconds }.keys) {
             val distance = packetLocation.distance(armorStand.getLorenzVec())
             if (distance < 2) {
                 if (event.type == EnumParticleTypes.FIREWORKS_SPARK) {
@@ -173,7 +173,7 @@ object DungeonHideItems {
         val entity = event.entity
 
         if (isSkeletonSkull(entity)) {
-            movingSkeletonSkulls[entity] = System.currentTimeMillis()
+            movingSkeletonSkulls[entity] = SimpleTimeMark.now()
             RenderLivingEntityHelper.setEntityColorWithNoHurtTime(
                 entity,
                 LorenzColor.GOLD.toColor().addAlpha(60),
@@ -182,9 +182,10 @@ object DungeonHideItems {
     }
 
     private fun shouldColorMovingSkull(entity: Entity) =
-        SkyHanniMod.feature.dungeon.highlightSkeletonSkull && movingSkeletonSkulls[entity]?.let {
-            it + 200 > System.currentTimeMillis()
-        } ?: false
+        SkyHanniMod.feature.dungeon.highlightSkeletonSkull &&
+            movingSkeletonSkulls[entity]?.let {
+                it.passedSince() < 200.milliseconds
+            } ?: false
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
