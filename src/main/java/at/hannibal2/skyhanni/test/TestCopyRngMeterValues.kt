@@ -21,11 +21,11 @@ object TestCopyRngMeterValues {
     private val patternGroup = RepoPattern.group("test.dev.copyrng")
     private val slayerPattern by patternGroup.pattern(
         "slayer",
-        "§7Slayer XP: §d.*§5/§d(?<xp>.*)"
+        "§7§7Slayer XP: §d.*§5/§d(?<xp>.*)"
     )
     private val dungeonPattern by patternGroup.pattern(
         "dungeon",
-        "§7Dungeon Score: §d.*§5/§d(?<xp>.*)"
+        "§7§7Dungeon Score: §d.*§5/§d(?<xp>.*)"
     )
 
     @HandleEvent
