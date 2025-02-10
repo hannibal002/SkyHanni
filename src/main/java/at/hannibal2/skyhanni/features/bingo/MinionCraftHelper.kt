@@ -120,18 +120,16 @@ object MinionCraftHelper {
 
         for (item in mainInventory) {
             val name = item.name.removeColor()
+            if (item.hasEnchantments()) continue
             val rawId = item.getInternalName()
+            if (!isMinionName(name)) {
+                if (!allIngredients.contains(rawId)) continue
+                if (!isAllowed(allMinions, rawId)) continue
 
-            if (
-                item.hasEnchantments() ||
-                !isMinionName(name) ||
-                !allIngredients.contains(rawId) ||
-                !isAllowed(allMinions, rawId)
-            ) continue
-
-            val (itemId, multiplier) = NeuItems.getPrimitiveMultiplier(rawId)
-            val old = otherItems.getOrDefault(itemId, 0)
-            otherItems[itemId] = old + item.stackSize * multiplier
+                val (itemId, multiplier) = NeuItems.getPrimitiveMultiplier(rawId)
+                val old = otherItems.getOrDefault(itemId, 0)
+                otherItems[itemId] = old + item.stackSize * multiplier
+            }
         }
 
         FirstMinionTier.firstMinionTier(otherItems, minions, tierOneMinions, tierOneMinionsDone)
