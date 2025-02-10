@@ -223,7 +223,7 @@ object GardenVisitorFeatures {
                 Renderable.clickAndHover(
                     "$name §ex${amount.addSeparators()}",
                     onClick = {
-                        if (GardenApi.inGarden() && !NeuItems.neuHasFocus()) return@clickAndHover
+                        if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickAndHover
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             SignUtils.setTextIntoSign("$amount")
                         } else {
