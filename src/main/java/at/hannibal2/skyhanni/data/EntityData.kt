@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
+import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.entity.EntityDisplayNameEvent
 import at.hannibal2.skyhanni.events.entity.EntityHealthDisplayEvent
 import at.hannibal2.skyhanni.events.entity.EntityLeaveWorldEvent
@@ -11,7 +13,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.LorenzUtils.derpy
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
+import net.minecraft.client.renderer.culling.ICamera
 import net.minecraft.entity.Entity
 import net.minecraft.entity.EntityLivingBase
 import net.minecraft.util.ChatComponentText
@@ -70,4 +74,25 @@ object EntityData {
         event.text
     }
 
+    private val lastVisibilityCheck = mutableMapOf<Entity, Pair<SimpleTimeMark, Boolean>>()
+
+    @HandleEvent
+    fun onSecondPassed(event: SecondPassedEvent) {
+        val now = SimpleTimeMark.now()
+        lastVisibilityCheck.entries.removeIf { entry ->
+            now - entry.value.first > 500.milliseconds
+        }
+    }
+
+    @JvmStatic
+    fun onRenderCheck(entity: Entity, camera: ICamera, camX: Double, camY: Double, camZ: Double): Boolean {
+        lastVisibilityCheck[entity]?.let { (time, result) ->
+            if (time.passedSince() < 200.milliseconds) {
+                return result
+            }
+        }
+        val result = CheckRenderEntityEvent(entity, camera, camX, camY, camZ).post()
+        lastVisibilityCheck[entity] = SimpleTimeMark.now() to result
+        return result
+    }
 }
