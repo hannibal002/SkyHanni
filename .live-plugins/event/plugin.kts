@@ -41,8 +41,8 @@ class HandleEventInspectionKotlin : AbstractKotlinInspection() {
                 // Check if the annotation specifies the eventType explicitly or as a positional parameter
                 val hasEventType = annotationEntry?.valueArguments
                     ?.any { argument ->
-                        // Check if it is a named parameter for `eventType`
-                        argument.getArgumentName()?.asName?.asString() == "eventType" ||
+                        val argName = argument.getArgumentName()?.asName?.asString()
+                        argName == eventType || argName == "eventTypes" ||
                             // Check if it is a positional argument (first argument)
                             (annotationEntry.valueArguments.indexOf(argument) == 0 &&
                                 argument.getArgumentExpression()?.text != null)
