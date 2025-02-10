@@ -69,30 +69,28 @@ class EventListeners private constructor(val name: String, private val isGeneric
         val name: String,
         val invoker: Consumer<Any>,
         val options: HandleEventCached,
-        val generic: Class<*>?,
-    ) {
-        val onlyOnIslandTypes: Set<IslandType> = getIslands(options)
-
-        companion object {
-            private fun getIslands(options: HandleEventCached): Set<IslandType> =
-                if (options.onlyOnIslands.isEmpty()) setOf(options.onlyOnIsland)
-                else options.onlyOnIslands.toSet()
-        }
-    }
+        val generic: Class<*>?
+    )
 
     class HandleEventCached(
         val onlyOnSkyblock: Boolean,
         val onlyOnIsland: IslandType,
-        val onlyOnIslands: Array<out IslandType>,
+        val onlyOnIslandTypes: Set<IslandType>,
         val priority: Int,
         val receiveCancelled: Boolean
     ) {
         constructor(event: HandleEvent) : this(
             event.onlyOnSkyblock,
             event.onlyOnIsland,
-            event.onlyOnIslands,
+            getIslands(event.onlyOnIsland, event.onlyOnIslands),
             event.priority,
             event.receiveCancelled
         )
+
+        companion object {
+            private fun getIslands(onlyOnIsland: IslandType, onlyOnIslands: Array<out IslandType>): Set<IslandType> =
+                if (onlyOnIslands.isEmpty()) setOf(onlyOnIsland)
+                else onlyOnIslands.toSet()
+        }
     }
 }

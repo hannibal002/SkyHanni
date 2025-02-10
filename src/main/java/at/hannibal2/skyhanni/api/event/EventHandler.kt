@@ -83,7 +83,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     private fun shouldInvoke(event: SkyHanniEvent, listener: EventListeners.Listener): Boolean {
         if (SkyHanniEvents.isDisabledInvoker(listener.name)) return false
         if (listener.options.onlyOnSkyblock && !LorenzUtils.inSkyBlock) return false
-        if (IslandType.ANY !in listener.onlyOnIslandTypes && !inAnyIsland(listener.onlyOnIslandTypes)) return false
+        if (IslandType.ANY !in listener.options.onlyOnIslandTypes && !inAnyIsland(listener.options.onlyOnIslandTypes)) return false
         if (event.isCancelled && !listener.options.receiveCancelled) return false
         if (
             event is GenericSkyHanniEvent<*> &&
