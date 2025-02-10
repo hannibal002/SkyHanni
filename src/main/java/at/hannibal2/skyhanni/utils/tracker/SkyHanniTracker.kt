@@ -98,6 +98,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+            return
+        }
         if (RenderData.outsideInventory) {
             currentlyOpen = false
         }
