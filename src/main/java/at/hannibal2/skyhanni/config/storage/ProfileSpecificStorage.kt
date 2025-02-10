@@ -60,6 +60,7 @@ import net.minecraft.item.ItemStack
 import java.time.LocalDate
 import kotlin.time.Duration
 
+// put everything under its respective feature, the order of the features is the same as in the folder structure
 class ProfileSpecificStorage {
     // api
     @Expose
