@@ -164,7 +164,7 @@ class DebugConfig {
     @Expose
     @ConfigOption(name = "Powder Messages", desc = "Shows debug messages every time Hotm Powder changes.")
     @ConfigEditorBoolean
-    public boolean powderMessages = false;
+    val powderMessages: Boolean = false;
 
     @Expose
     @ConfigOption(name = "Assume Mayor", desc = "Select a mayor to assume.")
