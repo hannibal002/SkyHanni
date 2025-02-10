@@ -48,13 +48,21 @@ class EventListeners private constructor(val name: String, private val isGeneric
     }
 
     private fun createZeroParameterConsumer(method: Method, instance: Any, options: HandleEvent): (Any) -> Unit {
-        require(options.eventType != SkyHanniEvent::class) {
-            "Method ${method.name} has no parameters but no eventType was provided in the annotation."
+        if (options.eventTypes.isNotEmpty()) {
+            options.eventTypes.onEach { kClass ->
+                require(SkyHanniEvent::class.java.isAssignableFrom(kClass.java)) {
+                    "Each event in eventTypes in @HandleEvent must extend SkyHanniEvent. Provided: $kClass"
+                }
+            }
+        } else {
+            require(options.eventType != SkyHanniEvent::class) {
+                "Method ${method.name} has no parameters but no eventType was provided in the annotation."
+            }
+            require(SkyHanniEvent::class.java.isAssignableFrom(options.eventType.java)) {
+                "eventType in @HandleEvent must extend SkyHanniEvent. Provided: ${options.eventType.java}"
+            }
         }
-        val eventType = options.eventType.java
-        require(SkyHanniEvent::class.java.isAssignableFrom(eventType)) {
-            "eventType in @HandleEvent must extend SkyHanniEvent. Provided: $eventType"
-        }
+
         return { _: Any -> method.invoke(instance) }
     }
 
