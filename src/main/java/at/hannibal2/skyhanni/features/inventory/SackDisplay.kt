@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
@@ -272,7 +273,7 @@ object SackDisplay {
         var totalPrice = 0L
         val table = buildMap {
             for ((_, gem) in sort(SackApi.gemstoneItem.toList())) {
-                val name = "${gem.gemType} Gemstones"
+                val name = "${gem.gemType.toDisplayString()} Gemstones"
                 val row = buildList {
                     addString(" §7- ")
                     addItemStack(gem.internalName)
@@ -280,7 +281,7 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onClick = {
-                                BazaarApi.searchForBazaarItem(name.dropLast(1))
+                                BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
                         ) { !NeuItems.neuHasFocus() },

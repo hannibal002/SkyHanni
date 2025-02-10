@@ -440,11 +440,6 @@ object Commands {
             category = CommandCategory.DEVELOPER_TEST
             callback { RepoPatternGui.open() }
         }
-        event.register("shtestitem") {
-            description = "test item internal name resolving"
-            category = CommandCategory.DEVELOPER_TEST
-            callback { SkyHanniDebugsAndTests.testItemCommand(it) }
-        }
         event.register("shfindnullconfig") {
             description = "Find config elements that are null and prints them into the console"
             category = CommandCategory.DEVELOPER_TEST
