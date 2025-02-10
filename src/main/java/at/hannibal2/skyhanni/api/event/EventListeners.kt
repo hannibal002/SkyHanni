@@ -80,7 +80,7 @@ class EventListeners private constructor(val name: String, private val isGeneric
         }
     }
 
-    data class HandleEventCached(
+    class HandleEventCached(
         val onlyOnSkyblock: Boolean,
         val onlyOnIsland: IslandType,
         val onlyOnIslands: Array<out IslandType>,
