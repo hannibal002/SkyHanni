@@ -17,12 +17,11 @@ import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import net.minecraft.init.Items
 import net.minecraft.item.ItemStack
-import java.time.Instant
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("SKyHanniModuleInspection", "unused")
 // @SkyHanniModule
+@Suppress("SKyHanniModuleInspection", "unused")
 object Year300RaffleEvent {
 
     private val config get() = SkyHanniMod.feature.event.century
