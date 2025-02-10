@@ -18,8 +18,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     private val canReceiveCancelled: Boolean,
 ) {
 
-    var invokeCount: Long = 0L
-        private set
+    val invokeLog = SkyHanniEvents.EventInvokeLog()
 
     constructor(event: Class<T>, listeners: List<EventListeners.Listener>) : this(
         (event.name.split(".").lastOrNull() ?: event.name).replace("$", "."),
@@ -43,7 +42,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
     }
 
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
-        invokeCount++
+        invokeLog.invokeCount++
         if (this.listeners.isEmpty()) return false
 
         if (SkyHanniEvents.isDisabledHandler(name)) return false
