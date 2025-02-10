@@ -70,7 +70,7 @@ object CrownOfAvariceCounter {
         val item = event.itemStack
         if (item.getInternalNameOrNull() != internalName) return
         val coins = item.getCoinsOfAvarice() ?: return
-        if (count == 0L) count = coins
+        if (count == null) count = coins
         coinsDifference = coins - (count ?: 0)
 
         if (coinsDifference == 0L) return

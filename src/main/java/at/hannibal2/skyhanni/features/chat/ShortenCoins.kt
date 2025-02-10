@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.replace
@@ -36,5 +37,13 @@ object ShortenCoins {
         }.takeIf { it != message } ?: return
 
         event.chatComponent = ChatComponentText(modifiedMessage)
+    }
+
+    fun Number.formatChatCoins(): String {
+        return "§6" + if (config.shortenCoinAmounts) {
+            shortFormat()
+        } else {
+            addSeparators()
+        }
     }
 }
