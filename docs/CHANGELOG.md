@@ -92,6 +92,8 @@
 + Made the "Open Last Storage" feature persistent across instances. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3182)
 + Made searches in Sack display GUIs sack-specific. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3338)
 + "Craft materials from bazaar" now supports purchasing from AH. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3386)
++ Added back the Item Tracker option "Hide outside Inventory". - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3404)
+    + Added option to hide Profit Trackers when not in an inventory.
 
 #### Mining Improvements
 
@@ -140,6 +142,7 @@
 + Added Coins Per Hour, Time until Max, and Last Coin Gained to Crown of Avarice counter. - Tryp0xd & Empa (https://github.com/hannibal002/SkyHanni/pull/2654)
     + Coins Per Hour and Time until Max reset if no coin is gained within 2 minutes (will show "RESET").
 + Updated UI buttons to display all variants on hover, with scroll and back options. - hannibal2 + Daveed (https://github.com/hannibal002/SkyHanni/pull/3345)
++ Re-added text for refunded coins in the Bazaar "Cancelled Buy Order Clipboard" feature. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3406)
 
 ### Bug Fixes
 
@@ -167,6 +170,9 @@
 + Fixed Jerry highlight being too aggressive. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3388)
     + Now only highlights your Jerrys.
     + No longer shows false positives during the Great Spook Festival.
++ Fixed Golden Jerry detection. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3393)
++ Fixed non-functional "Line to Jerry" disable option. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3397)
++ Fixed runic Jerry detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3396)
 
 #### Inventory Bug Fixes
 
@@ -202,6 +208,7 @@
 + Fixed Experimentation Table bits spent calculation. - YoGoUrT_20 (https://github.com/hannibal002/SkyHanni/pull/3390)
 + Fixed Harp GUI scale not resetting after being kicked to Limbo. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3383)
 + Fixed page scrolling with inverted bypass. - Cédric Ab (https://github.com/hannibal002/SkyHanni/pull/3206)
++ Fixed statspocalypse not affecting SkyHanni User Luck. - nopo (https://github.com/hannibal002/SkyHanni/pull/3399)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -224,6 +231,7 @@
 + Fixed Pest Profit Tracker to correctly count rare drops from pests. - Daveed (https://github.com/hannibal002/SkyHanni/pull/2987)
     + E.g., Enchanted Mushroom Blocks from slugs now count as 15 instead of 1.
 + Fixed pest repellent not being detected in Non God-Potion display. - not_a_cow (https://github.com/hannibal002/SkyHanni/pull/3333)
++ Fixed Visitor Shopping List not clickable. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3403)
 
 #### Combat Bug Fixes
 
@@ -288,6 +296,10 @@
 + Fixed NEU's `/pv` command not functioning for your profile. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3361)
 + Fixed occasional offsets in in-world text render positions. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3364)
 + Fixed TPS calculation error. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3378)
++ Fixed inconsistent scrolling in some SH GUIs. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3375)
++ Fixed TPS display not rounding results. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3401)
++ Fixed waypoints not visible behind blocks. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3408)
+    + E.g. In Diana, Slayer, Hoppity Eggs.
 
 ### Technical Details
 
