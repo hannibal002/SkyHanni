@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.data.IslandGraphs.pathFind
 import at.hannibal2.skyhanni.data.model.GraphNode
 import at.hannibal2.skyhanni.data.model.GraphNodeTag
 import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.sorted
 import at.hannibal2.skyhanni.utils.GraphUtils
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
@@ -17,7 +18,7 @@ import at.hannibal2.skyhanni.utils.chat.Text.send
 import kotlinx.coroutines.launch
 
 object NavigationHelper {
-    private const val NAVIGATION_CHAT_ID = -6457562
+    private val messageId = ChatUtils.getUniqueMessageId()
 
     val allowedTags = listOf(
         GraphNodeTag.NPC,
@@ -52,7 +53,7 @@ object NavigationHelper {
         Text.displayPaginatedList(
             title,
             locations,
-            chatLineId = NAVIGATION_CHAT_ID,
+            chatLineId = messageId,
             emptyMessage = "No locations found.",
         ) { (name, node) ->
             val distance = distances[node]!!.roundTo(1)
@@ -72,7 +73,7 @@ object NavigationHelper {
         val componentText = "§7Navigating to §r$name".asComponent()
         componentText.onClick(onClick = goBack)
         componentText.hover = "§eClick to stop navigating and return to previous search".asComponent()
-        componentText.send(NAVIGATION_CHAT_ID)
+        componentText.send(messageId)
     }
 
     private fun calculateNames(distances: Map<GraphNode, Double>): List<Pair<String, GraphNode>> {
