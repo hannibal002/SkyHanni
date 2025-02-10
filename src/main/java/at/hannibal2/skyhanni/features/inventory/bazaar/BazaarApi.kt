@@ -49,7 +49,8 @@ object BazaarApi {
     private var currentSearchedItem = ""
 
     var currentlyOpenedProduct: NeuInternalName? = null
-    var orderOptionProduct: NeuInternalName? = null
+    private var lastOpenedProduct: NeuInternalName? = null
+    private var orderOptionProduct: NeuInternalName? = null
 
     private val patternGroup = RepoPattern.group("inventory.bazaar")
 
@@ -123,6 +124,7 @@ object BazaarApi {
         if (inBazaarInventory) {
             val openedProduct = getOpenedProduct(event.inventoryItems) ?: return
             currentlyOpenedProduct = openedProduct
+            lastOpenedProduct = openedProduct
             BazaarOpenedProductEvent(openedProduct, event).post()
         }
     }
@@ -143,6 +145,13 @@ object BazaarApi {
         if (InventoryUtils.openInventoryName() == "Order options" && itemName == "§cCancel Order") {
             // pickup items from own bazaar order
             OwnInventoryData.ignoreItem(1.seconds) { it == orderOptionProduct }
+        }
+
+        if (inBazaarInventory) {
+            if (item.getLore().lastOrNull()?.removeColor() == "Click to buy now!") {
+                // instant buy
+                OwnInventoryData.ignoreItem(1.seconds) { it == lastOpenedProduct }
+            }
         }
     }
 
