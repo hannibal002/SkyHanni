@@ -1,6 +1,8 @@
 package at.hannibal2.skyhanni.features.inventory.bazaar
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.ItemBuyApi.buy
+import at.hannibal2.skyhanni.api.ItemBuyApi.createBuyTip
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
@@ -10,6 +12,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.isAuctionHouseItem
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -22,7 +25,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 
 @SkyHanniModule
-object CraftMaterialsFromBazaar {
+object CraftMaterialCollector {
 
     private val config get() = SkyHanniMod.feature.inventory.bazaar
 
@@ -60,7 +63,7 @@ object CraftMaterialsFromBazaar {
                 val material = item.internalName
                 val amount = item.amount
                 var text = "§8${amount.addSeparators()}x " + material.itemName
-                if (material.isBazaarItem()) {
+                if (material.isBazaarItem() || material.isAuctionHouseItem()) {
                     neededMaterials.add(item)
                     text += " §6${(material.getPrice() * amount).shortFormat()}"
                 }
@@ -69,10 +72,10 @@ object CraftMaterialsFromBazaar {
             if (neededMaterials.isNotEmpty()) {
                 add(
                     Renderable.clickAndHover(
-                        "§eGet from bazaar!",
-                        listOf("§eClick here to buy the items from bazaar!"),
+                        "§eAdd to craft material collector!",
+                        listOf("§eClick here to help purchasing the items!"),
                         onClick = {
-                            getFromBazaar(neededMaterials)
+                            addToPurchasing(neededMaterials)
                         },
                     ),
                 )
@@ -90,26 +93,27 @@ object CraftMaterialsFromBazaar {
         return recipeMaterials.map { it.key.makePrimitiveStack(it.value) }
     }
 
-    private fun getFromBazaar(neededMaterials: MutableList<PrimitiveItemStack>) {
+    private fun addToPurchasing(neededMaterials: List<PrimitiveItemStack>) {
         this.neededMaterials = neededMaterials
         this.multiplier = 1
         purchasing = true
-        updateBazaarDisplay()
+        updateDisplay()
     }
 
-    private fun updateBazaarDisplay() {
+    private fun updateDisplay() {
         display = buildList {
-            add(Renderable.string("§7Buy items from Bazaar:"))
+            add(Renderable.string("§7Buy items:"))
             for ((material, amount) in neededMaterials) {
                 val priceMultiplier = amount * multiplier
-                val text = "§8${priceMultiplier.addSeparators()}x " + material.itemName +
-                    " §6${(material.getPrice() * priceMultiplier).shortFormat(false)}"
+                val itemName = material.itemName
+                val text = "§8${priceMultiplier.addSeparators()}x " + itemName + " §6${
+                    (material.getPrice() * priceMultiplier).shortFormat(false)
+                }"
                 add(
-                    Renderable.optionalLink(
-                        text,
-                        onClick = {
-                            BazaarApi.searchForBazaarItem(material, priceMultiplier)
-                        },
+                    Renderable.clickAndHover(
+                        text = text,
+                        onClick = { material.buy(priceMultiplier) },
+                        tips = material.createBuyTip(),
                     ),
                 )
             }
@@ -141,7 +145,7 @@ object CraftMaterialsFromBazaar {
                         listOf("§eClick here to multiply the items needed times $m!"),
                         onClick = {
                             multiplier = m
-                            updateBazaarDisplay()
+                            updateDisplay()
                         },
                     ),
                 )
@@ -152,9 +156,7 @@ object CraftMaterialsFromBazaar {
     }
 
     private fun calculateTotalPrice(neededMaterials: List<PrimitiveItemStack>, multiplier: Int): Double =
-        neededMaterials
-            .filter { it.internalName.isBazaarItem() }
-            .sumOf { it.internalName.getPrice() * it.amount * multiplier }
+        neededMaterials.sumOf { it.internalName.getPrice() * it.amount * multiplier }
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
@@ -166,7 +168,7 @@ object CraftMaterialsFromBazaar {
         if (!isEnabled()) return
         if (!inRecipeInventory && !purchasing) return
 
-        config.craftMaterialsFromBazaarPosition.renderRenderables(display, posLabel = "Craft Materials From Bazaar")
+        config.craftMaterialsFromBazaarPosition.renderRenderables(display, posLabel = "Craft Material Collector")
     }
 
     fun isEnabled() = LorenzUtils.inSkyBlock && config.craftMaterialsFromBazaar
