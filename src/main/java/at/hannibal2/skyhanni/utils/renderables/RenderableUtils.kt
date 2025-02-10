@@ -156,6 +156,7 @@ internal object RenderableUtils {
         crossinline onChange: (T) -> Unit,
         universe: List<T> = enumValues<T>().toList(),
         enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
     ) {
         add(
             createButtonNew(
@@ -165,6 +166,7 @@ internal object RenderableUtils {
                 onChange = { onChange(it ?: error("it is null in non-nullable onChange()")) },
                 universe,
                 enableUniverseScroll,
+                scrollValue,
             ).renderable,
         )
     }
@@ -199,6 +201,7 @@ internal object RenderableUtils {
         crossinline onChange: (T?) -> Unit,
         universe: List<T?>,
         enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
     ): Searchable {
         val onClick: (Direction) -> Unit = { direction ->
             if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
@@ -236,7 +239,7 @@ internal object RenderableUtils {
             addString("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
-                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false)
+                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false, scrollValue = scrollValue)
                 false -> leftAndRightClickable(displayFormat, onClick = onClick, bypassChecks = false)
             }.let { add(it) }
             addString("§a]")
