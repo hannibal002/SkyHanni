@@ -8,8 +8,15 @@ import kotlin.reflect.KClass
 annotation class HandleEvent(
     /**
      * For cases where the event properties are themselves not needed, and solely a listener for an event fire suffices.
+     * To specify multiple events, use [eventTypes] instead.
      */
     val eventType: KClass<out SkyHanniEvent> = SkyHanniEvent::class,
+
+    /**
+     * For cases where multiple events are listened to, and properties are unnecessary.
+     * To specify only one event, use [eventType] instead.
+     */
+    val eventTypes: Array<KClass<out SkyHanniEvent>> = [],
 
     /**
      * If the event should only be received while on SkyBlock.
