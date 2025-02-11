@@ -292,6 +292,9 @@ class ProfileSpecificStorage {
 
             @Expose
             var purchasedHitmanSlots: Int = 0
+
+            @Expose
+            var hotChocolateMixinExpiry = farPast()
         }
 
         @Expose
@@ -799,4 +802,7 @@ class ProfileSpecificStorage {
         @Expose
         var museumMilestone: Int? = null
     }
+
+    @Expose
+    var godPotExpiry: SimpleTimeMark = farPast()
 }
