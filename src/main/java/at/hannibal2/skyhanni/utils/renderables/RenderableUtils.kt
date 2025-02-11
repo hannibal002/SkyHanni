@@ -16,6 +16,7 @@ import kotlin.reflect.KMutableProperty0
 
 private typealias Direction = Renderable.Companion.Direction
 
+@Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
     /** Calculates the absolute x position of the columns in a table*/
