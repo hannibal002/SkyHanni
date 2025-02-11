@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.HotmApi.PowderType
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.MaxwellApi.ThaumaturgyPowerTuning
+import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.ComposterUpgrade
 import at.hannibal2.skyhanni.data.model.SkyblockStat
@@ -750,7 +751,7 @@ class ProfileSpecificStorage {
 
     // data
     @Expose
-    var currentPet: String = ""
+    var currentPetData: PetData = PetData()
 
     @Expose
     var stats: MutableMap<SkyblockStat, Double?> = enumMapOf()
