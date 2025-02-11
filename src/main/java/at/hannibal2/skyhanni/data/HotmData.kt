@@ -692,7 +692,7 @@ enum class HotmData(
             ScoreboardPattern.powderPattern.firstMatcher(event.added) {
                 val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                 val amount = group("amount").formatLong()
-                type.setAmount(amount)
+                type.setAmount(amount, postEvent = true)
             }
         }
 
@@ -723,7 +723,7 @@ enum class HotmData(
                 powderPattern.matchMatcher(line) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return
                     val amount = group("amount").formatLong()
-                    type.setAmount(amount)
+                    type.setAmount(amount, postEvent = true)
                 }
             }
         }
