@@ -101,7 +101,7 @@ public class RewardWarningConfig {
     public boolean preventAcceptingHighLoss = false;
 
     @Expose
-    @ConfigOption(name = "Block Refusing New Visitors", desc = "Prevents refusing a visitor you've never completed an offer with.")
+    @ConfigOption(name = "Block Refusing New Visitors", desc = "Prevents refusing a visitor you've never completed an offer with.\n§eDisabled while on bingo.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean preventRefusingNew = true;

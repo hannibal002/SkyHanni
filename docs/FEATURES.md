@@ -882,6 +882,12 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Bacte Phase Display to the Damage Indicator. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
 + Added waypoints for Bacte's Tentacles with hit counts. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2322)
     + Shows hit counts instead of HP display due to varying max health values.
++ Added Rift Snake Highlighter. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/321)
+    + Highlights moving snakes in the Living Cave in the Rift.
+    + Uses colors to indicate different snake states.
+    + Highlights head or tail based on whether the held item calms or breaks the snake.
++ Added Sun Gecko Helper. - nopo (https://github.com/hannibal002/SkyHanni/pull/3097)
+    + Displays health, combo, combo progress, combo timeout, and active modifiers.
 
 </details>
 <details open><summary>
@@ -1090,6 +1096,13 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Century Daily Task Highlight. - Thunderbalde73 (https://github.com/hannibal002/SkyHanni/pull/3355)
 + Added Slice of Cake team finder for Anniversary Celebration. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3354)
     + Added highlight for players in the correct team when holding a Slice of Cake item.
++ Added Player Highlighter for Century Party Invitation item. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3360)
+    + Highlights players eligible for a Century Party invitation.
+
+#### Jerry
+
++ Added Line to Jerry. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3388)
+    + Shows a line to your spawned Jerry from Jerrypocalypse.
 
 </details>
 <details open><summary>
