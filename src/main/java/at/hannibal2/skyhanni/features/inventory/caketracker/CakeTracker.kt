@@ -409,8 +409,8 @@ object CakeTracker {
                 if (priceSum != 0.0) add(totalString)
                 else add("§cNo auctions found")
                 if (displayType == DisplayType.MISSING_CAKES) {
-                    add("§eClick to search auction house")
-                    add("§7Use arrow keys to change year")
+                    add("§eClick to search auction house!")
+                    add("§8Use arrow keys to change year!")
                 }
             }
         }
