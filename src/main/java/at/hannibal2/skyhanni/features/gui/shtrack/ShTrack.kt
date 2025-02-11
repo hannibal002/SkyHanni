@@ -229,7 +229,7 @@ object ShTrack {
         override var errorMessage: String? = null
 
         private fun fetchCollection(it: NeuInternalName): Long = CollectionApi.getCollectionCounter(it) ?: run {
-            errorMessage = "Collection amount is unknown"
+            errorMessage = "Collection amount is unknown. Open the specific collection and try again."
             0L
         }
 

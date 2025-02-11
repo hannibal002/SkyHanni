@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.api
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ItemAddManager
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.CollectionUpdateEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.ItemAddEvent
@@ -53,7 +54,7 @@ object CollectionApi {
         "§7Progress to .* I: .*",
     )
 
-    val collectionValue = mutableMapOf<NeuInternalName, Long>()
+    val collectionValue get() = ProfileStorageData.profileSpecific?.collection
 
     // TODO repo
     private val incorrectCollectionNames = mapOf(
@@ -62,7 +63,7 @@ object CollectionApi {
 
     @HandleEvent
     fun onProfileJoin(event: ProfileJoinEvent) {
-        collectionValue.clear()
+        collectionValue?.clear()
     }
 
     @HandleEvent
@@ -74,12 +75,13 @@ object CollectionApi {
                 val counter = group("amount").formatLong()
                 val name = inventoryName.split(" ").dropLast(1).joinToString(" ")
                 val internalName = incorrectCollectionNames[name] ?: NeuInternalName.fromItemName(name)
-                collectionValue[internalName] = counter
+                collectionValue?.set(internalName, counter)
             }
             CollectionUpdateEvent.post()
         }
 
         if (inventoryName.endsWith(" Collections")) {
+            // TODO add Boss Collection support
             if (inventoryName == "Boss Collections") return
 
             for ((_, stack) in event.inventoryItems) {
@@ -96,7 +98,7 @@ object CollectionApi {
                 val internalName = incorrectCollectionNames[name] ?: NeuInternalName.fromItemName(name)
                 counterPattern.firstMatcher(lore) {
                     val counter = group("amount").formatLong()
-                    collectionValue[internalName] = counter
+                    collectionValue?.set(internalName, counter)
                 }
             }
             CollectionUpdateEvent.post()
@@ -107,19 +109,23 @@ object CollectionApi {
     fun onItemAdd(event: ItemAddEvent) {
         if (event.source == ItemAddManager.Source.COMMAND) return
         val internalName = event.internalName
-        val amount = NeuItems.getPrimitiveMultiplier(internalName).amount
-        if (amount > 1) return
+        val primitive = NeuItems.getPrimitiveMultiplier(internalName)
+
+        val collectionName = when (primitive.internalName) {
+            else -> primitive.internalName
+        }
 
         // TODO add support for replenish (higher collection than actual items in inv)
-        if (internalName.getItemStackOrNull() == null) {
-            ChatUtils.debug("CollectionAPI.addFromInventory: item is null for '$internalName'")
+        if (collectionName.getItemStackOrNull() == null) {
+            ChatUtils.debug("CollectionAPI.addFromInventory: item is null for '$collectionName' from '$internalName'")
             return
         }
-        collectionValue.addOrPut(internalName, event.amount.toLong())
+        collectionValue?.addOrPut(collectionName, event.amount.toLong() * primitive.amount)
     }
 
     fun isCollectionTier0(lore: List<String>) = lore.any { collectionTier0Pattern.matches(it) }
-    fun getCollectionCounter(internalName: NeuInternalName): Long? = collectionValue[internalName]
+    fun getCollectionCounter(internalName: NeuInternalName): Long? =
+        collectionValue?.get(NeuItems.getPrimitiveMultiplier(internalName).internalName)
 
     fun NeuInternalName.getMultipleMap() = findAllMultiples()[this] ?: mapOf(this to 1)
 

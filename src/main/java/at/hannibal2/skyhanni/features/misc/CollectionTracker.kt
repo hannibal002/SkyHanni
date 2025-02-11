@@ -169,7 +169,7 @@ object CollectionTracker {
                     add(it.getItemStack())
                 }
                 add("$itemName collection: §e$format$goal $gainText")
-            }
+            },
         )
     }
 
@@ -184,12 +184,11 @@ object CollectionTracker {
         name == internalName
     }
 
-
     fun handleTabComplete(command: String): List<String>? {
         if (command != "shtrackcollection") return null
 
-        return CollectionApi.collectionValue.keys.mapNotNull { it.getItemStackOrNull() }
-            .map { it.displayName.removeColor().replace(" ", "_") }
+        return CollectionApi.collectionValue?.keys?.mapNotNull { it.getItemStackOrNull() }
+            ?.map { it.displayName.removeColor().replace(" ", "_") }
     }
 
     @HandleEvent

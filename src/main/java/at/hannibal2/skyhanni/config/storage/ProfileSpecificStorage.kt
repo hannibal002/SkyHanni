@@ -70,6 +70,9 @@ class ProfileSpecificStorage {
     @Expose
     var totalSkyBlockXP: Int? = null
 
+    @Expose
+    var collection: MutableMap<NeuInternalName, Long> = mutableMapOf()
+
     // features
     // - combat
     @Expose
