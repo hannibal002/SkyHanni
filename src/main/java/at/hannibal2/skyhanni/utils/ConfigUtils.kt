@@ -86,9 +86,7 @@ object ConfigUtils {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
 
         // TODO create utils function "crashIfInDevEnv"
-        if (EventHandler.isInEventHandler) {
-            throw Error("can not jump to editor $name")
-        }
+        ErrorManager.crashInDevEnv("Can not open the config")
         ErrorManager.logErrorStateWithData(
             "Can not open the config",
             "error while trying to jump to an editor element",

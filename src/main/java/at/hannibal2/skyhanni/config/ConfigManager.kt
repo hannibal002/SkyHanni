@@ -99,7 +99,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (EventHandler.isInEventHandler) throw e
+            ErrorManager.crashInDevEnv("Couldn't load config links", e)
         }
     }
 

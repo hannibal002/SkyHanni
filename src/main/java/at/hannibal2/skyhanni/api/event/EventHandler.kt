@@ -24,19 +24,6 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         listeners.any { it.receiveCancelled },
     )
 
-    companion object {
-        private var eventHandlerDepth by object : ThreadLocal<Int>() {
-            override fun initialValue(): Int = 0
-        }
-
-        /**
-         * Returns true if the current thread is in an event handler. This is because the event handler catches exceptions which means
-         * that we are free to throw exceptions in the event handler without crashing the game.
-         * We also return true if we are in a dev environment to alert the developer of any errors effectively.
-         */
-        val isInEventHandler get() = eventHandlerDepth > 0 || PlatformUtils.isDevEnvironment
-    }
-
     fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
         invokeCount++
         if (this.listeners.isEmpty()) return false
@@ -45,7 +32,6 @@ class EventHandler<T : SkyHanniEvent> private constructor(
 
         var errors = 0
 
-        eventHandlerDepth++
         for (listener in listeners) {
             if (!listener.shouldInvoke(event)) continue
             try {
@@ -62,7 +48,6 @@ class EventHandler<T : SkyHanniEvent> private constructor(
             }
             if (event.isCancelled && !canReceiveCancelled) break
         }
-        eventHandlerDepth--
 
         if (errors > 3) {
             val hiddenErrors = errors - 3
