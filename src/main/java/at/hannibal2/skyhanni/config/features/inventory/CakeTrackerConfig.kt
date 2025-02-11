@@ -35,17 +35,23 @@ class CakeTrackerConfig {
     @Expose
     var displayType: Property<CakeTrackerDisplayType> = Property.of(CakeTrackerDisplayType.MISSING_CAKES)
 
-    enum class CakeTrackerDisplayType {
-        MISSING_CAKES,
-        OWNED_CAKES,
+    enum class CakeTrackerDisplayType(private val displayName: String) {
+        MISSING_CAKES("§cMissing Cakes"),
+        OWNED_CAKES("§aOwned Cakes"),
+        ;
+
+        override fun toString() = displayName
     }
 
     @Expose
     var displayOrderType: Property<CakeTrackerDisplayOrderType> = Property.of(CakeTrackerDisplayOrderType.OLDEST_FIRST)
 
-    enum class CakeTrackerDisplayOrderType {
-        OLDEST_FIRST,
-        NEWEST_FIRST,
+    enum class CakeTrackerDisplayOrderType(private val displayName: String) {
+        OLDEST_FIRST("§cOldest First"),
+        NEWEST_FIRST("§aNewest First"),
+        ;
+
+        override fun toString() = displayName
     }
 
     @Expose
