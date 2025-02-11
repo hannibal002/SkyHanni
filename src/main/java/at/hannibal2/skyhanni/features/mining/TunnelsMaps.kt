@@ -303,7 +303,7 @@ object TunnelsMaps {
         add(Renderable.string("§6Locations:"))
         add(
             Renderable.clickable(
-                Renderable.string(campfireName),
+                campfireName,
                 tips = listOf(
                     "§eLeft Click to set active",
                     "§eRight Click for override",

@@ -283,7 +283,7 @@ object SkillProgress {
 
             this[skill] = if (level == -1) {
                 Renderable.clickable(
-                    Renderable.string("§cOpen your skills menu!"),
+                    "§cOpen your skills menu!",
                     tips = listOf("§eClick here to execute §6/skills"),
                     onClick = { HypixelCommands.skills() },
                 )
@@ -379,10 +379,9 @@ object SkillProgress {
         }
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
-        val sessionFormat = "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}"
         add(
             Renderable.clickable(
-                Renderable.string(sessionFormat),
+                "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
                 tips = listOf("§eClick to reset!"),
                 onClick = {
                     xpInfo.sessionTimerActive = false

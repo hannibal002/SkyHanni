@@ -224,7 +224,7 @@ object CarryTracker {
         val cost = formatCost(type.pricePer?.let { it * requested })
         val text = "$color$done§8/$color$requested $cost"
         return Renderable.clickable(
-            Renderable.string("  $type $text"),
+            "  $type $text",
             tips = buildList<String> {
                 add("§b${customer.name}' $type §cCarry")
                 add("")
