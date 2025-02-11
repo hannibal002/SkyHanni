@@ -19,6 +19,7 @@ import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import net.minecraft.world.IWorldNameable
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.12
 //$$ import net.minecraft.inventory.ClickType
 //#endif
@@ -134,13 +135,13 @@ object InventoryUtils {
         }
     }
 
-    fun Gui.getTitle() = when (this) {
+    fun Gui.getTitle(): String = when (this) {
         is IWorldNameable -> {
-            name!!
+            name
         }
 
         is IMerchant -> {
-            displayName.unformattedText!!
+            displayName.unformattedText
         }
 
         else -> ""
