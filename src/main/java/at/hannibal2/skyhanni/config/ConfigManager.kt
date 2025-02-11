@@ -99,7 +99,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            ErrorManager.crashInDevEnv("Couldn't load config links", e)
+            ErrorManager.crashInDevEnv("Couldn't load config links") { e }
         }
     }
 
