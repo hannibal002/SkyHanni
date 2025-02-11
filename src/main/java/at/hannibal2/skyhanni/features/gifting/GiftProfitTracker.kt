@@ -327,11 +327,11 @@ object GiftProfitTracker {
             val specificGiftFormat = if (applicableGifts.count() == 1) applicableGifts.keys.first().displayName else "§eGifts"
             val giftFormat = "§7${it.addSeparators()}x $specificGiftFormat§7: §c-${totalGiftCost.shortFormat()}"
             add(
-                if (applicableGifts.count() == 1) Renderable.string(giftFormat).toSearchable()
+                if (applicableGifts.count() == 1) Renderable.string(giftFormat).toSearchable(specificGiftFormat)
                 else Renderable.hoverTips(
                     giftFormat,
                     giftCostStrings,
-                ).toSearchable(),
+                ).toSearchable(specificGiftFormat),
             )
         }
 
@@ -342,7 +342,7 @@ object GiftProfitTracker {
                 Renderable.hoverTips(
                     "§d$northStarsFormat §5North Stars§7",
                     listOf("§7You gained §d${it.addSeparators()} §5North Stars."),
-                ).toSearchable(),
+                ).toSearchable("North Stars"),
             )
         }
 
@@ -359,7 +359,7 @@ object GiftProfitTracker {
                 Renderable.hoverTips(
                     "§7${sumXpGained.shortFormat()} §3Skill XP",
                     skillHoverTips,
-                ).toSearchable(),
+                ).toSearchable("Skill XP"),
             )
         }
 
