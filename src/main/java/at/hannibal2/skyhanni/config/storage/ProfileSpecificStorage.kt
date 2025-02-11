@@ -280,6 +280,9 @@ class ProfileSpecificStorage {
         @Expose
         var mealLastFound: MutableMap<HoppityEggType, SimpleTimeMark> = enumMapOf()
 
+        @Expose
+        var hotChocolateMixinExpiry = farPast()
+
         class HitmanStatsStorage {
             @Expose
             var availableHitmanEggs: Int = 0
@@ -292,9 +295,6 @@ class ProfileSpecificStorage {
 
             @Expose
             var purchasedHitmanSlots: Int = 0
-
-            @Expose
-            var hotChocolateMixinExpiry = farPast()
         }
 
         @Expose
