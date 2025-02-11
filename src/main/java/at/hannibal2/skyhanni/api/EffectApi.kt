@@ -159,9 +159,9 @@ object EffectApi {
             profileStorage?.godPotExpiry = existingValue + durationAdded
         }
 
-        var effect: NonGodPotEffect? = null
-        var changeType: EffectDurationChangeType? = null
-        var duration: Duration? = null
+        val effect: NonGodPotEffect?
+        val changeType: EffectDurationChangeType?
+        val duration: Duration?
 
         when (event.message) {
             "§aYou ate a §r§aRe-heated Gummy Polar Bear§r§a!" -> {
@@ -207,6 +207,7 @@ object EffectApi {
             "§cThe Goblin King's §r§afoul stench §r§chas dissipated!" -> {
                 effect = NonGodPotEffect.GOBLIN
                 changeType = EffectDurationChangeType.REMOVE
+                duration = null
             }
             else -> return
         }
