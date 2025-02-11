@@ -126,12 +126,18 @@ object RareDropMessages {
         if (category != ItemCategory.ENCHANTED_BOOK) return
         if (inAnyIsland(ignoredBookIslands)) return
 
-        val anyRecent = ChatUtils.chatLines.none {
-            it.passedSinceSent() < 1.seconds &&
-                (enchantedBookPattern.matches(it.message) || internalName.itemName in it.message.removeColor())
+        val itemName = internalName.itemName
+        var anyRecentMessage = false
+        for (line in ChatUtils.chatLines) {
+            if (line.passedSinceSent() < 1.seconds) break
+            val message = line.message
+            if (enchantedBookPattern.matches(message) || itemName in message.removeColor()) {
+                anyRecentMessage = true
+                break
+            }
         }
 
-        if (anyRecent) {
+        if (!anyRecentMessage) {
             var message = "§r§6§lRARE DROP! ${internalName.itemName}"
             userLuck?.takeIf { it != 0f }?.let { luck ->
                 var luckString = luck.roundTo(2).toString()
