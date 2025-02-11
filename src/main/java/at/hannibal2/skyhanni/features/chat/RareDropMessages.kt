@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -140,9 +141,9 @@ object RareDropMessages {
         if (!anyRecentMessage) {
             var message = "§r§6§lRARE DROP! ${internalName.itemName}"
             userLuck?.takeIf { it != 0f }?.let { luck ->
-                var luckString = luck.roundTo(2).toString()
+                var luckString = luck.roundTo(2).addSeparators()
                 if (luck > 0) luckString = "+$luckString"
-                message += " §a($luckString ✴ SkyHanni User Luck"
+                message += " §a($luckString ✴ SkyHanni User Luck)"
             }
             ChatUtils.chat(message, prefix = false)
             return
