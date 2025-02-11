@@ -47,7 +47,7 @@ public class DianaConfig {
     @Expose
     @ConfigOption(name = "Guessing technique", desc = "Which guesser to use.")
     @ConfigEditorDropdown
-    public BurrowGuessType burrowsGuessType = BurrowGuessType.SOOPY_GUESS;
+    public BurrowGuessType burrowsGuessType = BurrowGuessType.PRECISE_GUESS;
 
     @Expose
     @ConfigOption(name = "Nearby Detection", desc = "Show burrows near you.")

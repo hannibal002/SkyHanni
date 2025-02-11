@@ -51,6 +51,7 @@ object PreciseGuessBurrow {
         if (type != EnumParticleTypes.DRIP_LAVA) return
         val currLoc = packet.toLorenzVec()
         if (lastDianaSpade.passedSince() > 3.seconds) return
+        lastLavaParticle = SimpleTimeMark.now()
         if (particleLocations.isEmpty()) {
             // First particle spawns exactly 1 block away from the player
             if ((spadeUsePosition?.distance(currLoc) ?: 10.0) > 1.1555) return
@@ -108,6 +109,7 @@ object PreciseGuessBurrow {
     }
 
     private var lastDianaSpade = SimpleTimeMark.farPast()
+    private var lastLavaParticle = SimpleTimeMark.farPast()
     private var spadeUsePosition: LorenzVec? = null
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
@@ -116,6 +118,8 @@ object PreciseGuessBurrow {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
+        if (lastLavaParticle.passedSince() < 0.5.seconds) return
+        if (lastDianaSpade.passedSince() < 0.1.seconds) return
         particleLocations.clear()
         lastDianaSpade = SimpleTimeMark.now()
         spadeUsePosition = Minecraft.getMinecraft().thePlayer.getPositionEyes(1.0F).toLorenzVec()
@@ -123,7 +127,7 @@ object PreciseGuessBurrow {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(71, "event.diana.burrowsSoopyGuess", "event.diana.burrowsGuess")
+        event.move(74, "event.diana.burrowsSoopyGuess", "event.diana.burrowsGuess")
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.PRECISE_GUESS
