@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig

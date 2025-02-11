@@ -1,13 +1,10 @@
 package at.hannibal2.skyhanni.api.event
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.mixins.hooks.getValue
-import at.hannibal2.skyhanni.mixins.hooks.setValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.chat.Text
-import at.hannibal2.skyhanni.utils.system.PlatformUtils
 
 class EventHandler<T : SkyHanniEvent> private constructor(
     val name: String,
