@@ -33,6 +33,7 @@ import at.hannibal2.skyhanni.features.garden.fortuneguide.FarmingItems
 import at.hannibal2.skyhanni.features.garden.pests.PestProfitTracker
 import at.hannibal2.skyhanni.features.garden.pests.VinylType
 import at.hannibal2.skyhanni.features.garden.visitor.VisitorReward
+import at.hannibal2.skyhanni.features.gui.shtrack.TrackingList
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryStrayTracker
 import at.hannibal2.skyhanni.features.inventory.experimentationtable.ExperimentsProfitTracker
 import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.WardrobeData
@@ -556,6 +557,9 @@ class ProfileSpecificStorage {
         @Expose
         var boostedStat: String? = null
     }
+
+    @Expose
+    val tracking: TrackingList = TrackingList()
 
     // - inventory
     @Expose
