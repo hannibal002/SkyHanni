@@ -91,9 +91,9 @@ object ErrorManager {
         )
     }
 
-    inline fun crashInDevEnv(reason: String, t: () -> Throwable = { RuntimeException("SkyHanni crash") }) {
+    inline fun crashInDevEnv(reason: String, t: (String) -> Throwable = { RuntimeException(it) }) {
         if (!PlatformUtils.isDevEnvironment) return
-        Minecraft.getMinecraft().crashed(CrashReport("SkyHanni - $reason", t()))
+        Minecraft.getMinecraft().crashed(CrashReport("SkyHanni - $reason", t(reason)))
     }
 
     // just log for debug cases
