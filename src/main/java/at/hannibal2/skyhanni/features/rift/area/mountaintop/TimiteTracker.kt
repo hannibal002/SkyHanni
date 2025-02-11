@@ -101,7 +101,7 @@ object TimiteTracker {
     }
 
     private val tracker =
-        SkyHanniItemTracker("Timite Tracker", { Data() }, { it.timiteHelperTracker }) {
+        SkyHanniItemTracker("Timite Tracker", { Data() }, { it.rift.timiteHelperTracker }) {
             drawDisplay(it)
         }
 

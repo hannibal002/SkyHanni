@@ -44,6 +44,7 @@ import at.hannibal2.skyhanni.features.mining.powdertracker.PowderTracker
 import at.hannibal2.skyhanni.features.misc.DraconicSacrificeTracker
 import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper
 import at.hannibal2.skyhanni.features.misc.trevor.TrevorTracker.TrapperMobRarity
+import at.hannibal2.skyhanni.features.rift.area.mountaintop.TimiteTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.VerminTracker
 import at.hannibal2.skyhanni.features.rift.area.westvillage.kloon.KloonTerminal
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -732,6 +733,9 @@ class ProfileSpecificStorage {
 
         @Expose
         var verminTracker: VerminTracker.Data = VerminTracker.Data()
+
+        @Expose
+        var timiteHelperTracker: TimiteTracker.Data = TimiteTracker.Data()
     }
 
     // - slayer
