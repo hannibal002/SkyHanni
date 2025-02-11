@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.features.gifting.UniqueGiftingOpportunitiesFeatures.isHoldingGift
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
@@ -241,10 +240,10 @@ object GiftProfitTracker {
         }
     }
 
-    @HandleEvent
-    fun onRenderOverlay(event: GuiRenderEvent) {
-        if (!isEnabled()) return
-        tracker.renderDisplay(config.position)
+    init {
+        tracker.initRenderer(
+            { config.position },
+        ) { isEnabled() }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -313,17 +312,14 @@ object GiftProfitTracker {
         val giftsUsed = data.giftsUsed
         val applicableGifts = giftsUsed.filter { it.value > 0 }
         var totalGiftCost = 0.0
-        val giftCostStrings = buildList {
-            applicableGifts.forEach { (gift, count) ->
-                val item = gift.toInternalName()
-                val price = item.getPrice()
-                val totalPrice = price * count
-                if (totalPrice > 0) {
-                    profit -= totalPrice
-                    totalGiftCost += totalPrice
-                    add("§7${count}x ${gift.displayName}§7: §c-${totalPrice.shortFormat()}")
-                }
-            }
+        val giftCostStrings = applicableGifts.mapNotNull { (gift, count) ->
+            val item = gift.toInternalName()
+            val totalPrice = item.getPrice() * count
+            if (totalPrice > 0) {
+                profit -= totalPrice
+                totalGiftCost += totalPrice
+                "§7${count}x ${gift.displayName}§7: §c-${totalPrice.shortFormat()}"
+            } else null
         }
 
         // Add loss due to used gifts
@@ -353,10 +349,8 @@ object GiftProfitTracker {
         // Skill XP gains
         data.skillXpGained.sumAllValues().takeIf { it > 0 }?.let { sumXpGained ->
             val applicableSkills = data.skillXpGained.filter { it.value > 0 }
-            val skillHoverTips = buildList {
-                applicableSkills.forEach { (skill, xp) ->
-                    add("§7${xp.addSeparators()} §3${skill.displayName} XP")
-                }
+            val skillHoverTips = applicableSkills.map { (skill, xp) ->
+                "§7${xp.addSeparators()} §3${skill.displayName} XP"
             }.toMutableList()
             if (applicableSkills.size > 1) {
                 skillHoverTips.add("§7You gained §e${sumXpGained.addSeparators()} §7total skill XP.")
@@ -372,10 +366,8 @@ object GiftProfitTracker {
         // Breakdown of rewards by rarity
         val totalRewards = data.rarityRewardTypesGained.sumAllValues().toLong()
         val applicableRarities = data.rarityRewardTypesGained.filter { it.value > 0 }
-        val rewardHoverTips = buildList {
-            applicableRarities.forEach { (rarity, count) ->
-                add("§7${count.addSeparators()}x ${rarity.displayName}§7")
-            }
+        val rewardHoverTips = applicableRarities.map { (rarity, count) ->
+            "§7${count.addSeparators()}x ${rarity.displayName}§7"
         }
         totalRewards.takeIf { it > 0 }?.let {
             add(
