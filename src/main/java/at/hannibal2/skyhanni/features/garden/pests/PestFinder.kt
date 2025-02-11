@@ -73,7 +73,7 @@ object PestFinder {
                     "",
                     "§eClick here to warp!",
                 ),
-                onClick = {
+                onLeftClick = {
                     plot.sendTeleportTo()
                 },
             )
@@ -89,7 +89,7 @@ object PestFinder {
                     tips = listOf(
                         "Runs /desk.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.gardenDesk()
                     },
                 ),
@@ -100,7 +100,7 @@ object PestFinder {
                     tips = listOf(
                         "Runs /widget.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.widget()
                     },
                 ),

@@ -95,20 +95,20 @@ interface Renderable {
             else -> null
         }
 
-        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable =
-            link(string(text), onClick, bypassChecks = bypassChecks)
+        fun link(text: String, bypassChecks: Boolean = false, onLeftClick: () -> Unit): Renderable =
+            link(string(text), onLeftClick, bypassChecks = bypassChecks)
 
         fun optionalLink(
             text: String,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
-        ): Renderable = link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
+        ): Renderable = link(string(text), onLeftClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
 
         fun link(
             renderable: Renderable,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
@@ -120,7 +120,7 @@ interface Renderable {
                     condition = condition,
                     highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
-                onClick,
+                onLeftClick,
                 bypassChecks,
                 condition,
             )
@@ -128,44 +128,44 @@ interface Renderable {
 
         fun clickable(
             text: String,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(string(text), onClick, bypassChecks, condition, tips, onHover)
+        ) = clickable(string(text), onLeftClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(render, mapOf(LEFT_MOUSE to onClick), bypassChecks, condition, tips, onHover)
+        ) = clickable(render, mapOf(LEFT_MOUSE to onLeftClick), bypassChecks, condition, tips, onHover)
 
         fun clickable(
             text: String,
             /**
-             * This should be a direct map of key code to the function that should be called.
-             * For Mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * This should be a direct map of key code int, to the unit that should be invoked.
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
              * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
              */
-            click: Map<Int, () -> Unit>,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ) = clickable(string(text), click, bypassChecks, condition, tips, onHover)
+        ) = clickable(string(text), onAnyClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
             /**
-             * This should be a direct map of key code to the function that should be called.
-             * For Mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * This should be a direct map of key code int, to the unit that should be invoked.
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
              * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
              */
-            click: Map<Int, () -> Unit>,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
@@ -176,19 +176,21 @@ interface Renderable {
             } ?: onHover.takeIf { it != {} }?.let {
                 hoverable(render, render, bypassChecks = bypassChecks, onHover = onHover)
             } ?: render,
-            click,
+            onAnyClick,
             bypassChecks,
             condition,
         )
 
         private fun multiClickable(
             render: Renderable,
-            click: Map<Int, () -> Unit>,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             /**
-             * This function is called on hover and click if no keys within [click] are pressed.
-             * This is useful for things like scrolling, which don't have a direct key code.
+             * This unit is invoked on 'hover & click' if no keys within [onAnyClick] invoke their unit.
+             * This is useful for detecting things like scrolling, which do not have a direct key code to reference.
+             *
+             * See [clickableAndScrollable] for an example of how this is used.
              */
             nonStandardClick: () -> Unit = {},
         ) = object : Renderable {
@@ -206,9 +208,9 @@ interface Renderable {
 
             private fun handleClickChecks() {
                 var processed = false
-                for ((button, onClick) in click) {
-                    if (button.isKeyClicked()) {
-                        onClick()
+                for ((key, onKeyClicked) in onAnyClick) {
+                    if (key.isKeyClicked()) {
+                        onKeyClicked()
                         processed = true
                     }
                 }
@@ -218,7 +220,7 @@ interface Renderable {
 
         fun clickableAndScrollable(
             render: Renderable,
-            click: Map<Int, () -> Unit>,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             scrollValue: ScrollValue = ScrollValue(),
@@ -227,14 +229,14 @@ interface Renderable {
 
             return multiClickable(
                 render = render,
-                click = click,
+                onAnyClick = onAnyClick,
                 bypassChecks = bypassChecks,
                 condition = condition,
                 nonStandardClick = {
                     pureScrollInput.update(true)
                     when (pureScrollInput.asDirection()) {
-                        ScrollInput.ScrollDirection.UP -> click[RIGHT_MOUSE]?.invoke()
-                        ScrollInput.ScrollDirection.DOWN -> click[LEFT_MOUSE]?.invoke()
+                        ScrollInput.ScrollDirection.UP -> onAnyClick[RIGHT_MOUSE]?.invoke()
+                        ScrollInput.ScrollDirection.DOWN -> onAnyClick[LEFT_MOUSE]?.invoke()
                         else -> {}
                     }
                     pureScrollInput.dispose()

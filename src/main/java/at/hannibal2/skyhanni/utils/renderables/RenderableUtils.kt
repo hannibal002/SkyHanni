@@ -244,8 +244,8 @@ internal object RenderableUtils {
             addString("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
-                true -> clickableAndScrollable(displayFormat, click = clickMap, bypassChecks = false, scrollValue = scrollValue)
-                false -> clickable(displayFormat, click = clickMap, bypassChecks = false)
+                true -> clickableAndScrollable(displayFormat, onAnyClick = clickMap, bypassChecks = false, scrollValue = scrollValue)
+                false -> clickable(displayFormat, onAnyClick = clickMap, bypassChecks = false)
             }.let { add(it) }
             addString("§a]")
         }.toSearchable()

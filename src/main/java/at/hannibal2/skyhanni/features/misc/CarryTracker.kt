@@ -244,7 +244,7 @@ object CarryTracker {
                 add("§eClick to send current progress in the party chat!")
                 add("§eControl-click to remove this carry!")
             },
-            onClick = {
+            onLeftClick = {
                 if (KeyboardManager.isModifierKeyDown()) {
                     carries.remove(carry)
                     update()
@@ -294,7 +294,7 @@ object CarryTracker {
                     "",
                     "§eClick to send missing coins in party chat!",
                 ),
-                onClick = {
+                onLeftClick = {
                     HypixelCommands.partyChat(
                         "$customerName Carry: already paid: ${paidFormat.removeColor()}, still missing: ${missingFormat.removeColor()}",
                     )

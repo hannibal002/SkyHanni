@@ -142,7 +142,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             val renderable = if (isInventoryOpen()) Renderable.clickable(
                 listFormat,
                 tips = lore,
-                onClick = {
+                onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
                     update()

@@ -276,16 +276,16 @@ object TunnelsMaps {
                 if (active.isNotEmpty()) {
                     if (goal == campfire && active != campfire.name) {
                         add(Renderable.string("§6Override for ${campfire.name}"))
-                        add(Renderable.clickable("§eMake §f$active §eactive", onClick = ::setNextGoal))
+                        add(Renderable.clickable("§eMake §f$active §eactive", onLeftClick = ::setNextGoal))
                     } else {
                         add(
                             Renderable.clickable(
                                 "§6Active: §f$active",
                                 tips = listOf("§eClick to disable current Waypoint"),
-                                onClick = ::clearPath,
+                                onLeftClick = ::clearPath,
                             ),
                         )
-                        if (hasNext()) add(Renderable.clickable("§eNext Spot", onClick = ::setNextGoal))
+                        if (hasNext()) add(Renderable.clickable("§eNext Spot", onLeftClick = ::setNextGoal))
                         else addString("")
                     }
                 } else {
@@ -308,7 +308,7 @@ object TunnelsMaps {
                     "§eLeft Click to set active",
                     "§eRight Click for override",
                 ),
-                click = mapOf(
+                onAnyClick = mapOf(
                     LEFT_MOUSE to guiSetActive(campfireName),
                     RIGHT_MOUSE to ::campfireOverride,
                 ),
@@ -320,7 +320,7 @@ object TunnelsMaps {
                     Renderable.horizontalContainer(
                         listOf(Renderable.string("§dFairy Souls")) + fairySouls.map {
                             val name = it.key.removePrefix("§dFairy Soul ")
-                            Renderable.clickable(Renderable.string("§d[$name]"), onClick = guiSetActive(it.key))
+                            Renderable.clickable(Renderable.string("§d[$name]"), onLeftClick = guiSetActive(it.key))
                         },
                     ),
                     Renderable.string("§dFairy Souls"),
@@ -338,18 +338,18 @@ object TunnelsMaps {
         } else {
             addAll(
                 newGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                    Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
                 },
             )
             addAll(
                 oldGemstones.map {
-                    Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                    Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
                 },
             )
         }
         addAll(
             normalLocations.map {
-                Renderable.clickable(Renderable.string(it.key), onClick = guiSetActive(it.key))
+                Renderable.clickable(Renderable.string(it.key), onLeftClick = guiSetActive(it.key))
             },
         )
     }
@@ -364,7 +364,7 @@ object TunnelsMaps {
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         ),
         tips = listOf(it.key),
-        onClick = guiSetActive(it.key),
+        onLeftClick = guiSetActive(it.key),
     )
 
     private fun campfireOverride() {

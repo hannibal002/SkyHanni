@@ -182,7 +182,7 @@ object GardenVisitorTimer {
     private fun createDisplayText(text: String) = Renderable.clickable(
         text,
         tips = listOf("§eClick to teleport to the barn!"),
-        onClick = { HypixelCommands.teleportToPlot("barn") },
+        onLeftClick = { HypixelCommands.teleportToPlot("barn") },
     )
 
     init {

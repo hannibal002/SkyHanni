@@ -352,7 +352,7 @@ object CakeTracker {
                 renderable = Renderable.clickable(
                     renderable,
                     tips = getPriceHoverTooltip(displayType, colorCode),
-                    click = mapOf(
+                    onAnyClick = mapOf(
                         KEY_LEFT to { changeSelectedSingular(-1) },
                         KEY_UP to { changeSelectedSingular(-1) },
                         KEY_RIGHT to { changeSelectedSingular(1) },

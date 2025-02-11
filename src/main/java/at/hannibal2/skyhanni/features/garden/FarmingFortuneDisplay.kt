@@ -211,7 +211,7 @@ object FarmingFortuneDisplay {
                         "§cEnable the Stats widget and enable",
                         "§cshowing latest Crop Fortune.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.widget()
                     },
                 ),
@@ -224,7 +224,7 @@ object FarmingFortuneDisplay {
                         "§cEnable the Stats widget and enable",
                         "§cshowing the Farming Fortune stat.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.widget()
                     },
                 ),

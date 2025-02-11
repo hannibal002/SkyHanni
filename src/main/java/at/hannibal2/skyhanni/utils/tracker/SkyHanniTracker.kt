@@ -146,7 +146,7 @@ open class SkyHanniTracker<Data : TrackerData>(
             "§ccurrent session of",
             "§c$name",
         ),
-        onClick = {
+        onLeftClick = {
             if (sessionResetTime.passedSince() > 3.seconds) {
                 reset(DisplayMode.SESSION, "Reset this session of $name!")
                 sessionResetTime = SimpleTimeMark.now()

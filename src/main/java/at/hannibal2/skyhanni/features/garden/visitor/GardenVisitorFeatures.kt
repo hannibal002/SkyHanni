@@ -222,7 +222,7 @@ object GardenVisitorFeatures {
                 Renderable.clickable(
                     "$name §ex${amount.addSeparators()}",
                     tips = internalName.createBuyTip(),
-                    onClick = {
+                    onLeftClick = {
                         if (!GardenApi.inGarden() || NeuItems.neuHasFocus()) return@clickable
                         if (Minecraft.getMinecraft().currentScreen is GuiEditSign) {
                             LorenzUtils.setTextIntoSign("$amount")

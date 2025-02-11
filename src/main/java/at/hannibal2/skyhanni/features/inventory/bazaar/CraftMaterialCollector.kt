@@ -74,7 +74,7 @@ object CraftMaterialCollector {
                     Renderable.clickable(
                         "§eAdd to craft material collector!",
                         tips = listOf("§eClick here to help purchasing the items!"),
-                        onClick = {
+                        onLeftClick = {
                             addToPurchasing(neededMaterials)
                         },
                     ),
@@ -113,7 +113,7 @@ object CraftMaterialCollector {
                     Renderable.clickable(
                         text,
                         tips = material.createBuyTip(),
-                        onClick = { material.buy(priceMultiplier) },
+                        onLeftClick = { material.buy(priceMultiplier) },
                     ),
                 )
             }
@@ -121,7 +121,7 @@ object CraftMaterialCollector {
                 Renderable.clickable(
                     "§eStop!",
                     tips = listOf("§eClick here to stop this view!"),
-                    onClick = {
+                    onLeftClick = {
                         purchasing = false
                         display = emptyList()
                     },
@@ -143,7 +143,7 @@ object CraftMaterialCollector {
                     Renderable.clickable(
                         text,
                         tips = listOf("§eClick here to multiply the items needed times $m!"),
-                        onClick = {
+                        onLeftClick = {
                             multiplier = m
                             updateDisplay()
                         },

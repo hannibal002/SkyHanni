@@ -153,7 +153,7 @@ object FarmingWeightDisplay {
             Renderable.clickable(
                 it,
                 tips = listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
+                onLeftClick = ::resetData,
             )
         }
     }
@@ -193,7 +193,7 @@ object FarmingWeightDisplay {
             Renderable.clickable(
                 "§6Farming Weight§7: $weight$leaderboard",
                 tips = listOf("§eClick to open your Farming Profile."),
-                onClick = { openWebsite(LorenzUtils.getPlayerName()) },
+                onLeftClick = { openWebsite(LorenzUtils.getPlayerName()) },
             ),
         )
 
@@ -265,7 +265,7 @@ object FarmingWeightDisplay {
         val nextPlayer = nextPlayer ?: return Renderable.clickable(
             "§cWaiting for leaderboard update...",
             tips = listOf("§eClick here to load new data right now!"),
-            onClick = ::resetData,
+            onLeftClick = ::resetData,
         )
         val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
         var nextName =
@@ -301,7 +301,7 @@ object FarmingWeightDisplay {
             return Renderable.clickable(
                 "§cRejoin the garden to show ETA!",
                 tips = listOf("Click here to calculate the data right now!"),
-                onClick = ::resetData,
+                onLeftClick = ::resetData,
             )
         }
 
@@ -331,7 +331,7 @@ object FarmingWeightDisplay {
             Renderable.clickable(
                 text,
                 tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
-                onClick = { openWebsite(nextName) },
+                onLeftClick = { openWebsite(nextName) },
             )
         }
     }

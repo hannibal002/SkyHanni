@@ -191,7 +191,7 @@ object ChocolateFactoryStats {
     private fun createDisplay(text: List<String>) = Renderable.clickable(
         Renderable.verticalContainer(text.map(Renderable::string)),
         tips = listOf("§bCopy to Clipboard!"),
-        onClick = {
+        onLeftClick = {
             val list = text.toMutableList()
             list.add(0, "${LorenzUtils.getPlayerName()}'s Chocolate Factory Stats")
 

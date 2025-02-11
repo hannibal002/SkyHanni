@@ -262,7 +262,7 @@ object ReforgeHelper {
         Renderable.clickable(
             text,
             tips = tips,
-            onClick = {
+            onLeftClick = {
                 SoundUtils.playClickSound()
                 reforgeToSearch = reforge
                 updateDisplay()

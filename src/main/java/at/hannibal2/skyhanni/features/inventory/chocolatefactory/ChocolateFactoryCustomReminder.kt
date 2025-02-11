@@ -170,7 +170,7 @@ object ChocolateFactoryCustomReminder {
                     Renderable.clickable(
                         it,
                         tips = listOf("§eClick to remove the goal!"),
-                        onClick = {
+                        onLeftClick = {
                             reset()
                         },
                     ),

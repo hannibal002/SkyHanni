@@ -285,7 +285,7 @@ object SkillProgress {
                 Renderable.clickable(
                     "§cOpen your skills menu!",
                     tips = listOf("§eClick here to execute §6/skills"),
-                    onClick = { HypixelCommands.skills() },
+                    onLeftClick = { HypixelCommands.skills() },
                 )
             } else {
                 val tips = buildList {
@@ -383,7 +383,7 @@ object SkillProgress {
             Renderable.clickable(
                 "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
                 tips = listOf("§eClick to reset!"),
-                onClick = {
+                onLeftClick = {
                     xpInfo.sessionTimerActive = false
                     xpInfo.timeActive = 0L
                     chat("Timer for §b${activeSkill.displayName} §ehas been reset!")

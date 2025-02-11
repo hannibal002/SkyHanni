@@ -59,7 +59,7 @@ class GuideTab(
             }
         },
         tips = listOf(tip),
-        onClick = {
+        onLeftClick = {
             click()
             SoundUtils.playClickSound()
         }

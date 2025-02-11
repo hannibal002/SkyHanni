@@ -201,7 +201,7 @@ object IslandAreas {
                             add("§eClick to find a path!")
                         }
                     },
-                    onClick = {
+                    onLeftClick = {
                         if (node == targetNode) {
                             targetNode = null
                             IslandGraphs.stop()

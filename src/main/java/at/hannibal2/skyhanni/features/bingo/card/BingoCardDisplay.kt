@@ -90,7 +90,7 @@ object BingoCardDisplay {
                 Renderable.clickable(
                     "§cOpen the §e/bingo §ccard.",
                     tips = listOf("Click to run §e/bingo"),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.bingo()
                     }
                 )
@@ -197,7 +197,7 @@ object BingoCardDisplay {
                         add("")
                         add("§eClick to $clickName this goal as highlight!")
                     },
-                    onClick = {
+                    onLeftClick = {
                         it.highlight = !currentlyHighlighted
                         it.displayName
                         update()

@@ -127,7 +127,7 @@ object CraftableItemList {
         return Renderable.clickable(
             "§8x$amountFormat $itemName",
             tips = tooltip,
-            onClick = {
+            onLeftClick = {
                 HypixelCommands.viewRecipe(internalName.asString())
             },
         ).toSearchable(itemName)

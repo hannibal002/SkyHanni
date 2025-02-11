@@ -59,7 +59,7 @@ object GraphNodeEditor {
                 Renderable.clickable(
                     "§eGraph Nodes: $shown/$total",
                     tips = listOf("§eClick to toggle node tags!"),
-                    onClick = {
+                    onLeftClick = {
                         updateToggleTags()
                     },
                 ),
@@ -89,7 +89,7 @@ object GraphNodeEditor {
                     Renderable.clickable(
                         name,
                         tips = listOf("§eClick to " + (if (isVisible) "hide" else "show") + " nodes with this tag!"),
-                        onClick = {
+                        onLeftClick = {
                             toggleTag(tag)
                             updateToggleTags()
                         },
@@ -101,7 +101,7 @@ object GraphNodeEditor {
                 Renderable.clickable(
                     "§cGo Back!",
                     tips = listOf("§eClick to go back to the node list!"),
-                    onClick = {
+                    onLeftClick = {
                         updateNodeNames()
                     },
                 ),
@@ -145,7 +145,7 @@ object GraphNodeEditor {
             Renderable.clickable(
                 "§cGo Back!",
                 tips = listOf("§eClick to go back to the node list!"),
-                onClick = {
+                onLeftClick = {
                     updateNodeNames()
                 },
             ),
@@ -175,7 +175,7 @@ object GraphNodeEditor {
             "",
             "§eClick to set tag for ${node.name} to ${tag.name}!",
         ),
-        onClick = {
+        onLeftClick = {
             if (tag in node.tags) {
                 node.tags.remove(tag)
             } else {
@@ -231,7 +231,7 @@ object GraphNodeEditor {
             add("§eControl-Click to edit the tags for this node!")
 
         },
-        onClick = {
+        onLeftClick = {
             if (KeyboardManager.isModifierKeyDown()) {
                 updateTagView(node)
             } else {

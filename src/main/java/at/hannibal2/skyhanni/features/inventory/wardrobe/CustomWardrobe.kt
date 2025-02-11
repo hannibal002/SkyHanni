@@ -388,7 +388,7 @@ object CustomWardrobe {
                         verticalAlign = VerticalAlignment.BOTTOM,
                         scale = 1.0 * (activeScale / 100.0),
                     ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unHovered = it) },
-                    onClick = {
+                    onLeftClick = {
                         config::enabled.jumpToEditor()
                         reset()
                         WardrobeApi.currentPage = null
@@ -492,7 +492,7 @@ object CustomWardrobe {
                         centerString((if (wardrobeSlot.favorite) "§c" else "§7") + "❤", scale = textScale),
                         centerString((if (wardrobeSlot.favorite) "§4" else "§8") + "❤", scale = textScale),
                     ),
-                    onClick = {
+                    onLeftClick = {
                         wardrobeSlot.favorite = !wardrobeSlot.favorite
                         update()
                     },
