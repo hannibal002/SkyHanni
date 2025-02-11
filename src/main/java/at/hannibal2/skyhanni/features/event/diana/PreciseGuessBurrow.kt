@@ -37,7 +37,6 @@ object PreciseGuessBurrow {
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onWorldChange(event: IslandChangeEvent) {
-        if (!isEnabled()) return
         guessPoint = null
         particleLocations.clear()
     }
@@ -45,8 +44,7 @@ object PreciseGuessBurrow {
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onReceiveParticle(event: PacketReceivedEvent) {
         if (!isEnabled()) return
-        if (event.packet !is S2APacketParticles) return
-        val packet: S2APacketParticles = event.packet
+        val packet = event.packet as? S2APacketParticles ?: return
         val type = packet.particleType
         if (type != EnumParticleTypes.DRIP_LAVA) return
         val currLoc = packet.toLorenzVec()

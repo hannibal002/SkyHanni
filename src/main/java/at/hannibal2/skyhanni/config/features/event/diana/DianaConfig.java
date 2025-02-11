@@ -39,6 +39,7 @@ public class DianaConfig {
             str = string;
         }
 
+        @Override
         public String toString() {
             return str;
         }

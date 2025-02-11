@@ -3,18 +3,10 @@ package at.hannibal2.skyhanni.utils
 import kotlin.math.abs
 
 class Matrix(val data: Array<DoubleArray>) {
-    val width: Int
-        get() {
-            return data[0].size
-        }
-    val height: Int
-        get() {
-            return data.size
-        }
+    val width get() = data[0].size
+    val height get() = data.size
 
-    operator fun get(index: Int): DoubleArray {
-        return this.data[index]
-    }
+    operator fun get(index: Int) = this.data[index]
 
     fun inverse(): Matrix {
         if (this.height != this.width) throw Error("Incorrect dimensions!")
@@ -83,9 +75,7 @@ class Matrix(val data: Array<DoubleArray>) {
                 newDoubleArray[colIndex][rowIndex] = cell
             }
         }
-        return Matrix(
-            newDoubleArray,
-        )
+        return Matrix(newDoubleArray)
     }
 
     operator fun times(other: Matrix): Matrix {
@@ -105,9 +95,7 @@ class Matrix(val data: Array<DoubleArray>) {
                 cDoubleArray[j][i] = total
             }
         }
-        return Matrix(
-            cDoubleArray,
-        )
+        return Matrix(cDoubleArray)
     }
 
     operator fun set(index: Int, value: DoubleArray) {
@@ -124,9 +112,7 @@ class Matrix(val data: Array<DoubleArray>) {
                 newDoubleArray[rowIndex][colIndex] = row[colIndex]
             }
         }
-        return Matrix(
-            newDoubleArray,
-        )
+        return Matrix(newDoubleArray)
     }
 
     operator fun times(other: Double): Matrix {
@@ -140,9 +126,7 @@ class Matrix(val data: Array<DoubleArray>) {
                 newDoubleArray[rowIndex][colIndex] = cell * other
             }
         }
-        return Matrix(
-            newDoubleArray,
-        )
+        return Matrix(newDoubleArray)
     }
 
     operator fun plus(other: Matrix): Matrix {
@@ -157,9 +141,7 @@ class Matrix(val data: Array<DoubleArray>) {
                 newDoubleArray[rowIndex][colIndex] = cell + other[rowIndex][colIndex]
             }
         }
-        return Matrix(
-            newDoubleArray,
-        )
+        return Matrix(newDoubleArray)
     }
 
     operator fun minus(other: Matrix): Matrix {
@@ -174,9 +156,7 @@ class Matrix(val data: Array<DoubleArray>) {
                 newDoubleArray[rowIndex][colIndex] = cell - other[rowIndex][colIndex]
             }
         }
-        return Matrix(
-            newDoubleArray,
-        )
+        return Matrix(newDoubleArray)
     }
 
     override fun toString(): String {
@@ -200,9 +180,7 @@ class Matrix(val data: Array<DoubleArray>) {
             for (i in 0 until rows) {
                 newDoubleArray[i][i] = 1.0
             }
-            return Matrix(
-                newDoubleArray,
-            )
+            return Matrix(newDoubleArray)
         }
     }
 }
