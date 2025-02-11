@@ -24,6 +24,8 @@ class ItemsStackElement(
 
     val map = NeuItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()
 
+    private val mainIsBase = NeuItems.getPrimitiveMultiplier(main).internalName == main
+
     private val mappedCurrent get() = convertBaseToMain(current).toLong()
 
     private fun convertBaseToMain(base: Long) = map[main]?.let { base.toDouble().div(it) } ?: base.toDouble()
@@ -63,7 +65,7 @@ class ItemsStackElement(
         update((item.amount * multiple).toLong())
     }
 
-    override fun gainDisplayModifier(baseGain: Long): Number = convertBaseToMain(baseGain).roundTo(2)
+    override fun gainDisplayModifier(baseGain: Long): Number = if (mainIsBase) baseGain else convertBaseToMain(baseGain).roundTo(2)
 
     companion object {
 
