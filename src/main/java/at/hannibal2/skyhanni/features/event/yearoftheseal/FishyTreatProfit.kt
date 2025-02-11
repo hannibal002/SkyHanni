@@ -1,15 +1,13 @@
-package at.hannibal2.skyhanni.features.garden
+package at.hannibal2.skyhanni.features.event.yearoftheseal
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.add
 import at.hannibal2.skyhanni.utils.DisplayTableEntry
+import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
@@ -22,47 +20,45 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
+import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
+import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.item.ItemStack
 
 @SkyHanniModule
-object AnitaMedalProfit {
+object FishyTreatProfit {
 
-    private val config get() = GardenApi.config.anitaShop
+    private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
     private var display = emptyList<Renderable>()
+    private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
 
-    var inInventory = false
+    private val patternGroup = RepoPattern.group("event.year-of-the-seal.fishy-treat")
 
-    enum class MedalType(val displayName: String, val factorBronze: Int) {
-        GOLD("§6Gold medal", 8),
-        SILVER("§fSilver medal", 2),
-        BRONZE("§cBronze medal", 1),
-    }
+    /**
+     * REGEX-TEST: §62,000,000 Coins
+     */
+    private val coinsPattern by patternGroup.pattern(
+        "coins",
+        "§6(?<coins>.*) Coins",
+    )
 
-    private fun getMedal(name: String) = MedalType.entries.firstOrNull { it.displayName == name }
-
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inInventory = false
-    }
-
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!config.medalProfitEnabled) return
-        if (event.inventoryName != "Anita") return
-        if (VisitorApi.inInventory) return
-
-        inInventory = true
-
+        if (!config.fishyTreatProfit || !inventory.isInside()) return
         val table = mutableListOf<DisplayTableEntry>()
         for ((slot, item) in event.inventoryItems) {
+            // ignore the last line of menu items
+            if (slot > 44) continue
             try {
                 readItem(slot, item, table)
             } catch (e: Throwable) {
                 ErrorManager.logErrorWithData(
-                    e, "Error in AnitaMedalProfit while reading item '${item.itemName}'",
+                    e, "Error in FishyTreatProfit while reading item '${item.itemName}'",
                     "item" to item,
                     "name" to item.itemName,
                     "inventory name" to InventoryUtils.openInventoryName(),
@@ -71,21 +67,31 @@ object AnitaMedalProfit {
         }
 
         val newList = mutableListOf<Renderable>()
-        newList.add(Renderable.string("§eProfit per Bronze Medal"))
+        newList.add(Renderable.string("§eProfit per Fishy Treat"))
         newList.add(LorenzUtils.fillTable(table, padding = 5, itemScale = 0.7))
         display = newList
+        return
     }
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
         if (isInvalidItemName(itemName)) return
 
-        val requiredItems = getRequiredItems(item)
-        val additionalMaterials = getAdditionalMaterials(requiredItems)
-        val additionalCost = getAdditionalCost(additionalMaterials)
+        val allMaterials = getAdditionalMaterials(getRequiredItems(item))
+        val fishyTreat = "FISHY_TREAT".toInternalName()
+        val additionalMaterials = allMaterials.filter { it.key != fishyTreat }
+        val amountOfFishyTreat = allMaterials[fishyTreat] ?: run {
+            ErrorManager.logErrorStateWithData(
+                "failed reading fishy treat amount",
+                "fishy treat amount not found in additionalMaterials",
+                "itemName" to itemName,
+                "additionalMaterials" to allMaterials,
+                "inventory" to "",
+            )
+            return
+        }
 
-        // Ignore items without medal cost, e.g. InfiniDirt Wand
-        val bronzeCost = getBronzeCost(requiredItems) ?: return
+        val additionalCost = getAdditionalCost(additionalMaterials)
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
@@ -100,11 +106,11 @@ object AnitaMedalProfit {
         val profitPerSell = itemPrice - additionalCost
 
         // profit per bronze
-        val profitPerBronze = profitPerSell / bronzeCost
+        val profitPerFishy = profitPerSell / amountOfFishyTreat
 
-        val profitPerSellFormat = profitPerSell.shortFormat()
-        val profitPerBronzeFormat = profitPerBronze.shortFormat()
-        val color = if (profitPerBronze > 0) "§6" else "§c"
+//         val profitPerSellFormat = profitPerSell.shortFormat()
+        val profitPerFishyFormat = profitPerFishy.shortFormat()
+        val color = if (profitPerFishy > 0) "§6" else "§c"
 
         val hover = buildList {
             add(itemName)
@@ -115,16 +121,16 @@ object AnitaMedalProfit {
             add("§7Additional cost: §6${additionalCost.shortFormat()}")
             addAdditionalMaterials(additionalMaterials)
 
-            add("§7Profit per sell: §6$profitPerSellFormat")
+//             add("§7Profit per sell: §6$profitPerSellFormat")
             add("")
-            add("§7Bronze medals required: §c$bronzeCost")
-            add("§7Profit per bronze medal: §6$profitPerBronzeFormat")
+            add("§7Fishy Treat required: §c$amountOfFishyTreat")
+            add("§7Profit per Fishy Treat: §6$profitPerFishyFormat")
         }
         table.add(
             DisplayTableEntry(
                 itemName,
-                "$color$profitPerBronzeFormat",
-                profitPerBronze,
+                "$color$profitPerFishyFormat",
+                profitPerFishy,
                 internalName,
                 hover,
                 highlightsOnHoverSlots = listOf(slot),
@@ -159,8 +165,9 @@ object AnitaMedalProfit {
     private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NeuInternalName, Int> {
         val additionalMaterials = mutableMapOf<NeuInternalName, Int>()
         for ((name, amount) in requiredItems) {
-            val medal = getMedal(name)
-            if (medal == null) {
+            coinsPattern.matchMatcher(name) {
+                additionalMaterials[NeuInternalName.SKYBLOCK_COIN] = group("coins").formatInt()
+            } ?: run {
                 additionalMaterials[NeuInternalName.fromItemName(name)] = amount
             }
         }
@@ -173,15 +180,6 @@ object AnitaMedalProfit {
             otherItemsPrice += name.getPrice() * amount
         }
         return otherItemsPrice
-    }
-
-    private fun getBronzeCost(requiredItems: Map<String, Int>): Int? {
-        for ((name, amount) in requiredItems) {
-            getMedal(name)?.let {
-                return it.factorBronze * amount
-            }
-        }
-        return null
     }
 
     private fun getRequiredItems(item: ItemStack): MutableMap<String, Int> {
@@ -204,7 +202,7 @@ object AnitaMedalProfit {
                 val pair = ItemUtils.readItemAmount(rawItemName)
                 if (pair == null) {
                     ErrorManager.logErrorStateWithData(
-                        "Error in Anita Medal Contest", "Could not read item amount",
+                        "Error in FishyTreat Profit", "Could not read item amount",
                         "rawItemName" to rawItemName,
                         "name" to item.name,
                         "lore" to lore,
@@ -217,19 +215,12 @@ object AnitaMedalProfit {
         return items
     }
 
-    @HandleEvent
-    fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!inInventory || VisitorApi.inInventory) return
-        config.medalProfitPos.renderRenderables(
-            display,
-            extraSpace = 5,
-            posLabel = "Anita Medal Profit",
-        )
-    }
-
-    @HandleEvent
-    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(3, "garden.anitaMedalProfitEnabled", "garden.anitaShop.medalProfitEnabled")
-        event.move(3, "garden.anitaMedalProfitPos", "garden.anitaShop.medalProfitPos")
+    init {
+        RenderDisplayHelper(
+            condition = { config.fishyTreatProfit },
+            inventory = inventory,
+        ) {
+            config.fishyTreatProfitPosition.renderRenderables(display, posLabel = "Fishy Treat Profit")
+        }
     }
 }
