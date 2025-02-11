@@ -22,14 +22,18 @@ abstract class ScrollInput(
         }
         get() = scrollValue.getValue()
 
-    enum class ScrollDirection(val value: Int) {
-        UP(-1),
-        DOWN(1),
+    enum class ScrollDirection {
+        NONE,
+        UP,
+        DOWN,
     }
 
     fun asInt() = scroll.toInt()
     fun asDouble() = scroll
-    fun asDirection() = ScrollDirection.entries.firstOrNull { it.value == scroll.toInt() }
+    fun asDirection() =
+        if(scroll == 0.0) ScrollDirection.NONE
+        else if(scroll > 0.0) ScrollDirection.DOWN
+        else ScrollDirection.UP
 
     protected fun coerceInLimit() =
         if (maxValue < minValue) {

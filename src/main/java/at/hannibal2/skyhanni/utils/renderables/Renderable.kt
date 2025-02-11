@@ -127,7 +127,8 @@ interface Renderable {
         }
 
         fun clickable(
-            text: String, onClick: () -> Unit,
+            text: String,
+            onClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
@@ -135,7 +136,8 @@ interface Renderable {
         ) = clickable(string(text), onClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
-            render: Renderable, onClick: () -> Unit,
+            render: Renderable,
+            onClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             tips: List<Any>? = null,
@@ -169,7 +171,11 @@ interface Renderable {
             tips: List<Any>? = null,
             onHover: () -> Unit = {},
         ) = multiClickable(
-            tips?.let { hoverTips(render, it, bypassChecks = bypassChecks, onHover = onHover) } ?: render,
+            tips?.let {
+                hoverTips(render, it, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: onHover.takeIf { it != {} }?.let {
+                hoverable(render, render, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: render,
             click,
             bypassChecks,
             condition,
@@ -181,7 +187,8 @@ interface Renderable {
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             /**
-             * This function is called if no keys within [click] handle the click
+             * This function is called on hover and click if no keys within [click] are pressed.
+             * This is useful for things like scrolling, which don't have a direct key code.
              */
             nonStandardClick: () -> Unit = {},
         ) = object : Renderable {
@@ -198,10 +205,14 @@ interface Renderable {
             }
 
             private fun handleClickChecks() {
+                var processed = false
                 for ((button, onClick) in click) {
-                    if (button.isKeyClicked()) return onClick()
+                    if (button.isKeyClicked()) {
+                        onClick()
+                        processed = true
+                    }
                 }
-                nonStandardClick()
+                if (!processed) nonStandardClick()
             }
         }
 
