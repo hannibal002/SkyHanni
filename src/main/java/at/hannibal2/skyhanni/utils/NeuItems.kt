@@ -43,7 +43,7 @@ object NeuItems {
     private val itemIdCache = mutableMapOf<Item, List<NeuInternalName>>()
 
     var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
-    val allInternalNames = mutableListOf<NeuInternalName>()
+    var allInternalNames = setOf<NeuInternalName>()
     val ignoreItemsFilter = MultiFilter()
 
     private val fallbackItem by lazy {
@@ -62,20 +62,21 @@ object NeuItems {
 
     @HandleEvent
     fun onNeuRepoReload(event: NeuRepositoryReloadEvent) {
-        allItemsCache = readAllNeuItems()
+        readAllNeuItems()
     }
 
-    fun readAllNeuItems(): Map<String, NeuInternalName> {
-        allInternalNames.clear()
+    fun readAllNeuItems() {
         val map = mutableMapOf<String, NeuInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
-            var name = getItemStackOrNull(rawInternalName)?.displayName?.lowercase() ?: continue
+            val internalName = rawInternalName.toInternalName()
+            var name = internalName.getItemStackOrNull()?.displayName?.lowercase() ?: run {
+                ChatUtils.debug("skipped `$rawInternalName` from readAllNeuItems")
+                continue
+            }
 
             // we ignore all builder blocks from the item name -> internal name cache
             // because builder blocks can have the same display name as normal items.
             if (rawInternalName.startsWith("BUILDER_")) continue
-
-            val internalName = rawInternalName.toInternalName()
 
             // TODO remove all except one of them once neu is consistent
             name = name.removePrefix("§f§f§7[lvl 1➡100] ")
@@ -89,9 +90,9 @@ object NeuItems {
                 println("wrong name: '$name'")
             }
             map[name] = internalName
-            allInternalNames.add(internalName)
         }
-        return map
+        allInternalNames = map.values.toSet()
+        allItemsCache = map
     }
 
     fun getInternalName(itemStack: ItemStack): String? = ItemResolutionQuery()
