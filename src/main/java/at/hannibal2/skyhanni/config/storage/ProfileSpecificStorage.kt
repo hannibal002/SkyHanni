@@ -799,4 +799,13 @@ class ProfileSpecificStorage {
         @Expose
         var museumMilestone: Int? = null
     }
+
+    @Expose
+    var cakeCounterData: CakeCounterData = CakeCounterData()
+
+    data class CakeCounterData(
+        @Expose var cakesEaten: Int? = -1,
+        @Expose var soulsFound: Int = 0,
+    )
+
 }
