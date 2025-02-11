@@ -385,7 +385,7 @@ class ProfileSpecificStorage {
         @Expose
         var latestTrueFarmingFortune: MutableMap<CropType, Double> = enumMapOf()
 
-        // - TODO use in /ff guide
+        // TODO use in /ff guide
         @Expose
         var personalBestFF: MutableMap<CropType, Double> = enumMapOf()
 
