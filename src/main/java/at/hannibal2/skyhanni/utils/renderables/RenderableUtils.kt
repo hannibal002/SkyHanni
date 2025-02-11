@@ -3,17 +3,17 @@ package at.hannibal2.skyhanni.utils.renderables
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.CollectionUtils.putAt
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.SoundUtils
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.clickableAndScrollable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.hoverTips
-import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.leftAndRightClickable
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
-
-private typealias Direction = Renderable.Companion.Direction
 
 internal object RenderableUtils {
 
@@ -203,18 +203,6 @@ internal object RenderableUtils {
         enableUniverseScroll: Boolean = true,
         scrollValue: ScrollValue = ScrollValue(),
     ): Searchable {
-        val onClick: (Direction) -> Unit = { direction ->
-            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
-                val next = when (direction) {
-                    Direction.LEFT -> universe.circle(current)
-                    Direction.RIGHT -> universe.circleBackwards(current)
-                }
-                onChange(next)
-                SoundUtils.playClickSound()
-                ChatUtils.lastButtonClicked = System.currentTimeMillis()
-            }
-        }
-
         val currentName = getName(current)
         val tips = buildList {
             add("§a$label")
@@ -235,12 +223,29 @@ internal object RenderableUtils {
             }
         }
 
+        val onClick: (Int) -> Unit = onClick@{ keyCode ->
+            if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) < 150) return@onClick
+            val next = when (keyCode) {
+                LEFT_MOUSE -> universe.circle(current)
+                RIGHT_MOUSE -> universe.circleBackwards(current)
+                else -> return@onClick
+            }
+            onChange(next)
+            SoundUtils.playClickSound()
+            ChatUtils.lastButtonClicked = System.currentTimeMillis()
+        }
+
+        val clickMap = mapOf(
+            LEFT_MOUSE to { onClick(LEFT_MOUSE) },
+            RIGHT_MOUSE to { onClick(RIGHT_MOUSE) },
+        )
+
         return Renderable.line {
             addString("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
-                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false, scrollValue = scrollValue)
-                false -> leftAndRightClickable(displayFormat, onClick = onClick, bypassChecks = false)
+                true -> clickableAndScrollable(displayFormat, click = clickMap, bypassChecks = false, scrollValue = scrollValue)
+                false -> clickable(displayFormat, click = clickMap, bypassChecks = false)
             }.let { add(it) }
             addString("§a]")
         }.toSearchable()

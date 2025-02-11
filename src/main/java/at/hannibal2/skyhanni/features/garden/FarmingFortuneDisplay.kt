@@ -205,10 +205,9 @@ object FarmingFortuneDisplay {
         if (config.hideMissingFortuneWarnings) return@buildList
         if (cropFortune) {
             add(
-
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     if (config.compactFormat) "§cMissing FF!" else "§cMissing Crop Fortune! Enable The Stats Widget",
-                    listOf(
+                    tips = listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing latest Crop Fortune.",
                     ),
@@ -219,9 +218,9 @@ object FarmingFortuneDisplay {
             )
         } else {
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     if (config.compactFormat) "§cMissing FF!" else "§cNo Farming Fortune Found! Enable The Stats Widget",
-                    listOf(
+                    tips = listOf(
                         "§cEnable the Stats widget and enable",
                         "§cshowing the Farming Fortune stat.",
                     ),

@@ -188,7 +188,7 @@ object ChocolateFactoryStats {
         )
     }
 
-    private fun createDisplay(text: List<String>) = Renderable.clickAndHover(
+    private fun createDisplay(text: List<String>) = Renderable.clickable(
         Renderable.verticalContainer(text.map(Renderable::string)),
         tips = listOf("§bCopy to Clipboard!"),
         onClick = {

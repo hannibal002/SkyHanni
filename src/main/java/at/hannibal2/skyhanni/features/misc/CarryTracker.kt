@@ -223,7 +223,7 @@ object CarryTracker {
         }
         val cost = formatCost(type.pricePer?.let { it * requested })
         val text = "$color$done§8/$color$requested $cost"
-        return Renderable.clickAndHover(
+        return Renderable.clickable(
             Renderable.string("  $type $text"),
             tips = buildList<String> {
                 add("§b${customer.name}' $type §cCarry")
@@ -283,8 +283,8 @@ object CarryTracker {
         val paidFormat = "§6${customer.alreadyPaid.shortFormat()}"
         val missingFormat = formatCost(totalCost - customer.alreadyPaid)
         add(
-            Renderable.clickAndHover(
-                Renderable.string("§b$customerName $paidFormat§8/$totalCostFormat"),
+            Renderable.clickable(
+                "§b$customerName $paidFormat§8/$totalCostFormat",
                 tips = listOf(
                     "§7Carries for §b$customerName",
                     "",

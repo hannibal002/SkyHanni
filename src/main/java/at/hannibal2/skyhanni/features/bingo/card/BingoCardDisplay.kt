@@ -87,9 +87,9 @@ object BingoCardDisplay {
         if (BingoApi.bingoGoals.isEmpty()) {
             newList.add(Renderable.string("§6Bingo Goals:"))
             newList.add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cOpen the §e/bingo §ccard.",
-                    listOf("Click to run §e/bingo"),
+                    tips = listOf("Click to run §e/bingo"),
                     onClick = {
                         HypixelCommands.bingo()
                     }
@@ -187,9 +187,9 @@ object BingoCardDisplay {
 
             if (editDisplay) {
                 val clickName = if (currentlyHighlighted) "remove" else "add"
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     display,
-                    buildList {
+                    tips = buildList {
                         add("§a" + it.displayName)
                         for (s in it.guide) {
                             add(s)

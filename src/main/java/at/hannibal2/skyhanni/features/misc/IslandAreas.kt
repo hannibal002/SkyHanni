@@ -186,7 +186,7 @@ object IslandAreas {
             foundAreas++
 
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     text,
                     tips = buildList {
                         add(tag.color.getChatColor() + node.name)

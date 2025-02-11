@@ -145,27 +145,17 @@ object FarmingWeightDisplay {
 
     private val errorMessage by lazy {
         listOf(
-            Renderable.clickAndHover(
-                "§cFarming Weight error: Cannot load",
-                listOf("§eClick here to reload the data right now!"),
+            "§cFarming Weight error: Cannot load",
+            "§cdata from Elite Farmers!",
+            "§eRejoin the garden or",
+            "§eclick here to fix it.",
+        ).map {
+            Renderable.clickable(
+                it,
+                tips = listOf("§eClick here to reload the data right now!"),
                 onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§cdata from Elite Farmers!",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§eRejoin the garden or",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-            Renderable.clickAndHover(
-                "§eclick here to fix it.",
-                listOf("§eClick here to reload the data right now!"),
-                onClick = ::resetData,
-            ),
-        )
+            )
+        }
     }
 
     private var lastOpenWebsite = SimpleTimeMark.farPast()
@@ -200,9 +190,9 @@ object FarmingWeightDisplay {
 
         val list = mutableListOf<Renderable>()
         list.add(
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 "§6Farming Weight§7: $weight$leaderboard",
-                listOf("§eClick to open your Farming Profile."),
+                tips = listOf("§eClick to open your Farming Profile."),
                 onClick = { openWebsite(LorenzUtils.getPlayerName()) },
             ),
         )
@@ -272,9 +262,9 @@ object FarmingWeightDisplay {
     private fun getETA(): Renderable? {
         if (weight < 0) return null
 
-        val nextPlayer = nextPlayer ?: return Renderable.clickAndHover(
+        val nextPlayer = nextPlayer ?: return Renderable.clickable(
             "§cWaiting for leaderboard update...",
-            listOf("§eClick here to load new data right now!"),
+            tips = listOf("§eClick here to load new data right now!"),
             onClick = ::resetData,
         )
         val showRankGoal = leaderboardPosition == -1 || leaderboardPosition > rankGoal
@@ -308,9 +298,9 @@ object FarmingWeightDisplay {
         }
 
         if (nextPlayer.weight == 0.0) {
-            return Renderable.clickAndHover(
+            return Renderable.clickable(
                 "§cRejoin the garden to show ETA!",
-                listOf("Click here to calculate the data right now!"),
+                tips = listOf("Click here to calculate the data right now!"),
                 onClick = ::resetData,
             )
         }
@@ -338,9 +328,9 @@ object FarmingWeightDisplay {
         return if (showRankGoal) {
             Renderable.string(text)
         } else {
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 text,
-                listOf("§eClick to open the Farming Profile of §b$nextName."),
+                tips = listOf("§eClick to open the Farming Profile of §b$nextName."),
                 onClick = { openWebsite(nextName) },
             )
         }

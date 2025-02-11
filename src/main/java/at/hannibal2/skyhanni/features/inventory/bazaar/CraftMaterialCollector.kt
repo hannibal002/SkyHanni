@@ -71,9 +71,9 @@ object CraftMaterialCollector {
             }
             if (neededMaterials.isNotEmpty()) {
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         "§eAdd to craft material collector!",
-                        listOf("§eClick here to help purchasing the items!"),
+                        tips = listOf("§eClick here to help purchasing the items!"),
                         onClick = {
                             addToPurchasing(neededMaterials)
                         },
@@ -110,17 +110,17 @@ object CraftMaterialCollector {
                     (material.getPrice() * priceMultiplier).shortFormat(false)
                 }"
                 add(
-                    Renderable.clickAndHover(
-                        text = text,
-                        onClick = { material.buy(priceMultiplier) },
+                    Renderable.clickable(
+                        text,
                         tips = material.createBuyTip(),
+                        onClick = { material.buy(priceMultiplier) },
                     ),
                 )
             }
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§eStop!",
-                    listOf("§eClick here to stop this view!"),
+                    tips = listOf("§eClick here to stop this view!"),
                     onClick = {
                         purchasing = false
                         display = emptyList()
@@ -140,9 +140,9 @@ object CraftMaterialCollector {
             val text = "${nameColor}Mulitply x$m $price"
             if (!isThisMultiply) {
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         text,
-                        listOf("§eClick here to multiply the items needed times $m!"),
+                        tips = listOf("§eClick here to multiply the items needed times $m!"),
                         onClick = {
                             multiplier = m
                             updateDisplay()

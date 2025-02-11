@@ -139,8 +139,9 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
 
             val loreText = getLoreList.invoke(internalName, itemProfit)
             val lore = buildLore(loreText, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(
-                listFormat, lore,
+            val renderable = if (isInventoryOpen()) Renderable.clickable(
+                Renderable.string(listFormat),
+                tips = lore,
                 onClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)

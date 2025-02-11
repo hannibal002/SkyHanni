@@ -139,9 +139,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    private fun buildSessionResetButton() = Renderable.clickAndHover(
+    private fun buildSessionResetButton() = Renderable.clickable(
         "§cReset session!",
-        listOf(
+        tips = listOf(
             "§cThis will reset your",
             "§ccurrent session of",
             "§c$name",

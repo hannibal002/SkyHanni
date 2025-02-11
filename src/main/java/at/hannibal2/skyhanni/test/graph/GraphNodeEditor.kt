@@ -56,9 +56,9 @@ object GraphNodeEditor {
             val total = GraphEditor.nodes.count { it.name?.isNotBlank() ?: false }
             val shown = list.size
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§eGraph Nodes: $shown/$total",
-                    listOf("§eClick to toggle node tags!"),
+                    tips = listOf("§eClick to toggle node tags!"),
                     onClick = {
                         updateToggleTags()
                     },
@@ -86,9 +86,9 @@ object GraphNodeEditor {
                 val visibilityText = if (isVisible) " §aVisible" else " §7Invisible"
                 val name = " - ${tag.displayName} §8($nodes nodes) $visibilityText"
                 add(
-                    Renderable.clickAndHover(
+                    Renderable.clickable(
                         name,
-                        listOf("§eClick to " + (if (isVisible) "hide" else "show") + " nodes with this tag!"),
+                        tips = listOf("§eClick to " + (if (isVisible) "hide" else "show") + " nodes with this tag!"),
                         onClick = {
                             toggleTag(tag)
                             updateToggleTags()
@@ -98,7 +98,7 @@ object GraphNodeEditor {
             }
             addString("")
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cGo Back!",
                     tips = listOf("§eClick to go back to the node list!"),
                     onClick = {
@@ -142,7 +142,7 @@ object GraphNodeEditor {
         }
         addString("")
         add(
-            Renderable.clickAndHover(
+            Renderable.clickable(
                 "§cGo Back!",
                 tips = listOf("§eClick to go back to the node list!"),
                 onClick = {
@@ -167,7 +167,7 @@ object GraphNodeEditor {
         name: String,
         tag: GraphNodeTag,
         node: GraphingNode,
-    ) = Renderable.clickAndHover(
+    ) = Renderable.clickable(
         name,
         tips = listOf(
             "Tag ${tag.name}",
@@ -213,7 +213,7 @@ object GraphNodeEditor {
         text: String,
         name: String,
         node: GraphingNode,
-    ): Searchable = Renderable.clickAndHover(
+    ): Searchable = Renderable.clickable(
         text,
         tips = buildList {
             add("Node '$name'")

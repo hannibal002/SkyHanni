@@ -282,9 +282,9 @@ object SkillProgress {
                     Quad(skillInfo.level, skillInfo.currentXp, skillInfo.currentXpMax, skillInfo.totalXp)
 
             this[skill] = if (level == -1) {
-                Renderable.clickAndHover(
-                    "§cOpen your skills menu!",
-                    listOf("§eClick here to execute §6/skills"),
+                Renderable.clickable(
+                    Renderable.string("§cOpen your skills menu!"),
+                    tips = listOf("§eClick here to execute §6/skills"),
                     onClick = { HypixelCommands.skills() },
                 )
             } else {
@@ -379,13 +379,13 @@ object SkillProgress {
         }
 
         val session = xpInfo.timeActive.seconds.format(TimeUnit.HOUR)
+        val sessionFormat = "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}"
         add(
-            Renderable.clickAndHover(
-                "§7Session: §e$session ${if (xpInfo.sessionTimerActive) "" else "§c(PAUSED)"}",
-                listOf("§eClick to reset!"),
+            Renderable.clickable(
+                Renderable.string(sessionFormat),
+                tips = listOf("§eClick to reset!"),
                 onClick = {
                     xpInfo.sessionTimerActive = false
-
                     xpInfo.timeActive = 0L
                     chat("Timer for §b${activeSkill.displayName} §ehas been reset!")
                 },

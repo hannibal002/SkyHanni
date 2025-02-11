@@ -98,7 +98,7 @@ object HoppityEggDisplayManager {
 
         val container = Renderable.verticalContainer(displayList.map(Renderable::string))
         return listOf(
-            if (config.warpUnclaimedEggs) Renderable.clickAndHover(
+            if (config.warpUnclaimedEggs) Renderable.clickable(
                 container,
                 tips = listOf("§eClick to ${"/warp ${config.warpDestination}".trim()}!"),
                 onClick = { HypixelCommands.warp(config.warpDestination) },

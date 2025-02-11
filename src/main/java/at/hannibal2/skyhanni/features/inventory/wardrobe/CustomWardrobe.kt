@@ -387,7 +387,7 @@ object CustomWardrobe {
                         horizontalAlign = HorizontalAlignment.RIGHT,
                         verticalAlign = VerticalAlignment.BOTTOM,
                         scale = 1.0 * (activeScale / 100.0),
-                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unhovered = it) },
+                    ).let { Renderable.hoverable(hovered = Renderable.underlined(it), unHovered = it) },
                     onClick = {
                         config::enabled.jumpToEditor()
                         reset()
