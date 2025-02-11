@@ -1,4 +1,8 @@
-import at.skyhanni.sharedvariables.*
+import at.skyhanni.sharedvariables.MinecraftVersion
+import at.skyhanni.sharedvariables.MultiVersionStage
+import at.skyhanni.sharedvariables.ProjectTarget
+import at.skyhanni.sharedvariables.SHVersionInfo
+import at.skyhanni.sharedvariables.versionString
 import io.gitlab.arturbosch.detekt.Detekt
 import io.gitlab.arturbosch.detekt.DetektCreateBaselineTask
 import moe.nea.shot.ShotParser
@@ -171,8 +175,8 @@ dependencies {
         modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
         modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.42.0+1.16")
     } else if (target == ProjectTarget.MODERN) {
-        modCompileOnly("net.fabricmc:fabric-loader:0.16.7")
-        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.102.0+1.21")
+        modCompileOnly("net.fabricmc:fabric-loader:0.16.10")
+        modCompileOnly("net.fabricmc.fabric-api:fabric-api:0.115.0+1.21.4")
     }
 
     implementation(kotlin("stdlib-jdk8"))
