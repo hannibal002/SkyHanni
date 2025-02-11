@@ -91,13 +91,15 @@ abstract class TrackingElement<T : Number> {
         gain += amount
     }
 
+    protected open fun gainDisplayModifier(baseGain: T): Number = baseGain
+
     private val gainText: Renderable
         get() {
             if (sinceGain.isInPast()) {
                 gain = current.getZero()
                 return Renderable.placeholder(0, 0)
             }
-            return Renderable.tempString(sinceGain, gain.toStringWithPlusAndColor())
+            return Renderable.tempString(sinceGain, gainDisplayModifier(gain).toStringWithPlusAndColor())
         }
 
     open fun generateHover(): List<String> = listOf(

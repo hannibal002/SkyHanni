@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.NumberUtil.percentWithColorCode
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.PrimitiveItemStack
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import com.google.gson.JsonElement
@@ -23,7 +24,9 @@ class ItemsStackElement(
 
     val map = NeuItems.getPrimitiveMultiplier(main).internalName.getMultipleMap()
 
-    private val mappedCurrent get() = map[main]?.let { current.div(it) } ?: current
+    private val mappedCurrent get() = convertBaseToMain(current).toLong()
+
+    private fun convertBaseToMain(base: Long) = map[main]?.let { base.toDouble().div(it) } ?: base.toDouble()
 
     override fun similarElement(other: TrackingElement<*>): Boolean {
         if (other !is ItemsStackElement) return false
@@ -59,6 +62,8 @@ class ItemsStackElement(
         val multiple = map[item.internalName] ?: throw IllegalStateException("You should not be here!")
         update((item.amount * multiple).toLong())
     }
+
+    override fun gainDisplayModifier(baseGain: Long): Number = convertBaseToMain(baseGain).roundTo(2)
 
     companion object {
 
