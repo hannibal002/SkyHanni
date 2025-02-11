@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
-import at.hannibal2.skyhanni.features.gifting.UniqueGiftingOpportunitiesFeatures.isHoldingGift
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -382,5 +381,6 @@ object GiftProfitTracker {
         tracker.addPriceFromButton(this)
     }
 
-    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && (!config.holdingGift || isHoldingGift())
+    private fun holdingEnabled() = !config.holdingGift || GiftApi.isHoldingGift()
+    private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && holdingEnabled()
 }
