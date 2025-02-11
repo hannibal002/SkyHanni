@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.features.inventory
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.HideNotClickableItemsJson
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SalvageFilter
 import at.hannibal2.skyhanni.events.GuiContainerEvent
@@ -34,6 +35,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.isVanilla
 import at.hannibal2.skyhanni.utils.KeyboardManager
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.MultiFilter
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -199,7 +201,7 @@ object HideNotClickableItems {
             hideSackOfSacks(chestName, stack) -> true
             hideFishingBag(chestName, stack) -> true
             hidePotionBag(chestName, stack) -> true
-            hidePrivateIslandChest(chestName, stack) -> true
+            hidePrivateIslandChest(stack) -> true
             hideAttributeFusion(chestName, stack) -> true
             hideYourEquipment(chestName, stack) -> true
             hideComposter(chestName, stack) -> true
@@ -338,11 +340,9 @@ object HideNotClickableItems {
         return true
     }
 
-    private fun hidePrivateIslandChest(chestName: String, stack: ItemStack): Boolean {
-        if (chestName != "Chest" && chestName != "Large Chest") return false
-
-        // TODO make check if player is on private island
-
+    private fun hidePrivateIslandChest(stack: ItemStack): Boolean {
+        if (!InventoryUtils.isInNormalChest()) return false
+        if (!IslandType.PRIVATE_ISLAND.isInIsland()) return false
         if (!stack.isSoulBound()) return false
 
         hideReason = "This item cannot be stored into a chest!"

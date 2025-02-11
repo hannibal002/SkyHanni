@@ -25,10 +25,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
+
+private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
 @SkyHanniModule
 object SackDisplay {
@@ -261,10 +265,15 @@ object SackDisplay {
 
     private fun MutableList<Renderable>.drawGemstoneDisplay(): Long {
         if (SackApi.gemstoneItem.isEmpty()) return 0L
-        addString("§7Gemstones:")
+
+        val filterType = SackApi.gemstoneStackFilter
+        val filterFormat = filterType?.let { " ($it§7)" }.orEmpty()
+
+        addString("§7Gemstones$filterFormat§7:")
         var totalPrice = 0L
         val table = buildMap {
-            for ((name, gem) in sort(SackApi.gemstoneItem.toList())) {
+            for ((_, gem) in sort(SackApi.gemstoneItem.toList())) {
+                val name = "${gem.gemType.toDisplayString()} Gemstones"
                 val row = buildList {
                     addString(" §7- ")
                     addItemStack(gem.internalName)
@@ -272,15 +281,27 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onClick = {
-                                BazaarApi.searchForBazaarItem(name.dropLast(1))
+                                BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
                         ) { !NeuItems.neuHasFocus() },
                     )
-                    addAlignedNumber(gem.rough.addSeparators())
-                    addAlignedNumber("§a${gem.flawed.addSeparators()}")
-                    addAlignedNumber("§9${gem.fine.addSeparators()}")
-                    val price = gem.priceSum
+                    when (SackApi.gemstoneStackFilter) {
+                        GemstoneQuality.ROUGH -> addAlignedNumber(gem.rough.addSeparators())
+                        GemstoneQuality.FLAWED -> addAlignedNumber("§a${gem.flawed.addSeparators()}")
+                        GemstoneQuality.FINE -> addAlignedNumber("§9${gem.fine.addSeparators()}")
+                        else -> {
+                            addAlignedNumber(gem.rough.addSeparators())
+                            addAlignedNumber("§a${gem.flawed.addSeparators()}")
+                            addAlignedNumber("§9${gem.fine.addSeparators()}")
+                        }
+                    }
+                    val price = when (SackApi.gemstoneStackFilter) {
+                        GemstoneQuality.ROUGH -> gem.roughPrice
+                        GemstoneQuality.FLAWED -> gem.flawedPrice
+                        GemstoneQuality.FINE -> gem.finePrice
+                        else -> gem.priceSum
+                    }
                     totalPrice += price
                     if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
                 }
@@ -303,11 +324,6 @@ object SackDisplay {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
-    enum class PriceFormat(val displayName: String) {
-        FORMATTED("Formatted"),
-        UNFORMATTED("Unformatted"),
-    }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

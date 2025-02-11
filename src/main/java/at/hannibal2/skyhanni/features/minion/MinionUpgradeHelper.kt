@@ -5,8 +5,11 @@ import at.hannibal2.skyhanni.api.GetFromSackApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.SackApi.getAmountInSacksOrNull
 import at.hannibal2.skyhanni.events.GuiContainerEvent
+import at.hannibal2.skyhanni.events.InventoryCloseEvent
+import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
 import at.hannibal2.skyhanni.events.MinionCloseEvent
 import at.hannibal2.skyhanni.events.MinionOpenEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.render.gui.ReplaceItemEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -18,11 +21,13 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RegexUtils.findMatcher
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.init.Blocks
 import net.minecraft.item.ItemStack
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object MinionUpgradeHelper {
@@ -41,9 +46,12 @@ object MinionUpgradeHelper {
         "§7§cYou need §6(?<amount>\\d+) §cmore (?<itemName>.+)\\.",
     )
 
+    private var lastMinionOpen = SimpleTimeMark.farPast()
+
     @HandleEvent
     fun onMinionOpen(event: MinionOpenEvent) {
         if (!config.minionConfigHelper) return
+        lastMinionOpen = SimpleTimeMark.now()
         val lore = event.inventoryItems[50]?.getLore()?.joinToString(" ") ?: return
         requiredItemsPattern.findMatcher(lore) {
             internalName = NeuInternalName.fromItemName(group("itemName").removeColor())
@@ -59,8 +67,27 @@ object MinionUpgradeHelper {
 
     @HandleEvent
     fun onMinionClose(event: MinionCloseEvent) {
-        if (!config.minionConfigHelper) return
         resetItems()
+    }
+
+    // TODO make this event not necessary here.
+    @HandleEvent
+    fun onInventoryClose(event: InventoryCloseEvent) {
+        resetItems()
+    }
+
+    // TODO make this event not necessary here.
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
+        resetItems()
+    }
+
+    // TODO make this event not necessary here.
+    @HandleEvent
+    fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
+        if (lastMinionOpen.passedSince() > 2.seconds) {
+            resetItems()
+        }
     }
 
     private fun resetItems() {
