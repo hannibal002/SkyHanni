@@ -129,6 +129,11 @@ public class MiscConfig {
     @Accordion
     public EnchantedClockConfig enchantedClock = new EnchantedClockConfig();
 
+    @ConfigOption(name = "Century Party Invitation", desc = "Features for the Century Party Invitation")
+    @Accordion
+    @Expose
+    public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
+
     @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean

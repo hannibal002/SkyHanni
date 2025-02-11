@@ -350,6 +350,7 @@ object CakeTracker {
         lastKnownCakeDataHash = 0
     }
 
+    // TODO use addRenderableButton and add function that expects a boolean
     private fun buildDisplayTypeToggle(): Renderable = Renderable.line {
         val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
         val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
@@ -376,6 +377,7 @@ object CakeTracker {
         lastKnownCakeDataHash = 0
     }
 
+    // TODO use addRenderableButton and add function that expects a boolean
     private fun buildOrderTypeToggle(): Renderable = Renderable.line {
         val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
         val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"

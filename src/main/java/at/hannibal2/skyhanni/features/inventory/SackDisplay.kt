@@ -10,9 +10,7 @@ import at.hannibal2.skyhanni.data.SackApi
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.CollectionUtils.addButton
 import at.hannibal2.skyhanni.utils.CollectionUtils.addItemStack
-import at.hannibal2.skyhanni.utils.CollectionUtils.addSelector
 import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConfigUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -27,9 +25,14 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.highlight
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
+import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.buildSearchableTable
+
+private typealias GemstoneQuality = SkyBlockItemModifierUtils.GemstoneQuality
 
 @SkyHanniModule
 object SackDisplay {
@@ -192,50 +195,44 @@ object SackDisplay {
     }
 
     private fun MutableList<Renderable>.drawOptions(totalPrice: Long) {
-        val name = SortType.entries[config.sortingType.ordinal].longName // todo avoid ordinal
-        addString("§7Sorted By: §c$name")
-
-        addSelector<SortType>(
-            " ",
-            getName = { type -> type.shortName },
-            isCurrent = { it.ordinal == config.sortingType.ordinal }, // todo avoid ordinal
+        addRenderableButton<SortingTypeEntry>(
+            label = "Sorted By",
+            current = config.sortingType,
             onChange = {
-                config.sortingType = SortingTypeEntry.entries[it.ordinal] // todo avoid ordinals
+                config.sortingType = it
                 update(false)
             },
         )
 
-        addButton(
-            prefix = "§7Number format: ",
-            getName = NumberFormat.entries[config.numberFormat.ordinal].displayName, // todo avoid ordinal
+        addRenderableButton<NumberFormatEntry>(
+            label = "Number Format",
+            current = config.numberFormat,
             onChange = {
-                // todo avoid ordinal
-                config.numberFormat =
-                    NumberFormatEntry.entries[(config.numberFormat.ordinal + 1) % 3]
+                config.numberFormat = it
                 update(false)
             },
         )
 
         if (config.showPrice) {
-            addSelector<ItemPriceSource>(
-                " ",
-                getName = { type -> type.sellName },
-                isCurrent = { it.ordinal == config.priceSource.ordinal }, // todo avoid ordinal
+            addRenderableButton<ItemPriceSource>(
+                label = "Price Source",
+                current = config.priceSource,
+                getName = { it.sellName },
                 onChange = {
-                    config.priceSource = ItemPriceSource.entries[it.ordinal] // todo avoid ordinal
+                    config.priceSource = it
                     update(false)
                 },
             )
-            addButton(
-                prefix = "§7Price Format: ",
-                getName = PriceFormat.entries[config.priceFormat.ordinal].displayName, // todo avoid ordinal
+
+            addRenderableButton<PriceFormatEntry>(
+                label = "Price Format",
+                current = config.priceFormat,
                 onChange = {
-                    // todo avoid ordinal
-                    config.priceFormat =
-                        PriceFormatEntry.entries[(config.priceFormat.ordinal + 1) % 2]
+                    config.priceFormat = it
                     update(false)
                 },
             )
+
             addString("§eTotal price: §6${format(totalPrice)}")
         }
     }
@@ -268,10 +265,15 @@ object SackDisplay {
 
     private fun MutableList<Renderable>.drawGemstoneDisplay(): Long {
         if (SackApi.gemstoneItem.isEmpty()) return 0L
-        addString("§7Gemstones:")
+
+        val filterType = SackApi.gemstoneStackFilter
+        val filterFormat = filterType?.let { " ($it§7)" }.orEmpty()
+
+        addString("§7Gemstones$filterFormat§7:")
         var totalPrice = 0L
         val table = buildMap {
-            for ((name, gem) in sort(SackApi.gemstoneItem.toList())) {
+            for ((_, gem) in sort(SackApi.gemstoneItem.toList())) {
+                val name = "${gem.gemType.toDisplayString()} Gemstones"
                 val row = buildList {
                     addString(" §7- ")
                     addItemStack(gem.internalName)
@@ -279,15 +281,27 @@ object SackDisplay {
                         Renderable.optionalLink(
                             name,
                             onClick = {
-                                BazaarApi.searchForBazaarItem(name.dropLast(1))
+                                BazaarApi.searchForBazaarItem(name.removeColor().dropLast(1))
                             },
                             highlightsOnHoverSlots = listOf(gem.slot),
                         ) { !NeuItems.neuHasFocus() },
                     )
-                    addAlignedNumber(gem.rough.addSeparators())
-                    addAlignedNumber("§a${gem.flawed.addSeparators()}")
-                    addAlignedNumber("§9${gem.fine.addSeparators()}")
-                    val price = gem.priceSum
+                    when (SackApi.gemstoneStackFilter) {
+                        GemstoneQuality.ROUGH -> addAlignedNumber(gem.rough.addSeparators())
+                        GemstoneQuality.FLAWED -> addAlignedNumber("§a${gem.flawed.addSeparators()}")
+                        GemstoneQuality.FINE -> addAlignedNumber("§9${gem.fine.addSeparators()}")
+                        else -> {
+                            addAlignedNumber(gem.rough.addSeparators())
+                            addAlignedNumber("§a${gem.flawed.addSeparators()}")
+                            addAlignedNumber("§9${gem.fine.addSeparators()}")
+                        }
+                    }
+                    val price = when (SackApi.gemstoneStackFilter) {
+                        GemstoneQuality.ROUGH -> gem.roughPrice
+                        GemstoneQuality.FLAWED -> gem.flawedPrice
+                        GemstoneQuality.FINE -> gem.finePrice
+                        else -> gem.priceSum
+                    }
                     totalPrice += price
                     if (config.showPrice && price != 0L) addAlignedNumber("§7(§6${format(price)}§7)")
                 }
@@ -310,25 +324,6 @@ object SackDisplay {
     }
 
     private fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled
-
-    // TODO: one mod wide enum for sorttype, priceformat, etc instead of one per feature (e.g. ChestValue)
-    enum class SortType(val shortName: String, val longName: String) {
-        STORED_DESC("Stored D", "Stored Descending"),
-        STORED_ASC("Stored A", "Stored Ascending"),
-        PRICE_DESC("Price D", "Price Descending"),
-        PRICE_ASC("Price A", "Price Ascending"),
-    }
-
-    enum class PriceFormat(val displayName: String) {
-        FORMATTED("Formatted"),
-        UNFORMATTED("Unformatted"),
-    }
-
-    enum class NumberFormat(val displayName: String) {
-        DEFAULT("Default"),
-        FORMATTED("Formatted"),
-        UNFORMATTED("Unformatted"),
-    }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
