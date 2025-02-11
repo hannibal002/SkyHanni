@@ -10,30 +10,34 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiContainer
 import net.minecraft.client.gui.inventory.GuiInventory
 import net.minecraft.client.player.inventory.ContainerLocalMenu
+import net.minecraft.client.resources.I18n
 import net.minecraft.entity.player.InventoryPlayer
 import net.minecraft.inventory.ContainerChest
 import net.minecraft.inventory.IInventory
 import net.minecraft.inventory.Slot
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
+
 //#if MC > 1.12
 //$$ import net.minecraft.inventory.ClickType
 //#endif
 
+@Suppress("TooManyFunctions", "Unused", "MemberVisibilityCanBePrivate")
 object InventoryUtils {
 
     var itemInHandId = NeuInternalName.NONE
     var recentItemsInHand = mutableMapOf<Long, NeuInternalName>()
     var latestItemInHand: ItemStack? = null
+    private val normalChestInternalNames = setOf("container.chest", "container.chestDouble")
 
     fun getItemsInOpenChest(): List<Slot> {
-        val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList<Slot>()
+        val guiChest = Minecraft.getMinecraft().currentScreen as? GuiChest ?: return emptyList()
         return guiChest.inventorySlots.inventorySlots
             .filter { it.inventory !is InventoryPlayer && it.stack != null }
     }
 
     fun getSlotsInOwnInventory(): List<Slot> {
-        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory ?: return emptyList<Slot>()
+        val guiInventory = Minecraft.getMinecraft().currentScreen as? GuiInventory ?: return emptyList()
         return guiInventory.inventorySlots.inventorySlots
             .filter { it.inventory is InventoryPlayer && it.stack != null }
     }
@@ -54,13 +58,13 @@ object InventoryUtils {
 
     fun getWindowId(): Int? = (Minecraft.getMinecraft().currentScreen as? GuiChest)?.inventorySlots?.windowId
 
-    fun getItemsInOwnInventory() =
+    fun getItemsInOwnInventory(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.filterNotNull().orEmpty()
 
-    fun getItemsInOwnInventoryWithNull() = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
+    fun getItemsInOwnInventoryWithNull(): Array<ItemStack?>? = Minecraft.getMinecraft().thePlayer?.inventory?.mainInventory
 
     // TODO use this instead of getItemsInOwnInventory() for many cases, e.g. vermin tracker, diana spade, etc
-    fun getItemsInHotbar() =
+    fun getItemsInHotbar(): List<ItemStack> =
         getItemsInOwnInventoryWithNull()?.slice(0..8)?.filterNotNull().orEmpty()
 
     fun containsInLowerInventory(predicate: (ItemStack) -> Boolean): Boolean =
@@ -161,4 +165,6 @@ object InventoryUtils {
     fun closeInventory() {
         Minecraft.getMinecraft().currentScreen = null
     }
+
+    fun isInNormalChest(): Boolean = openInventoryName() in normalChestInternalNames.map { I18n.format(it) }
 }
