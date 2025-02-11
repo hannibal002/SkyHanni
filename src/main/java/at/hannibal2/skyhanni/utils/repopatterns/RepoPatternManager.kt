@@ -80,7 +80,9 @@ object RepoPatternManager {
     /**
      * Crash if in a development environment.
      */
-    private fun crash(reason: String) = ErrorManager.crashInDevEnv(reason) { RuntimeException(reason) }
+    private fun crash(reason: String) {
+        if (PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
+    }
 
     /**
      * Check that the [owner] has exclusive right to the specified [key], and locks out other code parts from ever
