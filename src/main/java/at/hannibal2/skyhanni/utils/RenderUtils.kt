@@ -141,8 +141,9 @@ object RenderUtils {
         color: LorenzColor,
         beacon: Boolean = false,
         alpha: Float = -1f,
+        seeThroughBlocks: Boolean = true,
     ) {
-        drawColor(location, color.toColor(), beacon, alpha)
+        drawColor(location, color.toColor(), beacon, alpha, seeThroughBlocks)
     }
 
     fun SkyHanniRenderWorldEvent.drawColor(
@@ -150,7 +151,7 @@ object RenderUtils {
         color: Color,
         beacon: Boolean = false,
         alpha: Float = -1f,
-        seeThroughBlocks: Boolean = false,
+        seeThroughBlocks: Boolean = true,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
