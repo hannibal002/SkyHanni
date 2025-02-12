@@ -13,7 +13,6 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
 
 class ChromaConfig {
-    @Expose
     @ConfigOption(name = "Chroma Preview", desc = "§fPlease star SkyHanni on GitHub!")
     @ConfigEditorInfoText(infoTitle = "Only in SkyBlock")
     var chromaPreview: Boolean = false

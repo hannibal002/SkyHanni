@@ -38,7 +38,8 @@ class NonStorageDoesntNeedExpose(config: Config): SkyHanniRule(config) {
             val hasExplicitGetter = property.getter?.hasBody() ?: false
             val doWeCare = property.isLocal || property.isPrivate() || hasExplicitGetter ||
                 property.hasAnnotation("ConfigEditorInfoText") ||
-                property.hasAnnotation("ConfigEditorButton")
+                property.hasAnnotation("ConfigEditorButton") ||
+                property.hasAnnotation("Transient")
 
             if (doWeCare) {
                 property.reportIssue("@Expose annotation is not needed on property ${property.name}")
