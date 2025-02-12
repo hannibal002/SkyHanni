@@ -12,6 +12,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.List;
 import java.util.Set;
+import java.util.TreeMap;
 
 @Pseudo
 @Mixin(value = FairySouls.class, remap = false)
@@ -24,7 +25,10 @@ public class MixinFairySouls {
     private Set<Integer> foundSoulsInLocation;
 
     @Shadow
-    private List<Integer> allSoulsInCurrentLocation;
+    private List<BlockPos> allSoulsInCurrentLocation;
+
+    @Shadow
+    private TreeMap<Double, BlockPos> missingSoulsDistanceSqMap;
 
     @Shadow
     private boolean showSouls;
@@ -47,6 +51,6 @@ public class MixinFairySouls {
     public void refreshMissingSoulInfo_skyhanni(CallbackInfo ci) {
         int found = foundSoulsInLocation.size();
         int total = allSoulsInCurrentLocation.size();
-        FairySoulPathFind.updateList(closestMissingSouls, found, total);
+        FairySoulPathFind.updateList(closestMissingSouls, found, total, missingSoulsDistanceSqMap);
     }
 }
