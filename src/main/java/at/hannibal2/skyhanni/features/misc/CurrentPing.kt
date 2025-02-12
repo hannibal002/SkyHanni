@@ -19,6 +19,7 @@ object CurrentPing {
     private val previousPings = mutableListOf<Long>()
     private var waitingForPacket = false
     var averagePing = Duration.ZERO
+        private set
 
     @Suppress("UNUSED_PARAMETER")
     fun onPingPacket(packet: ClientboundPingPacket) {
@@ -27,7 +28,7 @@ object CurrentPing {
         if (previousPings.size > 5) {
             previousPings.removeAt(0)
         }
-        previousPings.add((SimpleTimeMark.now() - lastPingRequested).inWholeMilliseconds)
+        previousPings.add((lastPingRequested.passedSince()).inWholeMilliseconds)
         averagePing = previousPings.average().milliseconds
     }
 

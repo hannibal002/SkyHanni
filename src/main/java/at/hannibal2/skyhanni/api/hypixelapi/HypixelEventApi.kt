@@ -6,10 +6,10 @@ import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import net.hypixel.data.region.Environment
 import net.hypixel.modapi.HypixelModAPI
-import net.hypixel.modapi.packet.HypixelPacket
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundHelloPacket
 import net.hypixel.modapi.packet.impl.clientbound.ClientboundPingPacket
 import net.hypixel.modapi.packet.impl.clientbound.event.ClientboundLocationPacket
+import net.hypixel.modapi.packet.impl.serverbound.ServerboundVersionedPacket
 import kotlin.jvm.optionals.getOrNull
 
 @SkyHanniModule
@@ -41,7 +41,7 @@ object HypixelEventApi {
         ).post()
     }
 
-    fun sendPacket(packet: HypixelPacket) {
+    fun sendPacket(packet: ServerboundVersionedPacket) {
         modApi.sendPacket(packet)
     }
 }
