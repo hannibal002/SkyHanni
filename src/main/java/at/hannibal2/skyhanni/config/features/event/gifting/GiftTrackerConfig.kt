@@ -13,7 +13,6 @@ class GiftTrackerConfig {
     @ConfigEditorBoolean
     var enabled: Boolean = false
 
-    @Expose
     @ConfigOption(
         name = "§cNote",
         desc = "§cDue to the complexities of gifts leaving and re-entering the inventory or stash, gift usage is not auto-tracked. " +
