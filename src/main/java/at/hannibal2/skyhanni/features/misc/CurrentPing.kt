@@ -23,7 +23,7 @@ object CurrentPing {
     fun onPingPacket(packet: ClientboundPingPacket) {
         waitingForPacket = false
 
-        if (previousPings.size > 10) {
+        if (previousPings.size > 5) {
             previousPings.dropLast(1)
         }
         previousPings.add(SimpleTimeMark.now() - lastPingRequested)
