@@ -7,7 +7,9 @@ import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.repo.RepoManager
 import at.hannibal2.skyhanni.data.repo.RepoManager.hasDefaultSettings
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.features.misc.CurrentPing
 import at.hannibal2.skyhanni.features.misc.IslandAreas
+import at.hannibal2.skyhanni.features.misc.TpsCounter
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
@@ -43,6 +45,7 @@ object DebugCommand {
         repoData(event)
         globalRender(event)
         skyblockStatus(event)
+        networkInfo(event)
         profileName(event)
         profileType(event)
 
@@ -185,6 +188,14 @@ object DebugCommand {
         event.addIrrelevant {
             add("name: '${LorenzUtils.getPlayerName()}'")
             add("uuid: '${LorenzUtils.getPlayerUuid()}'")
+        }
+    }
+
+    private fun networkInfo(event: DebugDataCollectEvent) {
+        event.title("Network Information")
+        event.addIrrelevant {
+            add("tps: ${TpsCounter.tps}")
+            add("ping: ${CurrentPing.averagePing}")
         }
     }
 }
