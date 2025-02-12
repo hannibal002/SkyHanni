@@ -16,7 +16,7 @@ import kotlin.time.Duration.Companion.seconds
 object CurrentPing {
 
     private var lastPingRequested = SimpleTimeMark.farPast()
-    private val previousPings = mutableListOf<Duration>()
+    private val previousPings = mutableListOf<Long>()
     private var waitingForPacket = false
     var averagePing = Duration.ZERO
 
@@ -24,10 +24,10 @@ object CurrentPing {
         waitingForPacket = false
 
         if (previousPings.size > 5) {
-            previousPings.dropLast(1)
+            previousPings.removeAt(0)
         }
-        previousPings.add(SimpleTimeMark.now() - lastPingRequested)
-        averagePing = (previousPings.sumOf { it.inWholeMilliseconds } / previousPings.size).milliseconds
+        previousPings.add((SimpleTimeMark.now() - lastPingRequested).inWholeMilliseconds)
+        averagePing = previousPings.average().milliseconds
     }
 
     @HandleEvent

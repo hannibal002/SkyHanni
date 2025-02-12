@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuItems
 import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils.equalsIgnoreColor
+import kotlin.time.Duration.Companion.seconds
 
 object DebugCommand {
 
@@ -193,9 +194,17 @@ object DebugCommand {
 
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
-        event.addIrrelevant {
-            add("tps: ${TpsCounter.tps}")
-            add("ping: ${CurrentPing.averagePing}")
+        val tps = TpsCounter.tps ?: 0.0
+        if (tps < 15.0 || CurrentPing.averagePing > 1.5.seconds) {
+            event.addData {
+                add("tps: ${TpsCounter.tps}")
+                add("ping: ${CurrentPing.averagePing}")
+            }
+        } else {
+            event.addIrrelevant {
+                add("tps: ${TpsCounter.tps}")
+                add("ping: ${CurrentPing.averagePing}")
+            }
         }
     }
 }
