@@ -118,7 +118,6 @@ object FairySoulPathFind {
 
     // Step 2: Fast Greedy TSP Algorithm (~1ms for 50 nodes)
     private fun greedyTSP(distanceMap: Map<GraphNode, Map<GraphNode, Double>>): List<GraphNode> {
-        // Pick the first node as the start (or choose any other)
         val startNode = distanceMap.keys.first()
         val route = mutableListOf(startNode)
         val visited = mutableSetOf(startNode)
@@ -128,7 +127,7 @@ object FairySoulPathFind {
             var nextNode: GraphNode? = null
             var bestDistance = Double.POSITIVE_INFINITY
 
-            // Look for the nearest unvisited neighbor from 'current'
+            // Try to pick the nearest unvisited neighbor from the current node.
             distanceMap[current]?.forEach { (candidate, distance) ->
                 if (candidate !in visited && distance < bestDistance) {
                     bestDistance = distance
@@ -136,16 +135,28 @@ object FairySoulPathFind {
                 }
             }
 
-            nextNode?.let {
-                route.add(it)
-                visited.add(it)
-                current = it
-            } ?: break // if no next node found (shouldn't happen in a connected graph)
+            // If none was found, search among all unvisited nodes.
+            if (nextNode == null) {
+                for (candidate in distanceMap.keys.filter { it !in visited }) {
+                    val candidateMinDistance =
+                        visited.mapNotNull { distanceMap[it]?.get(candidate) }.minOrNull() ?: Double.POSITIVE_INFINITY
+                    if (candidateMinDistance < bestDistance) {
+                        bestDistance = candidateMinDistance
+                        nextNode = candidate
+                    }
+                }
+            }
+
+            // Use a temporary variable for safe smart cast.
+            val chosen = nextNode
+            if (chosen != null) {
+                route.add(chosen)
+                visited.add(chosen)
+                current = chosen
+            } else {
+                break
+            }
         }
-
-        // Optionally, complete the cycle by returning to the start:
-        // route.add(startNode)
-
         return route
     }
 
