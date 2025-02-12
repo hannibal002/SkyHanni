@@ -15,7 +15,7 @@ import kotlin.jvm.optionals.getOrNull
 @SkyHanniModule
 object HypixelEventApi {
 
-    private var modApi : HypixelModAPI = HypixelModAPI.getInstance()
+    private val modApi: HypixelModAPI = HypixelModAPI.getInstance()
 
     init {
         modApi.subscribeToEventPacket(ClientboundLocationPacket::class.java)

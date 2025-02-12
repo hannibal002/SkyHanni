@@ -20,6 +20,7 @@ object CurrentPing {
     private var waitingForPacket = false
     var averagePing = Duration.ZERO
 
+    @Suppress("UNUSED_PARAMETER")
     fun onPingPacket(packet: ClientboundPingPacket) {
         waitingForPacket = false
 
