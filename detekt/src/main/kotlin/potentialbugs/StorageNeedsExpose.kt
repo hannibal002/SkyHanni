@@ -35,7 +35,8 @@ class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
         //  - Private properties
         //  - Values
         //  - Properties with getters
-        val doWeCare = (!property.isLocal && !property.isPrivate() && property.isVar && property.getter == null)
+        val hasExplicitGetter = property.getter?.hasBody() ?: false
+        val doWeCare = (!property.isLocal && !property.isPrivate() && property.isVar && !hasExplicitGetter)
 
         // Don't flag @Transient properties
         val isTransient = property.hasAnnotation("Transient")
