@@ -8,8 +8,8 @@ import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
+import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
-import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LorenzVec
@@ -18,7 +18,6 @@ import at.hannibal2.skyhanni.utils.PolynomialFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.toLorenzVec
 import net.minecraft.client.Minecraft
-import net.minecraft.network.play.server.S2APacketParticles
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -41,13 +40,12 @@ object PreciseGuessBurrow {
         particleLocations.clear()
     }
 
-    @HandleEvent(onlyOnIsland = IslandType.HUB)
-    fun onReceiveParticle(event: PacketReceivedEvent) {
+    @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
+    fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
-        val packet = event.packet as? S2APacketParticles ?: return
-        val type = packet.particleType
+        val type = event.type
         if (type != EnumParticleTypes.DRIP_LAVA) return
-        val currLoc = packet.toLorenzVec()
+        val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
         lastLavaParticle = SimpleTimeMark.now()
         if (particleLocations.isEmpty()) {
