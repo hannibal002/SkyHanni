@@ -195,16 +195,16 @@ object DebugCommand {
     private fun networkInfo(event: DebugDataCollectEvent) {
         event.title("Network Information")
         val tps = TpsCounter.tps ?: 0.0
+
+        val list = buildList {
+            add("tps: $tps")
+            add("ping: ${CurrentPing.averagePing}")
+        }
+
         if (tps < 15.0 || CurrentPing.averagePing > 1.5.seconds) {
-            event.addData {
-                add("tps: ${TpsCounter.tps}")
-                add("ping: ${CurrentPing.averagePing}")
-            }
+            event.addData(list)
         } else {
-            event.addIrrelevant {
-                add("tps: ${TpsCounter.tps}")
-                add("ping: ${CurrentPing.averagePing}")
-            }
+            event.addIrrelevant(list)
         }
     }
 }
