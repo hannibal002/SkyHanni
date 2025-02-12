@@ -16,6 +16,7 @@ class PotentialBugsProvider : RuleSetProvider {
             listOf(
                 ImmutableTypesWithExpectedInteriorMutabilityInConfig(config),
                 StorageNeedsExpose(config),
+                NonStorageDoesntNeedExpose(config),
             ),
         )
     }
