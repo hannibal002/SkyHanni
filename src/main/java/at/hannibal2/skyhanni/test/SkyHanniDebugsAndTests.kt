@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.features.garden.GardenNextJacobContest
 import at.hannibal2.skyhanni.features.garden.visitor.GardenVisitorColorNames
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.mining.OreBlock
+import at.hannibal2.skyhanni.features.misc.FairySoulPathFind
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockStateAt
@@ -138,6 +139,7 @@ object SkyHanniDebugsAndTests {
 
     @Suppress("EmptyFunctionBlock")
     private fun asyncTest(args: Array<String>) {
+        FairySoulPathFind.testCoolNewPath()
     }
 
     fun findNullConfig(args: Array<String>) {
