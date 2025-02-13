@@ -206,7 +206,6 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun initRenderer(position: () -> Position, inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY, condition: () -> Boolean) {
         RenderDisplayHelper(
             inventory,
-            // TODO add back toggle config option
             outsideInventory = true,
             inOwnInventory = true,
             condition = condition,
