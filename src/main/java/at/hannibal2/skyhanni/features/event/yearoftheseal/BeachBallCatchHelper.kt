@@ -109,6 +109,7 @@ object BeachBallCatchHelper {
             // Only update the path once every 3 ticks to reduce flickering of the path
             if (updated <= 3) return
             predictedPath = predict(startIndex, minY)
+            updated = 0
         }
 
         fun predict(startIndex: Int, minY: Double): List<LorenzVec> {
