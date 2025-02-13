@@ -53,6 +53,7 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.NONE
+import at.hannibal2.skyhanni.utils.PositionLog
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.farPast
 import com.google.gson.annotations.Expose
@@ -68,6 +69,9 @@ class ProfileSpecificStorage {
 
     @Expose
     var totalSkyBlockXP: Int? = null
+
+    @Expose
+    var movementLog = mutableMapOf<Int, MutableList<PositionLog>>()
 
     // features
     // - combat

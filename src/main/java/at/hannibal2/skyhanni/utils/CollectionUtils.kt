@@ -238,6 +238,13 @@ object CollectionUtils {
         return collection
     }
 
+    fun <K, V> MutableMap<K, V>.removeIf(predicate: (K, V) -> Boolean): MutableMap<K, V> {
+        for ((k, v) in this) {
+            if (predicate(k, v)) remove(k)
+        }
+        return this
+    }
+
     /** Removes the first element that matches the given [predicate] in the list. */
     fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
         val mutableList = this.toMutableList()
