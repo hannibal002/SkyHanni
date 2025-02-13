@@ -36,6 +36,7 @@ object FishyTreatProfit {
     private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
     private var display = emptyList<Renderable>()
     private val inventory = InventoryDetector { name -> name == "Lukas the Aquarist" }
+    private val FISHY_TREAT = "FISHY_TREAT".toInternalName()
 
     private val patternGroup = RepoPattern.group("event.year-of-the-seal.fishy-treat")
 
@@ -75,12 +76,9 @@ object FishyTreatProfit {
 
     private fun readItem(slot: Int, item: ItemStack, table: MutableList<DisplayTableEntry>) {
         val itemName = getItemName(item)
-        if (isInvalidItemName(itemName)) return
-
         val allMaterials = getAdditionalMaterials(getRequiredItems(item))
-        val fishyTreat = "FISHY_TREAT".toInternalName()
-        val additionalMaterials = allMaterials.filter { it.key != fishyTreat }
-        val amountOfFishyTreat = allMaterials[fishyTreat] ?: run {
+        val additionalMaterials = allMaterials.filter { it.key != FISHY_TREAT }
+        val amountOfFishyTreat = allMaterials[FISHY_TREAT] ?: run {
             ErrorManager.logErrorStateWithData(
                 "failed reading fishy treat amount",
                 "fishy treat amount not found in additionalMaterials",
@@ -142,16 +140,6 @@ object FishyTreatProfit {
         for ((internalName, amount) in additionalMaterials) {
             add(internalName.getPriceName(amount))
         }
-    }
-
-    private fun isInvalidItemName(itemName: String): Boolean = when (itemName) {
-        " ",
-        "§cClose",
-        "§eUnique Gold Medals",
-        "§aMedal Trades",
-        -> true
-
-        else -> false
     }
 
     private fun getItemName(item: ItemStack): String {

@@ -54,12 +54,12 @@ public class EventConfig {
     @Expose
     public CenturyConfig century = new CenturyConfig();
 
-    @ConfigOption(name = "400þ Anniversary Celebration", desc = "Features for the 400þ year of SkyBlock")
+    @ConfigOption(name = "400þ Anniversary Celebration", desc = "Features for the 400þ year of SkyBlock.")
     @Accordion
     @Expose
     public AnniversaryCelebration400Config anniversaryCelebration400 = new AnniversaryCelebration400Config();
 
-    @ConfigOption(name = "Year of the Seal", desc = "Features for the 400þ year of SkyBlock")
+    @ConfigOption(name = "Year of the Seal", desc = "Features for Year of the Seals.")
     @Accordion
     @Expose
     public YearOfTheSealConfig yearOfTheSeal = new YearOfTheSealConfig();
