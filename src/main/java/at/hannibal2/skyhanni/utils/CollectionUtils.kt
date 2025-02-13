@@ -165,8 +165,10 @@ object CollectionUtils {
 
     fun <T> MutableList<T>.addAll(vararg elements: T) = addAll(elements)
 
+    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <K, V> Map<K, V>.editCopy(function: MutableMap<K, V>.() -> Unit) = toMutableMap().also { function(it) }.toMap()
 
+    @Deprecated("use ConcurrentLinkedQueue or Mutex-like alternates", ReplaceWith(""))
     fun <T> List<T>.editCopy(function: MutableList<T>.() -> Unit) = toMutableList().also { function(it) }.toList()
 
     fun <K, V> Map<K, V>.moveEntryToTop(matcher: (Map.Entry<K, V>) -> Boolean): Map<K, V> {

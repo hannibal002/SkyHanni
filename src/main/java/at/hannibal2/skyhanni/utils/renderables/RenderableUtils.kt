@@ -12,9 +12,11 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.leftAndRight
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
+import kotlin.reflect.KMutableProperty0
 
 private typealias Direction = Renderable.Companion.Direction
 
+@Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
     /** Calculates the absolute x position of the columns in a table*/
@@ -129,6 +131,18 @@ internal object RenderableUtils {
         )
     }
 
+    inline fun MutableList<Searchable>.addButton(
+        label: String,
+        enabled: String,
+        disabled: String,
+        config: KMutableProperty0<Boolean>,
+        crossinline onChange: () -> Unit,
+        enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
+    ) {
+        add(createBooleanButton(label, enabled, disabled, config, onChange, enableUniverseScroll, scrollValue))
+    }
+
     inline fun <T> MutableList<Searchable>.addButton(
         label: String,
         current: T,
@@ -149,6 +163,44 @@ internal object RenderableUtils {
         )
     }
 
+    inline fun MutableList<Renderable>.addRenderableButton(
+        label: String,
+        enabled: String,
+        disabled: String,
+        config: KMutableProperty0<Boolean>,
+        crossinline onChange: () -> Unit,
+        enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
+    ) {
+        add(createBooleanButton(label, enabled, disabled, config, onChange, enableUniverseScroll, scrollValue).renderable)
+    }
+
+    private inline fun createBooleanButton(
+        label: String,
+        enabled: String,
+        disabled: String,
+        config: KMutableProperty0<Boolean>,
+        crossinline onChange: () -> Unit,
+        enableUniverseScroll: Boolean,
+        scrollValue: ScrollValue,
+    ): Searchable {
+
+        val current = config.get()
+        val element = createButtonNew(
+            label,
+            current = if (current) enabled else disabled,
+            getName = { it ?: error("it is null in non-nullable getName()") },
+            onChange = {
+                config.set(!current)
+                onChange()
+            },
+            universe = listOf(enabled, disabled),
+            enableUniverseScroll,
+            scrollValue,
+        )
+        return element
+    }
+
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableButton(
         label: String,
         current: T?,
@@ -156,6 +208,7 @@ internal object RenderableUtils {
         crossinline onChange: (T) -> Unit,
         universe: List<T> = enumValues<T>().toList(),
         enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
     ) {
         add(
             createButtonNew(
@@ -165,6 +218,7 @@ internal object RenderableUtils {
                 onChange = { onChange(it ?: error("it is null in non-nullable onChange()")) },
                 universe,
                 enableUniverseScroll,
+                scrollValue,
             ).renderable,
         )
     }
@@ -192,13 +246,14 @@ internal object RenderableUtils {
         return get(newIndex)
     }
 
-    inline fun <T> createButtonNew(
+    private inline fun <T> createButtonNew(
         label: String,
         current: T?,
         crossinline getName: (T?) -> String,
         crossinline onChange: (T?) -> Unit,
         universe: List<T?>,
         enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
     ): Searchable {
         val onClick: (Direction) -> Unit = { direction ->
             if ((System.currentTimeMillis() - ChatUtils.lastButtonClicked) > 150) { // funny thing happen if I don't do that
@@ -236,7 +291,7 @@ internal object RenderableUtils {
             addString("§7$label §a[")
             val displayFormat = hoverTips("§e$currentName", tips, bypassChecks = false, onHover = {})
             when (enableUniverseScroll) {
-                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false)
+                true -> clickableAndScrollable(displayFormat, onClick = onClick, bypassChecks = false, scrollValue = scrollValue)
                 false -> leftAndRightClickable(displayFormat, onClick = onClick, bypassChecks = false)
             }.let { add(it) }
             addString("§a]")

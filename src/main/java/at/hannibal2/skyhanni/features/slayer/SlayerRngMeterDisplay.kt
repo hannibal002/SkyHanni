@@ -181,8 +181,7 @@ object SlayerRngMeterDisplay {
 
         if (name != getCurrentSlayer()) return
 
-        val internalName = event.inventoryItems.values
-            .find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
+        val internalName = event.inventoryItems.values.find { item -> item.getLore().any { it.contains("§a§lSELECTED") } }
         setNewGoal(internalName?.getInternalName())
     }
 
@@ -209,13 +208,17 @@ object SlayerRngMeterDisplay {
             storage.goalNeeded = -1
         } else {
             storage.itemGoal = internalName.itemName
-            storage.goalNeeded = rngScore[getCurrentSlayer()]?.get(internalName)
-                ?: ErrorManager.skyHanniError(
-                    "RNG Meter goal setting failed",
+            val currentSlayer = getCurrentSlayer()
+            storage.goalNeeded = rngScore[currentSlayer]?.get(internalName) ?: run {
+                ErrorManager.logErrorStateWithData(
+                    "Failed reading RNG Meter goal needed amount",
+                    "rngScore does not contain current slayer and current item data",
                     "internalName" to internalName,
-                    "currentSlayer" to getCurrentSlayer(),
-                    "repo" to rngScore,
+                    "currentSlayer" to currentSlayer,
+                    "rngScore" to rngScore,
                 )
+                -1
+            }
         }
         update()
     }
@@ -229,21 +232,17 @@ object SlayerRngMeterDisplay {
         display = listOf(makeLink(drawDisplay()))
     }
 
-    private fun makeLink(text: String) =
-        Renderable.clickAndHover(
-            text, listOf("§eClick to open RNG Meter Inventory."),
-            onClick = {
-                HypixelCommands.showRng("slayer", SlayerApi.activeSlayer?.rngName)
-            },
-        )
+    private fun makeLink(text: String) = Renderable.clickAndHover(
+        text, listOf("§eClick to open RNG Meter Inventory."),
+        onClick = {
+            HypixelCommands.showRng("slayer", SlayerApi.activeSlayer?.rngName)
+        },
+    )
 
     fun drawDisplay(): String {
         val storage = getStorage() ?: return ""
 
-        if (SlayerApi.latestSlayerCategory.let {
-                it.endsWith(" I") || it.endsWith(" II")
-            }
-        ) {
+        if (SlayerApi.latestSlayerCategory.let { it.endsWith(" I") || it.endsWith(" II") }) {
             return ""
         }
 

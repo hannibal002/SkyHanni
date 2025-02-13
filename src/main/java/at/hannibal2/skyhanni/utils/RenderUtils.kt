@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
+import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.getCorners
 import at.hannibal2.skyhanni.utils.compat.GuiScreenUtils
@@ -139,8 +140,9 @@ object RenderUtils {
         color: LorenzColor,
         beacon: Boolean = false,
         alpha: Float = -1f,
+        seeThroughBlocks: Boolean = true,
     ) {
-        drawColor(location, color.toColor(), beacon, alpha)
+        drawColor(location, color.toColor(), beacon, alpha, seeThroughBlocks)
     }
 
     fun SkyHanniRenderWorldEvent.drawColor(
@@ -148,6 +150,7 @@ object RenderUtils {
         color: Color,
         beacon: Boolean = false,
         alpha: Float = -1f,
+        seeThroughBlocks: Boolean = true,
     ) {
         val (viewerX, viewerY, viewerZ) = getViewerPos(partialTicks)
         val x = location.x - viewerX
@@ -159,7 +162,9 @@ object RenderUtils {
         } else {
             alpha
         }
-        GlStateManager.disableDepth()
+        if (seeThroughBlocks) {
+            GlStateManager.disableDepth()
+        }
         GlStateManager.disableCull()
         drawFilledBoundingBox(
             AxisAlignedBB(x, y, z, x + 1, y + 1, z + 1).expandBlock(),
@@ -170,7 +175,9 @@ object RenderUtils {
         if (distSq > 5 * 5 && beacon) renderBeaconBeam(x, y + 1, z, color.rgb, 1.0f, partialTicks)
         GlStateManager.disableLighting()
         GlStateManager.enableTexture2D()
-        GlStateManager.enableDepth()
+        if (seeThroughBlocks) {
+            GlStateManager.enableDepth()
+        }
         GlStateManager.enableCull()
     }
 
@@ -1121,6 +1128,19 @@ object RenderUtils {
         }
     }
 
+    fun SkyHanniRenderWorldEvent.drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+        LineDrawer.draw3D(partialTicks) {
+            drawEdges(location, color, lineWidth, depth)
+        }
+    }
+
+    fun SkyHanniRenderWorldEvent.drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
+        // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+        LineDrawer.draw3D(partialTicks) {
+            drawEdges(axisAlignedBB, color, lineWidth, depth)
+        }
+    }
+
     fun SkyHanniRenderWorldEvent.draw3DLine(p1: LorenzVec, p2: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) =
         LineDrawer.draw3D(partialTicks) {
             draw3DLine(p1, p2, color, lineWidth, depth)
@@ -1393,6 +1413,19 @@ object RenderUtils {
                     val p2 = it.second
                     drawBezier2(p1, p2, p3, color, lineWidth, depth)
                 }
+            }
+        }
+
+        fun drawEdges(location: LorenzVec, color: Color, lineWidth: Int, depth: Boolean) {
+            for ((p1, p2) in location.edges) {
+                draw3DLine(p1, p2, color, lineWidth, depth)
+            }
+        }
+
+        fun drawEdges(axisAlignedBB: AxisAlignedBB, color: Color, lineWidth: Int, depth: Boolean) {
+            // TODO add cache. maybe on the caller site, since we cant add a lazy member in AxisAlignedBB
+            for ((p1, p2) in axisAlignedBB.calculateEdges()) {
+                draw3DLine(p1, p2, color, lineWidth, depth)
             }
         }
 
