@@ -16,12 +16,7 @@ import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
 import kotlin.reflect.KMutableProperty0
 
-<<<<<<< HEAD
-=======
-private typealias Direction = Renderable.Companion.Direction
-
 @Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
->>>>>>> upstream/beta
 internal object RenderableUtils {
 
     /** Calculates the absolute x position of the columns in a table*/
