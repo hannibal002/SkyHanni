@@ -336,13 +336,6 @@ object IslandGraphs {
         if (Minecraft.getMinecraft().thePlayer.onGround) {
             nodes.add(0, GraphNode(0, LocationUtils.playerLocation()))
         }
-        renderPath(setPath, nodes)
-    }
-
-    fun renderPath(
-        setPath: Boolean = true,
-        nodes: List<GraphNode>,
-    ) {
         if (setPath) {
             this.fastestPath = skipIfCloser(Graph(cutByMaxDistance(nodes, 2.0)))
         }
