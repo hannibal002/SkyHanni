@@ -15,6 +15,7 @@ object ScoreboardElementLobbyCode : ScoreboardElement() {
         listOfNotNull(
             HypixelData.serverId,
             DungeonApi.roomId,
+            "test string",
             MiningApi.mineshaftRoomId,
         ).forEach { append(" §8$it") }
     }.trim()
