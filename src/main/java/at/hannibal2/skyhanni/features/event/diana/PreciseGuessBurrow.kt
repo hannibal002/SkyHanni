@@ -6,6 +6,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.BurrowGuessType
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.IslandChangeEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -57,9 +58,16 @@ object PreciseGuessBurrow {
         val distToLast = particleLocations.last().distance(currLoc)
         if (distToLast == 0.0 || distToLast > 3.0) return
         particleLocations.add(currLoc)
+
+        val guessPosition = guessBurrowLocation() ?: return
+
+        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock()).post()
+    }
+
+    private fun guessBurrowLocation(): LorenzVec? {
         // A Degree n polynomial can be solved with n+1 unique points
         // The Bézier curve used is a degree 3, so 4 points are needed to solve
-        if (particleLocations.size < 4) return
+        if (particleLocations.size < 4) return null
         val fitters = arrayOf(PolynomialFitter(3), PolynomialFitter(3), PolynomialFitter(3))
         for ((index, location) in particleLocations.withIndex()) {
             val x = index.toDouble()
@@ -77,9 +85,7 @@ object PreciseGuessBurrow {
 
         val t = 3 * controlPointDistance / startPointDerivative.length()
 
-        val guessPosition = coefficients.map { it[0] + it[1] * t + it[2] * t.pow(2) + it[3] * t.pow(3) }.toLorenzVec()
-
-        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock()).post()
+        return coefficients.map { it[0] + it[1] * t + it[2] * t.pow(2) + it[3] * t.pow(3) }.toLorenzVec()
     }
 
     private fun getPitchFromDerivative(derivative: LorenzVec): Double {
@@ -119,6 +125,15 @@ object PreciseGuessBurrow {
         particleLocations.clear()
         lastDianaSpade = SimpleTimeMark.now()
         spadeUsePosition = Minecraft.getMinecraft().thePlayer.getPositionEyes(1.0F).toLorenzVec()
+    }
+
+    @HandleEvent
+    fun onDebug(event: DebugDataCollectEvent) {
+        event.title("Precise Burrow Guess")
+        event.addIrrelevant {
+            add("Burrow Guess: " + (guessBurrowLocation()?.toCleanString() ?: "No Guess"))
+            add("Rounded Guess: " + (guessBurrowLocation()?.down(0.5)?.roundLocationToBlock()?.toCleanString() ?: "No Guess"))
+        }
     }
 
     @HandleEvent
