@@ -38,7 +38,10 @@ import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
+<<<<<<< HEAD
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
+=======
+>>>>>>> upstream/beta
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
 import org.lwjgl.input.Keyboard.KEY_DOWN
@@ -416,6 +419,7 @@ object CakeTracker {
         }
     }
 
+<<<<<<< HEAD
     private fun MutableList<Renderable>.addDisplayTypeToggle() = addRenderableButton<CakeTrackerDisplayType>(
         label = "Display",
         current = config.displayType.get(),
@@ -430,6 +434,8 @@ object CakeTracker {
         getName = { it.toString() },
     )
 
+=======
+>>>>>>> upstream/beta
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
         val dataHash = data.hashCode()
         if (dataHash != lastKnownCakeDataHash) {
@@ -457,8 +463,28 @@ object CakeTracker {
 
     private fun buildCakeRenderables(data: CakeData) = buildList {
         add(Renderable.hoverTips("§c§lNew §f§lYear §c§lCake §f§lTracker", getHeaderTips(data)))
+<<<<<<< HEAD
         addDisplayTypeToggle()
         addOrderTypeToggle()
+=======
+
+        addRenderableButton<DisplayType>(
+            label = "Show",
+            current = config.displayType,
+            onChange = {
+                config.displayType = it
+                lastKnownCakeDataHash = 0
+            },
+        )
+        addRenderableButton<DisplayOrder>(
+            label = "Order",
+            current = config.displayOrderType,
+            onChange = {
+                config.displayOrderType = it
+                lastKnownCakeDataHash = 0
+            },
+        )
+>>>>>>> upstream/beta
 
         val displayType = config.displayType.get() ?: return@buildList
         val displayOrderType = config.displayOrderType.get() ?: return@buildList
