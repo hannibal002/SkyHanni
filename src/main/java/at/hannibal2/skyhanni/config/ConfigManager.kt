@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.config
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.config.core.config.CustomColor
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.core.config.PositionList
@@ -60,7 +59,7 @@ class ConfigManager {
 //             .registerIfBeta(FeatureTogglesByDefaultAdapter)
             .create()
 
-        var configDirectory = File("config/skyhanni")
+        val configDirectory = File("config/skyhanni")
     }
 
     private val logger = LorenzLogger("config_manager")
@@ -104,7 +103,7 @@ class ConfigManager {
         try {
             findPositionLinks(features, mutableSetOf())
         } catch (e: Exception) {
-            if (EventHandler.isInEventHandler) throw e
+            ErrorManager.crashInDevEnv("Couldn't load config links") { e }
         }
     }
 

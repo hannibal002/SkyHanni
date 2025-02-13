@@ -71,6 +71,16 @@ object Text {
     fun IChatComponent.send(id: Int = 0) =
         Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(this, id)
 
+    fun List<IChatComponent>.send(id: Int = 0) {
+        val parent = "".asComponent()
+        forEach {
+            parent.siblings.add(it)
+            parent.siblings.add("\n".asComponent())
+        }
+
+        Minecraft.getMinecraft().ingameGUI.chatGUI.printChatMessageWithOptionalDeletion(parent, id)
+    }
+
     var IChatComponent.hover: IChatComponent?
         get() = this.chatStyle.chatHoverEvent?.value
         set(value) {
@@ -98,6 +108,14 @@ object Text {
     fun IChatComponent.onClick(expiresAt: SimpleTimeMark = SimpleTimeMark.farFuture(), oneTime: Boolean = true, onClick: () -> Any) {
         val token = ChatClickActionManager.createAction(onClick, expiresAt, oneTime)
         this.command = "/shaction $token"
+    }
+
+    fun IChatComponent.onHover(tip: String) {
+        this.hover = tip.asComponent()
+    }
+
+    fun IChatComponent.onHover(tips: List<String>) {
+        this.hover = tips.joinToString("\n").asComponent()
     }
 
     fun createDivider(dividerColor: EnumChatFormatting = EnumChatFormatting.BLUE) = HYPHEN.fitToChat().style {
