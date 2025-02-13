@@ -1,69 +1,53 @@
-package at.hannibal2.skyhanni.features.event.seal
+package at.hannibal2.skyhanni.features.event.yearoftheseal
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ConfigLoadEvent
+import at.hannibal2.skyhanni.events.IslandChangeEvent
+import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeIf
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
+import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
-import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.SkullTextureHolder
+import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
-import at.hannibal2.skyhanni.utils.compat.getStandHelmet
 import at.hannibal2.skyhanni.utils.getLorenzVec
-import at.hannibal2.skyhanni.utils.getPositionLog
 import net.minecraft.entity.item.EntityArmorStand
-import java.awt.Color
 
 @SkyHanniModule
 object BeachBallCatchHelper {
 
-    val register get() = ProfileStorageData.profileSpecific?.movementLog
+    private val config get() = SkyHanniMod.feature.event.yearOfTheSeal
 
     private val predictors = mutableMapOf<Int, Predictor>()
 
-    private val NORMAL_BEACH_BALL by lazy {
-        //SkullTextureHolder.getTexture("NORMAL_BEACH_BALL")
-        "ewogICJ0aW1lc3RhbXAiIDogMTczNjQyNzQ4ODAwNCwKICAicHJvZmlsZUlkIiA6ICIzN2JhNjRkYzkxOTg0OGI4YjZhNDdiYTg0ZDgwNDM3MCIsCiAgInByb2ZpbGVOYW1lIiA6ICJTb3lLb3NhIiwKICAic2lnbmF0dXJlUmVxdWlyZWQiIDogdHJ1ZSwKICAidGV4dHVyZXMiIDogewogICAgIlNLSU4iIDogewogICAgICAidXJsIiA6ICJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlLzJhZGY5ZDcxMzY3Y2Q2ZTUwNWZiNDhjYWFhNWFjZGNkZmYyYTA5ZjY2YzQ4OGRhZjA0ZDA0NWVlMGJmNTI4ZTEiLAogICAgICAibWV0YWRhdGEiIDogewogICAgICAgICJtb2RlbCIgOiAic2xpbSIKICAgICAgfQogICAgfQogIH0KfQ=="
-    }
+    private val NORMAL_BEACH_BALL by lazy { SkullTextureHolder.getTexture("NORMAL_BEACH_BALL") }
 
     fun check(entity: EntityArmorStand) {
-        println("Change! ${entity.getStandHelmet()?.getSkullTexture()}")
         if (!entity.wearingSkullTexture(NORMAL_BEACH_BALL)) return
-        println("Beach Ball")
-        if (register?.get(entity.entityId) != null) return
-        register?.set(entity.entityId, mutableListOf())
+        if (predictors.get(entity.entityId) != null) return
         predictors[entity.entityId] = Predictor(entity.getLorenzVec())
-        println("New Beach Ball!")
     }
 
-    private var prev = emptySet<EntityArmorStand>()
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onEntityEnterWorld(event: EntityEnterWorldEvent<EntityArmorStand>) {
+        if (!isEnabled()) return
+        DelayedRun.runDelayed(2.ticks) { check(event.entity) }
+    }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSkyHanniTick(event: SkyHanniTickEvent) {
-        val now = EntityUtils.getEntities<EntityArmorStand>().toSet()
-        val diff = now - prev
-        prev = now
-
-        diff.forEach {
-            check(it)
-            DelayedRun.runNextTick { check(it) }
-            DelayedRun.runDelayed(2.ticks) { check(it) }
-            DelayedRun.runDelayed(3.ticks) { check(it) }
-        }
-
-        register?.forEach { (id, list) ->
-            val entity = EntityUtils.getEntityByID(id) ?: return@forEach
-            list.add(entity.getPositionLog())
-        }
-
+        if (!isEnabled()) return
         predictors.removeIf { id, predict ->
             val entity = EntityUtils.getEntityByID(id) ?: return@removeIf true
             predict.newData(entity.getLorenzVec())
@@ -71,20 +55,29 @@ object BeachBallCatchHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onSkyHanniRenderWorld(event: SkyHanniRenderWorldEvent) {
+        if (!isEnabled()) return
+        val color = config.bouncyBallLineColor.toSpecialColor()
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {
-/*             register?.forEach { (id, list) ->
-                val color = Color(id).addAlpha(50)
-                drawPath(list.map { it.position }, color, 3, true, bezierPoint = -1.0)
-            } */
             predictors.forEach { (id, predict) ->
-                val color = Color(id).addAlpha(255)
                 drawPath(predict.prePath, color.addAlpha(50), 3, true, bezierPoint = -1.0)
                 drawPath(predict.predictedPath, color, 3, true, bezierPoint = -1.0)
             }
         }
     }
+
+    @HandleEvent(onlyOnSkyblock = true)
+    fun onIslandChange(event: IslandChangeEvent) {
+        predictors.clear()
+    }
+
+    @HandleEvent
+    fun onConfigLoad(event: ConfigLoadEvent) {
+        config.bouncyBallLine.onDisable { DelayedRun.runDelayed(3.ticks) { predictors.clear() } }
+    }
+
+    private fun isEnabled() = config.bouncyBallLine.get()
 
     private class Predictor(start: LorenzVec) {
 
@@ -106,7 +99,7 @@ object BeachBallCatchHelper {
 
         fun newData(new: LorenzVec) {
             data.add(new)
-            if (new.distanceToPlayer() < 1.0) {
+            if (new.distanceToPlayer() < 1.3) {
                 startIndex = data.lastIndex
                 minY = new.y
             }

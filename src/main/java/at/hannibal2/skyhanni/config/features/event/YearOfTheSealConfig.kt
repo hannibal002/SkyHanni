@@ -4,8 +4,10 @@ import at.hannibal2.skyhanni.config.FeatureToggle
 import at.hannibal2.skyhanni.config.core.config.Position
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorColour
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
+import io.github.notenoughupdates.moulconfig.observer.Property
 
 class YearOfTheSealConfig {
     @Expose
@@ -20,4 +22,14 @@ class YearOfTheSealConfig {
     @Expose
     @ConfigLink(owner = YearOfTheSealConfig::class, field = "fishyTreatProfit")
     var fishyTreatProfitPosition: Position = Position(170, 150)
+
+    @Expose
+    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown (Only works on normal ones, not giant).")
+    @ConfigEditorBoolean
+    var bouncyBallLine: Property<Boolean> = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
+    @ConfigEditorColour
+    var bouncyBallLineColor: String = "0:245:85:255:85";
 }
