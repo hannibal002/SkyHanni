@@ -238,9 +238,9 @@ object IslandGraphs {
 
         currentTarget?.let {
             if (it.distanceToPlayer() < 3) {
+                onFound()
                 "§e[SkyHanni] Navigation reached §r$label§e!".asComponent().send(pathFindMessageId)
                 reset()
-                onFound()
             }
             if (!condition()) {
                 reset()
