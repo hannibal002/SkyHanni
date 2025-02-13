@@ -21,7 +21,7 @@ class NeuInternalName private constructor(private val internalName: String) {
         val TIGHTLY_TIED_HAY_BALE = "TIGHTLY_TIED_HAY_BALE".toInternalName()
 
         fun String.toInternalName(): NeuInternalName = uppercase().replace(" ", "_").let {
-            if (it.contains("§")) {
+            if (it.contains("§") || it.contains("&")) {
                 ErrorManager.skyHanniError(
                     "Internal name found with color codes",
                     "Internal Name" to it, "Original String" to this
