@@ -12,9 +12,11 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.leftAndRight
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
+import kotlin.reflect.KMutableProperty0
 
 private typealias Direction = Renderable.Companion.Direction
 
+@Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
     /** Calculates the absolute x position of the columns in a table*/
@@ -129,6 +131,18 @@ internal object RenderableUtils {
         )
     }
 
+    inline fun MutableList<Searchable>.addButton(
+        label: String,
+        enabled: String,
+        disabled: String,
+        config: KMutableProperty0<Boolean>,
+        crossinline onChange: () -> Unit,
+        enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
+    ) {
+        add(createBooleanButton(label, enabled, disabled, config, onChange, enableUniverseScroll, scrollValue))
+    }
+
     inline fun <T> MutableList<Searchable>.addButton(
         label: String,
         current: T,
@@ -147,6 +161,44 @@ internal object RenderableUtils {
                 enableUniverseScroll,
             ),
         )
+    }
+
+    inline fun MutableList<Renderable>.addRenderableButton(
+        label: String,
+        enabled: String,
+        disabled: String,
+        config: KMutableProperty0<Boolean>,
+        crossinline onChange: () -> Unit,
+        enableUniverseScroll: Boolean = true,
+        scrollValue: ScrollValue = ScrollValue(),
+    ) {
+        add(createBooleanButton(label, enabled, disabled, config, onChange, enableUniverseScroll, scrollValue).renderable)
+    }
+
+    private inline fun createBooleanButton(
+        label: String,
+        enabled: String,
+        disabled: String,
+        config: KMutableProperty0<Boolean>,
+        crossinline onChange: () -> Unit,
+        enableUniverseScroll: Boolean,
+        scrollValue: ScrollValue,
+    ): Searchable {
+
+        val current = config.get()
+        val element = createButtonNew(
+            label,
+            current = if (current) enabled else disabled,
+            getName = { it ?: error("it is null in non-nullable getName()") },
+            onChange = {
+                config.set(!current)
+                onChange()
+            },
+            universe = listOf(enabled, disabled),
+            enableUniverseScroll,
+            scrollValue,
+        )
+        return element
     }
 
     inline fun <reified T : Enum<T>> MutableList<Renderable>.addRenderableButton(
@@ -194,7 +246,7 @@ internal object RenderableUtils {
         return get(newIndex)
     }
 
-    inline fun <T> createButtonNew(
+    private inline fun <T> createButtonNew(
         label: String,
         current: T?,
         crossinline getName: (T?) -> String,

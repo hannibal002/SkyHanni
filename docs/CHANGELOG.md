@@ -59,6 +59,8 @@
     + Shows a line to your spawned Jerry from Jerrypocalypse.
 + Added Player Highlighter for Century Party Invitation item. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3360)
     + Highlights players eligible for a Century Party invitation.
++ Added Fishy Treat Profit Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3422)
+    + Shows what item to purchase with your hard-earned Fishy Treat.
 
 #### Dungeon
 
@@ -77,6 +79,9 @@
     + Displays current buffed region and duration until next change.
 + Added option to display Skyblock XP on the Minecraft XP bar. - j10a1n1 (https://github.com/hannibal002/SkyHanni/pull/2886)
 + Added SkyBlock Level to Custom Scoreboard. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/2895)
++ Added NEU-Souls Pathfinder. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3350)
+    + When using `/neusouls`, displays a pathfinding line to the nearest missing Fairy Soul.
+    + Shows the progress of Souls found of the current island in chat.
 
 ### Improvements
 
@@ -143,6 +148,7 @@
     + Coins Per Hour and Time until Max reset if no coin is gained within 2 minutes (will show "RESET").
 + Updated UI buttons to display all variants on hover, with scroll and back options. - hannibal2 + Daveed (https://github.com/hannibal002/SkyHanni/pull/3345)
 + Re-added text for refunded coins in the Bazaar "Cancelled Buy Order Clipboard" feature. - MTOnline (https://github.com/hannibal002/SkyHanni/pull/3406)
++ Improved overall performance slightly. - Empa, Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3417)
 
 ### Bug Fixes
 
@@ -155,6 +161,8 @@
 + Fixed Rift Blood Effigies detection. - Luna (https://github.com/hannibal002/SkyHanni/pull/3179)
 + Fixed Rift Dance Room Helper always hiding players. - CalMWolfs (https://github.com/hannibal002/SkyHanni/pull/3244)
 + Fixed Motes per Session when leaving Hypixel. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3374)
++ Fixed "Hide Other Players" in Dance Room Helper not working when the helper is disabled. - Luna (https://github.com/hannibal002/SkyHanni/pull/3413)
++ Fixed players and some mobs being hidden outside the Mirrorverse when "Hide Other Players" is enabled in Dance Room Helper. - Luna (https://github.com/hannibal002/SkyHanni/pull/3413)
 
 #### Chocolate Factory Bug Fixes
 
@@ -209,6 +217,7 @@
 + Fixed Harp GUI scale not resetting after being kicked to Limbo. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3383)
 + Fixed page scrolling with inverted bypass. - Cédric Ab (https://github.com/hannibal002/SkyHanni/pull/3206)
 + Fixed statspocalypse not affecting SkyHanni User Luck. - nopo (https://github.com/hannibal002/SkyHanni/pull/3399)
++ Fixed ChestValue not showing when using different Minecraft languages. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3418)
 
 #### Custom Scoreboard Bug Fixes
 
@@ -248,6 +257,7 @@
 + Fixed 'Buy 10 levels' text for fewer levels remaining in HOTM menu. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3237)
 + Fixed King's Scent detection for Non-God Pot display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3298)
 + Fixed minor error in line drawing for Golden Goblin Highlight while sneaking. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3364)
++ Fixed HotM menu opening causing false Powder Tracker updates. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3421)
 
 #### Chat Bug Fixes
 
@@ -376,6 +386,12 @@
 + Added partial match logic to debug command `/shtestitem`. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3389)
 + Changed `PowderGainEvent` to `PowderEvent` with Gain/Spent inherited events. - Empa (https://github.com/hannibal002/SkyHanni/pull/2839)
 + Moved IslandType data to the repo. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3035)
++ Added `CheckRenderEntityEvent` caching. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3414)
++ Added support for buttons in renderable/searchable lists via boolean config. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3407)
++ Changed event preconditions to be cached per tick and checked only when necessary. - Empa, ThatGravyBoat (https://github.com/hannibal002/SkyHanni/pull/3417)
++ Fixed IDE error for 2024.3. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3379)
++ Reordered internal storage. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3416)
++ Reverted the GSON bumps. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3402)
 
 ## Version 1.0.0
 
