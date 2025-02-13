@@ -2,9 +2,13 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledApiJson
+import at.hannibal2.skyhanni.data.jsonobjects.repo.EnchantedClockJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
+import at.hannibal2.skyhanni.features.misc.EnchantedClockHelper.BoostType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
@@ -161,9 +165,17 @@ object ItemPriceUtils {
         return -1L
     }
 
+    private var disabledApiJson: DisabledApiJson? = null
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        disabledApiJson = event.getConstant<DisabledApiJson>("misc/DisabledApi")
+    }
+
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (PlatformUtils.isNeuLoaded()) return
+        if (disabledApiJson?.disabledMoulberryLowestBin == true) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 

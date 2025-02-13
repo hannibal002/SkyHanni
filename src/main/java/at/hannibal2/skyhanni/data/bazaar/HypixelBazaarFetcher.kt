@@ -3,7 +3,9 @@ package at.hannibal2.skyhanni.data.bazaar
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledApiJson
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarData
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -53,9 +55,17 @@ object HypixelBazaarFetcher {
         }
     }
 
+    private var disabledApiJson: DisabledApiJson? = null
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        disabledApiJson = event.getConstant<DisabledApiJson>("misc/DisabledApi")
+    }
+
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!canFetch()) return
+        if (disabledApiJson?.disabledBazaar == true) return
         SkyHanniMod.coroutineScope.launch {
             fetchAndProcessBazaarData()
         }
