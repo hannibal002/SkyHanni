@@ -111,6 +111,7 @@ object IslandGraphs {
     private var color = Color.WHITE
     private var shouldAllowRerouting = false
     private var onFound: () -> Unit = {}
+    private var onManualCancel: () -> Unit = {}
     private var goal: GraphNode? = null
         set(value) {
             prevGoal = field
@@ -385,12 +386,13 @@ object IslandGraphs {
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
         allowRerouting: Boolean = false,
+        onManualCancel: () -> Unit = {},
         condition: () -> Boolean,
     ) {
         reset()
         currentTargetNode = this
         shouldAllowRerouting = allowRerouting
-        pathFind0(location = position, label, color, onFound, condition)
+        pathFind0(location = position, label, color, onFound, onManualCancel, condition)
     }
 
     /**
@@ -407,12 +409,13 @@ object IslandGraphs {
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
+        onManualCancel: () -> Unit = {},
         condition: () -> Boolean,
     ) {
         require(label.isNotEmpty()) { "Label cannot be empty." }
         reset()
         shouldAllowRerouting = false
-        pathFind0(location, label, color, onFound, condition)
+        pathFind0(location, label, color, onFound, onManualCancel, condition)
     }
 
     private fun pathFind0(
@@ -420,12 +423,14 @@ object IslandGraphs {
         label: String,
         color: Color = LorenzColor.WHITE.toColor(),
         onFound: () -> Unit = {},
+        onManualCancel: () -> Unit = {},
         condition: () -> Boolean,
     ) {
         currentTarget = location
         this.label = label
         this.color = color
         this.onFound = onFound
+        this.onManualCancel = onManualCancel
         this.condition = condition
         val graph = currentIslandGraph ?: return
         goal = graph.minBy { it.position.distance(currentTarget!!) }
@@ -462,6 +467,7 @@ object IslandGraphs {
         componentText.onClick(
             onClick = {
                 stop()
+                onManualCancel()
                 "§e[SkyHanni] Navigation stopped!".asComponent().send(pathFindMessageId)
             },
         )
