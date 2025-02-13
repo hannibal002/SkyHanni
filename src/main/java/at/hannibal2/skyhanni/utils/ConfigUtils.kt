@@ -84,7 +84,7 @@ object ConfigUtils {
     fun KMutableProperty0<*>.jumpToEditor() {
         if (tryJumpToEditor(ConfigGuiManager.getEditorInstance())) return
 
-        ErrorManager.crashInDevEnv("Can not open the config")
+        ErrorManager.crashInDevEnv("Can not open config $name")
         ErrorManager.logErrorStateWithData(
             "Can not open the config",
             "error while trying to jump to an editor element",
