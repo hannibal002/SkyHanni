@@ -24,12 +24,12 @@ class YearOfTheSealConfig {
     var fishyTreatProfitPosition: Position = Position(170, 150)
 
     @Expose
-    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown (Only works on normal ones, not giant).")
+    @ConfigOption(name = "Bouncy Ball Line", desc = "Shows a line for your bouncy balls thrown.")
     @ConfigEditorBoolean
-    var bouncyBallLine: Property<Boolean> = Property.of(true);
+    var bouncyBallLine: Property<Boolean> = Property.of(true)
 
     @Expose
     @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
     @ConfigEditorColour
-    var bouncyBallLineColor: String = "0:245:85:255:85";
+    var bouncyBallLineColor: String = "0:245:85:255:85"
 }
