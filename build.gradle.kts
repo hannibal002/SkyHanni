@@ -160,7 +160,7 @@ dependencies {
 
     headlessLwjgl(libs.headlessLwjgl)
 
-    compileOnly(ksp(project(":annotation-processors"))!!)
+    ksp(project(":annotation-processors"))?.let { compileOnly(it) }
 
     val mixinVersion = if (target.minecraftVersion >= MinecraftVersion.MC11200) "0.8.2" else "0.7.11-SNAPSHOT"
 
@@ -216,7 +216,6 @@ dependencies {
         compileOnly(libs.hypixelmodapi)
         shadowImpl(libs.hypixelmodapitweaker)
     }
-
 
     // getting clock offset
     shadowImpl("commons-net:commons-net:3.11.1")

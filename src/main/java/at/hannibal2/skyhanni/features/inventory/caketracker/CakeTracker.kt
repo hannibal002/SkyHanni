@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils.addString
 import at.hannibal2.skyhanni.utils.ConditionalUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -37,6 +36,7 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
 import java.awt.Color
@@ -345,60 +345,6 @@ object CakeTracker {
         }
     }
 
-    private fun setDisplayType(type: DisplayType) {
-        config.displayType = type
-        lastKnownCakeDataHash = 0
-    }
-
-    // TODO use addRenderableButton and add function that expects a boolean
-    private fun buildDisplayTypeToggle(): Renderable = Renderable.line {
-        val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
-        val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
-
-        add(
-            Renderable.optionalLink(
-                "$ownedColor[Owned]",
-                { setDisplayType(DisplayType.OWNED_CAKES) },
-                condition = { config.displayType != DisplayType.OWNED_CAKES },
-            ),
-        )
-        addString(" ")
-        add(
-            Renderable.optionalLink(
-                "$missingColor[Missing]",
-                { setDisplayType(DisplayType.MISSING_CAKES) },
-                condition = { config.displayType != DisplayType.MISSING_CAKES },
-            ),
-        )
-    }
-
-    private fun setDisplayOrderType(type: DisplayOrder) {
-        config.displayOrderType = type
-        lastKnownCakeDataHash = 0
-    }
-
-    // TODO use addRenderableButton and add function that expects a boolean
-    private fun buildOrderTypeToggle(): Renderable = Renderable.line {
-        val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
-        val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"
-
-        add(
-            Renderable.optionalLink(
-                "$newestColor[Newest First]",
-                { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
-                condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
-            ),
-        )
-        addString(" ")
-        add(
-            Renderable.optionalLink(
-                "$oldestColor[Oldest First]",
-                { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
-                condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
-            ),
-        )
-    }
-
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
         val dataHash = data.hashCode()
         if (dataHash != lastKnownCakeDataHash) {
@@ -426,8 +372,23 @@ object CakeTracker {
 
     private fun buildCakeRenderables(data: CakeData) = buildList {
         add(Renderable.hoverTips("§c§lNew §f§lYear §c§lCake §f§lTracker", getHeaderTips(data)))
-        add(buildDisplayTypeToggle())
-        add(buildOrderTypeToggle())
+
+        addRenderableButton<DisplayType>(
+            label = "Show",
+            current = config.displayType,
+            onChange = {
+                config.displayType = it
+                lastKnownCakeDataHash = 0
+            },
+        )
+        addRenderableButton<DisplayOrder>(
+            label = "Order",
+            current = config.displayOrderType,
+            onChange = {
+                config.displayOrderType = it
+                lastKnownCakeDataHash = 0
+            },
+        )
 
         val cakeList = when (config.displayType) {
             DisplayType.OWNED_CAKES -> data.ownedCakes
