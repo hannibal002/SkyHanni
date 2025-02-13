@@ -4,8 +4,11 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.CollectionApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
+import at.hannibal2.skyhanni.events.dungeon.DungeonCompleteEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.features.dungeon.DungeonFloor
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -32,6 +35,8 @@ object CollectionTracker {
     private var display = emptyList<List<Any>>()
 
     private var itemName = ""
+    private var isDungeonBoss = false
+    private var dungeonFloor: DungeonFloor? = null
     private var internalName: NeuInternalName? = null
     private var itemAmount = -1L
     private var goalAmount = -1L
@@ -84,16 +89,22 @@ object CollectionTracker {
 
         val foundInternalName = NeuInternalName.fromItemNameOrNull(rawName)
         if (foundInternalName == null) {
-            ChatUtils.userError("Item '$rawName' does not exist!")
-            return
-        }
 
-        val stack = foundInternalName.getItemStackOrNull()
-        if (stack == null) {
-            ChatUtils.userError("Item '$rawName' does not exist!")
-            return
+            val possibleDungeonBossMatches = DungeonFloor.entries.filter { it.bossName.lowercase().contains(rawName) }
+
+            if (possibleDungeonBossMatches.isEmpty() || possibleDungeonBossMatches.size > 1) {
+                ChatUtils.userError("Item / Dungeon Boss '$rawName' does not exist!")
+                return
+            }
+            setNewDungeonBossCollection(possibleDungeonBossMatches.first())
+        } else {
+            val stack = foundInternalName.getItemStackOrNull()
+            if (stack == null) {
+                ChatUtils.userError("Item / Dungeon Boss '$rawName' does not exist!")
+                return
+            }
+            setNewCollection(foundInternalName, stack.name.removeColor())
         }
-        setNewCollection(foundInternalName, stack.name.removeColor())
     }
 
     private fun fixTypo(rawName: String) = when (rawName) {
@@ -123,16 +134,34 @@ object CollectionTracker {
     private fun setNewCollection(internalName: NeuInternalName, name: String) {
         val foundAmount = CollectionApi.getCollectionCounter(internalName)
         if (foundAmount == null) {
-            ChatUtils.userError("$name collection not found. Try to open the collection inventory!")
+            ChatUtils.userError("$name boss collection not found. Try to open the collection inventory!")
             return
         }
         this.internalName = internalName
         itemName = name
         itemAmount = foundAmount
+        isDungeonBoss = false
+        dungeonFloor = null
 
         lastAmountInInventory = countCurrentlyInInventory()
-        updateDisplay()
         ChatUtils.chat("Started tracking $itemName §ecollection.")
+        updateDisplay()
+    }
+
+    private fun setNewDungeonBossCollection(floor: DungeonFloor) {
+        val foundAmount = ProfileStorageData.profileSpecific?.dungeons?.bosses[floor]
+        if (foundAmount == null) {
+            ChatUtils.userError("${floor.bossName} collection not found. Try to open the collection inventory!")
+            return
+        }
+        this.internalName = floor.bossName.toInternalName()
+        itemName = floor.bossName
+        itemAmount = foundAmount.toLong()
+        isDungeonBoss = true
+        dungeonFloor = floor
+
+        ChatUtils.chat("Started tracking $itemName §ecollection.")
+        updateDisplay()
     }
 
     private fun resetData() {
@@ -165,8 +194,10 @@ object CollectionTracker {
 
         display = Collections.singletonList(
             buildList {
-                internalName?.let {
-                    add(it.getItemStack())
+                if (!isDungeonBoss) {
+                    internalName?.let {
+                        add(it.getItemStack())
+                    }
                 }
                 add("$itemName collection: §e$format$goal $gainText")
             }
@@ -174,6 +205,8 @@ object CollectionTracker {
     }
 
     private fun countCurrentlyInInventory(): Int = InventoryUtils.countItemsInLowerInventory {
+        if (isDungeonBoss) return@countItemsInLowerInventory false
+
         val name = it.getInternalName()
         if (internalName == CACTUS && name == CACTUS_GREEN) {
             return@countItemsInLowerInventory true
@@ -194,11 +227,24 @@ object CollectionTracker {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        if (isDungeonBoss) return
+
         val thePlayer = Minecraft.getMinecraft().thePlayer ?: return
         thePlayer.worldObj ?: return
 
         compareInventory()
         updateGain()
+    }
+
+    @HandleEvent
+    fun onDungeonComplete(event: DungeonCompleteEvent) {
+        if (isDungeonBoss) {
+            val foundAmount = ProfileStorageData.profileSpecific?.dungeons?.bosses[dungeonFloor]
+            if (foundAmount != null) {
+                itemAmount = foundAmount.toLong()
+                updateDisplay()
+            }
+        }
     }
 
     private fun compareInventory() {
