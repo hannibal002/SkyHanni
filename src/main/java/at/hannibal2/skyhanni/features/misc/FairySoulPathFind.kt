@@ -29,6 +29,7 @@ object FairySoulPathFind {
     }
 
     var missing = setOf<LorenzVec>()
+    var lastMissing: Int? = null
 
     @JvmStatic
     fun updateList(
@@ -41,6 +42,10 @@ object FairySoulPathFind {
         val graph = IslandGraphs.currentIslandGraph ?: return
         if (lastRender.passedSince() > 300.milliseconds) return
         if (!config.neuSoulsPathFind) return
+        if (config.neuSoulsPathFindBetter) {
+            tryRunBetter()
+            return
+        }
 
         val souls = mutableMapOf<LorenzVec, GraphNode>()
 
@@ -69,6 +74,13 @@ object FairySoulPathFind {
             LorenzColor.DARK_PURPLE.toColor(),
             condition = { config.neuSoulsPathFind && lastRender.passedSince() < 300.milliseconds },
         )
+    }
+
+    private fun tryRunBetter() {
+        if (lastMissing != missing.size) {
+            lastMissing = missing.size
+            testCoolNewPath()
+        }
     }
 
     // Step 1: Preload the 50×50 Distance Matrix
@@ -160,7 +172,8 @@ object FairySoulPathFind {
         return route
     }
 
-    fun testCoolNewPath() {
+    // TODO cache
+    private fun testCoolNewPath() {
         val allNodes = IslandGraphs.currentIslandGraph ?: return
 
         // 1. Retrieve target nodes.
@@ -203,13 +216,6 @@ object FairySoulPathFind {
         }
         println("adjustRouteForCurrentLocation took $adjustRouteTime ms.")
 
-        // 6. Compute a path from the player's current location to the first node of the adjusted route.
-//         var pathToStart: List<LorenzVec>
-//         val pathToStartTime = measureTimeMillis {
-//             pathToStart = getPathFromCurrentLocation(currentPosition, adjustedRoute.first())
-//         }
-//         println("getPathFromCurrentLocation took $pathToStartTime ms.")
-
         pathTo(adjustedRoute.map { it.position }, 0)
     }
 
@@ -220,6 +226,7 @@ object FairySoulPathFind {
             return
         }
         val lorenzVec = adjustedRoute[index]
+        // TODO only start path once the fairy soul is clicked
         IslandGraphs.pathFind(
             lorenzVec,
             "${index + 1}/$totalSize",
@@ -230,6 +237,7 @@ object FairySoulPathFind {
         )
     }
 
+    // TODO write villager hub feature later, fix duplicate andrew
 //     val hubVillagers = setOf(
 //         "Andrew", "Duke", "Felix", "Jack", "Jamie", "Leo",
 //         "Liam", "Lynn", "Ryu", "Stella", "Tom", "Vex",
