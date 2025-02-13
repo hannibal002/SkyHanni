@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -67,7 +69,7 @@ object ErrorManager {
     // Extra data from last thrown error
     private var cachedExtraData: String? = null
 
-    // throw a error, best to not use it if not absolutely necessary
+    // throw an error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
@@ -93,6 +95,11 @@ object ErrorManager {
                 "$name copied into the clipboard, please report it on the SkyHanni discord!"
             } ?: "Error id not found!",
         )
+    }
+
+    inline fun crashInDevEnv(reason: String, t: (String) -> Throwable = { RuntimeException(it) }) {
+        if (!PlatformUtils.isDevEnvironment) return
+        Minecraft.getMinecraft().crashed(CrashReport("SkyHanni - $reason", t(reason)))
     }
 
     // just log for debug cases
