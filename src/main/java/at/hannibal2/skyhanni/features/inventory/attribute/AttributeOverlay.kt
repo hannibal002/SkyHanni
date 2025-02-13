@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.events.GuiRenderItemEvent
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.getAttributesLevels
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.getRollType
-import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.isGoodRoll
 import at.hannibal2.skyhanni.features.inventory.attribute.AttributeApi.isPartialRoll
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
