@@ -63,6 +63,7 @@ object ErrorManager {
     fun resetCache() {
         cache.clear()
     }
+
     // Extra data from last thrown error
     private var cachedExtraData: String? = null
 
@@ -104,7 +105,9 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
-        cachedExtraData = null
+        if (extraData.isNotEmpty()) {
+            cachedExtraData = null
+        }
         logError(
             IllegalStateException(internalMessage),
             userMessage,
