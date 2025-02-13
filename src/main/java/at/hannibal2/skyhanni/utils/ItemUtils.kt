@@ -774,4 +774,9 @@ object ItemUtils {
         getTagList(key, Constants.NBT.TAG_COMPOUND).let { loreList ->
             List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
         }
+
+    fun NeuInternalName.getNumberedName(amount: Number): String {
+        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
+        return "$prefix§r$itemName"
+    }
 }

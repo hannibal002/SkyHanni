@@ -35,7 +35,6 @@ object PesthunterProfit {
         " ",
     )
     private var display = emptyList<Renderable>()
-    private val tradeProfits = mutableListOf<Double>()
     private var inInventory = false
 
     /**
@@ -52,7 +51,6 @@ object PesthunterProfit {
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         inInventory = false
-        tradeProfits.clear()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
