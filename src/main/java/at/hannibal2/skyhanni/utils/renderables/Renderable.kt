@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.CollectionUtils.firstTwiceOf
+import at.hannibal2.skyhanni.utils.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -27,7 +29,9 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableX
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableY
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
@@ -1185,15 +1189,125 @@ interface Renderable {
             }
         }
 
-        private fun filterList(content: Map<Renderable, String?>, textBox: String): Set<Renderable> {
-            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) ?: true }
+        private fun filterList(content: Map<Renderable, String?>, textBox: String) =
+            filterListBase(content, textBox, string("§cNo search results!"))
+
+        private fun filterListMap(content: Map<List<Renderable>, String?>, textBox: String) =
+            filterListBase(content, textBox, singeltonString("§cNo search results!"))
+
+        private fun <T> filterListBase(content: Map<T, String?>, textBox: String, empty: T): Set<T> {
+            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) != false }
             val set = map.keys.toMutableSet()
             if (map.filter { it.value != null }.isEmpty()) {
                 if (textBox.isNotEmpty()) {
-                    set.add(string("§cNo search results!"))
+                    set.add(empty)
                 }
             }
             return set
+        }
+
+        fun searchableScrollTable(
+            content: Map<List<Renderable>, String?>,
+            height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
+            velocity: Double = 2.0,
+            button: Int? = null,
+            textInput: TextInput,
+            key: Int,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            header: List<Renderable> = emptyList(),
+            bypassChecks: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            private var list = filterListMap(content, textInput.textBox).toList()
+
+            private val fullContent = if (header.isNotEmpty()) listOf(header) + content.keys else content.keys
+
+            val xOffsets = calculateTableX(fullContent, xPadding)
+            val yOffsets = calculateTableY(fullContent, yPadding)
+
+            override val width = xOffsets.sum()
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val virtualHeight get() = list.sumOf { yOffsets[it] ?: 0 }
+
+            private val end get() = scroll.asInt() + height - yPadding - 1
+
+            private var scroll = createScroll()
+
+            private fun createScroll() = ScrollInput.Companion.Vertical(
+                scrollValue,
+                yOffsets[header] ?: 0,
+                virtualHeight - height,
+                velocity,
+                button,
+            )
+
+            init {
+                textInput.registerToEvent(key) {
+                    // null = ignored, never filtered
+                    list = filterListMap(content, textInput.textBox).toList()
+                    scroll = createScroll()
+                }
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                scroll.update(
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                )
+
+                var renderY = 0
+                if (header.isNotEmpty()) {
+                    var offset = 0
+                    for ((index, renderable) in header.withIndex()) {
+                        renderable.renderXYAligned(
+                            posX + offset,
+                            posY,
+                            xOffsets[index],
+                            yOffsets[header] ?: 0,
+                        )
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        offset += xOffsets[index]
+                    }
+                    GlStateManager.translate(-offset.toFloat(), 0f, 0f)
+                    val yShift = yOffsets[header] ?: 0
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+
+                val sequence = list.asSequence().withIndex()
+                val folded = sequence.runningIndexedFold(0) { r, it -> r + (yOffsets[it] ?: 0) }
+                val pair = folded
+                    .firstTwiceOf({ it.value >= scroll.asInt() }, { it.value >= end })
+
+                val range = pair
+                    .let { (start, end) -> (start?.index ?: 0)..(end?.index?.minus(1) ?: list.lastIndex) }
+
+                for (rowIndex in range) {
+                    val row = list[rowIndex]
+                    var offset = 0
+                    val yShift = yOffsets[row] ?: 0
+                    for ((index, renderable) in row.withIndex()) {
+                        renderable.renderXYAligned(
+                            posX + offset,
+                            posY + renderY,
+                            xOffsets[index],
+                            yShift,
+                        )
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        offset += xOffsets[index]
+                    }
+                    GlStateManager.translate(-offset.toFloat(), 0f, 0f)
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+            }
         }
 
         fun scrollTable(
