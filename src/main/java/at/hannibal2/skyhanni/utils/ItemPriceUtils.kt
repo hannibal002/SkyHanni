@@ -149,7 +149,6 @@ object ItemPriceUtils {
             } else {
                 NeuInternalName.fromItemNameOrNull(name)
             }
-
         }
     }
 
