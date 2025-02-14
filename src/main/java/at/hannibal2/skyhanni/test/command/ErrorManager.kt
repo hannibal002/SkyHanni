@@ -196,7 +196,7 @@ object ErrorManager {
                 return it
             }
         }
-        return buildExtraDataString(extraData) ?: ""
+        return buildExtraDataString(extraData).orEmpty()
     }
 
     private fun buildFinalMessage(message: String): String? {
