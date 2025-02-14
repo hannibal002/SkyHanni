@@ -1,9 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
-import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DropDetails
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerDropsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
@@ -14,7 +12,6 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
-import at.hannibal2.skyhanni.utils.StringUtils.removeWordsAtEnd
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
@@ -24,7 +21,7 @@ object DropChances {
 
     private val patternGroup = RepoPattern.group("slayer.drop")
 
-    private var storage: ProfileSpecificStorage.SlayerRngMeterStorage? = null
+    private val storage get() = ProfileStorageData.profileSpecific?.slayerRngMeter
 
     /**
      * REGEX-TEST: §r§c§lINSANE DROP! §r§7(§r§5Ender Slayer VII§r§7) §r§b(+210% §r§b✯ Magic Find§r§b)§r
@@ -88,8 +85,6 @@ object DropChances {
             crazyRareDropPattern
         )) {
             pattern.matchMatcher(e.message) {
-                storage = getStorage()
-
                 var itemName: String = group("itemName")
                 if (reg.find(itemName) != null) {
                     val (amm, cleanName) = reg.find(itemName)!!.destructured
@@ -114,10 +109,14 @@ object DropChances {
         val totalWeight = getTotalWeight(dropsJson, magicFind) ?: return null
         ChatUtils.chat("Total weight: $totalWeight")
 
+        if (storage == null) return null
+
         var selectedDropWeight = 0L
-        selectedDropWeight = if (internalName == NeuInternalName.fromItemNameOrNull(storage!!.itemGoal)) {
+        @Suppress("MaxLineLength")
+        selectedDropWeight = if (internalName == NeuInternalName.fromItemNameOrNull(storage!!.entries.elementAtOrNull(1)?.value?.itemGoal!!)) {
             getModifiedWeight(getRngMeterModifier(dropsJson.drops)!!.toInt(), magicFind)
         } else {
+            @Suppress("MaxLineLength")
             getModifiedWeight(getDropDetails(dropsJson.drops, internalName)!!.weight, magicFind)
         }
         ChatUtils.chat("Selected drop weight: $selectedDropWeight")
@@ -129,7 +128,7 @@ object DropChances {
         var totalWeight = 10000L
         if (storage == null) ChatUtils.chat("Storage not found.")
 
-        val selectedDrop = NeuInternalName.fromItemNameOrNull(storage!!.itemGoal) ?: return null
+        val selectedDrop = NeuInternalName.fromItemNameOrNull(storage!!.entries.elementAtOrNull(1)?.value?.itemGoal!!) ?: return null
 
         for (drop in dropsJson.drops["main_table"]?.values!!) {
             for ((dropKey, dropDetails) in drop.entries) {
@@ -188,12 +187,9 @@ object DropChances {
     }
 
     private fun getRngMeterModifier(drops: Map<String, Map<String, Map<String, DropDetails>>>): Long? {
-        val storage = getStorage() ?: return null
-        ChatUtils.chat("Storage found.")
-
-        val selectedDrop = NeuInternalName.fromItemNameOrNull(storage.itemGoal) ?: return null
+        val selectedDrop = NeuInternalName.fromItemNameOrNull(storage!!.entries.elementAtOrNull(1)?.value?.itemGoal!!) ?: return null
         ChatUtils.chat("Selected drop: $selectedDrop")
-        val currentXp = storage.currentMeter
+        val currentXp = storage!!.entries.elementAtOrNull(1)?.value?.currentMeter!!
         ChatUtils.chat("Current xp: $currentXp")
 
         val dropDetails = getDropDetails(drops, selectedDrop) ?: return null
@@ -220,12 +216,4 @@ object DropChances {
         }
         return null
     }
-
-    private fun getStorage(): ProfileSpecificStorage.SlayerRngMeterStorage? {
-        return ProfileStorageData.profileSpecific?.slayerRngMeter?.getOrPut(getCurrentSlayer()) {
-            ProfileSpecificStorage.SlayerRngMeterStorage()
-        }
-    }
-
-    private fun getCurrentSlayer() = SlayerApi.latestSlayerCategory.removeWordsAtEnd(1).removeColor()
 }
