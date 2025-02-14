@@ -25,7 +25,8 @@ object NeuEventWrappers {
                 HypixelApiTrophyFish::class.java,
                 object : TypeAdapter<HypixelApiTrophyFish>() {
                     @Suppress("EmptyFunctionBlock")
-                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {}
+                    override fun write(out: JsonWriter, value: HypixelApiTrophyFish) {
+                    }
 
                     override fun read(reader: JsonReader): HypixelApiTrophyFish {
                         val trophyFish = mutableMapOf<String, Int>()
@@ -53,7 +54,6 @@ object NeuEventWrappers {
             )
             .create()
     }
-
 
     @SubscribeEvent
     fun onProfileDataLoaded(event: ProfileDataLoadedEvent) {

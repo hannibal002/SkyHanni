@@ -11,7 +11,6 @@
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x, y, z)</ID>
     <ID>ArrayPrimitive:LorenzVec.kt$LorenzVec$arrayOf(x.toFloat(), y.toFloat(), z.toFloat())</ID>
     <ID>CyclomaticComplexMethod:AdvancedPlayerList.kt$AdvancedPlayerList$fun newSorting(original: List&lt;String&gt;): List&lt;String&gt;</ID>
-    <ID>CyclomaticComplexMethod:BitsApi.kt$BitsApi$@HandleEvent fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent)</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun calculateMoneyPerHour(debugList: MutableList&lt;List&lt;Any&gt;&gt;): Map&lt;NeuInternalName, Array&lt;Double&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>CyclomaticComplexMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
@@ -38,7 +37,6 @@
     <ID>InjectDispatcher:ElectionApi.kt$ElectionApi$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
-    <ID>LongMethod:BitsApi.kt$BitsApi$@HandleEvent fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent)</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
@@ -69,9 +67,7 @@
     <ID>NoNameShadowing:ContributorManager.kt$ContributorManager${ it.isAllowed() }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Name").value(it) }</ID>
     <ID>NoNameShadowing:Graph.kt$Graph.Companion${ out.name("Tags") out.beginArray() for (tagName in it) { out.value(tagName) } out.endArray() }</ID>
-    <ID>NoNameShadowing:GraphEditorBugFinder.kt$GraphEditorBugFinder${ it.position.distanceSqToPlayer() }</ID>
     <ID>NoNameShadowing:HoppityCollectionStats.kt$HoppityCollectionStats${ val displayAmount = it.amount.shortFormat() val operationFormat = when (milestoneType) { HoppityEggType.CHOCOLATE_SHOP_MILESTONE -&gt; "spending" HoppityEggType.CHOCOLATE_FACTORY_MILESTONE -&gt; "reaching" else -&gt; "" // Never happens } // List indexing is weird existingLore[replaceIndex - 1] = "§7Obtained by $operationFormat §6$displayAmount" existingLore[replaceIndex] = "§7all-time §6Chocolate." return existingLore }</ID>
-    <ID>NoNameShadowing:HotmData.kt$HotmData.Companion${ it.setCurrent(it.getTotal()) }</ID>
     <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$pitch</ID>
     <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$yaw</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posX</ID>
@@ -82,7 +78,6 @@
     <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
     <ID>NoNameShadowing:RepoPatternManager.kt$RepoPatternManager${ it == '.' }</ID>
     <ID>NoNameShadowing:Shimmy.kt$Shimmy.Companion$source</ID>
-    <ID>NoNameShadowing:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker${ ItemPriceSource.entries[it.ordinal] }</ID>
     <ID>RepoPatternRegexTestMissing:AshfangFreezeCooldown.kt$AshfangFreezeCooldown$by RepoPattern.pattern( "ashfang.freeze.cryogenic", "§cAshfang Follower's Cryogenic Blast hit you for .* damage!", )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "auction", "§7(?:Starting bid|Top bid): §6(?&lt;coins&gt;.*) coins" )</ID>
     <ID>RepoPatternRegexTestMissing:AuctionsHighlighter.kt$AuctionsHighlighter$by patternGroup.pattern( "buyitnow", "§7Buy it now: §6(?&lt;coins&gt;.*) coins" )</ID>
@@ -165,7 +160,6 @@
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "bingogoalrank", "(?:§.)*You were the (?:§.)*(?&lt;rank&gt;\\w+)(?&lt;ordinal&gt;st|nd|rd|th) (?:§.)*to", )</ID>
     <ID>RepoPatternRegexTestMissing:ItemDisplayOverlayFeatures.kt$ItemDisplayOverlayFeatures$by patternGroup.pattern( "harvest", "§7§7You may harvest §6(?&lt;amount&gt;.).*", )</ID>
     <ID>RepoPatternRegexTestMissing:JacobFarmingContestsInventory.kt$JacobFarmingContestsInventory$by RepoPattern.pattern( "garden.jacob.contests.inventory.medal", "§7§7You placed in the (?&lt;medal&gt;.*) §7bracket!" )</ID>
-    <ID>RepoPatternRegexTestMissing:KloonHacking.kt$KloonHacking$by RepoPattern.pattern( "rift.area.westvillage.kloon.color", "You've set the color of this terminal to (?&lt;color&gt;.*)!" )</ID>
     <ID>RepoPatternRegexTestMissing:KuudraApi.kt$KuudraApi$by patternGroup.pattern( "chat.complete", "§.\\s*(?:§.)*KUUDRA DOWN!", )</ID>
     <ID>RepoPatternRegexTestMissing:MaxPurseItems.kt$MaxPurseItems$by patternGroup.pattern( "instant", ".*Price per unit: §6(?&lt;coins&gt;[\\d.,]+) coins.*", )</ID>
     <ID>RepoPatternRegexTestMissing:MaxPurseItems.kt$MaxPurseItems$by patternGroup.pattern( "order", ".*§6(?&lt;coins&gt;[\\d.,]+) coins §7each.*", )</ID>
@@ -189,7 +183,6 @@
     <ID>RepoPatternRegexTestMissing:MythologicalCreatureTracker.kt$MythologicalCreatureTracker$by patternGroup.pattern( "siameselynxes", ".* §r§eYou dug out §r§2Siamese Lynxes§r§e!", )</ID>
     <ID>RepoPatternRegexTestMissing:NewYearCakeReminder.kt$NewYearCakeReminder$by RepoPattern.pattern( "event.winter.newyearcake.reminder.sidebar", "§dNew Year Event!§f (?&lt;time&gt;.*)", )</ID>
     <ID>RepoPatternRegexTestMissing:NonGodPotEffectDisplay.kt$NonGodPotEffectDisplay$by RepoPattern.pattern( "misc.nongodpot.effects", "§7You have §e(?&lt;name&gt;\\d+) §7non-god effects\\.", )</ID>
-    <ID>RepoPatternRegexTestMissing:NpcVisitorFix.kt$NpcVisitorFix$by RepoPattern.pattern( "garden.barn.skin.change", "§aChanging Barn skin to §r.*" )</ID>
     <ID>RepoPatternRegexTestMissing:PartyApi.kt$PartyApi$by patternGroup.pattern( "kuudrafinder.join", "§dParty Finder §f&gt; (?&lt;name&gt;.*?) §ejoined the group! \\(§[a-fA-F0-9]+Combat Level \\d+§e\\)", )</ID>
     <ID>RepoPatternRegexTestMissing:PestApi.kt$PestApi$by patternGroup.pattern( "inventory", "§4§lൠ §cThis plot has §6(?&lt;amount&gt;\\d) Pests?§c!", )</ID>
     <ID>RepoPatternRegexTestMissing:PestApi.kt$PestApi$by patternGroup.pattern( "scoreboard.pests", " §7⏣ §[ac]The Garden §4§lൠ§7 x(?&lt;pests&gt;.*)", )</ID>
@@ -209,9 +202,9 @@
     <ID>RepoPatternRegexTestMissing:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "actionbar", ".*§3\\+.* (?&lt;skill&gt;.*) \\((?&lt;overflow&gt;.*)/(?&lt;needed&gt;.*)\\).*" )</ID>
     <ID>RepoPatternRegexTestMissing:SkillExperience.kt$SkillExperience$by patternGroup.pattern( "inventory", ".* §e(?&lt;number&gt;.*)§6/.*" )</ID>
     <ID>RepoPatternRegexTestMissing:SlayerBossSpawnSoon.kt$SlayerBossSpawnSoon$by RepoPattern.pattern( "slayer.bosswarning.progress", " \\(?(?&lt;progress&gt;[0-9.,k]+)/(?&lt;total&gt;[0-9.,k]+)\\)?.*" )</ID>
-    <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "changeditem", "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!" )</ID>
-    <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "inventoryname", "(?&lt;name&gt;.*) RNG Meter" )</ID>
-    <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "update", " {3}§dRNG Meter §f- §d(?&lt;exp&gt;.*) Stored XP" )</ID>
+    <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "changeditem", "§aYou set your §r.* RNG Meter §r§ato drop §r.*§a!", )</ID>
+    <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "inventoryname", "(?&lt;name&gt;.*) RNG Meter", )</ID>
+    <ID>RepoPatternRegexTestMissing:SlayerRngMeterDisplay.kt$SlayerRngMeterDisplay$by patternGroup.pattern( "update", " {3}§dRNG Meter §f- §d(?&lt;exp&gt;.*) Stored XP", )</ID>
     <ID>RepoPatternRegexTestMissing:SprayFeatures.kt$SprayFeatures$by RepoPattern.pattern( "garden.spray.material", "§a§lSPRAYONATOR! §r§7Your selected material is now §r§a(?&lt;spray&gt;.*)§r§7!", )</ID>
     <ID>RepoPatternRegexTestMissing:TabListReader.kt$TabListReader$by patternGroup.pattern( "upgrades", "(?&lt;firstPart&gt;§e[A-Za-z ]+)(?&lt;secondPart&gt; §f[\\w ]+)" )</ID>
     <ID>RepoPatternRegexTestMissing:TabListReader.kt$TabListReader$by patternGroup.pattern( "winterpowerups", "Active Power Ups(?:§.)*(?:\\n(?:§.)*§7.+)*" )</ID>
@@ -245,7 +238,7 @@
     <ID>ReturnCount:BroodmotherFeatures.kt$BroodmotherFeatures$private fun onStageUpdate()</ID>
     <ID>ReturnCount:ChatPeek.kt$ChatPeek$@JvmStatic fun peek(): Boolean</ID>
     <ID>ReturnCount:ChestValue.kt$ChestValue$private fun isValidStorage(): Boolean</ID>
-    <ID>ReturnCount:CollectionTracker.kt$CollectionTracker$fun command(args: Array&lt;String&gt;)</ID>
+    <ID>ReturnCount:CollectionTracker.kt$CollectionTracker$private fun command(args: Array&lt;String&gt;)</ID>
     <ID>ReturnCount:CompactBingoChat.kt$CompactBingoChat$private fun onSkyBlockLevelUp(message: String): Boolean</ID>
     <ID>ReturnCount:CrimsonMinibossRespawnTimer.kt$CrimsonMinibossRespawnTimer$private fun updateArea()</ID>
     <ID>ReturnCount:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
@@ -280,7 +273,6 @@
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:Text.kt$Text$(*component.toTypedArray(), separator = separator)</ID>
     <ID>TooManyFunctions:CollectionUtils.kt$CollectionUtils</ID>
-    <ID>TooManyFunctions:DailyQuestHelper.kt$DailyQuestHelper</ID>
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator</ID>
     <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
     <ID>TooManyFunctions:InventoryUtils.kt$InventoryUtils</ID>
@@ -291,7 +283,6 @@
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
-    <ID>TooManyFunctions:RenderUtils.kt$RenderUtils</ID>
     <ID>TooManyFunctions:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
     <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
@@ -351,7 +342,6 @@
     <ID>UnsafeCallOnNullableType:MobFinder.kt$MobFinder$floor6GiantsSeparateDelay[uuid]!!</ID>
     <ID>UnsafeCallOnNullableType:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
     <ID>UnsafeCallOnNullableType:NumberUtil.kt$NumberUtil$romanSymbols[this]!!</ID>
-    <ID>UnsafeCallOnNullableType:PositionList.kt$PositionList$configLink!!</ID>
     <ID>UnsafeCallOnNullableType:ReminderManager.kt$ReminderManager$storage[args.drop(1).first()]!!</ID>
     <ID>UnsafeCallOnNullableType:ReminderManager.kt$ReminderManager$storage[args.first()]!!</ID>
     <ID>UnsafeCallOnNullableType:RenderEntityOutlineEvent.kt$RenderEntityOutlineEvent$entitiesToChooseFrom!!</ID>
@@ -365,8 +355,6 @@
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[2]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$match.groups[3]!!</ID>
     <ID>UnsafeCallOnNullableType:SackApi.kt$SackApi$oldData!!</ID>
-    <ID>UnsafeCallOnNullableType:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker$it.get(DisplayMode.SESSION).getItemsProp()[internalName]!!</ID>
-    <ID>UnsafeCallOnNullableType:SkyHanniBucketedItemTracker.kt$SkyHanniBucketedItemTracker$it.get(DisplayMode.TOTAL).getItemsProp()[internalName]!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$distance!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$distance2!!</ID>
     <ID>UnsafeCallOnNullableType:SoopyGuessBurrow.kt$SoopyGuessBurrow$firstParticlePoint?.distance(pos)!!</ID>

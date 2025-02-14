@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.data
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketSentEvent
@@ -169,7 +171,7 @@ object ChatManager {
         }
     }
 
-    fun openChatFilterGUI(args: Array<String>) {
+    private fun openChatFilterGUI(args: Array<String>) {
         SkyHanniMod.screenToOpen = if (args.isEmpty()) {
             ChatFilterGui(getRecentMessageHistory())
         } else {
@@ -234,6 +236,15 @@ object ChatManager {
                     }
                 }
             }
+        }
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shchathistory") {
+            description = "Show the unfiltered chat history"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { openChatFilterGUI(it) }
         }
     }
 }
