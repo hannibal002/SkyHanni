@@ -1281,7 +1281,7 @@ interface Renderable {
                 }
 
                 val sequence = list.asSequence().withIndex()
-                val folded = sequence.runningIndexedFold(0) { r, it -> r + (yOffsets[it] ?: 0) }
+                val folded = sequence.runningIndexedFold(0) { past, value -> past + (yOffsets[value] ?: 0) }
                 val pair = folded
                     .firstTwiceOf({ it.value >= scroll.asInt() }, { it.value >= end })
 
