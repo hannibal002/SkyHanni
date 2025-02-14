@@ -1218,9 +1218,13 @@ interface Renderable {
             yPadding: Int = 0,
             header: List<Renderable> = emptyList(),
             bypassChecks: Boolean = false,
+            showScrollableTipsInList: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
+            private val scrollUpTip = string("§7§oMore items above (scroll)")
+            private val scrollDownTip = string("§7§oMore items below (scroll)")
 
             private var list = filterListMap(content, textInput.textBox).toList()
 
@@ -1236,14 +1240,14 @@ interface Renderable {
 
             private val virtualHeight get() = list.sumOf { yOffsets[it] ?: 0 }
 
-            private val end get() = scroll.asInt() + height - yPadding - 1
+            private val end get() = scroll.asInt() + height
 
             private var scroll = createScroll()
 
             private fun createScroll() = ScrollInput.Companion.Vertical(
                 scrollValue,
                 yOffsets[header] ?: 0,
-                virtualHeight - height,
+                virtualHeight - height + 1 + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
@@ -1280,13 +1284,35 @@ interface Renderable {
                     renderY += yShift
                 }
 
-                val sequence = list.asSequence().withIndex()
-                val folded = sequence.runningIndexedFold(0) { past, value -> past + (yOffsets[value] ?: 0) }
-                val pair = folded
-                    .firstTwiceOf({ it.value >= scroll.asInt() }, { it.value >= end })
+                val range =
+                    if (list.size == 1) {
+                        0..0
+                    } else {
 
-                val range = pair
-                    .let { (start, end) -> (start?.index ?: 0)..(end?.index?.minus(1) ?: list.lastIndex) }
+                        val nStart = scroll.asInt()
+
+                        val endReduce1 = if (showScrollableTipsInList && !scroll.atMinimum()) scrollUpTip.height else 0
+                        val endReduce2 = if (showScrollableTipsInList && !scroll.atMaximum()) scrollDownTip.height else 0
+
+                        val nEnd = end - endReduce1 - endReduce2
+
+                        val sequence = list.asSequence().withIndex()
+                        val folded = sequence.runningIndexedFold(0) { past, value -> past + (yOffsets[value] ?: 0) }
+                        val pair = folded
+                            .firstTwiceOf({ it.value >= nStart }, { it.value >= nEnd })
+
+                        val start = pair.first?.index ?: 0
+                        var end = pair.second?.index?.minus(1) ?: list.lastIndex
+
+                        start..end
+                    }
+
+                if (showScrollableTipsInList && !scroll.atMinimum()) {
+                    scrollUpTip.render(posX, posY)
+                    val yShift = scrollUpTip.height
+                    renderY += yShift
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                }
 
                 for (rowIndex in range) {
                     val row = list[rowIndex]
@@ -1306,6 +1332,11 @@ interface Renderable {
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
+
+                if (showScrollableTipsInList && !scroll.atMaximum()) {
+                    scrollDownTip.render(posX, posY)
+                }
+
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }
