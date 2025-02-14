@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.chat
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DropDetails
 import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerDropsJson
@@ -17,6 +18,7 @@ import net.minecraft.util.ChatComponentText
 import java.util.regex.Pattern
 
 @SkyHanniModule
+@Suppress("UnusedParameter", "UnusedPrivateProperty", "FunctionOnlyReturningConstant")
 object DropChances {
 
     private val patternGroup = RepoPattern.group("slayer.drop")
@@ -50,6 +52,7 @@ object DropChances {
 
     /**
      * REGEX-TEST: §r§9§lVERY RARE DROP! §r§7(§r§fMana Steal I§r§7) §r§b(+191% §r§b✯ Magic Find§r§b)§r
+     * REGEX-TEST: §r§9§lVERY RARE DROP! §r§7(§r§f§r§9Null Atom§r§7) §r§b(+253% §r§b✯ Magic Find§r§b)§r
      */
     private val blueVeryRareDropPattern by patternGroup.pattern(
         "blue-very-rare",
@@ -85,6 +88,8 @@ object DropChances {
             crazyRareDropPattern
         )) {
             pattern.matchMatcher(e.message) {
+                val rngStorage: ProfileSpecificStorage.SlayerRngMeterStorage? = storage?.entries?.elementAtOrNull(1)?.value
+
                 var itemName: String = group("itemName")
                 if (reg.find(itemName) != null) {
                     val (amm, cleanName) = reg.find(itemName)!!.destructured
@@ -95,7 +100,9 @@ object DropChances {
                 val unformattedItemName: String = itemName.removeColor()
                 val internalName: NeuInternalName = NeuInternalName.fromItemNameOrNull(unformattedItemName) ?: itemName.toInternalName()
 
-                val dropChance: Double? = getDropChance(dropsJson!!, magicFind, internalName)
+                val meterDrop = internalName == NeuInternalName.fromItemNameOrNull(rngStorage!!.itemGoal)
+
+                val dropChance = getDropChance(dropsJson!!, magicFind, internalName, meterDrop)
                 val dropChanceAsFraction = "1/${(1 / dropChance!!).toInt()}"
 
                 e.chatComponent = ChatComponentText(
@@ -105,76 +112,68 @@ object DropChances {
         }
     }
 
-    private fun getDropChance(dropsJson: SlayerDropsJson, magicFind: Int, internalName: NeuInternalName): Double? {
-        val totalWeight = getTotalWeight(dropsJson, magicFind) ?: return null
-        ChatUtils.chat("Total weight: $totalWeight")
+    private fun getDropChance(dropsJson: SlayerDropsJson, magicFind: Int, internalName: NeuInternalName, isMeterDrop: Boolean): Double? {
+        if (isMeterDrop) {
+            val totalWeight = getTotalWeight(dropsJson, magicFind, internalName, true)
+            val dropWeight = getMagicFindModifiedWeight(getRngMeterModifier(dropsJson, internalName)!!, magicFind)
 
-        if (storage == null) return null
-
-        var selectedDropWeight = 0L
-        @Suppress("MaxLineLength")
-        selectedDropWeight = if (internalName == NeuInternalName.fromItemNameOrNull(storage!!.entries.elementAtOrNull(1)?.value?.itemGoal!!)) {
-            getModifiedWeight(getRngMeterModifier(dropsJson.drops)!!.toInt(), magicFind)
+            return dropWeight.toDouble() / totalWeight.toDouble()
         } else {
-            @Suppress("MaxLineLength")
-            getModifiedWeight(getDropDetails(dropsJson.drops, internalName)!!.weight, magicFind)
-        }
-        ChatUtils.chat("Selected drop weight: $selectedDropWeight")
+            val totalWeight = getTotalWeight(dropsJson, magicFind, internalName, false)
+            val dropWeight = getMagicFindModifiedWeight(getDropWeight(dropsJson, internalName)!!, magicFind)
 
-        return selectedDropWeight.toDouble() / totalWeight.toDouble()
+            return dropWeight.toDouble() / totalWeight.toDouble()
+        }
     }
 
-    private fun getTotalWeight(dropsJson: SlayerDropsJson, magicFind: Int): Long? {
-        var totalWeight = 10000L
-        if (storage == null) ChatUtils.chat("Storage not found.")
+    private fun getTotalWeight(dropsJson: SlayerDropsJson, magicFind: Int, internalName: NeuInternalName, isMeterDrop: Boolean): Double {
+        var totalWeight = 10000.0
 
-        val selectedDrop = NeuInternalName.fromItemNameOrNull(storage!!.entries.elementAtOrNull(1)?.value?.itemGoal!!) ?: return null
+        val rngStorage: ProfileSpecificStorage.SlayerRngMeterStorage? = storage?.entries?.elementAtOrNull(1)?.value
 
-        for (drop in dropsJson.drops["main_table"]?.values!!) {
-            for ((dropKey, dropDetails) in drop.entries) {
-                if (dropKey == selectedDrop.asString()) continue
+        val selectedDrop = NeuInternalName.fromItemNameOrNull(rngStorage!!.itemGoal)
 
-                val itemWeight = dropDetails.weight
+        for (drop in dropsJson.drops["main_table"]!!) {
+            for (dropDetails in drop.value.values) {
+                var weight: Double = dropDetails.weight.toDouble()
+
+                if (drop.key == selectedDrop!!.asString()) {
+                    weight = getRngMeterModifier(dropsJson, selectedDrop)!!.toDouble()
+                }
 
                 if (dropDetails.magicFind) {
-                    val modifiedWeight = getModifiedWeight(itemWeight, magicFind)
-                    totalWeight += modifiedWeight.toInt()
+                    totalWeight += getMagicFindModifiedWeight(weight, magicFind)
                 } else {
-                    totalWeight += itemWeight
+                    totalWeight += weight
                 }
             }
         }
 
-        if (getSelectedTable(dropsJson, selectedDrop) == dropsJson.drops["extra_table"]) {
-            for (drop in dropsJson.drops["extra_table"]?.values!!) {
-                for ((dropKey, dropDetails) in drop.entries) {
-                    if (dropKey == selectedDrop.asString()) continue
+        if (getTable(dropsJson, selectedDrop!!) == dropsJson.drops["extra_table"]) {
+            for (drop in dropsJson.drops["extra_table"]!!) {
+                for (dropDetails in drop.value.values) {
+                    var weight: Double = dropDetails.weight.toDouble()
 
-                    val itemWeight = dropDetails.weight
+                    if (drop.key == selectedDrop.asString()) {
+                        weight = getRngMeterModifier(dropsJson, selectedDrop)!!.toDouble()
+                    }
 
                     if (dropDetails.magicFind) {
-                        val modifiedWeight = getModifiedWeight(itemWeight, magicFind)
-                        totalWeight += modifiedWeight.toInt()
+                        totalWeight += getMagicFindModifiedWeight(weight, magicFind)
                     } else {
-                        totalWeight += itemWeight
+                        totalWeight += weight
                     }
                 }
             }
         }
 
-        val selectedDropWeight = getModifiedWeight(getRngMeterModifier(dropsJson.drops)!!.toInt(), magicFind)
-        ChatUtils.chat("Selected drop weight: $selectedDropWeight")
-        totalWeight += selectedDropWeight
-        ChatUtils.chat("Total weight: $totalWeight")
-
         return totalWeight
     }
 
-    private fun getSelectedTable(dropsJson: SlayerDropsJson, selectedDrop: NeuInternalName): Map<String, Map<String, DropDetails>>? {
+    private fun getTable(dropsJson: SlayerDropsJson, selectedDrop: NeuInternalName): Map<String, Map<String, DropDetails>>? {
         for (table in dropsJson.drops.values) {
             for (drop in table.values) {
                 if (drop.containsKey(selectedDrop.asString())) {
-                    ChatUtils.chat("Selected table: $table")
                     return table
                 }
             }
@@ -182,26 +181,32 @@ object DropChances {
         return null
     }
 
-    private fun getModifiedWeight(itemWeight: Int, magicFind: Int): Long {
+    private fun getMagicFindModifiedWeight(itemWeight: Double, magicFind: Int): Long {
         return (itemWeight * (1 + magicFind / 100)).toLong()
     }
 
-    private fun getRngMeterModifier(drops: Map<String, Map<String, Map<String, DropDetails>>>): Long? {
-        val selectedDrop = NeuInternalName.fromItemNameOrNull(storage!!.entries.elementAtOrNull(1)?.value?.itemGoal!!) ?: return null
-        ChatUtils.chat("Selected drop: $selectedDrop")
+    private fun getRngMeterModifier(dropsJson: SlayerDropsJson, drop: NeuInternalName): Double? {
         val currentXp = storage!!.entries.elementAtOrNull(1)?.value?.currentMeter!!
-        ChatUtils.chat("Current xp: $currentXp")
 
-        val dropDetails = getDropDetails(drops, selectedDrop) ?: return null
-        ChatUtils.chat("Drop details found.")
+        val dropDetails = getDropDetails(dropsJson, drop) ?: return null
         val xpNeeded = dropDetails.xpNeeded
-        ChatUtils.chat("Xp needed: $xpNeeded")
 
-        return dropDetails.weight * (1 + (2 * currentXp / xpNeeded).coerceAtMost(2))
+        return dropDetails.weight * (1 + (2 * currentXp / xpNeeded).coerceAtMost(2)).toDouble()
     }
 
-    private fun getDropDetails(drops: Map<String, Map<String, Map<String, DropDetails>>>, internalDropName: NeuInternalName): DropDetails? {
-        for (table in drops.values) {
+    private fun getDropWeight(dropsJson: SlayerDropsJson, internalName: NeuInternalName): Double? {
+        for (table in dropsJson.drops.values) {
+            for (drop in table.values) {
+                if (drop.containsKey(internalName.asString())) {
+                    return drop[internalName.asString()]!!.weight.toDouble()
+                }
+            }
+        }
+        return null
+    }
+
+    private fun getDropDetails(dropsJson: SlayerDropsJson, internalDropName: NeuInternalName): DropDetails? {
+        for (table in dropsJson.drops.values) {
             for (drop in table.values) {
                 if (drop.containsKey(internalDropName.asString())) {
                     ChatUtils.chat(
