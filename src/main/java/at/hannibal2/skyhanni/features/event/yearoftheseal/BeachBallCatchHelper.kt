@@ -99,7 +99,7 @@ object BeachBallCatchHelper {
 
         fun newData(new: LorenzVec) {
             data.add(new)
-            if (new.distanceToPlayer() < 1.6) {
+            if (new.distanceToPlayer() < 2.1) {
                 startIndex = data.lastIndex
                 minY = new.y
             }
