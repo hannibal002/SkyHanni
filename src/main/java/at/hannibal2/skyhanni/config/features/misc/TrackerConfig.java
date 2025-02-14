@@ -75,29 +75,6 @@ public class TrackerConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Hide Cheap Items", desc = "Hide cheap items.")
-    @Accordion
-    public HideCheapItemsConfig hideCheapItems = new HideCheapItemsConfig();
-
-    public static class HideCheapItemsConfig {
-
-        @Expose
-        @ConfigOption(name = "Enabled", desc = "Limit how many items should be shown.")
-        @ConfigEditorBoolean
-        public Property<Boolean> enabled = Property.of(true);
-
-        @Expose
-        @ConfigOption(name = "Show Expensive #", desc = "Always show the # most expensive items.")
-        @ConfigEditorSlider(minValue = 1, maxValue = 40, minStep = 1)
-        public Property<Integer> alwaysShowBest = Property.of(8);
-
-        @Expose
-        @ConfigOption(name = "Still Show Above", desc = "Always show items above this §6price in 1k §7even when not in the top # of items.")
-        @ConfigEditorSlider(minValue = 5, maxValue = 500, minStep = 5)
-        public Property<Integer> minPrice = Property.of(100);
-    }
-
-    @Expose
     @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not inside an inventory.")
     @ConfigEditorBoolean
     public boolean hideItemTrackersOutsideInventory = false;
