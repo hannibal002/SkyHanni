@@ -572,7 +572,7 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            var content = map.keys.toList()
+            var content = filter()
             val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
             val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
             override val horizontalAlign = horizontalAlign
@@ -586,10 +586,12 @@ interface Renderable {
 
             init {
                 textInput.registerToEvent(key) {
-                    // null = ignored, never filtered
-                    content = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+                    content = filter()
                 }
             }
+
+            // null = ignored, never filtered
+            private fun filter() = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
 
             override fun render(posX: Int, posY: Int) {
                 for ((rowIndex, row) in content.withIndex()) {

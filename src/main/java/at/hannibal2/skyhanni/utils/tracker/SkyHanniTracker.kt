@@ -47,7 +47,7 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    private val textInput = SearchTextInput()
+    val textInput = SearchTextInput()
 
     companion object {
 

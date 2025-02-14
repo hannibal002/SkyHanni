@@ -114,6 +114,9 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         val limitList = config.hideCheapItems
         var pos = 0
         val hiddenItemTexts = mutableListOf<Renderable>()
+
+        val table = mutableMapOf<List<Renderable>, String>()
+
         for ((internalName, price) in items.sortedDesc()) {
             val itemProfit = dataItems[internalName] ?: error("Item not found for $internalName")
 
@@ -130,8 +133,21 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             val displayName = if (hidden) "§8§m$formattedName" else cleanName
 
+
+            val loreText = getLoreList.invoke(internalName, itemProfit)
+            val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
+
+            fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickAndHover(
+                string, lore,
+                onClick = {
+                    if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
+                    else itemHider.invoke(internalName, hidden)
+                    update()
+                },
+            ) else Renderable.string(string)
+
             val row = mutableMapOf<TextPart, Renderable>()
-            row[TextPart.NAME] = Renderable.string(" $displayName")
+            row[TextPart.NAME] = string(" $displayName")
 
             val itemStackOrNull = if (internalName == SKYBLOCK_COIN) {
                 ItemUtils.getCoinItemStack(amount)
@@ -142,35 +158,27 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
                 row[TextPart.ICON] = Renderable.itemStack(it)
             }
 
-            row[TextPart.TOTAL_PRICE] = Renderable.string(" $priceFormat")
-            row[TextPart.AMOUNT] = Renderable.string(" $numberColor${displayAmount.addSeparators()}x")
+            row[TextPart.TOTAL_PRICE] = string(" $priceFormat")
+            row[TextPart.AMOUNT] = string(" $numberColor${displayAmount.addSeparators()}x")
 
-            val entryList = config.textOrder.get().mapNotNull { row[it] }
-            val listFormat = Renderable.horizontalContainer(entryList)
-
+            val line = config.textOrder.get().mapNotNull { row[it] }
             pos++
             if (limitList.enabled.get()) {
                 if (pos > limitList.alwaysShowBest.get()) {
                     if (price < limitList.minPrice.get() * 1000) {
-                        hiddenItemTexts += listFormat
+                        hiddenItemTexts += Renderable.horizontalContainer(line)
                         continue
                     }
                 }
             }
-
-            val loreText = getLoreList.invoke(internalName, itemProfit)
-            val lore = buildLore(loreText, hidden, newDrop, internalName)
-            val renderable = if (isInventoryOpen()) Renderable.clickAndHover(
-                listFormat, lore,
-                onClick = {
-                    if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
-                    else itemHider.invoke(internalName, hidden)
-                    update()
-                },
-            ) else listFormat
-
-            lists.add(renderable.toSearchable(formattedName))
+            table[line] = cleanName
         }
+
+        // TODO use scrollable
+//         lists.add(table.buildSearchableScrollableTable(textInput, height = 150).toSearchable())
+//         lists.add(table.buildSearchableTable(textInput).toSearchable())
+        lists.add(Renderable.searchableTable(table.toMap(), textInput = textInput, key = 99).toSearchable())
+
         if (hiddenItemTexts.size > 0) {
             val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
             lists.add(text)
