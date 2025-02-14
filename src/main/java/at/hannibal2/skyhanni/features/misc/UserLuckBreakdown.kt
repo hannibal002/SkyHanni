@@ -107,7 +107,7 @@ object UserLuckBreakdown {
 
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
-            12 -> event.replace(jerryItem)
+            12 -> if (::jerryItem.isInitialized) event.replace(jerryItem)
 
             in validItemSlots -> event.remove()
 
