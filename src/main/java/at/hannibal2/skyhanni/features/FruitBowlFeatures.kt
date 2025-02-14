@@ -91,8 +91,8 @@ object FruitBowlFeatures {
     )
 
     /**
-     * REGEX-TEST: §8[§e80§8] - [§e119§8] §eYellow
-     * REGEX-TEST: §8[§c440§8] - [§c479§8] §cRed
+     * REGEX-TEST: §7§bPapaya§7
+     * REGEX-TEST: §bLime§7, §bMango§7
      */
     private val itemMissingNameLinePattern by chatGroup.pattern(
         "item-lore.missing-name-line",
