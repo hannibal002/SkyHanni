@@ -65,6 +65,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.itemName
     }
 
+    @Suppress("CyclomaticComplexMethod")
     open fun drawItems(
         data: Data,
         filter: (NeuInternalName) -> Boolean,
