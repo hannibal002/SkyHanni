@@ -6,10 +6,15 @@ import at.hannibal2.skyhanni.utils.tracker.SkyHanniTracker;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class TrackerConfig {
 
@@ -101,4 +106,35 @@ public class TrackerConfig {
     @ConfigOption(name = "Tracker Search", desc = "Add a search bar to tracker GUIs.")
     @ConfigEditorBoolean
     public Property<Boolean> trackerSearchEnabled = Property.of(true);
+
+    @Expose
+    @ConfigOption(
+        name = "Text Order",
+        desc = "Drag text to change the line format."
+    )
+    @ConfigEditorDraggableList
+    public Property<List<TextPart>> textOrder = Property.of(new ArrayList<>(Arrays.asList(
+        TextPart.AMOUNT,
+        TextPart.NAME,
+        TextPart.TOTAL_PRICE
+    )));
+
+    public enum TextPart {
+        ICON("Item Icon"),
+        NAME("Item Name"),
+        AMOUNT("Amount"),
+        TOTAL_PRICE("Total Price"),
+        ;
+
+        private final String displayName;
+
+        TextPart(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
+    }
 }

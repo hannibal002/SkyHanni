@@ -493,4 +493,11 @@ object CollectionUtils {
         }
         return null
     }
+
+    fun <T> List<T>.insertAfterEach(extra: T): List<T> = buildList(size * 2) {
+        for (item in this@insertAfterEach) {
+            add(item)
+            add(extra)
+        }
+    }
 }

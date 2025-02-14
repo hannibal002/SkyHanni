@@ -24,6 +24,14 @@ object TrackerManager {
         ConditionalUtils.onToggle(config.alwaysShowBest, config.minPrice, config.enabled) {
             hasChanged = true
         }
+
+        with(SkyHanniMod.feature.misc.tracker) {
+            ConditionalUtils.onToggle(
+                textOrder,
+            ) {
+                hasChanged = true
+            }
+        }
     }
 
     @HandleEvent(priority = HandleEvent.HIGHEST)
