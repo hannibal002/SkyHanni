@@ -37,16 +37,40 @@ public class CakeTrackerConfig {
     public CakeTrackerDisplayType displayType = CakeTrackerDisplayType.MISSING_CAKES;
 
     public enum CakeTrackerDisplayType {
-        MISSING_CAKES,
-        OWNED_CAKES,
+        MISSING_CAKES("Missing"),
+        OWNED_CAKES("Owned"),
+        ;
+
+        private final String displayName;
+
+        CakeTrackerDisplayType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 
     @Expose
     public CakeTrackerDisplayOrderType displayOrderType = CakeTrackerDisplayOrderType.OLDEST_FIRST;
 
     public enum CakeTrackerDisplayOrderType {
-        OLDEST_FIRST,
-        NEWEST_FIRST,
+        OLDEST_FIRST("Oldest First"),
+        NEWEST_FIRST("Newest First"),
+        ;
+
+        private final String displayName;
+
+        CakeTrackerDisplayOrderType(String displayName) {
+            this.displayName = displayName;
+        }
+
+        @Override
+        public String toString() {
+            return displayName;
+        }
     }
 
     @Expose
