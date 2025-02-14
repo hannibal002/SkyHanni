@@ -31,5 +31,5 @@ class YearOfTheSealConfig {
     @Expose
     @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
     @ConfigEditorColour
-    var bouncyBallLineColor: String = "0:245:85:255:85"
+    var bouncyBallLineColor: String = "0:245:255:0:196"
 }

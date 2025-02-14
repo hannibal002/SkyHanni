@@ -9,8 +9,8 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeIf
+import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
 import at.hannibal2.skyhanni.utils.CollectionUtils.takeWhileInclusive
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ConditionalUtils.onDisable
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.EntityUtils
@@ -35,7 +35,7 @@ object BeachBallCatchHelper {
 
     fun check(entity: EntityArmorStand) {
         if (!entity.wearingSkullTexture(NORMAL_BEACH_BALL)) return
-        if (predictors.get(entity.entityId) != null) return
+        if (predictors[entity.entityId] != null) return
         predictors[entity.entityId] = Predictor(entity.getLorenzVec())
     }
 
@@ -60,9 +60,9 @@ object BeachBallCatchHelper {
         if (!isEnabled()) return
         val color = config.bouncyBallLineColor.toSpecialColor()
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {
-            predictors.forEach { (id, predict) ->
-                drawPath(predict.prePath, color.addAlpha(50), 3, true, bezierPoint = -1.0)
-                drawPath(predict.predictedPath, color, 3, true, bezierPoint = -1.0)
+            predictors.forEach { (_, predict) ->
+                drawPath(predict.prePath, color.darker(), 4, true, bezierPoint = -1.0)
+                drawPath(predict.predictedPath, color, 8, true, bezierPoint = -1.0)
             }
         }
     }
@@ -99,7 +99,7 @@ object BeachBallCatchHelper {
 
         fun newData(new: LorenzVec) {
             data.add(new)
-            if (new.distanceToPlayer() < 1.3) {
+            if (new.distanceToPlayer() < 1.6) {
                 startIndex = data.lastIndex
                 minY = new.y
             }
@@ -115,30 +115,34 @@ object BeachBallCatchHelper {
         fun predict(startIndex: Int, minY: Double): List<LorenzVec> {
             val presentValues = data.lastIndex - startIndex
 
-            val modelList = listOf<(List<LorenzVec>) -> Model>(::SmallPoly, ::AveragePoly, ::SpreadPoly).map { it(data) }
-                .filter { it.minimumToPredict <= presentValues }
+            val modelList = mapOf<(List<LorenzVec>) -> Model, Int>(::SmallPoly to 1, ::AveragePoly to 2, ::SpreadPoly to 1)
+                .mapKeys { it.key(data) }
+                .filterKeys { it.minimumToPredict <= presentValues }
 
             if (modelList.isEmpty()) return listOf(data.last())
 
-            val predictions = modelList.map { it.predict(startIndex, data.lastIndex, minY) }.filter {
+            val predictions = modelList.mapKeys { it.key.predict(startIndex, data.lastIndex, minY) }.filterKeys {
                 val y = it.last().y
                 minY - 1 < y && y < minY + 1
             }
 
             if (predictions.isEmpty()) return listOf(data.last())
 
-            val targets = predictions.map { it.last() }
+            val targets = predictions.mapKeys { it.key.last() }
 
-            val xTarget = targets.map { it.x }.average()
-            val zTarget = targets.map { it.z }.average()
+            val xTarget = targets.mapKeys { it.key.x }.weightedAverage()
+            val zTarget = targets.mapKeys { it.key.z }.weightedAverage()
 
             val target = predictions.minBy {
-                val last = it.last()
+                val last = it.key.last()
                 xTarget - last.x + zTarget - last.z
             }
-            return target
+            return target.key
         }
     }
+
+    private fun <K : Number, V : Number> Map<K, V>.weightedAverage() =
+        entries.sumOf { it.key.toDouble() * it.value.toDouble() } / sumAllValues()
 
     private abstract class PolyModel(override val given: List<LorenzVec>) : Model {
         abstract fun getT1(start: Int, current: Int, minY: Double): Int
