@@ -59,14 +59,15 @@ object GiftProfitTracker {
     )
 
     /**
-     * REGEX-TEST: §9§lRARE! §r§6+5,000 coins §r§egift with §r§b[MVP§r§d+§r§b] kizzazz§r§f§r§e!
-     * REGEX-TEST: §f§lCOMMON! §r§6+5,000 coins §r§egift with §r§a[VIP] Deato_Wez§r§f§r§e!
-     * REGEX-TEST: §9§lRARE! §r§6+20,000 coins §r§egift with §r§a[VIP§r§6+§r§a] Grazma§r§f§r§e!
-     * REGEX-TEST: §e§lSWEET! §r§6+100,000 coins §r§egift with §r§a[VIP] Destrudot§r§f§r§e!
+     * REGEX-TEST: §9§lRARE! §r§6+5,000 Coins §r§egift with §r§b[MVP§r§d+§r§b] kizzazz§r§f§r§e!
+     * REGEX-TEST: §f§lCOMMON! §r§6+5,000 Coins §r§egift with §r§a[VIP] Deato_Wez§r§f§r§e!
+     * REGEX-TEST: §9§lRARE! §r§6+20,000 Coins §r§egift with §r§a[VIP§r§6+§r§a] Grazma§r§f§r§e!
+     * REGEX-TEST: §e§lSWEET! §r§6+100,000 Coins §r§egift with §r§a[VIP] Destrudot§r§f§r§e!
+     * REGEX-TEST: §f§lCOMMON! §r§6+5,000 Coins §r§egift with §r§a[VIP] KralingenBoys§r§f§r§e!
      */
     val coinsGainedPattern by patternGroup.pattern(
         "reward.coins",
-        "§.§l.*! §r§.\\+(?<amount>[\\d,]+) coins §r§egift with §r.*"
+        "§.§l.*! §r§.\\+(?<amount>[\\d,]+) Coins §r§egift with §r.*"
     )
 
     /**
