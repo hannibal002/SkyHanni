@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
+import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
@@ -73,7 +74,6 @@ interface Renderable {
 
         val logger = LorenzLogger("debug/renderable")
         var currentRenderPassMousePosition: Pair<Int, Int>? = null
-            set
 
         fun <T> withMousePosition(posX: Int, posY: Int, block: () -> T): T {
             val last = currentRenderPassMousePosition
@@ -119,7 +119,6 @@ interface Renderable {
                     highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
                 onClick,
-                0,
                 bypassChecks,
                 condition,
             )
@@ -156,7 +155,22 @@ interface Renderable {
         fun clickable(
             render: Renderable,
             onClick: () -> Unit,
-            button: Int = 0,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+        ) = leftAndRightClickable(
+            render,
+            onClick = { if (it == Direction.LEFT) onClick() },
+            bypassChecks, condition,
+        )
+
+        enum class Direction {
+            LEFT,
+            RIGHT,
+        }
+
+        fun leftAndRightClickable(
+            render: Renderable,
+            onClick: (Direction) -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
         ) = object : Renderable {
@@ -166,8 +180,43 @@ interface Renderable {
             override val verticalAlign = render.verticalAlign
 
             override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks) && (button - 100).isKeyClicked()) {
-                    onClick()
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
+                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+                }
+                render.render(posX, posY)
+            }
+        }
+
+        fun clickableAndScrollable(
+            render: Renderable,
+            onClick: (Direction) -> Unit,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            scrollValue: ScrollValue = ScrollValue(),
+        ) = object : Renderable {
+            override val width = render.width
+            override val height = render.height
+            override val horizontalAlign = render.horizontalAlign
+            override val verticalAlign = render.verticalAlign
+
+            private val pureScrollInput = ScrollInput.Companion.PureVertical(scrollValue)
+
+            private fun ScrollInput.Companion.PureVertical.tryUpdateScroll() {
+                pureScrollInput.update(true)
+                when (asInt()) {
+                    -1 -> onClick(Direction.RIGHT) // Scroll Up -> Right Click
+                    1 -> onClick(Direction.LEFT) // Scroll Down -> Left Click
+                    else -> return
+                }
+                dispose()
+            }
+
+            override fun render(posX: Int, posY: Int) {
+                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
+                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
+                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+                    else pureScrollInput.tryUpdateScroll()
                 }
                 render.render(posX, posY)
             }
@@ -996,7 +1045,7 @@ interface Renderable {
             private val scrollUpTip = string("§7§oMore items above (scroll)")
             private val scrollDownTip = string("§7§oMore items below (scroll)")
 
-            override var width = list.maxOf { it.width }
+            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1006,7 +1055,7 @@ interface Renderable {
             private val scroll = ScrollInput.Companion.Vertical(
                 scrollValue,
                 0,
-                virtualHeight - height,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
@@ -1022,44 +1071,44 @@ interface Renderable {
                 var virtualY = 0
                 var found = false
 
+                var negativeSpace = 0
+
                 // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
                 // there are more items above
                 if (showScrollableTipsInList && scroll.asInt() > 0) {
-                    width = maxOf(width, scrollUpTip.width)
                     scrollUpTip.renderXAligned(posX, posY, width)
                     GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
                     renderY += scrollUpTip.height
-                    virtualY += scrollUpTip.height
+                    negativeSpace -= scrollUpTip.height
                 }
 
-                val atScrollEnd = scroll.asInt() == virtualHeight - height
+                val atScrollEnd = scroll.asInt() >= virtualHeight - height
                 if (!atScrollEnd) {
-                    virtualY += scrollDownTip.height
-                    renderY += scrollDownTip.height
+                    negativeSpace -= scrollDownTip.height
                 }
+
+                val window = scroll.asInt()..(end + negativeSpace)
 
                 for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
+                    if ((virtualY..virtualY + renderable.height) in window) {
                         renderable.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
                         renderY += renderable.height
                         found = true
                     } else if (found) {
                         found = false
-                        if (renderY + renderable.height <= height) {
+                        if (renderY + renderable.height <= height + negativeSpace) {
                             renderable.renderXAligned(posX, posY + renderY, width)
                         }
-                        continue
+                        break
                     }
                     virtualY += renderable.height
                 }
 
                 // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
                 // there are more items below
-                if (showScrollableTipsInList && virtualY > end) {
-                    width = maxOf(width, scrollDownTip.width)
+                if (showScrollableTipsInList && !atScrollEnd) {
                     scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
-                    GlStateManager.translate(0f, scrollDownTip.height.toFloat(), 0f)
                 }
 
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
