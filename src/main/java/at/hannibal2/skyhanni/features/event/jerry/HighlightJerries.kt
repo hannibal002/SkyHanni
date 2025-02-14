@@ -34,7 +34,7 @@ object HighlightJerries {
             "Green" -> LorenzColor.GREEN
             "Blue" -> LorenzColor.BLUE
             "Purple" -> LorenzColor.DARK_PURPLE
-            "Gold" -> LorenzColor.GOLD
+            "Golden" -> LorenzColor.GOLD
             else -> return
         }
         mob.highlight(color.toColor()) { config.highlightJerries.get() }
