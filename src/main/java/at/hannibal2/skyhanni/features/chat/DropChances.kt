@@ -91,7 +91,7 @@ object DropChances {
 
                 var itemName: String = group("itemName")
                 if (reg.find(itemName) != null) {
-                    val (amm, cleanName) = reg.find(itemName)?.destructured ?: continue@loop
+                    val (_, cleanName) = reg.find(itemName)?.destructured ?: continue@loop
                     itemName = cleanName
                 }
                 itemName = itemName.trim()
@@ -101,7 +101,7 @@ object DropChances {
 
                 val meterDrop = internalName == NeuInternalName.fromItemNameOrNull(rngStorage?.itemGoal ?: "")
 
-                val dropChance = getDropChance(dropsJson!!, magicFind, internalName, meterDrop) ?: return
+                val dropChance = getDropChance(dropsJson!!, magicFind, internalName, meterDrop)
                 val dropChanceAsFraction = "1/${(1 / dropChance).toInt()}"
 
                 e.chatComponent = ChatComponentText(
