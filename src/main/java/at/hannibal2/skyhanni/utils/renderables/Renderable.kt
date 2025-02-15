@@ -1051,7 +1051,7 @@ interface Renderable {
             private val scrollUpTip = string("§7§oMore items above (scroll)")
             private val scrollDownTip = string("§7§oMore items below (scroll)")
 
-            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width)
+            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1130,12 +1130,17 @@ interface Renderable {
             textInput: TextInput,
             key: Int,
             bypassChecks: Boolean = false,
+            showScrollableTipsInList: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
+
+            private val scrollUpTip = string("§7§oMore items above (scroll)")
+            private val scrollDownTip = string("§7§oMore items below (scroll)")
+
             private var list = filterList(content, textInput.textBox)
-            override val width = list.maxOf { it.width }
-            override val height = height
+            override val width = maxOf(list.maxOf { it.width }, scrollUpTip.width, scrollDownTip.width)
+            override val height = maxOf(height, scrollUpTip.height, scrollDownTip.height)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -1155,7 +1160,7 @@ interface Renderable {
             private fun createScroll() = ScrollInput.Companion.Vertical(
                 scrollValue,
                 0,
-                virtualHeight - height,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
@@ -1170,21 +1175,47 @@ interface Renderable {
                 var renderY = 0
                 var virtualY = 0
                 var found = false
+
+                var negativeSpace = 0
+
+                // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
+                // there are more items above
+                if (showScrollableTipsInList && scroll.asInt() > 0) {
+                    scrollUpTip.renderXAligned(posX, posY, width)
+                    GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                    renderY += scrollUpTip.height
+                    negativeSpace -= scrollUpTip.height
+                }
+
+                val atScrollEnd = scroll.asInt() >= virtualHeight - height
+                if (!atScrollEnd) {
+                    negativeSpace -= scrollDownTip.height
+                }
+
+                val window = scroll.asInt()..(end + negativeSpace)
+
                 for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
+                    if ((virtualY..virtualY + renderable.height) in window) {
                         renderable.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
                         renderY += renderable.height
                         found = true
                     } else if (found) {
                         found = false
-                        if (renderY + renderable.height <= height) {
+                        if (renderY + renderable.height <= height + negativeSpace) {
                             renderable.renderXAligned(posX, posY + renderY, width)
                         }
-                        continue
+                        break
                     }
                     virtualY += renderable.height
                 }
+
+                // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
+                // there are more items below
+                if (showScrollableTipsInList && !atScrollEnd) {
+                    scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
+                }
+
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
         }
@@ -1233,21 +1264,21 @@ interface Renderable {
             val xOffsets = calculateTableX(fullContent, xPadding)
             val yOffsets = calculateTableY(fullContent, yPadding)
 
-            override val width = xOffsets.sum()
-            override val height = height
+            override val width = maxOf(xOffsets.sum(), scrollUpTip.width, scrollDownTip.width)
+            override val height = maxOf(height, scrollUpTip.height, scrollDownTip.height)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
             private val virtualHeight get() = list.sumOf { yOffsets[it] ?: 0 }
 
-            private val end get() = scroll.asInt() + height
+            private val end get() = scroll.asInt() + height + 1
 
             private var scroll = createScroll()
 
             private fun createScroll() = ScrollInput.Companion.Vertical(
                 scrollValue,
                 yOffsets[header] ?: 0,
-                virtualHeight - height + 1 + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
@@ -1301,10 +1332,12 @@ interface Renderable {
                         val pair = folded
                             .firstTwiceOf({ it.value >= nStart }, { it.value >= nEnd })
 
-                        val start = pair.first?.index ?: 0
-                        var end = pair.second?.index?.minus(1) ?: list.lastIndex
+                        val subEnd = if ((pair.second?.value?.minus(pair.first?.value ?: 0) ?: 0) <= nEnd - nStart) 0 else 1
 
-                        start..end
+                        val start = pair.first?.index ?: 0
+                        val end = pair.second?.index?.minus(subEnd) ?: list.size
+
+                        start until end
                     }
 
                 if (showScrollableTipsInList && !scroll.atMinimum()) {
