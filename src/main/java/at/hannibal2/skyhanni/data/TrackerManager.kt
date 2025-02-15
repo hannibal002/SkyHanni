@@ -23,6 +23,8 @@ object TrackerManager {
         with(SkyHanniMod.feature.misc.tracker) {
             ConditionalUtils.onToggle(
                 textOrder,
+                showTable,
+                itemsShown,
             ) {
                 hasChanged = true
             }

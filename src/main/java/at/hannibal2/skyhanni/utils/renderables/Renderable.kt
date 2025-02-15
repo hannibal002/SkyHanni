@@ -1237,6 +1237,40 @@ interface Renderable {
             return set
         }
 
+        fun searchableScrollable(
+            table: Map<List<Renderable>, String>,
+            key: Int,
+            lines: Int,
+            velocity: Double,
+            textInput: TextInput,
+            scrollValue: ScrollValue,
+            showScrollableTipsInList: Boolean = true,
+            asTable: Boolean = true,
+        ) = if (asTable) {
+            val height = calculateTableY(table.keys, 0).maxOf { it.value }
+            searchableScrollTable(
+                table,
+                key = key,
+                height = lines * height,
+                textInput = textInput,
+                velocity = velocity,
+                scrollValue = scrollValue,
+                showScrollableTipsInList = showScrollableTipsInList
+            )
+        } else {
+            val content = table.mapKeys { horizontalContainer(it.key) }
+            val height = content.maxOf { it.key.height }
+            searchableScrollList(
+                content,
+                key = key,
+                height = lines * height,
+                textInput = textInput,
+                velocity = velocity,
+                scrollValue = scrollValue,
+                showScrollableTipsInList = showScrollableTipsInList
+            )
+        }
+
         fun searchableScrollTable(
             content: Map<List<Renderable>, String?>,
             height: Int,
