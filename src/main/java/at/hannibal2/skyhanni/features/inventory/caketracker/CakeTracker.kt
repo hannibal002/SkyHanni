@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.events.LorenzChatEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ConditionalUtils
@@ -23,7 +23,7 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
 import at.hannibal2.skyhanni.utils.RegexUtils.matchGroup
@@ -36,9 +36,9 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeLimitedCache
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableButton
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.inventory.ContainerChest
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 import java.awt.Color
 import kotlin.math.abs
 import kotlin.time.Duration.Companion.milliseconds
@@ -158,8 +158,8 @@ object CakeTracker {
         }
     }
 
-    @SubscribeEvent
-    fun onChat(event: LorenzChatEvent) {
+    @HandleEvent
+    fun onChat(event: SkyHanniChatEvent) {
         if (!isEnabled()) return
         cakePurchasedPattern.matchMatcher(event.message) {
             val year = group("year").formatInt()
@@ -316,7 +316,7 @@ object CakeTracker {
             return if (!config.priceOnHover) Renderable.string(displayString)
             else Renderable.hoverTips(
                 displayString,
-                getPriceHoverTooltip(displayType, colorCode)
+                getPriceHoverTooltip(displayType, colorCode),
             )
         }
 
@@ -345,62 +345,6 @@ object CakeTracker {
         }
     }
 
-    private fun setDisplayType(type: DisplayType) {
-        config.displayType = type
-        lastKnownCakeDataHash = 0
-    }
-
-    private fun buildDisplayTypeToggle(): Renderable = Renderable.horizontalContainer(
-        buildList {
-            val ownedColor = if (config.displayType == DisplayType.OWNED_CAKES) "§a" else "§e"
-            val missingColor = if (config.displayType == DisplayType.MISSING_CAKES) "§a" else "§e"
-
-            add(
-                Renderable.optionalLink(
-                    "$ownedColor[Owned]",
-                    { setDisplayType(DisplayType.OWNED_CAKES) },
-                    condition = { config.displayType != DisplayType.OWNED_CAKES },
-                ),
-            )
-            add(Renderable.string(" "))
-            add(
-                Renderable.optionalLink(
-                    "$missingColor[Missing]",
-                    { setDisplayType(DisplayType.MISSING_CAKES) },
-                    condition = { config.displayType != DisplayType.MISSING_CAKES },
-                ),
-            )
-        },
-    )
-
-    private fun setDisplayOrderType(type: DisplayOrder) {
-        config.displayOrderType = type
-        lastKnownCakeDataHash = 0
-    }
-
-    private fun buildOrderTypeToggle(): Renderable = Renderable.horizontalContainer(
-        buildList {
-            val newestColor = if (config.displayOrderType == DisplayOrder.NEWEST_FIRST) "§a" else "§e"
-            val oldestColor = if (config.displayOrderType == DisplayOrder.OLDEST_FIRST) "§a" else "§e"
-
-            add(
-                Renderable.optionalLink(
-                    "$newestColor[Newest First]",
-                    { setDisplayOrderType(DisplayOrder.NEWEST_FIRST) },
-                    condition = { config.displayOrderType != DisplayOrder.NEWEST_FIRST },
-                ),
-            )
-            add(Renderable.string(" "))
-            add(
-                Renderable.optionalLink(
-                    "$oldestColor[Oldest First]",
-                    { setDisplayOrderType(DisplayOrder.OLDEST_FIRST) },
-                    condition = { config.displayOrderType != DisplayOrder.OLDEST_FIRST },
-                ),
-            )
-        },
-    )
-
     private fun drawDisplay(data: CakeData): List<Renderable> = buildList {
         val dataHash = data.hashCode()
         if (dataHash != lastKnownCakeDataHash) {
@@ -428,8 +372,23 @@ object CakeTracker {
 
     private fun buildCakeRenderables(data: CakeData) = buildList {
         add(Renderable.hoverTips("§c§lNew §f§lYear §c§lCake §f§lTracker", getHeaderTips(data)))
-        add(buildDisplayTypeToggle())
-        add(buildOrderTypeToggle())
+
+        addRenderableButton<DisplayType>(
+            label = "Show",
+            current = config.displayType,
+            onChange = {
+                config.displayType = it
+                lastKnownCakeDataHash = 0
+            },
+        )
+        addRenderableButton<DisplayOrder>(
+            label = "Order",
+            current = config.displayOrderType,
+            onChange = {
+                config.displayOrderType = it
+                lastKnownCakeDataHash = 0
+            },
+        )
 
         val cakeList = when (config.displayType) {
             DisplayType.OWNED_CAKES -> data.ownedCakes
@@ -446,8 +405,8 @@ object CakeTracker {
                 getCakeRanges(cakeList, config.displayOrderType, config.displayType),
                 height = maxTrackerHeight.toInt() + 2, // +2 to account for tips
                 velocity = 20.0,
-                showScrollableTipsInList = true
-            )
+                showScrollableTipsInList = true,
+            ),
         )
     }
 

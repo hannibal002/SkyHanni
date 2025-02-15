@@ -5,7 +5,7 @@ import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryFullyOpenedEvent
-import at.hannibal2.skyhanni.features.garden.visitor.VisitorAPI
+import at.hannibal2.skyhanni.features.garden.visitor.VisitorApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.add
@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.DisplayTableEntry
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPriceName
 import at.hannibal2.skyhanni.utils.ItemUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
@@ -20,7 +21,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.ItemUtils.name
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.NEUInternalName
+import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.renderables.Renderable
@@ -29,7 +30,7 @@ import net.minecraft.item.ItemStack
 @SkyHanniModule
 object AnitaMedalProfit {
 
-    private val config get() = GardenAPI.config.anitaShop
+    private val config get() = GardenApi.config.anitaShop
     private var display = emptyList<Renderable>()
 
     var inInventory = false
@@ -51,7 +52,7 @@ object AnitaMedalProfit {
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
         if (!config.medalProfitEnabled) return
         if (event.inventoryName != "Anita") return
-        if (VisitorAPI.inInventory) return
+        if (VisitorApi.inInventory) return
 
         inInventory = true
 
@@ -88,7 +89,7 @@ object AnitaMedalProfit {
 
         val (name, amount) = ItemUtils.readItemAmount(itemName) ?: return
 
-        var internalName = NEUInternalName.fromItemNameOrNull(name)
+        var internalName = NeuInternalName.fromItemNameOrNull(name)
         if (internalName == null) {
             internalName = item.getInternalName()
         }
@@ -131,10 +132,9 @@ object AnitaMedalProfit {
         )
     }
 
-    private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NEUInternalName, Int>) {
+    private fun MutableList<String>.addAdditionalMaterials(additionalMaterials: Map<NeuInternalName, Int>) {
         for ((internalName, amount) in additionalMaterials) {
-            val pricePer = internalName.getPrice() * amount
-            add(" " + internalName.itemName + " §8${amount}x §7(§6${pricePer.shortFormat()}§7)")
+            add(internalName.getPriceName(amount))
         }
     }
 
@@ -156,18 +156,18 @@ object AnitaMedalProfit {
         } else name
     }
 
-    private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NEUInternalName, Int> {
-        val additionalMaterials = mutableMapOf<NEUInternalName, Int>()
+    private fun getAdditionalMaterials(requiredItems: Map<String, Int>): Map<NeuInternalName, Int> {
+        val additionalMaterials = mutableMapOf<NeuInternalName, Int>()
         for ((name, amount) in requiredItems) {
             val medal = getMedal(name)
             if (medal == null) {
-                additionalMaterials[NEUInternalName.fromItemName(name)] = amount
+                additionalMaterials[NeuInternalName.fromItemName(name)] = amount
             }
         }
         return additionalMaterials
     }
 
-    private fun getAdditionalCost(requiredItems: Map<NEUInternalName, Int>): Double {
+    private fun getAdditionalCost(requiredItems: Map<NeuInternalName, Int>): Double {
         var otherItemsPrice = 0.0
         for ((name, amount) in requiredItems) {
             otherItemsPrice += name.getPrice() * amount
@@ -219,7 +219,7 @@ object AnitaMedalProfit {
 
     @HandleEvent
     fun onBackgroundDraw(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        if (!inInventory || VisitorAPI.inInventory) return
+        if (!inInventory || VisitorApi.inInventory) return
         config.medalProfitPos.renderRenderables(
             display,
             extraSpace = 5,

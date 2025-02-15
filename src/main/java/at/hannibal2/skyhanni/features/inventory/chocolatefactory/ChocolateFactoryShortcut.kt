@@ -18,9 +18,11 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ChocolateFactoryShortcut {
 
-    private val config get() = ChocolateFactoryAPI.config
+    private val config get() = ChocolateFactoryApi.config
     private var showItem = false
     private var lastClick = SimpleTimeMark.farPast()
+
+    private val slotId get() = ChocolateFactoryApi.cfShortcutIndex
 
     private val item by lazy {
         ItemUtils.createSkull(
@@ -34,9 +36,8 @@ object ChocolateFactoryShortcut {
         )
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onInventoryFullyOpened(event: InventoryFullyOpenedEvent) {
-        if (!LorenzUtils.inSkyBlock) return
         if (LorenzUtils.inAnyIsland(
                 IslandType.THE_RIFT,
                 IslandType.KUUDRA_ARENA,
@@ -54,14 +55,14 @@ object ChocolateFactoryShortcut {
 
     @HandleEvent
     fun replaceItem(event: ReplaceItemEvent) {
-        if (event.inventory is ContainerLocalMenu && showItem && event.slot == 15) {
+        if (event.inventory is ContainerLocalMenu && showItem && event.slot == slotId) {
             event.replace(item)
         }
     }
 
     @HandleEvent(priority = HandleEvent.HIGH)
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
-        if (!showItem || event.slotId != 15) return
+        if (!showItem || event.slotId != slotId) return
         event.cancel()
         if (lastClick.passedSince() > 2.seconds) {
             HypixelCommands.chocolateFactory()

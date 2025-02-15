@@ -5,14 +5,15 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.jsonobjects.repo.DanceRoomInstructionsJson
+import at.hannibal2.skyhanni.data.mob.MobFilter.isRealPlayer
 import at.hannibal2.skyhanni.events.CheckRenderEntityEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
-import at.hannibal2.skyhanni.events.LorenzTickEvent
-import at.hannibal2.skyhanni.events.LorenzWorldChangeEvent
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.TitleReceivedEvent
-import at.hannibal2.skyhanni.features.rift.RiftAPI
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
+import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
+import at.hannibal2.skyhanni.features.rift.RiftApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.LocationUtils.isPlayerInside
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStrings
@@ -22,13 +23,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import net.minecraft.client.entity.EntityOtherPlayerMP
 import net.minecraft.util.AxisAlignedBB
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent
 
 @SkyHanniModule
 object DanceRoomHelper {
 
     private var display = emptyList<String>()
-    private val config get() = RiftAPI.config.area.mirrorverse.danceRoomHelper
+    private val config get() = RiftApi.config.area.mirrorverse.danceRoomHelper
     private var index = 0
     private var found = false
     private val danceRoom = AxisAlignedBB(-260.0, 32.0, -110.0, -267.0, 40.0, -102.0)
@@ -87,36 +87,37 @@ object DanceRoomHelper {
         } + this@addColor
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (!inRoom) return
         config.position.renderStrings(
             display,
             config.extraSpace,
-            posLabel = "Dance Room Helper"
+            posLabel = "Dance Room Helper",
         )
     }
 
-    @SubscribeEvent
-    fun onWorldChange(event: LorenzWorldChangeEvent) {
+    @HandleEvent
+    fun onWorldChange(event: WorldChangeEvent) {
         inRoom = false
     }
 
-    @SubscribeEvent
-    fun onTick(event: LorenzTickEvent) {
-        if (!isEnabled()) return
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
+    fun onTick(event: SkyHanniTickEvent) {
+        // We want this to run even if not enabled, so that the Hide Other Players feature
+        // properly updates without the helper being enabled
         if (event.isMod(10)) {
-            inRoom = danceRoom.isPlayerInside()
+            inRoom = RiftApi.inMirrorVerse && danceRoom.isPlayerInside()
         }
         if (inRoom) {
             update()
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onPlaySound(event: PlaySoundEvent) {
-        if (!isEnabled() || !inRoom) return
+        if (!config.enabled || !inRoom) return
         if ((event.soundName == "random.burp" && event.volume == 0.8f) ||
             (event.soundName == "random.levelup" && event.pitch == 1.8412699f && event.volume == 1.0f)
         ) {
@@ -132,9 +133,9 @@ object DanceRoomHelper {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onTitleReceived(event: TitleReceivedEvent) {
-        if (!isEnabled()) return
+        if (!config.enabled) return
         if (config.hideOriginalTitle && inRoom) event.cancel()
     }
 
@@ -161,7 +162,7 @@ object DanceRoomHelper {
 
     @HandleEvent(onlyOnIsland = IslandType.THE_RIFT)
     fun onCheckRender(event: CheckRenderEntityEvent<EntityOtherPlayerMP>) {
-        if (config.enabled && inRoom) {
+        if (config.hidePlayers && inRoom && event.entity.isRealPlayer()) {
             event.cancel()
         }
     }
@@ -180,8 +181,6 @@ object DanceRoomHelper {
             }
         }
     }
-
-    fun isEnabled() = RiftAPI.inRift() && config.enabled
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {

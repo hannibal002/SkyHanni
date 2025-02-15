@@ -8,9 +8,9 @@ import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
-import at.hannibal2.skyhanni.events.LorenzToolTipEvent
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_PAGES
-import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeAPI.MAX_SLOT_PER_PAGE
+import at.hannibal2.skyhanni.events.minecraft.ToolTipEvent
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_PAGES
+import at.hannibal2.skyhanni.features.inventory.wardrobe.WardrobeApi.MAX_SLOT_PER_PAGE
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.mixins.transformers.gui.AccessorGuiContainer
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -52,6 +52,10 @@ object CustomWardrobe {
     private var editMode = false
     private var waitingForInventoryUpdate = false
 
+    private val position: Position = Position().ignoreScale()
+    private val loadingPosition: Position = Position().ignoreScale()
+    private val inventoryButtonPosition: Position = Position().ignoreScale()
+
     private var activeScale: Int = 100
     private var currentMaxSize: Pair<Int, Int>? = null
     private var lastScreenSize: Pair<Int, Int>? = null
@@ -78,21 +82,21 @@ object CustomWardrobe {
         }
 
         val (width, height) = renderable.width to renderable.height
-        val pos = Position((gui.width - width) / 2, (gui.height - height) / 2).setIgnoreCustomScale(true)
+
+        position.moveTo((gui.width - width) / 2, (gui.height - height) / 2)
         if (waitingForInventoryUpdate && config.loadingText) {
             val loadingRenderable = Renderable.string(
                 "§cLoading...",
                 scale = activeScale / 100.0,
             )
-            val loadingPos =
-                Position(pos.rawX + (width - loadingRenderable.width) / 2, pos.rawY - loadingRenderable.height).setIgnoreCustomScale(true)
-            loadingPos.renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
+            loadingPosition.moveTo(position.x + (width - loadingRenderable.width) / 2, position.y - loadingRenderable.height)
+                .renderRenderable(loadingRenderable, posLabel = GUI_NAME, addToGuiManager = false)
         }
 
         GlStateManager.pushMatrix()
         GlStateManager.translate(0f, 0f, 100f)
 
-        pos.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        position.renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
 
         if (EstimatedItemValue.config.enabled) {
             GlStateManager.translate(0f, 0f, 400f)
@@ -112,14 +116,15 @@ object CustomWardrobe {
         val accessorGui = gui as AccessorGuiContainer
         val posX = accessorGui.guiLeft + (1.05 * accessorGui.width).toInt()
         val posY = accessorGui.guiTop + (accessorGui.height - renderable.height) / 2
-        Position(posX, posY).setIgnoreCustomScale(true).renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
+        inventoryButtonPosition.moveTo(posX, posY)
+            .renderRenderable(renderable, posLabel = GUI_NAME, addToGuiManager = false)
     }
 
     @HandleEvent
     fun onInventoryClose(event: InventoryCloseEvent) {
         waitingForInventoryUpdate = false
         DelayedRun.runDelayed(300.milliseconds) {
-            if (!WardrobeAPI.inWardrobe()) {
+            if (!WardrobeApi.inWardrobe()) {
                 reset()
             }
         }
@@ -246,7 +251,7 @@ object CustomWardrobe {
             val mcSlotId = slot.inventorySlots[armorIndex]
             // if the slot is null, we don't fire LorenzToolTipEvent at all.
             val mcSlot = InventoryUtils.getSlotAtIndex(mcSlotId) ?: return toolTips
-            LorenzToolTipEvent(mcSlot, stack, toolTips).postAndCatch()
+            ToolTipEvent(mcSlot, stack, toolTips).post()
 
             return toolTips
         } catch (e: Exception) {
@@ -293,7 +298,7 @@ object CustomWardrobe {
     }
 
     private fun createRenderables(): Renderable {
-        val (wardrobeWarning, list) = createWarning(WardrobeAPI.slots)
+        val (wardrobeWarning, list) = createWarning(WardrobeApi.slots)
 
         val maxPlayersPerRow = config.spacing.maxPlayersPerRow.get().coerceAtLeast(1)
         val maxPlayersRows = ((MAX_SLOT_PER_PAGE * MAX_PAGES - 1) / maxPlayersPerRow) + 1
@@ -386,7 +391,7 @@ object CustomWardrobe {
                     onClick = {
                         config::enabled.jumpToEditor()
                         reset()
-                        WardrobeAPI.currentPage = null
+                        WardrobeApi.currentPage = null
                     },
                 ),
                 blockBottomHover = false,
@@ -396,7 +401,7 @@ object CustomWardrobe {
         )
 
     private fun reset() {
-        WardrobeAPI.inCustomWardrobe = false
+        WardrobeApi.inCustomWardrobe = false
         editMode = false
         displayRenderable = null
         inventoryButton = null
@@ -412,7 +417,7 @@ object CustomWardrobe {
             onClick = {
                 InventoryUtils.clickSlot(48)
                 reset()
-                WardrobeAPI.currentPage = null
+                WardrobeApi.currentPage = null
             },
         )
         val exitButton = createLabeledButton(
@@ -420,7 +425,7 @@ object CustomWardrobe {
             onClick = {
                 InventoryUtils.clickSlot(49)
                 reset()
-                WardrobeAPI.currentPage = null
+                WardrobeApi.currentPage = null
             },
         )
 
@@ -469,7 +474,7 @@ object CustomWardrobe {
             hoveredColor = color,
             unhoveredColor = color.darker(0.8),
             onClick = {
-                WardrobeAPI.inCustomWardrobe = false
+                WardrobeApi.inCustomWardrobe = false
                 editMode = false
                 update()
             },
@@ -497,7 +502,7 @@ object CustomWardrobe {
                 add(
                     Renderable.hoverTips(
                         centerString("§2$", scale = textScale),
-                        WardrobeAPI.createPriceLore(wardrobeSlot),
+                        WardrobeApi.createPriceLore(wardrobeSlot),
                     ),
                 )
             }
@@ -603,18 +608,18 @@ object CustomWardrobe {
     fun WardrobeSlot.clickSlot() {
         val previousPageSlot = 45
         val nextPageSlot = 53
-        val wardrobePage = WardrobeAPI.currentPage ?: return
+        val wardrobePage = WardrobeApi.currentPage ?: return
         if (isInCurrentPage()) {
             if (isEmpty() || locked || waitingForInventoryUpdate) return
-            WardrobeAPI.currentSlot = if (isCurrentSlot()) null else id
+            WardrobeApi.currentSlot = if (isCurrentSlot()) null else id
             InventoryUtils.clickSlot(inventorySlot)
         } else {
             if (page < wardrobePage) {
-                WardrobeAPI.currentPage = wardrobePage - 1
+                WardrobeApi.currentPage = wardrobePage - 1
                 waitingForInventoryUpdate = true
                 InventoryUtils.clickSlot(previousPageSlot)
             } else if (page > wardrobePage) {
-                WardrobeAPI.currentPage = wardrobePage + 1
+                WardrobeApi.currentPage = wardrobePage + 1
                 waitingForInventoryUpdate = true
                 InventoryUtils.clickSlot(nextPageSlot)
             }
@@ -632,7 +637,7 @@ object CustomWardrobe {
                 .transformIf({ locked || isEmpty() }) { darker(0.2) }.addAlpha(100)
     }
 
-    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WardrobeAPI.inWardrobe()
+    fun isEnabled() = LorenzUtils.inSkyBlock && config.enabled && WardrobeApi.inWardrobe()
 
     fun centerString(
         text: String,
