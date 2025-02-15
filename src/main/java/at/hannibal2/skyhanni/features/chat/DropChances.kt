@@ -135,9 +135,7 @@ object DropChances {
 
         val selectedDrop = NeuInternalName.fromItemNameOrNull(rngStorage?.itemGoal ?: "")
 
-        ChatUtils.chat(dropsJson.toString())
-
-        for (drop in dropsJson.table["main_table"] ?: emptyMap()) {
+        for (drop in dropsJson.table) {
             val dropDetails = drop.value
 
             var weight: Double = dropDetails.weight.toDouble()
@@ -155,8 +153,8 @@ object DropChances {
 
         if (selectedDrop == null) return totalWeight
 
-        if (getTable(dropsJson, selectedDrop) == dropsJson.table) {
-            for (drop in dropsJson.table["extra_table"] ?: emptyMap()) {
+        if (getTable(dropsJson, selectedDrop) == dropsJson.extraTable) {
+            for (drop in dropsJson.table) {
                 val dropDetails = drop.value
 
                 var weight: Double = dropDetails.weight.toDouble()
@@ -176,10 +174,11 @@ object DropChances {
         return totalWeight
     }
 
-    private fun getTable(dropsJson: SlayerDropsJson, selectedDrop: NeuInternalName): Pair<String, Map<NeuInternalName, DropDetails>>? {
-        return dropsJson.table.entries
-            .firstOrNull { selectedDrop in it.value }
-            ?.let { it.key to it.value }
+    private fun getTable(dropsJson: SlayerDropsJson, selectedDrop: NeuInternalName): Map<NeuInternalName, DropDetails>? {
+        return (dropsJson.table + dropsJson.extraTable).entries
+            .firstOrNull { it.key == selectedDrop }
+            ?.value
+            ?.let { mapOf(selectedDrop to it) }
     }
 
     private fun getMagicFindModifiedWeight(itemWeight: Double, magicFind: Int): Long {
@@ -196,28 +195,18 @@ object DropChances {
     }
 
     private fun getDropWeight(dropsJson: SlayerDropsJson, internalName: NeuInternalName): Double? {
-        for (table in dropsJson.table) {
-            for (drop in table.value) {
-                if (drop.key == internalName) {
-                    return drop.value.weight.toDouble()
-                }
-            }
+        for (table in (dropsJson.table + dropsJson.extraTable)) {
+             if (table.key == internalName) {
+                 return table.value.weight.toDouble()
+             }
         }
         return null
     }
 
     private fun getDropDetails(dropsJson: SlayerDropsJson, internalDropName: NeuInternalName): DropDetails? {
         for (table in dropsJson.table) {
-            for (drop in table.value) {
-                if (drop.key.contains(internalDropName.asString())) {
-                    ChatUtils.chat(
-                        "Found drop details for $internalDropName: \n" +
-                            "xpNeeded: ${drop.value.xpNeeded}\n" +
-                            "weight: ${drop.value.weight}\n" +
-                            "magicFind: ${drop.value.magicFind}"
-                    )
-                    return drop.value
-                }
+            if (table.key.contains(internalDropName.asString())) {
+                return table.value
             }
         }
         return null
