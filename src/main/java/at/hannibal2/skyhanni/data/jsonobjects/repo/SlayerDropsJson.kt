@@ -6,7 +6,7 @@ import com.google.gson.annotations.SerializedName
 
 data class SlayerDropsJson(
     @Expose @SerializedName("main_table") val table: Map<NeuInternalName, DropDetails>,
-    @Expose @SerializedName("extra_table") val extraTable:  Map<NeuInternalName, DropDetails>
+    @Expose @SerializedName("extra_table") val extraTable: Map<NeuInternalName, DropDetails>
 )
 
 data class DropDetails(

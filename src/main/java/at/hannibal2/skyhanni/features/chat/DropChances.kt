@@ -8,18 +8,15 @@ import at.hannibal2.skyhanni.data.jsonobjects.repo.SlayerDropsJson
 import at.hannibal2.skyhanni.events.RepositoryReloadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
-import scala.Console
 import java.util.regex.Pattern
 
 @SkyHanniModule
-@Suppress("UnusedParameter", "UnusedPrivateProperty", "FunctionOnlyReturningConstant")
 object DropChances {
 
     private val patternGroup = RepoPattern.group("slayer.drop")
@@ -114,21 +111,21 @@ object DropChances {
         }
     }
 
-    private fun getDropChance(dropsJson: SlayerDropsJson, magicFind: Int, internalName: NeuInternalName, isMeterDrop: Boolean): Double? {
+    private fun getDropChance(dropsJson: SlayerDropsJson, magicFind: Int, internalName: NeuInternalName, isMeterDrop: Boolean): Double {
         if (isMeterDrop) {
-            val totalWeight = getTotalWeight(dropsJson, magicFind, internalName, true)
+            val totalWeight = getTotalWeight(dropsJson, magicFind)
             val dropWeight = getMagicFindModifiedWeight(getRngMeterModifier(dropsJson, internalName) ?: 0.0, magicFind)
 
             return dropWeight.toDouble() / totalWeight
         } else {
-            val totalWeight = getTotalWeight(dropsJson, magicFind, internalName, false)
+            val totalWeight = getTotalWeight(dropsJson, magicFind)
             val dropWeight = getMagicFindModifiedWeight(getDropWeight(dropsJson, internalName) ?: 0.0, magicFind)
 
             return dropWeight.toDouble() / totalWeight
         }
     }
 
-    private fun getTotalWeight(dropsJson: SlayerDropsJson, magicFind: Int, internalName: NeuInternalName, isMeterDrop: Boolean): Double {
+    private fun getTotalWeight(dropsJson: SlayerDropsJson, magicFind: Int): Double {
         var totalWeight = 10000.0
 
         val rngStorage: ProfileSpecificStorage.SlayerRngMeterStorage? = storage?.entries?.elementAtOrNull(1)?.value
@@ -141,7 +138,7 @@ object DropChances {
             var weight: Double = dropDetails.weight.toDouble()
 
             if (drop.key == selectedDrop) {
-                weight = getRngMeterModifier(dropsJson, selectedDrop)?.toDouble() ?: 0.0
+                weight = getRngMeterModifier(dropsJson, selectedDrop) ?: 0.0
             }
 
             if (dropDetails.magicFind) {
@@ -196,9 +193,9 @@ object DropChances {
 
     private fun getDropWeight(dropsJson: SlayerDropsJson, internalName: NeuInternalName): Double? {
         for (table in (dropsJson.table + dropsJson.extraTable)) {
-             if (table.key == internalName) {
-                 return table.value.weight.toDouble()
-             }
+            if (table.key == internalName) {
+                return table.value.weight.toDouble()
+            }
         }
         return null
     }
