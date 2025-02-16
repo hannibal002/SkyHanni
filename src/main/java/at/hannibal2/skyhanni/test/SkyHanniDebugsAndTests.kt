@@ -11,7 +11,6 @@ import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.data.HypixelData
 import at.hannibal2.skyhanni.data.IslandGraphs
-import at.hannibal2.skyhanni.data.model.TextInput
 import at.hannibal2.skyhanni.events.GuiKeyPressEvent
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
@@ -52,7 +51,6 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import at.hannibal2.skyhanni.utils.RenderUtils.renderStringsAndItems
@@ -62,7 +60,6 @@ import at.hannibal2.skyhanni.utils.renderables.DragNDrop
 import at.hannibal2.skyhanni.utils.renderables.Droppable
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.renderBounds
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.toDragItem
 import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
@@ -147,40 +144,6 @@ object SkyHanniDebugsAndTests {
         println("start null finder")
         findNull(SkyHanniMod.feature, "config")
         println("stop null finder")
-    }
-
-    private val scroll = ScrollValue()
-    private val text = TextInput()
-
-    @HandleEvent
-    fun onGuiRenderChestGuiOverlayRender(event: GuiRenderEvent.ChestGuiOverlayRenderEvent) {
-        config.debugPos.renderRenderable(
-            Renderable.searchableScrollable(
-                table = mapOf(
-                    Pair(listOf(Renderable.string("Help"), Renderable.string("ME"), Renderable.string("NOW!")), "HELP"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm not ok"), Renderable.string("how are you?")), "NOT OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm ok"), Renderable.string("how are you?")), "OK"),
-                    Pair(listOf(Renderable.string("I'm last"), Renderable.string("where are you?")), "LAST"),
-                ),
-                lines = 5,
-                key = 0,
-                velocity = 2.0,
-                scrollValue = scroll,
-                textInput = text,
-                showScrollableTipsInList = true,
-                asTable = false,
-            ).renderBounds(),
-            posLabel = "Test",
-        )
     }
 
     private fun findNull(obj: Any, path: String) {
