@@ -82,7 +82,7 @@ public class TrackerConfig {
     @Expose
     @ConfigOption(name = "Items Shown", desc = "Change the number of item lines shown at once.")
     @ConfigEditorSlider(minValue = 3, maxValue = 30, minStep = 1)
-    public Property<Integer> itemsShown = Property.of(7);
+    public Property<Integer> itemsShown = Property.of(10);
 
     @Expose
     @ConfigOption(name = "Hide outside Inventory", desc = "Hide Profit Trackers while not inside an inventory.")

@@ -29,10 +29,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableX
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableY
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
@@ -566,8 +562,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
             var content = filter()
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -614,8 +610,8 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -1227,7 +1223,7 @@ interface Renderable {
             showScrollableTipsInList: Boolean = true,
             asTable: Boolean = true,
         ) = if (asTable) {
-            val height = calculateTableY(table.keys, 0).maxOf { it.value }
+            val height = RenderableUtils.calculateTableY(table.keys, 0).maxOf { it.value }
             searchableScrollTable(
                 table,
                 key = key,
@@ -1275,8 +1271,8 @@ interface Renderable {
 
             private val fullContent = if (header.isNotEmpty()) listOf(header) + content.keys else content.keys
 
-            val xOffsets = calculateTableX(fullContent, xPadding)
-            val yOffsets = calculateTableY(fullContent, yPadding)
+            val xOffsets = RenderableUtils.calculateTableX(fullContent, xPadding)
+            val yOffsets = RenderableUtils.calculateTableY(fullContent, yPadding)
 
             override val width = maxOf(xOffsets.sum(), scrollUpTip.width, scrollDownTip.width)
             override val height = height
@@ -1400,8 +1396,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
 
             override val width = xOffsets.last() - xPadding
             override val height = height
