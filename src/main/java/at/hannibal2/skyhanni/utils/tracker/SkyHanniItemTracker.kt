@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("SpreadOperator")
 open class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
@@ -68,7 +67,6 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         return if (this == SKYBLOCK_COIN) getCoinName.invoke(item) else this.itemName
     }
 
-    @Suppress("CyclomaticComplexMethod")
     open fun drawItems(
         data: Data,
         filter: (NeuInternalName) -> Boolean,

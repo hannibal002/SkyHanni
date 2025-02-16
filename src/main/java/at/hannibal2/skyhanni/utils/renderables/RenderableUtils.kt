@@ -16,7 +16,6 @@ import kotlin.reflect.KMutableProperty0
 
 private typealias Direction = Renderable.Companion.Direction
 
-@Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
     /** Calculates the relative x position of the columns in a table*/
@@ -115,7 +114,6 @@ internal object RenderableUtils {
         return yOffset
     }
 
-    @Suppress("NOTHING_TO_INLINE")
     inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         GlStateManager.translate(1.0, 1.0, 0.0)
