@@ -1176,7 +1176,6 @@ interface Renderable {
                     renderY += renderable.height
                     found = true
                 } else if (found) {
-                    found = false
                     if (renderY + renderable.height <= height + negativeSpace2) {
                         renderable.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
