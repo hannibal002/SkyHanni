@@ -9,7 +9,7 @@ const detektOutput = fs.readFileSync('detekt_output.txt', 'utf8');
 
 const lines = detektOutput.split('\n');
 
-let comment = `### ${lines.length} Detekt Failure${lines.length !== 1 ? 's' : ''} were detected:\n\n`;
+let comment = `### ${lines.length} Detekt Failure${lines.length !== 1 ? 's were' : ' was'} detected:\n\n`;
 
 lines.forEach((line) => {
     if (!line.trim()) return; // Skip empty lines
