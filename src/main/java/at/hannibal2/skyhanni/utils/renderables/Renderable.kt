@@ -1174,17 +1174,17 @@ interface Renderable {
                     renderable.renderXAligned(posX, posY + renderY, width)
                     GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
                     renderY += renderable.height
-                    virtualY += renderable.height
                     found = true
                 } else if (found) {
                     found = false
                     if (renderY + renderable.height <= height + negativeSpace2) {
                         renderable.renderXAligned(posX, posY + renderY, width)
                         GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
-                        virtualY += renderable.height
+                        renderY += renderable.height
                     }
                     break
                 }
+                virtualY += renderable.height
             }
 
             // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
