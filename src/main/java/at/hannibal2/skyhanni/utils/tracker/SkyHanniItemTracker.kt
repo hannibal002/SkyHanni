@@ -1,5 +1,6 @@
 package at.hannibal2.skyhanni.utils.tracker
 
+import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.config.features.misc.TrackerConfig.TextPart
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.TrackerManager
@@ -30,6 +31,10 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
     vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
     drawDisplay: (Data) -> List<Searchable>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+
+    companion object {
+        private val config get() = SkyHanniMod.feature.misc.tracker
+    }
 
     private var scrollValue = ScrollValue()
 
@@ -134,6 +139,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             val loreText = getLoreList.invoke(internalName, itemProfit)
             val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
 
+            // TODO add row abstraction to api, with common click+hover behaviour
             fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickAndHover(
                 string, lore,
                 onClick = {

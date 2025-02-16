@@ -784,6 +784,7 @@ object ItemUtils {
     }
 
     // Taken from NEU
+    // TODO add cache
     fun getCoinItemStack(coinAmount: Number): ItemStack {
         val amount = coinAmount.toDouble()
         var uuid = "2070f6cb-f5db-367a-acd0-64d39a7e5d1b"
