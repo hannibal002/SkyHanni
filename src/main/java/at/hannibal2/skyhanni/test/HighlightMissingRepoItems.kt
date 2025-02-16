@@ -36,8 +36,8 @@ object HighlightMissingRepoItems {
         if (NeuItems.allInternalNames.isEmpty()) return
         val filteredSlots = slots.filter {
             val internalName = it.stack?.getInternalNameOrNull() ?: return@filter false
-            it.stack != null && NeuItems.allInternalNames.contains(internalName) &&
-                !ItemUtils.itemNameCache.contains(internalName) &&
+            internalName !in ItemUtils.itemNameCache &&
+                internalName !in NeuItems.allInternalNames &&
                 !NeuItems.ignoreItemsFilter.match(internalName.asString())
         }
         filteredSlots.highlightAll(LorenzColor.RED)
