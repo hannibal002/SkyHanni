@@ -15,7 +15,7 @@ fun List<Searchable>.buildSearchBox(
 ): Renderable {
     val key = 0
     return Renderable.searchBox(
-        Renderable.verticalSearchableContainer(toMap(), textInput = textInput, key = key + 1),
+        Renderable.verticalSearchableContainer(toMap(), textInput = textInput, key = key + 1, spacing = 1),
         SEARCH_PREFIX,
         onUpdateSize = {},
         textInput = textInput,

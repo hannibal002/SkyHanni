@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import kotlin.time.Duration.Companion.seconds
@@ -30,6 +31,8 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
     vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
     drawDisplay: (Data) -> List<Searchable>,
 ) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+
+    private var scrollValue = ScrollValue()
 
     open fun addCoins(amount: Int, command: Boolean) {
         addItem(SKYBLOCK_COIN, amount, command)
@@ -112,10 +115,6 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             }
         }
 
-        val limitList = config.hideCheapItems
-        var pos = 0
-        val hiddenItemTexts = mutableListOf<Renderable>()
-
         val table = mutableMapOf<List<Renderable>, String>()
 
         for ((internalName, price) in items.sortedDesc()) {
@@ -133,7 +132,6 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
 
             val formattedName = cleanName.removeColor(keepFormatting = true).replace("§r", "")
             val displayName = if (hidden) "§8§m$formattedName" else cleanName
-
 
             val loreText = getLoreList.invoke(internalName, itemProfit)
             val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
@@ -163,27 +161,21 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             row[TextPart.AMOUNT] = string(" $numberColor${displayAmount.addSeparators()}x")
 
             val line = config.textOrder.get().mapNotNull { row[it] }
-            pos++
-            if (limitList.enabled.get()) {
-                if (pos > limitList.alwaysShowBest.get()) {
-                    if (price < limitList.minPrice.get() * 1000) {
-                        hiddenItemTexts += Renderable.horizontalContainer(line)
-                        continue
-                    }
-                }
-            }
             table[line] = cleanName
         }
 
-        // TODO use scrollable
-//         lists.add(table.buildSearchableScrollableTable(textInput, height = 150).toSearchable())
-//         lists.add(table.buildSearchableTable(textInput).toSearchable())
-        lists.add(Renderable.searchableTable(table.toMap(), textInput = textInput, key = 99).toSearchable())
-
-        if (hiddenItemTexts.size > 0) {
-            val text = Renderable.hoverTips(" §7${hiddenItemTexts.size} cheap items are hidden.", hiddenItemTexts).toSearchable()
-            lists.add(text)
-        }
+        lists.add(
+            Renderable.searchableScrollable(
+                table,
+                key = 99,
+                lines = config.itemsShown.get(),
+                velocity = 5.0,
+                textInput = textInput,
+                scrollValue = scrollValue,
+                asTable = config.showTable.get(),
+                showScrollableTipsInList = true,
+            ).toSearchable(),
+        )
 
         return profit
     }

@@ -89,6 +89,21 @@ object CollectionUtils {
         }
     }
 
+    fun <T, R> Sequence<IndexedValue<T>>.runningIndexedFold(initial: R, operation: (R, T) -> R): Sequence<IndexedValue<R>> =
+        map { it.value }.runningFold(initial, operation).zip(map { it.index }) { value, index -> IndexedValue(index, value) }
+
+    fun <T : Any> Sequence<T>.firstTwiceOf(a: (T) -> Boolean, b: (T) -> Boolean): Pair<T?, T?> {
+        var firstA: T? = null
+        var firstB: T? = null
+
+        for (item in this) {
+            if (firstA == null && a(item)) firstA = item
+            if (firstB == null && b(item)) firstB = item
+            if (firstA != null && firstB != null) break
+        }
+        return Pair(firstA, firstB)
+    }
+
     /** Returns a map containing the count of occurrences of each distinct result of the [selector] function. */
     inline fun <T, K> Iterable<T>.countBy(selector: (T) -> K): Map<K, Int> {
         val map = mutableMapOf<K, Int>()
