@@ -18,6 +18,7 @@ import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.TitleUtils
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
@@ -238,13 +239,20 @@ open class SkyHanniTracker<Data : TrackerData>(
         )
     }
 
+    fun handlePossibleRareDropWithoutMessage(internalName: NeuInternalName, amount: Int) {
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
+        if (config.warnings.title && price >= config.warnings.minimumTitle) {
+            TitleUtils.addTitleToQueue("§a+ $itemName", 5.seconds)
+        }
+    }
+
     fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
         if (config.warnings.chat && price >= config.warnings.minimumChat) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
+            TitleUtils.addTitleToQueue("§a+ $itemName", 5.seconds)
         }
     }
 
