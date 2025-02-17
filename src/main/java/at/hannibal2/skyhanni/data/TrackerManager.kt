@@ -20,9 +20,14 @@ object TrackerManager {
 
     @HandleEvent
     fun onConfigLoad(event: ConfigLoadEvent) {
-        val config = SkyHanniMod.feature.misc.tracker.hideCheapItems
-        ConditionalUtils.onToggle(config.alwaysShowBest, config.minPrice, config.enabled) {
-            hasChanged = true
+        with(SkyHanniMod.feature.misc.tracker) {
+            ConditionalUtils.onToggle(
+                textOrder,
+                showTable,
+                itemsShown,
+            ) {
+                hasChanged = true
+            }
         }
     }
 

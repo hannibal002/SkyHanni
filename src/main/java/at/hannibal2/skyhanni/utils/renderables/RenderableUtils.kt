@@ -16,11 +16,31 @@ import kotlin.reflect.KMutableProperty0
 
 private typealias Direction = Renderable.Companion.Direction
 
-@Suppress("TooManyFunctions", "unused", "MemberVisibilityCanBePrivate")
 internal object RenderableUtils {
 
+    /** Calculates the relative x position of the columns in a table*/
+    fun calculateTableX(content: Collection<List<Renderable?>>, xPadding: Int): List<Int> {
+        var index = 0
+        return buildList {
+            while (true) {
+                val x = content.map { it.getOrNull(index) }.takeIf { it.any { it != null } }?.maxOfOrNull {
+                    it?.width ?: 0
+                }?.let { it + xPadding } ?: break
+                add(x)
+                index++
+            }
+        }
+    }
+
+    /** Calculates the relative y position of the rows in a table*/
+    fun calculateTableY(content: Collection<List<Renderable?>>, yPadding: Int): Map<List<Renderable?>, Int> {
+        return content.associateWith { row ->
+            (row.maxOfOrNull { it?.height ?: 0 } ?: 0) + yPadding
+        }
+    }
+
     /** Calculates the absolute x position of the columns in a table*/
-    fun calculateTableXOffsets(content: List<List<Renderable?>>, xPadding: Int) = run {
+    fun calculateTableXOffsets(content: Collection<List<Renderable?>>, xPadding: Int) = run {
         var buffer = 0
         var index = 0
         buildList {
@@ -39,7 +59,7 @@ internal object RenderableUtils {
     }
 
     /** Calculates the absolute y position of the rows in a table*/
-    fun calculateTableYOffsets(content: List<List<Renderable?>>, yPadding: Int) = run {
+    fun calculateTableYOffsets(content: Collection<List<Renderable?>>, yPadding: Int) = run {
         var buffer = 0
         listOf(0) + (
             content.takeIf { it.isNotEmpty() }?.map { row ->
@@ -94,7 +114,6 @@ internal object RenderableUtils {
         return yOffset
     }
 
-    @Suppress("NOTHING_TO_INLINE")
     inline fun renderString(text: String, scale: Double = 1.0, color: Color = Color.WHITE, inverseScale: Double = 1 / scale) {
         val fontRenderer = Minecraft.getMinecraft().fontRendererObj
         GlStateManager.translate(1.0, 1.0, 0.0)
