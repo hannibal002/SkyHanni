@@ -1113,8 +1113,8 @@
 + Added an alert for Gold or Diamond Trophy Fish catches. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/2615)
     + Displays a popup with the trophy name, rarity, and amount of the catch.
     + Optionally, also plays a sound.+ Added an alert for Gold or Diamond Trophy Fish catches. - ReyMaratov (https://github.com/hannibal002/SkyHanni/pull/2615)
-  + Displays a popup with the trophy name, rarity, and amount of the catch.
-  + Optionally, also plays a sound.
+    + Displays a popup with the trophy name, rarity, and amount of the catch.
+    + Optionally, also plays a sound.
 
 #### Misc Features
 
