@@ -73,7 +73,6 @@ object StashCompact {
     // </editor-fold>
 
     private val config get() = SkyHanniMod.feature.chat.filterType.stashMessages
-    private val filterConfig get() = SkyHanniMod.feature.chat.filterType
 
     private var currentType: StashType? = null
     private val currentMessages: MutableMap<StashType, StashMessage?> = mutableMapOf()
