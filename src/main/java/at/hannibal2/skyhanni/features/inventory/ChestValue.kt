@@ -168,13 +168,12 @@ object ChestValue {
             scrollValue = scrollValue,
         )
 
-        // TODO add function that expects a boolean
-        addRenderableButton<DisplayType>(
+        addRenderableButton(
             label = "Display Type",
-            current = DisplayType.entries[if (config.alignedDisplay) 1 else 0],
-            getName = { it.type },
+            config = config::alignedDisplay,
+            enabled = "Aligned",
+            disabled = "Normal",
             onChange = {
-                config.alignedDisplay = !config.alignedDisplay
                 update()
             },
             scrollValue = scrollValue,
@@ -227,11 +226,6 @@ object ChestValue {
         }
     }
 
-    enum class DisplayType(val type: String) {
-        NORMAL("Normal"),
-        COMPACT("Aligned")
-    }
-
     private fun isValidStorage(): Boolean {
         if (inOwnInventory) return true
         val name = InventoryUtils.openInventoryName().removeColor()
@@ -249,8 +243,7 @@ object ChestValue {
 
         val inMinion = name.contains("Minion") && !name.contains("Recipe") && IslandType.PRIVATE_ISLAND.isInIsland()
         // TODO: Use repo for this
-        return name == "Chest" || name == "Large Chest" || inMinion ||
-            name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
+        return InventoryUtils.isInNormalChest() || inMinion || name == "Personal Vault" || name == "Chest Storage" || name == "Wood Chest+"
     }
 
     private fun String.reduceStringLength(targetLength: Int, char: Char): String {
