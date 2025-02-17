@@ -7,12 +7,15 @@ import at.hannibal2.skyhanni.features.inventory.bazaar.BazaarApi.getBazaarData
 import at.hannibal2.skyhanni.features.inventory.bazaar.HypixelItemApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
+import at.hannibal2.skyhanni.utils.ItemUtils.getNumberedName
 import at.hannibal2.skyhanni.utils.ItemUtils.getRecipePrice
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.NeuItems.getRecipes
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
@@ -146,7 +149,6 @@ object ItemPriceUtils {
             } else {
                 NeuInternalName.fromItemNameOrNull(name)
             }
-
         }
     }
 
@@ -164,6 +166,7 @@ object ItemPriceUtils {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (PlatformUtils.isNeuLoaded()) return
+        if (ApiUtils.isMoulberryLowestBinDisabled()) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 
@@ -174,5 +177,21 @@ object ItemPriceUtils {
 
     private fun refreshLowestBins() {
         lowestBins = ApiUtils.getJSONResponse("https://moulberry.codes/lowestbin.json.gz", gunzip = true)
+    }
+
+    fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {
+        val price = pricePer * amount.toDouble()
+        if (this == SKYBLOCK_COIN) return " ${price.formatCoin()} coins"
+
+        return " ${getNumberedName(amount)} ${price.formatCoinWithBrackets()}"
+    }
+
+    fun Number.formatCoinWithBrackets(gray: Boolean = false): String {
+        return "§7(" + formatCoin(gray) + "§7)"
+    }
+
+    fun Number.formatCoin(gray: Boolean = false): String {
+        val color = if (gray) "§7" else "§6"
+        return color + shortFormat()
     }
 }
