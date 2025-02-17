@@ -12,6 +12,8 @@ import at.hannibal2.skyhanni.features.chroma.ChromaType
 import at.hannibal2.skyhanni.features.misc.DarkenShader
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.utils.CollectionUtils.contains
+import at.hannibal2.skyhanni.utils.CollectionUtils.firstTwiceOf
+import at.hannibal2.skyhanni.utils.CollectionUtils.runningIndexedFold
 import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
@@ -27,8 +29,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableXOffsets
-import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.calculateTableYOffsets
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderXYAligned
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.renderYAligned
@@ -48,7 +48,6 @@ import java.awt.Color
 import java.util.Collections
 import kotlin.math.max
 
-@Suppress("TooManyFunctions")
 interface Renderable {
 
     val width: Int
@@ -322,16 +321,7 @@ interface Renderable {
             val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
-                isGuiScreen &&
-                    isGuiPositionEditor &&
-                    inMenu &&
-                    isNotInSignAndOnSlot &&
-                    isConfigScreen &&
-                    !isInNeuPv &&
-                    !isInSkytilsPv &&
-                    !neuFocus &&
-                    !isInSkytilsSettings &&
-                    !isInNeuSettings
+                isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkytilsPv && !neuFocus && !isInSkytilsSettings && !isInNeuSettings
 
             if (debug) {
                 if (!result) {
@@ -523,10 +513,8 @@ interface Renderable {
             override val width by lazy { (rawWidth * scale).toInt() + 1 }
 
             val rawWidth by lazy {
-                if (map.size == 1)
-                    map.entries.first().value
-                else
-                    map.maxOf { it.value }
+                if (map.size == 1) map.entries.first().value
+                else map.maxOf { it.value }
             }
 
             override val height by lazy { map.size * ((9 * scale).toInt() + 1) }
@@ -572,9 +560,9 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            var content = map.keys.toList()
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            var content = filter()
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -586,10 +574,12 @@ interface Renderable {
 
             init {
                 textInput.registerToEvent(key) {
-                    // null = ignored, never filtered
-                    content = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
+                    content = filter()
                 }
             }
+
+            // null = ignored, never filtered
+            private fun filter() = map.filter { it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }.keys.toList()
 
             override fun render(posX: Int, posY: Int) {
                 for ((rowIndex, row) in content.withIndex()) {
@@ -619,8 +609,8 @@ interface Renderable {
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
 
@@ -1045,7 +1035,7 @@ interface Renderable {
             private val scrollUpTip = string("§7§oMore items above (scroll)")
             private val scrollDownTip = string("§7§oMore items below (scroll)")
 
-            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width)
+            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollDownTip.width, scrollUpTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1060,58 +1050,22 @@ interface Renderable {
                 button,
             )
 
-            private val end get() = scroll.asInt() + height
-
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
                     isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
                 )
 
-                var renderY = 0
-                var virtualY = 0
-                var found = false
-
-                var negativeSpace = 0
-
-                // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
-                // there are more items above
-                if (showScrollableTipsInList && scroll.asInt() > 0) {
-                    scrollUpTip.renderXAligned(posX, posY, width)
-                    GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
-                    renderY += scrollUpTip.height
-                    negativeSpace -= scrollUpTip.height
-                }
-
-                val atScrollEnd = scroll.asInt() >= virtualHeight - height
-                if (!atScrollEnd) {
-                    negativeSpace -= scrollDownTip.height
-                }
-
-                val window = scroll.asInt()..(end + negativeSpace)
-
-                for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in window) {
-                        renderable.renderXAligned(posX, posY + renderY, width)
-                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
-                        renderY += renderable.height
-                        found = true
-                    } else if (found) {
-                        found = false
-                        if (renderY + renderable.height <= height + negativeSpace) {
-                            renderable.renderXAligned(posX, posY + renderY, width)
-                        }
-                        break
-                    }
-                    virtualY += renderable.height
-                }
-
-                // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
-                // there are more items below
-                if (showScrollableTipsInList && !atScrollEnd) {
-                    scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
-                }
-
-                GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+                scrollListRender(
+                    posX,
+                    posY,
+                    height,
+                    width,
+                    list,
+                    scroll,
+                    showScrollableTipsInList,
+                    scrollUpTip,
+                    scrollDownTip,
+                )
             }
         }
 
@@ -1124,11 +1078,16 @@ interface Renderable {
             textInput: TextInput,
             key: Int,
             bypassChecks: Boolean = false,
+            showScrollableTipsInList: Boolean = false,
             horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
-            private var list = filterList(content, textInput.textBox)
-            override val width = list.maxOf { it.width }
+
+            private val scrollUpTip = string("§7§oMore items above (scroll)")
+            private val scrollDownTip = string("§7§oMore items below (scroll)")
+
+            private var list: Set<Renderable> = filterList(content, textInput.textBox)
+            override val width = maxOf(list.maxOfOrNull { it.width } ?: 0, scrollUpTip.width, scrollDownTip.width)
             override val height = height
             override val horizontalAlign = horizontalAlign
             override val verticalAlign = verticalAlign
@@ -1149,12 +1108,196 @@ interface Renderable {
             private fun createScroll() = ScrollInput.Companion.Vertical(
                 scrollValue,
                 0,
-                virtualHeight - height,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
                 velocity,
                 button,
             )
 
-            private val end get() = scroll.asInt() + height
+            override fun render(posX: Int, posY: Int) {
+                scroll.update(
+                    isHovered(posX, posY) && shouldAllowLink(true, bypassChecks),
+                )
+
+                scrollListRender(
+                    posX,
+                    posY,
+                    height,
+                    width,
+                    list,
+                    scroll,
+                    showScrollableTipsInList,
+                    scrollUpTip,
+                    scrollDownTip,
+                )
+            }
+        }
+
+        private fun scrollListRender(
+            posX: Int,
+            posY: Int,
+            height: Int,
+            width: Int,
+            list: Collection<Renderable>,
+            scroll: ScrollInput.Companion.Vertical,
+            showScrollableTipsInList: Boolean,
+            scrollUpTip: Renderable,
+            scrollDownTip: Renderable,
+        ) {
+            val end = scroll.asInt() + height + 1
+
+            var renderY = 0
+            var virtualY = 0
+            var found = false
+
+            var negativeSpace1 = 0
+            var negativeSpace2 = 0
+
+            // If showScrollableTipsInList is true, and we are scrolled 'down', display a tip indicating
+            // there are more items above
+            if (showScrollableTipsInList && !scroll.atMinimum()) {
+                scrollUpTip.renderXAligned(posX, posY, width)
+                GlStateManager.translate(0f, scrollUpTip.height.toFloat(), 0f)
+                renderY += scrollUpTip.height
+                negativeSpace1 -= scrollUpTip.height
+            }
+
+            val atScrollEnd = scroll.atMaximum()
+            if (!atScrollEnd) {
+                negativeSpace2 -= scrollDownTip.height
+            }
+
+            val window = scroll.asInt()..(end + negativeSpace1 + negativeSpace2)
+
+            for (renderable in list) {
+                if ((virtualY..virtualY + renderable.height) in window) {
+                    renderable.renderXAligned(posX, posY + renderY, width)
+                    GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
+                    renderY += renderable.height
+                    found = true
+                } else if (found) {
+                    if (renderY + renderable.height <= height + negativeSpace2) {
+                        renderable.renderXAligned(posX, posY + renderY, width)
+                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
+                        renderY += renderable.height
+                    }
+                    break
+                }
+                virtualY += renderable.height
+            }
+
+            // If showScrollableTipsInList is true, and we are scrolled 'up', display a tip indicating
+            // there are more items below
+            if (showScrollableTipsInList && !atScrollEnd) {
+                scrollDownTip.renderXAligned(posX, posY + height - scrollDownTip.height, width)
+            }
+
+            GlStateManager.translate(0f, -renderY.toFloat(), 0f)
+        }
+
+        private fun filterList(content: Map<Renderable, String?>, textBox: String) =
+            filterListBase(content, textBox, string("§cNo search results!"))
+
+        private fun filterListMap(content: Map<List<Renderable>, String?>, textBox: String) =
+            filterListBase(content, textBox, singeltonString("§cNo search results!"))
+
+        private fun <T> filterListBase(content: Map<T, String?>, textBox: String, empty: T): Set<T> {
+            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) != false }
+            val set = map.keys.toMutableSet()
+            if (map.filter { it.value != null }.isEmpty()) {
+                if (textBox.isNotEmpty()) {
+                    set.add(empty)
+                }
+            }
+            return set
+        }
+
+        fun searchableScrollable(
+            table: Map<List<Renderable>, String>,
+            key: Int,
+            lines: Int,
+            velocity: Double,
+            textInput: TextInput,
+            scrollValue: ScrollValue,
+            showScrollableTipsInList: Boolean = true,
+            asTable: Boolean = true,
+        ) = if (asTable) {
+            val height = RenderableUtils.calculateTableY(table.keys, 0).maxOf { it.value }
+            searchableScrollTable(
+                table,
+                key = key,
+                height = lines * height,
+                textInput = textInput,
+                velocity = velocity,
+                scrollValue = scrollValue,
+                showScrollableTipsInList = showScrollableTipsInList,
+            )
+        } else {
+            val content = table.mapKeys { horizontalContainer(it.key) }
+            val height = content.maxOf { it.key.height }
+            searchableScrollList(
+                content,
+                key = key,
+                height = lines * height,
+                textInput = textInput,
+                velocity = velocity,
+                scrollValue = scrollValue,
+                showScrollableTipsInList = showScrollableTipsInList,
+            )
+        }
+
+        fun searchableScrollTable(
+            content: Map<List<Renderable>, String?>,
+            height: Int,
+            scrollValue: ScrollValue = ScrollValue(),
+            velocity: Double = 2.0,
+            button: Int? = null,
+            textInput: TextInput,
+            key: Int,
+            xPadding: Int = 1,
+            yPadding: Int = 0,
+            header: List<Renderable> = emptyList(),
+            bypassChecks: Boolean = false,
+            showScrollableTipsInList: Boolean = false,
+            horizontalAlign: HorizontalAlignment = HorizontalAlignment.LEFT,
+            verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
+        ) = object : Renderable {
+
+            private val scrollUpTip = string("§7§oMore items above (scroll)")
+            private val scrollDownTip = string("§7§oMore items below (scroll)")
+
+            private var list = filterListMap(content, textInput.textBox).toList()
+
+            private val fullContent = if (header.isNotEmpty()) listOf(header) + content.keys else content.keys
+
+            val xOffsets = RenderableUtils.calculateTableX(fullContent, xPadding)
+            val yOffsets = RenderableUtils.calculateTableY(fullContent, yPadding)
+
+            override val width = maxOf(xOffsets.sum(), scrollUpTip.width, scrollDownTip.width)
+            override val height = height
+            override val horizontalAlign = horizontalAlign
+            override val verticalAlign = verticalAlign
+
+            private val virtualHeight get() = list.sumOf { yOffsets[it] ?: 0 }
+
+            private val end get() = scroll.asInt() + height + 1
+
+            private var scroll = createScroll()
+
+            private fun createScroll() = ScrollInput.Companion.Vertical(
+                scrollValue,
+                yOffsets[header] ?: 0,
+                virtualHeight - height + if (showScrollableTipsInList && virtualHeight > height) scrollUpTip.height else 0,
+                velocity,
+                button,
+            )
+
+            init {
+                textInput.registerToEvent(key) {
+                    // null = ignored, never filtered
+                    list = filterListMap(content, textInput.textBox).toList()
+                    scroll = createScroll()
+                }
+            }
 
             override fun render(posX: Int, posY: Int) {
                 scroll.update(
@@ -1162,36 +1305,79 @@ interface Renderable {
                 )
 
                 var renderY = 0
-                var virtualY = 0
-                var found = false
-                for (renderable in list) {
-                    if ((virtualY..virtualY + renderable.height) in scroll.asInt()..end) {
-                        renderable.renderXAligned(posX, posY + renderY, width)
-                        GlStateManager.translate(0f, renderable.height.toFloat(), 0f)
-                        renderY += renderable.height
-                        found = true
-                    } else if (found) {
-                        found = false
-                        if (renderY + renderable.height <= height) {
-                            renderable.renderXAligned(posX, posY + renderY, width)
-                        }
-                        continue
+                if (header.isNotEmpty()) {
+                    var offset = 0
+                    for ((index, renderable) in header.withIndex()) {
+                        renderable.renderXYAligned(
+                            posX + offset,
+                            posY,
+                            xOffsets[index],
+                            yOffsets[header] ?: 0,
+                        )
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        offset += xOffsets[index]
                     }
-                    virtualY += renderable.height
+                    GlStateManager.translate(-offset.toFloat(), 0f, 0f)
+                    val yShift = yOffsets[header] ?: 0
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
                 }
+
+                val range = if (list.size == 1) {
+                    0..0
+                } else {
+
+                    val nStart = scroll.asInt()
+
+                    val endReduce1 = if (showScrollableTipsInList && !scroll.atMinimum()) scrollUpTip.height else 0
+                    val endReduce2 = if (showScrollableTipsInList && !scroll.atMaximum()) scrollDownTip.height else 0
+
+                    val nEnd = end - endReduce1 - endReduce2
+
+                    val sequence = list.asSequence().withIndex()
+                    val folded = sequence.runningIndexedFold(0) { past, value -> past + (yOffsets[value] ?: 0) }
+                    val pair = folded.firstTwiceOf({ it.value >= nStart }, { it.value >= nEnd })
+
+                    val subEnd = if ((pair.second?.value?.minus(pair.first?.value ?: 0) ?: 0) <= nEnd - nStart) 0 else 1
+
+                    val start = pair.first?.index ?: 0
+                    val end = pair.second?.index?.minus(subEnd) ?: list.size
+
+                    start until end
+                }
+
+                if (showScrollableTipsInList && !scroll.atMinimum()) {
+                    scrollUpTip.render(posX, posY)
+                    val yShift = scrollUpTip.height
+                    renderY += yShift
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                }
+
+                for (rowIndex in range) {
+                    val row = list[rowIndex]
+                    var offset = 0
+                    val yShift = yOffsets[row] ?: 0
+                    for ((index, renderable) in row.withIndex()) {
+                        renderable.renderXYAligned(
+                            posX + offset,
+                            posY + renderY,
+                            xOffsets[index],
+                            yShift,
+                        )
+                        GlStateManager.translate(xOffsets[index].toFloat(), 0f, 0f)
+                        offset += xOffsets[index]
+                    }
+                    GlStateManager.translate(-offset.toFloat(), 0f, 0f)
+                    GlStateManager.translate(0f, yShift.toFloat(), 0f)
+                    renderY += yShift
+                }
+
+                if (showScrollableTipsInList && !scroll.atMaximum()) {
+                    scrollDownTip.render(posX, posY)
+                }
+
                 GlStateManager.translate(0f, -renderY.toFloat(), 0f)
             }
-        }
-
-        private fun filterList(content: Map<Renderable, String?>, textBox: String): Set<Renderable> {
-            val map = content.filter { it.value?.contains(textBox, ignoreCase = true) ?: true }
-            val set = map.keys.toMutableSet()
-            if (map.filter { it.value != null }.isEmpty()) {
-                if (textBox.isNotEmpty()) {
-                    set.add(string("§cNo search results!"))
-                }
-            }
-            return set
         }
 
         fun scrollTable(
@@ -1208,8 +1394,8 @@ interface Renderable {
             verticalAlign: VerticalAlignment = VerticalAlignment.TOP,
         ) = object : Renderable {
 
-            val xOffsets: List<Int> = calculateTableXOffsets(content, xPadding)
-            val yOffsets: List<Int> = calculateTableYOffsets(content, yPadding)
+            val xOffsets: List<Int> = RenderableUtils.calculateTableXOffsets(content, xPadding)
+            val yOffsets: List<Int> = RenderableUtils.calculateTableYOffsets(content, yPadding)
 
             override val width = xOffsets.last() - xPadding
             override val height = height
@@ -1249,11 +1435,11 @@ interface Renderable {
                     GlStateManager.translate(0f, yShift.toFloat(), 0f)
                     renderY += yShift
                 }
-                @Suppress("SpacingAroundCurly")
-                val range = yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
-                    yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
-                        ?: yOffsets.size
-                    ) - 1
+                val range =
+                    yOffsets.indexOfFirst { it >= scroll.asInt() }..<(
+                        yOffsets.indexOfFirst { it >= end }.takeIf { it > 0 }
+                            ?: yOffsets.size
+                        ) - 1
 
                 val range2 = if (range.last + 3 <= yOffsets.size && yOffsets[range.last + 2] - yOffsets[range.first] <= height - renderY) {
                     range.first..range.last() + 1

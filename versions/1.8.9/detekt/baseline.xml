@@ -25,7 +25,6 @@
     <ID>CyclomaticComplexMethod:ItemNameResolver.kt$ItemNameResolver$internal fun getInternalNameOrNull(itemName: String): NeuInternalName?</ID>
     <ID>CyclomaticComplexMethod:MinecraftConsoleFilter.kt$MinecraftConsoleFilter$override fun filter(event: LogEvent?): Filter.Result</ID>
     <ID>CyclomaticComplexMethod:PacketTest.kt$PacketTest$private fun Packet&lt;*&gt;.print()</ID>
-    <ID>CyclomaticComplexMethod:ParkourHelper.kt$ParkourHelper$fun render(event: SkyHanniRenderWorldEvent)</ID>
     <ID>CyclomaticComplexMethod:Renderable.kt$Renderable.Companion$internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean</ID>
     <ID>CyclomaticComplexMethod:SensitivityReducer.kt$SensitivityReducer$@HandleEvent fun onTick(event: SkyHanniTickEvent)</ID>
     <ID>CyclomaticComplexMethod:SoopyGuessBurrow.kt$SoopyGuessBurrow$@HandleEvent(onlyOnSkyblock = true) fun onReceiveParticle(event: ReceiveParticleEvent)</ID>
@@ -37,6 +36,7 @@
     <ID>InjectDispatcher:ElectionApi.kt$ElectionApi$IO</ID>
     <ID>InjectDispatcher:GardenNextJacobContest.kt$GardenNextJacobContest$IO</ID>
     <ID>InjectDispatcher:HypixelBazaarFetcher.kt$HypixelBazaarFetcher$IO</ID>
+    <ID>LargeClass:ItemUtils.kt$ItemUtils</ID>
     <ID>LongMethod:CropMoneyDisplay.kt$CropMoneyDisplay$private fun drawDisplay(): List&lt;List&lt;Any&gt;&gt;</ID>
     <ID>LongMethod:DamageIndicatorManager.kt$DamageIndicatorManager$@HandleEvent fun onRenderWorld(event: SkyHanniRenderWorldEvent)</ID>
     <ID>LongMethod:GraphEditor.kt$GraphEditor$private fun input()</ID>
@@ -55,6 +55,10 @@
     <ID>LoopWithTooManyJumpStatements:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$for</ID>
     <ID>LoopWithTooManyJumpStatements:SuperpairsClicksAlert.kt$SuperpairsClicksAlert$for</ID>
     <ID>MapGetWithNotNullAssertionOperator:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
+    <ID>MaxLineLength:ItemUtils.kt$ItemUtils$"ewogICJ0aW1lc3RhbXAiIDogMTYzNTk1NzQ4ODQxNywKICAicHJvZmlsZUlkIiA6ICJmNThkZWJkNTlmNTA0MjIyOGY2MDIyMjExZDRjMTQwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ1bnZlbnRpdmV0YWxlbnQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5NTFmZWQ2YTdiMmNiYzIwMzY5MTZkZWM3YTQ2YzRhNTY0ODE1NjRkMTRmOTQ1YjZlYmMwMzM4Mjc2NmQzYiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"</ID>
+    <ID>MaxLineLength:ItemUtils.kt$ItemUtils$"eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0="</ID>
+    <ID>MaxLineLength:ItemUtils.kt$ItemUtils$"eyJ0aW1lc3RhbXAiOjE2MzU5NTczOTM4MDMsInByb2ZpbGVJZCI6ImJiN2NjYTcxMDQzNDQ0MTI4ZDMwODllMTNiZGZhYjU5IiwicHJvZmlsZU5hbWUiOiJsYXVyZW5jaW8zMDMiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2M5Yjc3OTk5ZmVkM2EyNzU4YmZlYWYwNzkzZTUyMjgzODE3YmVhNjQwNDRiZjQzZWYyOTQzM2Y5NTRiYjUyZjYiLCJtZXRhZGF0YSI6eyJtb2RlbCI6InNsaW0ifX19fQo="</ID>
+    <ID>MaxLineLength:Renderable.kt$Renderable.Companion$isGuiScreen &amp;&amp; isGuiPositionEditor &amp;&amp; inMenu &amp;&amp; isNotInSignAndOnSlot &amp;&amp; isConfigScreen &amp;&amp; !isInNeuPv &amp;&amp; !isInSkytilsPv &amp;&amp; !neuFocus &amp;&amp; !isInSkytilsSettings &amp;&amp; !isInNeuSettings</ID>
     <ID>MemberNameEqualsClassName:CaptureFarmingGear.kt$CaptureFarmingGear$fun captureFarmingGear()</ID>
     <ID>MemberNameEqualsClassName:FameRanks.kt$FameRanks$var fameRanks = emptyMap&lt;String, FameRank&gt;() private set</ID>
     <ID>MemberNameEqualsClassName:FirstMinionTier.kt$FirstMinionTier$fun firstMinionTier( otherItems: Map&lt;NeuInternalName, Int&gt;, minions: MutableMap&lt;String, NeuInternalName&gt;, tierOneMinions: MutableList&lt;NeuInternalName&gt;, tierOneMinionsDone: MutableSet&lt;NeuInternalName&gt;, )</ID>
@@ -72,7 +76,6 @@
     <ID>NoNameShadowing:LorenzVec.kt$LorenzVec.Companion$yaw</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posX</ID>
     <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$posY</ID>
-    <ID>NoNameShadowing:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;${ it.value?.contains(textInput.textBox, ignoreCase = true) ?: true }</ID>
     <ID>NoNameShadowing:RenderableUtils.kt$RenderableUtils${ it != null }</ID>
     <ID>NoNameShadowing:ReplaceRomanNumerals.kt$ReplaceRomanNumerals${ it.isValidRomanNumeral() &amp;&amp; it.removeFormatting().romanToDecimal() != 2000 }</ID>
     <ID>NoNameShadowing:RepoManager.kt$RepoManager${ unsuccessfulConstants.add(it) }</ID>
@@ -167,7 +170,6 @@
     <ID>RepoPatternRegexTestMissing:MaxwellApi.kt$MaxwellApi$by patternGroup.pattern( "gui.thaumaturgy.data", "§(?&lt;color&gt;.)\\+(?&lt;amount&gt;[^ ]+)(?&lt;icon&gt;.) (?&lt;name&gt;.+)", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "filter.dojo", "^(?:(?&lt;points&gt;\\d+) pts|(?&lt;empty&gt;\\w+))$", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "filter.summon", "^(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;.*) \\d+.*", )</ID>
-    <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "jerry", "(?:\\[\\w+(?&lt;level&gt;\\d+)\\] )?(?&lt;owner&gt;\\w+)'s (?&lt;name&gt;\\w+ Jerry) \\d+ Hits", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.dungeon.woke.golem", "(?:§c§lWoke|§5§lSleeping) Golem§r", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.heavypearl.collect", "§.§lCOLLECT!", )</ID>
     <ID>RepoPatternRegexTestMissing:MobFilter.kt$MobFilter$by patternGroup.pattern( "pattern.jerry.magma.cube", "§c(?:Cubie|Maggie|Cubert|Cübe|Cubette|Magmalene|Lucky 7|8ball|Mega Cube|Super Cube)(?: ᛤ)? §a\\d+§8\\/§a\\d+§c❤", )</ID>
@@ -212,8 +214,6 @@
     <ID>RepoPatternRegexTestMissing:TeleportPadInventoryNumber.kt$TeleportPadInventoryNumber$by RepoPattern.pattern( "misc.teleportpad.number", "§.(?&lt;number&gt;.*) teleport pad" )</ID>
     <ID>RepoPatternRegexTestMissing:TerracottaPhase.kt$TerracottaPhase$by patternGroup.pattern( "start", "§c\\[BOSS] Sadan§r§f: So you made it all the way here... Now you wish to defy me\\? Sadan\\?!", )</ID>
     <ID>RepoPatternRegexTestMissing:TestCopyBestiaryValues.kt$TestCopyBestiaryValues$by RepoPattern.pattern( "test.bestiary.type", "\\[Lv(?&lt;lvl&gt;.*)] (?&lt;text&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTestMissing:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "dungeon", "§7Dungeon Score: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
-    <ID>RepoPatternRegexTestMissing:TestCopyRngMeterValues.kt$TestCopyRngMeterValues$by patternGroup.pattern( "slayer", "§7Slayer XP: §d.*§5/§d(?&lt;xp&gt;.*)" )</ID>
     <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "owner", "§7Owner: §e(?&lt;owner&gt;.+)" )</ID>
     <ID>RepoPatternRegexTestMissing:TotemOfCorruption.kt$TotemOfCorruption$by patternGroup.pattern( "timeremaining", "§7Remaining: §e(?:(?&lt;min&gt;\\d+)m )?(?&lt;sec&gt;\\d+)s" )</ID>
     <ID>RepoPatternRegexTestMissing:TrophyFishMessages.kt$TrophyFishMessages$by RepoPattern.pattern( "fishing.trophy.trophyfish", "§6§lTROPHY FISH! §r§bYou caught an? §r(?&lt;displayName&gt;§[0-9a-f](?:§k)?[\\w -]+) §r(?&lt;displayRarity&gt;§[0-9a-f]§l\\w+)§r§b\\." )</ID>
@@ -269,13 +269,13 @@
     <ID>ReturnCount:ShowFishingItemName.kt$ShowFishingItemName$fun inCorrectArea(): Boolean</ID>
     <ID>ReturnCount:SkillApi.kt$SkillApi$fun onCommand(it: Array&lt;String&gt;)</ID>
     <ID>ReturnCount:SkyHanniConfigSearchResetCommand.kt$SkyHanniConfigSearchResetCommand$private suspend fun setCommand(args: Array&lt;String&gt;): String</ID>
+    <ID>SpacingAroundCurly:Renderable.kt$Renderable.Companion.&lt;no name provided&gt;$}</ID>
     <ID>SpreadOperator:ItemUtils.kt$ItemUtils$(tag, displayName, *lore.toTypedArray())</ID>
     <ID>SpreadOperator:LimboPlaytime.kt$LimboPlaytime$( itemID.getItemStack().item, ITEM_NAME, *createItemLore() )</ID>
     <ID>SpreadOperator:Text.kt$Text$(*component.toTypedArray(), separator = separator)</ID>
     <ID>TooManyFunctions:CollectionUtils.kt$CollectionUtils</ID>
     <ID>TooManyFunctions:EstimatedItemValueCalculator.kt$EstimatedItemValueCalculator</ID>
     <ID>TooManyFunctions:HypixelCommands.kt$HypixelCommands</ID>
-    <ID>TooManyFunctions:InventoryUtils.kt$InventoryUtils</ID>
     <ID>TooManyFunctions:ItemResolutionQuery.kt$ItemResolutionQuery</ID>
     <ID>TooManyFunctions:LocationUtils.kt$LocationUtils</ID>
     <ID>TooManyFunctions:LorenzUtils.kt$LorenzUtils</ID>
@@ -283,7 +283,10 @@
     <ID>TooManyFunctions:MobFinder.kt$MobFinder</ID>
     <ID>TooManyFunctions:NumberUtil.kt$NumberUtil</ID>
     <ID>TooManyFunctions:RegexUtils.kt$RegexUtils</ID>
+    <ID>TooManyFunctions:Renderable.kt$Renderable$Companion</ID>
+    <ID>TooManyFunctions:RenderableUtils.kt$RenderableUtils</ID>
     <ID>TooManyFunctions:SkyBlockItemModifierUtils.kt$SkyBlockItemModifierUtils</ID>
+    <ID>TooManyFunctions:SkyHanniTracker.kt$SkyHanniTracker&lt;Data : TrackerData&gt;</ID>
     <ID>TooManyFunctions:StringUtils.kt$StringUtils</ID>
     <ID>UnsafeCallOnNullableType:BucketedItemTrackerData.kt$BucketedItemTrackerData$it.value[internalName]?.hidden!!</ID>
     <ID>UnsafeCallOnNullableType:ChatHoverEvent.kt$ChatHoverEvent$component.chatStyle.chatHoverEvent!!</ID>
@@ -339,7 +342,6 @@
     <ID>UnsafeCallOnNullableType:KSerializable.kt$KotlinTypeAdapterFactory$kotlinClass.memberProperties.find { it.name == param.name }!!</ID>
     <ID>UnsafeCallOnNullableType:KSerializable.kt$KotlinTypeAdapterFactory$param.name!!</ID>
     <ID>UnsafeCallOnNullableType:MinionFeatures.kt$MinionFeatures$newMinion!!</ID>
-    <ID>UnsafeCallOnNullableType:MobFinder.kt$MobFinder$floor6GiantsSeparateDelay[uuid]!!</ID>
     <ID>UnsafeCallOnNullableType:NavigationHelper.kt$NavigationHelper$distances[node]!!</ID>
     <ID>UnsafeCallOnNullableType:NumberUtil.kt$NumberUtil$romanSymbols[this]!!</ID>
     <ID>UnsafeCallOnNullableType:ReminderManager.kt$ReminderManager$storage[args.drop(1).first()]!!</ID>
@@ -376,5 +378,6 @@
     <ID>VarCouldBeVal:NeuReforgeJson.kt$NeuReforgeJson$private lateinit var itemTypeField: Pair&lt;String, List&lt;NeuInternalName&gt;&gt;</ID>
     <ID>VarCouldBeVal:RepoPatternGui.kt$RepoPatternGui$private var searchCache = ObservableList(mutableListOf&lt;RepoPatternInfo&gt;())</ID>
     <ID>VarCouldBeVal:RepoPatternManager.kt$RepoPatternManager$/** * Map containing all keys and their repo patterns. Used for filling in new regexes after an update, and for * checking duplicate registrations. */ private var usedKeys: NavigableMap&lt;String, CommonPatternInfo&lt;*, *&gt;&gt; = TreeMap()</ID>
+    <ID>VarCouldBeVal:SkyHanniItemTracker.kt$SkyHanniItemTracker$private var scrollValue = ScrollValue()</ID>
   </CurrentIssues>
 </SmellBaseline>
