@@ -328,15 +328,15 @@ object BitsApi {
         val stack = stacks.firstOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
         fun fameRankOrNull(rank: String) {
             currentFameRank = getFameRankByNameOrNull(rank) ?: run {
-                    ErrorManager.logErrorWithData(
-                        FameRankNotFoundException(rank),
-                        "FameRank $rank not found",
-                        "Rank" to rank,
-                        "Lore" to stack.getLore(),
-                        "FameRanks" to FameRanks.fameRanks,
-                    )
-                    return
-                }
+                ErrorManager.logErrorWithData(
+                    FameRankNotFoundException(rank),
+                    "FameRank $rank not found",
+                    "Rank" to rank,
+                    "Lore" to stack.getLore(),
+                    "FameRanks" to FameRanks.fameRanks,
+                )
+                return
+            }
         }
         for (line in stack.getLore()) {
             fameRankCommunityShopPattern.matchMatcher(line) {
