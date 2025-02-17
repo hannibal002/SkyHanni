@@ -78,8 +78,6 @@ object GardenApi {
 
     // TODO USE SH-REPO
     private val otherToolsList = listOf(
-        "DAEDALUS_AXE",
-        "STARRED_DAEDALUS_AXE",
         "BASIC_GARDENING_HOE",
         "ADVANCED_GARDENING_AXE",
         "BASIC_GARDENING_AXE",

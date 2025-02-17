@@ -98,7 +98,6 @@ object TrophyFishDisplay {
         val list = mutableListOf<Renderable>()
         list.addString("§e§lTrophy Fish Display")
         list.add(Renderable.table(createTable(), yPadding = config.extraSpace.get()))
-
         display = list
     }
 

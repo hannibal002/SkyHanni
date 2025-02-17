@@ -228,7 +228,6 @@ object ExperimentsProfitTracker {
         val profit = tracker.drawItems(data, { true }, this) + data.startCost
 
         val experimentsDone = data.experimentsDone
-        addSearchString("")
         addSearchString("§eExperiments Done: §a${experimentsDone.addSeparators()}")
         val startCostFormat = data.startCost.absoluteValue.shortFormat()
         val bitCostFormat = data.bitCost.shortFormat()
