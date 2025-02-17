@@ -12,6 +12,7 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import java.util.regex.Matcher
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 enum class HoppityEggType(
@@ -73,7 +74,7 @@ enum class HoppityEggType(
     fun hasRemainingSpawns(): Boolean {
         val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
         // If it's before the last two days of the event, we can assume there are more spawns
-        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
+        if (hoppityEndMark.timeUntil() > SkyBlockTime.SKYBLOCK_DAY_MILLIS.milliseconds * 2) return true
         // Otherwise we have to check if the next spawn is after the end of the event
         return timeUntil() < hoppityEndMark.timeUntil()
     }
