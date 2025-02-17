@@ -12,7 +12,9 @@ import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.StringUtils
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
+import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import net.minecraft.client.Minecraft
+import net.minecraft.crash.CrashReport
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -64,12 +66,18 @@ object ErrorManager {
         cache.clear()
     }
 
-    // throw a error, best to not use it if not absolutely necessary
+    // Extra data from last thrown error
+    private var cachedExtraData: String? = null
+
+    // throw an error, best to not use it if not absolutely necessary
     fun skyHanniError(message: String, vararg extraData: Pair<String, Any?>): Nothing {
         val exception = IllegalStateException(message.removeColor())
         println("silent SkyHanni error:")
         println("message: '$message'")
-        println("extraData: \n${buildExtraDataString(extraData)}")
+        buildExtraDataString(extraData)?.let {
+            println("extraData: \n$it")
+            cachedExtraData = it
+        }
         throw exception
     }
 
@@ -89,6 +97,11 @@ object ErrorManager {
         )
     }
 
+    inline fun crashInDevEnv(reason: String, t: (String) -> Throwable = { RuntimeException(it) }) {
+        if (!PlatformUtils.isDevEnvironment) return
+        Minecraft.getMinecraft().crashed(CrashReport("SkyHanni - $reason", t(reason)))
+    }
+
     // just log for debug cases
     fun logErrorStateWithData(
         userMessage: String,
@@ -99,6 +112,9 @@ object ErrorManager {
         betaOnly: Boolean = false,
         condition: () -> Boolean = { true },
     ) {
+        if (extraData.isNotEmpty()) {
+            cachedExtraData = null
+        }
         logError(
             IllegalStateException(internalMessage),
             userMessage,
@@ -158,7 +174,7 @@ object ErrorManager {
         }
         val randomId = StringUtils.generateRandomId()
 
-        val extraDataString = buildExtraDataString(extraData)
+        val extraDataString = getExtraDataOrCached(extraData)
         val rawMessage = message.removeColor()
         errorMessages[randomId] = "```\nSkyHanni ${SkyHanniMod.VERSION}: $rawMessage\n \n$stackTrace\n$extraDataString```"
         fullErrorMessages[randomId] =
@@ -171,6 +187,16 @@ object ErrorManager {
             "§eClick to copy!",
             prefix = false,
         )
+    }
+
+    private fun getExtraDataOrCached(extraData: Array<out Pair<String, Any?>>): String {
+        cachedExtraData?.let {
+            cachedExtraData = null
+            if (extraData.isEmpty()) {
+                return it
+            }
+        }
+        return buildExtraDataString(extraData).orEmpty()
     }
 
     private fun buildFinalMessage(message: String): String? {
@@ -216,7 +242,7 @@ object ErrorManager {
         repoErrors = data.changedErrorMessages.filter { it.fixedIn == null || version < it.fixedIn }
     }
 
-    private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String {
+    private fun buildExtraDataString(extraData: Array<out Pair<String, Any?>>): String? {
         val extraDataString = if (extraData.isNotEmpty()) {
             val builder = StringBuilder()
             for ((key, value) in extraData) {
@@ -234,7 +260,7 @@ object ErrorManager {
                 builder.append("\n")
             }
             "\nExtra data:\n$builder"
-        } else ""
+        } else null
         return extraDataString
     }
 
