@@ -45,7 +45,7 @@ object GiftProfitTracker {
      */
     private val giftRewardRarityPattern by patternGroup.pattern(
         "reward.rarity",
-        "§.§l(?<rarity>COMMON|RARE|SWEET|SANTA|PARTY)(?: TIER)?!.*"
+        "§.§l(?<rarity>COMMON|RARE|SWEET|SANTA|PARTY)(?: TIER)?!.*",
     )
 
     /**
@@ -55,7 +55,7 @@ object GiftProfitTracker {
      */
     val xpGainedPattern by patternGroup.pattern(
         "reward.skillxp",
-        "§.§l.*! §r§.\\+(?<amount>[\\d,]+) (?<skill>[\\w ]+) XP §r§egift with §r.*"
+        "§.§l.*! §r§.\\+(?<amount>[\\d,]+) (?<skill>[\\w ]+) XP §r§egift with §r.*",
     )
 
     /**
@@ -67,7 +67,7 @@ object GiftProfitTracker {
      */
     val coinsGainedPattern by patternGroup.pattern(
         "reward.coins",
-        "§.§l.*! §r§.\\+(?<amount>[\\d,]+) Coins §r§egift with §r.*"
+        "§.§l.*! §r§.\\+(?<amount>[\\d,]+) Coins §r§egift with §r.*",
     )
 
     /**
@@ -77,7 +77,7 @@ object GiftProfitTracker {
      */
     val northStarsPattern by patternGroup.pattern(
         "reward.northstars",
-        "§5§lEXTRA! §d\\+(?<amount>[\\d,]+) North Stars?"
+        "§5§lEXTRA! §d\\+(?<amount>[\\d,]+) North Stars?",
     )
 
     /**
@@ -87,7 +87,7 @@ object GiftProfitTracker {
      */
     val boostPotionPattern by patternGroup.pattern(
         "reward.boostpotion",
-        "§.§l.*! §r§.(?<skill>[\\w ]+) XP Boost (?<tier>[IVXLCDM]+) Potion §r§egift with §r.*"
+        "§.§l.*! §r§.(?<skill>[\\w ]+) XP Boost (?<tier>[IVXLCDM]+) Potion §r§egift with §r.*",
     )
 
     /**
@@ -97,7 +97,7 @@ object GiftProfitTracker {
      */
     val enchantmentBookPattern by patternGroup.pattern(
         "reward.enchantmentbook",
-        "§9§lRARE! §r§9(?<enchantment>.+) (?<tier>[IVXLCDM]+) §r§egift with .*"
+        "§9§lRARE! §r§9(?<enchantment>.+) (?<tier>[IVXLCDM]+) §r§egift with .*",
     )
 
     /**
@@ -108,7 +108,7 @@ object GiftProfitTracker {
      */
     val genericRewardPattern by patternGroup.pattern(
         "reward.generic",
-        "§.§l.*! §r§.(?<item>.+) §r§egift with §r.*"
+        "§.§l.*! §r§.(?<item>.+) §r§egift with §r.*",
     )
 
     // Patterns to remove from chat - kept here to centralize more specific patterns away from ChatUtils
@@ -119,7 +119,7 @@ object GiftProfitTracker {
         "§cYou cannot place a gift so close to an NPC!",
         "§eClick a player to gift them! §r§cThis isn't a player!",
         ".*§r§cdisconnected, gift refunded!",
-        "§cThis gift is for .*, sorry!"
+        "§cThis gift is for .*, sorry!",
     ).map { it.toPattern() }
     // </editor-fold>
 
@@ -243,7 +243,7 @@ object GiftProfitTracker {
     init {
         tracker.initRenderer(
             { config.position },
-        ) { isEnabled() }
+        ) { isEnabled() && IsGiftingDetection.isCurrentlyGifting() }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -253,6 +253,7 @@ object GiftProfitTracker {
             tracker.modify {
                 it.northStarsGained += amount
             }
+            IsGiftingDetection.markLocation()
             return // Don't continue to other patterns
         }
 
@@ -261,6 +262,7 @@ object GiftProfitTracker {
             tracker.modify {
                 it.rarityRewardTypesGained.addOrPut(rewardRarity, 1)
             }
+            IsGiftingDetection.markLocation()
         } ?: return // All gift messages should start with a rarity, if not, ignore the message
 
         xpGainedPattern.matchMatcher(event.message) {
