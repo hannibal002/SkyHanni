@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.FeatureToggle;
 import com.google.gson.annotations.Expose;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
+import io.github.notenoughupdates.moulconfig.observer.Property;
 
 public class MayorJerryConfig {
 
@@ -11,6 +12,12 @@ public class MayorJerryConfig {
     @ConfigOption(name = "Highlight Jerries", desc = "Highlight Jerries found from the Jerrypocalypse perk. Highlight color is based on color of the Jerry.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean highlightJerries = true;
+    public Property<Boolean> highlightJerries = Property.of(true);
+
+    @Expose
+    @ConfigOption(name = "Line to Jerries", desc = "Shows a line to your Jerries found from the Jerrypocalypse perk.")
+    @ConfigEditorBoolean
+    @FeatureToggle
+    public Property<Boolean> lineJerries = Property.of(true);
 
 }
