@@ -32,6 +32,7 @@ object HighlightMissingRepoItems {
         }
     }
 
+    @Suppress("LoopWithTooManyJumpStatements")
     private fun highlightItems(slots: Iterable<Slot>) {
         if (NeuItems.allInternalNames.isEmpty()) return
         val filteredSlots = slots.filter {
