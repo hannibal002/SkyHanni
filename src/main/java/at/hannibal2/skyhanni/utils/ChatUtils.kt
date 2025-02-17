@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -281,7 +282,7 @@ object ChatUtils {
     fun editFirstMessage(
         component: (IChatComponent) -> IChatComponent,
         reason: String,
-        predicate: (ChatLine) -> Boolean
+        predicate: (ChatLine) -> Boolean,
     ) {
         chatLines.editChatLine(component, predicate, reason)
         chatGui.refreshChat()
@@ -293,10 +294,29 @@ object ChatUtils {
     fun deleteMessage(
         reason: String,
         amount: Int = 1,
-        predicate: (ChatLine) -> Boolean
+        predicate: (ChatLine) -> Boolean,
     ) {
         chatLines.deleteChatLine(amount, reason, predicate)
         chatGui.refreshChat()
+    }
+
+    private var deleteNext: Pair<String, (String) -> Boolean>? = null
+
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onChat(event: SkyHanniChatEvent) {
+        val (reason, predicate) = deleteNext ?: return
+        this.deleteNext = null
+
+        if (predicate(event.message)) {
+            event.blockedReason = reason
+        }
+    }
+
+    fun deleteNextMessage(
+        reason: String,
+        predicate: (String) -> Boolean,
+    ) {
+        deleteNext = reason to predicate
     }
 
     private var lastMessageSent = SimpleTimeMark.farPast()

@@ -1,6 +1,10 @@
 package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.data.jsonobjects.repo.DisabledApiJson
+import at.hannibal2.skyhanni.events.RepositoryReloadEvent
+import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import com.google.gson.JsonElement
 import com.google.gson.JsonObject
@@ -23,6 +27,7 @@ import javax.net.ssl.KeyManagerFactory
 import javax.net.ssl.SSLContext
 import javax.net.ssl.TrustManagerFactory
 
+@SkyHanniModule
 object ApiUtils {
 
     private val parser = JsonParser()
@@ -223,5 +228,24 @@ object ApiUtils {
     fun toggleApiErrorMessages() {
         showApiErrors = !showApiErrors
         ChatUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
+    }
+
+    private var disabledApis: DisabledApiJson? = null
+
+    @HandleEvent
+    fun onRepoReload(event: RepositoryReloadEvent) {
+        disabledApis = event.getConstant<DisabledApiJson>("misc/DisabledApi")
+    }
+
+    fun isMoulberryLowestBinDisabled(): Boolean {
+        return disabledApis?.disabledMoulberryLowestBin == true
+    }
+
+    fun isHypixelItemsDisabled(): Boolean {
+        return disabledApis?.disableHypixelItems == true
+    }
+
+    fun isBazaarDisabled(): Boolean {
+        return disabledApis?.disabledBazaar == true
     }
 }

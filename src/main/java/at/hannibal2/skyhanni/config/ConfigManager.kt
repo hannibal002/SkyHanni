@@ -9,35 +9,24 @@ import at.hannibal2.skyhanni.data.jsonobjects.local.KnownFeaturesJson
 import at.hannibal2.skyhanni.data.jsonobjects.local.VisualWordsJson
 import at.hannibal2.skyhanni.features.misc.update.UpdateManager
 import at.hannibal2.skyhanni.test.command.ErrorManager
-import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
-import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.StringFileHandler
 import at.hannibal2.skyhanni.utils.json.BaseGsonBuilder
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonObject
 import com.google.gson.TypeAdapterFactory
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.processor.BuiltinMoulConfigGuis
 import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
-import java.io.BufferedReader
-import java.io.BufferedWriter
 import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
-import java.nio.charset.StandardCharsets
-import java.nio.file.Files
-import java.nio.file.StandardCopyOption
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
 
@@ -154,7 +143,7 @@ class ConfigManager {
             println("")
             println(
                 "This crash is here to remind you to fix the missing " +
-                    "@ConfigLink annotation over your new config position config element."
+                    "@ConfigLink annotation over your new config position config element.",
             )
             println("")
             println("Steps to fix:")
@@ -173,14 +162,12 @@ class ConfigManager {
 
         if (file!!.exists()) {
             try {
-                val inputStreamReader = InputStreamReader(FileInputStream(file), StandardCharsets.UTF_8)
-                val bufferedReader = BufferedReader(inputStreamReader)
+                val text = StringFileHandler(file).load()
                 val lenientGson = BaseGsonBuilder.lenientGson().create()
-
                 logger.log("load-$fileName-now")
 
                 output = if (fileType == ConfigFileType.FEATURES) {
-                    val jsonObject = lenientGson.fromJson(bufferedReader.readText(), JsonObject::class.java)
+                    val jsonObject = lenientGson.fromJson(text, com.google.gson.JsonObject::class.java)
                     val newJsonObject = ConfigUpdaterMigrator.fixConfig(jsonObject)
                     val run = { lenientGson.fromJson(newJsonObject, defaultValue.javaClass) }
                     if (PlatformUtils.isDevEnvironment) {
@@ -194,7 +181,7 @@ class ConfigManager {
                         run()
                     }
                 } else {
-                    lenientGson.fromJson(bufferedReader.readText(), defaultValue.javaClass)
+                    lenientGson.fromJson(text, defaultValue.javaClass)
                 }
 
                 logger.log("Loaded $fileName from file")
@@ -235,40 +222,11 @@ class ConfigManager {
         try {
             logger.log("Saving $fileName file")
             file.parentFile.mkdirs()
-            val unit = file.parentFile.resolve("$fileName.json.write")
-            unit.createNewFile()
-            BufferedWriter(OutputStreamWriter(FileOutputStream(unit), StandardCharsets.UTF_8)).use { writer ->
-                writer.write(gson.toJson(data))
-            }
-            // Perform move — which is atomic, unlike writing — after writing is done.
-            move(unit, file, reason)
+            StringFileHandler(file).save(gson.toJson(data))
+            logger.log("Saved $fileName file successfully")
         } catch (e: IOException) {
             logger.log("Could not save $fileName file to $file")
             logger.log(e.stackTraceToString())
-        }
-    }
-
-    private fun move(unit: File, file: File, reason: String, loop: Int = 0) {
-        try {
-            Files.move(
-                unit.toPath(),
-                file.toPath(),
-                StandardCopyOption.REPLACE_EXISTING,
-                StandardCopyOption.ATOMIC_MOVE,
-            )
-        } catch (e: AccessDeniedException) {
-            if (loop == 5) {
-                ErrorManager.logErrorWithData(
-                    e,
-                    "could not save config.",
-                    "config save reason" to reason,
-                )
-                return
-            }
-            ChatUtils.debug("config save AccessDeniedException! (loop $loop)")
-            DelayedRun.runNextTick {
-                move(unit, file, reason, loop + 1)
-            }
         }
     }
 
