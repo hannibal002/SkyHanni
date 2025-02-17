@@ -2,9 +2,10 @@ package at.hannibal2.skyhanni.config.features.misc;
 
 import at.hannibal2.skyhanni.config.FeatureToggle;
 import at.hannibal2.skyhanni.config.core.config.Position;
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig;
 import com.google.gson.annotations.Expose;
+import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorText;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 
@@ -16,10 +17,9 @@ public class FrogMaskFeaturesConfig {
     public boolean frogMaskDisplay = false;
 
     @Expose
-    @ConfigOption(name = "Frog Mask Warning", desc = "Displays a warning when foraging in the wrong region of the park while wearing a §5Frog Mask§7.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean frogMaskWarning = false;
+    @ConfigOption(name = "Frog Mask Warning", desc = "")
+    @Accordion
+    public FrogMaskWarningConfig frogMaskWarning = new FrogMaskWarningConfig();
 
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")

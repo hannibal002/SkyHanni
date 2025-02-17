@@ -1,11 +1,15 @@
 package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
+import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig
+import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig.WarningType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
@@ -63,23 +67,28 @@ object FrogMaskFeatures {
         activeRegionPattern.firstMatcher(helmet.getLore()) {
             val currentRegion = group("region")
 
-            when {
-                config.frogMaskDisplay -> {
-                    val now = SkyBlockTime.now()
-                    val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
-                    display = updateDisplay(currentRegion, timeRemaining)
-                }
-
-                config.frogMaskWarning -> {
-                    if (LorenzUtils.skyBlockArea == currentRegion) {
-                        lastWarning = SimpleTimeMark.farPast()
-                    } else if (lastWarning.passedSince() > 30.seconds) {
-                        LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
-                        lastWarning = SimpleTimeMark.now()
-                    }
-                }
-            }
+            if (config.frogMaskWarning.enabled) lastWarning = handleWarning(currentRegion)
+            if (config.frogMaskDisplay) display = handleDisplay(currentRegion)
         }
+    }
+
+    private fun handleWarning(currentRegion: String): SimpleTimeMark {
+        if (config.frogMaskWarning.warningTypes.isEmpty()) return SimpleTimeMark.farPast()
+
+        val needsToWarn = LorenzUtils.skyBlockArea != currentRegion && lastWarning.passedSince() > 30.seconds
+
+        if (!needsToWarn) return SimpleTimeMark.farPast()
+
+        if (WarningType.BEING.isSelected() || (WarningType.FORAGING.isSelected() && isForaging()))
+            LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
+
+        return SimpleTimeMark.now()
+    }
+
+    private fun handleDisplay(currentRegion: String): Renderable {
+        val now = SkyBlockTime.now()
+        val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
+        return updateDisplay(currentRegion, timeRemaining)
     }
 
     private fun updateDisplay(currentRegion: String, timeRemaining: SimpleTimeMark): Renderable {
@@ -103,6 +112,14 @@ object FrogMaskFeatures {
         event.move(74, "misc.frogMaskDisplay", "misc.frogMaskFeatures.frogMaskDisplay")
         event.move(74, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.frogMaskDisplayPosition")
     }
+
+    fun isForaging(): Boolean {
+        if (SkillApi.activeSkill != SkillType.FORAGING) return false
+        val info = SkillApi.skillXPInfoMap[SkillType.FORAGING] ?: return false
+        return info.lastUpdate.passedSince() < 10.seconds
+    }
+
+    fun WarningType.isSelected() = config.frogMaskWarning.warningTypes.contains(this)
 
     private fun isEnabled() = IslandType.THE_PARK.isInIsland() && (config.frogMaskDisplay || config.frogMaskWarning)
 }
