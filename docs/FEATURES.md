@@ -123,6 +123,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added Terminal Waypoints. - Stella (https://github.com/hannibal002/SkyHanni/pull/2719)
     +  Displays waypoints during the F7/M7 Goldor Phase.
 + Added mute for chest open and lever click sounds in dungeons (toggleable). - Ovi_1 (https://github.com/hannibal002/SkyHanni/pull/2521)
++ Added Enchanted Book Drop Name. - Empa (https://github.com/hannibal002/SkyHanni/pull/2000)
+    + Shows enchantment name in rare drop messages and sends a custom one if none is provided by Hypixel.
 
 </details>
 <details open><summary>
@@ -249,6 +251,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Added XP in Inventory. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3253)
     + Showing current XP in item lore of XP-dependent menus (e.g., Experimentation Table, Anvil, Hex).
     + This ensures XP visibility even when replaced by the SkyBlock XP bar.
++ Added Superpair Exp Overlay. - nopo (https://github.com/hannibal002/SkyHanni/pull/3342)
+    + Displays XP for super pairs in the bottom right corner of the item.
 
 </details>
 <details open><summary>
@@ -993,6 +997,8 @@ Use `/sh` or `/skyhanni` to open the SkyHanni config in game.
 + Easter Egg Hunt 2024 waypoints. - Erymanthus + walker (https://github.com/hannibal002/SkyHanni/pull/1193)
 + Added Fishy Treat Profit Display. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3422)
     + Shows what item to purchase with your hard-earned Fishy Treat.
++ Added Gift Profit Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3072)
+    + Does NOT auto-track used gifts - see `/shaddusedgifts`.
 
 ### Hoppity and Chocolate Factory
 
