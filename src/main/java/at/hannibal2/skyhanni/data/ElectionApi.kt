@@ -33,9 +33,6 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime.Companion.SKYBLOCK_YEAR_MILLIS
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.json.fromJson
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.milliseconds
@@ -97,7 +94,6 @@ object ElectionApi {
     private var lastJerryExtraMayorReminder = SimpleTimeMark.farPast()
 
     private var lastUpdate = SimpleTimeMark.farPast()
-    private val dispatcher = Dispatchers.IO
 
     private var rawMayorData: MayorJson? = null
     private var candidates = mapOf<Int, MayorCandidate>()
@@ -215,11 +211,13 @@ object ElectionApi {
         }
         lastUpdate = SimpleTimeMark.now()
 
-        SkyHanniMod.coroutineScope.launch {
-            val url = "https://api.hypixel.net/v2/resources/skyblock/election"
-            val jsonObject = withContext(dispatcher) { ApiUtils.getJSONResponse(url) }
+        SkyHanniMod.launchIOCoroutine {
+            val jsonObject = ApiUtils.getJSONResponse(
+                "https://api.hypixel.net/v2/resources/skyblock/election",
+                apiName = "Hypixel Election",
+            )
             rawMayorData = ConfigManager.gson.fromJson<MayorJson>(jsonObject)
-            val data = rawMayorData ?: return@launch
+            val data = rawMayorData ?: return@launchIOCoroutine
             val map = mutableMapOf<Int, MayorCandidate>()
             map put data.mayor.election.getPairs()
             data.current?.let {

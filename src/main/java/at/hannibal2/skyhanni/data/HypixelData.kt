@@ -321,6 +321,7 @@ object HypixelData {
                 }
             } catch (e: Exception) {
                 ErrorManager.logErrorWithData(e, "Failed to parse locraw data")
+                return
             }
         }
     }
