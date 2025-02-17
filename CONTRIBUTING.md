@@ -389,7 +389,7 @@ private fun ClientLevel.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entitiesForRendering()
+    entitiesForRendering()
 //#endif
 ```
 
@@ -403,7 +403,7 @@ private fun ClientWorld.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entities
+    entities
 //#endif
 ```
 
@@ -414,7 +414,7 @@ private fun ClientWorld.getAllEntities(): Iterable<Entity> =
 //#if MC < 1.14
 //$$         loadedEntityList
 //#else
-   entities
+    entities
 //#endif
 ```
 
