@@ -98,8 +98,8 @@ enum class HoppityEggType(
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
         private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
             enumMapOf(),
-            onUpdate = { type, markOrNull ->
-                val mark = markOrNull ?: return@ObservableMutableMap
+            postUpdate = postUpdate@{ type, markOrNull ->
+                val mark = markOrNull ?: return@postUpdate
                 profileStorage?.mealNextSpawn?.set(type, mark)
             },
         )
