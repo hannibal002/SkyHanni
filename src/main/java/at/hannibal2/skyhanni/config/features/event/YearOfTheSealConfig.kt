@@ -29,6 +29,11 @@ class YearOfTheSealConfig {
     var bouncyBallLine: Property<Boolean> = Property.of(true)
 
     @Expose
+    @ConfigOption(name = "Bouncy Ball Landing Spot", desc = "Show the spot where the Bouncy Ball will land, and add a counter.")
+    @ConfigEditorBoolean
+    var bouncyBallLandingSpot: Property<Boolean> = Property.of(true)
+
+    @Expose
     @ConfigOption(name = "Bouncy Ball Line Color", desc = "Color of the Bouncy Ball Line.")
     @ConfigEditorColour
     var bouncyBallLineColor: String = "0:245:255:0:196"

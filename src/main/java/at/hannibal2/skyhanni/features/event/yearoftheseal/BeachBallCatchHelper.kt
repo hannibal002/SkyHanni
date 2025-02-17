@@ -18,11 +18,19 @@ import at.hannibal2.skyhanni.utils.EntityUtils.wearingSkullTexture
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.RenderUtils
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledBoundingBoxNea
+import at.hannibal2.skyhanni.utils.RenderUtils.drawString
+import at.hannibal2.skyhanni.utils.RenderUtils.exactLocation
+import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SkullTextureHolder
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import at.hannibal2.skyhanni.utils.TimeUtils.ticks
 import at.hannibal2.skyhanni.utils.getLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.entity.item.EntityArmorStand
+import net.minecraft.util.AxisAlignedBB
+import java.awt.Color
+import kotlin.time.Duration.Companion.milliseconds
 
 @SkyHanniModule
 object BeachBallCatchHelper {
@@ -32,11 +40,19 @@ object BeachBallCatchHelper {
     private val predictors = mutableMapOf<Int, Predictor>()
 
     private val NORMAL_BEACH_BALL by lazy { SkullTextureHolder.getTexture("NORMAL_BEACH_BALL") }
+//     private val GIANT_BEACH_BALL by lazy { SkullTextureHolder.getTexture("GIANT_BEACH_BALL") }
 
     fun check(entity: EntityArmorStand) {
-        if (!entity.wearingSkullTexture(NORMAL_BEACH_BALL)) return
-        if (predictors[entity.entityId] != null) return
-        predictors[entity.entityId] = Predictor(entity.getLorenzVec())
+        if (entity.wearingSkullTexture(NORMAL_BEACH_BALL)) {
+            predictors.putIfAbsent(entity.entityId, Predictor(entity.getLorenzVec(), Variant.NORMAL))
+            println("normal detected")
+            return
+        }
+//         if (entity.wearingSkullTexture(GIANT_BEACH_BALL)) {
+//             predictors.putIfAbsent(entity.entityId, Predictor(entity.getLorenzVec(), Variant.GIANT))
+//             println("giant detected")
+//             return
+//         }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -48,7 +64,7 @@ object BeachBallCatchHelper {
     @HandleEvent(onlyOnSkyblock = true)
     fun onSkyHanniTick(event: SkyHanniTickEvent) {
         if (!isEnabled()) return
-        predictors.removeIf { id, predict ->
+        predictors.removeIf { (id, predict) ->
             val entity = EntityUtils.getEntityByID(id) ?: return@removeIf true
             predict.newData(entity.getLorenzVec())
             false
@@ -65,6 +81,49 @@ object BeachBallCatchHelper {
                 drawPath(predict.predictedPath, color, 8, true, bezierPoint = -1.0)
             }
         }
+        event.renderLandingPosition()
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderLandingPosition() {
+        if (!config.bouncyBallLandingSpot.get()) return
+        val player = exactLocation(Minecraft.getMinecraft().thePlayer).add(y = 1)
+        for ((e, predictor) in predictors.map { EntityUtils.getEntityByID(it.key) to it.value }) {
+            val entity = e ?: continue
+            val location = exactLocation(entity).copy(y = player.y)
+            renderBlock(location, player, predictor)
+            renderString(predictor, location)
+        }
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderString(predictor: Predictor, location: LorenzVec) {
+        val counter = predictor.bounceCounter
+        val (qualityColor, quality) = when {
+            counter < 2 -> "§c" to null // aww man
+            counter < 8 -> "§f" to "DECENT"
+            counter < 18 -> "§a" to "GOOD"
+            counter < 32 -> "§5" to "AMAZING"
+            counter < 51 -> "§6" to "IMPRESSIVE"
+            else -> "§d" to "INSANE"
+        }
+        val qualityString = quality?.let { " §8- $qualityColor§l$it!" } ?: ""
+        drawString(location.add(y = 0.7), "$qualityColor§l$counter$qualityString")
+    }
+
+    private fun SkyHanniRenderWorldEvent.renderBlock(location: LorenzVec, player: LorenzVec, predictor: Predictor) {
+        val distance = location.distance(player)
+        drawFilledBoundingBoxNea(
+            location.getAABB(predictor.variant),
+            when {
+                distance < 0.3 -> Color.GREEN
+                distance < 0.9 -> Color.ORANGE
+                else -> Color.RED
+            },
+        )
+    }
+
+    private fun LorenzVec.getAABB(variant: Variant): AxisAlignedBB = when (variant) {
+        Variant.NORMAL -> add(-0.3, -0.3, -0.3).boundingToOffset(0.6, 0.6, 0.6)
+        Variant.GIANT -> add(-0.9, -0.9, -0.9).boundingToOffset(1.8, 1.8, 1.8)
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -79,7 +138,12 @@ object BeachBallCatchHelper {
 
     private fun isEnabled() = config.bouncyBallLine.get()
 
-    private class Predictor(start: LorenzVec) {
+    enum class Variant {
+        NORMAL,
+        GIANT,
+    }
+
+    private class Predictor(start: LorenzVec, val variant: Variant) {
 
         private val data = mutableListOf<LorenzVec>()
 
@@ -92,12 +156,14 @@ object BeachBallCatchHelper {
         var prePath = emptyList<LorenzVec>()
 
         private var updated = 0
+        var lastPosition: LorenzVec = start
 
         init {
             newData(start)
         }
 
         fun newData(new: LorenzVec) {
+            updateDirection(new)
             data.add(new)
             if (new.distanceToPlayer() < 2.1) {
                 startIndex = data.lastIndex
@@ -110,6 +176,25 @@ object BeachBallCatchHelper {
             if (updated <= 3) return
             predictedPath = predict(startIndex, minY)
             updated = 0
+        }
+
+        var positive = true
+
+        var lastChange = SimpleTimeMark.now()
+        var bounceCounter = 0
+
+        private fun updateDirection(newPosition: LorenzVec) {
+            if (lastPosition.distance(newPosition) < 0.3) return
+            if (lastChange.passedSince() < 800.milliseconds) return
+            val diff = (newPosition - lastPosition).y
+            val isPositive = diff > 0
+            val wasPositive = positive
+            if (isPositive && !wasPositive) {
+                bounceCounter++
+                lastChange = SimpleTimeMark.now()
+            }
+            positive = isPositive
+            lastPosition = newPosition
         }
 
         fun predict(startIndex: Int, minY: Double): List<LorenzVec> {
