@@ -55,17 +55,10 @@ object HypixelBazaarFetcher {
         }
     }
 
-    private var disabledApiJson: DisabledApiJson? = null
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        disabledApiJson = event.getConstant<DisabledApiJson>("misc/DisabledApi")
-    }
-
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!canFetch()) return
-        if (disabledApiJson?.disabledBazaar == true) return
+        if (ApiUtils.isBazaarDisabled()) return
         SkyHanniMod.coroutineScope.launch {
             fetchAndProcessBazaarData()
         }

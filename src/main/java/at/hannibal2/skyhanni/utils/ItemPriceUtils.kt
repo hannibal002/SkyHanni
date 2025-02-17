@@ -163,17 +163,10 @@ object ItemPriceUtils {
         return -1L
     }
 
-    private var disabledApiJson: DisabledApiJson? = null
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        disabledApiJson = event.getConstant<DisabledApiJson>("misc/DisabledApi")
-    }
-
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (PlatformUtils.isNeuLoaded()) return
-        if (disabledApiJson?.disabledMoulberryLowestBin == true) return
+        if (ApiUtils.isMoulberryLowestBinDisabled()) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 

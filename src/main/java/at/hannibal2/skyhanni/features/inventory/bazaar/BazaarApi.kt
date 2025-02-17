@@ -16,6 +16,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -166,16 +167,9 @@ object BazaarApi {
         return NeuInternalName.fromItemName(bazaarItem.displayName)
     }
 
-    private var disabledApiJson: DisabledApiJson? = null
-
-    @HandleEvent
-    fun onRepoReload(event: RepositoryReloadEvent) {
-        disabledApiJson = event.getConstant<DisabledApiJson>("misc/DisabledApi")
-    }
-
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
-        if (disabledApiJson?.disabledNpcPrices == true) return
+        if (ApiUtils.isHypixelItemsDisabled()) return
 
         if (!loadedNpcPriceData) {
             loadedNpcPriceData = true
