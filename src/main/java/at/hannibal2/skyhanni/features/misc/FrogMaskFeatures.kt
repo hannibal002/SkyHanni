@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
+import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -73,12 +74,13 @@ object FrogMaskFeatures {
     private fun handleWarning(currentRegion: String): SimpleTimeMark {
         if (config.warning.warningType.isEmpty()) return SimpleTimeMark.farPast()
 
-        val needsToWarn = LorenzUtils.skyBlockArea != currentRegion && lastWarning.passedSince() > 30.seconds
+        val needsToWarn = LorenzUtils.skyBlockArea != currentRegion.removeColor() && lastWarning.passedSince() > 30.seconds
 
-        if (!needsToWarn) return SimpleTimeMark.farPast()
+        if (!needsToWarn) return lastWarning
 
-        if (WarningType.BEING.isSelected() || (WarningType.FORAGING.isSelected() && isForaging()))
+        if (WarningType.BEING.isSelected() || (WarningType.FORAGING.isSelected() && isForaging())) {
             LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
+        }
 
         return SimpleTimeMark.now()
     }
