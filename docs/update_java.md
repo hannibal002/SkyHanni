@@ -1,18 +1,18 @@
 # Optimize Minecraft Performance by Updating Java
 
 ## Background
-The Vanilla Minecraft Launcher uses Java 8 Update 51. This version is over eight years old and lacks modern optimizations. Upgrading to a newer Java 8 build or an optimized open-source distribution can boost FPS and reduce lag.
+The Vanilla Minecraft Launcher uses Java 8 Update 51. This version is over nine years old and lacks modern optimizations. Upgrading to a newer Java 8 build or an optimized open-source distribution can boost FPS and reduce lag.
 
 ## Recommended Java Distributions
 Choose one of these Java 8 options:
 
-- [Oracle Java 8](https://www.java.com/download/ie_manual.jsp)  
+- [Oracle Java](https://www.java.com/download/ie_manual.jsp)  
   *The original distribution from Oracle.*
-- [Eclipse Temurin 8 (Adoptium)](https://adoptium.net/temurin/releases/?version=8)  
+- [Eclipse Temurin (Adoptium)](https://adoptium.net/temurin/releases/?version=8)  
   *A free, open-source build with performance optimizations.*
-- [Zulu OpenJDK 8](https://www.azul.com/downloads/?version=java-8-lts&package=jdk#zulu)  
+- [Zulu OpenJDK](https://www.azul.com/downloads/?version=java-8-lts&package=jdk#zulu)  
   *Reliable builds maintained by Azul Systems.*
-- [Amazon Corretto 8](https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html)  
+- [Amazon Corretto](https://docs.aws.amazon.com/corretto/latest/corretto-8-ug/downloads-list.html)  
   *A production-ready build supported by Amazon.*
 
 ## Instructions
