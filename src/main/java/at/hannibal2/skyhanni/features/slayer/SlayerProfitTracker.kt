@@ -183,16 +183,14 @@ object SlayerProfitTracker {
 
         var profit = tracker.drawItems(data, { true }, this)
         val slayerSpawnCost = data.slayerSpawnCost
-        if (slayerSpawnCost != 0L) {
-            val slayerSpawnCostFormat = slayerSpawnCost.shortFormat()
-            add(
-                Renderable.hoverTips(
-                    " §7Slayer Spawn Costs: §c$slayerSpawnCostFormat",
-                    listOf("§7You paid §c$slayerSpawnCostFormat §7in total", "§7for starting the slayer quests."),
-                ).toSearchable(),
-            )
-            profit += slayerSpawnCost
-        }
+        val slayerSpawnCostFormat = slayerSpawnCost.shortFormat()
+        add(
+            Renderable.hoverTips(
+                " §7Slayer Spawn Costs: §c$slayerSpawnCostFormat",
+                listOf("§7You paid §c$slayerSpawnCostFormat §7in total", "§7for starting the slayer quests."),
+            ).toSearchable(),
+        )
+        profit += slayerSpawnCost
 
         val slayerCompletedCount = data.slayerCompletedCount.addSeparators()
         add(

@@ -30,7 +30,6 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("TooManyFunctions")
 open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
@@ -47,11 +46,11 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    private val textInput = SearchTextInput()
+    val textInput = SearchTextInput()
 
     companion object {
 
-        val config get() = SkyHanniMod.feature.misc.tracker
+        private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
