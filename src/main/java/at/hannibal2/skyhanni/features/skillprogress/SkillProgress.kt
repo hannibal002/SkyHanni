@@ -482,7 +482,7 @@ object SkillProgress {
         return "§6∞ Left"
     }
 
-    private fun updateSkillInfo() {
+    fun updateSkillInfo() {
         val activeSkill = activeSkill ?: return
         val xpInfo = skillXPInfoMap.getOrPut(activeSkill) { SkillApi.SkillXPInfo() }
         val skillInfo = SkillApi.storage?.get(activeSkill) ?: return

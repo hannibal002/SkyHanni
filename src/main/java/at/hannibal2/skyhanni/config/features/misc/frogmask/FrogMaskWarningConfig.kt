@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.config.features.misc.frogmask
 import at.hannibal2.skyhanni.config.FeatureToggle
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
-import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDropdown
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 
@@ -21,16 +21,17 @@ class FrogMaskWarningConfig {
     @Expose
     @ConfigOption(name = "Cooldown", desc = "Change how much time needs to pass before you get warned again.")
     @ConfigEditorSlider(minValue = 5f, maxValue = 60f, minStep = 1f)
-    var cooldown: Float = 30f
+    var cooldown: Int = 30
 
     @Expose
     @ConfigOption(name = "Warning Type", desc = "Change when you want to be warned.")
-    @ConfigEditorDraggableList
-    var warningType: List<WarningType> = ArrayList(listOf(WarningType.FORAGING))
+    @ConfigEditorDropdown
+    var warningType: WarningType = WarningType.FORAGING
 
     enum class WarningType(private val displayName: String) {
-        BEING("When being in a wrong region."),
-        FORAGING("When foraging in a wrong region.");
+        NEVER("§cNever"),
+        BEING("§eExisting"),
+        FORAGING("§aForaging");
 
         override fun toString(): String {
             return displayName

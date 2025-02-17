@@ -6,8 +6,10 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig.WarningType
 import at.hannibal2.skyhanni.data.IslandType
+import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
+import at.hannibal2.skyhanni.features.skillprogress.SkillProgress.updateSkillInfo
 import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
@@ -22,7 +24,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderable
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -44,6 +45,14 @@ object FrogMaskFeatures {
     private val activeRegionPattern by patternGroup.pattern(
         "description.active",
         "§7Today's region: (?<region>.+)",
+    )
+
+    /**
+     * REGEX-TEST:  §7⏣ §aSpruce Woods
+     */
+    private val currentAreaPattern by patternGroup.pattern(
+        "scoreboard.current",
+        " §7⏣ (?<area>.+)"
     )
 
     private val frogMask by lazy { "FROG_MASK".toInternalName().getItemStack() }
@@ -72,17 +81,26 @@ object FrogMaskFeatures {
     }
 
     private fun handleWarning(currentRegion: String): SimpleTimeMark {
-        if (config.warning.warningType.isEmpty()) return SimpleTimeMark.farPast()
+        if (config.warning.warningType == WarningType.NEVER) return lastWarning
 
-        val needsToWarn = LorenzUtils.skyBlockArea != currentRegion.removeColor() && lastWarning.passedSince() > 30.seconds
+        val currentArea = currentAreaPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
+            val needsToWarn =
+                group("area") != currentRegion && lastWarning.passedSince() > config.warning.cooldown.seconds
 
-        if (!needsToWarn) return lastWarning
+            if (!needsToWarn) return lastWarning
 
-        if (WarningType.BEING.isSelected() || (WarningType.FORAGING.isSelected() && isForaging())) {
-            LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
+            println(isForaging())
+
+            when (config.warning.warningType) {
+                WarningType.BEING -> LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
+                WarningType.FORAGING -> if (isForaging()) LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
+                else -> return lastWarning
+            }
+
+            return SimpleTimeMark.now()
         }
 
-        return SimpleTimeMark.now()
+        return lastWarning
     }
 
     private fun handleDisplay(currentRegion: String): Renderable {
@@ -115,11 +133,10 @@ object FrogMaskFeatures {
 
     private fun isForaging(): Boolean {
         if (SkillApi.activeSkill != SkillType.FORAGING) return false
+        updateSkillInfo()
         val info = SkillApi.skillXPInfoMap[SkillType.FORAGING] ?: return false
         return info.lastUpdate.passedSince() < 10.seconds
     }
-
-    fun WarningType.isSelected() = config.warning.warningType.contains(this)
 
     private fun isEnabled() = config.display || config.warning.enabled
 }
