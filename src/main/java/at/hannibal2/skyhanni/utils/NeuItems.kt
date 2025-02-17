@@ -115,6 +115,7 @@ object NeuItems {
     fun transHypixelNameToInternalName(hypixelId: String): NeuInternalName =
         ItemResolutionQuery.transformHypixelBazaarToNeuItemId(hypixelId).toInternalName()
 
+    //  TODO add cache
     fun NeuInternalName.getItemStackOrNull(): ItemStack? = ItemResolutionQuery()
         .withKnownInternalName(asString())
         .resolveToItemStack()?.copy()

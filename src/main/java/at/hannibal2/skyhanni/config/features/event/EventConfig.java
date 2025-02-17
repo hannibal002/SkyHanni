@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.config.features.event;
 import at.hannibal2.skyhanni.config.features.event.bingo.BingoConfig;
 import at.hannibal2.skyhanni.config.features.event.carnival.CarnivalConfig;
 import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig;
+import at.hannibal2.skyhanni.config.features.event.gifting.GiftingConfig;
 import at.hannibal2.skyhanni.config.features.event.hoppity.HoppityEggsConfig;
 import at.hannibal2.skyhanni.config.features.event.waypoints.LobbyWaypointsConfig;
 import at.hannibal2.skyhanni.config.features.event.winter.WinterConfig;
@@ -24,6 +25,10 @@ public class EventConfig {
     @Category(name = "Winter", desc = "Winter Season on Jerry's Island")
     @Expose
     public WinterConfig winter = new WinterConfig();
+
+    @Category(name = "Gifting", desc = "Giving and receiving gifts")
+    @Expose
+    public GiftingConfig gifting = new GiftingConfig();
 
     @Expose
     @Category(name = "Hoppity Eggs", desc = "Features for the Hoppity event that happens every SkyBlock spring.")
@@ -54,10 +59,15 @@ public class EventConfig {
     @Expose
     public CenturyConfig century = new CenturyConfig();
 
-    @ConfigOption(name = "400þ Anniversary Celebration", desc = "Features for the 400þ year of SkyBlock")
+    @ConfigOption(name = "400þ Anniversary Celebration", desc = "Features for the 400þ year of SkyBlock.")
     @Accordion
     @Expose
     public AnniversaryCelebration400Config anniversaryCelebration400 = new AnniversaryCelebration400Config();
+
+    @ConfigOption(name = "Year of the Seal", desc = "Features for Year of the Seals.")
+    @Accordion
+    @Expose
+    public YearOfTheSealConfig yearOfTheSeal = new YearOfTheSealConfig();
 
     @Category(name = "Lobby Waypoints", desc = "Lobby Event Waypoint settings")
     @Expose

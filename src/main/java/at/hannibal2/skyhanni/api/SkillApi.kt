@@ -279,8 +279,10 @@ object SkillApi {
             }
 
             maxSkillTabPattern.matchMatcher(line) {
-                tablistLevel = group("level").toInt()
-                if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                if (group("type") == skillType.displayName) {
+                    tablistLevel = group("level").toInt()
+                    if (group("type").lowercase() != activeSkill?.lowercaseName) tablistLevel = null
+                }
             }
 
             skillTabNoPercentPattern.matchMatcher(line) {
@@ -320,15 +322,13 @@ object SkillApi {
 
     private fun updateSkillInfo(existingLevel: SkillInfo, level: Int, currentXP: Long, maxXP: Long, totalXP: Long, gained: String) {
         val cap = activeSkill?.maxLevel
-        val add = if (level >= 50) {
-            when (cap) {
+        val add = cap?.takeIf { level >= it }?.let {
+            when (it) {
                 50 -> XP_NEEDED_FOR_50
                 60 -> XP_NEEDED_FOR_60
                 else -> 0
             }
-        } else {
-            0
-        }
+        } ?: 0
 
         val (levelOverflow, currentOverflow, currentMaxOverflow, totalOverflow) =
             calculateSkillLevel(totalXP + add, cap ?: 60)
