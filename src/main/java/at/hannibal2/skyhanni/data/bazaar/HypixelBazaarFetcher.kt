@@ -56,6 +56,7 @@ object HypixelBazaarFetcher {
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
         if (!canFetch()) return
+        if (ApiUtils.isBazaarDisabled()) return
         SkyHanniMod.coroutineScope.launch {
             fetchAndProcessBazaarData()
         }
