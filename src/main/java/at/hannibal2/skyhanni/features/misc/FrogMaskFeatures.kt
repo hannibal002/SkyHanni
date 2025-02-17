@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
@@ -9,6 +10,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
@@ -21,12 +23,15 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.TimeUtils.format
 import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
+import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
-object FrogMaskDisplay {
-    private val config get() = SkyHanniMod.feature.misc
+object FrogMaskFeatures {
+    private val config get() = SkyHanniMod.feature.misc.frogMaskFeatures
 
     private var display: Renderable? = null
+
+    private var lastWarning = SimpleTimeMark.farPast()
 
     private val patternGroup = RepoPattern.group("misc.frogmask")
 
@@ -55,11 +60,25 @@ object FrogMaskDisplay {
         val helmet = InventoryUtils.getHelmet() ?: return
         if (helmet.getInternalName() != "FROG_MASK".toInternalName()) return
 
-        display = activeRegionPattern.firstMatcher(helmet.getLore()) {
+        activeRegionPattern.firstMatcher(helmet.getLore()) {
             val currentRegion = group("region")
-            val now = SkyBlockTime.now()
-            val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
-            updateDisplay(currentRegion, timeRemaining)
+
+            when {
+                config.frogMaskDisplay -> {
+                    val now = SkyBlockTime.now()
+                    val timeRemaining = SkyBlockTime(year = now.year, month = now.month, day = now.day + 1).asTimeMark()
+                    display = updateDisplay(currentRegion, timeRemaining)
+                }
+
+                config.frogMaskWarning -> {
+                    if (LorenzUtils.skyBlockArea == currentRegion) {
+                        lastWarning = SimpleTimeMark.farPast()
+                    } else if (lastWarning.passedSince() > 30.seconds) {
+                        LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
+                        lastWarning = SimpleTimeMark.now()
+                    }
+                }
+            }
         }
     }
 
@@ -79,5 +98,11 @@ object FrogMaskDisplay {
         )
     }
 
-    private fun isEnabled() = IslandType.THE_PARK.isInIsland() && config.frogMaskDisplay
+    @HandleEvent
+    fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
+        event.move(74, "misc.frogMaskDisplay", "misc.frogMaskFeatures.frogMaskDisplay")
+        event.move(74, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.frogMaskDisplayPosition")
+    }
+
+    private fun isEnabled() = IslandType.THE_PARK.isInIsland() && (config.frogMaskDisplay || config.frogMaskWarning)
 }

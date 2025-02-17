@@ -135,6 +135,11 @@ public class MiscConfig {
     public CenturyPartyInvitationConfig centuryPartyInvitation = new CenturyPartyInvitationConfig();
 
     @Expose
+    @ConfigOption(name = "Frog Mask Features", desc = "")
+    @Accordion
+    public FrogMaskFeaturesConfig frogMaskFeatures = new FrogMaskFeaturesConfig();
+
+    @Expose
     @ConfigOption(name = "Reset Search on Close", desc = "Reset the search in GUIs after closing the inventory.")
     @ConfigEditorBoolean
     public boolean resetSearchGuiOnClose = true;
@@ -246,16 +251,6 @@ public class MiscConfig {
     @Expose
     @ConfigLink(owner = MiscConfig.class, field = "playerMovementSpeed")
     public Position playerMovementSpeedPos = new Position(394, 124, false, true);
-
-    @Expose
-    @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the §5Frog Mask§7.")
-    @ConfigEditorBoolean
-    @FeatureToggle
-    public boolean frogMaskDisplay = false;
-
-    @Expose
-    @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")
-    public Position frogMaskDisplayPosition = new Position(25, 25, false, true);
 
     @Expose
     @ConfigOption(name = "Server Restart Title", desc = "Show a title with seconds remaining until the server restarts after a Game Update or Scheduled Restart.")
