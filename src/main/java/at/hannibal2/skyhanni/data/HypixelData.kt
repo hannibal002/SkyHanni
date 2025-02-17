@@ -459,8 +459,10 @@ object HypixelData {
 
     @HandleEvent
     fun onSkyBlockLeave(event: SkyBlockLeaveEvent) {
-        if (skyBlockIsland != IslandType.NONE) {
-            IslandChangeEvent(IslandType.NONE, skyBlockIsland)
+        val oldIsland = skyBlockIsland
+        if (oldIsland != IslandType.NONE) {
+            skyBlockIsland = IslandType.NONE
+            IslandChangeEvent(IslandType.NONE, oldIsland)
         }
     }
 
