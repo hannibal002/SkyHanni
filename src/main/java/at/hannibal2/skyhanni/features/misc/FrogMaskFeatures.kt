@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.LorenzUtils.isInIsland
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStack
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
@@ -48,14 +47,14 @@ object FrogMaskFeatures {
 
     private val frogMask by lazy { "FROG_MASK".toInternalName().getItemStack() }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
         config.displayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
-    @HandleEvent
+    @HandleEvent(onlyOnIsland = IslandType.THE_PARK)
     fun onSecondPassed(event: SecondPassedEvent) {
         if (!isEnabled()) return
         display = null
@@ -112,7 +111,7 @@ object FrogMaskFeatures {
         event.move(74, "misc.frogMaskDisplayPosition", "misc.frogMaskFeatures.frogMaskDisplayPosition")
     }
 
-    fun isForaging(): Boolean {
+    private fun isForaging(): Boolean {
         if (SkillApi.activeSkill != SkillType.FORAGING) return false
         val info = SkillApi.skillXPInfoMap[SkillType.FORAGING] ?: return false
         return info.lastUpdate.passedSince() < 10.seconds
@@ -120,5 +119,5 @@ object FrogMaskFeatures {
 
     fun WarningType.isSelected() = config.warning.warningType.contains(this)
 
-    private fun isEnabled() = IslandType.THE_PARK.isInIsland() && (config.display || config.warning.enabled)
+    private fun isEnabled() = config.display || config.warning.enabled
 }
