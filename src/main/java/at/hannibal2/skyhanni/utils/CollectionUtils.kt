@@ -253,9 +253,13 @@ object CollectionUtils {
         return collection
     }
 
-    fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) {
-        filter(predicate).keys.forEach { remove(it) }
+    inline fun <reified T> MutableIterator<T>.removeIf(predicate: (T) -> Boolean) {
+        while (hasNext()) {
+            if (predicate(next())) this.remove()
+        }
     }
+
+    fun <K, V> MutableMap<K, V>.removeIf(predicate: (Map.Entry<K, V>) -> Boolean) = entries.iterator().removeIf(predicate)
 
     /** Removes the first element that matches the given [predicate] in the list. */
     fun <T> List<T>.removeFirst(predicate: (T) -> Boolean): List<T> {
