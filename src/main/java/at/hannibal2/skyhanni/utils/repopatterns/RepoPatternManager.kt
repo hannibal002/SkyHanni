@@ -1,7 +1,6 @@
 package at.hannibal2.skyhanni.utils.repopatterns
 
 import at.hannibal2.skyhanni.SkyHanniMod
-import at.hannibal2.skyhanni.api.event.EventHandler
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigManager
 import at.hannibal2.skyhanni.config.features.dev.RepoPatternConfig
@@ -79,12 +78,10 @@ object RepoPatternManager {
     private val logger = LogManager.getLogger("SkyHanni")
 
     /**
-     * Crash if in a development environment, or if inside a guarded event handler.
+     * Crash if in a development environment.
      */
-    fun crash(reason: String) {
-        if (EventHandler.isInEventHandler) {
-            throw RuntimeException(reason)
-        }
+    private fun crash(reason: String) {
+        if (PlatformUtils.isDevEnvironment) throw RuntimeException(reason)
     }
 
     /**
