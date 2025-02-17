@@ -168,18 +168,19 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
-        lists.add(
-            Renderable.searchableScrollable(
-                table,
-                key = 99,
-                lines = config.itemsShown.get(),
-                velocity = 5.0,
-                textInput = textInput,
-                scrollValue = scrollValue,
-                asTable = config.showTable.get(),
-                showScrollableTipsInList = true,
-            ).toSearchable(),
-        )
+        Renderable.searchableScrollable(
+            table,
+            key = 99,
+            lines = config.itemsShown.get(),
+            velocity = 5.0,
+            textInput = textInput,
+            scrollValue = scrollValue,
+            asTable = config.showTable.get(),
+            showScrollableTipsInList = true,
+        )?.let {
+            lists.add(it.toSearchable())
+        }
+
 
         return profit
     }
