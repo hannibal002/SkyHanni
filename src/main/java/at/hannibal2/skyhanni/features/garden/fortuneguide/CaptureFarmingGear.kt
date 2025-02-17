@@ -145,7 +145,6 @@ object CaptureFarmingGear {
 
         if (currentCrop == null) {
             // todo better fall back items
-            // todo Daedalus axe
         } else {
             currentCrop.farmingItem.setItem(itemStack)
         }
