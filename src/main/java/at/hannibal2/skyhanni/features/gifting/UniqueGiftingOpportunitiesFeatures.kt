@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.event
+package at.hannibal2.skyhanni.features.gifting
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -7,19 +7,14 @@ import at.hannibal2.skyhanni.data.WinterApi
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.entity.EntityCustomNameUpdateEvent
 import at.hannibal2.skyhanni.events.entity.EntityEnterWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
-import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
-import at.hannibal2.skyhanni.features.event.winter.UniqueGiftCounter
 import at.hannibal2.skyhanni.mixins.hooks.RenderLivingEntityHelper
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.EntityUtils.isNpc
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.getLorenzVec
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.client.entity.EntityOtherPlayerMP
@@ -44,27 +39,16 @@ object UniqueGiftingOpportunitiesFeatures {
         "§6\\+1 Unique Gift given! To (?<player>[^§]+)§r§6!",
     )
 
-    /**
-     * REGEX-TEST: WHITE_GIFT
-     * REGEX-TEST: RED_GIFT
-     * REGEX-TEST: GREEN_GIFT
-     */
-    private val giftNamePattern by patternGroup.pattern(
-        "giftname",
-        "(?:WHITE|RED|GREEN)_GIFT\$",
-    )
-
-    private var holdingGift = false
-
     private fun hasGiftedPlayer(player: EntityPlayer) = playerList?.contains(player.name) == true
 
     private fun addGiftedPlayer(playerName: String) {
         playerList?.add(playerName)
     }
 
-    private val config get() = SkyHanniMod.feature.event.winter.giftingOpportunities
+    private val config get() = SkyHanniMod.feature.event.gifting.giftingOpportunities
 
-    private fun isEnabled() = holdingGift
+    private fun isHoldingGift() = !config.highlighWithGiftOnly || GiftApi.isHoldingGift()
+    private fun isEnabled() = isHoldingGift() && config.enabled && WinterApi.isDecember()
 
     @Suppress("UnusedPrivateProperty")
     private const val HAS_NOT_GIFTED_NAMETAG = "§a§lꤥ"
@@ -115,22 +99,5 @@ object UniqueGiftingOpportunitiesFeatures {
             addGiftedPlayer(group("player"))
             UniqueGiftCounter.addUniqueGift()
         }
-    }
-
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        holdingGift = false
-
-        @Suppress("InSkyBlockEarlyReturn")
-        if (!LorenzUtils.inSkyBlock) return
-        if (!config.enabled) return
-        if (!WinterApi.isDecember()) return
-
-        holdingGift = !config.highlighWithGiftOnly || giftNamePattern.matches(InventoryUtils.itemInHandId.asString())
-    }
-
-    @HandleEvent
-    fun onWorldChange(event: WorldChangeEvent) {
-        holdingGift = false
     }
 }

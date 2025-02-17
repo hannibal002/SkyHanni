@@ -90,6 +90,7 @@ object PestProfitTracker {
         override fun resetItems() {
             totalPestsKills = 0L
             pestKills.clear()
+            spraysUsed.clear()
         }
 
         override fun getDescription(bucket: PestType?, timesGained: Long): List<String> {

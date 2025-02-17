@@ -127,6 +127,8 @@ object EffectApi {
 
         GREAT_SPOOK("§fGreat Spook I", inventoryItemName = "§fGreat Spook Potion"),
 
+        DOUCE_PLUIE_DE_STINKY_CHEESE("§eDouce Pluie de Stinky Cheese I"),
+
         HARVEST_HARBINGER("§6Harvest Harbinger V"),
 
         PEST_REPELLENT("§6Pest Repellent I§r"),
@@ -208,6 +210,11 @@ object EffectApi {
                 effect = NonGodPotEffect.GOBLIN
                 changeType = EffectDurationChangeType.REMOVE
                 duration = null
+            }
+            "§a§lBUFF! §fYou have gained §r§eDouce Pluie de Stinky Cheese I§r§f! Press TAB or type /effects to view your active effects!" -> {
+                effect = NonGodPotEffect.DOUCE_PLUIE_DE_STINKY_CHEESE
+                changeType = EffectDurationChangeType.SET
+                duration = 1.hours
             }
             else -> return
         }
