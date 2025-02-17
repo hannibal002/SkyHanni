@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.SkillApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig
 import at.hannibal2.skyhanni.config.features.misc.frogmask.FrogMaskWarningConfig.WarningType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiRenderEvent
@@ -53,7 +52,7 @@ object FrogMaskFeatures {
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
         if (!isEnabled()) return
 
-        config.frogMaskDisplayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
+        config.displayPosition.renderRenderable(display, posLabel = "Frog Mask Display")
     }
 
     @HandleEvent
@@ -67,13 +66,13 @@ object FrogMaskFeatures {
         activeRegionPattern.firstMatcher(helmet.getLore()) {
             val currentRegion = group("region")
 
-            if (config.frogMaskWarning.enabled) lastWarning = handleWarning(currentRegion)
-            if (config.frogMaskDisplay) display = handleDisplay(currentRegion)
+            if (config.warning.enabled) lastWarning = handleWarning(currentRegion)
+            if (config.display) display = handleDisplay(currentRegion)
         }
     }
 
     private fun handleWarning(currentRegion: String): SimpleTimeMark {
-        if (config.frogMaskWarning.warningTypes.isEmpty()) return SimpleTimeMark.farPast()
+        if (config.warning.warningType.isEmpty()) return SimpleTimeMark.farPast()
 
         val needsToWarn = LorenzUtils.skyBlockArea != currentRegion && lastWarning.passedSince() > 30.seconds
 
@@ -119,7 +118,7 @@ object FrogMaskFeatures {
         return info.lastUpdate.passedSince() < 10.seconds
     }
 
-    fun WarningType.isSelected() = config.frogMaskWarning.warningTypes.contains(this)
+    fun WarningType.isSelected() = config.warning.warningType.contains(this)
 
-    private fun isEnabled() = IslandType.THE_PARK.isInIsland() && (config.frogMaskDisplay || config.frogMaskWarning)
+    private fun isEnabled() = IslandType.THE_PARK.isInIsland() && (config.display || config.warning.enabled)
 }

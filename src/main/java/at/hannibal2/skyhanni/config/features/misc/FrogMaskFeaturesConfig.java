@@ -14,14 +14,14 @@ public class FrogMaskFeaturesConfig {
     @ConfigOption(name = "Frog Mask Display", desc = "Displays information about the §5Frog Mask§7.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean frogMaskDisplay = false;
+    public boolean display = false;
 
     @Expose
     @ConfigOption(name = "Frog Mask Warning", desc = "")
     @Accordion
-    public FrogMaskWarningConfig frogMaskWarning = new FrogMaskWarningConfig();
+    public FrogMaskWarningConfig warning = new FrogMaskWarningConfig();
 
     @Expose
-    @ConfigLink(owner = MiscConfig.class, field = "frogMaskDisplay")
-    public Position frogMaskDisplayPosition = new Position(25, 25, false, true);
+    @ConfigLink(owner = FrogMaskFeaturesConfig.class, field = "display")
+    public Position displayPosition = new Position(25, 25, false, true);
 }

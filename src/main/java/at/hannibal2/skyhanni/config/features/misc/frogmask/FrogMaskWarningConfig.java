@@ -6,10 +6,8 @@ import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorSlider;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
-import scala.collection.mutable.MutableList;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,7 +27,7 @@ public class FrogMaskWarningConfig {
     @Expose
     @ConfigOption(name = "Warning Type", desc = "Change when you want to be warned.")
     @ConfigEditorDraggableList
-    public List<WarningType> warningTypes = new ArrayList<>(Collections.singletonList(WarningType.FORAGING));
+    public List<WarningType> warningType = new ArrayList<>(Collections.singletonList(WarningType.FORAGING));
 
     public enum WarningType {
         BEING("When being in a wrong region."),
