@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.features.dungeon.DungeonApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
+import at.hannibal2.skyhanni.utils.ApiUtils
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils.getUpperItems
@@ -166,6 +167,7 @@ object BazaarApi {
 
     @HandleEvent
     fun onTick(event: SkyHanniTickEvent) {
+        if (ApiUtils.isHypixelItemsDisabled()) return
 
         if (!loadedNpcPriceData) {
             loadedNpcPriceData = true
