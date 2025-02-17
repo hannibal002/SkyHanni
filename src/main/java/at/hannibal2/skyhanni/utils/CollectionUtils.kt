@@ -514,7 +514,7 @@ object CollectionUtils {
         }
     }
 
-    class ObservableMap<K, V>(
+    class ObservableMutableMap<K, V>(
         private val map: MutableMap<K, V> = mutableMapOf(),
         private val preUpdate: (K, V?) -> Unit = { _, _ -> },
         private val postUpdate: (K, V?) -> Unit = { _, _ -> },

@@ -115,7 +115,7 @@ enum class HoppityEggType(
     @SkyHanniModule
     companion object {
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
-        private val nextSpawnCache = CollectionUtils.ObservableMap<HoppityEggType, SimpleTimeMark>(
+        private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
             postUpdate = { key, _ ->
                 profileStorage?.mealLastSpawn?.set(key, key.lastSpawn)
             },
