@@ -85,7 +85,7 @@ object HoppityEggDisplayManager {
                 else entries
             }.forEach {
                 val (color, timeFormat) = if (it.hasRemainingSpawns()) {
-                    it.mealColor to it.timeUntil().format()
+                    it.mealColor to it.timeUntil.format()
                 } else {
                     "§c" to (HoppityApi.getEventEndMark()?.timeUntil()?.format() ?: "???")
                 }

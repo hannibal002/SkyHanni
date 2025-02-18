@@ -3,11 +3,14 @@ package at.hannibal2.skyhanni.features.event.hoppity
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
+import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.getEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.inventory.chocolatefactory.ChocolateFactoryApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -31,7 +34,9 @@ import kotlin.time.Duration.Companion.seconds
 object HoppityEggsManager {
 
     val config get() = SkyHanniMod.feature.event.hoppityEggs
+    private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
+    // <editor-fold desc="Patterns">
     /**
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§9Chocolate Lunch Egg §r§don a ledge next to the stairs up§r§d!
      * REGEX-TEST: §d§lHOPPITY'S HUNT §r§dYou found a §r§aChocolate Dinner Egg §r§dbehind Emissary Sisko§r§d!
@@ -116,6 +121,7 @@ object HoppityEggsManager {
         "egg.notevent",
         "§cThis only works during Hoppity's Hunt!",
     )
+    // </editor-fold>
 
     private var lastMeal: HoppityEggType? = null
     private var lastNote: String? = null
@@ -125,11 +131,23 @@ object HoppityEggsManager {
     private var lastWarnTime = SimpleTimeMark.farPast()
 
     private var latestWaypointOnclick: () -> Unit = {}
+    private var syncedFromConfig: Boolean = false
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
         lastMeal = null
         lastNote = null
+        syncFromConfig()
+    }
+
+    private fun syncFromConfig() {
+        if (syncedFromConfig) return
+        profileStorage?.mealNextSpawn?.filter {
+            it.value.isInPast()
+        }?.keys?.forEach {
+            if (HoppityApi.isHoppityEvent()) it.markSpawned()
+        }
+        syncedFromConfig = true
     }
 
     @HandleEvent
@@ -178,7 +196,7 @@ object HoppityEggsManager {
         }
 
         eggSpawnedPattern.matchMatcher(event.message) {
-            getEggType(event).markSpawned()
+            EggSpawnedEvent(getEggType(event)).post()
             return
         }
     }
@@ -213,19 +231,22 @@ object HoppityEggsManager {
 
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
+        checkSpawned()
         if (!isActive()) return
         checkWarn()
     }
 
+    private fun checkSpawned() {
+        resettingEntries
+            .filter { it.spawnedToday() && !it.alreadyResetToday() }
+            .forEach { EggSpawnedEvent(it).post() }
+    }
+
     private fun checkWarn() {
         val allEggsRemaining = HoppityEggType.allEggsUnclaimed()
-        if (!warningActive) {
-            warningActive = !allEggsRemaining
-        }
+        if (!warningActive) warningActive = !allEggsRemaining
 
-        if (warningActive && allEggsRemaining) {
-            warn()
-        }
+        if (warningActive && allEggsRemaining) warn()
     }
 
     private fun warn() {

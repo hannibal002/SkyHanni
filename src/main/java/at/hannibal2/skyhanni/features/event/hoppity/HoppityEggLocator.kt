@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
+import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
@@ -84,8 +85,9 @@ object HoppityEggLocator {
         lastParticlePosition = null
     }
 
-    fun mealSpawned(meal: HoppityEggType) {
-        if (currentEggType == meal) resetData()
+    @HandleEvent
+    fun onEggSpawn(event: EggSpawnedEvent) {
+        if (event.eggType == currentEggType) resetData()
     }
 
     @HandleEvent
