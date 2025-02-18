@@ -83,7 +83,12 @@ object HoppityEggDisplayManager {
             }.let { entries ->
                 if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
                 else entries
-            }.forEach { add("§7 - ${it.formattedName} ${it.timeUntil().format()}") }
+            }.forEach {
+                val timeFormat =
+                    if (it.hasRemainingSpawns()) it.timeUntil().format()
+                    else "Unclaimed §7(§c${HoppityApi.getEventEndMark()?.timeUntil()?.format() ?: "???"}§7)"
+                add("§7 - ${it.formattedName} $timeFormat")
+            }
 
             if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
 
