@@ -154,7 +154,7 @@ object GriffinBurrowHelper {
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
-
+        if (guessLocation in particleBurrows) return
         guessLocation = event.guessLocation
         update()
     }

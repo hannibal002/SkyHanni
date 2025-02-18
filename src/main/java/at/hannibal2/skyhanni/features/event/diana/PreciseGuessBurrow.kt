@@ -134,14 +134,12 @@ object PreciseGuessBurrow {
         event.addIrrelevant {
             add("Burrow Guess: " + (guess?.toCleanString() ?: "No Guess"))
             add("Rounded Guess: " + (guess?.down(0.5)?.roundLocationToBlock()?.toCleanString() ?: "No Guess"))
-            guess.let {
-                add("Particle Locations:")
-                addAll(
-                    particleLocations.mapIndexed { index, lorenzVec ->
-                        "$index:  ${lorenzVec.toCleanString()}"
-                    }
-                )
-            }
+            add("Particle Locations:")
+            addAll(
+                particleLocations.mapIndexed { index, lorenzVec ->
+                    "$index:  ${lorenzVec.toCleanString()}"
+                },
+            )
         }
     }
 

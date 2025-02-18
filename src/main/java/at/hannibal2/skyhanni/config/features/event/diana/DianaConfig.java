@@ -24,7 +24,7 @@ public class DianaConfig {
     public String color = "0:127:85:255:255";
 
     @Expose
-    @ConfigOption(name = "Guess Next Burrow", desc = "Whether to guess the next burrow when using the Ancestral Spade")
+    @ConfigOption(name = "Guess Next Burrow", desc = "Guess the next burrow location when using the Ancestral Spade.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean burrowsGuess = false;
@@ -33,25 +33,25 @@ public class DianaConfig {
         SOOPY_GUESS("Soopy"),
         PRECISE_GUESS("Precise");
 
-        private final String str;
+        private final String display;
 
         BurrowGuessType(String string) {
-            str = string;
+            display = string;
         }
 
         @Override
         public String toString() {
-            return str;
+            return display;
         }
     }
 
     @Expose
-    @ConfigOption(name = "Guessing technique", desc = "Which guesser to use.")
+    @ConfigOption(name = "Guessing technique", desc = "Change which guess strategy to use.")
     @ConfigEditorDropdown
     public BurrowGuessType burrowsGuessType = BurrowGuessType.PRECISE_GUESS;
 
     @Expose
-    @ConfigOption(name = "Nearby Detection", desc = "Show burrows near you.")
+    @ConfigOption(name = "Nearby Detection", desc = "Show burrow locations near you.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean burrowsNearbyDetection = false;
