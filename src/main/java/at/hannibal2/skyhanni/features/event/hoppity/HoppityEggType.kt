@@ -17,7 +17,7 @@ import kotlin.time.Duration.Companion.minutes
 
 enum class HoppityEggType(
     val mealName: String,
-    private val mealColor: String,
+    val mealColor: String,
     val resetsAt: Int,
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
