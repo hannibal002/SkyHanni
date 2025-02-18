@@ -134,7 +134,8 @@ object RareDropMessages {
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
             val message = line.message
-            if (enchantedBookPattern.matches(message) || itemName in message.removeColor()) {
+            if (itemName in message) return // the message already has the enchant name
+            if (enchantedBookPattern.matches(message)) {
                 anyRecentMessage = true
                 break
             }
