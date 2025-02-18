@@ -83,13 +83,11 @@ object FrogMaskFeatures {
     private fun handleWarning(currentRegion: String): SimpleTimeMark {
         if (config.warning.warningType == WarningType.NEVER) return lastWarning
 
-        val currentArea = currentAreaPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
+        currentAreaPattern.firstMatcher(ScoreboardData.sidebarLinesFormatted) {
             val needsToWarn =
                 group("area") != currentRegion && lastWarning.passedSince() > config.warning.cooldown.seconds
 
             if (!needsToWarn) return lastWarning
-
-            println(isForaging())
 
             when (config.warning.warningType) {
                 WarningType.BEING -> LorenzUtils.sendTitle("§cWrong Region!", 3.seconds)
