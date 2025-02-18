@@ -10,17 +10,33 @@ import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
 object TitleUtils {
+    private val sortQueue: Deque<Quint<String, Duration, Double, Float, Double>> = LinkedList()
     private val titleQueue: Deque<Quad<String, Duration, Double, Float>> = LinkedList()
 
     private var lastTitle: SimpleTimeMark = SimpleTimeMark.farPast()
     private var lastTitleDuration: Duration = 0.seconds
 
-    fun addTitleToQueue(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
+    fun addTitleToSortQueue(
+        text: String,
+        duration: Duration,
+        height: Double = 1.8,
+        fontSize: Float = 4f,
+        value: Double
+    ) {
+        sortQueue.add(Quint(text, duration, height, fontSize, value))
+    }
+
+    private fun addTitleToQueue(text: String, duration: Duration, height: Double = 1.8, fontSize: Float = 4f) {
         titleQueue.add(Quad(text, duration, height, fontSize))
     }
 
     @HandleEvent
     fun onTick(e: SkyHanniTickEvent) {
+        if (sortQueue.isNotEmpty()) {
+            val sorted = sortQueue.sortedBy { it.fifth }
+            addTitleToQueue(sorted.first().first, sorted.first().second, sorted.first().third, sorted.first().fourth)
+            sortQueue.clear()
+        }
         if (titleQueue.isNotEmpty() && lastTitle.passedSince() > lastTitleDuration) {
             val title = titleQueue.poll()
             LorenzUtils.sendTitle(title.first, title.second, title.third, title.fourth)

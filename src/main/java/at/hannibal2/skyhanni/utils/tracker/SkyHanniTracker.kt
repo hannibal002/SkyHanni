@@ -239,20 +239,13 @@ open class SkyHanniTracker<Data : TrackerData>(
         )
     }
 
-    fun handlePossibleRareDropWithoutMessage(internalName: NeuInternalName, amount: Int) {
+    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            TitleUtils.addTitleToQueue("§a+ $itemName", 5.seconds)
-        }
-    }
-
-    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int) {
-        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
-        if (config.warnings.chat && price >= config.warnings.minimumChat) {
+        if (config.warnings.chat && price >= config.warnings.minimumChat && message) {
             ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
         }
         if (config.warnings.title && price >= config.warnings.minimumTitle) {
-            TitleUtils.addTitleToQueue("§a+ $itemName", 5.seconds)
+            TitleUtils.addTitleToSortQueue("§a+ $itemName", 5.seconds, value = price)
         }
     }
 
