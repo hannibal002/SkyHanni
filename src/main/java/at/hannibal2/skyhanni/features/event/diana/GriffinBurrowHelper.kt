@@ -5,7 +5,6 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
-import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig
 import at.hannibal2.skyhanni.data.ElectionCandidate
 import at.hannibal2.skyhanni.data.EntityMovementData
 import at.hannibal2.skyhanni.data.IslandType
@@ -63,7 +62,24 @@ object GriffinBurrowHelper {
     )
 
     var targetLocation: LorenzVec? = null
-    private var guessLocation: LorenzVec? = null
+
+    class Guess(private val location: LorenzVec, val precise: Boolean) {
+
+        fun getLocation(): LorenzVec = if (precise) {
+            location
+        } else {
+            findBlock(location)
+        }
+    }
+
+    private var latestGuess: Guess? = null
+    private var additionalGuessLocations = mutableListOf<Guess>()
+
+    private val allGuessLocations: List<Guess>
+        get() = latestGuess?.let {
+            additionalGuessLocations + it
+        } ?: additionalGuessLocations
+
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
     var lastTitleSentTime = SimpleTimeMark.farPast()
     private var shouldFocusOnInquis = false
@@ -82,7 +98,7 @@ object GriffinBurrowHelper {
 
         event.addData {
             add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
-            add("guessLocation: ${guessLocation?.printWithAccuracy(1)}")
+            add("guessLocation: ${latestGuess?.getLocation()?.printWithAccuracy(1)}")
             add("particleBurrows: ${particleBurrows.size}")
             for ((location, type) in particleBurrows) {
                 add(location.printWithAccuracy(1) + " " + type)
@@ -117,25 +133,10 @@ object GriffinBurrowHelper {
 
     fun update() {
         if (config.burrowsNearbyDetection) {
-            checkRemoveGuess()
+            checkRemoveNearbyGuess()
         }
 
-        val locations = mutableListOf<LorenzVec>()
-
-        if (config.inquisitorSharing.enabled) {
-            for (waypoint in InquisitorWaypointShare.waypoints) {
-                locations.add(waypoint.value.location)
-            }
-        }
-        shouldFocusOnInquis = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
-        if (!shouldFocusOnInquis) {
-            locations.addAll(particleBurrows.keys.toMutableList())
-            guessLocation?.let {
-                locations.add(findBlock(it))
-            }
-            locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
-        }
-        val newLocation = locations.minByOrNull { it.distanceToPlayer() }
+        val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
             // add island graphs here some day when the hub is fully added in the graph
@@ -151,27 +152,78 @@ object GriffinBurrowHelper {
         }
     }
 
+    private fun calculateNewTarget(): LorenzVec? {
+        val locations = mutableListOf<LorenzVec>()
+
+        if (config.inquisitorSharing.enabled) {
+            for (waypoint in InquisitorWaypointShare.waypoints) {
+                locations.add(waypoint.value.location)
+            }
+        }
+        shouldFocusOnInquis = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
+        // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
+        if (!shouldFocusOnInquis) {
+            locations.addAll(particleBurrows.keys.toMutableList())
+
+            locations.addAll(additionalGuessLocations.map { it.getLocation() })
+    //             latestGuess?.let {
+    //                 locations.add(it.getLocation())
+    //             }
+            locations.addAll(InquisitorWaypointShare.waypoints.values.map { it.location })
+        }
+        val newLocation = locations.minByOrNull { it.distanceToPlayer() }
+        return newLocation
+    }
+
+    private var lastGuessTime = SimpleTimeMark.farPast()
+
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
-        if (guessLocation in particleBurrows) return
-        guessLocation = event.guessLocation
+        val newLocation = event.guessLocation
+        if (event.precise && newLocation in particleBurrows) return
+
+        if (lastGuessTime.passedSince() > 3.seconds) {
+            latestGuess?.let {
+                if (it.precise) {
+                    if (it.getLocation() != newLocation)
+                    additionalGuessLocations.add(it)
+                }
+            }
+        }
+
+        lastGuessTime = SimpleTimeMark.now()
+        latestGuess = Guess(newLocation, event.precise)
         update()
     }
 
     @HandleEvent
     fun onBurrowDetect(event: BurrowDetectEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
-        particleBurrows = particleBurrows.editCopy { this[event.burrowLocation] = event.type }
+        val burrowLocation = event.burrowLocation
+        particleBurrows = particleBurrows.editCopy { this[burrowLocation] = event.type }
+
+        removePreciseGuess(burrowLocation)
         update()
     }
 
-    private fun checkRemoveGuess() {
-        guessLocation?.let { guessRaw ->
-            val guess = findBlock(guessRaw)
-            if (particleBurrows.any { guess.distance(it.key) < 40 }) {
-                guessLocation = null
+    private fun removePreciseGuess(burrowLocation: LorenzVec) {
+        latestGuess?.let {
+            if (it.precise) {
+                if (burrowLocation == it.getLocation()) {
+                    latestGuess = null
+                }
             }
+        }
+        additionalGuessLocations.removeIf { it.getLocation() == burrowLocation }
+    }
+
+    private fun checkRemoveNearbyGuess() {
+        val guess = latestGuess ?: return
+        if (guess.precise) return
+        val location = guess.getLocation()
+        if (particleBurrows.any { location.distance(it.key) < 40 }) {
+            latestGuess = null
         }
     }
 
@@ -204,7 +256,8 @@ object GriffinBurrowHelper {
     }
 
     private fun resetAllData() {
-        guessLocation = null
+        latestGuess = null
+        additionalGuessLocations.clear()
         targetLocation = null
         particleBurrows = emptyMap()
         GriffinBurrowParticleFinder.reset()
@@ -335,8 +388,7 @@ object GriffinBurrowHelper {
         }
 
         if (config.burrowsGuess) {
-            guessLocation?.let {
-                val guessLocation = if (config.burrowsGuessType == DianaConfig.BurrowGuessType.PRECISE_GUESS) it else findBlock(it)
+            for (guessLocation in allGuessLocations.map { it.getLocation() }) {
                 val distance = guessLocation.distance(playerLocation)
                 event.drawColor(guessLocation, LorenzColor.WHITE, distance > 10)
                 val color = if (currentWarp != null && targetLocation == guessLocation) "§b" else "§f"
