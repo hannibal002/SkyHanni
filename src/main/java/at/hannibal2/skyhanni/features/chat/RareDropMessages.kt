@@ -129,7 +129,7 @@ object RareDropMessages {
         if (category != ItemCategory.ENCHANTED_BOOK) return
         if (inAnyIsland(ignoredBookIslands)) return
 
-        val itemName = internalName.itemNameWithoutColor
+        val itemName = internalName.itemName
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
             if (line.passedSinceSent() > 1.seconds) break
