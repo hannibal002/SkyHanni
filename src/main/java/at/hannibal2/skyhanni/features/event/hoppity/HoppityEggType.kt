@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.event.hoppity
 
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggSpawnedEvent
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
@@ -14,11 +15,12 @@ import at.hannibal2.skyhanni.utils.SkyBlockTime
 import at.hannibal2.skyhanni.utils.SkyblockSeason
 import java.util.regex.Matcher
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 enum class HoppityEggType(
     val mealName: String,
-    private val mealColor: String,
+    val mealColor: String,
     val resetsAt: Int,
     private var claimed: Boolean = false,
     private var lastReset: SkyBlockTime = SkyBlockTime.fromSBYear(0),
@@ -101,7 +103,7 @@ enum class HoppityEggType(
     fun hasRemainingSpawns(): Boolean {
         val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
         // If it's before the last two days of the event, we can assume there are more spawns
-        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
+        if (hoppityEndMark.timeUntil() > SkyBlockTime.SKYBLOCK_DAY_MILLIS.milliseconds * 2) return true
         // Otherwise we have to check if the next spawn is after the end of the event
         return timeUntil < hoppityEndMark.timeUntil()
     }
@@ -114,6 +116,17 @@ enum class HoppityEggType(
 
     @SkyHanniModule
     companion object {
+        private val mealLastFound
+            get() = ProfileStorageData.profileSpecific?.chocolateFactory?.mealLastFound ?: mutableMapOf()
+
+        @HandleEvent
+        fun onProfileJoin(event: ProfileJoinEvent) {
+            mealLastFound.forEach { (meal, mark) ->
+                if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
+                else if (meal.hasRemainingSpawns() && !meal.hasNotFirstSpawnedYet()) meal.markSpawned()
+            }
+        }
+
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
         private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
             postUpdate = { key, _ ->
