@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
+import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -127,10 +128,10 @@ object RareDropMessages {
         if (category != ItemCategory.ENCHANTED_BOOK) return
         if (inAnyIsland(ignoredBookIslands)) return
 
-        val itemName = internalName.itemName
+        val itemName = internalName.itemNameWithoutColor
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
-            if (line.passedSinceSent() < 1.seconds) break
+            if (line.passedSinceSent() > 1.seconds) break
             val message = line.message
             if (enchantedBookPattern.matches(message) || itemName in message.removeColor()) {
                 anyRecentMessage = true
