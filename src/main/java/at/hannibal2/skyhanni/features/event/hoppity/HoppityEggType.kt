@@ -93,7 +93,7 @@ enum class HoppityEggType(
         fun onProfileJoin(event: ProfileJoinEvent) {
             mealLastFound.forEach { (meal, mark) ->
                 if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
-                else meal.markSpawned()
+                else if (meal.hasRemainingSpawns() && !meal.hasNotFirstSpawnedYet()) meal.markSpawned()
             }
         }
 
@@ -120,6 +120,7 @@ enum class HoppityEggType(
 
             for (eggType in resettingEntries.filter { it.altDay == isAltDay }) {
                 if (currentSBHour < eggType.resetsAt || eggType.lastResetDay == currentSBDay) continue
+                if (!eggType.hasRemainingSpawns() || eggType.hasNotFirstSpawnedYet()) continue
                 eggType.markSpawned()
                 eggType.lastResetDay = currentSBDay
                 if (HoppityEggLocator.currentEggType == eggType) {
