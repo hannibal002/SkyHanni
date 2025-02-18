@@ -210,12 +210,10 @@ object ElectionApi {
 
     private fun checkHypixelApi(forceReload: Boolean = false) {
         if (!forceReload) {
-            if (!forceReload) {
-                if (currentMayor == ElectionCandidate.UNKNOWN) {
-                    if (lastUpdate.passedSince() < 1.minutes) return
-                } else {
-                    if (lastUpdate.passedSince() < 20.minutes) return
-                }
+            if (currentMayor == ElectionCandidate.UNKNOWN) {
+                if (lastUpdate.passedSince() < 1.minutes) return
+            } else {
+                if (lastUpdate.passedSince() < 20.minutes) return
             }
         }
         lastUpdate = SimpleTimeMark.now()
