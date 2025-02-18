@@ -78,7 +78,8 @@ object HoppityEggDisplayManager {
         val displayList: List<String> = buildList {
             add("§bUnclaimed Eggs:")
             HoppityEggType.resettingEntries.filter {
-                it.hasRemainingSpawns() // Only show eggs that have future spawns
+                it.hasRemainingSpawns() || // Only show eggs that have future spawns
+                    !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
                 if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
                 else entries
