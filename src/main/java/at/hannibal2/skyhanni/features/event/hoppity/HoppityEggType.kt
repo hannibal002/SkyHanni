@@ -107,7 +107,6 @@ enum class HoppityEggType(
         return (altDay && now.day < 2) || now.hour < resetsAt
     }
 
-    @SkyHanniModule
     companion object {
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
         private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
