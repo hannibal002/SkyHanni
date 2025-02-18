@@ -9,7 +9,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.SKYBLOCK_COIN
 import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addNullableButton
-import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 
 @Suppress("SpreadOperator")
@@ -107,7 +106,6 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         itemRemover: (NeuInternalName, String) -> Unit,
         itemHider: (NeuInternalName, Boolean) -> Unit,
         getLoreList: (NeuInternalName, ItemTrackerData.TrackedItem) -> List<String>,
-        overrideScrollValue: ScrollValue,
     ): Double = super.drawItems(
         data = data,
         filter = filter,
@@ -132,6 +130,5 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             if (internalName == SKYBLOCK_COIN) data.getCoinDescription(selectedBucket, item)
             else data.getDescription(selectedBucket, item.timesGained)
         },
-        overrideScrollValue = data.selectedScrollValue
     )
 }

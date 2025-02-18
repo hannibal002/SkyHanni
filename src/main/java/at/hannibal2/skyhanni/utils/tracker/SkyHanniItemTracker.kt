@@ -99,7 +99,6 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
             else data.getDescription(item.timesGained)
         },
-        overrideScrollValue: ScrollValue = scrollValue,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NeuInternalName, Long>()
@@ -170,13 +169,14 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
+        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
         Renderable.searchableScrollable(
             table,
             key = 99,
             lines = min(items.size, config.itemsShown.get()),
             velocity = 5.0,
             textInput = textInput,
-            scrollValue = overrideScrollValue,
+            scrollValue = scrollValue,
             asTable = config.showTable.get(),
             showScrollableTipsInList = true,
         )?.let {
