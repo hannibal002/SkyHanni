@@ -82,24 +82,23 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
 
     @Expose
     var selectedBucket: E? = null
-    val selectedScrollValue: ScrollValue get() = scrollValues[selectedBucket] ?: throwBucketInitError()
 
     @Expose
-    private val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = HashMap()
-    private val E.items get() = bucketedItems[this]?.toMap() ?: HashMap()
+    val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = mutableMapOf()
+
+    private val E.items get() = bucketedItems[this] ?: mutableMapOf()
+    val selectedScrollValue: ScrollValue get() = scrollValues[selectedBucket] ?: throwBucketInitError()
     val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
 
-    private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> {
-        val flatMap: MutableMap<NeuInternalName, TrackedItem> = HashMap()
-        buckets.distinct().forEach { bucket ->
-            bucket.items.filter { (_, item) ->
-                !item.hidden
-            }.entries.distinctBy { it.key }.forEach { (key, value) ->
-                flatMap.merge(key, value, ::mergeBuckets)
-            }
+    private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
+        buckets.distinct().fold(mutableMapOf()) { acc, bucket ->
+            bucket.items.filter { (_, item) -> !item.hidden }
+                .entries.distinctBy { it.key }
+                .forEach { (key, value) ->
+                    acc.merge(key, value, ::mergeBuckets)
+                }
+            acc
         }
-        return flatMap.toMutableMap()
-    }
 
     private fun mergeBuckets(existing: TrackedItem, new: TrackedItem): TrackedItem = existing.copy(
         hidden = false,
