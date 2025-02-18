@@ -97,9 +97,13 @@ object GriffinBurrowHelper {
         event.addData {
             add("targetLocation: ${targetLocation?.printWithAccuracy(1)}")
             add("guessLocation: ${latestGuess?.getLocation()?.printWithAccuracy(1)}")
+            add("additionalGuesses: ${additionalGuesses.size}")
+            for (guess in additionalGuesses) {
+                add("  ${guess.getLocation().printWithAccuracy(1)} (precise=${guess.precise})")
+            }
             add("particleBurrows: ${particleBurrows.size}")
             for ((location, type) in particleBurrows) {
-                add(location.printWithAccuracy(1) + " " + type)
+                add("  ${location.printWithAccuracy(1)} (${type.name})")
             }
         }
     }
@@ -181,7 +185,9 @@ object GriffinBurrowHelper {
                 correctCounter++
             } else {
                 if (correctCounter > 5) {
-                    additionalGuesses.add(it)
+                    if (it.getLocation() !in particleBurrows) {
+                        additionalGuesses.add(it)
+                    }
                 }
                 correctCounter = 0
             }
