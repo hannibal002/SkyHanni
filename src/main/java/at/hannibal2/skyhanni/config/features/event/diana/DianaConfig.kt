@@ -50,7 +50,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Multi Guesses",
-        desc = "Remember previous guess locations when guessing to a new location. §eDes only work with precise guess logic.",
+        desc = "Remember previous guess locations when guessing to a new location.",
     )
     @ConfigEditorBoolean
     var multiGuesses: Boolean = true
@@ -58,7 +58,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Nearby Detection",
-        desc = "Show burrow locations near you, include type of burrow. §eThis is unrelated to guess logic.",
+        desc = "Show burrow locations near you, include type of burrow.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
