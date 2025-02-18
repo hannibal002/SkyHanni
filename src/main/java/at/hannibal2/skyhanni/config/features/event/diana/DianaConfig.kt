@@ -110,10 +110,10 @@ class DianaConfig {
     @Accordion
     var dianaProfitTracker: DianaProfitTrackerConfig = DianaProfitTrackerConfig()
 
+    // TODO rename mythologicalMobTracker
     @Expose
     @ConfigOption(name = "Mythological Creature Tracker", desc = "")
     @Accordion
-    // TODO rename mythologicalMobTracker
     var mythologicalMobtracker: MythologicalMobTrackerConfig = MythologicalMobTrackerConfig()
 
     @Expose
