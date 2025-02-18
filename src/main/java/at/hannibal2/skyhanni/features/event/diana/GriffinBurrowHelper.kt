@@ -170,22 +170,23 @@ object GriffinBurrowHelper {
         return newLocation
     }
 
-    private var lastGuessTime = SimpleTimeMark.farPast()
+    private var correctCounter = 0
 
     @HandleEvent
     fun onBurrowGuess(event: BurrowGuessEvent) {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         val newLocation = event.guessLocation
-        if (lastGuessTime.passedSince() > 3.seconds) {
-            latestGuess?.let {
-                if (it.precise) {
-                    if (it.getLocation() != newLocation)
-                        additionalGuesses.add(it)
+        latestGuess?.let {
+            if (it.getLocation() == newLocation) {
+                correctCounter++
+            } else {
+                if (correctCounter > 5) {
+                    additionalGuesses.add(it)
                 }
+                correctCounter = 0
             }
         }
 
-        lastGuessTime = SimpleTimeMark.now()
         latestGuess = Guess(newLocation, event.precise)
         update()
     }
@@ -205,6 +206,7 @@ object GriffinBurrowHelper {
             if (it.precise) {
                 if (location == it.getLocation()) {
                     latestGuess = null
+                    correctCounter = 0
                 }
             }
         }
@@ -217,6 +219,7 @@ object GriffinBurrowHelper {
         val location = guess.getLocation()
         if (particleBurrows.any { location.distance(it.key) < distance }) {
             latestGuess = null
+            correctCounter = 0
         }
     }
 
@@ -251,6 +254,7 @@ object GriffinBurrowHelper {
 
     private fun resetAllData() {
         latestGuess = null
+        correctCounter = 0
         additionalGuesses.clear()
         targetLocation = null
         particleBurrows = emptyMap()
