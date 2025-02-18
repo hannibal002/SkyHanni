@@ -78,11 +78,19 @@ object HoppityEggDisplayManager {
         val displayList: List<String> = buildList {
             add("§bUnclaimed Eggs:")
             HoppityEggType.resettingEntries.filter {
-                it.hasRemainingSpawns() // Only show eggs that have future spawns
+                it.hasRemainingSpawns() || // Only show eggs that have future spawns
+                    !it.isClaimed() // Or eggs that have not been claimed
             }.let { entries ->
                 if (config.unclaimedEggsOrder == SOONEST_FIRST) entries.sortedBy { it.timeUntil() }
                 else entries
-            }.forEach { add("§7 - ${it.formattedName} ${it.timeUntil().format()}") }
+            }.forEach {
+                val (color, timeFormat) = if (it.hasRemainingSpawns()) {
+                    it.mealColor to it.timeUntil().format()
+                } else {
+                    "§c" to (HoppityApi.getEventEndMark()?.timeUntil()?.format() ?: "???")
+                }
+                add("§7 - ${it.formattedName}$color $timeFormat")
+            }
 
             if (!config.showCollectedLocationCount || !LorenzUtils.inSkyBlock) return@buildList
 

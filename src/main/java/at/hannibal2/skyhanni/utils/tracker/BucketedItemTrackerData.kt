@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 
@@ -69,6 +70,10 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
             } ?: throwBucketInitError()
     }
 
+    private val scrollValues: Map<E?, ScrollValue> by lazy {
+        buckets.associateWith { ScrollValue() } + (null to ScrollValue())
+    }
+
     private fun throwBucketInitError(): Nothing = ErrorManager.skyHanniError(
         "Unable to retrieve enum constants for E in BucketedItemTrackerData",
         "selectedBucket" to selectedBucket,
@@ -79,33 +84,26 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
     var selectedBucket: E? = null
 
     @Expose
-    private val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = HashMap()
+    val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = mutableMapOf()
 
-    private fun getBucket(bucket: E): MutableMap<NeuInternalName, TrackedItem> = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
-    private fun getPoppedBuckets(): MutableList<E> = bucketedItems.toMutableMap().filter {
-        it.value.isNotEmpty()
-    }.keys.toMutableList()
+    private val E.items get() = bucketedItems[this] ?: mutableMapOf()
+    val selectedScrollValue: ScrollValue get() = scrollValues[selectedBucket] ?: throwBucketInitError()
+    val selectedBucketItems get() = selectedBucket?.items ?: flattenBucketsItems()
 
-    fun getItemsProp(): MutableMap<NeuInternalName, TrackedItem> = selectedBucket?.let {
-        getBucket(it)
-    } ?: flattenBucketsItems()
-
-    private fun getBucketItems(bucket: E) = bucketedItems[bucket]?.toMutableMap() ?: HashMap()
-    fun getSelectedBucketItems() = selectedBucket?.let { getBucketItems(it) } ?: flattenBucketsItems()
-    private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> {
-        val flatMap: MutableMap<NeuInternalName, TrackedItem> = HashMap()
-        buckets.distinct().forEach { bucket ->
-            getBucketItems(bucket).filter { !it.value.hidden }.entries.distinctBy { it.key }.forEach { (key, value) ->
-                flatMap.merge(key, value) { existing, new ->
-                    existing.copy(
-                        hidden = false,
-                        totalAmount = existing.totalAmount + new.totalAmount,
-                        timesGained = existing.timesGained + new.timesGained,
-                        lastTimeUpdated = maxOf(existing.lastTimeUpdated, new.lastTimeUpdated),
-                    )
+    private fun flattenBucketsItems(): MutableMap<NeuInternalName, TrackedItem> =
+        buckets.distinct().fold(mutableMapOf()) { acc, bucket ->
+            bucket.items.filter { (_, item) -> !item.hidden }
+                .entries.distinctBy { it.key }
+                .forEach { (key, value) ->
+                    acc.merge(key, value, ::mergeBuckets)
                 }
-            }
+            acc
         }
-        return flatMap.toMutableMap()
-    }
+
+    private fun mergeBuckets(existing: TrackedItem, new: TrackedItem): TrackedItem = existing.copy(
+        hidden = false,
+        totalAmount = existing.totalAmount + new.totalAmount,
+        timesGained = existing.timesGained + new.timesGained,
+        lastTimeUpdated = maxOf(existing.lastTimeUpdated, new.lastTimeUpdated),
+    )
 }
