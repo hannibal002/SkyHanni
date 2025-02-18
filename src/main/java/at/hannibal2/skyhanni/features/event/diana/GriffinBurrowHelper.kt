@@ -424,6 +424,7 @@ object GriffinBurrowHelper {
 
         val location = event.position
         if (event.itemInHand?.isDianaSpade != true || location.getBlockAt() !== Blocks.grass) return
+        removePreciseGuess(location)
 
         if (particleBurrows.containsKey(location)) {
             DelayedRun.runDelayed(1.seconds) {
