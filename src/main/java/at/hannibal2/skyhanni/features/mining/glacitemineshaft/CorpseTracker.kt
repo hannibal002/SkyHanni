@@ -98,7 +98,7 @@ object CorpseTracker {
 
         if (bucketData.getCorpseCount() == 0L) return@buildList
 
-        var profit = tracker.drawItems(bucketData, { true }, this)
+        var profit = tracker.drawItems(bucketData, { true }, this, overrideScrollValue = bucketData.selectedScrollValue)
         val applicableKeys: List<CorpseType> = bucketData.selectedBucket?.let {
             listOf(it)
         } ?: enumValues<CorpseType>().toList()

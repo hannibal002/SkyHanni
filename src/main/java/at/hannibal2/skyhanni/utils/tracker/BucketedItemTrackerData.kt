@@ -3,6 +3,7 @@ package at.hannibal2.skyhanni.utils.tracker
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
+import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import com.google.gson.annotations.Expose
 import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl
 
@@ -69,6 +70,12 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
             } ?: throwBucketInitError()
     }
 
+    private val scrollValues: Map<E?, ScrollValue> by lazy {
+        buckets.associateWith { ScrollValue() } + (null to ScrollValue())
+    }
+
+    private fun E?.getScrollValue(): ScrollValue = scrollValues[this] ?: throwBucketInitError()
+
     private fun throwBucketInitError(): Nothing = ErrorManager.skyHanniError(
         "Unable to retrieve enum constants for E in BucketedItemTrackerData",
         "selectedBucket" to selectedBucket,
@@ -77,6 +84,7 @@ abstract class BucketedItemTrackerData<E : Enum<E>> : ItemTrackerData() {
 
     @Expose
     var selectedBucket: E? = null
+    val selectedScrollValue: ScrollValue get() = selectedBucket.getScrollValue()
 
     @Expose
     private val bucketedItems: MutableMap<E, MutableMap<NeuInternalName, TrackedItem>> = HashMap()

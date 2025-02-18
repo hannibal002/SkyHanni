@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniItemTracker<Data : ItemTrackerData>(
@@ -98,6 +99,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             if (internalName == SKYBLOCK_COIN) data.getCoinDescription(item)
             else data.getDescription(item.timesGained)
         },
+        overrideScrollValue: ScrollValue = scrollValue,
     ): Double {
         var profit = 0.0
         val items = mutableMapOf<NeuInternalName, Long>()
@@ -171,10 +173,10 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
         Renderable.searchableScrollable(
             table,
             key = 99,
-            lines = config.itemsShown.get(),
+            lines = min(items.size, config.itemsShown.get()),
             velocity = 5.0,
             textInput = textInput,
-            scrollValue = scrollValue,
+            scrollValue = overrideScrollValue,
             asTable = config.showTable.get(),
             showScrollableTipsInList = true,
         )?.let {
