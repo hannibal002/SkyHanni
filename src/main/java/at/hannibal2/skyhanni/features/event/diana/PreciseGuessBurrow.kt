@@ -46,6 +46,8 @@ object PreciseGuessBurrow {
         if (!isEnabled()) return
         val type = event.type
         if (type != EnumParticleTypes.DRIP_LAVA) return
+        if (event.count != 2) return
+        if (event.speed != -0.5f) return
         val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
         lastLavaParticle = SimpleTimeMark.now()
