@@ -145,7 +145,7 @@ object PreciseGuessBurrow {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(74, "event.diana.burrowsSoopyGuess", "event.diana.burrowsGuess")
+        event.move(74, "event.diana.burrowsSoopyGuess", "event.diana.guess")
     }
 
     private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessLogic == GuessLogic.PRECISE_GUESS
