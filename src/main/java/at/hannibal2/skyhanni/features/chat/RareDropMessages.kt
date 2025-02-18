@@ -94,6 +94,7 @@ object RareDropMessages {
         IslandType.DARK_AUCTION,
         IslandType.DUNGEON_HUB,
         IslandType.CATACOMBS,
+        IslandType.KUUDRA_ARENA,
     )
 
     private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
