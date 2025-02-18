@@ -14,7 +14,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Highlight Inquisitors",
-        desc = "Highlight Inquisitors found from the Mythological Event perk."
+        desc = "Highlight Inquisitors found from the Mythological Event perk.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -28,18 +28,18 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Guess Next Burrow",
-        desc = "Guess the next burrow location when using the Ancestral Spade. §eDoes not show the type of burrow."
+        desc = "Guess the next burrow location when using the Ancestral Spade. §eDoes not show the type of burrow.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
     var guess: Boolean = false
 
     enum class GuessLogic(private val display: String) {
-        SOOPY_GUESS("Soopy"), PRECISE_GUESS("Precise");
+        SOOPY_GUESS("Soopy"),
+        PRECISE_GUESS("Precise"),
+        ;
 
-        override fun toString(): String {
-            return display
-        }
+        override fun toString(): String = display
     }
 
     @Expose
@@ -50,7 +50,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Multi Guesses",
-        desc = "Remember previous guess locations when guessing to a new location. §eDes only work with precise guess logic."
+        desc = "Remember previous guess locations when guessing to a new location. §eDes only work with precise guess logic.",
     )
     @ConfigEditorBoolean
     var multiGuesses: Boolean = true
@@ -58,7 +58,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Nearby Detection",
-        desc = "Show burrow locations near you, include type of burrow. §eThis is unrelated to guess logic."
+        desc = "Show burrow locations near you, include type of burrow. §eThis is unrelated to guess logic.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
@@ -66,8 +66,9 @@ class DianaConfig {
 
     @Expose
     @ConfigOption(
-        name = "Line To Next", desc = """Show a line to the closest burrow or guess location.
-§eRequires Burrow particle detection."""
+        name = "Line To Next",
+        desc = "Show a line to the closest burrow or guess location.\n" +
+            "§eRequires Burrow particle detection.",
     )
     @ConfigEditorBoolean
     var lineToNext: Boolean = true
@@ -75,7 +76,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Nearest Warp",
-        desc = "Warp to the nearest warp point on the hub, if closer to the next burrow."
+        desc = "Warp to the nearest warp point on the hub, if closer to the next burrow.",
     )
     @ConfigEditorBoolean
     var burrowNearestWarp: Boolean = false
@@ -98,7 +99,7 @@ class DianaConfig {
     @Expose
     @ConfigOption(
         name = "Griffin Pet Warning",
-        desc = "Warn when holding an Ancestral Spade if a Griffin Pet is not equipped."
+        desc = "Warn when holding an Ancestral Spade if a Griffin Pet is not equipped.",
     )
     @ConfigEditorBoolean
     @FeatureToggle
