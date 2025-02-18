@@ -59,7 +59,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
 
-    fun addItem(bucket: E, internalName: NeuInternalName, amount: Int) {
+    fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, message: Boolean = true) {
         modify {
             it.addItem(bucket, internalName, amount)
         }
@@ -72,7 +72,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
             }
             sessionProp.hidden = totalProp.hidden
         }
-        handlePossibleRareDrop(internalName, amount)
+        handlePossibleRareDrop(internalName, amount, message)
     }
 
     fun addBucketSelector(
