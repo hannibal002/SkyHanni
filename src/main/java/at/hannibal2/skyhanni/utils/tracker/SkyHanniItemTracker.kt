@@ -22,6 +22,7 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniItemTracker<Data : ItemTrackerData>(
@@ -168,10 +169,11 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
+        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
         Renderable.searchableScrollable(
             table,
             key = 99,
-            lines = config.itemsShown.get(),
+            lines = min(items.size, config.itemsShown.get()),
             velocity = 5.0,
             textInput = textInput,
             scrollValue = scrollValue,
