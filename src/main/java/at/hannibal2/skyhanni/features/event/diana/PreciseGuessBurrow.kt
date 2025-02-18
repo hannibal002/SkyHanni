@@ -130,9 +130,16 @@ object PreciseGuessBurrow {
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Precise Burrow Guess")
+        val guess = guessBurrowLocation()
         event.addIrrelevant {
-            add("Burrow Guess: " + (guessBurrowLocation()?.toCleanString() ?: "No Guess"))
-            add("Rounded Guess: " + (guessBurrowLocation()?.down(0.5)?.roundLocationToBlock()?.toCleanString() ?: "No Guess"))
+            add("Burrow Guess: " + (guess?.toCleanString() ?: "No Guess"))
+            add("Rounded Guess: " + (guess?.down(0.5)?.roundLocationToBlock()?.toCleanString() ?: "No Guess"))
+            guess.let {
+                add("Particle Locations:")
+                addAll(particleLocations.mapIndexed { index, lorenzVec ->
+                    "$index:  ${lorenzVec.toCleanString()}"
+                })
+            }
         }
     }
 
