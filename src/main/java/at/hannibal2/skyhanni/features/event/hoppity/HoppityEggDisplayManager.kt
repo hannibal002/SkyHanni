@@ -86,7 +86,7 @@ object HoppityEggDisplayManager {
             }.forEach {
                 val timeFormat =
                     if (it.hasRemainingSpawns()) it.timeUntil().format()
-                    else "Unclaimed §7(§c${HoppityApi.getEventEndMark()?.timeUntil()?.format() ?: "???"}§7)"
+                    else "--- §c${HoppityApi.getEventEndMark()?.timeUntil()?.format() ?: "???"}"
                 add("§7 - ${it.formattedName} $timeFormat")
             }
 
