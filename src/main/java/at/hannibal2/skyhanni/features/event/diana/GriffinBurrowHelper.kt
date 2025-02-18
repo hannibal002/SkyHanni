@@ -75,8 +75,7 @@ object GriffinBurrowHelper {
     private var latestGuess: Guess? = null
     private val additionalGuesses = mutableListOf<Guess>()
 
-    private val allGuessLocations: List<LorenzVec>
-        get() = (latestGuess?.let { additionalGuesses + it } ?: additionalGuesses).map { it.getLocation() }
+    private var allGuessLocations: List<LorenzVec> = emptyList()
 
     private var particleBurrows = mapOf<LorenzVec, BurrowType>()
     var lastTitleSentTime = SimpleTimeMark.farPast()
@@ -138,6 +137,9 @@ object GriffinBurrowHelper {
             checkRemoveNearbyGuess()
         }
 
+        val additionalGuesses = if (config.multiGuesses) additionalGuesses else emptyList()
+        allGuessLocations = (latestGuess?.let { additionalGuesses + it } ?: additionalGuesses).map { it.getLocation() }
+
         val newLocation = calculateNewTarget()
         if (targetLocation != newLocation) {
             targetLocation = newLocation
@@ -154,6 +156,7 @@ object GriffinBurrowHelper {
         }
     }
 
+    // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
     private fun calculateNewTarget(): LorenzVec? {
         val locations = mutableListOf<LorenzVec>()
 
@@ -163,7 +166,6 @@ object GriffinBurrowHelper {
             }
         }
         shouldFocusOnInquis = config.inquisitorSharing.focusInquisitor && locations.isNotEmpty()
-        // TODO add option to only focus on last guess - highly requersted method that is less optimal for money per hour. users choice
         if (!shouldFocusOnInquis) {
             locations.addAll(particleBurrows.keys.toMutableList())
 
