@@ -17,6 +17,7 @@ import java.util.regex.Matcher
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
+import kotlin.time.Duration.Companion.seconds
 
 enum class HoppityEggType(
     val mealName: String,
@@ -116,21 +117,29 @@ enum class HoppityEggType(
 
     @SkyHanniModule
     companion object {
-        private val mealLastFound
-            get() = ProfileStorageData.profileSpecific?.chocolateFactory?.mealLastFound ?: mutableMapOf()
+        private val storage
+            get() = ProfileStorageData.profileSpecific?.chocolateFactory
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            mealLastFound.forEach { (meal, mark) ->
-                if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
-                else if (meal.hasRemainingSpawns() && !meal.hasNotFirstSpawnedYet()) meal.markSpawned()
+            if (!HoppityApi.isHoppityEvent()) return
+            resettingEntries.forEach {
+                val lastFound = storage?.mealLastFound?.get(it) ?: SimpleTimeMark.farFuture()
+                if (lastFound.isInPast()) it.markClaimed(lastFound)
+
+                val nextSpawn = storage?.mealNextSpawn?.get(it) ?: SimpleTimeMark.farFuture()
+                if (nextSpawn.isInPast() && it.hasRemainingSpawns() && !it.hasNotFirstSpawnedYet()) it.markSpawned()
             }
         }
 
         private val profileStorage get() = ProfileStorageData.profileSpecific?.chocolateFactory
         private val nextSpawnCache = CollectionUtils.ObservableMutableMap<HoppityEggType, SimpleTimeMark>(
-            postUpdate = { key, _ ->
-                profileStorage?.mealLastSpawn?.set(key, key.lastSpawn)
+            postUpdate = { key, value ->
+                val newMark = value ?: run {
+                    profileStorage?.mealNextSpawn?.remove(key)
+                    return@ObservableMutableMap
+                }
+                profileStorage?.mealNextSpawn?.set(key, newMark)
             },
         )
         val resettingEntries = entries.filter { it.resetsAt != -1 }
