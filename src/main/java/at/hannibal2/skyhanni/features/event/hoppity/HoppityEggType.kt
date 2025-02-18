@@ -14,11 +14,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import java.util.regex.Matcher
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 enum class HoppityEggType(
     val mealName: String,
-    private val mealColor: String,
+    val mealColor: String,
     val resetsAt: Int,
     private var claimed: Boolean = false,
     val altDay: Boolean = false
@@ -82,7 +83,7 @@ enum class HoppityEggType(
     fun hasRemainingSpawns(): Boolean {
         val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
         // If it's before the last two days of the event, we can assume there are more spawns
-        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
+        if (hoppityEndMark.timeUntil() > SkyBlockTime.SKYBLOCK_DAY_MILLIS.milliseconds * 2) return true
         // Otherwise we have to check if the next spawn is after the end of the event
         return timeUntil < hoppityEndMark.timeUntil()
     }
@@ -112,12 +113,17 @@ enum class HoppityEggType(
 
         @HandleEvent
         fun onProfileJoin(event: ProfileJoinEvent) {
-            val spawnMap = profileStorage?.mealNextSpawn ?: return
-            val findMap = profileStorage?.mealLastFound ?: return
-            for ((meal, mark) in spawnMap) {
-                val lastFound = findMap[meal] ?: continue
-                if (mark.isInPast()) meal.markSpawned()
-                else if (lastFound.passedSince() <= 40.minutes) meal.markClaimed(lastFound)
+            if (!HoppityApi.isHoppityEvent()) return
+
+            val lastFound = profileStorage?.mealLastFound ?: return
+            val nextSpawn = profileStorage?.mealNextSpawn ?: return
+            for ((meal, spawnMark) in nextSpawn) {
+                val isSpawned = !meal.hasNotFirstSpawnedYet() && meal.hasRemainingSpawns()
+                if (!spawnMark.isInPast() && isSpawned) return meal.markSpawned()
+                when (isSpawned) {
+                    true -> meal.markSpawned()
+                    false -> meal.markClaimed(lastFound[meal])
+                }
             }
         }
 
