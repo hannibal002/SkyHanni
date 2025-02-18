@@ -3,7 +3,7 @@ package at.hannibal2.skyhanni.features.event.diana
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
-import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.BurrowGuessType
+import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
 import at.hannibal2.skyhanni.data.ClickType
 import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -46,6 +46,8 @@ object PreciseGuessBurrow {
         if (!isEnabled()) return
         val type = event.type
         if (type != EnumParticleTypes.DRIP_LAVA) return
+        if (event.count != 2) return
+        if (event.speed != -0.5f) return
         val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
         lastLavaParticle = SimpleTimeMark.now()
@@ -61,7 +63,7 @@ object PreciseGuessBurrow {
 
         val guessPosition = guessBurrowLocation() ?: return
 
-        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock()).post()
+        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock(), precise = true).post()
     }
 
     private fun guessBurrowLocation(): LorenzVec? {
@@ -145,8 +147,8 @@ object PreciseGuessBurrow {
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
-        event.move(74, "event.diana.burrowsSoopyGuess", "event.diana.burrowsGuess")
+        event.move(74, "event.diana.burrowsSoopyGuess", "event.diana.guess")
     }
 
-    private fun isEnabled() = DianaApi.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.PRECISE_GUESS
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessLogic == GuessLogic.PRECISE_GUESS
 }
