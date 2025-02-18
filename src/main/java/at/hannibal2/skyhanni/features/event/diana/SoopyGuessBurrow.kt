@@ -2,7 +2,7 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.BurrowGuessType
+import at.hannibal2.skyhanni.config.features.event.diana.DianaConfig.GuessLogic
 import at.hannibal2.skyhanni.events.PlaySoundEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
@@ -234,7 +234,7 @@ object SoopyGuessBurrow {
                         } else {
                             LorenzVec(floor(p2.x), 255.0, floor(p2.z))
                         }
-                        BurrowGuessEvent(finalLocation).post()
+                        BurrowGuessEvent(finalLocation, precise = false).post()
                     }
                 }
             }
@@ -272,5 +272,5 @@ object SoopyGuessBurrow {
         }
     }
 
-    private fun isEnabled() = DianaApi.isDoingDiana() && config.burrowsGuess && config.burrowsGuessType == BurrowGuessType.SOOPY_GUESS
+    private fun isEnabled() = DianaApi.isDoingDiana() && config.guess && config.guessLogic == GuessLogic.SOOPY_GUESS
 }
