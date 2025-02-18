@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage.ChocolateFact
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityApi.isAlternateDay
 import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType
+import at.hannibal2.skyhanni.features.event.hoppity.HoppityEggType.Companion.resettingEntries
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
@@ -20,12 +21,9 @@ object HitmanApi {
 
     private const val MINUTES_PER_DAY = 20 // Real minutes per SkyBlock day
     private const val SB_HR_PER_DAY = 24 // SkyBlock hours per day
-    private val sortedEntries get() = HoppityEggType.sortedResettingEntries
-    private val orderOrdinalMap: Map<HoppityEggType, HoppityEggType> by lazy {
-        sortedEntries.mapIndexed { index, hoppityEggType ->
-            hoppityEggType to sortedEntries[(index + 1) % sortedEntries.size]
-        }.toMap()
-    }
+    private val orderOrdinalMap = resettingEntries.mapIndexed { index, hoppityEggType ->
+        hoppityEggType to resettingEntries[(index + 1) % resettingEntries.size]
+    }.toMap()
 
     /**
      * Get the time until the given number of slots are available.
@@ -50,8 +48,8 @@ object HitmanApi {
      * Determine the first meal that would be hunted by Hitman if given an infinite amount of time.
      */
     private fun getFirstHuntedMeal(): HoppityEggType =
-        sortedEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil }
-            ?: sortedEntries.minByOrNull { it.timeUntil }
+        resettingEntries.filter { !it.isClaimed() }.minByOrNull { it.timeUntil }
+            ?: resettingEntries.minByOrNull { it.timeUntil }
             ?: ErrorManager.skyHanniError("Could not find initial meal to hunt")
 
     /**
@@ -60,7 +58,7 @@ object HitmanApi {
     private fun getNextHuntedMeal(
         previousMeal: HoppityEggType,
         duration: Duration,
-    ): HoppityEggType = sortedEntries
+    ): HoppityEggType = resettingEntries
         .filter { it.timeUntil < duration }
         .let { passingEggs ->
             passingEggs.firstOrNull { it.resetsAt > previousMeal.resetsAt && it.altDay == previousMeal.altDay }
@@ -78,7 +76,7 @@ object HitmanApi {
         if (huntsToPerform <= 0) return Duration.ZERO
 
         // Determine which pre-available meals we have, to determine better the first hunt
-        val initialClaimable = sortedEntries.filter {
+        val initialClaimable = resettingEntries.filter {
             !it.isClaimed()
         }.sortedBy {
             it.timeUntil
@@ -197,9 +195,9 @@ object HitmanApi {
         val isAllSlotDayAlt = sbTimeAllSlots.isAlternateDay()
 
         // Find the first HoppityEggType that spawns after the slots are full
-        val nextMealAfterAllSlots = HoppityEggType.sortedResettingEntries.firstOrNull {
+        val nextMealAfterAllSlots = resettingEntries.firstOrNull {
             it.resetsAt > sbTimeAllSlots.hour && it.altDay == isAllSlotDayAlt
-        } ?: HoppityEggType.sortedResettingEntries.filter {
+        } ?: resettingEntries.filter {
             it.altDay != isAllSlotDayAlt
         }.minByOrNull { it.resetsAt } ?: ErrorManager.skyHanniError("Could not find next meal after all slots")
 

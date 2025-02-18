@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.ConfigUpdaterMigrator
 import at.hannibal2.skyhanni.data.ProfileStorageData
+import at.hannibal2.skyhanni.events.ProfileJoinEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
@@ -132,6 +133,23 @@ object HoppityEggsManager {
 
     private var latestWaypointOnclick: () -> Unit = {}
     private var syncedFromConfig: Boolean = false
+
+    @HandleEvent
+    fun onProfileJoin(event: ProfileJoinEvent) {
+        if (!HoppityApi.isHoppityEvent()) return
+        resettingEntries.forEach {
+            val lastFound = profileStorage?.mealLastFound?.get(it) ?: SimpleTimeMark.farFuture()
+            if (lastFound.isInPast()) it.markClaimed(lastFound)
+
+            val nextSpawn = profileStorage?.mealNextSpawn?.get(it) ?: SimpleTimeMark.farFuture()
+            if (nextSpawn.isInPast() && it.hasRemainingSpawns() && !it.hasNotFirstSpawnedYet()) it.markSpawned()
+        }
+    }
+
+    @HandleEvent
+    fun onEggSpawned(event: EggSpawnedEvent) {
+        event.eggType.markSpawned(setLastReset = true)
+    }
 
     @HandleEvent
     fun onWorldChange(event: WorldChangeEvent) {
