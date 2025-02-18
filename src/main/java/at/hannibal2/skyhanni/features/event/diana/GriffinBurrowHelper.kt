@@ -73,7 +73,7 @@ object GriffinBurrowHelper {
     }
 
     private var latestGuess: Guess? = null
-    private var additionalGuesses = mutableListOf<Guess>()
+    private val additionalGuesses = mutableListOf<Guess>()
 
     private val allGuessLocations: List<LorenzVec>
         get() = (latestGuess?.let { additionalGuesses + it } ?: additionalGuesses).map { it.getLocation() }
@@ -181,15 +181,18 @@ object GriffinBurrowHelper {
         EntityMovementData.addToTrack(Minecraft.getMinecraft().thePlayer)
         val newLocation = event.guessLocation
         latestGuess?.let {
-            if (it.getLocation() == newLocation) {
-                correctCounter++
-            } else {
-                if (correctCounter > 5) {
-                    if (it.getLocation() !in particleBurrows) {
-                        additionalGuesses.add(it)
+            if (it.precise && config.multiGuesses) {
+                if (it.getLocation() == newLocation) {
+                    correctCounter++
+                } else {
+                    if (correctCounter > 5) {
+                        config.guess
+                        if (it.getLocation() !in particleBurrows) {
+                            additionalGuesses.add(it)
+                        }
                     }
+                    correctCounter = 0
                 }
-                correctCounter = 0
             }
         }
 
@@ -391,7 +394,7 @@ object GriffinBurrowHelper {
             }
         }
 
-        if (config.burrowsGuess) {
+        if (config.guess) {
             for (guessLocation in allGuessLocations) {
                 if (guessLocation in particleBurrows) continue
                 val distance = guessLocation.distance(playerLocation)

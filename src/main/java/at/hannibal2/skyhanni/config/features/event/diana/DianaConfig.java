@@ -24,18 +24,18 @@ public class DianaConfig {
     public String color = "0:127:85:255:255";
 
     @Expose
-    @ConfigOption(name = "Guess Next Burrow", desc = "Guess the next burrow location when using the Ancestral Spade.")
+    @ConfigOption(name = "Guess Next Burrow", desc = "Guess the next burrow location when using the Ancestral Spade. §eDoes not show the type of burrow.")
     @ConfigEditorBoolean
     @FeatureToggle
-    public boolean burrowsGuess = false;
+    public boolean guess = false;
 
-    public enum BurrowGuessType {
+    public enum GuessLogic {
         SOOPY_GUESS("Soopy"),
         PRECISE_GUESS("Precise");
 
         private final String display;
 
-        BurrowGuessType(String string) {
+        GuessLogic(String string) {
             display = string;
         }
 
@@ -46,12 +46,17 @@ public class DianaConfig {
     }
 
     @Expose
-    @ConfigOption(name = "Guessing technique", desc = "Change which guess strategy to use.")
+    @ConfigOption(name = "Guessing Logic", desc = "Change which guess strategy to use.")
     @ConfigEditorDropdown
-    public BurrowGuessType burrowsGuessType = BurrowGuessType.PRECISE_GUESS;
+    public GuessLogic guessLogic = GuessLogic.PRECISE_GUESS;
 
     @Expose
-    @ConfigOption(name = "Nearby Detection", desc = "Show burrow locations near you.")
+    @ConfigOption(name = "Multi Guesses", desc = "Remember previous guess locations when guessing to a new location. §eDes only work with precise guess logic.")
+    @ConfigEditorBoolean
+    public boolean multiGuesses = true;
+
+    @Expose
+    @ConfigOption(name = "Nearby Detection", desc = "Show burrow locations near you, include type of burrow. §eThis is unrelated to guess logic.")
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean burrowsNearbyDetection = false;
