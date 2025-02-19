@@ -208,6 +208,18 @@ data class LorenzVec(
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
+    private val normX = if (x == 0.0) 0.0 else x
+    private val normY = if (y == 0.0) 0.0 else y
+    private val normZ = if (z == 0.0) 0.0 else z
+
+    override fun equals(other: Any?) =
+        other is LorenzVec &&
+            normX == other.normX &&
+            normY == other.normY &&
+            normZ == other.normZ
+
+    override fun hashCode() = 31 * (31 * normX.hashCode() + normY.hashCode()) + normZ.hashCode()
+
     companion object {
 
         val directions = setOf(
