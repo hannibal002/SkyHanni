@@ -106,6 +106,10 @@ public class DungeonConfig {
     @Accordion
     public LividFinderConfig lividFinder = new LividFinderConfig();
 
+    @Expose
+    @ConfigOption(name = "Trinity", desc = "")
+    @Accordion
+    public DungeonTrinityHelperConfig trinityHelper = new DungeonTrinityHelperConfig();
 
     @Expose
     @ConfigOption(name = "Terracotta Phase", desc = "")
