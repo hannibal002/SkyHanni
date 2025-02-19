@@ -139,29 +139,11 @@ object PestProfitTracker {
 
     @HandleEvent(onlyOnIsland = IslandType.GARDEN)
     fun onChat(event: SkyHanniChatEvent) {
-        if (!config.enabled) return
         event.checkPestChats()
         event.checkSprayChats()
     }
 
     private fun SkyHanniChatEvent.checkPestChats() {
-        PestApi.pestDeathChatPattern.matchMatcher(message) {
-            val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
-                "Could not find PestType for killed pest, please report this in the Discord.",
-                "pest_name" to group("pest"),
-                "full_message" to message,
-            )
-            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
-            val amount = group("amount").toInt().fixAmount(internalName, pest)
-
-            tracker.addItem(pest, internalName, amount)
-
-            // Field Mice drop 6 separate items, but we only want to count the kill once
-            if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
-            else if (pest != PestType.FIELD_MOUSE) addKill(pest)
-
-            if (config.hideChat) blockedReason = "pest_drop"
-        }
         pestRareDropPattern.matchMatcher(message) {
             val itemGroup = group("item")
             val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
@@ -173,12 +155,34 @@ object PestProfitTracker {
                 chatComponent = ChatComponentText(fixedString)
             }
 
+            // Happens here so that the amount is fixed independently of tracker being enabled
+            if (!config.enabled) return
+
             tracker.addItem(pest, internalName, amount)
             // Pests always have guaranteed loot, therefore there's no need to add kill here
+        }
+        PestApi.pestDeathChatPattern.matchMatcher(message) {
+            val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
+                "Could not find PestType for killed pest, please report this in the Discord.",
+                "pest_name" to group("pest"),
+                "full_message" to message,
+            )
+            val internalName = NeuInternalName.fromItemNameOrNull(group("item")) ?: return
+            val amount = group("amount").toInt().fixAmount(internalName, pest)
+
+            if (config.hideChat) blockedReason = "pest_drop"
+            if (!config.enabled) return
+
+            tracker.addItem(pest, internalName, amount)
+
+            // Field Mice drop 6 separate items, but we only want to count the kill once
+            if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
+            else if (pest != PestType.FIELD_MOUSE) addKill(pest)
         }
     }
 
     private fun SkyHanniChatEvent.checkSprayChats() {
+        if (!config.enabled) return
         sprayonatorUsedPattern.matchGroup(message, "spray")?.let {
             SprayType.getByNameOrNull(it)?.addSprayUsed()
         }
