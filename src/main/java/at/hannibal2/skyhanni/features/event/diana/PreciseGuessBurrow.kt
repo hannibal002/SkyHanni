@@ -59,7 +59,7 @@ object PreciseGuessBurrow {
 
         val guessPosition = guessBurrowLocation() ?: return
 
-        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock(), precise = true).post()
+        BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock().normalizeZero(), precise = true).post()
     }
 
     private fun guessBurrowLocation(): LorenzVec? {

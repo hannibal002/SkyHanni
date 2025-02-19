@@ -208,6 +208,10 @@ data class LorenzVec(
 
     private operator fun div(i: Number): LorenzVec = LorenzVec(x / i.toDouble(), y / i.toDouble(), z / i.toDouble())
 
+    private fun normalizeZero(value: Double) = if (value == 0.0) 0.0 else value
+
+    fun normalizeZero(): LorenzVec = LorenzVec(normalizeZero(x), normalizeZero(y), normalizeZero(z))
+
     companion object {
 
         val directions = setOf(

@@ -234,7 +234,7 @@ object SoopyGuessBurrow {
                         } else {
                             LorenzVec(floor(p2.x), 255.0, floor(p2.z))
                         }
-                        BurrowGuessEvent(finalLocation, precise = false).post()
+                        BurrowGuessEvent(finalLocation.normalizeZero(), precise = false).post()
                     }
                 }
             }
