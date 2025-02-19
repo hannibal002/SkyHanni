@@ -12,11 +12,9 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ChatUtils.message
 import at.hannibal2.skyhanni.utils.ChatUtils.passedSinceSent
-import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.itemName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemNameWithoutColor
 import at.hannibal2.skyhanni.utils.LorenzUtils.colorCodeToRarity
 import at.hannibal2.skyhanni.utils.LorenzUtils.inAnyIsland
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
@@ -25,7 +23,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
@@ -76,7 +73,7 @@ object RareDropMessages {
      */
     private val oringoPattern by petGroup.pattern(
         "oringomessage",
-        "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)"
+        "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)",
     )
 
     /**
@@ -84,7 +81,7 @@ object RareDropMessages {
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook",
-        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book (?<end>§r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)).*"
+        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book (?<end>§r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)).*",
     )
 
     private val petPatterns = listOf(
@@ -116,7 +113,7 @@ object RareDropMessages {
                 start = start.substring(0..start.length - 2) + "n "
 
             event.chatComponent = ChatComponentText(
-                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end"
+                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end",
             )
         }
     }
@@ -155,7 +152,7 @@ object RareDropMessages {
         ChatUtils.editFirstMessage(
             component = { it.formattedText.replace("Enchanted Book", internalName.itemName).asComponent() },
             "enchanted book",
-            predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) }
+            predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) },
         )
 
     }
