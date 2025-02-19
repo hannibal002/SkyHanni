@@ -23,7 +23,7 @@ object DungeonTrinityHelper {
         val puzzleCount = TabWidget.DUNGEON_PUZZLE.matchMatcherFirstLine { group("amount") }?.toIntOrNull() ?: 0
 
         // https://hypixel.net/threads/best-way-to-get-trinitys-number-instead-of-acquiring-actual-friends.5489159/
-        if (puzzleCount <= 6) {
+        if (puzzleCount == 5) {
             dragonSound.playSound()
             LorenzUtils.sendTitle("§dTrinity ?!?!", 5.seconds)
             if (config.sendPartyChat) HypixelCommands.partyChat("5 Puzzle dungeon, watch out for Trinity room")
