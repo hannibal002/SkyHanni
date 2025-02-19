@@ -17,8 +17,6 @@ import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
 import at.hannibal2.skyhanni.utils.PolynomialFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
-import at.hannibal2.skyhanni.utils.toLorenzVec
-import net.minecraft.client.Minecraft
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.PI
 import kotlin.math.atan2
@@ -52,8 +50,6 @@ object PreciseGuessBurrow {
         if (lastDianaSpade.passedSince() > 3.seconds) return
         lastLavaParticle = SimpleTimeMark.now()
         if (particleLocations.isEmpty()) {
-            // First particle spawns exactly 1 block away from the player
-            if ((spadeUsePosition?.distance(currLoc) ?: 10.0) > 1.1555) return
             particleLocations.add(currLoc)
             return
         }
@@ -114,7 +110,6 @@ object PreciseGuessBurrow {
 
     private var lastDianaSpade = SimpleTimeMark.farPast()
     private var lastLavaParticle = SimpleTimeMark.farPast()
-    private var spadeUsePosition: LorenzVec? = null
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onUseAbility(event: ItemClickEvent) {
@@ -122,11 +117,12 @@ object PreciseGuessBurrow {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
-        if (lastLavaParticle.passedSince() < 0.5.seconds) return
-        if (lastDianaSpade.passedSince() < 0.1.seconds) return
+        if (lastLavaParticle.passedSince() < 0.5.seconds) {
+            event.cancel()
+            return
+        }
         particleLocations.clear()
         lastDianaSpade = SimpleTimeMark.now()
-        spadeUsePosition = Minecraft.getMinecraft().thePlayer.getPositionEyes(1.0F).toLorenzVec()
     }
 
     @HandleEvent
