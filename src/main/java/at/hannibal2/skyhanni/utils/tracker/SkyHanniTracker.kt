@@ -5,17 +5,22 @@ import at.hannibal2.skyhanni.config.core.config.Position
 import at.hannibal2.skyhanni.config.storage.ProfileSpecificStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.RenderData
+import at.hannibal2.skyhanni.data.SlayerApi
 import at.hannibal2.skyhanni.data.TrackerManager
 import at.hannibal2.skyhanni.features.misc.items.EstimatedItemValue
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
-import at.hannibal2.skyhanni.utils.CollectionUtils
+import at.hannibal2.skyhanni.utils.InventoryDetector
+import at.hannibal2.skyhanni.utils.ItemPriceSource
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.RenderDisplayHelper
 import at.hannibal2.skyhanni.utils.RenderUtils.renderRenderables
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.renderables.Renderable
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addButton
+import at.hannibal2.skyhanni.utils.renderables.RenderableUtils.addRenderableNullableButton
 import at.hannibal2.skyhanni.utils.renderables.SearchTextInput
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.buildSearchBox
@@ -41,11 +46,11 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    private val textInput = SearchTextInput()
+    val textInput = SearchTextInput()
 
     companion object {
 
-        val config get() = SkyHanniMod.feature.misc.tracker
+        private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
@@ -75,10 +80,26 @@ open class SkyHanniTracker<Data : TrackerData>(
         update()
     }
 
+    private fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+        getSharedTracker()?.let {
+            it.tryModify(mode, modifyFunction)
+            update()
+        }
+    }
+
+    fun modifyEachMode(modifyFunction: (Data) -> Unit) {
+        DisplayMode.entries.forEach {
+            tryModify(it, modifyFunction)
+        }
+    }
+
     fun renderDisplay(position: Position) {
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+            return
+        }
         if (RenderData.outsideInventory) {
             currentlyOpen = false
         }
@@ -110,7 +131,7 @@ open class SkyHanniTracker<Data : TrackerData>(
         add(searchBox)
         if (isEmpty()) return@buildList
         if (inventoryOpen) {
-            add(buildDisplayModeView())
+            buildDisplayModeView()
             if (getDisplayMode() == DisplayMode.SESSION) {
                 add(buildSessionResetButton())
             }
@@ -132,21 +153,21 @@ open class SkyHanniTracker<Data : TrackerData>(
         },
     )
 
-    private val availableTrackers = arrayOf(DisplayMode.TOTAL, DisplayMode.SESSION) + extraDisplayModes.keys
+    private val availableTrackers = listOf(DisplayMode.TOTAL, DisplayMode.SESSION) + extraDisplayModes.keys
 
-    private fun buildDisplayModeView() = Renderable.horizontalContainer(
-        CollectionUtils.buildSelector<DisplayMode>(
-            "§7Display Mode: ",
-            getName = { type -> type.displayName },
-            isCurrent = { it == getDisplayMode() },
-            onChange = {
-                displayMode = it
-                storedTrackers[name] = it
+    private fun MutableList<Renderable>.buildDisplayModeView() {
+        addRenderableNullableButton<DisplayMode>(
+            label = "Display Mode",
+            current = getDisplayMode(),
+            onChange = { new ->
+                if (new == null) return@addRenderableNullableButton
+                displayMode = new
+                storedTrackers[name] = new
                 update()
             },
             universe = availableTrackers,
-        ),
-    )
+        )
+    }
 
     protected fun getSharedTracker() = ProfileStorageData.profileSpecific?.let { ps ->
         SharedTracker(
@@ -181,13 +202,14 @@ open class SkyHanniTracker<Data : TrackerData>(
         }
     }
 
-    fun initRenderer(position: Position, condition: () -> Boolean) {
+    fun initRenderer(position: () -> Position, inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY, condition: () -> Boolean) {
         RenderDisplayHelper(
+            inventory,
             outsideInventory = true,
             inOwnInventory = true,
             condition = condition,
             onRender = {
-                renderDisplay(position)
+                renderDisplay(position())
             },
         )
     }
@@ -198,6 +220,10 @@ open class SkyHanniTracker<Data : TrackerData>(
 
         fun modify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
             get(mode).let(modifyFunction)
+        }
+
+        fun tryModify(mode: DisplayMode, modifyFunction: (Data) -> Unit) {
+            entries[mode]?.let(modifyFunction)
         }
 
         fun modify(modifyFunction: (Data) -> Unit) {
@@ -212,10 +238,38 @@ open class SkyHanniTracker<Data : TrackerData>(
         )
     }
 
-    enum class DisplayMode(val displayName: String) {
+    fun handlePossibleRareDrop(internalName: NeuInternalName, amount: Int) {
+        val (itemName, price) = SlayerApi.getItemNameAndPrice(internalName, amount)
+        if (config.warnings.chat && price >= config.warnings.minimumChat) {
+            ChatUtils.chat("§a+Tracker Drop§7: §r$itemName")
+        }
+        if (config.warnings.title && price >= config.warnings.minimumTitle) {
+            LorenzUtils.sendTitle("§a+ $itemName", 5.seconds)
+        }
+    }
+
+    fun addPriceFromButton(lists: MutableList<Searchable>) {
+        if (isInventoryOpen()) {
+            lists.addButton<ItemPriceSource>(
+                label = "Price Source",
+                current = config.priceSource,
+                getName = { it.sellName },
+                onChange = {
+                    config.priceSource = it
+                    update()
+                },
+                universe = ItemPriceSource.entries,
+            )
+        }
+    }
+
+    enum class DisplayMode(private val displayName: String) {
         TOTAL("Total"),
         SESSION("This Session"),
         MAYOR("This Mayor"),
+        ;
+
+        override fun toString(): String = displayName
     }
 
     enum class DefaultDisplayMode(val display: String, val mode: DisplayMode?) {

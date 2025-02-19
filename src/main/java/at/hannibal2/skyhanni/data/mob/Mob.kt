@@ -14,6 +14,7 @@ import at.hannibal2.skyhanni.utils.EntityUtils.isRunic
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LocationUtils.getBoxCenter
 import at.hannibal2.skyhanni.utils.LocationUtils.union
+import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils.baseMaxHealth
 import at.hannibal2.skyhanni.utils.MobUtils
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
@@ -61,8 +62,9 @@ import java.util.UUID
  * Gives back the second additional armor stand.
  *
  *   (should be called in the [MobEvent.Spawn] since it is a lazy)
- * @property id Unique identifier for each Mob instance
+ * @property uniqueId Unique identifier for each Mob instance
  */
+@Suppress("TooManyFunctions")
 class Mob(
     var baseEntity: EntityLivingBase,
     val mobType: Type,
@@ -75,9 +77,12 @@ class Mob(
     val levelOrTier: Int = -1,
 ) {
 
-    private val id: UUID = UUID.randomUUID()
+    private val uniqueId: UUID = UUID.randomUUID()
+    val id = baseEntity.entityId
 
     val owner: MobUtils.OwnerShip?
+
+    fun belongsToPlayer(): Boolean = owner?.equals(LorenzUtils.getPlayerName()) ?: false
 
     val hologram1Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 1) }
     val hologram2Delegate = lazy { MobUtils.getArmorStand(armorStand ?: baseEntity, 2) }
@@ -118,6 +123,7 @@ class Mob(
     fun isInvisible() = baseEntity !is EntityZombie && baseEntity.isInvisible && baseEntity.getWholeInventory().isNullOrEmpty()
 
     private var highlightColor: Color? = null
+    private var condition: () -> Boolean = { true }
 
     /** If [color] has no alpha or alpha is set to 255 it will set the alpha to 127
      * If [color] is set to null it removes a highlight*/
@@ -132,11 +138,17 @@ class Mob(
         }
     }
 
+    fun highlight(color: Color, condition: () -> Boolean) {
+        highlightColor = color.takeIf { it.alpha == 255 }?.addAlpha(127) ?: color
+        this.condition = condition
+        internalHighlight()
+    }
+
     private fun internalHighlight() {
         highlightColor?.let { color ->
-            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() }
+            RenderLivingEntityHelper.setEntityColorWithNoHurtTime(baseEntity, color.rgb) { !this.isInvisible() && condition() }
             extraEntities.forEach {
-                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() }
+                RenderLivingEntityHelper.setEntityColorWithNoHurtTime(it, color.rgb) { !this.isInvisible() && condition() }
             }
         }
     }
@@ -235,7 +247,7 @@ class Mob(
 
     val centerCords get() = boundingBox.getBoxCenter()
 
-    override fun hashCode() = id.hashCode()
+    override fun hashCode() = uniqueId.hashCode()
 
     override fun toString(): String = "$name - ${baseEntity.entityId}"
 
@@ -243,10 +255,12 @@ class Mob(
         if (this === other) return true
         if (other !is Mob) return false
 
-        return id == other.id
+        return uniqueId == other.uniqueId
     }
 
     // TODO add max distance
-    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true) = LineToMobHandler.register(this, color, lineWidth, depth)
+    fun lineToPlayer(color: Color, lineWidth: Int = 2, depth: Boolean = true, condition: () -> Boolean = { true }) =
+        LineToMobHandler.register(this, color, lineWidth, depth, condition)
+
     fun distanceToPlayer(): Double = baseEntity.distanceToPlayer()
 }

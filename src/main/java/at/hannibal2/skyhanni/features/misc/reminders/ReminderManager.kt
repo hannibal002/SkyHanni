@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.features.misc.reminders
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.events.SecondPassedEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.ChatUtils
@@ -27,9 +28,9 @@ object ReminderManager {
     private const val REMINDERS_PER_PAGE = 10
 
     // Random numbers chosen, this will be used to delete the old list and action messages
-    private const val REMINDERS_LIST_ID = -546745
-    private const val REMINDERS_ACTION_ID = -546746
-    private const val REMINDERS_MESSAGE_ID = -546747
+    private val REMINDERS_LIST_ID = ChatUtils.getUniqueMessageId()
+    private val REMINDERS_ACTION_ID = ChatUtils.getUniqueMessageId()
+    private val REMINDERS_MESSAGE_ID = ChatUtils.getUniqueMessageId()
 
     private val storage get() = SkyHanniMod.feature.storage.reminders
     private val config get() = SkyHanniMod.feature.misc.reminders
@@ -196,12 +197,20 @@ object ReminderManager {
         }
     }
 
-    fun command(args: Array<String>) = when (args.firstOrNull()) {
+    private fun command(args: Array<String>) = when (args.firstOrNull()) {
         "list" -> listReminders(args.drop(1).firstOrNull()?.toIntOrNull() ?: 1)
         "remove", "delete" -> removeReminder(args.drop(1))
         "edit", "update" -> editReminder(args.drop(1))
         "move" -> moveReminder(args.drop(1))
         "help" -> help()
         else -> createReminder(args)
+    }
+
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shremind") {
+            description = "Set a reminder for yourself"
+            callback { command(it) }
+        }
     }
 }
