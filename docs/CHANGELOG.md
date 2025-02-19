@@ -67,6 +67,7 @@
     + Shows what item to purchase with your hard-earned Fishy Treat.
 + Added Gift Profit Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3072)
     + Does NOT auto-track used gifts - see `/shaddusedgifts`.
++ Added precise Diana burrow prediction. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3249)
 
 #### Dungeon
 
@@ -132,6 +133,7 @@
 + Added custom sound to the Inquisitor Share feature. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3160)
 + Replaced old hoppity ready reminder messages when clickable is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3215)
 + Separated totals from mob list on Mythological Creature Tracker. - indigo_polecat (https://github.com/hannibal002/SkyHanni/pull/3228)
++ Added multi-guess support for precise burrow prediction. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3456)
 
 #### Chat Improvements
 
@@ -193,6 +195,7 @@
 + Fixed Golden Jerry detection. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3393)
 + Fixed non-functional "Line to Jerry" disable option. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3397)
 + Fixed runic Jerry detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3396)
++ Fixed Hoppity Eggs appearing in the display even when they don't spawn again before the event ends. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3450)
 
 #### Inventory Bug Fixes
 
@@ -333,6 +336,8 @@
 + Fixed memory leak in entity rendering code. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3446)
 + Fixed NEU Souls in Dwarven Mines and Glacite Tunnels. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3435)
 + Possibly fixed some config reset errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3400)
++ Fixed incorrect spacing in all Item Trackers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3452)
++ Fixed mayor data updating too slow after new mayor takes office. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3455)
 
 ### Technical Details
 

@@ -65,7 +65,7 @@ class About {
 
         @ConfigOption(name = "LibAutoUpdate", desc = "LibAutoUpdate is available under the BSD 2 Clause License")
         @ConfigEditorButton(buttonText = "Source")
-        var libAutoUpdate: Runnable = Runnable { openBrowser("https://git.nea.moe/nea/libautoupdate/") }
+        var libAutoUpdate: Runnable = Runnable { openBrowser("https://github.com/nea89o/libautoupdate") }
 
         @ConfigOption(name = "Mixin", desc = "Mixin is available under the MIT License")
         @ConfigEditorButton(buttonText = "Source")
