@@ -49,7 +49,8 @@ object OSUtils {
                 Desktop.getDesktop().browse(URI(url))
             } catch (e: IOException) {
                 ErrorManager.logErrorWithData(
-                    e, "Error while opening website.",
+                    e,
+                    "Error while opening website.",
                     "url" to url,
                 )
             }

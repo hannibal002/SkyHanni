@@ -178,12 +178,15 @@ object MaxwellApi {
     private fun Pattern.tryReadPower(message: String) {
         matchMatcher(message) {
             val power = group("power")
-            currentPower = getPowerByNameOrNull(power) ?: return ErrorManager.logErrorWithData(
-                UnknownMaxwellPower("Unknown power: $power"),
-                "Unknown power: $power",
-                "power" to power,
-                "message" to message,
-            )
+            currentPower = getPowerByNameOrNull(power) ?: run {
+                ErrorManager.logErrorWithData(
+                    UnknownMaxwellPower("Unknown power: $power"),
+                    "Unknown power: $power",
+                    "power" to power,
+                    "message" to message,
+                )
+                return
+            }
         }
     }
 
@@ -244,14 +247,16 @@ object MaxwellApi {
             } ?: return
         val displayName = selectedPowerStack.displayName.removeColor().trim()
 
-        currentPower = getPowerByNameOrNull(displayName)
-            ?: return ErrorManager.logErrorWithData(
+        currentPower = getPowerByNameOrNull(displayName) ?: run {
+            ErrorManager.logErrorWithData(
                 UnknownMaxwellPower("Unknown power: $displayName"),
                 "Unknown power: $displayName",
                 "displayName" to displayName,
                 "lore" to selectedPowerStack.getLore(),
                 noStackTrace = true,
             )
+            return
+        }
     }
 
     private fun loadThaumaturgyTunings(inventoryItems: Map<Int, ItemStack>) {
