@@ -88,6 +88,7 @@ object PestProfitTracker {
 
     class BucketData : BucketedItemTrackerData<PestType>() {
         override fun resetItems() {
+            @Suppress("DEPRECATION")
             totalPestsKills = 0L
             pestKills.clear()
             spraysUsed.clear()
@@ -114,6 +115,7 @@ object PestProfitTracker {
 
         override fun PestType.isBucketSelectable() = this in PestType.filterableEntries
 
+        @Suppress("DEPRECATION")
         fun getTotalPestCount(): Long =
             if (selectedBucket != null) pestKills[selectedBucket] ?: 0L
             else (pestKills.entries.filter { it.key != PestType.UNKNOWN }.sumOf { it.value } + totalPestsKills)
