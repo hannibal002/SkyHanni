@@ -146,23 +146,6 @@ object PestProfitTracker {
     }
 
     private fun SkyHanniChatEvent.checkPestChats() {
-        pestRareDropPattern.matchMatcher(message) {
-            val itemGroup = group("item")
-            val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
-            val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
-            val amount = 1.fixAmount(internalName, pest).also {
-                if (it == 1) return@also
-                // If the amount was fixed, edit the chat message to reflect the change
-                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
-                chatComponent = ChatComponentText(fixedString)
-            }
-
-            // Happens here so that the amount is fixed independently of tracker being enabled
-            if (!config.enabled) return
-
-            tracker.addItem(pest, internalName, amount)
-            // Pests always have guaranteed loot, therefore there's no need to add kill here
-        }
         PestApi.pestDeathChatPattern.matchMatcher(message) {
             val pest = PestType.getByNameOrNull(group("pest")) ?: ErrorManager.skyHanniError(
                 "Could not find PestType for killed pest, please report this in the Discord.",
@@ -180,6 +163,23 @@ object PestProfitTracker {
             // Field Mice drop 6 separate items, but we only want to count the kill once
             if (pest == PestType.FIELD_MOUSE && internalName == DUNG_ITEM) addKill(pest)
             else if (pest != PestType.FIELD_MOUSE) addKill(pest)
+        }
+        pestRareDropPattern.matchMatcher(message) {
+            val itemGroup = group("item")
+            val internalName = NeuInternalName.fromItemNameOrNull(itemGroup) ?: return
+            val pest = PestType.getByInternalNameItemOrNull(internalName) ?: return@matchMatcher
+            val amount = 1.fixAmount(internalName, pest).also {
+                if (it == 1) return@also
+                // If the amount was fixed, edit the chat message to reflect the change
+                val fixedString = message.replace(itemGroup, "§a${it}x $itemGroup")
+                chatComponent = ChatComponentText(fixedString)
+            }
+
+            // Happens here so that the amount is fixed independently of tracker being enabled
+            if (!config.enabled) return
+
+            tracker.addItem(pest, internalName, amount)
+            // Pests always have guaranteed loot, therefore there's no need to add kill here
         }
     }
 
