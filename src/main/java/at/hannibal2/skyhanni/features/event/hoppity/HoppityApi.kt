@@ -49,8 +49,6 @@ import net.minecraft.init.Items
 import net.minecraft.inventory.Slot
 import net.minecraft.item.Item
 import net.minecraft.item.ItemStack
-import kotlin.reflect.KMutableProperty1
-import kotlin.reflect.full.memberProperties
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
