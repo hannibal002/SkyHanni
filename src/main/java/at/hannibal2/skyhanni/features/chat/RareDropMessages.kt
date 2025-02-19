@@ -23,7 +23,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatchers
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.StringUtils.isVowel
-import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.chat.Text.asComponent
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import net.minecraft.util.ChatComponentText
@@ -74,7 +73,7 @@ object RareDropMessages {
      */
     private val oringoPattern by petGroup.pattern(
         "oringomessage",
-        "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)"
+        "(?<start>§e\\[NPC] Oringo§f: §b✆ §f§r§8• )§(?<rarityColor>.)(?<petName>[^§(.]+)(?<end> Pet)",
     )
 
     /**
@@ -82,7 +81,7 @@ object RareDropMessages {
      */
     private val enchantedBookPattern by repoGroup.pattern(
         "enchantedbook",
-        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book (?<end>§r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)).*"
+        "(?<start>(?:§.)+RARE DROP!) (?<color>(?:§.)*)Enchanted Book (?<end>§r§b\\([+](?:§.)*(?<mf>\\d*)% §r§b✯ Magic Find§r§b\\)).*",
     )
 
     private val petPatterns = listOf(
@@ -93,6 +92,7 @@ object RareDropMessages {
         IslandType.DARK_AUCTION,
         IslandType.DUNGEON_HUB,
         IslandType.CATACOMBS,
+        IslandType.KUUDRA_ARENA,
     )
 
     private val userLuck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck
@@ -113,7 +113,7 @@ object RareDropMessages {
                 start = start.substring(0..start.length - 2) + "n "
 
             event.chatComponent = ChatComponentText(
-                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end"
+                "$start§$rarityColor§l$rarityName §$rarityColor$petName$end",
             )
         }
     }
@@ -130,9 +130,10 @@ object RareDropMessages {
         val itemName = internalName.itemName
         var anyRecentMessage = false
         for (line in ChatUtils.chatLines) {
-            if (line.passedSinceSent() < 1.seconds) break
+            if (line.passedSinceSent() > 1.seconds) break
             val message = line.message
-            if (enchantedBookPattern.matches(message) || itemName in message.removeColor()) {
+            if (itemName in message) return // the message already has the enchant name
+            if (enchantedBookPattern.matches(message)) {
                 anyRecentMessage = true
                 break
             }
@@ -151,7 +152,7 @@ object RareDropMessages {
         ChatUtils.editFirstMessage(
             component = { it.formattedText.replace("Enchanted Book", internalName.itemName).asComponent() },
             "enchanted book",
-            predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) }
+            predicate = { it.passedSinceSent() < 1.seconds && enchantedBookPattern.matches(it.message) },
         )
 
     }
