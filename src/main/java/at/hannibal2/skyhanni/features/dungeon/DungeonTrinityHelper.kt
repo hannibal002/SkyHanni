@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.events.dungeon.DungeonStartEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.HypixelCommands
 import at.hannibal2.skyhanni.utils.LorenzUtils
-import at.hannibal2.skyhanni.utils.SoundUtils.createSound
-import at.hannibal2.skyhanni.utils.SoundUtils.playSound
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
