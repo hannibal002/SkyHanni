@@ -31,11 +31,9 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val particleLocations = mutableListOf<LorenzVec>()
-    private var guessPoint: LorenzVec? = null
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onWorldChange(event: IslandChangeEvent) {
-        guessPoint = null
         particleLocations.clear()
     }
 
