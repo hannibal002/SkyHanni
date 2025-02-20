@@ -17,6 +17,7 @@ class Matrix(private val data: Array<DoubleArray>) {
     operator fun get(row: Int, col: Int): Double = data[row][col]
 
     operator fun set(index: Int, value: DoubleArray) {
+        require(value.size == width) { "Invalid row size" }
         data[index] = value
     }
 
