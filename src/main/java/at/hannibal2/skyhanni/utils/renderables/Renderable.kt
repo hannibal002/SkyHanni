@@ -1700,6 +1700,7 @@ interface Renderable {
         private val unfilledColor: Color = Color.LIGHT_GRAY,
     ) : Renderable {
         private val totalRadius: Int = max(radius, border?.totalRadius ?: 0)
+        private val diffRadius: Int = totalRadius - radius
 
         override val width: Int = radius * 2
         override val height: Int = radius * 2
@@ -1709,9 +1710,15 @@ interface Renderable {
         override fun render(posX: Int, posY: Int) {
             border?.render(posX, posY)
 
-            GlStateManager.pushMatrix()
+            if (filledPercentage < 100.0) {
+                val baseAngle = Math.PI.toFloat() * 3f / 2f
+                val endAngle = (baseAngle + ((100.0 - filledPercentage) / 50.0 * Math.PI).toFloat()).mod(2f * Math.PI.toFloat())
+                drawFilledCircle(diffRadius, diffRadius, radius, backgroundColor, angle1 = baseAngle, angle2 = endAngle)
+                drawFilledCircle(diffRadius, diffRadius, radius, unfilledColor, angle1 = endAngle, angle2 = baseAngle)
+            } else {
+                drawFilledCircle(diffRadius, diffRadius, radius, backgroundColor)
+            }
 
-            drawFilledCircle(0, 0, radius, backgroundColor)
 
             itemStack?.let { stack ->
                 val itemWidth = (15.5 * itemScale).toInt()
@@ -1719,14 +1726,8 @@ interface Renderable {
                 val itemX = totalRadius - itemWidth / 2
                 val itemY = totalRadius - itemHeight / 2
 
-                GL11.glPushMatrix()
-                // Translate so that (0,0) is where the item should be rendered.
-                GL11.glTranslatef(itemX.toFloat(), itemY.toFloat(), 0f)
-                stack.renderOnScreen(0f, 0f, scaleMultiplier = itemScale, rescaleSkulls = true)
-                GL11.glPopMatrix()
+                stack.renderOnScreen(itemX.toFloat(), itemY.toFloat(), scaleMultiplier = itemScale, rescaleSkulls = true)
             }
-
-            GL11.glPopMatrix()
         }
 
     }

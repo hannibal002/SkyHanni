@@ -15,7 +15,6 @@ import at.hannibal2.skyhanni.features.misc.RoundedRectangleShader
 import at.hannibal2.skyhanni.features.misc.RoundedTextureShader
 import at.hannibal2.skyhanni.shader.CircleShader
 import at.hannibal2.skyhanni.utils.CollectionUtils.zipWithNext3
-import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.getFirstColorCode
 import at.hannibal2.skyhanni.utils.LocationUtils.calculateEdges
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
@@ -1948,11 +1947,11 @@ object RenderUtils {
      * @param y The y-coordinate of the circle's center.
      * @param radius The circle's radius.
      * @param color The fill color.
-     * @param smoothness how smooth the corners will appear (default 1). NOTE: This does very
-     * little to the smoothness of the corners in reality due to how the final pixel color is calculated.
-     * It is best kept at its default.
+     * @param angle1 defines the start of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
+     * @param angle2 defines the end of the semicircle (Default value makes it a full circle). Must be in range [0,2*pi] (0 is on the left and increases counterclockwise)
+     * @param smoothness smooths out the edge. (In amount of blurred pixels)
      */
-    fun drawFilledCircle(x: Int, y: Int, radius: Int, color: Color, smoothness: Float = 0f) {
+    fun drawFilledCircle(x: Int, y: Int, radius: Int, color: Color, smoothness: Float = 2.5f, angle1: Float = 7.0f, angle2: Float = 7.0f) {
         val scaleFactor = ScaledResolution(Minecraft.getMinecraft()).scaleFactor
         val radiusIn = radius * scaleFactor
         val xIn = x * scaleFactor
@@ -1962,11 +1961,13 @@ object RenderUtils {
         CircleShader.radius = radiusIn.toFloat()
         CircleShader.smoothness = smoothness.toFloat()
         CircleShader.centerPos = floatArrayOf((xIn + radiusIn).toFloat(), (yIn + radiusIn).toFloat())
+        CircleShader.angle1 = angle1 - Math.PI.toFloat()
+        CircleShader.angle2 = angle2 - Math.PI.toFloat()
 
         GlStateManager.pushMatrix()
         ShaderManager.enableShader(ShaderManager.Shaders.CIRCLE)
 
-        Gui.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, color.addAlpha(100).rgb)
+        Gui.drawRect(x - 5, y - 5, x + radius * 2 + 5, y + radius * 2 + 5, color.rgb)
 
         ShaderManager.disableShader()
         GlStateManager.popMatrix()
