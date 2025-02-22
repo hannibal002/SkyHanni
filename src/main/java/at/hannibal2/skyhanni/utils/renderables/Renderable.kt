@@ -1694,41 +1694,45 @@ interface Renderable {
     class CircularRenderable(
         private val backgroundColor: Color,
         private val radius: Int,
-        // Optional border; if provided, its render() is called first.
         private val border: CircularRenderable? = null,
-        // Optional ItemStack to render on top of the circle.
         private val itemStack: ItemStack? = null,
-        // Scale for the item rendering.
-        private val itemScale: Double = 1.0
+        private val itemScale: Double = 1.0,
+        private val filledPercentage: Int = 100,
+        private val unfilledColor: Color = Color.LIGHT_GRAY,
     ) : Renderable {
 
-        // The bounding box is a square of side length 2 * radius.
+        companion object {
+            // How many segments to use when drawing the circle.
+            private const val SEGMENT_COUNT: Int = 400
+        }
+
         override val width: Int = radius * 2
         override val height: Int = radius * 2
         override val horizontalAlign = HorizontalAlignment.LEFT
         override val verticalAlign = VerticalAlignment.TOP
 
         override fun render(posX: Int, posY: Int) {
-            // Render the border (if any) first.
             border?.render(posX, posY)
 
-            val centerX = posX + radius
-            val centerY = posY + radius
-            drawFilledCircle(centerX, centerY, radius, backgroundColor)
+            GlStateManager.pushMatrix()
+            GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
+            GlStateManager.translate(0f, 0f, 100f)
 
-            val itemStack = itemStack ?: return
-            // Use an approximate size for the item icon (you can adjust these values).
-            val itemWidth = (15.5 * itemScale).toInt()
-            val itemHeight = (15.5 * itemScale).toInt()
-            // Compute the top-left coordinates to center the item.
-            val itemX = centerX - itemWidth / 2
-            val itemY = centerY - itemHeight / 2
+            drawFilledCircle(radius, radius, radius, backgroundColor)
 
-            GL11.glPushMatrix()
-            // Translate so that (0,0) is where the item should be rendered.
-            GL11.glTranslatef(itemX.toFloat(), itemY.toFloat(), 0f)
-            // Render the item at (0,0) now.
-            itemStack.renderOnScreen(0f, 0f, scaleMultiplier = itemScale, rescaleSkulls = true)
+            itemStack?.let { stack ->
+                val itemWidth = (15.5 * itemScale).toInt()
+                val itemHeight = (15.5 * itemScale).toInt()
+                val itemX = radius - itemWidth / 2
+                val itemY = radius - itemHeight / 2
+
+                GL11.glPushMatrix()
+                // Translate so that (0,0) is where the item should be rendered.
+                GL11.glTranslatef(itemX.toFloat(), itemY.toFloat(), 0f)
+                stack.renderOnScreen(0f, 0f, scaleMultiplier = itemScale, rescaleSkulls = true)
+                GL11.glPopMatrix()
+            }
+
             GL11.glPopMatrix()
         }
 
@@ -1741,31 +1745,41 @@ interface Renderable {
          * @param color The fill color.
          */
         private fun drawFilledCircle(cx: Int, cy: Int, radius: Int, color: Color) {
-            GL11.glPushMatrix()
-            GL11.glEnable(GL11.GL_BLEND)
-            GL11.glDisable(GL11.GL_TEXTURE_2D)
-            // Set the desired color.
-            GL11.glColor4f(
+            GlStateManager.pushMatrix()
+            GlStateManager.disableTexture2D()
+            GlStateManager.enableBlend()
+            GlStateManager.tryBlendFuncSeparate(
+                GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO
+            )
+            GlStateManager.color(
                 color.red / 255f,
                 color.green / 255f,
                 color.blue / 255f,
                 color.alpha / 255f
             )
+            var doneFilling = false
+            val fillSegmentCount = (filledPercentage / 100.0 * SEGMENT_COUNT).toInt()
             GL11.glBegin(GL11.GL_TRIANGLE_FAN)
-            // Center vertex.
             GL11.glVertex2f(cx.toFloat(), cy.toFloat())
-            // Draw circle segments.
-            val segments = 100
-            for (i in 0..segments) {
-                val angle = (2.0 * Math.PI * i / segments).toFloat()
+            for (i in 0..SEGMENT_COUNT) {
+                val angle = (2.0 * Math.PI * i / SEGMENT_COUNT).toFloat()
                 val x = cx + (cos(angle) * radius).toInt()
                 val y = cy + (sin(angle) * radius).toInt()
                 GL11.glVertex2f(x.toFloat(), y.toFloat())
+                if (i == fillSegmentCount && !doneFilling) {
+                    doneFilling = true
+                    GlStateManager.color(
+                        unfilledColor.red / 255f,
+                        unfilledColor.green / 255f,
+                        unfilledColor.blue / 255f,
+                        unfilledColor.alpha / 255f
+                    )
+                }
             }
             GL11.glEnd()
-            GL11.glEnable(GL11.GL_TEXTURE_2D)
-            GL11.glDisable(GL11.GL_BLEND)
-            GL11.glPopMatrix()
+            GlStateManager.disableBlend()
+            GlStateManager.enableTexture2D()
+            GlStateManager.popMatrix()
         }
     }
 }
