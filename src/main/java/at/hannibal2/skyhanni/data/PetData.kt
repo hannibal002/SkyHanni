@@ -4,7 +4,6 @@ import at.hannibal2.skyhanni.api.CurrentPetApi.petDespawnMenuPattern
 import at.hannibal2.skyhanni.data.jsonobjects.repo.neu.NeuPetSkinJson
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -54,8 +53,7 @@ data class PetData(
     val xp: Double? = null,
     val skinInternalNameOverride: NeuInternalName? = null,
 ) {
-    val displayName = petItem?.itemName
-    val formattedName = "${rarity?.chatColorCode}$cleanName"
+    val displayName = "${rarity?.chatColorCode}$cleanName"
     val skin: NeuPetSkinJson? = getSkinOrNull()
 
     val levelProgressionPercentage: Double? = when {
@@ -81,7 +79,7 @@ data class PetData(
     ): String {
         val levelString = if (includeLevel) "§7[Lvl $level] §r" else ""
         val skinString = if (includeSkin) skinSymbolColor?.let { "${it.getChatColor()}✦" }.orEmpty() else ""
-        return "§r$levelString$formattedName$skinString"
+        return "§r$levelString$displayName$skinString"
     }
 
     fun getItemStackOrNull(): ItemStack? = skin?.itemStack ?: petItem?.getItemStackOrNull()

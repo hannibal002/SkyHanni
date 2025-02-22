@@ -56,6 +56,7 @@ object CurrentPetApi {
             ProfileStorageData.profileSpecific?.currentPetData = value?.asStorage() ?: PetDataStorage()
         }
 
+    fun isCurrentPet(petInternalName: NeuInternalName): Boolean = currentPet?.petItem == petInternalName
     fun isCurrentPet(petName: String): Boolean = currentPet?.cleanName?.contains(petName) ?: false
 
     // <editor-fold desc="Patterns">
@@ -227,7 +228,7 @@ object CurrentPetApi {
         val petInternalName = petNameToInternalName(petName, rarity)
         val level = groupOrNull("level")?.toInt() ?: 0
         val xp = levelToXp(level, petInternalName) ?: return null
-        val skinColor = groupOrNull("skin")?.substring(1, 2)?.get(0)?.toLorenzColor()
+        val skinColor = groupOrNull("skin")?.substring(1)?.get(0)?.toLorenzColor()
 
         return PetData(
             petItem = petInternalName,
@@ -334,7 +335,7 @@ object CurrentPetApi {
     // </editor-fold>
 
     // <editor-fold desc="Event Handlers">
-    @HandleEvent
+    @HandleEvent(onlyOnSkyblock = true)
     fun onWidgetUpdate(event: WidgetUpdateEvent) {
         if (!event.isWidget(TabWidget.PET)) return
 
@@ -392,10 +393,9 @@ object CurrentPetApi {
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {
         if (!inPetMenu) return
         if (event.clickType != GuiContainerEvent.ClickType.NORMAL) return
-        val category = event.item?.getItemCategoryOrNull() ?: return
-        if (category != ItemCategory.PET) return
+        val item = event.item.takeIf { it?.getItemCategoryOrNull() == ItemCategory.PET } ?: return
 
-        updatePet(parsePetAsItem(event.item))
+        updatePet(parsePetAsItem(item))
     }
 
     @HandleEvent

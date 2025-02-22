@@ -1695,15 +1695,15 @@ interface Renderable {
         private val radius: Int,
         private val border: CircularRenderable? = null,
         private val itemStack: ItemStack? = null,
-        private val itemScale: Double = 2.0,
+        private val itemScale: Double = 1.9,
         private val filledPercentage: Double = 100.0,
         private val unfilledColor: Color = Color.LIGHT_GRAY,
     ) : Renderable {
         private val totalRadius: Int = max(radius, border?.totalRadius ?: 0)
         private val diffRadius: Int = totalRadius - radius
 
-        override val width: Int = radius * 2
-        override val height: Int = radius * 2
+        override val width: Int = totalRadius * 2
+        override val height: Int = totalRadius * 2
         override val horizontalAlign = HorizontalAlignment.LEFT
         override val verticalAlign = VerticalAlignment.TOP
 
@@ -1721,8 +1721,8 @@ interface Renderable {
 
 
             itemStack?.let { stack ->
-                val itemWidth = (15.5 * itemScale).toInt()
-                val itemHeight = (15.5 * itemScale).toInt()
+                val itemWidth = (16 * itemScale).toInt()
+                val itemHeight = (16 * itemScale).toInt()
                 val itemX = totalRadius - itemWidth / 2
                 val itemY = totalRadius - itemHeight / 2
 

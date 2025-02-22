@@ -22,21 +22,21 @@ object CurrentPetDisplay {
         if (RiftApi.inRift() || !config.enabled) return
 
         val currentPet = CurrentPetApi.currentPet ?: return
-        val displayName = currentPet.getUserFriendlyName(includeLevel = false)
+        val displayName = currentPet.getUserFriendlyName(includeLevel = true)
         val itemStack = currentPet.getItemStackOrNull() ?: return
         val rarityColor = currentPet.rarity?.color ?: return
 
         val nameRender = Renderable.string(displayName, color = rarityColor.toColor())
         val circle = Renderable.CircularRenderable(
             rarityColor.toColor(),
-            25,
+            20,
             itemStack = itemStack,
             border = Renderable.CircularRenderable(
-                Color.LIGHT_GRAY,
-                30,
+                Color.GRAY,
+                26,
                 border = if (config.levelRing) Renderable.CircularRenderable(
-                    backgroundColor = Color.BLUE,
-                    radius = 32,
+                    backgroundColor = Color.cyan,
+                    radius = 29,
                     filledPercentage = currentPet.levelProgressionPercentage ?: 0.0
                 ) else null
             )
