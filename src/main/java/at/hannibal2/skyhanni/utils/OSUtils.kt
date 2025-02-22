@@ -94,20 +94,37 @@ object OSUtils {
     /**
      * Recursively deletes files and directories inside the root directory.
      *
-     * Empty or expired files are deleted.
-     * They are deemed expired if their last modified time is longer than the given expiry duration
-     * Directories are deleted if they are empty after deleting all files inside
+     * Empty or expired files are deleted. Files are considered expired if their last modified time
+     * exceeds the specified expiry duration.
+     * Directories are removed if they are empty after file deletion.
+     * Files modified on the three most recent distinct dates are always retained.
      *
      * @param root the starting directory for recursive deletion.
-     * @param expiryDuration the duration threshold to check if a file is expired.
+     * @param expiryDuration the duration threshold used to determine if a file is expired.
      */
     fun deleteExpiredFiles(root: File, expiryDuration: Duration) {
         SkyHanniMod.coroutineScope.launch {
+            val allFiles = root.walk().filter { it.isFile }.toList()
+            @Suppress("ConvertCallChainIntoSequence")
+            val recentDays = allFiles.mapNotNull { file ->
+                file.lastModifiedTime()?.toLocalDate()
+            }
+                .distinct()
+                .sortedDescending()
+                .take(3)
+                .toSet()
+
             root.walkBottomUp().forEach { file ->
                 when {
-                    file.isFile && (file.isEmptyFile() || file.isExpired(expiryDuration)) -> {
-                        if (!file.delete()) {
-                            println("Failed to delete file: ${file.absolutePath}")
+                    file.isFile -> {
+                        val fileDate = file.lastModifiedTime()?.toLocalDate()
+                        // Always retain files modified on the three most recent distinct dates.
+                        if (fileDate != null && fileDate in recentDays) return@forEach
+
+                        if (file.isEmptyFile() || file.isExpired(expiryDuration)) {
+                            if (!file.delete()) {
+                                println("Failed to delete file: ${file.absolutePath}")
+                            }
                         }
                     }
 
