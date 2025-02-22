@@ -148,6 +148,9 @@ object HoppityEggLocator {
         val guess = guessEggLocation() ?: return
         possibleEggLocations = listOf(guess)
         drawLocations = true
+        if (possibleEggLocations.size == 1) {
+            trySendingGraph()
+        }
     }
 
     @HandleEvent(onlyOnSkyblock = true)
