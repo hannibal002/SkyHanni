@@ -14,15 +14,10 @@ import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BezierFitter
+import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
-import kotlin.math.PI
-import kotlin.math.atan2
-import kotlin.math.cos
-import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -67,33 +62,11 @@ object PreciseGuessBurrow {
         val startPointDerivative = bezierCurve.derivativeAt(0.0)
 
         // How far away from the first point the control point is
-        val controlPointDistance = sqrt(24 * sin(getPitchFromDerivative(startPointDerivative) - PI) + 25)
+        val controlPointDistance = LocationUtils.computePitchWeight(startPointDerivative)
 
         val t = 3 * controlPointDistance / startPointDerivative.length()
 
         return bezierCurve.at(t)
-    }
-
-    private fun getPitchFromDerivative(derivative: LorenzVec): Double {
-        val xzLength = sqrt(derivative.x.pow(2) + derivative.z.pow(2))
-        val pitchRadians = -atan2(derivative.y, xzLength)
-        // Solve y = atan2(sin(x) - 0.75, cos(x)) for x from y
-        var guessPitch = pitchRadians
-        var resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
-        var windowMax = PI / 2
-        var windowMin = -PI / 2
-        repeat(100) {
-            if (resultPitch < pitchRadians) {
-                windowMin = guessPitch
-                guessPitch = (windowMin + windowMax) / 2
-            } else {
-                windowMax = guessPitch
-                guessPitch = (windowMin + windowMax) / 2
-            }
-            resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
-            if (resultPitch == pitchRadians) return guessPitch
-        }
-        return guessPitch
     }
 
     private var lastDianaSpade = SimpleTimeMark.farPast()
