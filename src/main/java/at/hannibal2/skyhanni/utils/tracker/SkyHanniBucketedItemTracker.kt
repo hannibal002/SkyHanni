@@ -28,6 +28,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         addItem(bucket, SKYBLOCK_COIN, coins)
     }
 
+    // TODO impl in normal item tracker as well
     fun ItemAddEvent.addItemFromEvent() {
         var bucket: E? = null
         modify { data ->
