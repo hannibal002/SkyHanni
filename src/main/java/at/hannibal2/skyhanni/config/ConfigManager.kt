@@ -255,7 +255,7 @@ private fun getBackupFile(file: File): File {
 
     val directory = File(parent, "backup/$year/$month")
 
-    return File(directory, "$day-${SkyHanniMod.VERSION}-$fileName.json")
+    return File(directory, "$year-$month-$day-${SkyHanniMod.VERSION}-$fileName.json")
 }
 
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
