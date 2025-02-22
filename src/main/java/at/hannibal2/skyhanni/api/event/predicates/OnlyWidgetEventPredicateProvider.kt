@@ -22,7 +22,6 @@ object OnlyWidgetEventPredicateProvider : EventPredicateProvider() {
 
     override fun getPredicate(data: EventData): EventPredicate? {
         val annotation = data.method.getAnnotation<OnlyWidget>() ?: return null
-        enumSetOf(*annotation.widgets)
         val widgets = annotation.widgets.toList().toEnumSet()
         if (widgets.isEmpty()) return null
         else if (widgets.size == 1) {
