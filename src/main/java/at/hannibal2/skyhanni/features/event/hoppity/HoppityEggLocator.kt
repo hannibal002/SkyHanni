@@ -53,6 +53,8 @@ object HoppityEggLocator {
 
     var sharedEggLocation: LorenzVec? = null
     var possibleEggLocations = listOf<LorenzVec>()
+    var currentEggType: HoppityEggType? = null
+    var currentEggNote: String? = null
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
@@ -68,6 +70,8 @@ object HoppityEggLocator {
         possibleEggLocations = emptyList()
         drawLocations = false
         sharedEggLocation = null
+        currentEggType = null
+        currentEggNote = null
         bezierFitter.reset()
     }
 
@@ -246,6 +250,8 @@ object HoppityEggLocator {
             add("Possible Egg Locations: ${possibleEggLocations.size}")
             add("Draw Locations: $drawLocations")
             add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
+            add("Current Egg Type: ${currentEggType ?: "None"}")
+            add("Current Egg Note: ${currentEggNote ?: "None"}")
         }
     }
 
