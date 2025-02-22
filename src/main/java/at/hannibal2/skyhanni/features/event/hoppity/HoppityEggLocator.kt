@@ -29,7 +29,6 @@ import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.item.ItemStack
@@ -41,7 +40,6 @@ import kotlin.math.pow
 import kotlin.math.sign
 import kotlin.math.sin
 import kotlin.math.sqrt
-import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -49,20 +47,12 @@ object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
     val locatorItem = "EGGLOCATOR".toInternalName()
 
-    private var lastParticlePositionForever: LorenzVec? = null
-    private var lastChange = SimpleTimeMark.farPast()
     private var lastClick = SimpleTimeMark.farPast()
-    private val validParticleLocations = mutableListOf<LorenzVec>()
 
     private var drawLocations = false
 
-    private var ticksSinceLastParticleFound = -1
-    private var lastGuessMade = SimpleTimeMark.farPast()
-
     var sharedEggLocation: LorenzVec? = null
     var possibleEggLocations = listOf<LorenzVec>()
-    var currentEggType: HoppityEggType? = null
-    var currentEggNote: String? = null
 
     @HandleEvent
     fun onEggFound(event: EggFoundEvent) {
@@ -75,21 +65,15 @@ object HoppityEggLocator {
     }
 
     private fun resetData() {
-        validParticleLocations.clear()
-        ticksSinceLastParticleFound = -1
         possibleEggLocations = emptyList()
         drawLocations = false
         sharedEggLocation = null
-        currentEggType = null
-        currentEggNote = null
         bezierFitter.reset()
     }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-
-        event.drawGuessImmediately()
 
         if (drawLocations) {
             event.drawGuessLocations()
@@ -141,27 +125,6 @@ object HoppityEggLocator {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.drawGuessImmediately() {
-        if (config.waypointsImmediately && lastClick.passedSince() < 5.seconds) {
-            lastParticlePositionForever?.let {
-                if (lastChange.passedSince() < 300.milliseconds) {
-                    val eyeLocation = exactPlayerEyeLocation()
-                    if (eyeLocation.distance(it) > 2) {
-                        drawWaypointFilled(
-                            it,
-                            config.waypointColor.toSpecialColor(),
-                            seeThroughBlocks = true,
-                        )
-                        drawDynamicText(it.up(), "§aGuess", 1.5)
-                    }
-                    if (!drawLocations && config.showLine) {
-                        drawLineToEye(it.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
-                    }
-                }
-            }
-        }
-    }
-
     private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
         val shouldMarkDuplicate = config.highlightDuplicateEggLocations && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
@@ -188,19 +151,6 @@ object HoppityEggLocator {
         val guess = guessEggLocation() ?: return
         possibleEggLocations = listOf(guess)
         drawLocations = true
-    }
-
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (validParticleLocations.isEmpty()) return
-        ticksSinceLastParticleFound++
-
-        if (ticksSinceLastParticleFound < 6) return
-
-
-        ticksSinceLastParticleFound = 0
-        validParticleLocations.clear()
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -294,11 +244,8 @@ object HoppityEggLocator {
 
         event.addIrrelevant {
             add("Possible Egg Locations: ${possibleEggLocations.size}")
-            add("Last Time Checked: ${lastGuessMade.passedSince().inWholeSeconds}s ago")
             add("Draw Locations: $drawLocations")
             add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
-            add("Current Egg Type: ${currentEggType ?: "None"}")
-            add("Current Egg Note: ${currentEggNote ?: "None"}")
         }
     }
 

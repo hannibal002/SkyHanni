@@ -51,6 +51,9 @@ object PreciseGuessBurrow {
             return
         }
         val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
+
+        if (distToLast == 0.0 || distToLast > 3.0) return
+
         bezierFitter.addPoint(currLoc)
 
         val guessPosition = guessBurrowLocation() ?: return
