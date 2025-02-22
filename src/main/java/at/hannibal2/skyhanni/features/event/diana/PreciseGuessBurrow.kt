@@ -31,11 +31,9 @@ object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
     private val particleLocations = mutableListOf<LorenzVec>()
-    private var guessPoint: LorenzVec? = null
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onWorldChange(event: IslandChangeEvent) {
-        guessPoint = null
         particleLocations.clear()
     }
 
@@ -46,9 +44,9 @@ object PreciseGuessBurrow {
         if (type != EnumParticleTypes.DRIP_LAVA) return
         if (event.count != 2) return
         if (event.speed != -0.5f) return
+        lastLavaParticle = SimpleTimeMark.now()
         val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
-        lastLavaParticle = SimpleTimeMark.now()
         if (particleLocations.isEmpty()) {
             particleLocations.add(currLoc)
             return
@@ -117,7 +115,7 @@ object PreciseGuessBurrow {
         if (event.clickType != ClickType.RIGHT_CLICK) return
         val item = event.itemInHand ?: return
         if (!item.isDianaSpade) return
-        if (lastLavaParticle.passedSince() < 0.5.seconds) {
+        if (lastLavaParticle.passedSince() < 0.2.seconds) {
             event.cancel()
             return
         }
