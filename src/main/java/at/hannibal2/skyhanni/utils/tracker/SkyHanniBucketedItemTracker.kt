@@ -56,7 +56,7 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
         "Use addItem(bucket, internalName, amount) instead",
         ReplaceWith("addItem(bucket, internalName, amount)"),
     )
-    override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean) =
+    override fun addItem(internalName: NeuInternalName, amount: Int, command: Boolean, message: Boolean) =
         throw UnsupportedOperationException("Use addItem(bucket, internalName, amount) instead")
 
     fun addItem(bucket: E, internalName: NeuInternalName, amount: Int, message: Boolean = true) {
