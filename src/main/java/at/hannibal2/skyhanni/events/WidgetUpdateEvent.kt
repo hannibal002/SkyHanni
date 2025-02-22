@@ -10,7 +10,13 @@ open class WidgetUpdateEvent(
     val lines: List<String>,
 ) : SkyHanniEvent() {
 
+    override fun post(): Boolean = post(widget)
+    override fun post(onError: (Throwable) -> Unit): Boolean = post(widget, onError)
+
+    @Deprecated("Consider using the @OnlyWidget annotation instead", ReplaceWith(""))
     fun isWidget(widgetType: TabWidget) = widget == widgetType
+
+    @Deprecated("Consider using the @OnlyWidget annotation instead", ReplaceWith(""))
     fun isWidget(vararg widgetType: TabWidget) = widget.isAnyOf(*widgetType)
 
     fun isClear() = lines.isEmpty()

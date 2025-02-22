@@ -21,7 +21,11 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         listeners.any { it.receiveCancelled },
     )
 
-    fun post(event: T, onError: ((Throwable) -> Unit)? = null): Boolean {
+    fun post(
+        event: T,
+        context: Any? = null,
+        onError: ((Throwable) -> Unit)? = null
+    ): Boolean {
         invokeCount++
         if (this.listeners.isEmpty()) return false
 
@@ -30,7 +34,7 @@ class EventHandler<T : SkyHanniEvent> private constructor(
         var errors = 0
 
         for (listener in listeners) {
-            if (!listener.shouldInvoke(event)) continue
+            if (!listener.shouldInvoke(event, context)) continue
             try {
                 listener.invoker.accept(event)
             } catch (throwable: Throwable) {

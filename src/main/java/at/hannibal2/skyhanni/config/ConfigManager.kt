@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getAnnotation
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringFileHandler
@@ -119,7 +120,7 @@ class ConfigManager {
                 findPositionLinks(field.get(obj), slog)
                 continue
             }
-            val configLink = field.getAnnotation(ConfigLink::class.java)
+            val configLink = field.getAnnotation<ConfigLink>()
             if (configLink == null) {
                 if (PlatformUtils.isDevEnvironment) {
                     var name = "${field.declaringClass.name}.${field.name}"

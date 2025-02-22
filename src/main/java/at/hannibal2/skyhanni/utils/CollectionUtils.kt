@@ -9,6 +9,7 @@ import at.hannibal2.skyhanni.utils.renderables.toSearchable
 import net.minecraft.item.ItemStack
 import java.util.Collections
 import java.util.EnumMap
+import java.util.EnumSet
 import java.util.Queue
 import java.util.WeakHashMap
 import kotlin.math.ceil
@@ -313,6 +314,14 @@ object CollectionUtils {
     inline fun <reified K : Enum<K>, V> enumMapOf(vararg pairs: Pair<K, V>): EnumMap<K, V> {
         return enumMapOf<K, V>().apply { putAll(pairs) }
     }
+
+    inline fun <reified E : Enum<E>> enumSetOf(): EnumSet<E> = EnumSet.noneOf(E::class.java)
+
+    fun <E : Enum<E>> enumSetOf(element: E): EnumSet<E> = EnumSet.of(element)
+
+    fun <E : Enum<E>> enumSetOf(vararg elements: E): EnumSet<E> = elements.toList().toEnumSet()
+
+    fun <E : Enum<E>> Collection<E>.toEnumSet(): EnumSet<E> = EnumSet.copyOf(this)
 
     // TODO add cache
     fun MutableList<Renderable>.addString(

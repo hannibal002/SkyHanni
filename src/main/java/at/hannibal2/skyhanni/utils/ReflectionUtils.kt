@@ -2,6 +2,7 @@ package at.hannibal2.skyhanni.utils
 
 import java.lang.reflect.Constructor
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -32,6 +33,10 @@ object ReflectionUtils {
 //            }
 //        }
 //    }
+
+    inline fun <reified T : Annotation> Method.getAnnotation(): T? = getAnnotation(T::class.java)
+
+    inline fun <reified T : Annotation> Field.getAnnotation(): T? = getAnnotation(T::class.java)
 
     fun <T, R> dynamic(root: KProperty0<R?>, child: KMutableProperty1<R, T>) =
         object : ReadWriteProperty<Any?, T?> {

@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.HotmApi
 import at.hannibal2.skyhanni.api.HotmApi.MayhemPerk
 import at.hannibal2.skyhanni.api.HotmApi.SkymallPerk
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.api.event.predicates.OnlyWidget
 import at.hannibal2.skyhanni.data.jsonobjects.local.HotmTree
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -716,9 +717,9 @@ enum class HotmData(
             }
         }
 
+        @OnlyWidget(TabWidget.POWDER)
         @HandleEvent
         fun onWidgetUpdate(event: WidgetUpdateEvent) {
-            if (!event.isWidget(TabWidget.POWDER)) return
             event.lines.forEach { line ->
                 powderPattern.matchMatcher(line) {
                     val type = HotmApi.PowderType.entries.firstOrNull { it.displayName == group("type") } ?: return

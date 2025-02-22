@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.utils.json
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getAnnotation
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getDeclaredFieldOrNull
 import com.google.gson.Gson
 import com.google.gson.JsonObject
@@ -39,7 +40,7 @@ object FeatureTogglesByDefaultAdapter : TypeAdapterFactory {
 
             // Overwrite the default with true (or false) for feature toggles
             for (field in clazz.fields) {
-                val featureToggle = field.getAnnotation(FeatureToggle::class.java)
+                val featureToggle = field.getAnnotation<FeatureToggle>()
                 val adapt = gson.getAdapter(TypeToken.get(getType(type, field)))
                 if (featureToggle != null)
                     field.set(obj, adapt.read(JsonTreeReader(JsonPrimitive(featureToggle.trueIsEnabled))))

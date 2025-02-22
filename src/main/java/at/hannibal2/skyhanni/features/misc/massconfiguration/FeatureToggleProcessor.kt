@@ -1,6 +1,7 @@
 package at.hannibal2.skyhanni.features.misc.massconfiguration
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.utils.ReflectionUtils.getAnnotation
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import io.github.notenoughupdates.moulconfig.observer.Property
@@ -44,8 +45,8 @@ class FeatureToggleProcessor : ConfigStructureReader {
     }
 
     override fun emitOption(baseObject: Any, field: Field, option: ConfigOption) {
-        val featureToggle = field.getAnnotation(FeatureToggle::class.java) ?: return
-        field.getAnnotation(ConfigEditorBoolean::class.java)
+        val featureToggle = field.getAnnotation<FeatureToggle>() ?: return
+        field.getAnnotation<ConfigEditorBoolean>()
             ?: error("Feature toggle found without ConfigEditorBoolean: $field")
         val setter: (Boolean) -> Unit
         val value: Boolean
