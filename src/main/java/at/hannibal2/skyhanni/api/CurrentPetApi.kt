@@ -22,6 +22,8 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
+import at.hannibal2.skyhanni.utils.LorenzColor
+import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
@@ -189,9 +191,16 @@ object CurrentPetApi {
     // </editor-fold>
 
     // <editor-fold desc="Helpers">
-    private fun updatePet(newPet: PetData?) {
-        if (newPet == currentPet) return
+    private fun updatePet(eventNewPet: PetData?) {
+        val newPet = eventNewPet ?: return
         val oldPet = currentPet
+        if (newPet == oldPet) return
+        if (newPet.allButSkinEquivalent(oldPet)) {
+            // If the two pets are the same except for the skin, we want to take the one that has the skin.
+            // If they both have differing skins, we want to take the new one.
+            if (oldPet?.skinInternalName != null && newPet.skinInternalName == null) return
+        }
+
         currentPet = newPet
         if (SkyHanniMod.feature.dev.debug.petEventMessages) {
             ChatUtils.debug("oldPet: " + oldPet.toString().convertToUnformatted())
@@ -217,15 +226,16 @@ object CurrentPetApi {
         val petName = groupOrNull("name").orEmpty()
         val level = groupOrNull("level")?.toInt() ?: 0
         val xp = levelToXp(level, rarity, petName) ?: return null
+        val skinColor = groupOrNull("skin")?.substring(1, 2)?.get(0)?.toLorenzColor()
 
         return PetData(
             petItem = petNameToInternalName(petName, rarity),
-            skinItem = null,
             heldItem = null,
             cleanName = petName,
             rarity = rarity,
             level = level,
             xp = xp,
+            skinSymbolColor = skinColor,
         )
     }
 

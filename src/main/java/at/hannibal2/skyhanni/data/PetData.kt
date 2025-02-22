@@ -50,10 +50,14 @@ data class PetData(
 
     override fun equals(other: Any?): Boolean {
         if (other !is PetData) return false
+        return allButSkinEquivalent(other) && this.skinInternalName == other.skinInternalName
+    }
+
+    fun allButSkinEquivalent(other: Any?): Boolean {
+        if (other !is PetData) return false
         return this.petItem == other.petItem &&
             this.heldItem == other.heldItem &&
             this.cleanName == other.cleanName &&
-            this.skinSymbolColor == other.skinSymbolColor &&
             this.rarity == other.rarity &&
             this.level == other.level &&
             this.xp == other.xp
