@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.data.PetData.Companion.parsePetAsItem
 import at.hannibal2.skyhanni.data.PetData.Companion.parsePetData
 import at.hannibal2.skyhanni.data.PetData.Companion.parsePetDataLists
 import at.hannibal2.skyhanni.data.PetData.Companion.petNameToInternalName
+import at.hannibal2.skyhanni.data.PetDataStorage
 import at.hannibal2.skyhanni.data.ProfileStorageData
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -22,7 +23,6 @@ import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.ItemCategory
 import at.hannibal2.skyhanni.utils.ItemUtils.getItemCategoryOrNull
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
-import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzColor.Companion.toLorenzColor
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
@@ -30,6 +30,7 @@ import at.hannibal2.skyhanni.utils.NumberUtil.formatDouble
 import at.hannibal2.skyhanni.utils.PetUtils.isPetMenu
 import at.hannibal2.skyhanni.utils.PetUtils.levelToXp
 import at.hannibal2.skyhanni.utils.PetUtils.rarityByColorGroup
+import at.hannibal2.skyhanni.utils.Quad
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatchGroup
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
@@ -50,9 +51,9 @@ object CurrentPetApi {
     private var lastPetLine: String? = null
 
     var currentPet: PetData?
-        get() = ProfileStorageData.profileSpecific?.currentPetData?.takeIf { it.isInitialized() }
+        get() = ProfileStorageData.profileSpecific?.currentPetData?.toPetData()?.takeIf { it.isInitialized() }
         set(value) {
-            ProfileStorageData.profileSpecific?.currentPetData = value ?: PetData()
+            ProfileStorageData.profileSpecific?.currentPetData = value?.asStorage() ?: PetDataStorage()
         }
 
     fun isCurrentPet(petName: String): Boolean = currentPet?.cleanName?.contains(petName) ?: false
@@ -291,7 +292,7 @@ object CurrentPetApi {
     // </editor-fold>
 
     // <editor-fold desc="Pet Data Extractors (Selected Pet)">
-    private fun extractSelectedPetData(lore: List<String>): Triple<Int, LorenzRarity, NeuInternalName>? {
+    private fun extractSelectedPetData(lore: List<String>): Quad<Int, LorenzRarity, NeuInternalName, String>? {
         val level = inventorySelectedProgressPattern.firstMatchGroup(lore, "level")?.toInt()
         val rarity = inventorySelectedPetPattern.firstMatchGroup(lore, "rarity")?.let { rarityByColorGroup(it) }
         val petName = inventorySelectedPetPattern.firstMatchGroup(lore, "pet")
@@ -300,31 +301,31 @@ object CurrentPetApi {
         }
 
         return if (level != null && rarity != null && petInternalName != null) {
-            Triple(level, rarity, petInternalName)
+            Quad(level, rarity, petInternalName, petName)
         } else null
     }
 
     private fun handleSelectedPetName(lore: List<String>): NeuInternalName? = inventorySelectedPetPattern.firstMatcher(lore) {
-        val (_, _, petInternalName) = extractSelectedPetData(lore) ?: return null
-        petInternalName
+        extractSelectedPetData(lore)?.third ?: return null
     }
 
     private fun handleSelectedPetOverflowXp(lore: List<String>): Double? {
         // Only have overflow if `next` group is absent
         if (inventorySelectedXpPattern.firstMatchGroup(lore, "next") != null) return 0.0
-        val (level, _, petInternalName) = extractSelectedPetData(lore) ?: return null
+        val (level, _, petInternalName, _) = extractSelectedPetData(lore) ?: return null
         val maxXpNeeded = levelToXp(level, petInternalName)
         val currentXp = inventorySelectedXpPattern.firstMatchGroup(lore, "current")?.formatDouble() ?: 0.0
         return maxXpNeeded?.minus(currentXp) ?: 0.0
     }
 
     private fun handleSelectedPetData(lore: List<String>): PetData? {
-        val (level, rarity, petInternalName) = extractSelectedPetData(lore) ?: return null
+        val (level, rarity, petInternalName, petName) = extractSelectedPetData(lore) ?: return null
         val partialXp = inventorySelectedXpPattern.firstMatchGroup(lore, "current")?.formatDouble() ?: 0.0
         val nextExists = inventorySelectedXpPattern.firstMatchGroup(lore, "next") != null
         val totalXp = partialXp + if (nextExists) (levelToXp(level, petInternalName) ?: return null) else 0.0
         return PetData(
             petItem = petInternalName,
+            cleanName = petName,
             rarity = rarity,
             heldItem = null,
             level = level,
@@ -385,10 +386,8 @@ object CurrentPetApi {
         updatePet(petData.copy(xp = petData.xp?.plus(overflowXp)))
     }
 
-    @HandleEvent
-    fun onInventoryClose(event: InventoryCloseEvent) {
-        inPetMenu = false
-    }
+    @HandleEvent(InventoryCloseEvent::class)
+    fun onInventoryClose() { inPetMenu = false }
 
     @HandleEvent
     fun onSlotClick(event: GuiContainerEvent.SlotClickEvent) {

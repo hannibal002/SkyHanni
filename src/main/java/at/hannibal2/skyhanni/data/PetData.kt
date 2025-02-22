@@ -22,15 +22,37 @@ import com.google.gson.Gson
 import com.google.gson.annotations.Expose
 import net.minecraft.item.ItemStack
 
+data class PetDataStorage(
+    @Expose var petItem: NeuInternalName? = null, // The internal name of the pet, e.g., `RABBIT;5`
+    @Expose var heldItem: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
+    @Expose var cleanName: String? = null, // The clean name of the pet, e.g., `Rabbit`
+    @Expose var skinSymbolColor: LorenzColor? = null, // The color symbol of the skin of the pet, e.g., §d ✦ -> `LorenzColor.Pink`
+    @Expose var rarity: LorenzRarity? = null, // The rarity of the pet, e.g., `COMMON`
+    @Expose var level: Int? = null, // The current level of the pet as an integer, e.g., `100`
+    @Expose var xp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
+    @Expose var skinInternalNameOverride: NeuInternalName? = null, // If the skin is known (i.e., from stored data or Inventory)
+) {
+    fun toPetData(): PetData = PetData(
+        petItem = petItem,
+        heldItem = heldItem,
+        cleanName = cleanName,
+        skinSymbolColor = skinSymbolColor,
+        rarity = rarity,
+        level = level,
+        xp = xp,
+        skinInternalNameOverride = skinInternalNameOverride,
+    )
+}
+
 data class PetData(
-    @Expose val petItem: NeuInternalName? = null, // The internal name of the pet, e.g., `RABBIT;5`
-    @Expose val heldItem: NeuInternalName? = null, // The held item of the pet, e.g., `PET_ITEM_COMBAT_SKILL_BOOST_EPIC`
-    @Expose val cleanName: String? = null, // The clean name of the pet, e.g., `Rabbit`
-    @Expose val skinSymbolColor: LorenzColor? = null, // The color symbol of the skin of the pet, e.g., §d ✦ -> `LorenzColor.Pink`
-    @Expose val rarity: LorenzRarity? = null, // The rarity of the pet, e.g., `COMMON`
-    @Expose val level: Int? = null, // The current level of the pet as an integer, e.g., `100`
-    @Expose val xp: Double? = null, // The total XP of the pet as a double, e.g., `0.0`
-    @Expose val skinInternalNameOverride: NeuInternalName? = null, // If the skin is known (i.e., from stored data or Inventory)
+    val petItem: NeuInternalName? = null,
+    val heldItem: NeuInternalName? = null,
+    val cleanName: String? = null,
+    val skinSymbolColor: LorenzColor? = null,
+    val rarity: LorenzRarity? = null,
+    val level: Int? = null,
+    val xp: Double? = null,
+    val skinInternalNameOverride: NeuInternalName? = null,
 ) {
     val displayName = petItem?.itemName
     val formattedName = "${rarity?.chatColorCode}$cleanName"
@@ -90,6 +112,17 @@ data class PetData(
     fun isInitialized(): Boolean {
         return petItem != null && cleanName != null && rarity != null && level != null && xp != null
     }
+
+    fun asStorage(): PetDataStorage = PetDataStorage(
+        petItem = petItem,
+        heldItem = heldItem,
+        cleanName = cleanName,
+        skinSymbolColor = skinSymbolColor,
+        rarity = rarity,
+        level = level,
+        xp = xp,
+        skinInternalNameOverride = skinInternalNameOverride,
+    )
 
     companion object {
         // <editor-fold desc="Pet Data Extractors (General)">
