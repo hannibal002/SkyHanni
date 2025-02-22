@@ -77,14 +77,21 @@ object OSUtils {
 
     suspend fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 
-    private fun File.isExpired(expiryDuration: Duration): Boolean = lastModifiedTime()?.let {
-        it.passedSince() > expiryDuration
-    } ?: false
+    private fun File.isExpired(
+        expiryDuration: Duration,
+        lastModifiedTime: SimpleTimeMark = lastModifiedTime(),
+    ): Boolean = lastModifiedTime.passedSince() > expiryDuration
 
-    private fun File.lastModifiedTime(): SimpleTimeMark? = try {
+    private fun File.lastModifiedTime(): SimpleTimeMark = try {
         val attributes = Files.readAttributes(toPath(), BasicFileAttributes::class.java)
         SimpleTimeMark(attributes.lastModifiedTime().toMillis())
     } catch (e: IOException) {
+        ErrorManager.logErrorWithData(
+            e,
+            "Error reading last modified attributes",
+            "file" to this,
+            "path" to toPath(),
+        )
         SimpleTimeMark.now()
     }
 
@@ -105,10 +112,12 @@ object OSUtils {
     fun deleteExpiredFiles(root: File, expiryDuration: Duration) {
         SkyHanniMod.coroutineScope.launch {
             val allFiles = root.walk().filter { it.isFile }.toList()
-            @Suppress("ConvertCallChainIntoSequence")
-            val recentDays = allFiles.mapNotNull { file ->
-                file.lastModifiedTime()?.toLocalDate()
+            val lastModified = allFiles.associateWith { file ->
+                file.lastModifiedTime()
             }
+
+            @Suppress("ConvertCallChainIntoSequence")
+            val recentDays = lastModified.mapNotNull { it.value.toLocalDate() }
                 .distinct()
                 .sortedDescending()
                 .take(3)
@@ -117,24 +126,30 @@ object OSUtils {
             root.walkBottomUp().forEach { file ->
                 when {
                     file.isFile -> {
-                        val fileDate = file.lastModifiedTime()?.toLocalDate()
-                        // Always retain files modified on the three most recent distinct dates.
-                        if (fileDate != null && fileDate in recentDays) return@forEach
+                        val lastModifiedTime = lastModified[file] ?: file.lastModifiedTime()
+                        if (lastModifiedTime.toLocalDate() in recentDays) return@forEach
 
-                        if (file.isEmptyFile() || file.isExpired(expiryDuration)) {
-                            if (!file.delete()) {
-                                println("Failed to delete file: ${file.absolutePath}")
-                            }
+                        if (file.isEmptyFile() || file.isExpired(expiryDuration, lastModifiedTime)) {
+                            file.deleteWithError()
                         }
                     }
 
                     file.isDirectory && file.isEmptyDirectory() -> {
-                        if (!file.delete()) {
-                            println("Failed to delete empty directory: ${file.absolutePath}")
-                        }
+                        file.deleteWithError()
                     }
                 }
             }
+        }
+    }
+
+    fun File.deleteWithError() {
+        if (!this.delete()) {
+            ErrorManager.logErrorStateWithData(
+                "Failed to delete file",
+                "Failed to delete file",
+                "file" to this,
+                "file" to this.absolutePath,
+            )
         }
     }
 }
