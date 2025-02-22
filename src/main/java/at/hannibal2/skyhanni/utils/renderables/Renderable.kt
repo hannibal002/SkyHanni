@@ -1716,7 +1716,6 @@ interface Renderable {
 
             GlStateManager.pushMatrix()
             GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
-            GlStateManager.translate(0f, 0f, 100f)
 
             drawFilledCircle(radius, radius, radius, backgroundColor)
 
