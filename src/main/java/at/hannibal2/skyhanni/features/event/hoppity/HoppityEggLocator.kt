@@ -10,7 +10,6 @@ import at.hannibal2.skyhanni.events.ItemClickEvent
 import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.hoppity.EggFoundEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniRenderWorldEvent
-import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
@@ -23,18 +22,17 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
+import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
 import at.hannibal2.skyhanni.utils.RenderUtils.drawLineToEye
 import at.hannibal2.skyhanni.utils.RenderUtils.drawWaypointFilled
-import at.hannibal2.skyhanni.utils.RenderUtils.exactPlayerEyeLocation
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
-import kotlin.time.Duration.Companion.milliseconds
+import kotlin.math.sign
 import kotlin.time.Duration.Companion.seconds
 
 @SkyHanniModule
@@ -42,19 +40,9 @@ object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
     val locatorItem = "EGGLOCATOR".toInternalName()
 
-    private var lastParticlePosition: LorenzVec? = null
-    private var lastParticlePositionForever: LorenzVec? = null
-    private var lastChange = SimpleTimeMark.farPast()
     private var lastClick = SimpleTimeMark.farPast()
-    private val validParticleLocations = mutableListOf<LorenzVec>()
 
     private var drawLocations = false
-    private var firstPos = LorenzVec()
-    private var secondPos = LorenzVec()
-
-    private var ticksSinceLastParticleFound = -1
-    private var lastGuessMade = SimpleTimeMark.farPast()
-    private var eggLocationWeights = listOf<Double>()
 
     var sharedEggLocation: LorenzVec? = null
     var possibleEggLocations = listOf<LorenzVec>()
@@ -72,23 +60,17 @@ object HoppityEggLocator {
     }
 
     private fun resetData() {
-        validParticleLocations.clear()
-        ticksSinceLastParticleFound = -1
         possibleEggLocations = emptyList()
-        firstPos = LorenzVec()
-        secondPos = LorenzVec()
         drawLocations = false
         sharedEggLocation = null
         currentEggType = null
         currentEggNote = null
-        lastParticlePosition = null
+        bezierFitter.reset()
     }
 
     @HandleEvent
     fun onRenderWorld(event: SkyHanniRenderWorldEvent) {
         if (!isEnabled()) return
-
-        event.drawGuessImmediately()
 
         if (drawLocations) {
             event.drawGuessLocations()
@@ -140,27 +122,6 @@ object HoppityEggLocator {
         }
     }
 
-    private fun SkyHanniRenderWorldEvent.drawGuessImmediately() {
-        if (config.waypointsImmediately && lastClick.passedSince() < 5.seconds) {
-            lastParticlePositionForever?.let {
-                if (lastChange.passedSince() < 300.milliseconds) {
-                    val eyeLocation = exactPlayerEyeLocation()
-                    if (eyeLocation.distance(it) > 2) {
-                        drawWaypointFilled(
-                            it,
-                            config.waypointColor.toSpecialColor(),
-                            seeThroughBlocks = true,
-                        )
-                        drawDynamicText(it.up(), "§aGuess", 1.5)
-                    }
-                    if (!drawLocations && config.showLine) {
-                        drawLineToEye(it.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
-                    }
-                }
-            }
-        }
-    }
-
     private fun SkyHanniRenderWorldEvent.drawEggWaypoint(location: LorenzVec, label: String) {
         val shouldMarkDuplicate = config.highlightDuplicateEggLocations && HoppityEggLocations.hasCollectedEgg(location)
         val possibleDuplicateLabel = if (shouldMarkDuplicate) "$label §c(Duplicate Location)" else label
@@ -174,38 +135,22 @@ object HoppityEggLocator {
 
     private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
+    private val bezierFitter = ParticlePathBezierFitter(3)
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!locatorInHotbar) return
-        if (!event.isVillagerParticle() && !event.isEnchantmentParticle()) return
+        if (!event.isVillagerParticle()) return
 
-        val lastParticlePosition = lastParticlePosition ?: run {
-            lastParticlePosition = event.location
-            lastParticlePositionForever = lastParticlePosition
-            lastChange = SimpleTimeMark.now()
-            return
+        bezierFitter.addPoint(event.location)
+
+        val guess = guessEggLocation() ?: return
+        possibleEggLocations = listOf(guess)
+        drawLocations = true
+        if (possibleEggLocations.size == 1) {
+            trySendingGraph()
         }
-        if (lastParticlePosition == event.location) {
-            validParticleLocations.add(event.location)
-            ticksSinceLastParticleFound = 0
-        }
-        HoppityEggLocator.lastParticlePosition = null
-    }
-
-    @HandleEvent
-    fun onTick(event: SkyHanniTickEvent) {
-        if (!isEnabled()) return
-        if (validParticleLocations.isEmpty()) return
-        ticksSinceLastParticleFound++
-
-        if (ticksSinceLastParticleFound < 6) return
-
-        calculateEggPosition()
-
-        ticksSinceLastParticleFound = 0
-        validParticleLocations.clear()
-        lastParticlePosition = null
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -213,64 +158,22 @@ object HoppityEggLocator {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
 
-        if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem) {
+        if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem && lastClick.passedSince() >= 5.seconds) {
             lastClick = SimpleTimeMark.now()
             MythicRabbitPetWarning.check()
             trySendingGraph()
+            bezierFitter.reset()
         }
     }
 
-    private fun calculateEggPosition() {
-        if (lastGuessMade.passedSince() < 1.seconds) return
-        lastGuessMade = SimpleTimeMark.now()
-        possibleEggLocations = emptyList()
+    private fun guessEggLocation(): LorenzVec? {
+        val guessLocation = bezierFitter.solve() ?: return null
 
-        val islandEggsLocations = HoppityEggLocations.islandLocations
-        val listSize = validParticleLocations.size
+        val guessEgg = HoppityEggLocations.islandLocations.sortedWith { a, b ->
+            sign(a.distanceSq(guessLocation) - b.distanceSq(guessLocation)).toInt()
+        }.firstOrNull()
 
-        if (listSize < 5) return
-
-        val secondPoint = validParticleLocations.removeLast()
-        firstPos = validParticleLocations.removeLast()
-
-        val xDiff = secondPoint.x - firstPos.x
-        val yDiff = secondPoint.y - firstPos.y
-        val zDiff = secondPoint.z - firstPos.z
-
-        secondPos = LorenzVec(
-            secondPoint.x + xDiff * 1000,
-            secondPoint.y + yDiff * 1000,
-            secondPoint.z + zDiff * 1000,
-        )
-
-        val sortedEggs = islandEggsLocations.map {
-            it to it.getEggLocationWeight(firstPos, secondPos)
-        }.sortedBy { it.second }
-
-        eggLocationWeights = sortedEggs.map {
-            it.second.roundTo(3)
-        }.take(5)
-
-        val filteredEggs = sortedEggs.filter {
-            it.second < 1
-        }.map { it.first }
-
-        val maxLineDistance = filteredEggs.sortedByDescending {
-            it.nearestPointOnLine(firstPos, secondPos).distance(firstPos)
-        }
-
-        if (maxLineDistance.isEmpty()) {
-            LorenzUtils.sendTitle("§cNo eggs found, try getting closer", 2.seconds)
-            return
-        }
-        secondPos = maxLineDistance.first().nearestPointOnLine(firstPos, secondPos)
-
-        possibleEggLocations = filteredEggs
-
-        if (drawLocations) return
-        drawLocations = true
-
-        trySendingGraph()
+        return guessEgg
     }
 
     private fun trySendingGraph() {
@@ -278,6 +181,7 @@ object HoppityEggLocator {
         val location = possibleEggLocations.firstOrNull() ?: return
 
         val color = config.waypointColor.toSpecialColor()
+        if (IslandGraphs.isActive(location, "Hoppity Egg")) return
 
         IslandGraphs.pathFind(location, "Hoppity Egg", color, condition = { config.showPathFinder })
     }
@@ -299,14 +203,6 @@ object HoppityEggLocator {
         LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
     }
 
-    private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
-        val distToLine = this.distanceToLine(firstPoint, secondPoint)
-        val distToStart = this.distance(firstPoint)
-        val distMultiplier = distToStart * 2 / 100 + 5
-        val disMultiplierSquared = distMultiplier * distMultiplier
-        return distToLine / disMultiplierSquared
-    }
-
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Hoppity Eggs Locations")
@@ -317,11 +213,7 @@ object HoppityEggLocator {
         }
 
         event.addIrrelevant {
-            add("First Pos: $firstPos")
-            add("Second Pos: $secondPos")
             add("Possible Egg Locations: ${possibleEggLocations.size}")
-            add("Egg Location Weights: $eggLocationWeights")
-            add("Last Time Checked: ${lastGuessMade.passedSince().inWholeSeconds}s ago")
             add("Draw Locations: $drawLocations")
             add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
             add("Current Egg Type: ${currentEggType ?: "None"}")

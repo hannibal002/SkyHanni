@@ -36,6 +36,11 @@ class DevConfig {
     var logExpiryTime: Int = 14
 
     @Expose
+    @ConfigOption(name = "Backup Expiry Time", desc = "Deletes your backups of SkyHanni configs after this time period in days.")
+    @ConfigEditorSlider(minValue = 1, maxValue = 30, minStep = 1)
+    public int configBackupExpiryTime = 7;
+
+    @Expose
     @ConfigOption(
         name = "Chat History Length",
         desc = "The number of messages to keep in memory for §e/shchathistory§7.\n" +

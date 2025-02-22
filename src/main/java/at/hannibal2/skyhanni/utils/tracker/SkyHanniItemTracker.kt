@@ -178,7 +178,7 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             textInput = textInput,
             scrollValue = scrollValue,
             asTable = config.showTable.get(),
-            showScrollableTipsInList = true,
+            showScrollableTipsInList = isInventoryOpen(),
         )?.let {
             lists.add(it.toSearchable())
         }

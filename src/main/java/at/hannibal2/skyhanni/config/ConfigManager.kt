@@ -13,6 +13,7 @@ import at.hannibal2.skyhanni.utils.CollectionUtils.enumMapOf
 import at.hannibal2.skyhanni.utils.IdentityCharacteristics
 import at.hannibal2.skyhanni.utils.LorenzLogger
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.OSUtils
 import at.hannibal2.skyhanni.utils.ReflectionUtils.makeAccessible
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.StringFileHandler
@@ -27,8 +28,11 @@ import io.github.notenoughupdates.moulconfig.processor.ConfigProcessorDriver
 import io.github.notenoughupdates.moulconfig.processor.MoulConfigProcessor
 import java.io.File
 import java.io.IOException
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.concurrent.fixedRateTimer
 import kotlin.reflect.KMutableProperty0
+import kotlin.time.Duration.Companion.days
 
 private fun GsonBuilder.registerIfBeta(create: TypeAdapterFactory): GsonBuilder {
     return if (SkyHanniMod.isBetaVersion) {
@@ -89,6 +93,12 @@ class ConfigManager {
         } catch (e: Exception) {
             ErrorManager.crashInDevEnv("Couldn't load config links") { e }
         }
+
+        deleteOldBackups()
+    }
+
+    private fun deleteOldBackups() {
+        OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
     // Some position elements don't need config links as they don't have a config option.
@@ -213,12 +223,12 @@ class ConfigManager {
     fun saveConfig(fileType: ConfigFileType, reason: String) {
         val json = jsonHolder[fileType] ?: error("Could not find json object for $fileType")
         saveFile(fileType.file, fileType.fileName, json, reason)
+        saveFile(fileType.backupFile, fileType.fileName, json, reason)
     }
 
-    private fun saveFile(file: File?, fileName: String, data: Any, reason: String) {
+    private fun saveFile(file: File, fileName: String, data: Any, reason: String) {
         if (disableSaving) return
         logger.log("saveConfig: $reason")
-        if (file == null) throw Error("Can not save $fileName, ${fileName}File is null!")
         try {
             logger.log("Saving $fileName file")
             file.parentFile.mkdirs()
@@ -235,6 +245,19 @@ class ConfigManager {
     }
 }
 
+private fun getBackupFile(file: File): File {
+    val parent = file.parentFile
+    val fileName = file.nameWithoutExtension
+    val now = LocalDate.now()
+    val year = now.format(DateTimeFormatter.ofPattern("yyyy"))
+    val month = now.format(DateTimeFormatter.ofPattern("MM"))
+    val day = now.format(DateTimeFormatter.ofPattern("dd"))
+
+    val directory = File(parent, "backup/$year/$month")
+
+    return File(directory, "$day-${SkyHanniMod.VERSION}-$fileName.json")
+}
+
 enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val property: KMutableProperty0<*>) {
     FEATURES("config", Features::class.java, SkyHanniMod::feature),
     SACKS("sacks", SackData::class.java, SkyHanniMod::sackData),
@@ -245,4 +268,5 @@ enum class ConfigFileType(val fileName: String, val clazz: Class<*>, val propert
     ;
 
     val file by lazy { File(ConfigManager.configDirectory, "$fileName.json") }
+    val backupFile get() = getBackupFile(file)
 }
