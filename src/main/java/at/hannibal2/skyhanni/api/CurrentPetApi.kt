@@ -192,11 +192,10 @@ object CurrentPetApi {
     // </editor-fold>
 
     // <editor-fold desc="Helpers">
-    private fun updatePet(eventNewPet: PetData?) {
-        val newPet = eventNewPet ?: return
+    private fun updatePet(newPet: PetData?) {
         val oldPet = currentPet
         if (newPet == oldPet) return
-        if (newPet.allButSkinEquivalent(oldPet)) {
+        if (newPet?.allButSkinEquivalent(oldPet) == true) {
             // If the two pets are the same except for the skin, we want to take the one that has the skin.
             // If they both have differing skins, we want to take the new one.
             if (oldPet?.skinInternalName != null && newPet.skinInternalName == null) return
@@ -205,7 +204,7 @@ object CurrentPetApi {
         currentPet = newPet
         if (SkyHanniMod.feature.dev.debug.petEventMessages) {
             ChatUtils.debug("oldPet: " + oldPet.toString().convertToUnformatted())
-            ChatUtils.debug("newPet: " + newPet?.toString()?.convertToUnformatted())
+            ChatUtils.debug("newPet: " + newPet.toString().convertToUnformatted())
         }
         PetChangeEvent(oldPet, newPet).post()
     }

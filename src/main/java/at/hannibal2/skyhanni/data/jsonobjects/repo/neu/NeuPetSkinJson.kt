@@ -7,8 +7,6 @@ import at.hannibal2.skyhanni.utils.ItemUtils.getSkullTexture
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.RegexUtils.firstMatcher
-import at.hannibal2.skyhanni.utils.RegexUtils.firstMatches
-import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern.Companion.group
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import net.minecraft.nbt.CompressedStreamTools
