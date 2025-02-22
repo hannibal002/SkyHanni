@@ -46,7 +46,9 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
+import kotlin.math.cos
 import kotlin.math.max
+import kotlin.math.sin
 
 interface Renderable {
 
@@ -1686,6 +1688,77 @@ interface Renderable {
                 )
                 GlStateManager.translate(0f, 0f, -100f)
             }
+        }
+    }
+
+    class CircularRenderable(
+        private val backgroundColor: Color,
+        private val radius: Int,
+        private val border: CircularRenderable? = null,
+        private val itemStack: ItemStack? = null,
+        private val itemScale: Double = 1.0
+    ) : Renderable {
+
+        // The bounding box is a square with a diameter equal to 2*radius.
+        override val width: Int = radius * 2
+        override val height: Int = radius * 2
+        // We use top-left alignment here; positioning will be done via translation.
+        override val horizontalAlign = HorizontalAlignment.LEFT
+        override val verticalAlign = VerticalAlignment.TOP
+
+        override fun render(posX: Int, posY: Int) {
+            // Render outer border rings first (if any) - we want to transpose each circle on top of the previous one,
+            // to give the illusion of a ring effect.
+            border?.render(posX, posY)
+
+            val centerX = posX + radius
+            val centerY = posY + radius
+            drawFilledCircle(centerX, centerY, radius, backgroundColor)
+
+            val itemStack = itemStack ?: return
+            // Render the ItemStack centered in this circle.
+            val itemRenderable = itemStack(itemStack, scale = itemScale)
+            // Calculate top-left position for centering the item.
+            val itemX = centerX - itemRenderable.width / 2
+            val itemY = centerY - itemRenderable.height / 2
+            itemRenderable.render(itemX, itemY)
+        }
+
+        /**
+         * Draws a filled circle using OpenGL.
+         *
+         * @param cx The x-coordinate of the circle's center.
+         * @param cy The y-coordinate of the circle's center.
+         * @param radius The circle's radius.
+         * @param color The fill color.
+         */
+        private fun drawFilledCircle(cx: Int, cy: Int, radius: Int, color: Color) {
+            GL11.glPushMatrix()
+            GL11.glEnable(GL11.GL_BLEND)
+            GL11.glDisable(GL11.GL_TEXTURE_2D)
+            // Set the circle's color.
+            GL11.glColor4f(
+                color.red / 255f,
+                color.green / 255f,
+                color.blue / 255f,
+                color.alpha / 255f
+            )
+            // Begin drawing a triangle fan (a filled circle)
+            GL11.glBegin(GL11.GL_TRIANGLE_FAN)
+            // Center of the circle.
+            GL11.glVertex2f(cx.toFloat(), cy.toFloat())
+            // Use enough segments for a smooth circle.
+            val segments = 100
+            for (i in 0..segments) {
+                val angle = (2.0 * Math.PI * i / segments).toFloat()
+                val x = cx + (cos(angle.toDouble()) * radius).toInt()
+                val y = cy + (sin(angle.toDouble()) * radius).toInt()
+                GL11.glVertex2f(x.toFloat(), y.toFloat())
+            }
+            GL11.glEnd()
+            GL11.glEnable(GL11.GL_TEXTURE_2D)
+            GL11.glDisable(GL11.GL_BLEND)
+            GL11.glPopMatrix()
         }
     }
 }

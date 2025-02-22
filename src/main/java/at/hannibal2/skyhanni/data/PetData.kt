@@ -7,6 +7,7 @@ import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
+import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
 import at.hannibal2.skyhanni.utils.PetUtils.xpToLevel
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -40,8 +41,10 @@ data class PetData(
     ): String {
         val levelString = if (includeLevel) "§7[Lvl $level] §r" else ""
         val skinString = if (includeSkin) (skinSymbol.orEmpty()) else ""
-        return "§r$levelString$formattedName$cleanName$skinString"
+        return "§r$levelString$formattedName$skinString"
     }
+
+    fun getItemStackOrNull(): ItemStack? = petItem?.getItemStackOrNull()
 
     override fun equals(other: Any?): Boolean {
         if (other !is PetData) return false
