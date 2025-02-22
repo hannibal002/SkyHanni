@@ -1760,12 +1760,14 @@ interface Renderable {
             )
             var doneFilling = false
             val fillSegmentCount = (filledPercentage / 100.0 * SEGMENT_COUNT).toInt()
+            GL11.glEnable(GL11.GL_POLYGON_SMOOTH)
+            GL11.glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_NICEST)
             GL11.glBegin(GL11.GL_TRIANGLE_FAN)
             GL11.glVertex2f(cx.toFloat(), cy.toFloat())
             for (i in 0..SEGMENT_COUNT) {
                 val angle = (2.0 * Math.PI * i / SEGMENT_COUNT).toFloat()
-                val x = cx + (cos(angle) * radius).toInt()
-                val y = cy + (sin(angle) * radius).toInt()
+                val x = cx + cos(angle) * radius
+                val y = cy + sin(angle) * radius
                 GL11.glVertex2f(x.toFloat(), y.toFloat())
                 if (i != SEGMENT_COUNT && i == fillSegmentCount && !doneFilling) {
                     doneFilling = true
@@ -1777,6 +1779,7 @@ interface Renderable {
                     )
                 }
             }
+            GL11.glDisable(GL11.GL_POLYGON_SMOOTH)
             GL11.glEnd()
             GlStateManager.disableBlend()
             GlStateManager.enableTexture2D()
