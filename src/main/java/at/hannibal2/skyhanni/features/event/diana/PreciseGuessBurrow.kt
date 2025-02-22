@@ -13,9 +13,8 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.BezierFitter
 import at.hannibal2.skyhanni.utils.LorenzVec
-import at.hannibal2.skyhanni.utils.LorenzVec.Companion.toLorenzVec
-import at.hannibal2.skyhanni.utils.PolynomialFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import kotlin.math.PI
@@ -30,11 +29,11 @@ import kotlin.time.Duration.Companion.seconds
 object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val particleLocations = mutableListOf<LorenzVec>()
+    private val bezierFitter = BezierFitter(3)
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onWorldChange(event: IslandChangeEvent) {
-        particleLocations.clear()
+        bezierFitter.reset()
     }
 
     @HandleEvent(onlyOnIsland = IslandType.HUB, receiveCancelled = true)
@@ -47,13 +46,12 @@ object PreciseGuessBurrow {
         lastLavaParticle = SimpleTimeMark.now()
         val currLoc = event.location
         if (lastDianaSpade.passedSince() > 3.seconds) return
-        if (particleLocations.isEmpty()) {
-            particleLocations.add(currLoc)
+        if (bezierFitter.isEmpty()) {
+            bezierFitter.addPoint(currLoc)
             return
         }
-        val distToLast = particleLocations.last().distance(currLoc)
-        if (distToLast == 0.0 || distToLast > 3.0) return
-        particleLocations.add(currLoc)
+        val distToLast = bezierFitter.getLastPoint()?.distance(currLoc) ?: return
+        bezierFitter.addPoint(currLoc)
 
         val guessPosition = guessBurrowLocation() ?: return
 
@@ -61,27 +59,16 @@ object PreciseGuessBurrow {
     }
 
     private fun guessBurrowLocation(): LorenzVec? {
-        // A Degree n polynomial can be solved with n+1 unique points
-        // The Bézier curve used is a degree 3, so 4 points are needed to solve
-        if (particleLocations.size < 4) return null
-        val fitters = arrayOf(PolynomialFitter(3), PolynomialFitter(3), PolynomialFitter(3))
-        for ((index, location) in particleLocations.withIndex()) {
-            val x = index.toDouble()
-            val locationArray = location.toDoubleArray()
-            for ((i, fitter) in fitters.withIndex()) {
-                fitter.addPoint(x, locationArray[i])
-            }
-        }
+        val bezierCurve = bezierFitter.fit() ?: return null
 
-        val coefficients = fitters.map { it.fit() }
-        val startPointDerivative = coefficients.map { it[1] }.toLorenzVec()
+        val startPointDerivative = bezierCurve.derivativeAt(0.0)
 
         // How far away from the first point the control point is
         val controlPointDistance = sqrt(24 * sin(getPitchFromDerivative(startPointDerivative) - PI) + 25)
 
         val t = 3 * controlPointDistance / startPointDerivative.length()
 
-        return coefficients.map { it[0] + it[1] * t + it[2] * t.pow(2) + it[3] * t.pow(3) }.toLorenzVec()
+        return bezierCurve.at(t)
     }
 
     private fun getPitchFromDerivative(derivative: LorenzVec): Double {
@@ -119,7 +106,7 @@ object PreciseGuessBurrow {
             event.cancel()
             return
         }
-        particleLocations.clear()
+        bezierFitter.reset()
         lastDianaSpade = SimpleTimeMark.now()
     }
 
@@ -138,7 +125,7 @@ object PreciseGuessBurrow {
             add("Rounded Guess: " + (guess?.down(0.5)?.roundLocationToBlock()?.toCleanString() ?: "No Guess"))
             add("Particle Locations:")
             addAll(
-                particleLocations.mapIndexed { index, lorenzVec ->
+                bezierFitter.points.mapIndexed { index, lorenzVec ->
                     "$index:  ${lorenzVec.toCleanString()}"
                 },
             )

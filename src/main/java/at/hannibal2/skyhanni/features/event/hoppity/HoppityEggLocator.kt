@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.features.fame.ReminderUtils
 import at.hannibal2.skyhanni.features.garden.GardenApi
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
+import at.hannibal2.skyhanni.utils.BezierFitter
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
@@ -23,7 +24,6 @@ import at.hannibal2.skyhanni.utils.LorenzUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
-import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RecalculatingValue
 import at.hannibal2.skyhanni.utils.RenderUtils.drawColor
 import at.hannibal2.skyhanni.utils.RenderUtils.drawDynamicText
@@ -34,6 +34,13 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.SpecialColor.toSpecialColor
 import net.minecraft.item.ItemStack
 import net.minecraft.util.EnumParticleTypes
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.pow
+import kotlin.math.sign
+import kotlin.math.sin
+import kotlin.math.sqrt
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -42,19 +49,15 @@ object HoppityEggLocator {
     private val config get() = HoppityEggsManager.config
     val locatorItem = "EGGLOCATOR".toInternalName()
 
-    private var lastParticlePosition: LorenzVec? = null
     private var lastParticlePositionForever: LorenzVec? = null
     private var lastChange = SimpleTimeMark.farPast()
     private var lastClick = SimpleTimeMark.farPast()
     private val validParticleLocations = mutableListOf<LorenzVec>()
 
     private var drawLocations = false
-    private var firstPos = LorenzVec()
-    private var secondPos = LorenzVec()
 
     private var ticksSinceLastParticleFound = -1
     private var lastGuessMade = SimpleTimeMark.farPast()
-    private var eggLocationWeights = listOf<Double>()
 
     var sharedEggLocation: LorenzVec? = null
     var possibleEggLocations = listOf<LorenzVec>()
@@ -75,13 +78,11 @@ object HoppityEggLocator {
         validParticleLocations.clear()
         ticksSinceLastParticleFound = -1
         possibleEggLocations = emptyList()
-        firstPos = LorenzVec()
-        secondPos = LorenzVec()
         drawLocations = false
         sharedEggLocation = null
         currentEggType = null
         currentEggNote = null
-        lastParticlePosition = null
+        bezierFitter.reset()
     }
 
     @HandleEvent
@@ -174,23 +175,19 @@ object HoppityEggLocator {
 
     private fun shouldShowAllEggs() = config.showAllWaypoints && !locatorInHotbar && HoppityEggType.eggsRemaining()
 
+    private val bezierFitter = BezierFitter(3)
+
     @HandleEvent(onlyOnSkyblock = true)
     fun onReceiveParticle(event: ReceiveParticleEvent) {
         if (!isEnabled()) return
         if (!locatorInHotbar) return
-        if (!event.isVillagerParticle() && !event.isEnchantmentParticle()) return
+        if (!event.isVillagerParticle()) return
 
-        val lastParticlePosition = lastParticlePosition ?: run {
-            lastParticlePosition = event.location
-            lastParticlePositionForever = lastParticlePosition
-            lastChange = SimpleTimeMark.now()
-            return
-        }
-        if (lastParticlePosition == event.location) {
-            validParticleLocations.add(event.location)
-            ticksSinceLastParticleFound = 0
-        }
-        HoppityEggLocator.lastParticlePosition = null
+        bezierFitter.addPoint(event.location)
+
+        val guess = guessEggLocation() ?: return
+        possibleEggLocations = listOf(guess)
+        drawLocations = true
     }
 
     @HandleEvent
@@ -201,11 +198,9 @@ object HoppityEggLocator {
 
         if (ticksSinceLastParticleFound < 6) return
 
-        calculateEggPosition()
 
         ticksSinceLastParticleFound = 0
         validParticleLocations.clear()
-        lastParticlePosition = null
     }
 
     @HandleEvent(onlyOnSkyblock = true)
@@ -213,64 +208,53 @@ object HoppityEggLocator {
         if (!isEnabled()) return
         val item = event.itemInHand ?: return
 
-        if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem) {
+        if (event.clickType == ClickType.RIGHT_CLICK && item.isLocatorItem && lastClick.passedSince() >= 5.seconds) {
             lastClick = SimpleTimeMark.now()
             MythicRabbitPetWarning.check()
             trySendingGraph()
+            bezierFitter.reset()
         }
     }
 
-    private fun calculateEggPosition() {
-        if (lastGuessMade.passedSince() < 1.seconds) return
-        lastGuessMade = SimpleTimeMark.now()
-        possibleEggLocations = emptyList()
+    private fun guessEggLocation(): LorenzVec? {
+        val bezierCurve = bezierFitter.fit() ?: return null
 
-        val islandEggsLocations = HoppityEggLocations.islandLocations
-        val listSize = validParticleLocations.size
+        val startPointDerivative = bezierCurve.derivativeAt(0.0)
 
-        if (listSize < 5) return
+        // How far away from the first point the control point is
+        val controlPointDistance = sqrt(24 * sin(getPitchFromDerivative(startPointDerivative) - PI) + 25)
 
-        val secondPoint = validParticleLocations.removeLast()
-        firstPos = validParticleLocations.removeLast()
+        val t = 3 * controlPointDistance / startPointDerivative.length()
 
-        val xDiff = secondPoint.x - firstPos.x
-        val yDiff = secondPoint.y - firstPos.y
-        val zDiff = secondPoint.z - firstPos.z
+        val guessLocation = bezierCurve.at(t)
 
-        secondPos = LorenzVec(
-            secondPoint.x + xDiff * 1000,
-            secondPoint.y + yDiff * 1000,
-            secondPoint.z + zDiff * 1000,
-        )
+        val guessEgg = HoppityEggLocations.islandLocations.sortedWith { a, b ->
+            sign(a.distanceSq(guessLocation) - b.distanceSq(guessLocation)).toInt()
+        }.firstOrNull()
 
-        val sortedEggs = islandEggsLocations.map {
-            it to it.getEggLocationWeight(firstPos, secondPos)
-        }.sortedBy { it.second }
-
-        eggLocationWeights = sortedEggs.map {
-            it.second.roundTo(3)
-        }.take(5)
-
-        val filteredEggs = sortedEggs.filter {
-            it.second < 1
-        }.map { it.first }
-
-        val maxLineDistance = filteredEggs.sortedByDescending {
-            it.nearestPointOnLine(firstPos, secondPos).distance(firstPos)
+        return guessEgg
+    }
+    // From PreciseGuessBurrow.kt
+    private fun getPitchFromDerivative(derivative: LorenzVec): Double {
+        val xzLength = sqrt(derivative.x.pow(2) + derivative.z.pow(2))
+        val pitchRadians = -atan2(derivative.y, xzLength)
+        // Solve y = atan2(sin(x) - 0.75, cos(x)) for x from y
+        var guessPitch = pitchRadians
+        var resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+        var windowMax = PI / 2
+        var windowMin = -PI / 2
+        repeat(100) {
+            if (resultPitch < pitchRadians) {
+                windowMin = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            } else {
+                windowMax = guessPitch
+                guessPitch = (windowMin + windowMax) / 2
+            }
+            resultPitch = atan2(sin(guessPitch) - 0.75, cos(guessPitch))
+            if (resultPitch == pitchRadians) return guessPitch
         }
-
-        if (maxLineDistance.isEmpty()) {
-            LorenzUtils.sendTitle("§cNo eggs found, try getting closer", 2.seconds)
-            return
-        }
-        secondPos = maxLineDistance.first().nearestPointOnLine(firstPos, secondPos)
-
-        possibleEggLocations = filteredEggs
-
-        if (drawLocations) return
-        drawLocations = true
-
-        trySendingGraph()
+        return guessPitch
     }
 
     private fun trySendingGraph() {
@@ -299,14 +283,6 @@ object HoppityEggLocator {
         LorenzUtils.inSkyBlock && InventoryUtils.getItemsInHotbar().any { it.isLocatorItem }
     }
 
-    private fun LorenzVec.getEggLocationWeight(firstPoint: LorenzVec, secondPoint: LorenzVec): Double {
-        val distToLine = this.distanceToLine(firstPoint, secondPoint)
-        val distToStart = this.distance(firstPoint)
-        val distMultiplier = distToStart * 2 / 100 + 5
-        val disMultiplierSquared = distMultiplier * distMultiplier
-        return distToLine / disMultiplierSquared
-    }
-
     @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Hoppity Eggs Locations")
@@ -317,10 +293,7 @@ object HoppityEggLocator {
         }
 
         event.addIrrelevant {
-            add("First Pos: $firstPos")
-            add("Second Pos: $secondPos")
             add("Possible Egg Locations: ${possibleEggLocations.size}")
-            add("Egg Location Weights: $eggLocationWeights")
             add("Last Time Checked: ${lastGuessMade.passedSince().inWholeSeconds}s ago")
             add("Draw Locations: $drawLocations")
             add("Shared Egg Location: ${sharedEggLocation ?: "None"}")
