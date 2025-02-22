@@ -14,7 +14,6 @@ import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BezierFitter
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
@@ -56,18 +55,7 @@ object PreciseGuessBurrow {
         BurrowGuessEvent(guessPosition.down(0.5).roundLocationToBlock(), precise = true).post()
     }
 
-    private fun guessBurrowLocation(): LorenzVec? {
-        val bezierCurve = bezierFitter.fit() ?: return null
-
-        val startPointDerivative = bezierCurve.derivativeAt(0.0)
-
-        // How far away from the first point the control point is
-        val controlPointDistance = LocationUtils.computePitchWeight(startPointDerivative)
-
-        val t = 3 * controlPointDistance / startPointDerivative.length()
-
-        return bezierCurve.at(t)
-    }
+    private fun guessBurrowLocation(): LorenzVec? = bezierFitter.solve()
 
     private var lastDianaSpade = SimpleTimeMark.farPast()
     private var lastLavaParticle = SimpleTimeMark.farPast()

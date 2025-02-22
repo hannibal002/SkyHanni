@@ -61,6 +61,19 @@ class BezierFitter(private val degree: Int) {
         fitters.map { it.reset() }
         lastCurve = null
     }
+
+    fun solve(): LorenzVec? {
+        val bezierCurve = fit() ?: return null
+
+        val startPointDerivative = bezierCurve.derivativeAt(0.0)
+
+        // How far away from the first point the control point is
+        val controlPointDistance = LocationUtils.computePitchWeight(startPointDerivative)
+
+        val t = 3 * controlPointDistance / startPointDerivative.length()
+
+        return bezierCurve.at(t)
+    }
 }
 class BezierCurve(val coefficients: List<DoubleArray>) {
     init {

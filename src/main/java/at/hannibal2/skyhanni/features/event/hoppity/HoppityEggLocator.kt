@@ -17,7 +17,6 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BezierFitter
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.LocationUtils
 import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzUtils
@@ -165,16 +164,7 @@ object HoppityEggLocator {
     }
 
     private fun guessEggLocation(): LorenzVec? {
-        val bezierCurve = bezierFitter.fit() ?: return null
-
-        val startPointDerivative = bezierCurve.derivativeAt(0.0)
-
-        // How far away from the first point the control point is
-        val controlPointDistance = LocationUtils.computePitchWeight(startPointDerivative)
-
-        val t = 3 * controlPointDistance / startPointDerivative.length()
-
-        val guessLocation = bezierCurve.at(t)
+        val guessLocation = bezierFitter.solve() ?: return null
 
         val guessEgg = HoppityEggLocations.islandLocations.sortedWith { a, b ->
             sign(a.distanceSq(guessLocation) - b.distanceSq(guessLocation)).toInt()
