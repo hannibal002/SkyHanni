@@ -1696,18 +1696,19 @@ interface Renderable {
         private val radius: Int,
         private val border: CircularRenderable? = null,
         private val itemStack: ItemStack? = null,
-        private val itemScale: Double = 1.0,
-        private val filledPercentage: Int = 100,
+        private val itemScale: Double = 2.0,
+        private val filledPercentage: Double = 100.0,
         private val unfilledColor: Color = Color.LIGHT_GRAY,
     ) : Renderable {
+        private val totalRadius: Int = max(radius, border?.totalRadius ?: 0)
 
         companion object {
             // How many segments to use when drawing the circle.
-            private const val SEGMENT_COUNT: Int = 400
+            private const val SEGMENT_COUNT: Int = 1000
         }
 
-        override val width: Int = radius * 2
-        override val height: Int = radius * 2
+        override val width: Int = totalRadius * 2
+        override val height: Int = totalRadius * 2
         override val horizontalAlign = HorizontalAlignment.LEFT
         override val verticalAlign = VerticalAlignment.TOP
 
@@ -1717,13 +1718,13 @@ interface Renderable {
             GlStateManager.pushMatrix()
             GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
 
-            drawFilledCircle(radius, radius, radius, backgroundColor)
+            drawFilledCircle(totalRadius, totalRadius, radius, backgroundColor)
 
             itemStack?.let { stack ->
                 val itemWidth = (15.5 * itemScale).toInt()
                 val itemHeight = (15.5 * itemScale).toInt()
-                val itemX = radius - itemWidth / 2
-                val itemY = radius - itemHeight / 2
+                val itemX = totalRadius - itemWidth / 2
+                val itemY = totalRadius - itemHeight / 2
 
                 GL11.glPushMatrix()
                 // Translate so that (0,0) is where the item should be rendered.
@@ -1744,6 +1745,7 @@ interface Renderable {
          * @param color The fill color.
          */
         private fun drawFilledCircle(cx: Int, cy: Int, radius: Int, color: Color) {
+            GlStateManager.disableCull()
             GlStateManager.pushMatrix()
             GlStateManager.disableTexture2D()
             GlStateManager.enableBlend()
@@ -1765,7 +1767,7 @@ interface Renderable {
                 val x = cx + (cos(angle) * radius).toInt()
                 val y = cy + (sin(angle) * radius).toInt()
                 GL11.glVertex2f(x.toFloat(), y.toFloat())
-                if (i == fillSegmentCount && !doneFilling) {
+                if (i != SEGMENT_COUNT && i == fillSegmentCount && !doneFilling) {
                     doneFilling = true
                     GlStateManager.color(
                         unfilledColor.red / 255f,
@@ -1779,6 +1781,7 @@ interface Renderable {
             GlStateManager.disableBlend()
             GlStateManager.enableTexture2D()
             GlStateManager.popMatrix()
+            GlStateManager.enableCull()
         }
     }
 }

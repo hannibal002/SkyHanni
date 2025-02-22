@@ -15,11 +15,11 @@ import java.awt.Color
 @SkyHanniModule
 object CurrentPetDisplay {
 
-    private val config get() = SkyHanniMod.feature.misc.pets
+    private val config get() = SkyHanniMod.feature.misc.pets.display
 
     @HandleEvent(onlyOnSkyblock = true)
     fun onRenderOverlay(event: GuiRenderEvent.GuiOverlayRenderEvent) {
-        if (RiftApi.inRift() || !config.display) return
+        if (RiftApi.inRift() || !config.enabled) return
 
         val currentPet = CurrentPetApi.currentPet ?: return
         val displayName = currentPet.getUserFriendlyName(includeLevel = false)
@@ -29,9 +29,17 @@ object CurrentPetDisplay {
         val nameRender = Renderable.string(displayName, color = rarityColor.toColor())
         val circle = Renderable.CircularRenderable(
             rarityColor.toColor(),
-            50,
+            25,
             itemStack = itemStack,
-            border = Renderable.CircularRenderable(Color.LIGHT_GRAY, 65)
+            border = Renderable.CircularRenderable(
+                Color.LIGHT_GRAY,
+                30,
+                border = if (config.levelRing) Renderable.CircularRenderable(
+                    backgroundColor = Color.BLUE,
+                    radius = 32,
+                    filledPercentage = currentPet.levelProgressionPercentage ?: 0.0
+                ) else null
+            )
         )
 
         val container = Renderable.verticalContainer(
@@ -39,12 +47,14 @@ object CurrentPetDisplay {
             horizontalAlign = RenderUtils.HorizontalAlignment.CENTER,
         )
 
-        config.displayPos.renderRenderable(container, posLabel = "Current Pet")
+        config.position.renderRenderable(container, posLabel = "Current Pet")
     }
 
     @HandleEvent
     fun onConfigFix(event: ConfigUpdaterMigrator.ConfigFixEvent) {
         event.move(3, "misc.petDisplay", "misc.pets.display")
         event.move(9, "misc.petDisplayPos", "misc.pets.displayPos")
+        event.move(75, "misc.pets.display", "misc.pets.display.enabled")
+        event.move(75, "misc.pets.displayPos", "misc.pets.display.pos")
     }
 }

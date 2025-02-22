@@ -10,7 +10,9 @@ import at.hannibal2.skyhanni.utils.LorenzRarity
 import at.hannibal2.skyhanni.utils.NeuInternalName
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.PetUtils
 import at.hannibal2.skyhanni.utils.PetUtils.getSkinOrNull
+import at.hannibal2.skyhanni.utils.PetUtils.levelToXp
 import at.hannibal2.skyhanni.utils.PetUtils.xpToLevel
 import at.hannibal2.skyhanni.utils.RegexUtils.anyMatches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getExtraAttributes
@@ -33,6 +35,20 @@ data class PetData(
     val displayName = petItem?.itemName
     val formattedName = "${rarity?.chatColorCode}$cleanName"
     val skin: NeuPetSkinJson? = getSkinOrNull()
+
+    val levelProgressionPercentage: Double? = when {
+        xp == null -> null
+        level == null -> null
+        petItem == null -> null
+        PetUtils.isValidLevel(level + 1, petItem) -> {
+            val currentLevelXp = levelToXp(level, petItem) ?: 0.0
+            val nextLevelXp = levelToXp(level + 1, petItem) ?: 0.0
+            val xpDifference = nextLevelXp - currentLevelXp
+            val xpProgress = xp - currentLevelXp
+            xpProgress / xpDifference * 100
+        }
+        else -> 100.0
+    }
 
     @Expose var skinInternalName: NeuInternalName? = skinInternalNameOverride ?: skin?.internalName
 

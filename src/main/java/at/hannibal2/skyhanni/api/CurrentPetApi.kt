@@ -224,12 +224,13 @@ object CurrentPetApi {
     private fun handleWidgetPetLine(line: String): PetData? = petWidgetPattern.matchMatcher(line) {
         val rarity = rarityByColorGroup(group("rarity"))
         val petName = groupOrNull("name").orEmpty()
+        val petInternalName = petNameToInternalName(petName, rarity)
         val level = groupOrNull("level")?.toInt() ?: 0
-        val xp = levelToXp(level, rarity, petName) ?: return null
+        val xp = levelToXp(level, petInternalName) ?: return null
         val skinColor = groupOrNull("skin")?.substring(1, 2)?.get(0)?.toLorenzColor()
 
         return PetData(
-            petItem = petNameToInternalName(petName, rarity),
+            petItem = petInternalName,
             heldItem = null,
             cleanName = petName,
             rarity = rarity,
@@ -273,13 +274,14 @@ object CurrentPetApi {
         val level = group("level").toInt()
         val rarity = rarityByColorGroup(group("rarity"))
         val petName = group("pet")
+        val petInternalName = petNameToInternalName(petName, rarity)
 
         return PetData(
-            petItem = petNameToInternalName(petName, rarity),
+            petItem = petInternalName,
             cleanName = petName,
             rarity = rarity,
             level = level,
-            xp = levelToXp(level, rarity, petName) ?: 0.0,
+            xp = levelToXp(level, petInternalName) ?: 0.0,
         )
     }
 
@@ -289,38 +291,40 @@ object CurrentPetApi {
     // </editor-fold>
 
     // <editor-fold desc="Pet Data Extractors (Selected Pet)">
-    private fun extractSelectedPetData(lore: List<String>): Triple<Int, LorenzRarity, String>? {
+    private fun extractSelectedPetData(lore: List<String>): Triple<Int, LorenzRarity, NeuInternalName>? {
         val level = inventorySelectedProgressPattern.firstMatchGroup(lore, "level")?.toInt()
         val rarity = inventorySelectedPetPattern.firstMatchGroup(lore, "rarity")?.let { rarityByColorGroup(it) }
         val petName = inventorySelectedPetPattern.firstMatchGroup(lore, "pet")
+        val petInternalName = petName?.let {
+            petNameToInternalName(it, rarity ?: return null)
+        }
 
-        return if (level != null && rarity != null && petName != null) {
-            Triple(level, rarity, petName)
+        return if (level != null && rarity != null && petInternalName != null) {
+            Triple(level, rarity, petInternalName)
         } else null
     }
 
     private fun handleSelectedPetName(lore: List<String>): NeuInternalName? = inventorySelectedPetPattern.firstMatcher(lore) {
-        val (_, rarity, petName) = extractSelectedPetData(lore) ?: return null
-        petNameToInternalName(petName, rarity)
+        val (_, _, petInternalName) = extractSelectedPetData(lore) ?: return null
+        petInternalName
     }
 
     private fun handleSelectedPetOverflowXp(lore: List<String>): Double? {
         // Only have overflow if `next` group is absent
         if (inventorySelectedXpPattern.firstMatchGroup(lore, "next") != null) return 0.0
-        val (level, rarity, petName) = extractSelectedPetData(lore) ?: return null
-        val maxXpNeeded = levelToXp(level, rarity, petName)
+        val (level, _, petInternalName) = extractSelectedPetData(lore) ?: return null
+        val maxXpNeeded = levelToXp(level, petInternalName)
         val currentXp = inventorySelectedXpPattern.firstMatchGroup(lore, "current")?.formatDouble() ?: 0.0
         return maxXpNeeded?.minus(currentXp) ?: 0.0
     }
 
     private fun handleSelectedPetData(lore: List<String>): PetData? {
-        val (level, rarity, petName) = extractSelectedPetData(lore) ?: return null
+        val (level, rarity, petInternalName) = extractSelectedPetData(lore) ?: return null
         val partialXp = inventorySelectedXpPattern.firstMatchGroup(lore, "current")?.formatDouble() ?: 0.0
         val nextExists = inventorySelectedXpPattern.firstMatchGroup(lore, "next") != null
-        val totalXp = partialXp + if (nextExists) (levelToXp(level, rarity, petName) ?: return null) else 0.0
+        val totalXp = partialXp + if (nextExists) (levelToXp(level, petInternalName) ?: return null) else 0.0
         return PetData(
-            petItem = petNameToInternalName(petName, rarity),
-            cleanName = petName,
+            petItem = petInternalName,
             rarity = rarity,
             heldItem = null,
             level = level,
