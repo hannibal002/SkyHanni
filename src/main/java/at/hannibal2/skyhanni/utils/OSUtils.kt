@@ -90,7 +90,7 @@ object OSUtils {
             e,
             "Error reading last modified attributes",
             "file" to this,
-            "path" to toPath(),
+            "path" to this.absolutePath,
         )
         SimpleTimeMark.now()
     }
@@ -148,7 +148,7 @@ object OSUtils {
                 "Failed to delete file",
                 "Failed to delete file",
                 "file" to this,
-                "file" to this.absolutePath,
+                "path" to this.absolutePath,
             )
         }
     }
