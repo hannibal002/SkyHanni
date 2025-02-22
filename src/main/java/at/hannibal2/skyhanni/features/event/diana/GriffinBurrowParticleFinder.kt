@@ -84,7 +84,7 @@ object GriffinBurrowParticleFinder {
                     ParticleType.TREASURE -> burrow.type = 2
                 }
 
-                burrow.burrowTimeToLive += 2
+                burrow.burrowTimeToLive += 1
                 if (burrow.burrowTimeToLive > 30) burrow.burrowTimeToLive = 30
 
                 if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
