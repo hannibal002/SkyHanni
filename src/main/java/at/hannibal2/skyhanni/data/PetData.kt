@@ -40,7 +40,7 @@ data class PetData(
     ): String {
         val levelString = if (includeLevel) "§7[Lvl $level] §r" else ""
         val skinString = if (includeSkin) (skinSymbol.orEmpty()) else ""
-        return "§r$levelString$formattedName$cleanName$skinString"
+        return "§r$levelString$formattedName$skinString"
     }
 
     override fun equals(other: Any?): Boolean {
