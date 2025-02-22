@@ -26,7 +26,7 @@ class PolynomialFitter(private val degree: Int) {
         yPoints.clear()
     }
 }
-class BezierFitter(private val degree: Int) {
+open class BezierFitter(private val degree: Int) {
     val points: MutableList<LorenzVec> = mutableListOf()
     private val fitters = arrayOf(PolynomialFitter(degree), PolynomialFitter(degree), PolynomialFitter(degree))
     fun addPoint(point: LorenzVec) {
@@ -61,7 +61,8 @@ class BezierFitter(private val degree: Int) {
         fitters.map { it.reset() }
         lastCurve = null
     }
-
+}
+class ParticlePathBezierFitter(degree: Int) : BezierFitter(degree) {
     fun solve(): LorenzVec? {
         val bezierCurve = fit() ?: return null
 
@@ -75,7 +76,7 @@ class BezierFitter(private val degree: Int) {
         return bezierCurve.at(t)
     }
 }
-class BezierCurve(val coefficients: List<DoubleArray>) {
+class BezierCurve(private val coefficients: List<DoubleArray>) {
     init {
         require(coefficients.size == 3) { "Coefficients must be for a 3d curve!" }
     }

@@ -13,8 +13,8 @@ import at.hannibal2.skyhanni.events.ReceiveParticleEvent
 import at.hannibal2.skyhanni.events.diana.BurrowGuessEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
-import at.hannibal2.skyhanni.utils.BezierFitter
 import at.hannibal2.skyhanni.utils.LorenzVec
+import at.hannibal2.skyhanni.utils.ParticlePathBezierFitter
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import net.minecraft.util.EnumParticleTypes
 import kotlin.time.Duration.Companion.seconds
@@ -23,7 +23,7 @@ import kotlin.time.Duration.Companion.seconds
 object PreciseGuessBurrow {
     private val config get() = SkyHanniMod.feature.event.diana
 
-    private val bezierFitter = BezierFitter(3)
+    private val bezierFitter = ParticlePathBezierFitter(3)
 
     @HandleEvent(onlyOnIsland = IslandType.HUB)
     fun onWorldChange(event: IslandChangeEvent) {
