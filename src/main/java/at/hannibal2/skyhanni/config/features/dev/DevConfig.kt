@@ -38,7 +38,7 @@ class DevConfig {
     @Expose
     @ConfigOption(name = "Backup Expiry Time", desc = "Deletes your backups of SkyHanni configs after this time period in days.")
     @ConfigEditorSlider(minValue = 1f, maxValue = 30f, minStep = 1f)
-    var configBackupExpiryTime: Int = 7;
+    var configBackupExpiryTime: Int = 7
 
     @Expose
     @ConfigOption(
