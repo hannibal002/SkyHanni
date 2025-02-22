@@ -63,11 +63,7 @@ class LorenzLogger(filePath: String) {
 
         if (!hasDone && LorenzUtils.onHypixel) {
             hasDone = true
-            val directoryFiles = LOG_DIRECTORY.listFiles() ?: run {
-                println("log directory has no files")
-                return logger
-            }
-            OSUtils.deleteRecursively(directoryFiles, SkyHanniMod.feature.dev.logExpiryTime.days)
+            OSUtils.deleteExpiredFiles(LOG_DIRECTORY, SkyHanniMod.feature.dev.logExpiryTime.days)
         }
 
         return logger

@@ -77,24 +77,45 @@ object OSUtils {
 
     suspend fun readFromClipboard() = ClipboardUtils.readFromClipboard()
 
-    fun deleteRecursively(directoryFiles: Array<File>, timeToDelete: Duration) {
+    private fun File.isExpired(expiryDuration: Duration): Boolean = lastModifiedTime()?.let {
+        it.passedSince() > expiryDuration
+    } ?: false
+
+    private fun File.lastModifiedTime(): SimpleTimeMark? = try {
+        val attributes = Files.readAttributes(toPath(), BasicFileAttributes::class.java)
+        SimpleTimeMark(attributes.lastModifiedTime().toMillis())
+    } catch (e: IOException) {
+        SimpleTimeMark.now()
+    }
+
+    private fun File.isEmptyFile() = length() == 0L
+    private fun File.isEmptyDirectory() = listFiles()?.isEmpty() == true
+
+    /**
+     * Recursively deletes files and directories inside the root directory.
+     *
+     * Empty or expired files are deleted.
+     * They are deemed expired if their last modified time is longer than the given expiry duration
+     * Directories are deleted if they are empty after deleting all files inside
+     *
+     * @param root the starting directory for recursive deletion.
+     * @param expiryDuration the duration threshold to check if a file is expired.
+     */
+    fun deleteExpiredFiles(root: File, expiryDuration: Duration) {
         SkyHanniMod.coroutineScope.launch {
-            for (file in directoryFiles) {
-                val path = file.toPath()
-                try {
-                    val attributes = Files.readAttributes(path, BasicFileAttributes::class.java)
-                    val creationTime = attributes.creationTime().toMillis()
-                    val timeSinceCreation = SimpleTimeMark(creationTime).passedSince()
-                    if (timeSinceCreation > timeToDelete) {
-                        if (!file.deleteRecursively()) {
-                            println("failed to delete directory: ${file.name}")
+            root.walkBottomUp().forEach { file ->
+                when {
+                    file.isFile && (file.isEmptyFile() || file.isExpired(expiryDuration)) -> {
+                        if (!file.delete()) {
+                            println("Failed to delete file: ${file.absolutePath}")
                         }
                     }
-                } catch (e: SecurityException) {
-                    e.printStackTrace()
-                } catch (e: IOException) {
-                    e.printStackTrace()
-                    println("Error: Unable to get creation date.")
+
+                    file.isDirectory && file.isEmptyDirectory() -> {
+                        if (!file.delete()) {
+                            println("Failed to delete empty directory: ${file.absolutePath}")
+                        }
+                    }
                 }
             }
         }

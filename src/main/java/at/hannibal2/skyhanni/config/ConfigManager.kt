@@ -98,11 +98,7 @@ class ConfigManager {
     }
 
     private fun deleteOldBackups() {
-        val directoryFiles = File("skyhanni/config/backup").listFiles() ?: run {
-            println("backup directory has no files")
-            return
-        }
-        OSUtils.deleteRecursively(directoryFiles, SkyHanniMod.feature.dev.configBackupExpiryTime.days)
+        OSUtils.deleteExpiredFiles(File("skyhanni/config/backup"), SkyHanniMod.feature.dev.configBackupExpiryTime.days)
     }
 
     // Some position elements don't need config links as they don't have a config option.
