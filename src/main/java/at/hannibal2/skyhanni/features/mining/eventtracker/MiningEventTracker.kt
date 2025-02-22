@@ -211,7 +211,7 @@ object MiningEventTracker {
         canRequestAt = SimpleTimeMark.now() + defaultCooldown
         SkyHanniMod.coroutineScope.launch {
             val data = try {
-                ApiUtils.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get")
+                ApiUtils.getJSONResponse("https://api.soopy.dev/skyblock/chevents/get", apiName = "Soopy Mining Events")
             } catch (e: Exception) {
                 apiErrorCount++
                 canRequestAt = SimpleTimeMark.now() + 20.minutes
