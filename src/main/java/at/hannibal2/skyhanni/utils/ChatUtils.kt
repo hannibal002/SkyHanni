@@ -90,12 +90,13 @@ object ChatUtils {
         prefixColor: String = "§e",
         replaceSameMessage: Boolean = false,
         onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ) {
 
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
-            internalChat(message, replaceSameMessage, onlySendOnce)
+            internalChat(message, replaceSameMessage, onlySendOnce, messageId = messageId)
         }
     }
 
@@ -105,6 +106,7 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean,
         onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ): Boolean {
         val text = ChatComponentText(message)
         if (onlySendOnce) {
@@ -114,8 +116,8 @@ object ChatUtils {
             messagesThatAreOnlySentOnce.add(message)
         }
 
-        return if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(message))
+        return if (replaceSameMessage || messageId != null) {
+            text.send(messageId ?: getUniqueMessageIdForString(message))
             chat(text, false)
         } else {
             chat(text)
