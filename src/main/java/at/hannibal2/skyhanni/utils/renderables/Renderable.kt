@@ -1694,21 +1694,22 @@ interface Renderable {
     class CircularRenderable(
         private val backgroundColor: Color,
         private val radius: Int,
+        // Optional border; if provided, its render() is called first.
         private val border: CircularRenderable? = null,
+        // Optional ItemStack to render on top of the circle.
         private val itemStack: ItemStack? = null,
+        // Scale for the item rendering.
         private val itemScale: Double = 1.0
     ) : Renderable {
 
-        // The bounding box is a square with a diameter equal to 2*radius.
+        // The bounding box is a square of side length 2 * radius.
         override val width: Int = radius * 2
         override val height: Int = radius * 2
-        // We use top-left alignment here; positioning will be done via translation.
         override val horizontalAlign = HorizontalAlignment.LEFT
         override val verticalAlign = VerticalAlignment.TOP
 
         override fun render(posX: Int, posY: Int) {
-            // Render outer border rings first (if any) - we want to transpose each circle on top of the previous one,
-            // to give the illusion of a ring effect.
+            // Render the border (if any) first.
             border?.render(posX, posY)
 
             val centerX = posX + radius
@@ -1716,12 +1717,19 @@ interface Renderable {
             drawFilledCircle(centerX, centerY, radius, backgroundColor)
 
             val itemStack = itemStack ?: return
-            // Render the ItemStack centered in this circle.
-            val itemRenderable = itemStack(itemStack, scale = itemScale)
-            // Calculate top-left position for centering the item.
-            val itemX = centerX - itemRenderable.width / 2
-            val itemY = centerY - itemRenderable.height / 2
-            itemRenderable.render(itemX, itemY)
+            // Use an approximate size for the item icon (you can adjust these values).
+            val itemWidth = (15.5 * itemScale).toInt()
+            val itemHeight = (15.5 * itemScale).toInt()
+            // Compute the top-left coordinates to center the item.
+            val itemX = centerX - itemWidth / 2
+            val itemY = centerY - itemHeight / 2
+
+            GL11.glPushMatrix()
+            // Translate so that (0,0) is where the item should be rendered.
+            GL11.glTranslatef(itemX.toFloat(), itemY.toFloat(), 0f)
+            // Render the item at (0,0) now.
+            itemStack.renderOnScreen(0f, 0f, scaleMultiplier = itemScale, rescaleSkulls = true)
+            GL11.glPopMatrix()
         }
 
         /**
@@ -1736,23 +1744,22 @@ interface Renderable {
             GL11.glPushMatrix()
             GL11.glEnable(GL11.GL_BLEND)
             GL11.glDisable(GL11.GL_TEXTURE_2D)
-            // Set the circle's color.
+            // Set the desired color.
             GL11.glColor4f(
                 color.red / 255f,
                 color.green / 255f,
                 color.blue / 255f,
                 color.alpha / 255f
             )
-            // Begin drawing a triangle fan (a filled circle)
             GL11.glBegin(GL11.GL_TRIANGLE_FAN)
-            // Center of the circle.
+            // Center vertex.
             GL11.glVertex2f(cx.toFloat(), cy.toFloat())
-            // Use enough segments for a smooth circle.
+            // Draw circle segments.
             val segments = 100
             for (i in 0..segments) {
                 val angle = (2.0 * Math.PI * i / segments).toFloat()
-                val x = cx + (cos(angle.toDouble()) * radius).toInt()
-                val y = cy + (sin(angle.toDouble()) * radius).toInt()
+                val x = cx + (cos(angle) * radius).toInt()
+                val y = cy + (sin(angle) * radius).toInt()
                 GL11.glVertex2f(x.toFloat(), y.toFloat())
             }
             GL11.glEnd()

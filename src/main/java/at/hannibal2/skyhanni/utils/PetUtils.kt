@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.CurrentPetApi
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.commands.CommandCategory
 import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
+import at.hannibal2.skyhanni.data.PetData
 import at.hannibal2.skyhanni.data.PetData.Companion.internalNameToPetName
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetData
 import at.hannibal2.skyhanni.data.jsonobjects.repo.NEUPetsJson
@@ -14,7 +15,6 @@ import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ItemUtils.getLore
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
-import at.hannibal2.skyhanni.utils.RegexUtils.groupOrNull
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
@@ -25,8 +25,8 @@ import net.minecraft.item.ItemStack
 object PetUtils {
     private val patternGroup = RepoPattern.group("misc.pet")
     private const val FORGE_BACK_SLOT = 48
-    // Map of Pet Name to a Map of Skin Name to NeuPetSkinJson
-    val petSkins = mutableMapOf<String, MutableMap<String, NeuPetSkinJson>>()
+    // Map of Pet Name to a Map of InternalName to NeuPetSkinJson
+    private val petSkins = mutableMapOf<String, MutableMap<String, NeuPetSkinJson>>()
 
     private var baseXpLevelReqs: List<Int> = listOf()
     private var customXpLevelReqs: Map<String, NEUPetData>? = null
@@ -230,13 +230,10 @@ object PetUtils {
         NeuItems.allNeuRepoItems().forEach { (rawInternalName, jsonObject) ->
             petSkinNamePattern.matchMatcher(rawInternalName) {
                 val petName = group("pet") ?: return@matchMatcher
-                // Skin name can be empty, see PET_SKIN_ENDERMAN, PET_SKIN_RABBIT, etc.
-                val skinName = groupOrNull("skin").orEmpty()
-
                 // Use GSON to reflect the JSON into a NeuPetSkinJson object
                 val petItemData = Gson().fromJson(jsonObject, NeuPetSkinJson::class.java)
 
-                petSkins.getOrPut(petName) { mutableMapOf() }[skinName] = petItemData
+                petSkins.getOrPut(petName) { mutableMapOf() }[rawInternalName] = petItemData
             }
         }
     }
@@ -248,5 +245,21 @@ object PetUtils {
             category = CommandCategory.DEVELOPER_TEST
             callback { levelToXPCommand(it) }
         }
+    }
+
+    fun PetData.getSkinOrNull(): NeuPetSkinJson? {
+        if (skinSymbolColor == null && skinInternalName == null) return null
+
+        val cleanPetName = cleanName ?: return null
+        val possiblePetSkins = petSkins[cleanPetName] ?: return null
+        if (possiblePetSkins.size == 1) return possiblePetSkins.values.first()
+
+        skinInternalName?.let { return possiblePetSkins[it.asString()] }
+
+        val possibleSymbolSkins = possiblePetSkins.filter {
+            val cosmeticRarity = it.value.rarity ?: return@filter false
+            cosmeticRarity.color == skinSymbolColor
+        }.takeIf { it.isNotEmpty() } ?: return null
+        if (possibleSymbolSkins.size == 1) return possibleSymbolSkins.values.first()
     }
 }
