@@ -259,7 +259,8 @@ object PetUtils {
         val possibleSymbolSkins = possiblePetSkins.filter {
             val cosmeticRarity = it.value.rarity ?: return@filter false
             cosmeticRarity.color == skinSymbolColor
-        }.takeIf { it.isNotEmpty() } ?: return null
-        if (possibleSymbolSkins.size == 1) return possibleSymbolSkins.values.first()
+        }
+
+        return possibleSymbolSkins.values.firstOrNull()
     }
 }
