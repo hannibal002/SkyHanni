@@ -26,6 +26,7 @@ import at.hannibal2.skyhanni.utils.NeuItems.renderOnScreen
 import at.hannibal2.skyhanni.utils.RenderUtils
 import at.hannibal2.skyhanni.utils.RenderUtils.HorizontalAlignment
 import at.hannibal2.skyhanni.utils.RenderUtils.VerticalAlignment
+import at.hannibal2.skyhanni.utils.RenderUtils.drawFilledCircle
 import at.hannibal2.skyhanni.utils.compat.getTooltipCompat
 import at.hannibal2.skyhanni.utils.guide.GuideGUI
 import at.hannibal2.skyhanni.utils.renderables.Renderable.Companion.shouldAllowLink
@@ -46,9 +47,7 @@ import net.minecraft.util.ResourceLocation
 import org.lwjgl.opengl.GL11
 import java.awt.Color
 import java.util.Collections
-import kotlin.math.cos
 import kotlin.math.max
-import kotlin.math.sin
 
 interface Renderable {
 
@@ -1702,13 +1701,8 @@ interface Renderable {
     ) : Renderable {
         private val totalRadius: Int = max(radius, border?.totalRadius ?: 0)
 
-        companion object {
-            // How many segments to use when drawing the circle.
-            private const val SEGMENT_COUNT: Int = 1000
-        }
-
-        override val width: Int = totalRadius * 2
-        override val height: Int = totalRadius * 2
+        override val width: Int = radius * 2
+        override val height: Int = radius * 2
         override val horizontalAlign = HorizontalAlignment.LEFT
         override val verticalAlign = VerticalAlignment.TOP
 
@@ -1716,9 +1710,8 @@ interface Renderable {
             border?.render(posX, posY)
 
             GlStateManager.pushMatrix()
-            GlStateManager.translate(posX.toFloat(), posY.toFloat(), 0f)
 
-            drawFilledCircle(totalRadius, totalRadius, radius, backgroundColor)
+            drawFilledCircle(0, 0, radius, backgroundColor)
 
             itemStack?.let { stack ->
                 val itemWidth = (15.5 * itemScale).toInt()
@@ -1736,55 +1729,5 @@ interface Renderable {
             GL11.glPopMatrix()
         }
 
-        /**
-         * Draws a filled circle using OpenGL.
-         *
-         * @param cx The x-coordinate of the circle's center.
-         * @param cy The y-coordinate of the circle's center.
-         * @param radius The circle's radius.
-         * @param color The fill color.
-         */
-        private fun drawFilledCircle(cx: Int, cy: Int, radius: Int, color: Color) {
-            GlStateManager.disableCull()
-            GlStateManager.pushMatrix()
-            GlStateManager.disableTexture2D()
-            GlStateManager.enableBlend()
-            GlStateManager.tryBlendFuncSeparate(
-                GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO
-            )
-            GlStateManager.color(
-                color.red / 255f,
-                color.green / 255f,
-                color.blue / 255f,
-                color.alpha / 255f
-            )
-            var doneFilling = false
-            val fillSegmentCount = (filledPercentage / 100.0 * SEGMENT_COUNT).toInt()
-            GL11.glEnable(GL11.GL_POLYGON_SMOOTH)
-            GL11.glHint(GL11.GL_POLYGON_SMOOTH_HINT, GL11.GL_NICEST)
-            GL11.glBegin(GL11.GL_TRIANGLE_FAN)
-            GL11.glVertex2f(cx.toFloat(), cy.toFloat())
-            for (i in 0..SEGMENT_COUNT) {
-                val angle = (2.0 * Math.PI * i / SEGMENT_COUNT).toFloat()
-                val x = cx + cos(angle) * radius
-                val y = cy + sin(angle) * radius
-                GL11.glVertex2f(x.toFloat(), y.toFloat())
-                if (i != SEGMENT_COUNT && i == fillSegmentCount && !doneFilling) {
-                    doneFilling = true
-                    GlStateManager.color(
-                        unfilledColor.red / 255f,
-                        unfilledColor.green / 255f,
-                        unfilledColor.blue / 255f,
-                        unfilledColor.alpha / 255f
-                    )
-                }
-            }
-            GL11.glDisable(GL11.GL_POLYGON_SMOOTH)
-            GL11.glEnd()
-            GlStateManager.disableBlend()
-            GlStateManager.enableTexture2D()
-            GlStateManager.popMatrix()
-            GlStateManager.enableCull()
-        }
     }
 }
