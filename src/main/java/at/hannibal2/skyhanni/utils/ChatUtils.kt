@@ -340,8 +340,17 @@ object ChatUtils {
     }
 
     fun sendMessageToServer(message: String) {
+        if (canSendInstantly()) {
+            Minecraft.getMinecraft().thePlayer?.let {
+                it.sendChatMessage(message)
+                lastMessageSent = SimpleTimeMark.now()
+                return
+            }
+        }
         sendQueue.add(message)
     }
+
+    private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay
 
     fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
         it.isNotEmpty()
