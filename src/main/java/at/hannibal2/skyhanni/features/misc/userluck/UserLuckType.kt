@@ -19,18 +19,21 @@ import java.util.regex.Pattern
 
 sealed class UserLuckType {
     abstract val luck: Float
+    abstract val prettyName: String
 
     object Limbo : UserLuckType() {
         override val luck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck ?: 0f
+        override val prettyName = "Limbo"
     }
 
     @SkyHanniModule
     object Skills : UserLuckType() {
-        override val luck get() = skillMap.sumAllValues().toFloat()
+        override val luck get() = _skillMap.sumAllValues().toFloat()
+        override val prettyName = "Skills"
 
-        private var _skillMap: Map<SkillType, Float>? = null
+        private var _skillMap: Map<SkillType, Float> = emptyMap()
         val skillMap: Map<SkillType, Float>
-            get() = _skillMap ?: calcSkillMap()
+            get() = _skillMap.takeIf { it.isNotEmpty() } ?: calcSkillMap()
 
         private fun calcSkillMap(): Map<SkillType, Float> {
             val storage = SkillApi.storage ?: return SkillType.entries.associate { it to 0f }
@@ -51,13 +54,14 @@ sealed class UserLuckType {
             val skillLuck = luckFromOverflowLevel(event.skill.maxLevel, event.newLevel).toFloat()
 
             map.put(event.skill, skillLuck)
+            _skillMap = map.toMap()
         }
 
         private fun luckFromOverflowLevel(maxLevel: Int, currentOverflowLevel: Int) = ((currentOverflowLevel - maxLevel) / 5) * 50
     }
 
     companion object {
-        val entries: List<UserLuckType> = listOf(Limbo, Skills)
+        val entries = listOf(Limbo, Skills)
 
         fun getTotalLuck(): Float = entries.sumOf { it.luck.toDouble() }.toFloat()
     }
