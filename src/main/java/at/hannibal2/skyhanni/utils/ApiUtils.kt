@@ -31,7 +31,6 @@ import javax.net.ssl.TrustManagerFactory
 object ApiUtils {
 
     private val parser = JsonParser()
-    private var showApiErrors = false
 
     private val ctx: SSLContext? = run {
         try {
@@ -78,18 +77,18 @@ object ApiUtils {
      * make suspend
      * use withContext(Dispatchers.IO) { APIUtils.getJSONResponse(url) }.asJsonObject
      */
-    fun getJSONResponse(urlString: String, silentError: Boolean = false, gunzip: Boolean = false) =
-        getJSONResponseAsElement(urlString, silentError, gunzip = gunzip) as JsonObject
+    fun getJSONResponse(urlString: String, silentError: Boolean = false, apiName: String, gunzip: Boolean = false) =
+        getJSONResponseAsElement(urlString, silentError, apiName, gunzip) as JsonObject
 
     fun getJSONResponseAsElement(
-        urlString: String,
+        url: String,
         silentError: Boolean = false,
-        apiName: String = "Hypixel API",
+        apiName: String,
         gunzip: Boolean = false,
     ): JsonElement {
         val client = builder.build()
         try {
-            client.execute(HttpGet(urlString)).use { response ->
+            client.execute(HttpGet(url)).use { response ->
                 val entity = response.entity
                 if (entity != null) {
                     val inputStream = if (gunzip) {
@@ -97,38 +96,31 @@ object ApiUtils {
                     } else {
                         entity.content
                     }
-                    val retSrc = inputStream.bufferedReader().use { it.readText() }
+                    val returnedData = inputStream.bufferedReader().use { it.readText() }
                     try {
-                        return parser.parse(retSrc)
+                        return parser.parse(returnedData)
                     } catch (e: JsonSyntaxException) {
                         val name = e.javaClass.name
                         val message = "$name: ${e.message}"
                         if (e.message?.contains("Use JsonReader.setLenient(true)") == true) {
                             println("MalformedJsonException: Use JsonReader.setLenient(true)")
-                            println(" - getJSONResponse: '$urlString'")
+                            println(" - getJSONResponse: '$url'")
                             ChatUtils.debug("MalformedJsonException: Use JsonReader.setLenient(true)")
-                        } else if (retSrc.contains("<center><h1>502 Bad Gateway</h1></center>")) {
-                            if (showApiErrors && apiName == "Hypixel API") {
-                                ChatUtils.clickableChat(
-                                    "Problems with detecting the Hypixel API. §eClick here to hide this message for now.",
-                                    onClick = { toggleApiErrorMessages() },
-                                    "§eClick to run /shtogglehypixelapierrors!",
-                                )
-                            }
+                        } else if (returnedData.contains("<center><h1>502 Bad Gateway</h1></center>")) {
                             ErrorManager.skyHanniError(
-                                "SkyHanni Connection Error",
+                                "Error fetching data from $apiName API!",
                                 "error message" to "$message(502 Bad Gateway)",
-                                "apiName" to apiName,
-                                "urlString" to urlString,
-                                "returnedData" to retSrc,
+                                "api name" to apiName,
+                                "url" to url,
+                                "returned data" to returnedData,
                             )
                         } else {
                             ErrorManager.skyHanniError(
-                                "SkyHanni Connection Error",
+                                "Error fetching data from $apiName API!",
                                 "error message" to message,
-                                "apiName" to apiName,
-                                "urlString" to urlString,
-                                "returnedData" to retSrc,
+                                "api name" to apiName,
+                                "url" to url,
+                                "returned data" to returnedData,
                             )
                         }
                     }
@@ -139,11 +131,12 @@ object ApiUtils {
                 throw e
             }
             val name = e.javaClass.name
-            val message = "$name: ${e.message}"
+            val errorMessage = "$name: ${e.message}"
             ErrorManager.skyHanniError(
-                "SkyHanni Connection Error",
-                "error message" to message,
-                "urlString" to urlString,
+                "Error fetching data from $apiName API!",
+                "api name" to apiName,
+                "error message" to errorMessage,
+                "url" to url,
             )
         } finally {
             client.close()
@@ -151,11 +144,11 @@ object ApiUtils {
         return JsonObject()
     }
 
-    fun postJSON(urlString: String, body: String, silentError: Boolean = false): ApiResponse {
+    fun postJSON(url: String, body: String, apiName: String): ApiResponse {
         val client = builder.build()
 
         try {
-            val method = HttpPost(urlString)
+            val method = HttpPost(url)
             method.entity = StringEntity(body, ContentType.APPLICATION_JSON)
 
             client.execute(method).use { response ->
@@ -167,22 +160,24 @@ object ApiUtils {
                     return ApiResponse(true, "Request successful", data)
                 }
 
-                val message = "POST request to '$urlString' returned status ${status.statusCode}"
+                val message = "POST request to '$url' returned status ${status.statusCode}"
                 ErrorManager.logErrorStateWithData(
-                    "Error communicating with API", "APIUtil POST request returned an error code",
-                    "statusCode" to status.statusCode,
-                    "urlString" to urlString,
+                    "Error sending data to $apiName API!",
+                    "statusCode is ${status.statusCode}",
+                    "error message" to "$message(502 Bad Gateway)",
+                    "api name" to apiName,
+                    "url" to url,
+                    "status code" to status.statusCode,
                     "body" to body,
                 )
                 return ApiResponse(false, message, JsonObject())
             }
         } catch (throwable: Throwable) {
-            if (silentError) {
-                throw throwable
-            }
             ErrorManager.logErrorWithData(
-                throwable, "SkyHanni ran into an ${throwable::class.simpleName ?: "error"} whilst sending a resource",
-                "urlString" to urlString,
+                throwable,
+                "Error sending data to $apiName API!",
+                "api name" to apiName,
+                "url" to url,
                 "body" to body,
             )
             return ApiResponse(false, throwable.message, JsonObject())
@@ -205,29 +200,24 @@ object ApiUtils {
         }
     }
 
-    fun postJSONIsSuccessful(url: String, body: String, silentError: Boolean = false): Boolean {
-        val response = postJSON(url, body, silentError)
+    fun postJSONIsSuccessful(url: String, body: String, apiName: String): Boolean {
+        val response = postJSON(url, body, apiName)
 
         if (response.success) {
             return true
         }
 
         ErrorManager.logErrorStateWithData(
-            "An error occurred during the API request",
+            "An error occurred during the $apiName API request!",
             "unsuccessful API response",
             "url" to url,
+            "apiName" to apiName,
             "body" to body,
             "message" to response.message,
             "response" to response,
         )
 
         return false
-    }
-
-    // TODO remove command, use clickable chat message instead
-    fun toggleApiErrorMessages() {
-        showApiErrors = !showApiErrors
-        ChatUtils.chat("Hypixel API error messages " + if (showApiErrors) "§chidden" else "§ashown")
     }
 
     private var disabledApis: DisabledApiJson? = null
