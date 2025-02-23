@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
-class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
+class StorageNeedsExpose(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "StorageNeedsExpose",
         Severity.Defect,
@@ -49,9 +49,9 @@ class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
             // Valid reasons to not have the @Expose annotation on a config option:
             //  - Has the ConfigEditorInfoText annotation
             //  - Has the ConfigEditorButton annotation
-                if(property.hasAnnotation("ConfigEditorInfoText")) return
-                if(property.hasAnnotation("ConfigEditorButton")) return
-            }
+            if (property.hasAnnotation("ConfigEditorInfoText")) return
+            if (property.hasAnnotation("ConfigEditorButton")) return
+        }
 
         return property.reportIssue("@Expose annotation is missing from property ${property.name}")
     }
