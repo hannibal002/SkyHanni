@@ -38,8 +38,21 @@ object PetExpTooltip {
         val petExperience = itemStack.getPetExp()?.roundTo(1) ?: return
         val name = itemStack.name
         try {
-
             val index = findIndex(event.toolTip) ?: return
+            val fixedIndex = if (index > event.toolTip.size) {
+                ErrorManager.logErrorStateWithData(
+                    "Error in Pet Exp Tooltip",
+                    "index is out of bounds of item tooltip",
+                    "index" to index,
+                    "event.toolTip.size" to event.toolTip.size,
+                    "name" to name,
+                    "event.toolTip" to event.toolTip,
+                    betaOnly = true,
+                )
+                event.toolTip.size
+            } else {
+                index
+            }
 
             val (maxLevel, maxXP) = getMaxValues(name, petExperience)
 
@@ -47,15 +60,15 @@ object PetExpTooltip {
             val percentageFormat = LorenzUtils.formatPercentage(percentage)
 
             if (percentage < 1) {
-                event.toolTip.add(index, " ")
-                val progressBar = StringUtils.progressBar(percentage)
                 val isBelowLegendary = itemStack.getItemRarityOrNull()?.let { it < LorenzRarity.LEGENDARY } ?: false
                 val addLegendaryColor = if (isBelowLegendary) "§6" else ""
-                event.toolTip.add(
-                    index,
-                    "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXP.shortFormat()}",
-                )
-                event.toolTip.add(index, "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat")
+                val progressTextLine = "§7Progress to ${addLegendaryColor}Level $maxLevel: §e$percentageFormat"
+
+                val progressBar = StringUtils.progressBar(percentage)
+                val progressBarLine = "$progressBar §e${petExperience.addSeparators()}§6/§e${maxXP.shortFormat()}"
+
+                event.toolTip.addAll(fixedIndex, listOf(progressTextLine, progressBarLine, " "))
+
             }
         } catch (e: Exception) {
             ErrorManager.logErrorWithData(
