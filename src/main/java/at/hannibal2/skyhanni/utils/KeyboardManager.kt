@@ -64,7 +64,7 @@ object KeyboardManager {
         }
     }
 
-    @HandleEvent
+    @HandleEvent(priority = HandleEvent.LOWEST)
     fun onTick(event: SkyHanniTickEvent) {
         val currentScreen = Minecraft.getMinecraft().currentScreen
         val isConfigScreen = currentScreen is GuiScreenElementWrapper
@@ -100,7 +100,10 @@ object KeyboardManager {
     }
 
     private fun postEvent(keyCode: Int) {
-        DelayedRun.runDelayed(150.milliseconds) {
+        // This cooldown is here to make sure the Text input features in graph editor
+        // and in renderable calls have time to react first,
+        // and lock this key press event properly
+        DelayedRun.runDelayed(50.milliseconds) {
             if (TextInput.isActive()) return@runDelayed
             KeyPressEvent(keyCode).post()
         }
@@ -112,7 +115,8 @@ object KeyboardManager {
             if (keyCode.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorWithData(
-                e, "Error while checking if a key is pressed.",
+                e,
+                "Error while checking if a key is pressed.",
                 "keyCode" to keyCode,
             )
             return false
