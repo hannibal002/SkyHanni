@@ -67,6 +67,7 @@
     + Shows what item to purchase with your hard-earned Fishy Treat.
 + Added Gift Profit Tracker. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3072)
     + Does NOT auto-track used gifts - see `/shaddusedgifts`.
++ Added precise Diana burrow prediction. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3249)
 
 #### Dungeon
 
@@ -132,10 +133,13 @@
 + Added custom sound to the Inquisitor Share feature. - Helium9 (https://github.com/hannibal002/SkyHanni/pull/3160)
 + Replaced old hoppity ready reminder messages when clickable is disabled. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3215)
 + Separated totals from mob list on Mythological Creature Tracker. - indigo_polecat (https://github.com/hannibal002/SkyHanni/pull/3228)
++ Added multi-guess support for precise burrow prediction. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3456)
++ Improved Hoppity egglocator guesses. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3479)
 
 #### Chat Improvements
 
 + Added option to only hide sack messages while in the garden. - MisterCheezeCake (https://github.com/hannibal002/SkyHanni/pull/2858)
++ Added SBE error to spam filter. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3473)
 
 #### Fishing Improvements
 
@@ -161,6 +165,8 @@
     + Reordered item name, amount, price, and icon.
     + Shows the list as a table.
     + Added scrolling for long lists, replacing the "hide cheap items" option.
++ Added automatic backups for the config files. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3477)
+    + Allows a 7-day manual rollback option for config issues.
 
 ### Bug Fixes
 
@@ -182,6 +188,7 @@
 + Fixed Rabbit Hitman claim estimates. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3142)
 + Fixed stray rabbit tracker being gray. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3327)
 + Fixed stray timer inaccurately resetting on inventory change. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3322)
++ Fixed chocolate factory features disappearing when Hoppity's Collection contains multiple pages. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3476)
 
 #### Event Bug Fixes
 
@@ -193,6 +200,12 @@
 + Fixed Golden Jerry detection. - rueblimaster (https://github.com/hannibal002/SkyHanni/pull/3393)
 + Fixed non-functional "Line to Jerry" disable option. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3397)
 + Fixed runic Jerry detection. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3396)
++ Fixed Hoppity Eggs appearing in the display even when they don't spawn again before the event ends. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3450)
++ Fixed various bugs in the burrow guessing logic. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3459)
+    + Prevented the first burrow particle from being skipped with a well-timed spade use on high ping.
+    + Prevented burrow guesses from being added when the player is within 6 blocks of the guess.
++ Fixed burrows sometimes persisting after being dug. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3480)
++ Fixed incorrect burrow guesses under certain circumstances. - bloxigus (https://github.com/hannibal002/SkyHanni/pull/3469)
 
 #### Inventory Bug Fixes
 
@@ -259,6 +272,8 @@
 + Fixed Garden Visitor Supercraft button not appearing when you can't craft all crops but already have the remainder in sacks. - Luna (https://github.com/hannibal002/SkyHanni/pull/3436)
     + E.g., if a visitor wants 8 Enchanted Melon Blocks and you have 2 Enchanted Melon Blocks and 960 Enchanted Melons.
 + Fixed sprays not resetting when Pest Profit Tracker is reset. - Luna (https://github.com/hannibal002/SkyHanni/pull/3448)
++ Fixed bugs with visitor features. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3481)
++ Fixed Composter overlay not updating. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3481)
 
 #### Combat Bug Fixes
 
@@ -291,6 +306,7 @@
 + Fixed incorrect Livid highlighting in F5/M5 sometimes. - martimavocado (https://github.com/hannibal002/SkyHanni/pull/2897)
 + Fixed the "Clean End" feature from hiding mobs even after restarting a run. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3336)
 + Fixed Damage Indicator timing issues in Dungeon F6/M6. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3356)
++ Fixed rare error when checking block textures in dungeons. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3472)
 
 #### Fishing Bug Fixes
 
@@ -333,6 +349,12 @@
 + Fixed memory leak in entity rendering code. - Nessiesson (https://github.com/hannibal002/SkyHanni/pull/3446)
 + Fixed NEU Souls in Dwarven Mines and Glacite Tunnels. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3435)
 + Possibly fixed some config reset errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3400)
++ Fixed incorrect spacing in all Item Trackers. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3452)
++ Fixed mayor data updating too slow after new mayor takes office. - j10a1n15 (https://github.com/hannibal002/SkyHanni/pull/3455)
++ Fixed HypixelData errors. - Empa (https://github.com/hannibal002/SkyHanni/pull/3465)
++ Fixed rare pest drop messages not including amounts when the pest tracker is disabled. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3463)
++ Fixed various issues with the Enchanted Book Name feature. - Empa (https://github.com/hannibal002/SkyHanni/pull/3457)
++ Fixed error in "pet progress to level 100" line in item tooltip. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3471)
 
 ### Technical Details
 
@@ -423,6 +445,8 @@
 + Added ChatUtils.editFirstMessage. - Empa (https://github.com/hannibal002/SkyHanni/pull/2000)
 + Added Renderable.searchScrollTable. - Thunderblade73 (https://github.com/hannibal002/SkyHanni/pull/3439)
 + Moved some existing gift-related resources to a new `gifting` package. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3072)
++ Fixed spacing in chat history. - Daveed (https://github.com/hannibal002/SkyHanni/pull/3464)
++ Improved error messages, especially for Repo and API errors. - hannibal2 (https://github.com/hannibal002/SkyHanni/pull/3447)
 
 ### Removed Features
 

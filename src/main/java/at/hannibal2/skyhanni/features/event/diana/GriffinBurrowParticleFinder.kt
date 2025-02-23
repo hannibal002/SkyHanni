@@ -8,16 +8,19 @@ import at.hannibal2.skyhanni.events.DebugDataCollectEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDetectEvent
 import at.hannibal2.skyhanni.events.diana.BurrowDugEvent
+import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.events.minecraft.WorldChangeEvent
 import at.hannibal2.skyhanni.events.minecraft.packet.PacketReceivedEvent
 import at.hannibal2.skyhanni.features.event.diana.DianaApi.isDianaSpade
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.BlockUtils.getBlockAt
 import at.hannibal2.skyhanni.utils.DelayedRun
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceSqToPlayer
 import at.hannibal2.skyhanni.utils.LorenzVec
 import at.hannibal2.skyhanni.utils.SimpleTimeMark
 import at.hannibal2.skyhanni.utils.TimeLimitedSet
 import at.hannibal2.skyhanni.utils.toLorenzVec
+import net.minecraft.client.Minecraft
 import net.minecraft.init.Blocks
 import net.minecraft.network.play.server.S2APacketParticles
 import kotlin.time.Duration.Companion.minutes
@@ -69,8 +72,9 @@ object GriffinBurrowParticleFinder {
             if (particleType != null) {
 
                 val location = packet.toLorenzVec().toBlockPos().down().toLorenzVec()
-                if (location in recentlyDugParticleBurrows) return
                 val burrow = burrows.getOrPut(location) { Burrow(location) }
+
+                val oldBurrowType = burrow.type
 
                 when (particleType) {
                     ParticleType.FOOTSTEP -> burrow.hasFootstep = true
@@ -80,12 +84,30 @@ object GriffinBurrowParticleFinder {
                     ParticleType.TREASURE -> burrow.type = 2
                 }
 
+                burrow.burrowTimeToLive += 1
+                if (burrow.burrowTimeToLive > 40) burrow.burrowTimeToLive = 40
+
                 if (burrow.hasEnchant && burrow.hasFootstep && burrow.type != -1) {
-                    if (!burrow.found) {
+                    if (!burrow.found || burrow.type != oldBurrowType) {
                         BurrowDetectEvent(burrow.location, burrow.getType()).post()
                         burrow.found = true
                     }
                 }
+            }
+        }
+    }
+
+    @HandleEvent(onlyOnIsland = IslandType.HUB)
+    fun onTick(event: SkyHanniTickEvent) {
+        val isSpade = Minecraft.getMinecraft().thePlayer.inventory.getCurrentItem()?.isDianaSpade ?: false
+        if (isSpade) {
+            burrows.filter { (location, burrow) ->
+                burrow.burrowTimeToLive -= 1
+                location.distanceSqToPlayer() < 256 && burrow.burrowTimeToLive < 0
+            }.forEach { (location, burrow) ->
+                BurrowDugEvent(location).post()
+                burrows.remove(location)
+                lastDugParticleBurrow = null
             }
         }
     }
@@ -211,6 +233,7 @@ object GriffinBurrowParticleFinder {
         var hasEnchant: Boolean = false,
         var type: Int = -1,
         var found: Boolean = false,
+        var burrowTimeToLive: Int = 0
     ) {
 
         fun getType(): BurrowType {
