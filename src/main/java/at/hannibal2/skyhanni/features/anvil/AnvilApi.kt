@@ -4,14 +4,12 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.OwnInventoryData
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryCloseEvent
-import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.inventory.AnvilUpdateEvent
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.DelayedRun
 import at.hannibal2.skyhanni.utils.InventoryDetector
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalName
-import at.hannibal2.skyhanni.utils.ItemUtils.itemName
 import net.minecraft.item.ItemStack
 import kotlin.time.Duration.Companion.seconds
 
@@ -34,7 +32,6 @@ object AnvilApi {
                     val left = slot.stack
                     if (this.left?.getInternalName() != left?.getInternalName()) {
                         this.left = left
-                        println("update left: ${left?.itemName}")
                         postEvent()
                     }
                 }
@@ -42,7 +39,6 @@ object AnvilApi {
                     val right = slot.stack
                     if (this.right?.getInternalName() != right?.getInternalName()) {
                         this.right = right
-                        println("update right: ${right?.itemName}")
                         postEvent()
                     }
                 }
@@ -60,12 +56,10 @@ object AnvilApi {
 
         var hadItems = false
         left?.let {
-            println("close left: ${it.itemName}")
             OwnInventoryData.ignoreItem(3.seconds, it.getInternalName())
             hadItems = true
         }
         right?.let {
-            println("close right: ${it.itemName}")
             OwnInventoryData.ignoreItem(3.seconds, it.getInternalName())
             hadItems = true
         }

@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.features.anvil
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.events.GuiContainerEvent
 import at.hannibal2.skyhanni.events.InventoryUpdatedEvent
 import at.hannibal2.skyhanni.events.inventory.AnvilUpdateEvent
@@ -43,7 +42,7 @@ object AnvilCombineHelper {
         return InventoryUtils.getSlotsInOwnInventory().filter { slot ->
             val name = slot.stack?.getInternalName()
             name == leftStack || name == rightStack
-        }.mapTo(mutableSetOf()) { it.slotNumber }
+        }.map { it.slotNumber }.toSet()
 
     }
 
