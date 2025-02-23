@@ -63,6 +63,7 @@ object CurrentChatDisplay {
      * REGEX-TEST: §cYou are not in a party and were moved to the ALL channel.
      * REGEX-TEST: §cThe conversation you were in expired and you have been moved back to the ALL channel.
      */
+    @Suppress("MaxLineLength")
     private val allChatPattern by patternGroun.pattern(
         "all",
         "§cYou are not in a party and were moved to the ALL channel\\.|§cThe conversation you were in expired and you have been moved back to the ALL channel\\."
@@ -71,6 +72,7 @@ object CurrentChatDisplay {
     /**
      * REGEX-TEST: §aOpened a chat conversation with §r§b[MVP§r§5+§r§b] martimavocado§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave
      */
+    @Suppress("MaxLineLength")
     private val openPrivateMessagePattern by patternGroun.pattern(
         "private.open",
         "^§aOpened a chat conversation with (?:§.)*(?:\\[.+])?(?:§.|\\s)*(?<player>.*)§r§a for the next 5 minutes. Use §r§b/chat a§r§a to leave"
