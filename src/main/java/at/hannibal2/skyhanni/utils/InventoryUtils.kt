@@ -144,6 +144,10 @@ object InventoryUtils {
 
     fun getItemAtSlotIndex(slotIndex: Int): ItemStack? = getSlotAtIndex(slotIndex)?.stack
 
+    fun getItemsAtSlots(vararg slotIndexes: Int): List<ItemStack> {
+        return slotIndexes.toList().mapNotNull(::getItemAtSlotIndex)
+    }
+
     fun getSlotAtIndex(slotIndex: Int): Slot? = getItemsInOpenChest().find { it.slotIndex == slotIndex }
 
     fun NeuInternalName.getAmountInInventory(): Int = countItemsInLowerInventory { it.getInternalNameOrNull() == this }

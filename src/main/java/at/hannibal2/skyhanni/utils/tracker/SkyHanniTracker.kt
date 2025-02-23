@@ -34,11 +34,10 @@ open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    private val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     private val drawDisplay: (Data) -> List<Searchable>,
 ) {
 
-    private val extraDisplayModes = extraStorage.toMap()
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
