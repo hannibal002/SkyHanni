@@ -2,7 +2,6 @@ package at.hannibal2.skyhanni.api.event.predicates
 
 import at.hannibal2.skyhanni.data.model.TabWidget
 import at.hannibal2.skyhanni.events.WidgetUpdateEvent
-import at.hannibal2.skyhanni.utils.CollectionUtils.enumSetOf
 import at.hannibal2.skyhanni.utils.CollectionUtils.toEnumSet
 import at.hannibal2.skyhanni.utils.ReflectionUtils.getAnnotation
 
