@@ -65,15 +65,15 @@ object PestFinder {
             val name = "§e" + if (isInaccurate) "1+?" else {
                 pests
             } + " §c$pestsName §7in §b$plotName"
-            val renderable = Renderable.clickAndHover(
+            val renderable = Renderable.clickable(
                 name,
-                listOf(
+                tips = listOf(
                     "§7Pests Found: §e" + if (isInaccurate) "Unknown" else pests,
                     "§7In plot §b$plotName",
                     "",
                     "§eClick here to warp!",
                 ),
-                onClick = {
+                onLeftClick = {
                     plot.sendTeleportTo()
                 },
             )
@@ -84,23 +84,23 @@ object PestFinder {
             remindInChat()
             add(Renderable.string("§e${PestApi.scoreboardPests} §6Bugged pests!"))
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cTry opening your plots menu",
-                    listOf(
+                    tips = listOf(
                         "Runs /desk.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.gardenDesk()
                     },
                 ),
             )
             add(
-                Renderable.clickAndHover(
+                Renderable.clickable(
                     "§cor enable Pests Widget in §e/widget.",
-                    listOf(
+                    tips = listOf(
                         "Runs /widget.",
                     ),
-                    onClick = {
+                    onLeftClick = {
                         HypixelCommands.widget()
                     },
                 ),

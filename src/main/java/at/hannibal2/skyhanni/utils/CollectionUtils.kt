@@ -286,9 +286,9 @@ object CollectionUtils {
         true
     } else false
 
-    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = takeIf { null !in this } as? Iterable<T>
+    fun <T> Iterable<T?>.takeIfAllNotNull(): Iterable<T>? = if (all { it != null }) filterNotNull() else null
 
-    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = takeIf { null !in this } as? List<T>
+    fun <T> List<T?>.takeIfAllNotNull(): List<T>? = if (all { it != null }) filterNotNull() else null
 
     fun <T> Collection<T>.takeIfNotEmpty(): Collection<T>? = takeIf { it.isNotEmpty() }
 
