@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.features.event.diana
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.ElectionApi.getElectionYear
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
@@ -59,11 +61,13 @@ object MythologicalCreatureTracker {
 
     private val tracker = SkyHanniTracker(
         "Mythological Creature Tracker", { Data() }, { it.diana.mythologicalMobTracker },
-        SkyHanniTracker.DisplayMode.MAYOR to {
-            it.diana.mythologicalMobTrackerPerElection.getOrPut(
-                SkyBlockTime.now().getElectionYear(), ::Data,
-            )
-        },
+        extraDisplayModes = mapOf(
+            SkyHanniTracker.DisplayMode.MAYOR to {
+                it.diana.mythologicalMobTrackerPerElection.getOrPut(
+                    SkyBlockTime.now().getElectionYear(), ::Data,
+                )
+            },
+        ),
     ) { drawDisplay(it) }
 
     class Data : TrackerData() {
@@ -149,8 +153,12 @@ object MythologicalCreatureTracker {
         )
     }
 
-    fun resetCommand() {
-        tracker.resetCommand()
+    @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shresetmythologicalcreaturetracker") {
+            description = "Resets the Mythological Creature Tracker"
+            category = CommandCategory.USERS_RESET
+            callback { tracker.resetCommand() }
+        }
     }
-
 }

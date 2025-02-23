@@ -7,9 +7,11 @@ const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
 // Read detekt_output.txt
 const detektOutput = fs.readFileSync('detekt_output.txt', 'utf8');
 
-let comment = '### One or more Detekt Failures were detected:\n\n';
-
 const lines = detektOutput.split('\n');
+const lineLength = lines.length - 1; // We might have an empty line at the end maybe?
+
+let comment = `### ${lineLength} Detekt Failure${lineLength !== 1 ? 's were' : ' was'} detected:\n\n`;
+
 lines.forEach((line) => {
     if (!line.trim()) return; // Skip empty lines
 

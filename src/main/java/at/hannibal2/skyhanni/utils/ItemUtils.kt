@@ -2,6 +2,8 @@ package at.hannibal2.skyhanni.utils
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
+import at.hannibal2.skyhanni.config.commands.CommandCategory
+import at.hannibal2.skyhanni.config.commands.CommandRegistrationEvent
 import at.hannibal2.skyhanni.data.NotificationManager
 import at.hannibal2.skyhanni.data.PetApi
 import at.hannibal2.skyhanni.data.SkyHanniNotification
@@ -14,10 +16,14 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.removeIfKey
+import at.hannibal2.skyhanni.utils.CollectionUtils.sortedDesc
+import at.hannibal2.skyhanni.utils.ItemPriceUtils.formatCoin
 import at.hannibal2.skyhanni.utils.ItemPriceUtils.getPrice
 import at.hannibal2.skyhanni.utils.NeuInternalName.Companion.toInternalName
 import at.hannibal2.skyhanni.utils.NeuItems.getItemStackOrNull
+import at.hannibal2.skyhanni.utils.NumberUtil.addSeparators
 import at.hannibal2.skyhanni.utils.NumberUtil.formatInt
+import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.PrimitiveIngredient.Companion.toPrimitiveItemStacks
 import at.hannibal2.skyhanni.utils.RegexUtils.matchMatcher
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
@@ -27,8 +33,14 @@ import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.isRecombobulated
 import at.hannibal2.skyhanni.utils.StringUtils.removeColor
 import at.hannibal2.skyhanni.utils.StringUtils.removeResets
+import at.hannibal2.skyhanni.utils.chat.Text
+import at.hannibal2.skyhanni.utils.chat.Text.asComponent
+import at.hannibal2.skyhanni.utils.chat.Text.onClick
+import at.hannibal2.skyhanni.utils.chat.Text.onHover
+import at.hannibal2.skyhanni.utils.chat.Text.send
 import at.hannibal2.skyhanni.utils.repopatterns.RepoPattern
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
+import kotlinx.coroutines.launch
 import net.minecraft.client.Minecraft
 import net.minecraft.init.Items
 import net.minecraft.item.Item
@@ -36,6 +48,7 @@ import net.minecraft.item.ItemStack
 import net.minecraft.nbt.NBTTagCompound
 import net.minecraft.nbt.NBTTagList
 import net.minecraft.nbt.NBTTagString
+import net.minecraft.util.ChatComponentText
 import net.minecraftforge.common.util.Constants
 import java.util.LinkedList
 import java.util.regex.Matcher
@@ -46,7 +59,7 @@ import kotlin.time.Duration.Companion.seconds
 @SkyHanniModule
 object ItemUtils {
 
-    private val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
+    val itemNameCache = mutableMapOf<NeuInternalName, String>() // internal name -> item name
 
     // This map might not contain all stats the item has, compare with itemBaseStatsRaw if unclear
     private var itemBaseStats = mapOf<NeuInternalName, Map<SkyblockStat, Int>>()
@@ -107,7 +120,7 @@ object ItemUtils {
 
     private val SKYBLOCK_MENU = "SKYBLOCK_MENU".toInternalName()
 
-    fun ItemStack.cleanName() = this.displayName.removeColor()
+    fun ItemStack.cleanName() = displayName.removeColor()
 
     fun isSack(stack: ItemStack) = stack.getInternalName().endsWith("_SACK") && stack.cleanName().endsWith(" Sack")
 
@@ -244,7 +257,8 @@ object ItemUtils {
 
     }
 
-    fun NBTTagCompound.getSkullTexture(): String = getCompoundTag("Properties").getCompoundList("textures")[0].getString("Value")
+    fun NBTTagCompound.getSkullTexture(): String? =
+        getCompoundTag("Properties").getCompoundList("textures").firstOrNull()?.getString("Value")
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null
@@ -510,7 +524,7 @@ object ItemUtils {
 
     fun NeuInternalName.isRune(): Boolean = contains("_RUNE;")
 
-    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.itemName: String
         get() {
             getAttributeFromShard()?.let {
@@ -525,12 +539,14 @@ object ItemUtils {
         return attributes.firstOrNull()
     }
 
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val ItemStack.itemNameWithoutColor: String get() = itemName.removeColor()
 
-    // use when showing the item name to the user (in guis, chat message, etc.), not for comparing
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemName: String
         get() = itemNameCache.getOrPut(this) { grabItemName() }
 
+    /** Use when showing the item name to the user (in guis, chat message, etc.), not for comparing. */
     val NeuInternalName.itemNameWithoutColor: String get() = itemName.removeColor()
 
     val NeuInternalName.readableInternalName: String
@@ -550,6 +566,7 @@ object ItemUtils {
             return "§cBugged Item"
         }
 
+        // We do not use NeuItems.allItemsCache here since we need itemStack below
         val itemStack = getItemStackOrNull()
         val name = itemStack?.name ?: run {
             val name = toString()
@@ -617,6 +634,103 @@ object ItemUtils {
     }.sum()
 
     @HandleEvent
+    fun onCommandRegistration(event: CommandRegistrationEvent) {
+        event.register("shtestitem") {
+            description = "test item internal name resolving"
+            category = CommandCategory.DEVELOPER_TEST
+            callback { testItemCommand(it) }
+        }
+    }
+
+    private fun testItemCommand(args: Array<String>) {
+        if (args.isEmpty()) {
+            ChatUtils.userError("Usage: /shtestitem <item name or internal name>")
+            return
+        }
+
+        val input = args.joinToString(" ")
+        Text.text("§eProcessing..").send(testItemMessageId)
+
+        // running .getPrice() on thousands of items may take ~500ms
+        SkyHanniMod.coroutineScope.launch {
+            buildTestItemMessage(input).send(testItemMessageId)
+        }
+    }
+
+    private val testItemMessageId = ChatUtils.getUniqueMessageId()
+
+    private fun buildTestItemMessage(input: String) = buildList {
+        add("".asComponent())
+        add("§bSkyHanni Test Item".asComponent())
+        add("§eInput: '§f$input§e'".asComponent())
+
+        NeuInternalName.fromItemNameOrNull(input)?.let<NeuInternalName, Nothing> { internalName ->
+            formatTestItem(internalName, internalName.getPrice())
+            return@buildList
+        }
+
+        input.toInternalName().getItemStackOrNull()?.let<ItemStack, Nothing> { item ->
+            val internalName = item.getInternalName()
+            formatTestItem(internalName, internalName.getPrice())
+            return@buildList
+        }
+
+        val matches = mutableSetOf<NeuInternalName>()
+        for ((name, internalName) in NeuItems.allItemsCache) {
+            if (name.contains(input, ignoreCase = true)) {
+                matches.add(internalName)
+            } else if (internalName.asString().contains(input.replace(" ", "_"), ignoreCase = true)) {
+                matches.add(internalName)
+            }
+        }
+        // TODO add all enchantments to NeuItems.allItemsCache
+        // somehow, enchantments arent part of NeuItems.allItemsCache atm
+        // itemNameCache contains bazaar enchantments
+        // the non bz enchantments are only in the cache after found in game
+        for ((internalName, name) in itemNameCache) {
+            if (name.contains(input, ignoreCase = true)) {
+                matches.add(internalName)
+            } else if (internalName.asString().contains(input.replace(" ", "_"), ignoreCase = true)) {
+                matches.add(internalName)
+            }
+        }
+
+        if (matches.isEmpty()) {
+            add("§cNothing found!".asComponent())
+        } else {
+            add("§eNo exact match! Show partial matches:".asComponent())
+            val max = 10
+            if (matches.size > max) {
+                add("§7(Showing only the first $max results of ${matches.size.addSeparators()} total)".asComponent())
+            }
+            for ((internalName, price) in matches.associateWith { it.getPrice() }.sortedDesc().entries.take(max)) {
+                formatTestItem(internalName, price)
+            }
+        }
+    }
+
+    private fun MutableList<ChatComponentText>.formatTestItem(internalName: NeuInternalName, price: Double) {
+        val priceColor = if (price > 0) "§6" else "§7"
+        val name = internalName.itemName
+        val priceFormat = "$priceColor${price.shortFormat()}"
+        val componentText = " §8- §r$name $priceFormat".asComponent()
+        componentText.onClick {
+            ClipboardUtils.copyToClipboard(internalName.asString())
+        }
+        componentText.onHover(
+            listOf(
+                name,
+                "",
+                "§7Price: $priceFormat",
+                "§7Internal name: §8${internalName.asString()}",
+                "",
+                "§eClick to copy internal name to clipboard!",
+            ),
+        )
+        add(componentText)
+    }
+
+    @HandleEvent
     fun onDebug(event: DebugDataCollectEvent) {
         event.title("Missing Repo Items")
 
@@ -664,4 +778,42 @@ object ItemUtils {
         getTagList(key, Constants.NBT.TAG_COMPOUND).let { loreList ->
             List(loreList.tagCount()) { loreList.getCompoundTagAt(it) }
         }
+
+    fun NeuInternalName.getNumberedName(amount: Number): String {
+        val prefix = if (amount == 1.0) "" else "§8${amount.addSeparators()}x "
+        return "$prefix§r$itemName"
+    }
+
+    // Taken from NEU
+    // TODO add cache
+    fun getCoinItemStack(coinAmount: Number): ItemStack {
+        val amount = coinAmount.toDouble()
+        var uuid = "2070f6cb-f5db-367a-acd0-64d39a7e5d1b"
+        var texture =
+            "eyJ0ZXh0dXJlcyI6eyJTS0lOIjp7InVybCI6Imh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvNTM4MDcxNzIxY2M1YjRjZDQwNmNlNDMxYTEzZjg2MDgzYTg5NzNlMTA2NGQyZjg4OTc4Njk5MzBlZTZlNTIzNyJ9fX0="
+
+        if (amount >= 100000) {
+            uuid = "94fa2455-2881-31fe-bb4e-e3e24d58dbe3"
+            texture =
+                "eyJ0aW1lc3RhbXAiOjE2MzU5NTczOTM4MDMsInByb2ZpbGVJZCI6ImJiN2NjYTcxMDQzNDQ0MTI4ZDMwODllMTNiZGZhYjU5IiwicHJvZmlsZU5hbWUiOiJsYXVyZW5jaW8zMDMiLCJzaWduYXR1cmVSZXF1aXJlZCI6dHJ1ZSwidGV4dHVyZXMiOnsiU0tJTiI6eyJ1cmwiOiJodHRwOi8vdGV4dHVyZXMubWluZWNyYWZ0Lm5ldC90ZXh0dXJlL2M5Yjc3OTk5ZmVkM2EyNzU4YmZlYWYwNzkzZTUyMjgzODE3YmVhNjQwNDRiZjQzZWYyOTQzM2Y5NTRiYjUyZjYiLCJtZXRhZGF0YSI6eyJtb2RlbCI6InNsaW0ifX19fQo="
+        }
+
+        if (amount >= 10000000) {
+            uuid = "0af8df1f-098c-3b72-ac6b-65d65fd0b668"
+            texture =
+                "ewogICJ0aW1lc3RhbXAiIDogMTYzNTk1NzQ4ODQxNywKICAicHJvZmlsZUlkIiA6ICJmNThkZWJkNTlmNTA0MjIyOGY2MDIyMjExZDRjMTQwYyIsCiAgInByb2ZpbGVOYW1lIiA6ICJ1bnZlbnRpdmV0YWxlbnQiLAogICJzaWduYXR1cmVSZXF1aXJlZCIgOiB0cnVlLAogICJ0ZXh0dXJlcyIgOiB7CiAgICAiU0tJTiIgOiB7CiAgICAgICJ1cmwiIDogImh0dHA6Ly90ZXh0dXJlcy5taW5lY3JhZnQubmV0L3RleHR1cmUvN2I5NTFmZWQ2YTdiMmNiYzIwMzY5MTZkZWM3YTQ2YzRhNTY0ODE1NjRkMTRmOTQ1YjZlYmMwMzM4Mjc2NmQzYiIsCiAgICAgICJtZXRhZGF0YSIgOiB7CiAgICAgICAgIm1vZGVsIiA6ICJzbGltIgogICAgICB9CiAgICB9CiAgfQp9"
+        }
+
+        val skull = ItemUtils.createSkull(
+            amount.formatCoin() + " Coins",
+            uuid,
+            texture,
+        )
+
+        val extraAttributes = skull.tagCompound.getCompoundTag("ExtraAttributes")
+        extraAttributes.setString("id", "SKYBLOCK_COIN")
+        skull.tagCompound.setTag("ExtraAttributes", extraAttributes)
+
+        return skull
+    }
 }
