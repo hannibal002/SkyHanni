@@ -18,6 +18,8 @@ import at.hannibal2.skyhanni.utils.ColorUtils
 import at.hannibal2.skyhanni.utils.ColorUtils.addAlpha
 import at.hannibal2.skyhanni.utils.ColorUtils.darker
 import at.hannibal2.skyhanni.utils.GuiRenderUtils
+import at.hannibal2.skyhanni.utils.KeyboardManager.LEFT_MOUSE
+import at.hannibal2.skyhanni.utils.KeyboardManager.RIGHT_MOUSE
 import at.hannibal2.skyhanni.utils.KeyboardManager.isKeyClicked
 import at.hannibal2.skyhanni.utils.LorenzColor
 import at.hannibal2.skyhanni.utils.LorenzLogger
@@ -92,20 +94,20 @@ interface Renderable {
             else -> null
         }
 
-        fun link(text: String, bypassChecks: Boolean = false, onClick: () -> Unit): Renderable =
-            link(string(text), onClick, bypassChecks = bypassChecks)
+        fun link(text: String, bypassChecks: Boolean = false, onLeftClick: () -> Unit): Renderable =
+            link(string(text), onLeftClick, bypassChecks = bypassChecks)
 
         fun optionalLink(
             text: String,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
-        ): Renderable = link(string(text), onClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
+        ): Renderable = link(string(text), onLeftClick, bypassChecks, highlightsOnHoverSlots = highlightsOnHoverSlots, condition)
 
         fun link(
             renderable: Renderable,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             highlightsOnHoverSlots: List<Int> = emptyList(),
             condition: () -> Boolean = { true },
@@ -117,61 +119,79 @@ interface Renderable {
                     condition = condition,
                     highlightsOnHoverSlots = highlightsOnHoverSlots,
                 ),
-                onClick,
+                onLeftClick,
                 bypassChecks,
                 condition,
             )
         }
 
-        fun clickAndHover(
-            text: Any,
-            tips: List<Any>,
+        fun clickable(
+            text: String,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
-            onClick: () -> Unit,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
             onHover: () -> Unit = {},
-        ): Renderable {
-            return clickable(
-                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
-                onClick,
-                bypassChecks = bypassChecks,
-            )
-        }
-
-        fun multiClickAndHover(
-            text: Any,
-            tips: List<Any>,
-            bypassChecks: Boolean = false,
-            click: Map<Int, () -> Unit>,
-            onHover: () -> Unit = {},
-        ): Renderable {
-            return multiClickable(
-                hoverTips(text, tips, bypassChecks = bypassChecks, onHover = onHover),
-                click,
-                bypassChecks = bypassChecks,
-            )
-        }
+        ) = clickable(string(text), onLeftClick, bypassChecks, condition, tips, onHover)
 
         fun clickable(
             render: Renderable,
-            onClick: () -> Unit,
+            onLeftClick: () -> Unit,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
-        ) = leftAndRightClickable(
-            render,
-            onClick = { if (it == Direction.LEFT) onClick() },
-            bypassChecks, condition,
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = clickable(render, mapOf(LEFT_MOUSE to onLeftClick), bypassChecks, condition, tips, onHover)
+
+        fun clickable(
+            text: String,
+            /**
+             * This should be a direct map of key code int, to the unit that should be invoked.
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
+             */
+            onAnyClick: Map<Int, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = clickable(string(text), onAnyClick, bypassChecks, condition, tips, onHover)
+
+        fun clickable(
+            render: Renderable,
+            /**
+             * This should be a direct map of key code int, to the unit that should be invoked.
+             * For mouse buttons, use [LEFT_MOUSE] and [RIGHT_MOUSE] from [at.hannibal2.skyhanni.utils.KeyboardManager].
+             * For keyboard codes, use the [org.lwjgl.input.Keyboard] enums.
+             */
+            onAnyClick: Map<Int, () -> Unit>,
+            bypassChecks: Boolean = false,
+            condition: () -> Boolean = { true },
+            tips: List<Any>? = null,
+            onHover: () -> Unit = {},
+        ) = multiClickable(
+            tips?.let {
+                hoverTips(render, it, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: onHover.takeIf { it != {} }?.let {
+                hoverable(render, render, bypassChecks = bypassChecks, onHover = onHover)
+            } ?: render,
+            onAnyClick,
+            bypassChecks,
+            condition,
         )
 
-        enum class Direction {
-            LEFT,
-            RIGHT,
-        }
-
-        fun leftAndRightClickable(
+        private fun multiClickable(
             render: Renderable,
-            onClick: (Direction) -> Unit,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
+            /**
+             * This unit is invoked on 'hover & click' if no keys within [onAnyClick] invoke their unit.
+             * This is useful for detecting things like scrolling, which do not have a direct key code to reference.
+             *
+             * See [clickableAndScrollable] for an example of how this is used.
+             */
+            nonStandardClick: () -> Unit = {},
         ) = object : Renderable {
             override val width = render.width
             override val height = render.height
@@ -180,64 +200,47 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
-                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
+                    handleClickChecks()
                 }
                 render.render(posX, posY)
+            }
+
+            private fun handleClickChecks() {
+                var processed = false
+                for ((key, onKeyClicked) in onAnyClick) {
+                    if (key.isKeyClicked()) {
+                        onKeyClicked()
+                        processed = true
+                    }
+                }
+                if (!processed) nonStandardClick()
             }
         }
 
         fun clickableAndScrollable(
             render: Renderable,
-            onClick: (Direction) -> Unit,
+            onAnyClick: Map<Int, () -> Unit>,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             scrollValue: ScrollValue = ScrollValue(),
-        ) = object : Renderable {
-            override val width = render.width
-            override val height = render.height
-            override val horizontalAlign = render.horizontalAlign
-            override val verticalAlign = render.verticalAlign
+        ): Renderable {
+            val pureScrollInput = ScrollInput.Companion.PureVertical(scrollValue)
 
-            private val pureScrollInput = ScrollInput.Companion.PureVertical(scrollValue)
-
-            private fun ScrollInput.Companion.PureVertical.tryUpdateScroll() {
-                pureScrollInput.update(true)
-                when (asInt()) {
-                    -1 -> onClick(Direction.RIGHT) // Scroll Up -> Right Click
-                    1 -> onClick(Direction.LEFT) // Scroll Down -> Left Click
-                    else -> return
+            return multiClickable(
+                render = render,
+                onAnyClick = onAnyClick,
+                bypassChecks = bypassChecks,
+                condition = condition,
+                nonStandardClick = {
+                    pureScrollInput.update(true)
+                    when (pureScrollInput.asDirection()) {
+                        ScrollInput.ScrollDirection.UP -> onAnyClick[RIGHT_MOUSE]?.invoke()
+                        ScrollInput.ScrollDirection.DOWN -> onAnyClick[LEFT_MOUSE]?.invoke()
+                        else -> {}
+                    }
+                    pureScrollInput.dispose()
                 }
-                dispose()
-            }
-
-            override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) {
-                    if ((-100).isKeyClicked()) onClick(Direction.LEFT)
-                    else if ((-99).isKeyClicked()) onClick(Direction.RIGHT)
-                    else pureScrollInput.tryUpdateScroll()
-                }
-                render.render(posX, posY)
-            }
-        }
-
-        fun multiClickable(
-            render: Renderable,
-            click: Map<Int, () -> Unit>,
-            bypassChecks: Boolean = false,
-            condition: () -> Boolean = { true },
-        ) = object : Renderable {
-            override val width = render.width
-            override val height = render.height
-            override val horizontalAlign = render.horizontalAlign
-            override val verticalAlign = render.verticalAlign
-
-            override fun render(posX: Int, posY: Int) {
-                if (isHovered(posX, posY) && condition() && shouldAllowLink(true, bypassChecks)) for ((button, onClick) in click) {
-                    if ((button - 100).isKeyClicked()) onClick()
-                }
-                render.render(posX, posY)
-            }
+            )
         }
 
         fun hoverTips(
@@ -289,22 +292,13 @@ interface Renderable {
         }
 
         internal fun shouldAllowLink(debug: Boolean = false, bypassChecks: Boolean): Boolean {
-            val guiScreen = Minecraft.getMinecraft().currentScreen
+            val guiScreen = Minecraft.getMinecraft().currentScreen.takeIf { it != null } ?: return false
 
-            val isGuiScreen = guiScreen != null
+            // Never support grayed out inventories
+            if (RenderData.outsideInventory) return false
 
-            if (!isGuiScreen) {
-                return false
-            }
+            if (bypassChecks) return true
 
-//             never support grayed out inventories
-            if (RenderData.outsideInventory) {
-                return false
-            }
-
-            if (bypassChecks) {
-                return true
-            }
             val inMenu = Minecraft.getMinecraft().currentScreen !is GuiIngameMenu
             val isGuiPositionEditor = guiScreen !is GuiPositionEditor
             val isNotInSignAndOnSlot = if (guiScreen !is GuiEditSign && guiScreen !is GuideGUI<*>) {
@@ -312,7 +306,7 @@ interface Renderable {
             } else true
             val isConfigScreen = guiScreen !is GuiScreenElementWrapper
 
-            val openGui = guiScreen?.javaClass?.name ?: "none"
+            val openGui = guiScreen.javaClass.name ?: "none"
             val isInNeuPv = openGui == "io.github.moulberry.notenoughupdates.profileviewer.GuiProfileViewer"
             val neuFocus = NeuItems.neuHasFocus()
             val isInSkytilsPv = openGui == "gg.skytils.skytilsmod.gui.profile.ProfileGui"
@@ -321,13 +315,20 @@ interface Renderable {
             val isInNeuSettings = openGui.startsWith("io.github.moulberry.notenoughupdates.")
 
             val result =
-                isGuiScreen && isGuiPositionEditor && inMenu && isNotInSignAndOnSlot && isConfigScreen && !isInNeuPv && !isInSkytilsPv && !neuFocus && !isInSkytilsSettings && !isInNeuSettings
+                isGuiPositionEditor &&
+                    inMenu &&
+                    isNotInSignAndOnSlot &&
+                    isConfigScreen &&
+                    !isInNeuPv &&
+                    !isInSkytilsPv &&
+                    !neuFocus &&
+                    !isInSkytilsSettings &&
+                    !isInNeuSettings
 
             if (debug) {
                 if (!result) {
                     logger.log("")
                     logger.log("blocked link because:")
-                    if (!isGuiScreen) logger.log("isGuiScreen")
                     if (!isGuiPositionEditor) logger.log("isGuiPositionEditor")
                     if (!inMenu) logger.log("inMenu")
                     if (!isNotInSignAndOnSlot) logger.log("isNotInSignAndOnSlot")
@@ -363,16 +364,16 @@ interface Renderable {
 
         fun hoverable(
             hovered: Renderable,
-            unhovered: Renderable,
+            unHovered: Renderable,
             bypassChecks: Boolean = false,
             condition: () -> Boolean = { true },
             highlightsOnHoverSlots: List<Int> = emptyList(),
             onHover: () -> Unit = {},
         ) = object : Renderable {
-            override val width = max(hovered.width, unhovered.width)
-            override val height = max(hovered.height, unhovered.height)
-            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unhovered.horizontalAlign
-            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unhovered.verticalAlign
+            override val width = max(hovered.width, unHovered.width)
+            override val height = max(hovered.height, unHovered.height)
+            override val horizontalAlign get() = if (isHovered) hovered.horizontalAlign else unHovered.horizontalAlign
+            override val verticalAlign get() = if (isHovered) hovered.verticalAlign else unHovered.verticalAlign
 
             var isHovered = false
 
@@ -384,7 +385,7 @@ interface Renderable {
                     HighlightOnHoverSlot.currentSlots[pair] = highlightsOnHoverSlots
                     true
                 } else {
-                    unhovered.render(posX, posY)
+                    unHovered.render(posX, posY)
                     HighlightOnHoverSlot.currentSlots.remove(pair)
                     false
                 }
@@ -404,12 +405,12 @@ interface Renderable {
 
             override fun render(posX: Int, posY: Int) {
                 val (x, y) = topLayer.renderXYAligned(posX, posY, width, height)
-                val (posX, posY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
+                val (nPosX, nPosY) = if (topLayer.isHovered(posX + x, posY + y) && blockBottomHover) {
                     bottomLayer.width + 1 to bottomLayer.height + 1
                 } else {
                     posX to posY
                 }
-                bottomLayer.render(posX, posY)
+                bottomLayer.render(nPosX, nPosY)
             }
         }
 

@@ -290,6 +290,7 @@ object ChatFilter {
         "§e[NPC] Jacob§f: §rMy contest has started!",
         "§eObtain a §r§6Booster Cookie §r§efrom the community shop in the hub!",
         "Unknown command. Type \"/help\" for help. ('uhfdsolguhkjdjfhgkjhdfdlgkjhldkjhlkjhsldkjfhldshkjf')",
+        "§3[SBE] §a§cUnable to download bin data. This may result in certain features not working!",
     )
 
     private val skymallMessages = listOf(
