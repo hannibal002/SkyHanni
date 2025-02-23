@@ -512,7 +512,7 @@ object HoppityEventSummary {
     }
 
     private fun buildStatYearSwitcher(text: String, year: Int) =
-        Renderable.optionalLink(text, onClick = { statYear = year })
+        Renderable.optionalLink(text, onLeftClick = { statYear = year })
     private fun String.toLeftButtonString() = "§d[ §r§f§l<- §r§7$this §r§d]".partyModeReplace()
     private fun String.toRightButtonString() = "§d[ §7$this §r§f§l-> §r§d]".partyModeReplace()
 
