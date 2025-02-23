@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.psi.KtProperty
 import org.jetbrains.kotlin.psi.psiUtil.isPrivate
 
-class StorageNeedsExpose(config: Config): SkyHanniRule(config) {
+class StorageNeedsExpose(config: Config) : SkyHanniRule(config) {
     override val issue = Issue(
         "StorageNeedsExpose",
         Severity.Defect,
