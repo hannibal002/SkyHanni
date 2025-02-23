@@ -9,8 +9,10 @@ import at.hannibal2.skyhanni.features.skillprogress.SkillType
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.utils.CollectionUtils.addOrPut
 import at.hannibal2.skyhanni.utils.CollectionUtils.sumAllValues
+import at.hannibal2.skyhanni.utils.EntityUtils
 import at.hannibal2.skyhanni.utils.InventoryUtils
 import at.hannibal2.skyhanni.utils.ItemUtils.getInternalNameOrNull
+import at.hannibal2.skyhanni.utils.LocationUtils.distanceToPlayer
 import at.hannibal2.skyhanni.utils.RegexUtils.matches
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getEnchantments
 import at.hannibal2.skyhanni.utils.SkyBlockItemModifierUtils.getReforgeName
@@ -21,49 +23,52 @@ sealed class UserLuckType {
     abstract val luck: Float
     abstract val prettyName: String
 
-    object Limbo : UserLuckType() {
+    class Limbo : UserLuckType() {
         override val luck get() = ProfileStorageData.playerSpecific?.limbo?.userLuck ?: 0f
         override val prettyName = "Limbo"
     }
 
-    @SkyHanniModule
-    object Skills : UserLuckType() {
+    class Skills : UserLuckType() {
         override val luck get() = _skillMap.sumAllValues().toFloat()
         override val prettyName = "Skills"
 
         private var _skillMap: Map<SkillType, Float> = emptyMap()
-        val skillMap: Map<SkillType, Float>
+        var skillMap: Map<SkillType, Float>
             get() = _skillMap.takeIf { it.isNotEmpty() } ?: calcSkillMap()
+            set(value) { _skillMap = value }
 
-        private fun calcSkillMap(): Map<SkillType, Float> {
-            val storage = SkillApi.storage ?: return SkillType.entries.associate { it to 0f }
-            val map = mutableMapOf<SkillType, Float>()
-            for ((skillType, skillInfo) in storage) {
-                val level = skillInfo.level
-                val overflow = skillInfo.overflowLevel
-                val luck = luckFromOverflowLevel(level, overflow)
-                map.addOrPut(skillType, luck.toFloat())
+        @SkyHanniModule
+        companion object {
+            private fun calcSkillMap(): Map<SkillType, Float> {
+                val storage = SkillApi.storage ?: return SkillType.entries.associate { it to 0f }
+                val map = mutableMapOf<SkillType, Float>()
+                for ((skillType, skillInfo) in storage) {
+                    val level = skillInfo.level
+                    val overflow = skillInfo.overflowLevel
+                    val luck = luckFromOverflowLevel(level, overflow)
+                    map.addOrPut(skillType, luck.toFloat())
+                }
+                Skills()._skillMap = map
+                return map
             }
-            _skillMap = map
-            return map
+
+            @HandleEvent
+            fun onLevelUp(event: SkillOverflowLevelUpEvent) {
+                val map = calcSkillMap().toMutableMap()
+                val skillLuck = luckFromOverflowLevel(event.skill.maxLevel, event.newLevel).toFloat()
+
+                map.put(event.skill, skillLuck)
+                Skills()._skillMap = map.toMap()
+            }
+
+            private fun luckFromOverflowLevel(maxLevel: Int, currentOverflowLevel: Int) = ((currentOverflowLevel - maxLevel) / 5) * 50
         }
-
-        @HandleEvent
-        fun onLevelUp(event: SkillOverflowLevelUpEvent) {
-            val map = calcSkillMap().toMutableMap()
-            val skillLuck = luckFromOverflowLevel(event.skill.maxLevel, event.newLevel).toFloat()
-
-            map.put(event.skill, skillLuck)
-            _skillMap = map.toMap()
-        }
-
-        private fun luckFromOverflowLevel(maxLevel: Int, currentOverflowLevel: Int) = ((currentOverflowLevel - maxLevel) / 5) * 50
     }
 
     companion object {
-        val entries = listOf(Limbo, Skills)
+        val entries = listOf<UserLuckType>(Limbo(), Skills())
 
-        fun getTotalLuck(): Float = entries.sumOf { it.luck.toDouble() }.toFloat()
+        val totalLuck get() = entries.sumOf { it.luck.toDouble() }.toFloat()
     }
 }
 
@@ -82,13 +87,14 @@ enum class UserLuckMultiplier(val condition: (() -> Float), val isMultiplicative
 //         { /* isLegendary && pet level * 0.001 */ 0f}
 //     ),
     LEGION_ENCHANTMENT(
-        { getTotalEnchantmentLevel("Legion") * 0.0007f },
+        { getTotalEnchantmentLevel("ultimate_legion") * 0.0007f * EntityUtils.getPlayerEntities().filter { it.distanceToPlayer() < 30 }.size.coerceIn(0..20) },
     ),
     RENOWNED_REFORGE(
-        { getTotalReforgeLevel("renowned") * 0.001f },
+        { getTotalReforgeLevel("renowned") * 0.01f },
     ),
     ;
 
+    @SkyHanniModule
     companion object {
         fun totalLuckAfterBonus(luck: Float): Float {
             var totalLuck = luck
@@ -105,7 +111,7 @@ enum class UserLuckMultiplier(val condition: (() -> Float), val isMultiplicative
 
         private val superiorDragonArmorNames by RepoPattern.pattern(
             "misc.userluck.armor.superior",
-            "(?:BRONZE|SILVER|GOLD|DIAMOND)_HUNTER_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
+            "SUPERIOR_DRAGON_(?:HELMET|CHESTPLATE|LEGGINGS|BOOTS)",
         )
 
         private fun isWearingArmor(armorPattern: Pattern): Boolean =
