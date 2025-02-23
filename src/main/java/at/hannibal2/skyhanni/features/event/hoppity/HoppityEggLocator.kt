@@ -105,7 +105,10 @@ object HoppityEggLocator {
 
     private fun SkyHanniRenderWorldEvent.drawGuessLocations() {
         for ((index, eggLocation) in possibleEggLocations.withIndex()) {
-            drawEggWaypoint(eggLocation, "§aGuess #${index + 1}")
+            val name = if (possibleEggLocations.size == 1) {
+                "§aGuess"
+            } else "§aGuess #${index + 1}"
+            drawEggWaypoint(eggLocation, name)
             if (waypointsConfig.showLine) {
                 drawLineToEye(eggLocation.blockCenter(), LorenzColor.GREEN.toColor(), 2, false)
             }
