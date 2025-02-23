@@ -455,7 +455,7 @@ object FarmingWeightDisplay {
         val atRank = if (isEtaEnabled() && goalRank != 10001) "&atRank=$goalRank" else ""
 
         val url = "https://api.elitebot.dev/leaderboard/rank/farmingweight/$uuid/$profileId$includeUpcoming$atRank"
-        val apiResponse = ApiUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Leaderboard")
 
         try {
             val apiData = toEliteLeaderboardJson(apiResponse).data
@@ -485,7 +485,7 @@ object FarmingWeightDisplay {
     private fun loadWeight(localProfile: String) {
         val uuid = LorenzUtils.getPlayerUuid()
         val url = "https://api.elitebot.dev/weight/$uuid"
-        val apiResponse = ApiUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elite Farming Weight")
 
         var error: Throwable? = null
 
@@ -581,7 +581,7 @@ object FarmingWeightDisplay {
         if (attemptingCropWeightFetch || hasFetchedCropWeights) return
         attemptingCropWeightFetch = true
         val url = "https://api.elitebot.dev/weights/all"
-        val apiResponse = ApiUtils.getJSONResponse(url)
+        val apiResponse = ApiUtils.getJSONResponse(url, apiName = "Elitebot Farming Weight")
 
         try {
             val apiData = eliteWeightApiGson.fromJson<EliteWeightsJson>(apiResponse)

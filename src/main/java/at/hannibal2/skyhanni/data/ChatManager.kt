@@ -185,6 +185,8 @@ object ChatManager {
         }
     }
 
+    // TODO: Add another predicate to stop searching after a certain amount of lines have been searched
+    //  or if the lines were sent too long ago. Same thing for the deleteChatLine function.
     fun MutableList<ChatLine>.editChatLine(
         component: (IChatComponent) -> IChatComponent,
         predicate: (ChatLine) -> Boolean,

@@ -12,11 +12,12 @@ import at.hannibal2.skyhanni.utils.SimpleTimeMark.Companion.asTimeMark
 import at.hannibal2.skyhanni.utils.SkyBlockTime
 import java.util.regex.Matcher
 import kotlin.time.Duration
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.minutes
 
 enum class HoppityEggType(
     val mealName: String,
-    private val mealColor: String,
+    val mealColor: String,
     val resetsAt: Int,
     var lastResetDay: Int = -1,
     private var claimed: Boolean = false,
@@ -73,7 +74,7 @@ enum class HoppityEggType(
     fun hasRemainingSpawns(): Boolean {
         val hoppityEndMark = HoppityApi.getEventEndMark() ?: return false
         // If it's before the last two days of the event, we can assume there are more spawns
-        if (hoppityEndMark.toMillis() > SkyBlockTime.SKYBLOCK_DAY_MILLIS * 2) return true
+        if (hoppityEndMark.timeUntil() > SkyBlockTime.SKYBLOCK_DAY_MILLIS.milliseconds * 2) return true
         // Otherwise we have to check if the next spawn is after the end of the event
         return timeUntil() < hoppityEndMark.timeUntil()
     }
@@ -92,7 +93,7 @@ enum class HoppityEggType(
         fun onProfileJoin(event: ProfileJoinEvent) {
             mealLastFound.forEach { (meal, mark) ->
                 if (mark.passedSince() < 40.minutes) meal.markClaimed(mark)
-                else meal.markSpawned()
+                else if (meal.hasRemainingSpawns() && !meal.hasNotFirstSpawnedYet()) meal.markSpawned()
             }
         }
 
@@ -119,6 +120,7 @@ enum class HoppityEggType(
 
             for (eggType in resettingEntries.filter { it.altDay == isAltDay }) {
                 if (currentSBHour < eggType.resetsAt || eggType.lastResetDay == currentSBDay) continue
+                if (!eggType.hasRemainingSpawns() || eggType.hasNotFirstSpawnedYet()) continue
                 eggType.markSpawned()
                 eggType.lastResetDay = currentSBDay
                 if (HoppityEggLocator.currentEggType == eggType) {

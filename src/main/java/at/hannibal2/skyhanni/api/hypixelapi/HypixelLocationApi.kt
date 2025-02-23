@@ -149,45 +149,28 @@ object HypixelLocationApi {
         internalIsland = IslandType.NONE
     }
 
-    fun checkHypixel(hypixel: Boolean) {
+    fun checkEquals() {
         runNextSecond {
-            if (hypixel == inHypixel) return@runNextSecond
-            sendError("Hypixel")
+            val isHypixelEqual = (HypixelData.hypixelLive || HypixelData.hypixelAlpha) == inHypixel
+            val isSkyblockEqual = HypixelData.skyBlock == inSkyblock
+            val otherIsland = HypixelData.skyBlockIsland
+            val isIslandEqual = otherIsland == island || otherIsland == IslandType.NONE || island == IslandType.NONE
+            val isServerIdEqual = !inSkyblock || HypixelData.serverId == serverId || serverId == "limbo"
+            if (isHypixelEqual && isSkyblockEqual && isIslandEqual && isServerIdEqual) return@runNextSecond
+            sendError()
         }
     }
 
     private fun runNextSecond(run: () -> Unit) = DelayedRun.runDelayed(1.seconds, run)
 
-    fun checkSkyblock(skyblock: Boolean) {
-        runNextSecond {
-            if (skyblock == inSkyblock) return@runNextSecond
-            sendError("SkyBlock")
-        }
-    }
-
-    fun checkIsland(otherIsland: IslandType) {
-        if (otherIsland == IslandType.NONE) return
-        runNextSecond {
-            if (otherIsland == island) return@runNextSecond
-            sendError("Island")
-        }
-    }
-
-    fun checkServerId(otherId: String?) {
-        runNextSecond {
-            if (serverId == otherId) return@runNextSecond
-            sendError("ServerId")
-        }
-    }
-
-    private fun sendError(message: String) {
+    private fun sendError() {
         if (!config) return
         val data = debugData
         logger.log("ERROR: ${data.joinToString(transform = ::dataToString)}")
         @Suppress("SpreadOperator")
         ErrorManager.logErrorStateWithData(
-            "$message check comparison with HypixelModAPI failed. Please report in discord.",
-            "$message comparison failed",
+            "HypixelData check comparison with HypixelModAPI failed. Please report in discord.",
+            "HypixelData comparison failed",
             *data,
             betaOnly = true,
             noStackTrace = true,
