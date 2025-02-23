@@ -43,14 +43,6 @@ object BazaarCancelledBuyOrderClipboard {
         "Order options",
     )
 
-    /**
-     * REGEX-TEST: §a§lBUY §5Giant Killer VII
-     */
-    private val lastItemClickedPattern by patternGroup.pattern(
-        "lastitemclicked",
-        "§a§lBUY (?<name>.*)",
-    )
-
     private var latestAmount: Int? = null
 
     @HandleEvent
