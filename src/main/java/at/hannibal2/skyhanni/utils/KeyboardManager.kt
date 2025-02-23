@@ -112,7 +112,8 @@ object KeyboardManager {
             if (keyCode.isKeyHeld()) return true
         } catch (e: IndexOutOfBoundsException) {
             ErrorManager.logErrorWithData(
-                e, "Error while checking if a key is pressed.",
+                e,
+                "Error while checking if a key is pressed.",
                 "keyCode" to keyCode,
             )
             return false

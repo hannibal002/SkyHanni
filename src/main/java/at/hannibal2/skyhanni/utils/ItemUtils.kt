@@ -257,7 +257,8 @@ object ItemUtils {
 
     }
 
-    fun NBTTagCompound.getSkullTexture(): String = getCompoundTag("Properties").getCompoundList("textures")[0].getString("Value")
+    fun NBTTagCompound.getSkullTexture(): String? =
+        getCompoundTag("Properties").getCompoundList("textures").firstOrNull()?.getString("Value")
 
     fun ItemStack.getSkullOwner(): String? {
         if (item != Items.skull) return null

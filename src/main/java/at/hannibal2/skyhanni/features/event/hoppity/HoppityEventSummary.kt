@@ -81,12 +81,13 @@ object HoppityEventSummary {
 
     /**
      * REGEX-TEST: Hoppity's Collection
+     * REGEX-TEST: (1/2) Hoppity's Collection
      * REGEX-TEST: Chocolate Factory Milestones
      * REGEX-TEST: Chocolate Shop Milestones
      */
     private val miscCfInventoryPatterns by ChocolateFactoryApi.patternGroup.pattern(
         "cf.inventory",
-        "Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
+        "(?:\\(\\d*\\/\\d*\\) )?Hoppity's Collection|Chocolate (?:Factory|Shop) Milestones|Rabbit Hitman",
     )
 
     private const val LINE_HEADER = "    "

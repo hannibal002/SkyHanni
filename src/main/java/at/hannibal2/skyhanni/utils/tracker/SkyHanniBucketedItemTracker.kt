@@ -17,8 +17,8 @@ class SkyHanniBucketedItemTracker<E : Enum<E>, BucketedData : BucketedItemTracke
     createNewSession: () -> BucketedData,
     getStorage: (ProfileSpecificStorage) -> BucketedData,
     drawDisplay: (BucketedData) -> List<Searchable>,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> BucketedData>,
-) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> BucketedData> = emptyMap(),
+) : SkyHanniItemTracker<BucketedData>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     @Deprecated("Use addCoins(bucket, coins) instead", ReplaceWith("addCoins(bucket, coins)"))
     override fun addCoins(amount: Int, command: Boolean) =
