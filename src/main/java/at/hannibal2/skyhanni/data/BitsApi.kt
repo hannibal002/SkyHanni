@@ -215,12 +215,12 @@ object BitsApi {
         }
     }
 
-    private fun updateBits(amount: Int) {
+    private fun updateBits(amount: Int, modifyAvailable: Boolean = true) {
         val diff = amount - bits
         if (diff == 0) return
 
         if (diff > 0) {
-            bitsAvailable -= diff
+            if (modifyAvailable) bitsAvailable -= diff
             bits = amount
             sendBitsGainEvent(diff)
         } else {
@@ -327,13 +327,13 @@ object BitsApi {
     private fun processFameRankStacks(stacks: Collection<ItemStack>) {
         val stack = stacks.firstOrNull { fameRankGuiStackPattern.matches(it.displayName) } ?: return
         fun fameRankOrNull(rank: String) {
-            currentFameRank = getFameRankByNameOrNull(rank) ?: run {
+            fameRank = FameRanks.getByName(rank) ?: run {
                 ErrorManager.logErrorWithData(
                     FameRankNotFoundException(rank),
                     "FameRank $rank not found",
                     "Rank" to rank,
                     "Lore" to stack.getLore(),
-                    "FameRanks" to FameRanks.fameRanks,
+                    "FameRanks" to FameRanks.fameRanksMap,
                 )
                 return
             }
