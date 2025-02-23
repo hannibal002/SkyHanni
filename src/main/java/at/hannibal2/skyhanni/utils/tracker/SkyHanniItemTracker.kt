@@ -22,15 +22,16 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+) : SkyHanniTracker<Data>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     companion object {
         private val config get() = SkyHanniMod.feature.misc.tracker
@@ -140,9 +141,10 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             val lore: List<String> = buildLore(loreText, hidden, newDrop, internalName)
 
             // TODO add row abstraction to api, with common click+hover behaviour
-            fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickAndHover(
-                string, lore,
-                onClick = {
+            fun string(string: String): Renderable = if (isInventoryOpen()) Renderable.clickable(
+                string,
+                tips = lore,
+                onLeftClick = {
                     if (KeyboardManager.isModifierKeyDown()) itemRemover.invoke(internalName, cleanName)
                     else itemHider.invoke(internalName, hidden)
                     update()
@@ -168,15 +170,16 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
+        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
         Renderable.searchableScrollable(
             table,
             key = 99,
-            lines = config.itemsShown.get(),
+            lines = min(items.size, config.itemsShown.get()),
             velocity = 5.0,
             textInput = textInput,
             scrollValue = scrollValue,
             asTable = config.showTable.get(),
-            showScrollableTipsInList = true,
+            showScrollableTipsInList = isInventoryOpen(),
         )?.let {
             lists.add(it.toSearchable())
         }
