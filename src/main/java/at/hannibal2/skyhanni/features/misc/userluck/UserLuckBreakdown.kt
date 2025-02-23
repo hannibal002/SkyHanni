@@ -1,4 +1,4 @@
-package at.hannibal2.skyhanni.features.misc
+package at.hannibal2.skyhanni.features.misc.userluck
 
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
@@ -31,8 +31,8 @@ import kotlin.time.Duration.Companion.seconds
 object UserLuckBreakdown {
     private var inMiscStats = false
     private var replaceSlot: Int? = null
-    private var itemCreateCoolDown = SimpleTimeMark.farPast()
-    private var skillCalcCoolDown = SimpleTimeMark.farPast()
+    private var itemCreateCoolDown = SimpleTimeMark.Companion.farPast()
+    private var skillCalcCoolDown = SimpleTimeMark.Companion.farPast()
 
     private val storage get() = ProfileStorageData.playerSpecific
     private val config get() = SkyHanniMod.feature.misc
@@ -63,7 +63,7 @@ object UserLuckBreakdown {
      * REGEX-TEST: §7Show all stats: §aYes
      * REGEX-TEST: §7Show all stats: §cNope
      */
-    private val showAllStatsPattern by RepoPattern.pattern(
+    private val showAllStatsPattern by RepoPattern.Companion.pattern(
         "misc.statsbreakdown.showallstats",
         "§7Show all stats: §.(?<toggle>.*)",
     )
@@ -86,7 +86,7 @@ object UserLuckBreakdown {
             val limboUserLuck = storage?.limbo?.userLuck ?: 0.0f
             if (limboUserLuck == 0.0f && !showAllStats) return
             if (itemCreateCoolDown.passedSince() > 3.seconds) {
-                itemCreateCoolDown = SimpleTimeMark.now()
+                itemCreateCoolDown = SimpleTimeMark.Companion.now()
                 createItems()
             }
             event.replace(mainLuckItem)
@@ -94,7 +94,7 @@ object UserLuckBreakdown {
         }
         if (inCustomBreakdown) {
             if (itemCreateCoolDown.passedSince() > 3.seconds) {
-                itemCreateCoolDown = SimpleTimeMark.now()
+                itemCreateCoolDown = SimpleTimeMark.Companion.now()
                 createItems()
             }
             checkItemSlot(event)
@@ -162,7 +162,7 @@ object UserLuckBreakdown {
     fun onTooltip(event: ToolTipEvent) {
         if (!config.userluckEnabled) return
         if (skillCalcCoolDown.passedSince() > 3.seconds) {
-            skillCalcCoolDown = SimpleTimeMark.now()
+            skillCalcCoolDown = SimpleTimeMark.Companion.now()
             calcSkillLuck()
         }
         val limboLuck = storage?.limbo?.userLuck?.roundTo(1) ?: 0.0f
