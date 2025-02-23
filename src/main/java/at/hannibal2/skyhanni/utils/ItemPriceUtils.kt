@@ -19,7 +19,6 @@ import at.hannibal2.skyhanni.utils.NumberUtil.shortFormat
 import at.hannibal2.skyhanni.utils.system.PlatformUtils
 import com.google.gson.JsonObject
 import io.github.moulberry.notenoughupdates.NotEnoughUpdates
-import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.minutes
 
 @SkyHanniModule
@@ -166,16 +165,21 @@ object ItemPriceUtils {
     @HandleEvent
     fun onSecondPassed(event: SecondPassedEvent) {
         if (PlatformUtils.isNeuLoaded()) return
+        if (ApiUtils.isMoulberryLowestBinDisabled()) return
         if (lastLowestBinRefresh.passedSince() < 2.minutes) return
         lastLowestBinRefresh = SimpleTimeMark.now()
 
-        SkyHanniMod.coroutineScope.launch {
+        SkyHanniMod.launchIOCoroutine {
             refreshLowestBins()
         }
     }
 
     private fun refreshLowestBins() {
-        lowestBins = ApiUtils.getJSONResponse("https://moulberry.codes/lowestbin.json.gz", gunzip = true)
+        lowestBins = ApiUtils.getJSONResponse(
+            "https://moulberry.codes/lowestbin.json.gz",
+            apiName = "NEU Lowest Bin",
+            gunzip = true,
+        )
     }
 
     fun NeuInternalName.getPriceName(amount: Number, pricePer: Double = getPrice()): String {

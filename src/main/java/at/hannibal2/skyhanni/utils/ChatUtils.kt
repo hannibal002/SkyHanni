@@ -4,6 +4,7 @@ import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.data.ChatManager.deleteChatLine
 import at.hannibal2.skyhanni.data.ChatManager.editChatLine
 import at.hannibal2.skyhanni.events.MessageSendToServerEvent
+import at.hannibal2.skyhanni.events.chat.SkyHanniChatEvent
 import at.hannibal2.skyhanni.events.minecraft.SkyHanniTickEvent
 import at.hannibal2.skyhanni.mixins.transformers.AccessorMixinGuiNewChat
 import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
@@ -89,12 +90,13 @@ object ChatUtils {
         prefixColor: String = "§e",
         replaceSameMessage: Boolean = false,
         onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ) {
 
         if (prefix) {
-            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce)
+            internalChat(prefixColor + CHAT_PREFIX + message, replaceSameMessage, onlySendOnce, messageId = messageId)
         } else {
-            internalChat(message, replaceSameMessage, onlySendOnce)
+            internalChat(message, replaceSameMessage, onlySendOnce, messageId = messageId)
         }
     }
 
@@ -104,6 +106,7 @@ object ChatUtils {
         message: String,
         replaceSameMessage: Boolean,
         onlySendOnce: Boolean = false,
+        messageId: Int? = null,
     ): Boolean {
         val text = ChatComponentText(message)
         if (onlySendOnce) {
@@ -113,8 +116,8 @@ object ChatUtils {
             messagesThatAreOnlySentOnce.add(message)
         }
 
-        return if (replaceSameMessage) {
-            text.send(getUniqueMessageIdForString(message))
+        return if (replaceSameMessage || messageId != null) {
+            text.send(messageId ?: getUniqueMessageIdForString(message))
             chat(text, false)
         } else {
             chat(text)
@@ -281,7 +284,7 @@ object ChatUtils {
     fun editFirstMessage(
         component: (IChatComponent) -> IChatComponent,
         reason: String,
-        predicate: (ChatLine) -> Boolean
+        predicate: (ChatLine) -> Boolean,
     ) {
         chatLines.editChatLine(component, predicate, reason)
         chatGui.refreshChat()
@@ -293,10 +296,29 @@ object ChatUtils {
     fun deleteMessage(
         reason: String,
         amount: Int = 1,
-        predicate: (ChatLine) -> Boolean
+        predicate: (ChatLine) -> Boolean,
     ) {
         chatLines.deleteChatLine(amount, reason, predicate)
         chatGui.refreshChat()
+    }
+
+    private var deleteNext: Pair<String, (String) -> Boolean>? = null
+
+    @HandleEvent(priority = HandleEvent.HIGH)
+    fun onChat(event: SkyHanniChatEvent) {
+        val (reason, predicate) = deleteNext ?: return
+        this.deleteNext = null
+
+        if (predicate(event.message)) {
+            event.blockedReason = reason
+        }
+    }
+
+    fun deleteNextMessage(
+        reason: String,
+        predicate: (String) -> Boolean,
+    ) {
+        deleteNext = reason to predicate
     }
 
     private var lastMessageSent = SimpleTimeMark.farPast()
@@ -320,8 +342,17 @@ object ChatUtils {
     }
 
     fun sendMessageToServer(message: String) {
+        if (canSendInstantly()) {
+            Minecraft.getMinecraft().thePlayer?.let {
+                it.sendChatMessage(message)
+                lastMessageSent = SimpleTimeMark.now()
+                return
+            }
+        }
         sendQueue.add(message)
     }
+
+    private fun canSendInstantly() = sendQueue.isEmpty() && lastMessageSent.passedSince() > messageDelay
 
     fun MessageSendToServerEvent.isCommand(commandWithSlash: String) = splitMessage.takeIf {
         it.isNotEmpty()

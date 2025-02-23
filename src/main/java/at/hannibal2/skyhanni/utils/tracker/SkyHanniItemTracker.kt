@@ -22,15 +22,16 @@ import at.hannibal2.skyhanni.utils.renderables.Renderable
 import at.hannibal2.skyhanni.utils.renderables.ScrollValue
 import at.hannibal2.skyhanni.utils.renderables.Searchable
 import at.hannibal2.skyhanni.utils.renderables.toSearchable
+import kotlin.math.min
 import kotlin.time.Duration.Companion.seconds
 
 open class SkyHanniItemTracker<Data : ItemTrackerData>(
     name: String,
     createNewSession: () -> Data,
     getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     drawDisplay: (Data) -> List<Searchable>,
-) : SkyHanniTracker<Data>(name, createNewSession, getStorage, *extraStorage, drawDisplay = drawDisplay) {
+) : SkyHanniTracker<Data>(name, createNewSession, getStorage, extraDisplayModes, drawDisplay = drawDisplay) {
 
     companion object {
         private val config get() = SkyHanniMod.feature.misc.tracker
@@ -168,18 +169,20 @@ open class SkyHanniItemTracker<Data : ItemTrackerData>(
             table[line] = cleanName
         }
 
-        lists.add(
-            Renderable.searchableScrollable(
-                table,
-                key = 99,
-                lines = config.itemsShown.get(),
-                velocity = 5.0,
-                textInput = textInput,
-                scrollValue = scrollValue,
-                asTable = config.showTable.get(),
-                showScrollableTipsInList = true,
-            ).toSearchable(),
-        )
+        val scrollValue = (data as? BucketedItemTrackerData<*>)?.selectedScrollValue ?: scrollValue
+        Renderable.searchableScrollable(
+            table,
+            key = 99,
+            lines = min(items.size, config.itemsShown.get()),
+            velocity = 5.0,
+            textInput = textInput,
+            scrollValue = scrollValue,
+            asTable = config.showTable.get(),
+            showScrollableTipsInList = isInventoryOpen(),
+        )?.let {
+            lists.add(it.toSearchable())
+        }
+
 
         return profit
     }

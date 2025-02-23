@@ -215,7 +215,6 @@ object ChatManager {
         }
     }
 
-    // TODO FOR hannibal, very important before full version 2.0.0: use this function for sack message hide empty lines
     fun MutableList<ChatLine>.deleteChatLine(
         amount: Int,
         reason: String? = null,

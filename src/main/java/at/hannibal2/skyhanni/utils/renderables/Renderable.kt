@@ -1220,29 +1220,32 @@ interface Renderable {
             scrollValue: ScrollValue,
             showScrollableTipsInList: Boolean = true,
             asTable: Boolean = true,
-        ) = if (asTable) {
-            val height = RenderableUtils.calculateTableY(table.keys, 0).maxOf { it.value }
-            searchableScrollTable(
-                table,
-                key = key,
-                height = lines * height,
-                textInput = textInput,
-                velocity = velocity,
-                scrollValue = scrollValue,
-                showScrollableTipsInList = showScrollableTipsInList,
-            )
-        } else {
-            val content = table.mapKeys { horizontalContainer(it.key) }
-            val height = content.maxOf { it.key.height }
-            searchableScrollList(
-                content,
-                key = key,
-                height = lines * height,
-                textInput = textInput,
-                velocity = velocity,
-                scrollValue = scrollValue,
-                showScrollableTipsInList = showScrollableTipsInList,
-            )
+        ): Renderable? {
+            if (table.isEmpty()) return null
+            return if (asTable) {
+                val height = RenderableUtils.calculateTableY(table.keys, 0).maxOf { it.value }
+                searchableScrollTable(
+                    table,
+                    key = key,
+                    height = lines * height,
+                    textInput = textInput,
+                    velocity = velocity,
+                    scrollValue = scrollValue,
+                    showScrollableTipsInList = showScrollableTipsInList,
+                )
+            } else {
+                val content = table.mapKeys { horizontalContainer(it.key) }
+                val height = content.maxOf { it.key.height }
+                searchableScrollList(
+                    content,
+                    key = key,
+                    height = lines * height,
+                    textInput = textInput,
+                    velocity = velocity,
+                    scrollValue = scrollValue,
+                    showScrollableTipsInList = showScrollableTipsInList,
+                )
+            }
         }
 
         fun searchableScrollTable(
