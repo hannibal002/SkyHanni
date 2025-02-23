@@ -534,7 +534,7 @@ object ItemUtils {
         }
 
     fun ItemStack.getAttributeFromShard(): Pair<String, Int>? {
-        if (getInternalName().asString() != "ATTRIBUTE_SHARD") return null
+        if (!(getInternalName().asString().startsWith("ATTRIBUTE_SHARD"))) return null
         val attributes = getAttributes() ?: return null
         return attributes.firstOrNull()
     }
