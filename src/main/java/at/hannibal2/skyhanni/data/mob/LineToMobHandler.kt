@@ -39,7 +39,7 @@ object LineToMobHandler {
         val playerLocation = event.exactPlayerEyeLocation()
         RenderUtils.LineDrawer.draw3D(event.partialTicks) {
             for ((mob, settings) in lines) {
-                if (!mob.canBeSeen()) continue
+                if (!settings.condition() || !mob.canBeSeen()) continue
                 draw3DLine(mob.centerCords, playerLocation, settings.color, settings.width, settings.depth)
             }
         }

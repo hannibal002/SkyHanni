@@ -53,7 +53,7 @@ object UserLuckBreakdown {
     private val skillsID = Items.diamond_sword
     private const val SKILLS_NAME = "§a✴ Category: Skills"
 
-    private lateinit var jerryItem: ItemStack
+    private var jerryItem: ItemStack? = null
     private val jerryID = Items.paper
     private const val JERRY_NAME = "§a✴ Statspocalypse"
 
@@ -107,7 +107,7 @@ object UserLuckBreakdown {
 
             10 -> event.replace(skillsItem)
             11 -> event.replace(limboItem)
-            12 -> event.replace(jerryItem)
+            12 -> jerryItem?.let { event.replace(it) }
 
             in validItemSlots -> event.remove()
 

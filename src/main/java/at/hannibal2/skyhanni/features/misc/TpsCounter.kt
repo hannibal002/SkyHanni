@@ -15,6 +15,7 @@ import at.hannibal2.skyhanni.skyhannimodule.SkyHanniModule
 import at.hannibal2.skyhanni.test.command.ErrorManager
 import at.hannibal2.skyhanni.utils.ChatUtils
 import at.hannibal2.skyhanni.utils.LorenzUtils
+import at.hannibal2.skyhanni.utils.NumberUtil.roundTo
 import at.hannibal2.skyhanni.utils.RenderUtils.renderString
 import kotlin.time.Duration.Companion.seconds
 
@@ -69,7 +70,7 @@ object TpsCounter {
             if (tpsList.isEmpty()) {
                 "§70 (Limbo?)"
             } else {
-                val newTps = tpsList.average().coerceIn(0.0..20.0)
+                val newTps = tpsList.average().roundTo(1).coerceIn(0.0..20.0)
                 tps = newTps
                 val legacyColor = format(newTps)
                 "$legacyColor$newTps"

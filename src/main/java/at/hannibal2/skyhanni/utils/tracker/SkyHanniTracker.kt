@@ -30,16 +30,14 @@ import net.minecraft.client.gui.inventory.GuiChest
 import net.minecraft.client.gui.inventory.GuiInventory
 import kotlin.time.Duration.Companion.seconds
 
-@Suppress("TooManyFunctions")
 open class SkyHanniTracker<Data : TrackerData>(
     val name: String,
     private val createNewSession: () -> Data,
     private val getStorage: (ProfileSpecificStorage) -> Data,
-    vararg extraStorage: Pair<DisplayMode, (ProfileSpecificStorage) -> Data>,
+    private val extraDisplayModes: Map<DisplayMode, (ProfileSpecificStorage) -> Data> = emptyMap(),
     private val drawDisplay: (Data) -> List<Searchable>,
 ) {
 
-    private val extraDisplayModes = extraStorage.toMap()
     private var inventoryOpen = false
     private var displayMode: DisplayMode? = null
     private val currentSessions = mutableMapOf<ProfileSpecificStorage, Data>()
@@ -47,11 +45,11 @@ open class SkyHanniTracker<Data : TrackerData>(
     private var sessionResetTime = SimpleTimeMark.farPast()
     private var wasSearchEnabled = config.trackerSearchEnabled.get()
     private var dirty = false
-    private val textInput = SearchTextInput()
+    val textInput = SearchTextInput()
 
     companion object {
 
-        val config get() = SkyHanniMod.feature.misc.tracker
+        private val config get() = SkyHanniMod.feature.misc.tracker
         private val storedTrackers get() = SkyHanniMod.feature.storage.trackerDisplayModes
 
         fun getPricePer(name: NeuInternalName) = name.getPrice(config.priceSource)
@@ -98,6 +96,9 @@ open class SkyHanniTracker<Data : TrackerData>(
         if (config.hideInEstimatedItemValue && EstimatedItemValue.isCurrentlyShowing()) return
 
         var currentlyOpen = Minecraft.getMinecraft().currentScreen?.let { it is GuiInventory || it is GuiChest } ?: false
+        if (!currentlyOpen && config.hideItemTrackersOutsideInventory && this is SkyHanniItemTracker) {
+            return
+        }
         if (RenderData.outsideInventory) {
             currentlyOpen = false
         }
@@ -203,7 +204,6 @@ open class SkyHanniTracker<Data : TrackerData>(
     fun initRenderer(position: () -> Position, inventory: InventoryDetector = RenderDisplayHelper.NO_INVENTORY, condition: () -> Boolean) {
         RenderDisplayHelper(
             inventory,
-            // TODO add back toggle config option
             outsideInventory = true,
             inOwnInventory = true,
             condition = condition,
