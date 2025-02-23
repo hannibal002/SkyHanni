@@ -1,12 +1,15 @@
 package at.hannibal2.skyhanni.config.features.chat
 
 import at.hannibal2.skyhanni.config.FeatureToggle
+import at.hannibal2.skyhanni.config.core.config.Position
+import at.hannibal2.skyhanni.config.features.misc.MiscConfig
 import com.google.gson.annotations.Expose
 import io.github.notenoughupdates.moulconfig.annotations.Accordion
 import io.github.notenoughupdates.moulconfig.annotations.Category
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind
+import io.github.notenoughupdates.moulconfig.annotations.ConfigLink
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption
 import org.lwjgl.input.Keyboard
 
@@ -74,6 +77,19 @@ class ChatConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     var hideFarDeathMessages: Boolean = false
+
+    @Expose
+    @ConfigOption(
+        name = "Current Chat Display",
+        desc = "Displays a GUI element that indicates what chat you are in (e.g. Party, Guild, Coop, All).",
+    )
+    @ConfigEditorBoolean
+    @FeatureToggle
+    var currentChatDisplay: Boolean = true
+
+    @Expose
+    @ConfigLink(owner = ChatConfig::class, field = "currentChatDisplay")
+    var currentChatDisplayPos: Position = Position(3, -21)
 
     // TODO jawbus + thunder
     @Expose

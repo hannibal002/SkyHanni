@@ -337,6 +337,9 @@ object StringUtils {
 
     fun isEmpty(message: String): Boolean = message.removeColor().trimWhiteSpaceAndResets().isEmpty()
 
+    fun <T : Enum<T>> Enum<T>.toFormattedName(): String =
+        name.split("_").joinToString(" ") { it.lowercase().replaceFirstChar(Char::uppercase) }
+
     fun generateRandomId() = UUID.randomUUID().toString()
 
     fun String.insert(pos: Int, chars: CharSequence): String = this.substring(0, pos) + chars + this.substring(pos)
