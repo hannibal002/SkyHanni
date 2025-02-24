@@ -42,7 +42,7 @@ class GuideTab(
 
     private var selectColor = NOT_SELECTED_COLOR
 
-    private val renderable = Renderable.clickAndHover(
+    private val renderable = Renderable.clickable(
         object : Renderable {
             override val width = this@GuideTab.width
             override val height = this@GuideTab.height
@@ -58,8 +58,8 @@ class GuideTab(
                 itemRender.renderXYAligned(posX, posY, width, height)
             }
         },
-        listOf(tip),
-        onClick = {
+        tips = listOf(tip),
+        onLeftClick = {
             click()
             SoundUtils.playClickSound()
         }
