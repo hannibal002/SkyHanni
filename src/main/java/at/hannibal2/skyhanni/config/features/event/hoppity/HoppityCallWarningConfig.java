@@ -22,14 +22,6 @@ public class HoppityCallWarningConfig {
     public boolean enabled = false;
 
     @Expose
-    @ConfigOption(
-        name = "Accept Call Hotkey",
-        desc = "Accept the call from hoppity by pressing this keybind."
-    )
-    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
-    public int acceptHotkey = Keyboard.KEY_NONE;
-
-    @Expose
     @ConfigOption(name = "Warning Sound", desc = "The sound that plays when hoppity calls.\n" +
         "§eYou can use custom sounds, put it in the §bskyhanni/sounds §efolder in your resource pack.\n" +
         "§eThen write §bskyhanni:yourfilename\n" +

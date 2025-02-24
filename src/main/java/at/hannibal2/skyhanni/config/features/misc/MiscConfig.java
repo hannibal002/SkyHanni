@@ -13,10 +13,12 @@ import io.github.notenoughupdates.moulconfig.annotations.Accordion;
 import io.github.notenoughupdates.moulconfig.annotations.Category;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorBoolean;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorDraggableList;
+import io.github.notenoughupdates.moulconfig.annotations.ConfigEditorKeybind;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigLink;
 import io.github.notenoughupdates.moulconfig.annotations.ConfigOption;
 import io.github.notenoughupdates.moulconfig.annotations.SearchTag;
 import io.github.notenoughupdates.moulconfig.observer.Property;
+import org.lwjgl.input.Keyboard;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -401,4 +403,12 @@ public class MiscConfig {
     @ConfigEditorBoolean
     @FeatureToggle
     public boolean warnAboutPcTimeOffset = true;
+
+    @Expose
+    @ConfigOption(
+        name = "Abiphone Hotkey",
+        desc = "Answer incoming abiphone calls with a hotkey."
+    )
+    @ConfigEditorKeybind(defaultKey = Keyboard.KEY_NONE)
+    public int abiphoneAcceptKey = Keyboard.KEY_NONE;
 }
