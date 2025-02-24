@@ -232,9 +232,10 @@ object SlayerRngMeterDisplay {
         display = listOf(makeLink(drawDisplay()))
     }
 
-    private fun makeLink(text: String) = Renderable.clickAndHover(
-        text, listOf("§eClick to open RNG Meter Inventory."),
-        onClick = {
+    private fun makeLink(text: String) = Renderable.clickable(
+        text,
+        tips = listOf("§eClick to open RNG Meter Inventory."),
+        onLeftClick = {
             HypixelCommands.showRng("slayer", SlayerApi.activeSlayer?.rngName)
         },
     )

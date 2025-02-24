@@ -616,7 +616,7 @@ object GardenNextJacobContest {
         val url = "https://api.elitebot.dev/contests/at/now"
         val body = Gson().toJson(formatted)
 
-        val result = ApiUtils.postJSONIsSuccessful(url, body)
+        val result = ApiUtils.postJSONIsSuccessful(url, body, apiName = "Elitebot Farming Contests")
 
         if (result) {
             ChatUtils.chat("Successfully submitted this years upcoming contests, thank you for helping everyone out!")
