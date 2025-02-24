@@ -12,7 +12,6 @@ package at.hannibal2.skyhanni.features.gui.customscoreboard
 import at.hannibal2.skyhanni.SkyHanniMod
 import at.hannibal2.skyhanni.api.event.HandleEvent
 import at.hannibal2.skyhanni.config.enums.OutsideSBFeature
-import at.hannibal2.skyhanni.data.IslandType
 import at.hannibal2.skyhanni.data.ScoreboardData
 import at.hannibal2.skyhanni.events.ConfigLoadEvent
 import at.hannibal2.skyhanni.events.DebugDataCollectEvent
@@ -205,7 +204,7 @@ object CustomScoreboard {
 
     @HandleEvent
     fun onIslandChange(event: IslandChangeEvent) {
-        if (event.newIsland != IslandType.NONE) updateIslandEntries()
+        updateIslandEntries()
     }
 
     private fun updateIslandEntries() {

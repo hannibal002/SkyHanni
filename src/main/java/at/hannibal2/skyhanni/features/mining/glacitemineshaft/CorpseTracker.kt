@@ -34,7 +34,7 @@ import com.google.gson.annotations.Expose
 object CorpseTracker {
     private val config get() = SkyHanniMod.feature.mining.glaciteMineshaft.corpseTracker
 
-    private val tracker = SkyHanniBucketedItemTracker<CorpseType, BucketData>(
+    private val tracker = SkyHanniBucketedItemTracker(
         "Corpse Tracker",
         { BucketData() },
         { it.mining.mineshaft.corpseProfitTracker },
