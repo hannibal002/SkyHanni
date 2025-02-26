@@ -47,7 +47,12 @@ object CommandUtils {
 
     private val itemNamePattern = "[a-zA-Z:_\"';]+([:\\-;]\\d+)?".toPattern()
 
-    fun itemCheck(args: Iterable<String>, context: CommandContextAwareObject): Pair<Int, Any?> {
+    fun itemCheck(
+        args: Iterable<String>,
+        context: CommandContextAwareObject,
+        validItems: (NeuInternalName) -> Boolean = { true },
+        aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases,
+    ): Pair<Int, Any?> {
         // This replacement does not work for iterable interface. Therefore, the suppression.
         @Suppress("ReplaceSizeZeroCheckWithIsEmpty") if (args.count() == 0) {
             context.errorMessage = "No item specified"
@@ -64,22 +69,27 @@ object CommandUtils {
 
         val grabbed = args.takeWhile { itemNamePattern.matches(it) }
 
-        val collected = grabbed.joinToString(" ").replace(removeApostrophe, "")
+        val collected = grabbed.joinToString(" ").replace(removeApostrophe, "").lowercase()
 
         val item: Any? = when (expected) {
             NameSource.INTERNAL_NAME -> collected.replace(internalPattern, "$2").replace(" ", "_").toInternalName()
             NameSource.ITEM_NAME -> NeuInternalName.fromItemNameOrNull(collected.replace(namePattern, "$2").replace("_", " "))
             NameSource.GROUP -> ItemGroup.findGroup(collected.replace(groupPattern, "$2"))
             null -> {
-                val fromItemName = NeuInternalName.fromItemNameOrNull(collected.replace("_", " "))
-                if (fromItemName?.getItemStackOrNull() != null) {
-                    fromItemName
+                val alias = aliases[collected.replace("_", " ")]?.takeIf { validItems(it) }
+                if (alias != null) {
+                    alias
                 } else {
-                    val internalName = collected.replace(" ", "_").toInternalName()
-                    if (internalName.getItemStackOrNull() != null) {
-                        internalName
+                    val fromItemName = NeuInternalName.fromItemNameOrNull(collected.replace("_", " "))?.takeIf { validItems(it) }
+                    if (fromItemName?.getItemStackOrNull() != null) {
+                        fromItemName
                     } else {
-                        ItemGroup.findGroup(collected)
+                        val internalName = collected.replace(" ", "_").toInternalName().takeIf { validItems(it) }
+                        if (internalName?.getItemStackOrNull() != null) {
+                            internalName
+                        } else {
+                            ItemGroup.findGroup(collected)
+                        }
                     }
                 }
             }
@@ -92,7 +102,11 @@ object CommandUtils {
         return grabbed.size to item
     }
 
-    fun itemTabComplete(start: String): List<String> = buildList {
+    fun itemTabComplete(
+        start: String,
+        validItems: (NeuInternalName) -> Boolean = { true },
+        aliases: Map<String, NeuInternalName> = NeuItems.commonItemAliases,
+    ): List<String> = buildList {
         if (start.isEmpty()) return@buildList
         val expected = when {
             namePattern.matches(start) -> NameSource.ITEM_NAME
@@ -126,17 +140,30 @@ object CommandUtils {
         }
 
         when (expected) {
-            NameSource.INTERNAL_NAME -> resultAdd(internalPattern, start, uppercaseStart, NeuItems::findInternalNameStartingWithWithoutNPCs)
-            NameSource.ITEM_NAME -> resultAdd(namePattern, start, lowercaseStart, NeuItems::findItemNameStartingWithWithoutNPCs)
+            NameSource.INTERNAL_NAME -> resultAdd(
+                internalPattern,
+                start,
+                uppercaseStart,
+                { NeuItems.findInternalNameStartingWithWithoutNPCs(it, validItems) },
+            )
+
+            NameSource.ITEM_NAME -> resultAdd(
+                namePattern,
+                start,
+                lowercaseStart,
+                { NeuItems.findItemNameStartingWithWithoutNPCs(it, validItems) },
+            )
+
             NameSource.GROUP -> resultAdd(groupPattern, start, uppercaseStart, ItemGroup::groupNameStartingWith)
             null -> {
                 val lastSpaceIndex = start.indexOfLast { it == ' ' } + 1
+                addAll(aliases.filter { it.key.startsWith(lowercaseStart) }.filter { validItems(it.value) }.keys)
                 addAll(ItemGroup.groupStartingWith(uppercaseStart).map { it.name.substring(lastSpaceIndex) })
-                addAll(NeuItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart).map { it.substring(lastSpaceIndex) })
+                addAll(NeuItems.findInternalNameStartingWithWithoutNPCs(uppercaseStart, validItems).map { it.substring(lastSpaceIndex) })
                 // 200 is here to limit the max amount of results since more than that can introduce performance issues for the client
                 if (size < 200) {
                     addAll(
-                        NeuItems.findItemNameStartingWithWithoutNPCs(lowercaseStart).map { result ->
+                        NeuItems.findItemNameStartingWithWithoutNPCs(lowercaseStart, validItems).map { result ->
                             result.substring(lastSpaceIndex).replace(" ", "_")
                         },
                     )

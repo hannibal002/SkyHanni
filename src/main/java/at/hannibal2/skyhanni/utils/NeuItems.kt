@@ -48,11 +48,13 @@ object NeuItems {
     private val itemIdCache = mutableMapOf<Item, List<NeuInternalName>>()
 
     var allItemsCache = mapOf<String, NeuInternalName>() // item name -> internal name
-    var itemNamesWithoutColor: NavigableMap<String, List<NeuInternalName>> = TreeMap()
+    var itemNamesWithoutColor: NavigableMap<String, NeuInternalName> = TreeMap()
 
     /** Keys are internal names as String */
     val allInternalNames: NavigableMap<String, NeuInternalName> = TreeMap()
     val ignoreItemsFilter = MultiFilter()
+
+    var commonItemAliases: Map<String, NeuInternalName> = emptyMap()
 
     private val fallbackItem by lazy {
         ItemUtils.createItemStack(
@@ -66,6 +68,8 @@ object NeuItems {
     fun onRepoReload(event: RepositoryReloadEvent) {
         val ignoredItems = event.getConstant<MultiFilterJson>("IgnoredItems")
         ignoreItemsFilter.load(ignoredItems)
+        val aliases = event.getConstant<Map<String, NeuInternalName>>("CommonItemAliases")
+        commonItemAliases = aliases
     }
 
     @HandleEvent
@@ -76,7 +80,7 @@ object NeuItems {
     fun readAllNeuItems() {
         allInternalNames.clear()
         val map = mutableMapOf<String, NeuInternalName>()
-        val noColor = TreeMap<String, MutableList<NeuInternalName>>()
+        val noColor = TreeMap<String, NeuInternalName>()
         for (rawInternalName in allNeuRepoItems().keys) {
             val internalName = rawInternalName.toInternalName()
             var name = internalName.getItemStackOrNull()?.displayName?.lowercase() ?: run {
@@ -103,13 +107,11 @@ object NeuItems {
             name.removeNonAscii().trim()
 
             map[name] = internalName
-            noColor.compute(name.removeColor()) { _, v ->
-                v?.apply { add(internalName) } ?: mutableListOf(internalName)
-            }
+            noColor[name.removeColor()] = internalName
             allInternalNames[rawInternalName] = internalName
         }
         @Suppress("UNCHECKED_CAST")
-        itemNamesWithoutColor = noColor as NavigableMap<String, List<NeuInternalName>>
+        itemNamesWithoutColor = noColor as NavigableMap<String, NeuInternalName>
         allItemsCache = map
     }
 
@@ -264,18 +266,17 @@ object NeuItems {
         return result
     }
 
-    fun findInternalNameStartingWithWithoutNPCs(prefix: String): List<String> =
-        findInternalNameStartingWith(prefix).filterNot { npcInternal.matches(it) }
-
-    fun findInternalNameStartingWith(prefix: String): Set<String> = StringUtils.subMapOfStringsStartingWith(prefix, allInternalNames).keys
+    fun findInternalNameStartingWithWithoutNPCs(prefix: String, valid: (NeuInternalName) -> Boolean): Set<String> =
+        StringUtils.subMapOfStringsStartingWith(prefix, allInternalNames).filterNot { npcInternal.matches(it.key) }
+            .filter { valid(it.value) }.keys
 
     private val npcName = ".*\\((?:(?:rift )?npc|monster|mayor)\\)".toPattern()
     private val npcInternal = ".*\\((?:(?:RIFT_)?NPC|MONSTER|MAYOR)\\)".toPattern()
 
-    fun findItemNameStartingWithWithoutNPCs(prefix: String): List<String> =
-        findItemNameStartingWith(prefix).filterNot { npcName.matches(it) }
+    fun findItemNameStartingWithWithoutNPCs(prefix: String, valid: (NeuInternalName) -> Boolean): Set<String> =
+        findItemNameStartingWith(prefix).filterNot { npcName.matches(it.key) }.filter { valid(it.value) }.keys
 
-    fun findItemNameStartingWith(prefix: String): Set<String> = StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor).keys
+    fun findItemNameStartingWith(prefix: String) = StringUtils.subMapOfStringsStartingWith(prefix, itemNamesWithoutColor)
 
     fun getPrimitiveMultiplier(internalName: NeuInternalName, tryCount: Int = 0): PrimitiveItemStack {
         multiplierCache[internalName]?.let { return it }
