@@ -1,677 +1,610 @@
-import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import javax.swing.JButton;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
-import javax.swing.SwingConstants;
-import javax.swing.UIManager;
-import javax.swing.WindowConstants;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Image;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.util.Locale;
-import java.util.Objects;
-import java.util.jar.JarFile;
-import java.util.regex.Pattern;
-import java.util.zip.ZipEntry;
+import java.awt.BorderLayout
+import java.awt.Color
+import java.awt.Cursor
+import java.awt.Desktop
+import java.awt.Dimension
+import java.awt.FlowLayout
+import java.awt.Font
+import java.awt.Image
+import java.awt.Rectangle
+import java.awt.Toolkit
+import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
+import java.awt.event.MouseEvent
+import java.awt.event.MouseListener
+import java.awt.image.BufferedImage
+import java.io.BufferedReader
+import java.io.File
+import java.io.IOException
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.io.PrintWriter
+import java.io.StringWriter
+import java.net.URI
+import java.net.URISyntaxException
+import java.nio.file.Files
+import java.util.Locale
+import java.util.jar.JarFile
+import java.util.regex.Pattern
+import java.util.zip.ZipEntry
+import javax.imageio.ImageIO
+import javax.swing.ImageIcon
+import javax.swing.JButton
+import javax.swing.JFileChooser
+import javax.swing.JFrame
+import javax.swing.JLabel
+import javax.swing.JOptionPane
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextArea
+import javax.swing.JTextField
+import javax.swing.SwingConstants
+import javax.swing.UIManager
+import javax.swing.WindowConstants
 
-public class SkyHanniInstallerFrame extends JFrame implements ActionListener, MouseListener {
-    private static final Pattern IN_MODS_SUBFOLDER = Pattern.compile("1\\.8\\.9[/\\\\]?$");
-    private static final int TOTAL_HEIGHT = 435;
-    private static final int TOTAL_WIDTH = 404;
-    private JLabel logo = null;
-    private JLabel versionInfo = null;
-    private JLabel labelFolder = null;
-    private JPanel panelCenter = null;
-    private JPanel panelBottom = null;
-    private JPanel totalContentPane = null;
-    private JTextArea descriptionText = null;
-    private JTextArea forgeDescriptionText = null;
-    private JTextField textFieldFolderLocation = null;
-    private JButton buttonChooseFolder = null;
-    private JButton buttonInstall = null;
-    private JButton buttonOpenFolder = null;
-    private JButton buttonClose = null;
-    private int x = 0;
-    private int y = 0;
+class SkyHanniInstallerFrame : JFrame(), ActionListener, MouseListener {
 
-    private int w = TOTAL_WIDTH;
-    private int h;
-    private int margin;
+    companion object {
+        private val IN_MODS_SUBFOLDER = Pattern.compile("1\\.8\\.9[/\\\\]?$")
+        private const val TOTAL_HEIGHT = 435
+        private const val TOTAL_WIDTH = 404
 
-    public SkyHanniInstallerFrame() {
-        try {
-            setName("SkyHanniInstallerFrame");
-            setTitle("SkyHanni Installer");
-            setResizable(false);
-            setSize(TOTAL_WIDTH, TOTAL_HEIGHT);
-            setContentPane(getPanelContentPane());
+        @JvmStatic
+        fun main(args: Array<String>) {
+            try {
+                UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
+                val frame = SkyHanniInstallerFrame()
+                frame.centerFrame(frame)
+                frame.isVisible = true
+            } catch (ex: Exception) {
+                showErrorPopup(ex)
+            }
+        }
 
-            getButtonFolder().addActionListener(this);
-            getButtonInstall().addActionListener(this);
-            getButtonOpenFolder().addActionListener(this);
-            getButtonClose().addActionListener(this);
-            getForgeTextArea().addMouseListener(this);
+        private fun getStacktraceText(ex: Throwable): String {
+            val sw = StringWriter()
+            ex.printStackTrace(PrintWriter(sw))
+            return sw.toString().replace("\t", "  ")
+        }
 
-            pack();
-            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-            getFieldFolder().setText(getModsFolder().getPath());
-            getButtonInstall().setEnabled(true);
-            getButtonInstall().requestFocus();
-        } catch (Exception ex) {
-            showErrorPopup(ex);
+        fun showErrorPopup(ex: Throwable) {
+            ex.printStackTrace()
+            val textArea = JTextArea(getStacktraceText(ex)).apply {
+                isEditable = false
+                font = Font(Font.MONOSPACED, font.style, font.size)
+            }
+            val errorScrollPane = JScrollPane(textArea).apply {
+                preferredSize = Dimension(600, 400)
+            }
+            JOptionPane.showMessageDialog(null, errorScrollPane, "Error", JOptionPane.ERROR_MESSAGE)
         }
     }
 
-    public static void main(String[] args) {
-        try {
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-            SkyHanniInstallerFrame frame = new SkyHanniInstallerFrame();
-            frame.centerFrame(frame);
-            frame.setVisible(true);
+    // UI Components
+    private var logo: JLabel? = null
+    private var versionInfo: JLabel? = null
+    private var labelFolder: JLabel? = null
+    private var panelCenter: JPanel? = null
+    private var panelBottom: JPanel? = null
+    private var totalContentPane: JPanel? = null
+    private var descriptionText: JTextArea? = null
+    private var forgeDescriptionText: JTextArea? = null
+    private var textFieldFolderLocation: JTextField? = null
+    private var buttonChooseFolder: JButton? = null
+    private var buttonInstall: JButton? = null
+    private var buttonOpenFolder: JButton? = null
+    private var buttonClose: JButton? = null
 
-        } catch (Exception ex) {
-            showErrorPopup(ex);
+    // Layout constants
+    private val margin = 5
+    private val frameWidth = TOTAL_WIDTH
+
+    // We'll compute each row's Y position sequentially.
+    private var rowY = 0
+
+    init {
+        try {
+            name = "SkyHanniInstallerFrame"
+            title = "SkyHanni Installer"
+            isResizable = false
+            setSize(TOTAL_WIDTH, TOTAL_HEIGHT)
+            contentPane = getPanelContentPane()
+
+            getButtonFolder().addActionListener(this)
+            getButtonInstall().addActionListener(this)
+            getButtonOpenFolder().addActionListener(this)
+            getButtonClose().addActionListener(this)
+            getForgeTextArea().addMouseListener(this)
+
+            pack()
+            defaultCloseOperation = WindowConstants.EXIT_ON_CLOSE
+
+            getFieldFolder().text = getModsFolder().path
+            getButtonInstall().isEnabled = true
+            getButtonInstall().requestFocus()
+        } catch (ex: Exception) {
+            showErrorPopup(ex)
         }
     }
 
-    private static String getStacktraceText(Throwable ex) {
-        StringWriter stringWriter = new StringWriter();
-        ex.printStackTrace(new PrintWriter(stringWriter));
-        return stringWriter.toString().replace("\t", "  ");
-    }
-
-    private static void showErrorPopup(Throwable ex) {
-        ex.printStackTrace();
-
-        JTextArea textArea = new JTextArea(getStacktraceText(ex));
-        textArea.setEditable(false);
-        Font currentFont = textArea.getFont();
-        Font newFont = new Font(Font.MONOSPACED, currentFont.getStyle(), currentFont.getSize());
-        textArea.setFont(newFont);
-
-        JScrollPane errorScrollPane = new JScrollPane(textArea);
-        errorScrollPane.setPreferredSize(new Dimension(600, 400));
-        JOptionPane.showMessageDialog(null, errorScrollPane, "Error", JOptionPane.ERROR_MESSAGE);
-    }
-
-    private JPanel getPanelContentPane() {
+    private fun getPanelContentPane(): JPanel {
         if (totalContentPane == null) {
             try {
-                totalContentPane = new JPanel();
-                totalContentPane.setName("PanelContentPane");
-                totalContentPane.setLayout(new BorderLayout(5, 5));
-                totalContentPane.setPreferredSize(new Dimension(TOTAL_WIDTH, TOTAL_HEIGHT));
-                totalContentPane.add(getPanelCenter(), "Center");
-                totalContentPane.add(getPanelBottom(), "South");
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                totalContentPane = JPanel().apply {
+                    name = "PanelContentPane"
+                    layout = BorderLayout(5, 5)
+                    preferredSize = Dimension(TOTAL_WIDTH, TOTAL_HEIGHT)
+                    add(getPanelCenter(), BorderLayout.CENTER)
+                    add(getPanelBottom(), BorderLayout.SOUTH)
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return totalContentPane;
+        return totalContentPane!!
     }
 
-    private JPanel getPanelCenter() {
+    private fun getPanelCenter(): JPanel {
         if (panelCenter == null) {
             try {
-                (panelCenter = new JPanel()).setName("PanelCenter");
-                panelCenter.setLayout(null);
-                panelCenter.add(getPictureLabel(), getPictureLabel().getName());
-                panelCenter.add(getVersionInfo(), getVersionInfo().getName());
-                panelCenter.add(getTextArea(), getTextArea().getName());
-                panelCenter.add(getForgeTextArea(), getForgeTextArea().getName());
-                panelCenter.add(getLabelFolder(), getLabelFolder().getName());
-                panelCenter.add(getFieldFolder(), getFieldFolder().getName());
-                panelCenter.add(getButtonFolder(), getButtonFolder().getName());
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                panelCenter = JPanel(null).apply { name = "PanelCenter" }
+                // Reset rowY before adding components.
+                rowY = 0
+                panelCenter!!.add(getPictureLabel())
+                panelCenter!!.add(getVersionInfo())
+                panelCenter!!.add(getTextArea())
+                panelCenter!!.add(getForgeTextArea())
+                panelCenter!!.add(getLabelFolder())
+                panelCenter!!.add(getFieldFolder())
+                panelCenter!!.add(getButtonFolder())
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return panelCenter;
+        return panelCenter!!
     }
 
-    private JLabel getPictureLabel() {
+    private fun getPictureLabel(): JLabel {
         if (logo == null) {
             try {
-                h = w / 2;
-                margin = 5;
-
-                BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("assets/skyhanni/logo.png"), "Logo not found."));
-                Image scaled = myPicture.getScaledInstance(w - margin * 2, h - margin, Image.SCALE_SMOOTH);
-                logo = new JLabel(new ImageIcon(scaled));
-                logo.setName("Logo");
-                logo.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
-                logo.setFont(new Font(Font.DIALOG, Font.BOLD, 18));
-                logo.setHorizontalAlignment(SwingConstants.CENTER);
-                logo.setPreferredSize(new Dimension(h * 742 / 537, h));
-
-                y += h;
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                val picHeight = frameWidth / 2
+                val resource = javaClass.classLoader.getResourceAsStream("assets/skyhanni/logo.png")
+                    ?: throw Exception("Logo not found.")
+                val myPicture: BufferedImage = ImageIO.read(resource)
+                val scaled = myPicture.getScaledInstance(frameWidth - margin * 2, picHeight - margin, Image.SCALE_SMOOTH)
+                logo = JLabel(ImageIcon(scaled)).apply {
+                    name = "Logo"
+                    setBounds(margin, rowY + margin, frameWidth - margin * 2, picHeight - margin)
+                    font = Font(Font.DIALOG, Font.BOLD, 18)
+                    horizontalAlignment = SwingConstants.CENTER
+                    preferredSize = Dimension(picHeight * 742 / 537, picHeight)
+                }
+                rowY += picHeight // move rowY below the image
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return logo;
+        return logo!!
     }
 
-    private JLabel getVersionInfo() {
+    private fun getVersionInfo(): JLabel {
         if (versionInfo == null) {
             try {
-                h = 25;
-
-                versionInfo = new JLabel();
-                versionInfo.setName("LabelMcVersion");
-                versionInfo.setBounds(x, y, w, h);
-                versionInfo.setFont(new Font(Font.DIALOG, Font.BOLD, 14));
-                versionInfo.setHorizontalAlignment(SwingConstants.CENTER);
-                versionInfo.setPreferredSize(new Dimension(w, h));
-                versionInfo.setText("SkyHanni by hannibal2, Installer by Biscuit");
-
-                y += h;
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                val compHeight = 25
+                versionInfo = JLabel().apply {
+                    name = "LabelMcVersion"
+                    setBounds(0, rowY, frameWidth, compHeight)
+                    font = Font(Font.DIALOG, Font.BOLD, 14)
+                    horizontalAlignment = SwingConstants.CENTER
+                    preferredSize = Dimension(frameWidth, compHeight)
+                    text = "SkyHanni by hannibal2, Installer by Biscuit"
+                }
+                rowY += compHeight
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return versionInfo;
+        return versionInfo!!
     }
 
-    private JTextArea getTextArea() {
+    private fun getTextArea(): JTextArea {
         if (descriptionText == null) {
             try {
-                h = 60;
-                margin = 10;
-
-                descriptionText = new JTextArea();
-                descriptionText.setName("TextArea");
-                setStandardFormatting(descriptionText);
-                descriptionText.setText(
-                    "This installer will copy SkyHanni into your forge mods folder for you, and replace any old versions that already exist. " +
-                        "Close this if you prefer to do this yourself!");
-                descriptionText.setWrapStyleWord(true);
-
-                y += h;
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                val compHeight = 60
+                descriptionText = JTextArea().apply {
+                    name = "TextArea"
+                    setStandardFormatting(this, compHeight)
+                    text = ("This installer will copy SkyHanni into your forge mods folder for you, " +
+                        "and replace any old versions that already exist. Close this if you prefer to do this yourself!")
+                    wrapStyleWord = true
+                }
+                rowY += compHeight
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return descriptionText;
+        return descriptionText!!
     }
 
-    private void setStandardFormatting(JTextArea descriptionText) {
-        descriptionText.setBounds(x + margin, y + margin, w - margin * 2, h - margin);
-        descriptionText.setEditable(false);
-        descriptionText.setHighlighter(null);
-        descriptionText.setEnabled(true);
-        descriptionText.setFont(new Font(Font.DIALOG, Font.PLAIN, 12));
-        descriptionText.setLineWrap(true);
-        descriptionText.setOpaque(false);
-        descriptionText.setPreferredSize(new Dimension(w - margin * 2, h - margin));
+    // Updated setStandardFormatting now takes the component height and uses the helper variable "margin"
+    private fun setStandardFormatting(textArea: JTextArea, compHeight: Int) {
+        val m = this@SkyHanniInstallerFrame.margin
+        textArea.apply {
+            setBounds(m, rowY + m, frameWidth - m * 2, compHeight - m)
+            isEditable = false
+            highlighter = null
+            isEnabled = true
+            font = Font(Font.DIALOG, Font.PLAIN, 12)
+            lineWrap = true
+            isOpaque = false
+            preferredSize = Dimension(frameWidth - m * 2, compHeight - m)
+        }
     }
 
-    private JTextArea getForgeTextArea() {
+    private fun getForgeTextArea(): JTextArea {
         if (forgeDescriptionText == null) {
             try {
-                h = 55;
-                margin = 10;
-
-                forgeDescriptionText = new JTextArea();
-                forgeDescriptionText.setName("TextAreaForge");
-                setStandardFormatting(forgeDescriptionText);
-                forgeDescriptionText.setText(
-                    "However, you still need to install Forge client in order to be able to run this mod. Click here to visit the download page for Forge 1.8.9!");
-                forgeDescriptionText.setForeground(Color.BLUE.darker());
-                forgeDescriptionText.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-                forgeDescriptionText.setWrapStyleWord(true);
-
-                y += h;
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                val compHeight = 55
+                forgeDescriptionText = JTextArea().apply {
+                    name = "TextAreaForge"
+                    setStandardFormatting(this, compHeight)
+                    text = ("However, you still need to install Forge client in order to be able to run this mod. " +
+                        "Click here to visit the download page for Forge 1.8.9!")
+                    foreground = Color.BLUE.darker()
+                    cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
+                    wrapStyleWord = true
+                }
+                rowY += compHeight
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return forgeDescriptionText;
+        return forgeDescriptionText!!
     }
 
-    private JLabel getLabelFolder() {
+    private fun getLabelFolder(): JLabel {
         if (labelFolder == null) {
-            h = 16;
-            w = 65;
-
-            x += 10; // Padding
-
             try {
-                labelFolder = new JLabel();
-                labelFolder.setName("LabelFolder");
-                labelFolder.setBounds(x, y + 2, w, h);
-                labelFolder.setPreferredSize(new Dimension(w, h));
-                labelFolder.setText("Mods Folder");
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                val compHeight = 16
+                // Use a local x offset for this row.
+                val xPos = 10
+                labelFolder = JLabel().apply {
+                    name = "LabelFolder"
+                    setBounds(xPos, rowY + 2, 65, compHeight)
+                    preferredSize = Dimension(65, compHeight)
+                    text = "Mods Folder"
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
-
-            x += w;
         }
-        return labelFolder;
+        return labelFolder!!
     }
 
-    private JTextField getFieldFolder() {
+    private fun getFieldFolder(): JTextField {
         if (textFieldFolderLocation == null) {
-            h = 20;
-            w = 287;
-
             try {
-                textFieldFolderLocation = new JTextField();
-                textFieldFolderLocation.setName("FieldFolder");
-                textFieldFolderLocation.setBounds(x, y, w, h);
-                textFieldFolderLocation.setEditable(false);
-                textFieldFolderLocation.setPreferredSize(new Dimension(w, h));
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                val compHeight = 20
+                // Position next to label.
+                val xPos = 10 + 65
+                textFieldFolderLocation = JTextField().apply {
+                    name = "FieldFolder"
+                    setBounds(xPos, rowY, 287, compHeight)
+                    isEditable = false
+                    preferredSize = Dimension(287, compHeight)
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
-
-            x += w;
         }
-        return textFieldFolderLocation;
+        return textFieldFolderLocation!!
     }
 
-    private JButton getButtonFolder() {
+    private fun getButtonFolder(): JButton {
         if (buttonChooseFolder == null) {
-            h = 20;
-            w = 25;
-
-            x += 10; // Padding
-
             try {
-                BufferedImage myPicture = ImageIO.read(Objects.requireNonNull(getClass()
-                    .getClassLoader()
-                    .getResourceAsStream("assets/skyhanni/folder.png"), "Folder icon not found."));
-                Image scaled = myPicture.getScaledInstance(w - 8, h - 6, Image.SCALE_SMOOTH);
-                buttonChooseFolder = new JButton(new ImageIcon(scaled));
-                buttonChooseFolder.setName("ButtonFolder");
-                buttonChooseFolder.setBounds(x, y, w, h);
-                buttonChooseFolder.setPreferredSize(new Dimension(w, h));
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                val compHeight = 20
+                // Position after folder text field
+                val xPos = 10 + 65 + 287 + 10
+                val resource = javaClass.classLoader.getResourceAsStream("assets/skyhanni/folder.png")
+                    ?: throw Exception("Folder icon not found.")
+                val myPicture = ImageIO.read(resource)
+                val scaled = myPicture.getScaledInstance(25 - 8, compHeight - 6, Image.SCALE_SMOOTH)
+                buttonChooseFolder = JButton(ImageIcon(scaled)).apply {
+                    name = "ButtonFolder"
+                    setBounds(xPos, rowY, 25, compHeight)
+                    preferredSize = Dimension(25, compHeight)
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return buttonChooseFolder;
+        return buttonChooseFolder!!
     }
 
-    private JPanel getPanelBottom() {
+    private fun getPanelBottom(): JPanel {
         if (panelBottom == null) {
             try {
-                panelBottom = new JPanel();
-                panelBottom.setName("PanelBottom");
-                panelBottom.setLayout(new FlowLayout(FlowLayout.CENTER, 15, 10));
-                panelBottom.setPreferredSize(new Dimension(390, 55));
-                panelBottom.add(getButtonInstall(), getButtonInstall().getName());
-                panelBottom.add(getButtonOpenFolder(), getButtonOpenFolder().getName());
-                panelBottom.add(getButtonClose(), getButtonClose().getName());
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                panelBottom = JPanel(FlowLayout(FlowLayout.CENTER, 15, 10)).apply {
+                    name = "PanelBottom"
+                    preferredSize = Dimension(390, 55)
+                    add(getButtonInstall())
+                    add(getButtonOpenFolder())
+                    add(getButtonClose())
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return panelBottom;
+        return panelBottom!!
     }
 
-    private JButton getButtonInstall() {
+    private fun getButtonInstall(): JButton {
         if (buttonInstall == null) {
-            w = 100;
-            h = 26;
-
             try {
-                buttonInstall = new JButton();
-                buttonInstall.setName("ButtonInstall");
-                buttonInstall.setPreferredSize(new Dimension(w, h));
-                buttonInstall.setText("Install");
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                buttonInstall = JButton("Install").apply {
+                    name = "ButtonInstall"
+                    preferredSize = Dimension(100, 26)
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return buttonInstall;
+        return buttonInstall!!
     }
 
-    private JButton getButtonOpenFolder() {
+    private fun getButtonOpenFolder(): JButton {
         if (buttonOpenFolder == null) {
-            w = 130;
-            h = 26;
-
             try {
-                buttonOpenFolder = new JButton();
-                buttonOpenFolder.setName("ButtonOpenFolder");
-                buttonOpenFolder.setPreferredSize(new Dimension(w, h));
-                buttonOpenFolder.setText("Open Mods Folder");
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                buttonOpenFolder = JButton("Open Mods Folder").apply {
+                    name = "ButtonOpenFolder"
+                    preferredSize = Dimension(130, 26)
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return buttonOpenFolder;
+        return buttonOpenFolder!!
     }
 
-    private JButton getButtonClose() {
+    private fun getButtonClose(): JButton {
         if (buttonClose == null) {
-            w = 100;
-            h = 26;
-
             try {
-                (buttonClose = new JButton()).setName("ButtonClose");
-                buttonClose.setPreferredSize(new Dimension(w, h));
-                buttonClose.setText("Cancel");
-            } catch (Throwable ivjExc) {
-                showErrorPopup(ivjExc);
+                buttonClose = JButton("Cancel").apply {
+                    name = "ButtonClose"
+                    preferredSize = Dimension(100, 26)
+                }
+            } catch (ivjExc: Throwable) {
+                showErrorPopup(ivjExc)
             }
         }
-        return buttonClose;
+        return buttonClose!!
     }
 
-    public void onFolderSelect() {
-        File currentDirectory = new File(getFieldFolder().getText());
-
-        JFileChooser jFileChooser = new JFileChooser(currentDirectory);
-        jFileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        jFileChooser.setAcceptAllFileFilterUsed(false);
-        if (jFileChooser.showOpenDialog(this) == 0) {
-            File newDirectory = jFileChooser.getSelectedFile();
-            getFieldFolder().setText(newDirectory.getPath());
+    fun onFolderSelect() {
+        val currentDirectory = File(getFieldFolder().text)
+        val jFileChooser = JFileChooser(currentDirectory).apply {
+            fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
+            isAcceptAllFileFilterUsed = false
         }
-    }
-
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        if (e.getSource() == getButtonClose()) {
-            dispose();
-            System.exit(0);
-        }
-        if (e.getSource() == getButtonFolder()) {
-            onFolderSelect();
-        }
-        if (e.getSource() == getButtonInstall()) {
-            onInstall();
-        }
-        if (e.getSource() == getButtonOpenFolder()) {
-            onOpenFolder();
+        if (jFileChooser.showOpenDialog(this) == JFileChooser.APPROVE_OPTION) {
+            val newDirectory = jFileChooser.selectedFile
+            getFieldFolder().text = newDirectory.path
         }
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        if (e.getSource() == getForgeTextArea()) {
+    override fun actionPerformed(e: ActionEvent) {
+        when (e.source) {
+            getButtonClose() -> {
+                dispose()
+                System.exit(0)
+            }
+            getButtonFolder() -> onFolderSelect()
+            getButtonInstall() -> onInstall()
+            getButtonOpenFolder() -> onOpenFolder()
+        }
+    }
+
+    override fun mouseClicked(e: MouseEvent) {
+        if (e.source == getForgeTextArea()) {
             try {
-                Desktop.getDesktop().browse(new URI(
-                    "https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"));
-            } catch (IOException | URISyntaxException ex) {
-                showErrorPopup(ex);
+                Desktop.getDesktop().browse(URI("https://files.minecraftforge.net/maven/net/minecraftforge/forge/index_1.8.9.html"))
+            } catch (ex: IOException) {
+                showErrorPopup(ex)
+            } catch (ex: URISyntaxException) {
+                showErrorPopup(ex)
             }
         }
     }
 
-    public void onInstall() {
+    fun onInstall() {
         try {
-            File modsFolder = new File(getFieldFolder().getText());
-            if (!modsFolder.exists()) {
-                showErrorMessage("Folder not found: " + modsFolder.getPath());
-                return;
+            val modsFolder = File(getFieldFolder().text)
+            when {
+                !modsFolder.exists() -> {
+                    showErrorMessage("Folder not found: ${modsFolder.path}")
+                    return
+                }
+                !modsFolder.isDirectory -> {
+                    showErrorMessage("Not a folder: ${modsFolder.path}")
+                    return
+                }
             }
-            if (!modsFolder.isDirectory()) {
-                showErrorMessage("Not a folder: " + modsFolder.getPath());
-                return;
-            }
-            tryInstall(modsFolder);
-        } catch (Exception e) {
-            showErrorPopup(e);
+            tryInstall(modsFolder)
+        } catch (e: Exception) {
+            showErrorPopup(e)
         }
     }
 
-    private void tryInstall(File modsFolder) {
-        File thisFile = getThisFile();
+    private fun tryInstall(modsFolder: File) {
+        val thisFile = getThisFile() ?: return
+        val inSubFolder = IN_MODS_SUBFOLDER.matcher(modsFolder.path).find()
+        var deletingFailure = false
 
-        if (thisFile != null) {
-            boolean inSubFolder = IN_MODS_SUBFOLDER.matcher(modsFolder.getPath()).find();
-
-            boolean deletingFailure = false;
-            if (modsFolder.isDirectory()) { // Delete in this current folder.
-                boolean failed = findSkyHanniAndDelete(modsFolder.listFiles());
-                if (failed) deletingFailure = true;
-            }
-            if (inSubFolder) { // We are in the 1.8.9 folder, delete in the parent folder as well.
-                if (modsFolder.getParentFile().isDirectory()) {
-                    boolean failed = findSkyHanniAndDelete(modsFolder.getParentFile().listFiles());
-                    if (failed) deletingFailure = true;
-                }
-            } else { // We are in the main mods folder, but the 1.8.9 subfolder exists... delete in there too.
-                File subFolder = new File(modsFolder, "1.8.9");
-                if (subFolder.exists() && subFolder.isDirectory()) {
-                    boolean failed = findSkyHanniAndDelete(subFolder.listFiles());
-                    if (failed) deletingFailure = true;
-                }
-            }
-
-            if (deletingFailure) return;
-
-            if (thisFile.isDirectory()) {
-                showErrorMessage("This file is a directory... Are we in a development environment?");
-                return;
-            }
-
-            try {
-                Files.copy(thisFile.toPath(), new File(modsFolder, thisFile.getName()).toPath());
-            } catch (Exception ex) {
-                showErrorPopup(ex);
-                return;
-            }
-
-            showMessage("SkyHanni has been successfully installed into your mods folder.");
-            dispose();
-            System.exit(0);
+        if (modsFolder.isDirectory) {
+            if (findSkyHanniAndDelete(modsFolder.listFiles()) == true) deletingFailure = true
         }
+        if (inSubFolder) {
+            val parent = modsFolder.parentFile
+            if (parent.isDirectory) {
+                if (findSkyHanniAndDelete(parent.listFiles()) == true) deletingFailure = true
+            }
+        } else {
+            val subFolder = File(modsFolder, "1.8.9")
+            if (subFolder.exists() && subFolder.isDirectory) {
+                if (findSkyHanniAndDelete(subFolder.listFiles()) == true) deletingFailure = true
+            }
+        }
+
+        if (deletingFailure) return
+
+        if (thisFile.isDirectory) {
+            showErrorMessage("This file is a directory... Are we in a development environment?")
+            return
+        }
+
+        try {
+            Files.copy(thisFile.toPath(), File(modsFolder, thisFile.name).toPath())
+        } catch (ex: Exception) {
+            showErrorPopup(ex)
+            return
+        }
+
+        showMessage("SkyHanni has been successfully installed into your mods folder.")
+        dispose()
+        System.exit(0)
     }
 
-    private boolean findSkyHanniAndDelete(File[] files) {
-        if (files == null) return false;
-
-        for (File file : files) {
-            if (!file.isDirectory() && file.getPath().endsWith(".jar")) {
+    private fun findSkyHanniAndDelete(files: Array<File>?): Boolean? {
+        if (files == null) return false
+        for (file in files) {
+            if (!file.isDirectory && file.path.endsWith(".jar")) {
                 try {
-                    JarFile jarFile = new JarFile(file);
-                    ZipEntry mcModInfo = jarFile.getEntry("mcmod.info");
-                    if (mcModInfo != null) {
-                        InputStream inputStream = jarFile.getInputStream(mcModInfo);
-                        String modID = getModIDFromInputStream(inputStream);
-                        if (modID.equals("SkyHanni")) {
-                            jarFile.close();
-                            try {
-                                boolean deleted = file.delete();
-                                if (!deleted) {
-                                    throw new Exception();
+                    JarFile(file).use { jarFile ->
+                        val mcModInfo: ZipEntry? = jarFile.getEntry("mcmod.info")
+                        if (mcModInfo != null) {
+                            jarFile.getInputStream(mcModInfo).use { inputStream ->
+                                val modID = getModIDFromInputStream(inputStream)
+                                if (modID == "SkyHanni") {
+                                    if (!file.delete()) {
+                                        showErrorMessage(
+                                            "Was not able to delete the other SkyHanni files found in your mods folder!" +
+                                                System.lineSeparator() +
+                                                "Please make sure that your minecraft is currently closed and try again, or feel" +
+                                                System.lineSeparator() +
+                                                "free to open your mods folder and delete those files manually."
+                                        )
+                                        return true
+                                    }
                                 }
-                            } catch (Exception ex) {
-                                ex.printStackTrace();
-                                showErrorMessage("Was not able to delete the other SkyHanni files found in your mods folder!" +
-                                    System.lineSeparator() +
-                                    "Please make sure that your minecraft is currently closed and try again, or feel" +
-                                    System.lineSeparator() +
-                                    "free to open your mods folder and delete those files manually.");
-                                return true;
                             }
-                            continue;
                         }
                     }
-                    jarFile.close();
-                } catch (Exception ex) {
-                    // Just don't check the file I guess, move on to the next...
+                } catch (ex: Exception) {
+                    // Skip file
                 }
             }
         }
-        return false;
+        return false
     }
 
-    public void onOpenFolder() {
+    fun onOpenFolder() {
         try {
-            Desktop.getDesktop().open(getModsFolder());
-        } catch (Exception e) {
-            showErrorPopup(e);
+            Desktop.getDesktop().open(getModsFolder())
+        } catch (e: Exception) {
+            showErrorPopup(e)
         }
     }
 
-    public File getModsFolder() {
-        String userHome = System.getProperty("user.home", ".");
-
-        File modsFolder = getFile(userHome, "minecraft/mods/1.8.9");
+    fun getModsFolder(): File {
+        val userHome = System.getProperty("user.home", ".")
+        var modsFolder = getFile(userHome, "minecraft/mods/1.8.9")
         if (!modsFolder.exists()) {
-            modsFolder = getFile(userHome, "minecraft/mods");
+            modsFolder = getFile(userHome, "minecraft/mods")
         }
-
         if (!modsFolder.exists() && !modsFolder.mkdirs()) {
-            throw new RuntimeException("The working directory could not be created: " + modsFolder);
+            throw RuntimeException("The working directory could not be created: $modsFolder")
         }
-        return modsFolder;
+        return modsFolder
     }
 
-    public File getFile(String userHome, String minecraftPath) {
-        File workingDirectory;
-        switch (getOperatingSystem()) {
-            case LINUX:
-            case SOLARIS: {
-                workingDirectory = new File(userHome, '.' + minecraftPath + '/');
-                break;
+    fun getFile(userHome: String, minecraftPath: String): File {
+        val workingDirectory: File = when (getOperatingSystem()) {
+            OperatingSystem.LINUX, OperatingSystem.SOLARIS ->
+                File(userHome, ".$minecraftPath/")
+            OperatingSystem.WINDOWS -> {
+                val appData = System.getenv("APPDATA")
+                if (appData != null) File(appData, ".$minecraftPath/") else File(userHome, ".$minecraftPath/")
             }
-            case WINDOWS: {
-                String applicationData = System.getenv("APPDATA");
-                if (applicationData != null) {
-                    workingDirectory = new File(applicationData, "." + minecraftPath + '/');
-                    break;
-                }
-                workingDirectory = new File(userHome, '.' + minecraftPath + '/');
-                break;
-            }
-            case MACOS: {
-                workingDirectory = new File(userHome, "Library/Application Support/" + minecraftPath);
-                break;
-            }
-            default: {
-                workingDirectory = new File(userHome, minecraftPath + '/');
-                break;
-            }
+            OperatingSystem.MACOS ->
+                File(userHome, "Library/Application Support/$minecraftPath")
+            else -> File(userHome, "$minecraftPath/")
         }
-        return workingDirectory;
+        return workingDirectory
     }
 
-    public OperatingSystem getOperatingSystem() {
-        String osName = System.getProperty("os.name").toLowerCase(Locale.US);
-        if (osName.contains("win")) {
-            return OperatingSystem.WINDOWS;
-
-        } else if (osName.contains("mac")) {
-            return OperatingSystem.MACOS;
-
-        } else if (osName.contains("solaris") || osName.contains("sunos")) {
-
-            return OperatingSystem.SOLARIS;
-        } else if (osName.contains("linux") || osName.contains("unix")) {
-
-            return OperatingSystem.LINUX;
+    fun getOperatingSystem(): OperatingSystem {
+        val osName = System.getProperty("os.name").toLowerCase(Locale.US)
+        return when {
+            osName.contains("win") -> OperatingSystem.WINDOWS
+            osName.contains("mac") -> OperatingSystem.MACOS
+            osName.contains("solaris") || osName.contains("sunos") -> OperatingSystem.SOLARIS
+            osName.contains("linux") || osName.contains("unix") -> OperatingSystem.LINUX
+            else -> OperatingSystem.UNKNOWN
         }
-        return OperatingSystem.UNKNOWN;
     }
 
-    public void centerFrame(JFrame frame) {
-        Rectangle rectangle = frame.getBounds();
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Rectangle screenRectangle = new Rectangle(0, 0, screenSize.width, screenSize.height);
-
-        int newX = screenRectangle.x + (screenRectangle.width - rectangle.width) / 2;
-        int newY = screenRectangle.y + (screenRectangle.height - rectangle.height) / 2;
-
-        if (newX < 0) newX = 0;
-        if (newY < 0) newY = 0;
-
-        frame.setBounds(newX, newY, rectangle.width, rectangle.height);
+    fun centerFrame(frame: JFrame) {
+        val rectangle = frame.bounds
+        val screenSize = Toolkit.getDefaultToolkit().screenSize
+        val screenRectangle = Rectangle(0, 0, screenSize.width, screenSize.height)
+        var newX = screenRectangle.x + (screenRectangle.width - rectangle.width) / 2
+        var newY = screenRectangle.y + (screenRectangle.height - rectangle.height) / 2
+        if (newX < 0) newX = 0
+        if (newY < 0) newY = 0
+        frame.setBounds(newX, newY, rectangle.width, rectangle.height)
     }
 
-    public void showMessage(String message) {
-        JOptionPane.showMessageDialog(null, message, "SkyHanni", JOptionPane.INFORMATION_MESSAGE);
+    fun showMessage(message: String) {
+        JOptionPane.showMessageDialog(null, message, "SkyHanni", JOptionPane.INFORMATION_MESSAGE)
     }
 
-    public void showErrorMessage(String message) {
-        JOptionPane.showMessageDialog(null, message, "SkyHanni - Error", JOptionPane.ERROR_MESSAGE);
+    fun showErrorMessage(message: String) {
+        JOptionPane.showMessageDialog(null, message, "SkyHanni - Error", JOptionPane.ERROR_MESSAGE)
     }
 
-    private String getModIDFromInputStream(InputStream inputStream) {
-        String version = "";
+    private fun getModIDFromInputStream(inputStream: InputStream): String {
+        var version = ""
         try {
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-            while ((version = bufferedReader.readLine()) != null) {
-                if (version.contains("\"modid\": \"")) {
-                    version = version.split(Pattern.quote("\"modid\": \""))[1];
-                    version = version.substring(0, version.length() - 2);
-                    break;
+            BufferedReader(InputStreamReader(inputStream)).use { bufferedReader ->
+                while (bufferedReader.readLine().also { version = it } != null) {
+                    if (version.contains("\"modid\": \"")) {
+                        version = version.split("\"modid\": \"")[1].dropLast(2)
+                        break
+                    }
                 }
             }
-        } catch (Exception ex) {
-            // RIP, couldn't find the modid...
+        } catch (ex: Exception) {
+            // Couldn't find modid
         }
-        return version;
+        return version
     }
 
-    private File getThisFile() {
-        try {
-            return new File(SkyHanniInstallerFrame.class
-                .getProtectionDomain()
-                .getCodeSource()
-                .getLocation()
-                .toURI());
-        } catch (URISyntaxException ex) {
-            showErrorPopup(ex);
+    private fun getThisFile(): File? {
+        return try {
+            File(javaClass.protectionDomain.codeSource.location.toURI())
+        } catch (ex: URISyntaxException) {
+            showErrorPopup(ex)
+            null
         }
-        return null;
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-    }
+    override fun mousePressed(e: MouseEvent) {}
+    override fun mouseReleased(e: MouseEvent) {}
+    override fun mouseEntered(e: MouseEvent) {}
+    override fun mouseExited(e: MouseEvent) {}
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    public enum OperatingSystem {
+    enum class OperatingSystem {
         LINUX,
         SOLARIS,
         WINDOWS,
